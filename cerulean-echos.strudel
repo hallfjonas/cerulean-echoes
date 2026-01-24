@@ -1,0 +1,9 @@
+
+
+stack(
+  // dumpfer bass
+  s("bd * 4").bank("tr909").dec(0.9).lpf(60).attack(0.2).room(2.0),
+
+  // schnelle hi-hat
+  s("hh * 4").bank("tr909").dec(4.0).gain(0.3).lpf(12000).hpf(6000).room(0.2).delay("<0.5 0 0.125 0>")
+)
