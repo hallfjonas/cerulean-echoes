@@ -1,0 +1,27 @@
+// sounds
+const bd = s("bd ~ bd ~").bank("tr909")
+  .dec(0.6)
+  .lpf(70)
+  .gain(0.9)
+  .room(1.5)
+
+const sd = s("~ sd ~ ~").bank("tr909")
+  .dec(0.4)
+  .lpf(2000)
+  .gain(0.3)
+  .room(2.5)
+
+const hh = s("~ hh ~ hh").bank("tr909")
+  .dec(1.2)
+  .hpf(8000)
+  .lpf(12000)
+  .gain(0.05)
+  .delay("<0 0.25>")
+  .room(0.3)
+
+// scene
+stack(
+  bd,
+  sd,
+  hh
+)
