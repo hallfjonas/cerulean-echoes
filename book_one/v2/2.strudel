@@ -1,0 +1,53 @@
+// ╔═══════════════════════════════════════════════════════════════════════╗
+// ║ CHAPTER 2: PLAYFUL ESCAPE (15-Minute Techno Festival Extended Scene)║
+// ║ Tempo: 126 CPM | Key: C Minor                                         ║
+// ╚═══════════════════════════════════════════════════════════════════════╝
+
+setcpm(126/4)
+
+// Stem 1 / Orbit 0: Mainstage 909 Kick Drum (Fader 1)
+const stem1_kick = s("bd * 4").bank("RolandTR909")
+  .lpf(140).decay(0.34).gain(0.88)
+  .orbit(0)
+
+// Stem 2 / Orbit 1: Driving Staccato Rolling Bassline (Fader 2)
+const stem2_bass = note("<[c2 c2 ~ c2] [c2 eb2 ~ c2] [c2 c2 ~ g1] [c2 eb2 ~ d2]>*2")
+  .s("sawtooth")
+  .lpf(sine.range(280, 520).slow(16)) // Dynamic filter expansion
+  .lpq(5.5)
+  .decay(0.15).sustain(0)
+  .gain(0.55)
+  .orbit(1)
+
+// Stem 3 / Orbit 2: Hypnotic Festival Chord Stabs (Fader 3)
+const stem3_stab = chord("<Cm7 ~ Cm7 ~> <Fm7 ~ Cm7 ~> <Ab^7 ~ Fm7 ~> <Cm7 ~ Bb ~>")
+  .voicing()
+  .s("sawtooth")
+  .lpf(sine.range(800, 3200).slow(32)).lpq(4) // 32-cycle macro filter sweep
+  .decay(0.18).sustain(0)
+  .room(0.45).roomsize(0.65)
+  .delay(0.25).delaytime(0.375).delayfeedback(0.38)
+  .gain(0.34)
+  .orbit(2)
+
+// Stem 4 / Orbit 3: Off-Beat Kinetic Hi-Hats & Shimmers (Fader 4)
+const stem4_hats = stack(
+  s("hh*8").bank("RolandTR909")
+    .gain("<0.2 0.55 0.28 0.68>")
+    .hpf(5500)
+    .swingBy(1/6, 4),
+  s("sh*16").bank("RolandTR909")
+    .gain(sine.range(0.05, 0.18).slow(8))
+    .hpf(7000)
+    .pan(sine.range(0.2, 0.8).slow(4))
+)
+.orbit(3)
+
+
+// Master Stack
+stack(
+  stem1_kick,
+  stem2_bass,
+  stem3_stab,
+  stem4_hats
+)

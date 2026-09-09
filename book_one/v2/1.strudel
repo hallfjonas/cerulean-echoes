@@ -1,0 +1,124 @@
+
+// FINAL VERDICT HERE:
+// - 1. Some nice tunes in here.
+// - 2. Some nice intro, nice build up
+// - 3. Needs some work in the transitions
+// - 4. Bassline is still too much circus
+// - 5. Need to make sure that Chapter 1 stays honest to its mood (Frozen Stillness) before jumping into the Playfull escape. IT DOESN'T NEED TO BE 15 minutes. But maybe 5-7.
+// - 6. Some technical issues with the fade-in which causes a lot of fade out. It's sometimes nice, but it's a bit too much here.
+// - 7. 2_playful_escape.strudel has a slightly different variation of the grove in second part in 1/2.strudel. BOTH ARE NICE!
+// - 8. Unfold music from bottom up
+
+// ╔═══════════════════════════════════════════════════════════════════════╗
+// ║ BOOK ONE: CHAPTERS 1 & 2 (LINEAR HOLD FADES & BOTTOM-TO-TOP FLOW)     ║
+// ║ Flow: Ultra-slow Intro -> Linear Fades -> Strip Reso -> Stab -> DROP   ║
+// ╚═══════════════════════════════════════════════════════════════════════╝
+
+setcpm(126/4) // Base tempo [1]
+
+// =========================================================================
+// SECTION 1: STEM DEFINITIONS
+// =========================================================================
+
+// --- CHAPTER 1: ISOLATION STEMS ---
+const ch1_sub = note("c1 ~ <~ c1> ~").s("sine")
+  .penv(14).pdecay(0.04).decay(0.9).sustain(0)
+  .lpf(70)
+  .gain(saw.range(0, 0.85).slow(16))
+  .orbit(0)
+
+// Glacial Pad: Time convergence with .clip(1) to cut tails cleanly on step change
+const ch1_pad = note("<[c2, g2, d3] [c2, eb2, bb3] [f2, c3, g3] [c2, g2, d3]>")
+  .s("sawtooth").lpf(sine.range(160, 480).slow(32))
+  .slow(saw.range(8, 1).slow(32))
+  .attack(2.0).release(1.0).clip(1)
+  .room(0.5).gain(0.4)
+
+// Ice Resonances: Ultra-slow entry & 32-cycle volume fade
+const ch1_resonances = note("<[~ g5] ~ [~ eb6] ~ [bb5 ~] ~ [~ c6]>")
+  .s("sine").decay(0.22).sustain(0)
+  .slow(saw.range(4, 1.5).slow(32))
+  .delay(0.65).delaytime(0.375).delayfeedback(0.65)
+  .degradeBy(sine.range(0.2, 0.6).slow(16))
+  .gain(saw.range(0, 0.22).slow(32))
+  .room(0.75).orbit(2)
+
+const ch1_crackle = s("crackle*8").degradeBy(0.45)
+  .hpf(7500).pan(sine.range(0.15, 0.85).slow(12))
+  .gain(0.14).orbit(3)
+
+// --- CHAPTER 2: TECHNO STEMS ---
+// Hi-Hats: Linear HPF & volume swell that holds at full volume (!128)
+const ch2_hats = stack(
+  s("hh*8").bank("RolandTR909")
+    .gain("<0 0.12 0.25 0.38 0.5 0.62 0.68!128>")
+    .hpf("<12000 10500 9000 7500 6000 5500!128>")
+    .swingBy(1/6, 4),
+  s("sh*16") // Standard shaker sample (prevents RolandTR909_sh sample error)
+    .gain(sine.range(0.0, 0.18).slow(8))
+    .hpf(7000).pan(sine.range(0.2, 0.8).slow(4))
+).orbit(3)
+
+// Kick Drum: Linear LPF sweep & volume swell that holds at 0.88 (!128)
+const ch2_kick = s("bd * 4").bank("RolandTR909")
+  .lpf("<40 55 70 85 100 115 130 140!128>")       // Linear LPF sweep (40Hz -> 140Hz)
+  .decay(0.34)
+  .gain("<0 0.15 0.3 0.45 0.6 0.75 0.88!128>")   // Linear volume fade (0 -> 0.88, holds)
+  .orbit(0)
+
+const ch2_stab = chord("<Cm7 ~ Cm7 ~> <Fm7 ~ Cm7 ~> <Ab^7 ~ Fm7 ~> <Cm7 ~ Bb ~>")
+  .voicing().s("sawtooth")
+  .lpf(sine.range(800, 3200).slow(32)).lpq(4)
+  .decay(0.18).sustain(0).room(0.45).roomsize(0.65)
+  .delay(0.25).delaytime(0.375).delayfeedback(0.38)
+  .gain(0.34).orbit(2)
+
+const ch2_bass = note("<[c2 c2 ~ c2] [c2 eb2 ~ c2] [c2 c2 ~ g1] [c2 eb2 ~ d2]>*2")
+  .s("sawtooth").lpf(sine.range(280, 520).slow(16)).lpq(5.5)
+  .decay(0.15).sustain(0).gain(0.55).orbit(1)
+
+// =========================================================================
+// SECTION 2: PERFORMANCE STAGE DEFINITIONS
+// =========================================================================
+
+// --- PHASE A: SLOW INTRO FADE-IN ---
+const intro_1_pad = stack(ch1_pad)
+const intro_2_sub = stack(ch1_pad, ch1_sub)
+const intro_3_crackle = stack(ch1_pad, ch1_sub, ch1_crackle)
+const intro_4_resonances = stack(ch1_pad, ch1_sub, ch1_crackle, ch1_resonances)
+
+// --- PHASE B: GRANULAR LAYER ADDITION WITH LINEAR FADES ---
+const add_1_hats = stack(ch1_pad, ch1_sub, ch1_crackle, ch1_resonances, ch2_hats)
+const add_2_kick = stack(ch1_pad, ch1_sub, ch1_crackle, ch1_resonances, ch2_hats, ch2_kick)
+
+// --- PHASE C: STRIP RESONANCES BEFORE STAB ENTERS ---
+const remove_resonances = stack(ch1_pad, ch1_sub, ch1_crackle, ch2_hats, ch2_kick) // Resonances stripped
+const add_3_stab = stack(ch1_pad, ch1_sub, ch1_crackle, ch2_hats, ch2_kick, ch2_stab) // Stab enters clean
+const add_4_bass = stack(ch1_pad, ch1_sub, ch1_crackle, ch2_hats, ch2_kick, ch2_stab, ch2_bass)
+
+// --- PHASE D: BREAKDOWN & DROP ---
+const remove_pad = stack(ch1_crackle, ch2_hats, ch2_kick, ch2_stab, ch2_bass)
+const cut_hi_mid = stack(ch1_crackle, ch2_bass)
+const dive_tunes = stack(ch2_stab)
+const drop = stack(ch2_kick, ch2_bass, ch2_stab, ch2_hats)
+
+
+// =========================================================================
+// PERFORMANCE EXECUTION (READS BOTTOM-TO-TOP)
+// Leave all lines uncommented to start on `intro_1_pad`.
+// Comment out `//` from the BOTTOM line up to advance steps & hit Ctrl+Enter:
+// =========================================================================
+
+drop                  // [Step 13] PEAK DROP: Full Techno
+dive_tunes            // [Step 12] Breakdown Tease: Chord Stab solo
+cut_hi_mid            // [Step 11] Low-End Strip: Crackle + Bass
+remove_pad            // [Step 10] Strip Pad: Tight Drum & Synth energy
+add_4_bass            // [Step 09] Add Bass: Full Groove
+add_3_stab            // [Step 08] Add Stab: Chord Stab enters NOW (Resonances already gone)
+remove_resonances     // [Step 07] Strip Resonances: Cleans the high-mid space
+add_2_kick            // [Step 06] Add Kick: Linear Fade-In (Swells & Holds at 0.88)
+add_1_hats            // [Step 05] Add Hats: Linear HPF Fade-In (Swells & Holds)
+intro_4_resonances    // [Step 04] Intro 4: Add Ultra-Slow Resonances
+intro_3_crackle       // [Step 03] Intro 3: Add Organic Crackle
+intro_2_sub           // [Step 02] Intro 2: Add Sub-Pulse Heartbeat
+intro_1_pad           // [Step 01] START HERE: Glacial Pad (Time Accelerating)
