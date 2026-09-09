@@ -1,0 +1,46 @@
+// ╔═══════════════════════════════════════════════════════════════════════╗
+// ║ CHAPTER 2: PLAYFUL ESCAPE (Techno Festival Edition)                   ║
+// ║ Mood: Kinetic Drive · Hypnotic Escape · Festival Energy               ║
+// ║ Character: Punchy 909 Pulse, Rolling Bass, Resonant Chord Stabs       ║
+// ╚═══════════════════════════════════════════════════════════════════════╝
+
+setcpm(126/4)
+
+// 1. Mainstage 909 Kick (Four-on-the-Floor Anchor)
+const kick = s("bd * 4").bank("RolandTR909")
+  .lpf(130).decay(0.32).gain(0.85)
+
+// 2. Off-Beat Kinetic Hi-Hats with Accents
+const hats = s("hh*8").bank("RolandTR909")
+  .gain("<0.25 0.55 0.3 0.65>")
+  .hpf(6000)
+  .swingBy(1/6, 4)
+
+// 3. Rolling Techno Bassline (Driving Staccato)
+const bass = note("<[c2 c2 ~ c2] [c2 eb2 ~ c2]>*2")
+  .s("sawtooth")
+  .lpf(340).lpq(6)
+  .decay(0.14).sustain(0)
+  .gain(0.55)
+
+// 4. Hypnotic Festival Chord Stab (Replaces Circus Pluck)
+const festival_stab = chord("<Cm7 ~ Cm7 ~> <Fm7 ~ Cm7 ~>")
+  .voicing()
+  .s("sawtooth")
+  .lpf(sine.range(700, 2800).slow(8)).lpq(5)
+  .decay(0.16).sustain(0)
+  .room(0.45).roomsize(0.6)
+  .delay(0.25).delaytime(0.375).delayfeedback(0.35)
+  .gain(0.32)
+
+// 5. Syncopated Rimshot Drive (Percussive Tension)
+const rim_drive = s("rim(3,8,1)").bank("RolandTR909")
+  .gain(0.28)
+  .delay(0.2).delaytime(0.1875)
+
+// FULL TECHNO FESTIVAL STACK
+stack(
+  kick,
+  hats,
+  festival_stab,
+)
