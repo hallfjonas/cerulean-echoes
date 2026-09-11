@@ -1,0 +1,184 @@
+// ============================================================
+// GLOBAL CONTROLS
+// ============================================================
+//
+// These are intentionally separate from the 8 source columns.
+// Later, these can become MIDI-controlled performance controls.
+//
+// Global:
+//   BPM
+//   Master Level
+//   Energy       — reserved for future global modulation
+//   Space        — reserved for future global modulation
+// ============================================================
+
+const bpm = 126
+const masterLevel = 1.0
+const globalEnergy = 1.0
+const globalSpace = 0.0
+
+setcpm(bpm / 4)
+
+
+// ============================================================
+// STEM 1: MAIN KICK — Column 1 / Orbit 0
+// ============================================================
+const kickPunch = 20
+const kickDecay = 0.34
+const kickFreq  = 140
+const kickLevel = 0.88
+
+const stem1_kick = s("bd * 4").bank("RolandTR909")
+  .lpf(kickFreq)
+  .decay(kickDecay)
+  .penv(kickPunch)
+  .pdecay(0.03)
+  .sustain(0)
+  .gain(kickLevel * masterLevel)
+  .orbit(0)
+
+
+// ============================================================
+// STEM 2: ROLLING BASS — Column 2 / Orbit 1
+// ============================================================
+const bassBrightness = 400
+const bassMovement   = 120
+const bassDecay      = 0.15
+const bassLevel      = 0.55
+
+const stem2_bass = note("<[c2 c2 c3 c2] [c2 eb2 ~ c2] [c2 c2 ~ g1] [c2 eb2 ~ d2]>*2")
+  .s("sawtooth")
+  // Filter sweep scales up or down based on globalEnergy
+  .lpf(sine.range(
+    bassBrightness - (bassMovement * globalEnergy),
+    bassBrightness + (bassMovement * globalEnergy)
+  ).slow(16))
+  .lpq(5.5)
+  .decay(bassDecay)
+  .sustain(0)
+  .room(0.1 + globalSpace * 0.2)
+  .gain(bassLevel * masterLevel)
+  .orbit(1)
+
+
+// ============================================================
+// STEM 3: STAB CHORDS — Column 3 / Orbit 2
+// ============================================================
+const stabCutoff = 2000
+const stabDecay  = 0.18
+const stabEcho   = 0.38
+const stabLevel  = 0.34
+
+const stem3_stab = chord("<Cm7 ~ Cm7 ~> <Fm7 ~ Cm7 ~> <Ab^7 ~ Fm7 ~> <Cm7 ~ Bb ~>")
+  .voicing()
+  .s("sawtooth")
+  // The cutoff ceiling shifts upward with higher globalEnergy
+  .lpf(sine.range(800, stabCutoff * globalEnergy).slow(32))
+  .lpq(4)
+  .decay(stabDecay)
+  .sustain(0)
+  // Dynamic room adds globalSpace context to the stab decays
+  .room(0.35 + globalSpace * 0.4)
+  .roomsize(0.65)
+  .delay(0.25).delaytime(0.375).delayfeedback(stabEcho)
+  .gain(stabLevel * masterLevel)
+  .orbit(2)
+
+
+// ============================================================
+// STEM 4: KINETIC HATS — Column 4 / Orbit 3
+// ============================================================
+const hatsOpenness = 0.08
+const hatsGroove   = 1/6
+const hatsLevel    = 0.68
+
+const stem4_hats = s("hh*8").bank("RolandTR909")
+  .gain("<0.2 0.55 0.28 0.68>")
+  .hpf(5500)
+  .decay(hatsOpenness)
+  .sustain(0)
+  .swingBy(hatsGroove, 4)
+  .gain(hatsLevel * masterLevel)
+  .orbit(3)
+
+
+// ============================================================
+// STEM 5: SHIMMER RIDE — Column 5 / Orbit 3
+// ============================================================
+const rideDensity = 1.0
+const ridePan     = 0.3
+const rideLevel   = 0.18
+
+const stem5_ride = s("sh*16").bank("RolandTR909")
+  .gain(sine.range(0.05, 0.18).slow(8))
+  .degradeBy(1 - rideDensity)
+  .hpf(7000)
+  .pan(sine.range(0.5 - ridePan, 0.5 + ridePan).slow(4))
+  .gain(rideLevel * masterLevel)
+  .orbit(3)
+
+
+// ============================================================
+// STEM 6: NOISE RISER — Column 6 / Orbit 4
+// ============================================================
+const riserSweep = 0.6
+const riserRoom  = 0.5
+const riserLevel = 0.22
+
+const stem6_riser = s("white").slow(16)
+  .struct("t*32")
+  .hpf(sine.range(1000, 9000).slow(16 * riserSweep))
+  .decay(0.04)
+  .sustain(0)
+  .room(riserRoom + globalSpace * 0.3)
+  .gain(riserLevel * masterLevel)
+  .orbit(4)
+
+
+// ============================================================
+// STEM 7: ACID PULSE — Column 7 / Orbit 5
+// ============================================================
+const acidCutoff = 900
+const acidReso   = 7.0
+const acidLevel  = 0.28
+
+const stem7_acid = note("<[~ c4 ~ c4] [~ eb4 ~ d4] [~ c4 ~ bb3] [~ f4 ~ g4]>")
+  .s("sawtooth")
+  .lpf(saw.range(100, (acidCutoff + 500) * globalEnergy).slow(8))
+  .lpq(acidReso)
+  .decay(0.12)
+  .sustain(0)
+  .delay(0.3).delaytime(0.25).delayfeedback(0.4)
+  .gain(acidLevel * masterLevel)
+  .orbit(5)
+
+
+// ============================================================
+// STEM 8: INDUSTRIAL CLAP — Column 8 / Orbit 0
+// ============================================================
+const clapDensity = 0.8
+const clapSpace   = 0.4
+const clapLevel   = 0.45
+
+const stem8_clap = s("~ [cp*2] ~ cp")
+  .bank("RolandTR909")
+  .degradeBy(1 - clapDensity)
+  .hpf(1500)
+  .room(clapSpace + globalSpace * 0.4)
+  .gain(clapLevel * masterLevel)
+  .orbit(0)
+
+
+// ============================================================
+// MASTER AUDIO MATRIX
+// ============================================================
+stack(
+  stem1_kick,
+  stem2_bass,
+  stem3_stab,
+  stem4_hats,
+  stem5_ride,
+  stem6_riser,
+  stem7_acid,
+  stem8_clap
+)

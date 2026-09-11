@@ -1,0 +1,274 @@
+
+// ============================================================
+// GLOBAL CONTROLS
+// ============================================================
+//
+// These are intentionally separate from the 8 source columns.
+// Later, these can become MIDI-controlled performance controls.
+//
+// Global:
+//   BPM
+//   Master Level
+//   Energy       — reserved for future global modulation
+//   Space        — reserved for future global modulation
+// ============================================================
+
+const bpm = 140
+const masterLevel = 1.0
+const globalEnergy = 1.0
+const globalSpace = 0.0
+
+setcpm(bpm / 4)
+
+
+// ============================================================
+// KICK — Column 1 / Orbit 0
+// ============================================================
+//
+// Knob 1: Punch
+// Knob 2: Body
+// Knob 3: Brightness
+// Fader:  Level
+// ============================================================
+
+const kickPunch = 14
+const kickBody = 0.9
+const kickBrightness = 70
+const kickLevel = 0.85
+
+$: note("c1 ~ <~ c1> ~")
+  .s("sine")
+
+  // Punch
+  .penv(kickPunch)
+  .pdecay(0.04)
+
+  // Body
+  .decay(kickBody)
+  .sustain(0)
+
+  // Brightness
+  .lpf(kickBrightness)
+
+  // Original slow amplitude movement, scaled by level
+  .gain(saw.range(0, 0.85 * kickLevel).slow(16))
+
+  .orbit(0)
+
+
+// ============================================================
+// BASS — Column 2 / Orbit 1
+// ============================================================
+//
+// Knob 1: Brightness
+// Knob 2: Movement
+// Knob 3: Space
+// Fader:  Level
+// ============================================================
+
+const bassBrightness = 1300
+const bassMovement = 500
+const bassSpace = 0.5
+const bassLevel = 0.4
+
+$: note("<[c2, g2, d3] [c2, eb2, bb3] [f2, c3, g3] [c2, g2, d3]>")
+  .s("sawtooth")
+
+  // Brightness + movement
+  .lpf(
+    sine
+      .range(
+        bassBrightness - bassMovement,
+        bassBrightness + bassMovement
+      )
+      .slow(3)
+  )
+
+  .attack(2.0)
+  .release(1.0)
+
+  // Orbit 1 = bass processing
+  .room(bassSpace)
+
+  .gain(bassLevel)
+
+  .orbit(1)
+
+const hatsOpenness = 0.8  // Continuous decay length (0.01s to 0.5s)
+const hatsDensity = 1   // 0.0 = 8ths, 1.0 = 16ths
+const hatsGroove = 1 / 6  // Swing
+const hatsLevel = 0.68    // Volume
+
+// A mathematical Bell Curve in Strudel
+const normalDist = (x) => Math.exp(-0.5 * Math.pow(x, 2));
+
+
+$: s("white").slow(20)
+  .struct("t*8")
+  .fast(hatsDensity)
+  .hpf(7000)
+  .decay(0.01 + hatsOpenness * 0.45)
+  .sustain(0)
+  .gain(hatsLevel)
+  .swing(hatsGroove)
+
+
+// ============================================================
+// PERCUSSION — Column 4 / Orbit 0
+// ============================================================
+//
+// Crisp / high percussion.
+//
+// Knob 1: Density
+// Knob 2: Brightness
+// Knob 3: Space
+// Fader:  Level
+// ============================================================
+
+const percDensity = 0.55
+const percBrightness = 4500
+const percSpace = 0.35
+const percLevel = 0.35
+
+$: s("~ [cp*2] ~ cp")
+  .bank("RolandTR909")
+  .degradeBy(1 - percDensity)
+  .hpf(percBrightness)
+  .room(percSpace)
+  .gain(percLevel)
+  .orbit(0)
+
+
+// ============================================================
+// PERCUSSION — Column 5 / Orbit 0
+// ============================================================
+//
+// Different role from Column 4:
+// more sparse / tonal / accent-like percussion.
+//
+// Knob 1: Density
+// Knob 2: Brightness
+// Knob 3: Space
+// Fader:  Level
+// ============================================================
+
+const perc2Density = 0.45
+const perc2Brightness = 2500
+const perc2Space = 0.30
+const perc2Level = 0.30
+
+$: s("<rim ~ rim [~ rim]>")
+  .bank("RolandTR909")
+  .degradeBy(1 - perc2Density)
+  .lpf(perc2Brightness)
+  .room(perc2Space)
+  .gain(perc2Level)
+  .orbit(0)
+
+
+// ============================================================
+// LEAD — Column 6 / Orbit 2
+// ============================================================
+//
+// Knob 1: Decay
+// Knob 2: Echo
+// Knob 3: Space
+// Fader:  Level
+//
+// This is the main musical lead control column.
+// ============================================================
+
+const leadDecay = 0.22
+const leadEcho = 0.65
+const leadSpace = 0.75
+const leadLevel = 1.0
+
+$: note("<[~ g5] ~ [~ eb6] ~ [bb5 ~] ~ [~ c6]>")
+  .s("sine")
+
+  .decay(leadDecay)
+  .sustain(0)
+
+  .delay(leadEcho)
+  .delaytime(0.375)
+
+  .room(leadSpace)
+
+  .gain(leadLevel)
+
+  .orbit(2)
+
+
+// ============================================================
+// LEAD FX — Column 7 / Orbit 2
+// ============================================================
+//
+// This column controls the SAME lead as Column 6.
+//
+// Knob 1: Brightness
+// Knob 2: Feedback
+// Knob 3: Echo Time
+// Fader:  Level
+// ============================================================
+//
+// Note:
+// The current lead is a sine wave, so Brightness is deliberately
+// subtle. The LPF becomes much more musically significant if the
+// lead waveform is later changed to triangle/saw.
+// ============================================================
+
+const leadBrightness = 12000
+const leadFeedback = 0.65
+const leadEchoTime = 0.375
+const lead2Level = 1.0
+
+$: note("<[~ g5] ~ [~ eb6] ~ [bb5 ~] ~ [~ c6]>")
+  .s("sine")
+  .decay(leadDecay)
+  .sustain(0)
+  .lpf(leadBrightness)
+  .delay(leadEcho)
+  .delaytime(leadEchoTime)
+  .delayfeedback(leadFeedback)
+
+  .room(leadSpace)
+
+  .gain(lead2Level)
+
+  .orbit(2)
+
+
+// ============================================================
+// TEXTURE — Column 8 / Orbit 3
+// ============================================================
+//
+// Knob 1: Density
+// Knob 2: Brightness
+// Knob 3: Movement
+// Fader:  Level
+// ============================================================
+
+const textureDensity = 0.55
+const textureBrightness = 7500
+const textureMovement = 0.35
+const textureLevel = 0.14
+
+$: s("crackle*8")
+
+  // Density
+  .degradeBy(1 - textureDensity)
+
+  // Brightness
+  .hpf(textureBrightness)
+
+  // Movement = stereo movement depth
+  .pan(
+    sine.range(
+      0.5 - textureMovement,
+      0.5 + textureMovement
+    ).slow(12)
+  )
+
+  .gain(textureLevel)
+
+  .orbit(3)
