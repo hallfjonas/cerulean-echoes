@@ -13,6 +13,8 @@
 //   Space        — reserved for future global modulation
 // ============================================================
 
+const cc = await midin()
+
 const bpm = 140
 const masterLevel = 1.0
 const globalEnergy = 1.0

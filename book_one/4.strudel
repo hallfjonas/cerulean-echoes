@@ -2,3 +2,6 @@ setcpm(140/4)
 
 $: s("bd * 4").bank("RolandTR909").dec(0.9).lpf(60).attack(0.2).room(2.0).gain(2.0)
 $: s("hh * 4").bank("RolandTR909").dec(4.0).gain(0.1).lpf(12000).hpf(6000).room(0.2).delay("<0.5 0 0.25 0>")
+
+// sad lead
+$: note("c!2 [eb,<g a bb a>]").sound("piano").gain(0.0133)

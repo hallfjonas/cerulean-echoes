@@ -1,0 +1,9 @@
+
+const cc = await midin()
+
+const bpm = 140
+const masterLevel = cc(12).range(0,1)
+const globalEnergy = 0.0
+const globalSpace = 0.0
+
+setcpm(bpm / 4)
