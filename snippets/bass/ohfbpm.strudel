@@ -1,0 +1,17 @@
+setcpm(140/4)
+
+note(`
+  [d1 d1 ~ d1 d1 ~ d1 ~]
+  [d1 ~ d1 d1 ~ d1 f1 e1]
+  [d1 d1 ~ d1 ~ d1 ~ c1]
+  [d1 ~ d1 ~ d1 d1 c1 cs1]
+`)
+  .s("sawtooth")
+  .lpf(160)
+  .lpq(15)
+  .decay(.09)
+  .sustain(.1)
+  .release(.04)
+  .distort(0.8)
+  .gain(.65)
+  .orbit(1)

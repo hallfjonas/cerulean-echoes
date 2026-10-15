@@ -1,0 +1,19 @@
+
+const cc = await midin()
+
+const bpm = 140
+const masterLevel = cc(12).range(0,1)
+const globalEnergy = 0.0
+const globalSpace = 0.0
+
+setcpm(bpm / 4)
+
+const bassBrightness = 400 // cc(14).range(400,400)
+const bassMovement   = cc(22).range(150,500)
+const bassDecay      = cc(30).range(0.15,0.15)
+const bassLevel      = cc(6).range(0, 1)
+
+const stem2_bass = note("<[c2 c2 c3 c2] [c2 eb2 ~ c2] [c2 c2 ~ g1] [c2 eb2 ~ d2]>*2")
+  .s("sawtooth")
+  // Filter sweep scales up or down based on globalEnergy
+  .lpf(sine.range(bassMovement.add(-50.0), bassMovement.add(50.0).slow(16)))

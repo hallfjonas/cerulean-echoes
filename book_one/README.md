@@ -1,3 +1,6 @@
+What was book 1? It was Jonas prior to owning a Launch Control XL 3.
+Until, one day, Jonas realized what is possible with Launch Control XL 3 -- or at the very least scratch that surface to which we now build towards.
+
 # Book One
 
 - Targeting a two hour set
@@ -7,7 +10,7 @@
 
 ## Hi-level Mood trajectory
 1. Frozen Stillness - (isolation · suspended grief · quiet emptiness)
-1. Playful Escape - (wonder · denial · kinetic joy)  
+1. Playful Escape - (wonder · denial · kinetic joy)
 1. Haunted Realization - (shock · survivor’s guilt · quiet devastation)
 1. Constant Pressure - (anxiety · pursuit · rising tension)
 1. Growing Resolve - (determination · discipline · emotional friction)
