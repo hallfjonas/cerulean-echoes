@@ -1,25 +1,23 @@
-- sub bass is kind of broken --> is it because we have too many tracks at the same time? limit of strudel or limit of laptop or limit of box or limit of launchcontrol?
-- groovy hats are not so cool anymore
-- REALIZATION: Use 3rd row for density (e.g., add groovey hat on top of off-beat hat)
-- global LPF & room are currently not used --> replace
+- global LPF rwo not really used at all. I don't really understand how I should use it on a global level
+- density mechanism
+    - clap (taking second hi-hat spot)
+    - sub wummern --> IMMER AN, wieso?
+    - acid tunes
+    - maybe even kick for a mid range clack sound
 
-- improve bass groove
-- what to place on second/third row of knobs. I'm not really using them; only 2/3 are even mapped to effects
-- improve overall groove (the four on the floor are overloaded need more off-beat stuff)
+## I dislike (<20%)
+- groovy hats must be way way more groovey
+- sensity acid
+- overall mix when everything is at 100%
+- effects on 7 are nice but also a bit boring. want something with a bit more tension there
 
-## I like
+## I like (>50%)
 - global HPF
+- global Density
 - kick on 1
-- sub on 3
-- hi hat on 5
-
-## not perfect
-- bass on 2
-- hi hat on 4
-- melody on 6
-- effects on 7 (nice enough, but I use them seldomly)
-
-## I dislike
-
-## Q&A
-- How to control more than 7/8 components with launch contrl / strudel --> Custom mode mapping in components
+- sub on 2
+- bass on 3
+- oh on 4
+- bongos
+- space sounds
+- melody

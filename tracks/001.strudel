@@ -1,0 +1,228 @@
+// ============================================================
+// GLOBAL CONTROLS
+// ============================================================
+const cc = await midin()
+
+const bpm = 140
+setcpm(bpm / 4)
+
+const globalHpf   = cc(20).range(0, 1000)
+const globalLpf   = cc(28).range(0, 0)
+const globalRoom  = cc(36).range(0, 1)
+const masterLevel = cc(12).range(0, 1)
+
+
+
+
+// ============================================================
+// STEMS Theb Beginning; Part 1: MAIN KICK
+// ============================================================
+const kickHpf   = cc(13).range(0, 0)
+const kickLpf   = cc(21).range(10, 50)
+const kickRoom  = cc(29).range(0, 0.15)
+const kickLevel = cc(5).range(0, 4)
+
+const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
+  .hpf(globalHpf.add(kickHpf))
+  .lpf(kickLpf)
+  .room(kickRoom.mul(globalRoom))
+  .attack(0.00)
+  .dec(0.3)
+  .sustain(0.15)
+  .release(0.12)
+  .gain(kickLevel.mul(masterLevel))
+
+
+  // STEM 2: SUB-BASS
+  const subCC    = 6
+  const subHpf   = cc(subCC + 8).range(0, 0)
+  const subLpf   = cc(subCC + 2*8).range(50, 500)
+  const subSlow  = cc(subCC + 3*3).range(0.9, 2)
+  const subLevel = cc(subCC).range(0, 0.8)
+
+  const stem2_sub = stack(
+    note("c1*4")
+    .s("sawtooth")
+    .delay("<2 2 2 2>")
+    .hpf(globalHpf.add(subHpf))
+    .lpf(sine.range(subLpf.mul(0.5), subLpf).slow(subSlow))
+    .decay(0.12)
+    .sustain(0.05),
+
+    note("c1*4")
+    .s("sine")
+    .hpf(globalHpf.add(subHpf))
+    .lpf(subLpf)
+    .decay(0.15)
+    .sustain(0.1)
+  )
+  .room(globalRoom)
+  .roomsize(0.8) // Großer Raum lässt den Sub massiv wummern
+  .gain(subLevel.mul(masterLevel))
+
+  // STEM 3: BASS
+  const bassCC    = 7
+  const bassHpf   = cc(bassCC + 8).range(0, 500)
+  const bassLpf   = cc(bassCC + 2*8).range(100, 800)
+  const bassSlow  = cc(bassCC + 3*3).range(1, 2)
+  const bassLevel = cc(bassCC).range(0, 2)
+
+  const stem3_bass = note("<[c2 ~ c2 c2] [eb2 c2 ~ eb2]>*2")
+    .s("sawtooth")
+    .hpf(globalHpf.add(bassHpf))
+    .lpf(bassLpf)
+    .lpq(5.5)
+    .decay(0.15)
+    .sustain(0)
+    .room(globalRoom)
+    .gain(bassLevel.mul(masterLevel))
+
+// STEM 4: KINETIC HATS
+const hatsHpf   = cc(16).range(1000, 8000)
+const hatsLpf   = cc(24).range(2000, 20000)
+const hatsRoom  = cc(32).range(0, 1)
+const hatsLevel = cc(8).range(0, 1)
+
+const stem4_hats = s("hh * 4").bank("RolandTR909")
+  .delay("<0.25 0.5 0.33 0.5>")
+  .dec(4.0)
+  .hpf(hatsHpf)
+  .lpf(hatsLpf)
+  .room(hatsRoom.mul(globalRoom))
+  .gain(hatsLevel.mul(masterLevel))
+
+
+// STEM 5: OPEN HATS
+const openHatsHpf   = cc(17).range(1000, 12000)
+const openHatsLpf   = cc(25).range(2000, 20000)
+const openHatsRoom  = cc(33).range(0, 1)
+const openHatsLevel = cc(9).range(0, 0.5)
+
+const stem5_open_hats = s("[~ oh ~ oh] * 2").bank("RolandTR909")
+  .dec(1.0)
+  .hpf(openHatsHpf)
+  .lpf(openHatsLpf)
+  .room(openHatsRoom.mul(globalRoom))
+  .gain(openHatsLevel.mul(masterLevel))
+
+
+// STEM 6: STAB CHORDS
+const stabHpf   = cc(18).range(0, 2000)
+const stabDecay = cc(26).range(0.1, 0.2)
+const stabLpf   = 800
+const stabRoom  = 0.25
+const stabSlow  = cc(34).range(1, 1)
+const stabLevel = cc(10).range(0, 2)
+
+const stem6_stab = chord("<Cm7 ~ Cm7 ~> <Fm7 ~ Cm7 ~> <Ab^7 ~ Fm7 ~> <Cm7 ~ Bb ~>")
+  .voicing()
+  .s("sawtooth")
+  .hpf(sine.range(stabHpf.mul(0.1), stabHpf).slow(stabSlow))
+  .lpf(stabLpf)
+  .lpq(4)
+  .decay(0.18)
+  .sustain(0)
+  .room(globalRoom.mul(stabRoom))
+  .roomsize(0.65)
+  .delay(0.25).delaytime(0.375).delayfeedback(0.3)
+  .gain(stabLevel.mul(masterLevel))
+
+
+// STEM 7: ACID PULSE
+const acidHpf   = cc(19).range(50, 2000)
+const acidLpf   = cc(27).range(300, 12000)
+const acidRoom  = cc(35).range(0, 1)
+const acidLevel = cc(11).range(0, 0.3)
+
+const stem7_acid = note("<[~ c4 ~ c4] [~ eb4 ~ d4] [~ c4 ~ bb3] [~ f4 ~ g4]>")
+  .s("sawtooth")
+  .hpf(acidHpf)
+  .lpf(saw.range(100, acidLpf).slow(8))
+  .lpq(7)
+  .decay(0.12)
+  .room(acidRoom.mul(globalRoom))
+  .delay(0.3).delaytime(0.25).delayfeedback(0.4)
+  .gain(acidLevel.mul(masterLevel))
+
+
+// STEM 8: HYPNOTIC BONGOS
+const bongoHpf   = cc(53).range(100, 1200)
+const bongoLpf   = cc(61).range(500, 10000)
+const bongoDensity = cc(68).range(0, 3)
+const bongoLevel = cc(105).range(0, 0.8)
+
+const stem8_bongos = stack(
+  // Sparse pattern
+  s("bongo:0 ~ bongo:1 ~ ~ bongo:0 ~ bongo:1")
+    .bank("RolandTR808")
+    .gain(0.8),
+
+  // Additional hits as density increases
+  s("~ ~ bongo:1 ~ bongo:0 ~ ~ ~")
+    .bank("RolandTR808")
+    .gain(0.45),
+
+  // Busy rolling layer
+  s("~ bongo:0 ~ bongo:1 ~ bongo:0 bongo:1 ~")
+    .bank("RolandTR808")
+    .gain(bongoDensity.div(3).mul(0.35))
+)
+  .hpf(globalHpf.add(bongoHpf))
+  .room(0.25)
+  .roomsize(0.55)
+  .gain(bongoLevel.mul(masterLevel))
+
+
+// STEM 9: LIQUID ACID SPACE
+const spaceLevel    = cc(113).range(0, 0.7)
+const spaceHpf      = cc(61).range(80, 1200)
+const spaceFeedback = cc(69).range(0.2, 0.8)
+
+const stem9_space = stack(
+
+  // Liquid, slowly morphing acid phrase
+  note("<c4 ~ eb4 g4 ~ bb4 ~ g4 ~ eb4>")
+    .s("sawtooth")
+    .hpf(globalHpf.add(spaceHpf))
+    .lpf(sine.range(500, 7000).slow(8))
+    .lpq(12)
+    .decay(0.3)
+    .sustain(0.12)
+    .release(0.4)
+    .delay(0.7)
+    .delaytime(0.375)
+    .delayfeedback(spaceFeedback)
+    .gain(0.55),
+
+  // Sparse, high liquid droplets
+  note("~ c6 ~ ~ ~ g5 ~ ~ eb6 ~ ~ ~")
+    .s("sine")
+    .hpf(globalHpf.add(spaceHpf))
+    .lpf(7000)
+    .decay(0.12)
+    .sustain(0)
+    .delay(0.8)
+    .delaytime(0.5)
+    .delayfeedback(spaceFeedback)
+    .gain(0.2)
+
+)
+  .room(0.4)
+  .roomsize(0.9)
+  .gain(spaceLevel.mul(masterLevel))
+
+
+// ============================================================
+// MASTER AUDIO MATRIX
+// ============================================================
+stack(
+  stem1_kick,
+  stem2_sub,
+  stem3_bass,
+  stem4_hats,
+  stem5_open_hats,
+  stem6_stab,
+  stem7_acid,
+  stem8_bongos,
+  stem9_space
+)
