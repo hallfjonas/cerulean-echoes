@@ -1,0 +1,327 @@
+// ============================================================
+// GLOBAL CONTROLS
+// ============================================================
+const cc = await midin()
+
+const bpm = 140
+setcpm(bpm / 4)
+
+const globalLpf   = cc(20).range(0, 1000)
+
+const globalDensity  = cc(36).range(0, 1)
+const globalLevel = cc(12).range(0, 1)
+
+// Melody
+scale("B:minor")
+
+register('acidenv', (x, pat) => pat
+  // .lpf(100)       // Basisfrequenz des Filters
+  .lpenv(x * 9)   // Filterhüllkurve (Envelope) basierend auf Eingabe x
+  .lps(0.2)       // Sustain (Haltezeit)
+  .lpd(0.12)      // Decay (Abklingzeit)
+  .lpq(2)         // Q-Faktor (Resonanz) für spitze Filterkurven
+)
+
+
+// ============================================================
+// STEMS Theb Beginning; Part 1: MAIN KICK
+// ============================================================
+const kickHpf   = cc(13).range(0, 0)
+const kickLpf   = cc(21).range(10, 50)
+const kickRoom  = cc(29).range(0, 0.15)
+const kickLevel = cc(5).range(0, 4)
+
+const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
+  .hpf(globalLpf.add(kickHpf))
+  .lpf(kickLpf)
+  .room(kickRoom)
+  .attack(0.00)
+  .dec(0.3)
+  .sustain(0.15)
+  .release(0.12)
+  .gain(kickLevel.mul(globalLevel))
+
+
+  // STEM 2: SUB-BASS
+  const subHpf   = cc(16).range(50, 500)
+  const subLpf   = cc(22).range(30, 500)
+  const subDensity  = cc(30).range(0, 1.3)
+  const subLevel = cc(6).range(0, 2.0)
+
+  const stem2_sub = stack(
+    note("c2*4")
+    .s("sawtooth")
+    .hpf(globalLpf.add(subHpf))
+    .lpf(subLpf)
+    .decay(0.112)
+    .sustain(0.05)
+    .gain(subLevel.mul(globalLevel)),
+
+    note("c2*8")
+    .s("sawtooth")
+    .hpf(globalLpf.add(subHpf))
+    .lpf(subLpf)
+    .decay(0.112)
+    .sustain(0.05)
+    .gain(globalDensity.mul(subDensity).mul(sine.range(0, 3).slow(0.125))),
+
+    note("c1*4")
+    .s("sine")
+    .hpf(globalLpf.add(subHpf))
+    .lpf(subLpf)
+    .decay(0.15)
+    .sustain(0.1)
+    .gain(subLevel.mul(globalLevel))
+  )
+  .room(0.2)
+  .roomsize(0.8) // Großer Raum lässt den Sub massiv wummern
+
+  // STEM 3: BASS
+  const bassHpf   = cc(15).range(0, 500)
+  const bassLpf   = cc(23).range(100, 800)
+
+  const bassLevel = cc(7).range(0, 2)
+
+  const stem3_bass = note("<[c2 ~ c2 c2] [eb2 c2 ~ eb2]>*2")
+    .s("sawtooth")
+    .hpf(globalLpf.add(bassHpf))
+    .lpf(bassLpf)
+    .lpq(5.5)
+    .decay(0.15)
+    .sustain(0)
+    .room(0.2)
+    .gain(bassLevel.mul(globalLevel))
+
+// STEM 4: HATS
+const hatsHpf   = cc(16).range(1000, 20000)
+const hatsLpf   = cc(24).range(2000, 20000)
+const hatsDensity  = cc(32).range(0, 1)
+const hatsLevel = cc(8).range(0, 1)
+
+const stem4_hats = stack(
+  // open hats
+  s("[~ oh ~ oh] * 2").bank("RolandTR909")
+  .dec(1.0)
+  .hpf(hatsHpf)
+  .lpf(hatsLpf)
+  .room(0.2)
+  .gain(hatsLevel.mul(globalLevel)),
+
+  // groovey hats
+  s("hh * 16").bank("RolandTR909")
+  .dec(1.0)
+  .hpf(hatsHpf)
+  .lpf(hatsLpf)
+  .gain(hatsDensity.mul(globalDensity).mul(sine.range(0.25, 1))),
+)
+
+// STEM 5: CLAP
+
+const clapHpf     = cc(17).range(500, 2500)
+const clapLpf     = cc(25).range(1500, 12000)
+const clapDensity = cc(33).range(0, 2)
+const clapRoom    = cc(41).range(0, 0.5)
+const clapLevel   = cc(9).range(0, 2.5)
+
+// Main clap — classic 909 backbeat
+const clapMain = s("~ cp ~ cp")
+  .bank("RolandTR909")
+  .hpf(clapHpf)
+  .lpf(clapLpf)
+  .attack(0.001)
+  .dec(0.12)
+  .sustain(0)
+  .release(0.06)
+  .room(clapRoom)
+  .roomsize(0.55)
+  .gain(clapLevel.mul(globalLevel))
+
+// Quiet offbeat ghosts — add movement without clutter
+const clapGhosts = s("~ ~ cp ~")
+  .bank("RolandTR909")
+  .hpf(clapHpf)
+  .lpf(clapLpf)
+  .dec(0.08)
+  .room(clapRoom.mul(0.6))
+  .gain(clapLevel.mul(clapDensity).mul(globalDensity).mul(0.22))
+
+// Sparse double taps — controlled rhythmic variation
+const clapFills = s("~ [~ cp] ~ ~")
+  .bank("RolandTR909")
+  .hpf(clapHpf)
+  .lpf(clapLpf)
+  .dec(0.06)
+  .room(clapRoom)
+  .gain(clapLevel.mul(clapDensity).mul(globalDensity).mul(0.12))
+
+const stem5_clap = stack(
+  clapMain,
+  clapGhosts,
+  clapFills
+)
+
+// STEM 6: STAB CHORDS
+const stabHpf   = cc(18).range(0, 2000)
+const stabDecay = cc(26).range(0.1, 0.2)
+const stabLpf   = 800
+const stabRoom  = 0.25
+const stabSlow  = cc(34).range(1, 1)
+const stabLevel = cc(10).range(0, 2)
+
+const stem6_stab = chord("<Cm7 ~ Cm7 ~> <Fm7 ~ Cm7 ~> <Ab^7 ~ Fm7 ~> <Cm7 ~ Bb ~>")
+  .voicing()
+  .s("sawtooth")
+  .hpf(sine.range(stabHpf.mul(0.1), stabHpf).slow(stabSlow))
+  .lpf(stabLpf)
+  .lpq(4)
+  .decay(0.18)
+  .sustain(0)
+  .room(globalDensity.mul(stabRoom))
+  .roomsize(0.65)
+  .delay(0.25).delaytime(0.375).delayfeedback(0.3)
+  .gain(stabLevel.mul(globalLevel))
+
+
+// STEM 7: ACID PULSE
+const acidHpf   = cc(19).range(50, 2000)
+const acidLpf   = cc(27).range(300, 12000)
+const acidRoom  = cc(35).range(0, 1)
+const acidLevel = cc(11).range(0, 1)
+
+const stem7_acid = note("<[~ c4 ~ c4] [~ eb4 ~ d4] [~ c4 ~ bb3] [~ f4 ~ g4]>")
+  .s("sawtooth")
+  .hpf(acidHpf)
+  .lpf(saw.range(100, acidLpf).slow(8))
+  .lpq(7)
+  .decay(0.12)
+  .room(acidRoom)
+  .delay(0.3).delaytime(0.25).delayfeedback(0.4)
+  .gain(acidLevel.mul(globalLevel))
+
+
+// PILLOW BONGOS
+const bongoHpf     = cc(18).range(80, 500)
+const bongoLpf     = cc(26).range(700, 5000)
+const bongoDensity = cc(34).range(0, 1)
+const bongoLevel   = cc(10).range(0, 0.8)
+
+// Soft wooden low drum: rounded, warm, gentle
+const bongoLow = note("c4 ~ ~ c4 ~ g4 ~ ~")
+  .s("sine")
+  .decay(0.085)
+  .sustain(0)
+  .release(0.035)
+  .gain(bongoLevel.mul(globalLevel).mul(0.65))
+
+// Higher, hollow hand taps
+const bongoHigh = note("~ g5 ~ c5 ~ ~ g5 ~")
+  .s("sine")
+  .decay(0.045)
+  .sustain(0)
+  .release(0.025)
+  .gain(bongoLevel.mul(globalLevel).mul(0.85))
+
+// Soft fingertip ghost notes
+const bongoGhosts = note("~ ~ eb5 ~ ~ g5 ~ c5")
+  .s("sine")
+  .decay(0.035)
+  .sustain(0)
+  .release(0.02)
+  .gain(bongoLevel.mul(bongoDensity.mul(globalLevel)))
+
+// Tiny, playful bouncy rolls
+const bongoRoll = note("~ c6 ~ g5 c6 ~ eb5 ~")
+  .s("sine")
+  .decay(0.025)
+  .sustain(0)
+  .release(0.015)
+  .gain(globalLevel.mul(bongoDensity.range(0.0, 1.5)))
+
+// Extra delicate taps for maximum density
+const bongoFingers = note("c5 ~ ~ eb5 ~ c5 g5 ~")
+  .s("sine")
+  .decay(0.025)
+  .sustain(0)
+  .release(0.015)
+  .gain(globalLevel.mul(bongoDensity.range(0.0, 1.36)))
+
+const stem6_bongos = stack(
+  bongoLow,
+  bongoHigh,
+  bongoGhosts,
+  bongoRoll,
+  bongoFingers
+)
+  .hpf(globalLpf.add(bongoHpf))
+  .lpf(bongoLpf)
+  .room(0.18)
+  .roomsize(0.45)
+
+
+// LIQUID ACID SPACE
+const spaceHpf      = cc(19).range(80, 1200)
+const spaceLpf    = cc(27).range(0, 0.7)
+const spaceFeedback = cc(35).range(0.23115, 1.1426)
+const spaceLevel    = cc(11).range(0, 0.7)
+const stem7_space = stack(
+  note("<c4 ~ eb4 g4 ~ bb4 ~ g4 ~ eb4>")
+    .s("sawtooth")
+    .hpf(globalLpf.add(spaceHpf))
+    .lpf(sine.range(500, 7000).slow(8))
+    .lpq(12)
+    .decay(0.3)
+    .sustain(0.12)
+    .release(0.4)
+    .delay(0.7)
+    .delaytime(0.375)
+    .delayfeedback(spaceFeedback)
+    .gain(0.55),
+
+  // Sparse, high liquid droplets
+  note("~ c6 ~ ~ ~ g5 ~ ~ eb6 ~ ~ ~")
+    .s("sine")
+    .hpf(globalLpf.add(spaceHpf))
+    .lpf(7000)
+    .decay(0.12)
+    .sustain(0)
+    .delay(0.8)
+    .delaytime(0.5)
+    .delayfeedback(spaceFeedback)
+    .gain(0.2)
+
+)
+  .room(0.4)
+  .roomsize(0.9)
+  .gain(spaceLevel.mul(globalLevel))
+
+// MELODY 1
+const melody1Hpf    = cc(53).range(0, 10000)
+const melody1Lpf    = cc(61).range(0, 200)
+const melody1Density = cc(69).range(0, 1)
+const melody1Level    = cc(105).range(0, 1)
+const stem_melody1 = stack(
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").lpf(globalLpf.add(melody1Lpf)).acidenv(0.3).gain(globalLevel.mul(melody1Level)),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(24).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.25)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(12).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(7).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(3).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-5).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-9).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-12).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
+    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-24).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.25)).acidenv(0.3)
+)
+
+
+// ============================================================
+// MASTER AUDIO MATRIX
+// ============================================================
+stack(
+  stem1_kick,
+  stem2_sub,
+  stem3_bass,
+  stem4_hats,
+  stem5_clap,
+  stem6_bongos,
+  stem7_space,
+  stem_melody1
+)
