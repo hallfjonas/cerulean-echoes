@@ -6,7 +6,8 @@ const cc = await midin()
 const bpm = 140
 setcpm(bpm / 4)
 
-const globalLpf   = cc(20).range(0, 1000)
+const globalHpf   = cc(20).range(0, 1000)
+const globalLpf   = cc(28).range(0, 1000)
 
 const globalDensity  = cc(36).range(0, 1)
 const globalLevel = cc(12).range(0, 1)
@@ -32,7 +33,7 @@ const kickRoom  = cc(29).range(0, 0.15)
 const kickLevel = cc(5).range(0, 4)
 
 const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
-  .hpf(globalLpf.add(kickHpf))
+  .hpf(globalHpf.add(kickHpf))
   .lpf(kickLpf)
   .room(kickRoom)
   .attack(0.00)
@@ -51,7 +52,7 @@ const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
   const stem2_sub = stack(
     note("c2*4")
     .s("sawtooth")
-    .hpf(globalLpf.add(subHpf))
+    .hpf(globalHpf.add(subHpf))
     .lpf(subLpf)
     .decay(0.112)
     .sustain(0.05)
@@ -59,7 +60,7 @@ const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
 
     note("c2*8")
     .s("sawtooth")
-    .hpf(globalLpf.add(subHpf))
+    .hpf(globalHpf.add(subHpf))
     .lpf(subLpf)
     .decay(0.112)
     .sustain(0.05)
@@ -67,7 +68,7 @@ const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
 
     note("c1*4")
     .s("sine")
-    .hpf(globalLpf.add(subHpf))
+    .hpf(globalHpf.add(subHpf))
     .lpf(subLpf)
     .decay(0.15)
     .sustain(0.1)
@@ -84,7 +85,7 @@ const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
 
   const stem3_bass = note("<[c2 ~ c2 c2] [eb2 c2 ~ eb2]>*2")
     .s("sawtooth")
-    .hpf(globalLpf.add(bassHpf))
+    .hpf(globalHpf.add(bassHpf))
     .lpf(bassLpf)
     .lpq(5.5)
     .decay(0.15)
@@ -93,8 +94,8 @@ const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
     .gain(bassLevel.mul(globalLevel))
 
 // STEM 4: HATS
-const hatsHpf   = cc(16).range(1000, 20000)
-const hatsLpf   = cc(24).range(2000, 20000)
+const hatsHpf   = cc(16).range(1000, 12000)
+const hatsLpf   = cc(24).range(2000, 2000)
 const hatsDensity  = cc(32).range(0, 1)
 const hatsLevel = cc(8).range(0, 1)
 
@@ -252,7 +253,7 @@ const stem6_bongos = stack(
   bongoRoll,
   bongoFingers
 )
-  .hpf(globalLpf.add(bongoHpf))
+  .hpf(globalHpf.add(bongoHpf))
   .lpf(bongoLpf)
   .room(0.18)
   .roomsize(0.45)
@@ -266,7 +267,7 @@ const spaceLevel    = cc(11).range(0, 0.7)
 const stem7_space = stack(
   note("<c4 ~ eb4 g4 ~ bb4 ~ g4 ~ eb4>")
     .s("sawtooth")
-    .hpf(globalLpf.add(spaceHpf))
+    .hpf(globalHpf.add(spaceHpf))
     .lpf(sine.range(500, 7000).slow(8))
     .lpq(12)
     .decay(0.3)
@@ -280,7 +281,7 @@ const stem7_space = stack(
   // Sparse, high liquid droplets
   note("~ c6 ~ ~ ~ g5 ~ ~ eb6 ~ ~ ~")
     .s("sine")
-    .hpf(globalLpf.add(spaceHpf))
+    .hpf(globalHpf.add(spaceHpf))
     .lpf(7000)
     .decay(0.12)
     .sustain(0)
@@ -294,22 +295,138 @@ const stem7_space = stack(
   .roomsize(0.9)
   .gain(spaceLevel.mul(globalLevel))
 
+// ============================================================
+// MELODIES
+// Every melody uses the same controls, numbered from melody 1:
+// hpf cc(52+N), lpf cc(60+N), density cc(68+N), level cc(104+N)
+// ============================================================
+const melodyMainLpf = 100
+const baselineLpfMax = 800
+const ramp = (sig, from, to) => sig.fmap(v => Math.min(1, Math.max(0, (v - from) / (to - from))))
+
+// Random wobble, driven by a melody's hpf knob (cc 52+N, 0..1); it also drives that melody's bassline.
+// 0      dry
+// ~0.5   organic: audible slow detune drift and vibrato shared by all layers, breathing envelopes
+// 1      extravagant: per-note pitch scatter, octave jumps, dropouts and strongly varying envelopes
+const wobble = (pat, knob) => {
+  const organic = ramp(knob, 0, 0.5)
+  const extra   = ramp(knob, 0.5, 1)
+  const drift   = perlin.slow(2).range(-1, 1)    // same signals in every layer, so layers stay in tune with each other
+  const vibrato = sine.slow(4).range(-1, 1)
+  const jump    = rand.lt(extra.mul(0.15)).fmap(b => b ? 12 : 0)
+  const drop    = rand.gt(extra.mul(0.25)).fmap(b => b ? 1 : 0)
+  const level   = rand.mul(organic.mul(-0.3)).add(1)
+  // Envelope: per-note random attack, decay and sustain, each widening from organic to extravagant
+  const atkAmt  = organic.mul(0.06).add(extra.mul(0.25))
+  const decAmt  = organic.mul(0.2).add(extra.mul(0.5))
+  const susAmt  = organic.mul(0.2).add(extra.mul(0.5))
+  // Pitch in cents via detune (control arithmetic on note values is not allowed, so no .add here)
+  const cents   = drift.mul(organic.mul(55)).add(vibrato.mul(organic.mul(20)))  // up to ~55 cents drift + ~20 cents vibrato
+    .add(rand.range(-1, 1).mul(organic.mul(15).add(extra.mul(150))))             // per-note scatter: ±15 cents organic, up to ±150 extravagant
+  return pat
+    .detune(cents)
+    // TODO: This feature doesnt work so well
+    // .trans(jump)                                 // occasional octave jumps
+    // .velocity(drop.mul(level))                   // dropouts and level variation
+    // .attack(rand.mul(atkAmt))                    // up to 60 ms organic, up to 0.25 s extravagant
+    // .decay(rand.mul(decAmt).add(0.05))
+    // .sustain(rand.mul(susAmt).mul(-1).add(1))    // sustain drops from 1 by up to susAmt
+    // .release(rand.mul(extra.mul(0.3)).add(0.05))
+}
+
+// Overtones = harmonic partials above the fundamental, in three entry groups.
+// Each partial n gets amplitude 1/n; its window is set by the melody's density.
+const melody = (notes, density, level, knob) => {
+  const dens = globalDensity.mul(density)
+  const overtone = (semis, n, from, to) => wobble(note(notes)
+    .sound("sawtooth")
+    .trans(semis)
+    .lpf(globalLpf.add(melodyMainLpf))
+    .gain(ramp(dens, from, to).mul(1 / n))
+    .acidenv(0.3), knob)
+
+  return stack(
+    wobble(note(notes).sound("sawtooth").lpf(globalLpf.add(melodyMainLpf)).acidenv(0.3).gain(globalLevel.mul(level)), knob),
+    // Group 1: 2nd and 3rd partial
+    overtone(12, 2, 0.0, 0.3),   // octave (2nd partial)
+    overtone(19, 3, 0.0, 0.3),   // octave + fifth (3rd partial)
+    // Group 2: 4th and 5th partial
+    overtone(24, 4, 0.3, 0.6),   // two octaves (4th partial)
+    overtone(28, 5, 0.3, 0.6),   // two octaves + major third (5th partial)
+    // Group 3: 6th partial
+    overtone(31, 6, 0.6, 0.9)    // two octaves + fifth (6th partial)
+  )
+}
+
+// Baseline: fades in with its lpf knob, from 0 up to baselineLpfMax
+const baseline = (notes, lpf, knob) => wobble(note(notes)
+  .sound("sawtooth")
+  .lpf(lpf)
+  .acidenv(0.3)
+  .gain(globalLevel.mul(0.5)), knob)
+
 // MELODY 1
-const melody1Hpf    = cc(53).range(0, 10000)
-const melody1Lpf    = cc(61).range(0, 200)
+const melody1Hpf    = cc(53).range(0, 1)
 const melody1Density = cc(69).range(0, 1)
 const melody1Level    = cc(105).range(0, 1)
-const stem_melody1 = stack(
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").lpf(globalLpf.add(melody1Lpf)).acidenv(0.3).gain(globalLevel.mul(melody1Level)),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(24).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.25)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(12).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(7).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(3).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-5).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-9).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-12).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.5)).acidenv(0.3),
-    note("[e2 e3 f2 f3 g2 g3 a2 a3]").sound("sawtooth").trans(-24).lpf(globalLpf.add(melody1Lpf)).gain(globalDensity.mul(melody1Density).mul(0.25)).acidenv(0.3)
-)
+const stem_melody1 = melody("[e2 e3 f2 f3 g2 g3 a2 a3]", melody1Density, melody1Level, melody1Hpf)
+const baseline1Lpf = cc(61).range(0, baselineLpfMax)
+// Octave-jumping eighths on E / F / G / A, following the melody's cycle
+const stem_baseline1 = baseline("<[e1 e2 e1 e2 f1 f2 e1 g2] [a1 a2 a1 a2 g1 g2 a1 e2]>", baseline1Lpf, melody1Hpf)
+
+// MELODY 2
+const melody2Hpf     = cc(54).range(0, 1)
+const melody2Density = cc(70).range(0, 1)
+const melody2Level   = cc(106).range(0, 1)
+const stem_melody2 = melody("[d3 e3 c3 f3 b2 g3 a2 a3]", melody2Density, melody2Level, melody2Hpf)
+const baseline2Lpf = cc(62).range(0, baselineLpfMax)
+// Root D with octave pops and passing tones from the melody (C, F, G, A)
+const stem_baseline2 = baseline("<[d1 d2 d1 d2 c2 d2 a1 d2] [d1 d2 f1 d2 g1 d2 a1 d2]>", baseline2Lpf, melody2Hpf).decay(sine.range(0.4,0.6))
+
+// MELODY 3
+const melody3Hpf     = cc(55).range(0, 1)
+const melody3Density = cc(71).range(0, 1)
+const melody3Level   = cc(107).range(0, 1)
+const stem_melody3 = melody("[a2 e3 c3 f3 b2 d3 g2 e3 a2 c3 f2 d3 g2 b2 e2 c3]*.5", melody3Density, melody3Level, melody3Hpf)
+// Energetic: driving octave-jumping eighths
+const baseline3Lpf = cc(63).range(0, baselineLpfMax)
+const stem_baseline3 = baseline("<[a1 a1 a2 a1] [g1 g1 g2 g1]>*2", baseline3Lpf, melody3Hpf)
+
+// MELODY 4
+const melody4Hpf     = cc(56).range(0, 1)
+const melody4Density = cc(72).range(0, 1)
+const melody4Level   = cc(108).range(0, 1)
+const stem_melody4 = melody("[c#3 f#3 a3 g3 c#3 f#3 a3 g3 c#3 f#3 g3 e3 c#3 f#3 g3 e3]*.5", melody4Density, melody4Level, melody4Hpf)
+// Chord tones of the melody (F#, C#, A, G, E), 8 steps to match the melody's cycle
+const baseline4Lpf = cc(64).range(0, baselineLpfMax)
+const stem_baseline4 = baseline("<[f#1 f#2 ~ c#2 a1 ~ f#2 c#2] [f#1 f#2 ~ g1 e1 ~ c#2 f#2]>", baseline4Lpf, melody4Hpf)
+
+// MELODY 5
+const melody5Hpf     = cc(57).range(0, 1)
+const melody5Density = cc(73).range(0, 1)
+const melody5Level   = cc(109).range(0, 1)
+const stem_melody5 = melody("[db3 f3 b3 e3]!2", melody5Density, melody5Level, melody5Hpf)
+const baseline5Lpf = cc(65).range(0, baselineLpfMax)
+// Melody's B / E / F / Db, with a turnaround on the second half of the cycle
+const stem_baseline5 = baseline("<[b1 b2 e1 b2 b1 b2 f1 db2] [b1 b2 e1 b2 db2 b2 f1 b2]>", baseline5Lpf, melody5Hpf)
+
+// MELODY 6
+const melody6Hpf     = cc(58).range(0, 1)
+const melody6Density = cc(74).range(0, 1)
+const melody6Level   = cc(110).range(0, 1)
+const stem_melody6 = melody("[c#3 f3 <a3 g3> e3]!2", melody6Density, melody6Level, melody6Hpf)
+// Energetic: pulsing octave c# / f eighths (f natural, as in the melody), with a g passing tone
+const baseline6Lpf = cc(66).range(0, baselineLpfMax)
+const stem_baseline6 = baseline("<[c#1 c#2 c#1 c#2] [f1 f2 g1 f2]>*2", baseline6Lpf, melody6Hpf)
+
+// MELODY 7
+const melody7Hpf     = cc(59).range(0, 1)
+const melody7Density = cc(75).range(0, 1)
+const melody7Level   = cc(111).range(0, 1)
+const stem_melody7 = melody("[db3 eb3 b3 f3]!", melody7Density, melody7Level, melody7Hpf)
+const baseline7Lpf = cc(67).range(0, baselineLpfMax)
+// Melody's Db / Eb / B / F (the old gb was not in the melody)
+const stem_baseline7 = baseline("<[b1 ~ db2 b2 eb2 ~ f1 b2] [f1 ~ eb2 b1 db2 ~ b1 ~]>", baseline7Lpf, melody7Hpf)
 
 
 // ============================================================
@@ -323,5 +440,18 @@ stack(
   stem5_clap,
   stem6_bongos,
   stem7_space,
-  stem_melody1
+  stem_melody1,
+  stem_melody2,
+  stem_melody3,
+  stem_melody4,
+  stem_melody5,
+  stem_melody6,
+  stem_melody7,
+  stem_baseline1,
+  stem_baseline2,
+  stem_baseline5,
+  stem_baseline3,
+  stem_baseline4,
+  stem_baseline6,
+  stem_baseline7
 )
