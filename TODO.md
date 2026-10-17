@@ -1,7 +1,7 @@
 - global LPF rwo not really used at all. I don't really understand how I should use it on a global level
 - density mechanism
     - clap (taking second hi-hat spot)
-    - sub wummern --> IMMER AN, wieso?
+    - sub wummern --> IMMER AN, wieso? --> IIMER AUS?!
     - acid tunes
     - maybe even kick for a mid range clack sound
 
