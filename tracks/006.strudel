@@ -26,20 +26,42 @@ const lastMoved = (a, b) => {
 }
 const ccGlobal = n => lastMoved(cc(n), cc(n + 48))
 
+// Knobs are endless encoders that remember a separate position per mode, so taking the last-moved
+// value would jump to the other mode's position. Instead each knob adds its own movement (delta) to one
+// shared value: turning either knob nudges the same thing from where it currently is.
+// Mode 16 is the home mode: its knob's first value is taken as is; the Mode 2 knob's first value is only
+// remembered as its starting point (cc() reads 0 until the knob has sent anything).
+const coupled = (a, b) => {
+  let prevA, prevB, bSeen, val
+  return a.fmap(x => y => {
+    if (val === undefined) { val = x; prevA = x; prevB = y; bSeen = y !== 0 }
+    if (x !== prevA) { val += x - prevA; prevA = x }
+    if (y !== prevB) {
+      if (bSeen) val += y - prevB
+      bSeen = true
+      prevB = y
+    }
+    val = Math.min(1, Math.max(0, val))
+    return val
+  }).appLeft(b)
+}
+const ccGlobalKnob = n => coupled(cc(n), cc(n + 48))
+
 const bpm = 140
 setcpm(bpm / 4)
 
-const globalHpf   = ccGlobal(20).fmap(v => 1000 * v * v)   // 0..1000 Hz, added to the stems' hpf; quadratic for fine control at the bottom
+const globalHpf   = ccGlobalKnob(20).fmap(v => 1000 * v * v)   // 0..1000 Hz, added to the stems' hpf; quadratic for fine control at the bottom
 // Swing: shifts every offbeat 8th later, from straight (0) to a heavy shuffle (1, a bit past triplet feel)
-const globalSwing = ccGlobal(36).range(0, 0.25)
-const globalLpf   = expRange(ccGlobal(28), 100, 12800)   // melodies only
+const globalSwing = ccGlobalKnob(36).range(0, 0.25)
+const globalLpf   = expRange(ccGlobalKnob(28), 100, 12800)   // melodies only
 const globalLevel = ccGlobal(12).range(0, 1)
 
 // Mode 2 (melodies): columns 1-7 use the Mode 16 layout with every CC + 48, continuing right after Mode 16
 // (faders 53-59, knobs 61-67 / 69-75 / 77-83, buttons 85-91 / 93-99).
-// Column 8 stays the global column in Mode 2 too (CC 60, 68, 76, 84 read via ccGlobal).
+// Column 8 stays the global column in Mode 2 too (fader CC 60 via ccGlobal, knobs CC 68, 76, 84 via ccGlobalKnob).
 // cc2(n) reads the Mode 2 control that sits where CC n sits in Mode 16.
-// Column N = melody N: knob row 1 = wobble, row 2 = baseline lpf, row 3 = density, fader = level.
+// Column N = melody N: knob row 1 = wobble, row 2 = baseline lpf, row 3 = density, fader = level,
+// button row 1 = overtone mode (momentary, steps Dur → Moll → Oktaven).
 const cc2 = n => cc(n + 48)
 
 // Melody
@@ -413,27 +435,52 @@ const wobble = (pat, knob) => {
     // .release(rand.mul(extra.mul(0.3)).add(0.05))
 }
 
-// Overtones = harmonic partials above the fundamental, in three entry groups.
-// Each partial n gets amplitude 1/n; its window is set by the melody's density.
-const melody = (notes, density, level, knob) => {
+// Momentary button that steps through n states, one step per press (counts presses, not the held value).
+// Re-evaluating the code starts again at 0.
+const cycleButton = (button, n) => {
+  let prev = 0, state = 0
+  return button.fmap(v => {
+    if (v > 0.5 && prev <= 0.5) state = (state + 1) % n
+    prev = v
+    return state
+  })
+}
+
+// Overtone modes, stepped by the melody's button
+const DUR = 0, MOLL = 1, OKTAVEN = 2
+
+// Voices above each melody note, in three entry groups set by the melody's density.
+// Each voice gets amplitude 1/n (n = its partial number, or its rank in the chord).
+// Dur:     the harmonic series (octave, fifth, major third), fits the baselines
+// Moll:    a parallel minor 9 chord on every note, the classic techno chord-memory stab: m → m7 → m9
+// Oktaven: octaves only, no third
+const melody = (notes, density, level, knob, button) => {
   const dens = density
-  const overtone = (semis, n, from, to) => wobble(note(notes)
+  const mode = cycleButton(button, 3)
+  const overtone = (semis, n, from, to, modes) => wobble(note(notes)
     .sound("sawtooth")
     .trans(semis)
     .lpf(globalLpf.add(melodyMainLpf))
-    .gain(ramp(dens, from, to).mul(1 / n).mul(globalLevel).mul(level))   // overtones follow the level fader too
+    .gain(ramp(dens, from, to).mul(1 / n)
+      .mul(mode.fmap(m => modes.includes(m) ? 1 : 0))
+      .mul(globalLevel).mul(level))   // overtones follow the level fader too
     .acidenv(0.3), knob)
 
   return stack(
     wobble(note(notes).sound("sawtooth").lpf(globalLpf.add(melodyMainLpf)).acidenv(0.3).gain(globalLevel.mul(level)), knob),
-    // Group 1: 2nd and 3rd partial
-    overtone(12, 2, 0.0, 0.3),   // octave (2nd partial)
-    overtone(19, 3, 0.0, 0.3),   // octave + fifth (3rd partial)
-    // Group 2: 4th and 5th partial
-    overtone(24, 4, 0.3, 0.6),   // two octaves (4th partial)
-    overtone(28, 5, 0.3, 0.6),   // two octaves + major third (5th partial)
-    // Group 3: 6th partial
-    overtone(31, 6, 0.6, 0.9)    // two octaves + fifth (6th partial)
+    // Group 1
+    overtone(12, 2, 0.0, 0.3, [DUR, MOLL, OKTAVEN]),   // octave
+    overtone(19, 3, 0.0, 0.3, [DUR]),                  // octave + fifth (3rd partial)
+    overtone(15, 3, 0.0, 0.3, [MOLL]),                 // octave + minor third
+    // Group 2
+    overtone(24, 4, 0.3, 0.6, [DUR, OKTAVEN]),         // two octaves (4th partial)
+    overtone(28, 5, 0.3, 0.6, [DUR]),                  // two octaves + major third (5th partial)
+    overtone(19, 4, 0.3, 0.6, [MOLL]),                 // octave + fifth
+    overtone(22, 5, 0.3, 0.6, [MOLL]),                 // octave + minor seventh
+    // Group 3
+    overtone(31, 6, 0.6, 0.9, [DUR]),                  // two octaves + fifth (6th partial)
+    overtone(26, 6, 0.6, 0.9, [MOLL]),                 // ninth
+    overtone(36, 6, 0.6, 0.9, [OKTAVEN])               // three octaves
   )
 }
 
@@ -448,7 +495,8 @@ const baseline = (notes, lpf, knob) => wobble(note(notes)
 const melody1Hpf    = cc2(13)
 const melody1Density = cc2(29)
 const melody1Level    = cc2(5)
-const stem_melody1 = melody("[e2 e3 f2 f3 g2 g3 a2 a3]", melody1Density, melody1Level, melody1Hpf)
+const melody1Mode    = cc2(37)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody1 = melody("[e2 e3 f2 f3 g2 g3 a2 a3]", melody1Density, melody1Level, melody1Hpf, melody1Mode)
 const baseline1Lpf = cc2(21).range(0, baselineLpfMax)
 // Octave-jumping eighths on E / F / G / A, following the melody's cycle
 const stem_baseline1 = baseline("<[e1 e2 e1 e2 f1 f2 e1 g2] [a1 a2 a1 a2 g1 g2 a1 e2]>", baseline1Lpf, melody1Hpf)
@@ -457,7 +505,8 @@ const stem_baseline1 = baseline("<[e1 e2 e1 e2 f1 f2 e1 g2] [a1 a2 a1 a2 g1 g2 a
 const melody2Hpf     = cc2(14)
 const melody2Density = cc2(30)
 const melody2Level   = cc2(6)
-const stem_melody2 = melody("[d3 e3 c3 f3 b2 g3 a2 a3]", melody2Density, melody2Level, melody2Hpf)
+const melody2Mode    = cc2(38)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody2 = melody("[d3 e3 c3 f3 b2 g3 a2 a3]", melody2Density, melody2Level, melody2Hpf, melody2Mode)
 const baseline2Lpf = cc2(22).range(0, baselineLpfMax)
 // Root D with octave pops and passing tones from the melody (C, F, G, A)
 const stem_baseline2 = baseline("<[d1 d2 d1 d2 c2 d2 a1 d2] [d1 d2 f1 d2 g1 d2 a1 d2]>", baseline2Lpf, melody2Hpf).decay(sine.range(0.4,0.6))
@@ -466,7 +515,8 @@ const stem_baseline2 = baseline("<[d1 d2 d1 d2 c2 d2 a1 d2] [d1 d2 f1 d2 g1 d2 a
 const melody3Hpf     = cc2(15)
 const melody3Density = cc2(31)
 const melody3Level   = cc2(7)
-const stem_melody3 = melody("[a2 e3 c3 f3 b2 d3 g2 e3 a2 c3 f2 d3 g2 b2 e2 c3]*.5", melody3Density, melody3Level, melody3Hpf)
+const melody3Mode    = cc2(39)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody3 = melody("[a2 e3 c3 f3 b2 d3 g2 e3 a2 c3 f2 d3 g2 b2 e2 c3]*.5", melody3Density, melody3Level, melody3Hpf, melody3Mode)
 // Energetic: driving octave-jumping eighths
 const baseline3Lpf = cc2(23).range(0, baselineLpfMax)
 const stem_baseline3 = baseline("<[a1 a1 a2 a1] [g1 g1 g2 g1]>*2", baseline3Lpf, melody3Hpf)
@@ -475,7 +525,8 @@ const stem_baseline3 = baseline("<[a1 a1 a2 a1] [g1 g1 g2 g1]>*2", baseline3Lpf,
 const melody4Hpf     = cc2(16)
 const melody4Density = cc2(32)
 const melody4Level   = cc2(8)
-const stem_melody4 = melody("[c#3 f#3 a3 g3 c#3 f#3 a3 g3 c#3 f#3 g3 e3 c#3 f#3 g3 e3]*.5", melody4Density, melody4Level, melody4Hpf)
+const melody4Mode    = cc2(40)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody4 = melody("[c#3 f#3 a3 g3 c#3 f#3 a3 g3 c#3 f#3 g3 e3 c#3 f#3 g3 e3]*.5", melody4Density, melody4Level, melody4Hpf, melody4Mode)
 // Chord tones of the melody (F#, C#, A, G, E), 8 steps to match the melody's cycle
 const baseline4Lpf = cc2(24).range(0, baselineLpfMax)
 const stem_baseline4 = baseline("<[f#1 f#2 ~ c#2 a1 ~ f#2 c#2] [f#1 f#2 ~ g1 e1 ~ c#2 f#2]>", baseline4Lpf, melody4Hpf)
@@ -484,7 +535,8 @@ const stem_baseline4 = baseline("<[f#1 f#2 ~ c#2 a1 ~ f#2 c#2] [f#1 f#2 ~ g1 e1 
 const melody5Hpf     = cc2(17)
 const melody5Density = cc2(33)
 const melody5Level   = cc2(9)
-const stem_melody5 = melody("[db3 f3 b3 e3]!2", melody5Density, melody5Level, melody5Hpf)
+const melody5Mode    = cc2(41)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody5 = melody("[db3 f3 b3 e3]!2", melody5Density, melody5Level, melody5Hpf, melody5Mode)
 const baseline5Lpf = cc2(25).range(0, baselineLpfMax)
 // Melody's B / E / F / Db, with a turnaround on the second half of the cycle
 const stem_baseline5 = baseline("<[b1 b2 e1 b2 b1 b2 f1 db2] [b1 b2 e1 b2 db2 b2 f1 b2]>", baseline5Lpf, melody5Hpf)
@@ -493,7 +545,8 @@ const stem_baseline5 = baseline("<[b1 b2 e1 b2 b1 b2 f1 db2] [b1 b2 e1 b2 db2 b2
 const melody6Hpf     = cc2(18)
 const melody6Density = cc2(34)
 const melody6Level   = cc2(10)
-const stem_melody6 = melody("[c#3 f3 <a3 g3> e3]!2", melody6Density, melody6Level, melody6Hpf)
+const melody6Mode    = cc2(42)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody6 = melody("[c#3 f3 <a3 g3> e3]!2", melody6Density, melody6Level, melody6Hpf, melody6Mode)
 // Energetic: pulsing octave c# / f eighths (f natural, as in the melody), with a g passing tone
 const baseline6Lpf = cc2(26).range(0, baselineLpfMax)
 const stem_baseline6 = baseline("<[c#1 c#2 c#1 c#2] [f1 f2 g1 f2]>*2", baseline6Lpf, melody6Hpf)
@@ -502,7 +555,8 @@ const stem_baseline6 = baseline("<[c#1 c#2 c#1 c#2] [f1 f2 g1 f2]>*2", baseline6
 const melody7Hpf     = cc2(19)
 const melody7Density = cc2(35)
 const melody7Level   = cc2(11)
-const stem_melody7 = melody("[db3 eb3 b3 f3]!", melody7Density, melody7Level, melody7Hpf)
+const melody7Mode    = cc2(43)   // button row 1: steps Dur → Moll → Oktaven
+const stem_melody7 = melody("[db3 eb3 b3 f3]!", melody7Density, melody7Level, melody7Hpf, melody7Mode)
 const baseline7Lpf = cc2(27).range(0, baselineLpfMax)
 // Melody's Db / Eb / B / F (the old gb was not in the melody)
 const stem_baseline7 = baseline("<[b1 ~ db2 b2 eb2 ~ f1 b2] [f1 ~ eb2 b1 db2 ~ b1 ~]>", baseline7Lpf, melody7Hpf)
