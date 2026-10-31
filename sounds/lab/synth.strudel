@@ -1,0 +1,248 @@
+// ============================================================
+// SYNTH BOARD: one bass voice, every column is one stage of the sound, to learn what each parameter does
+// ============================================================
+// Launch Control XL 3, the same custom mode as the drum and bass boards (MIDI channel 16).
+// The columns follow the signal path: source → volume envelope → filter → filter envelope → FM → pitch → drive → space.
+// Button row 1 steps through a choice in that stage, button row 2 switches the stage on/off (A/B: hear what it adds).
+// Column 1 is the exception: its button row 2 steps through the basslines.
+// The status box at the bottom right shows every value live, with units.
+//
+// @layout Synth Board (sounds/lab)
+// @note One bass voice; each column is one stage of the signal path: source → volume envelope → filter → filter envelope → FM → pitch → drive → space.
+// @note Button row 1 picks a choice within the stage, button row 2 switches the stage on/off (A/B comparison). Exception column 1: button 2 = bassline. At start only envelope and filter are on.
+// @note The status box at the bottom right shows all values live, with units. Faders jump from their start value to their real position on first movement.
+// @mode 16 Mode 16 — Synth Board
+// @col 16:1 1 Source
+// @col 16:2 2 Envelope
+// @col 16:3 3 Filter
+// @col 16:4 4 Filter env.
+// @col 16:5 5 FM
+// @col 16:6 6 Pitch
+// @col 16:7 7 Drive
+// @col 16:8 8 Space
+
+const bpm = 118
+setcpm(bpm / 4)
+
+// Basslines (column 1, button 2), all in A minor, one bar = 16 sixteenths. Same as the bass board.
+const BASSLINES = [
+  "<[~ a1]*4 [~ a1]*4 [~ f1]*4 [~ g1]*4>",              // 1  offbeat
+  "[~ a1 a1 a1]*4",                                     // 2  rolling
+  "[a1 a2]*4",                                          // 3  octave eighths
+  "<[a1 ~ ~ a1 ~ ~ a2 ~ ~ ~ a1 ~ c2 ~ g1 ~] [a1 ~ ~ a1 ~ ~ a2 ~ ~ ~ f1 ~ e1 ~ g1 ~]>",  // 4  syncopated
+]
+
+// Choices for button row 1, per column. trim = rough loudness match (bright waveforms are louder at the same gain).
+const WAVES    = [['sine', 1], ['triangle', 0.9], ['sawtooth', 0.5], ['square', 0.45], ['pulse', 0.45], ['supersaw', 0.35]]
+const LENGTHS  = [['kurz ¼', 0.25], ['halb ½', 0.5], ['voll', 1], ['lang ×2', 2]]   // clip: note length relative to its step
+const FTYPES   = ['12db', '24db', 'ladder']
+const FDIRS    = [['auf', 1], ['ab', -1]]
+const RATIOS   = [1, 2, 3, 0.5, 1.414]                                               // fmh: modulator frequency / note frequency
+const OCTAVES  = [['±0', 0], ['+1 Okt.', 12], ['+2 Okt.', 24]]
+const DTYPES   = ['scurve', 'soft', 'hard', 'cubic', 'diode', 'asym', 'fold', 'sinefold', 'chebyshev']
+const DTIMES   = [['1/8', 0.5], ['3/16', 0.75], ['1/4', 1], ['1/16', 0.25]]          // delay time in beats
+
+// Continuous controls: [CC, label, start (0..1), map 0..1 → value, format].
+// Faders: 4 + column, knob rows: 12 / 20 / 28 + column.
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)   // exponential: every bit of travel is equally audible
+const lin = (lo, hi) => v => lo + (hi - lo) * v
+const sec = x => x < 1 ? Math.round(x * 1000) + ' ms' : x.toFixed(2) + ' s'
+const hz  = x => x < 1000 ? Math.round(x) + ' Hz' : (x / 1000).toFixed(1) + ' kHz'
+const num = d => x => x.toFixed(d)
+const CTL = {
+  // 1 source
+  // @ctl 16:1.fader Level | 0–1, overall volume.
+  level:     [5,  'Lautst.',    0.7,  lin(0, 1),        num(2)],
+  // @ctl 16:1.k1 Pulse width | Only for pulse: 0.5 = square (hollow) … 0.05 = thin, nasal.
+  pw:        [13, 'Pulsbr.',    0,    lin(0.5, 0.05),   num(2)],
+  // @ctl 16:1.k2 Detune | Only for supersaw: how far the 5 sawtooths are detuned. 0 = one saw, more = wide, shimmering.
+  detune:    [21, 'Detune',     0.3,  lin(0, 1),        num(2)],
+  // @ctl 16:1.k3 Noise | 0–1, mix in noise (sine/triangle/sawtooth/square): air, bite.
+  noise:     [29, 'Rauschen',   0,    lin(0, 1),        num(2)],
+  // 2 volume envelope (ADSR): how the volume of each note moves over time
+  // @ctl 16:2.k1 Attack | 1 ms–1 s: how long the note takes to fade in. Short = click, long = soft, swelling.
+  attack:    [14, 'A',          0,    exp(0.001, 1),    sec],
+  // @ctl 16:2.k2 Decay | 10 ms–2 s: how fast it then falls to the sustain level.
+  decay:     [22, 'D',          0.45, exp(0.01, 2),     sec],
+  // @ctl 16:2.fader Sustain | 0–1: level while the note is held. 0 = every note dies away (pluck), 1 = organ.
+  sustain:   [6,  'S',          0.5,  lin(0, 1),        num(2)],
+  // @ctl 16:2.k3 Release | 10 ms–2 s: fade-out after the note ends. Mostly audible with short note lengths.
+  release:   [30, 'R',          0.3,  exp(0.01, 2),     sec],
+  // 3 filter: removes frequencies. Lowpass (LPF) lets the lows through, highpass (HPF) the highs.
+  // @ctl 16:3.fader Cutoff (LPF) | 40 Hz–12 kHz: low-pass, low = dull, high = bright. Almost no effect on sine (no overtones).
+  cutoff:    [7,  'LPF',        0.45, exp(40, 12000),   hz],
+  // @ctl 16:3.k1 Resonance | 0–20: boosts the frequencies around the cutoff. High = whistling, squeaky (acid).
+  lpq:       [15, 'Res',        0.1,  lin(0, 20),       num(1)],
+  // @ctl 16:3.k2 HPF | 20 Hz–2 kHz: high-pass, removes the body; the bass gets thin.
+  hpf:       [23, 'HPF',        0,    exp(20, 2000),    hz],
+  // @ctl 16:3.k3 HPF resonance | 0–20: resonance of the high-pass.
+  hpq:       [31, 'HPF-Res',    0,    lin(0, 20),       num(1)],
+  // 4 filter envelope: moves the lowpass cutoff with every note
+  // @ctl 16:4.fader Env amount | 0–6 octaves: how far the filter sweeps up (or down) from the cutoff on each note. Needs column 3 on.
+  fenv:      [8,  'Menge',      0.5,  lin(0, 6),        x => x.toFixed(1) + ' Okt.'],
+  // @ctl 16:4.k1 Filter attack | 1 ms–1 s: how fast the filter opens. Long = „wah“.
+  fattack:   [16, 'A',          0,    exp(0.001, 1),    sec],
+  // @ctl 16:4.k2 Filter decay | 10 ms–2 s: how fast it closes again. Short = „blubb“, squelch.
+  fdecay:    [24, 'D',          0.4,  exp(0.01, 2),     sec],
+  // @ctl 16:4.k3 Filter sustain | 0–1: how far open it stays while the note sounds.
+  fsustain:  [32, 'S',          0,    lin(0, 1),        num(2)],
+  // 5 FM: a second, inaudible oscillator wobbles the pitch of the first so fast that new overtones appear
+  // @ctl 16:5.fader FM amount | 0–8: 0 = none, a little = warmer, a lot = metallic, bell-like, growl.
+  fm:        [9,  'Stärke',     0.25, lin(0, 8),        num(1)],
+  // @ctl 16:5.k1 FM decay | 10 ms–2 s: how fast the FM overtones fade (with FM sustain below 1).
+  fmdecay:   [17, 'D',          0.45, exp(0.01, 2),     sec],
+  // @ctl 16:5.k2 FM sustain | 0–1: 1 = FM stays for the whole note, 0 = only a strike (like e-piano, bell).
+  fmsustain: [25, 'S',          1,    lin(0, 1),        num(2)],
+  // @ctl 16:5.k3 Detune | 0–5 % off the ratio: crooked, inharmonic, beating.
+  fmdetune:  [33, 'Verst.',     0,    lin(0, 0.05),     x => (x * 100).toFixed(1) + ' %'],
+  // 6 pitch: pitch envelope (a drop at the start of each note) and vibrato (slow wobble)
+  // @ctl 16:6.fader Pitch env | 0–24 semitones: each note starts this much higher and falls down. High + short = „zap“, kick-like.
+  penv:      [10, 'P-Env',      0.5,  lin(0, 24),       x => x.toFixed(1) + ' HT'],
+  // @ctl 16:6.k1 Pitch decay | 10 ms–1 s: how fast the pitch falls.
+  pdecay:    [18, 'P-Dec',      0.4,  exp(0.01, 1),     sec],
+  // @ctl 16:6.k2 Vibrato rate | 0–12 Hz: how fast the pitch wobbles.
+  vib:       [26, 'Vib',        0.4,  lin(0, 12),       x => x.toFixed(1) + ' Hz'],
+  // @ctl 16:6.k3 Vibrato depth | 0–2 semitones: how far it wobbles.
+  vibmod:    [34, 'Tiefe',      0.25, lin(0, 2),        x => x.toFixed(2) + ' HT'],
+  // 7 drive: distortion adds overtones by bending the waveform
+  // @ctl 16:7.fader Drive | 0–6: how much distortion. The type (button 1) sets the character.
+  drive:     [11, 'Drive',      0.3,  lin(0, 6),        num(1)],
+  // @ctl 16:7.k1 Level after | 0.1–1: distortion makes it louder; use this to bring it back down.
+  distvol:   [19, 'Pegel',      0.5,  lin(0.1, 1),      num(2)],
+  // @ctl 16:7.k2 Bitcrush | 16–2 bit: coarser volume steps, rough, digital, 8-bit.
+  crush:     [27, 'Bits',       0,    lin(16, 2),       x => x.toFixed(1)],
+  // @ctl 16:7.k3 Coarse | 1–32: lower sample rate, metallic aliasing, telephone/Game Boy.
+  coarse:    [35, 'Coarse',     0,    v => 1 + Math.round(31 * v), x => String(x)],
+  // 8 space: reverb (room) and echo (delay)
+  // @ctl 16:8.fader Reverb | 0–1: amount of reverb. Use sparingly on bass, otherwise it turns to mush.
+  room:      [12, 'Hall',       0.3,  lin(0, 1),        num(2)],
+  // @ctl 16:8.k1 Room size | 0.5–8: small room … cathedral.
+  roomsize:  [20, 'Größe',      0.3,  exp(0.5, 8),      num(1)],
+  // @ctl 16:8.k2 Delay | 0–0.8: volume of the echoes.
+  delay:     [28, 'Delay',      0.3,  lin(0, 0.8),      num(2)],
+  // @ctl 16:8.k3 Feedback | 0–0.9: how many echoes (high = endless).
+  feedback:  [36, 'Feedb.',     0.4,  lin(0, 0.9),      num(2)],
+}
+
+// All state lives on globalThis, so re-evaluating while playing keeps knobs and buttons where they are.
+const S = globalThis.synthLab ??= {
+  val: Object.fromEntries(Object.values(CTL).map(([cc, , start]) => [cc, start])),
+  sel: [2, 1, 0, 0, 0, 0, 0, 0],        // button row 1 per column; starts on sawtooth, half note length
+  line: 0,                              // column 1, button 2
+  on: [true, true, true, false, false, false, false, false],   // button row 2: stage on/off (column 1 always on)
+}
+const get = name => CTL[name][3](S.val[CTL[name][0]])
+const p = name => signal(() => get(name))
+const sig = f => signal(() => f())
+
+// The knobs are endless encoders that keep their own position, so tell the controller where they are.
+// Only when this board was not the last one synced (the drum and bass boards use the same flag).
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = await navigator.requestMIDIAccess()
+if (globalThis.knobsSyncedFor !== 'synth') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round(S.val[cc] * 127)])   // 0xBF = CC on channel 16
+    globalThis.knobsSyncedFor = 'synth'
+  }
+}
+
+// Status box at the bottom right: every column with its choice, on/off and the live values.
+const COLUMNS = [
+  ['Quelle',     () => WAVES[S.sel[0]][0] + '  Line ' + (S.line + 1), ['level', 'pw', 'detune', 'noise']],
+  ['Hüllkurve',  () => 'Länge ' + LENGTHS[S.sel[1]][0],               ['attack', 'decay', 'sustain', 'release']],
+  ['Filter',     () => FTYPES[S.sel[2]],                              ['cutoff', 'lpq', 'hpf', 'hpq']],
+  ['Filter-Env', () => FDIRS[S.sel[3]][0],                            ['fenv', 'fattack', 'fdecay', 'fsustain']],
+  ['FM',         () => 'Verh. ' + RATIOS[S.sel[4]],                   ['fm', 'fmdecay', 'fmsustain', 'fmdetune']],
+  ['Tonhöhe',    () => OCTAVES[S.sel[5]][0],                          ['penv', 'pdecay', 'vib', 'vibmod']],
+  ['Verzerrung', () => DTYPES[S.sel[6]],                              ['drive', 'distvol', 'crush', 'coarse']],
+  ['Raum',       () => 'Delay ' + DTIMES[S.sel[7]][0],                ['room', 'roomsize', 'delay', 'feedback']],
+]
+let statusBox = document.getElementById('board-status')
+if (!statusBox) {
+  statusBox = document.createElement('pre')
+  statusBox.id = 'board-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);color:#eee;font:13px/1.5 monospace;border-radius:6px;pointer-events:none'
+  document.body.appendChild(statusBox)
+}
+const showStatus = () => {
+  statusBox.textContent = COLUMNS.map(([name, choice, names], i) =>
+    (i + 1) + ' ' + name.padEnd(11) + (i === 0 ? '   ' : S.on[i] ? 'AN ' : 'aus') + ' ' + choice().padEnd(19) +
+    names.map(n => (CTL[n][1] + ' ' + CTL[n][4](get(n))).padEnd(15)).join('')
+  ).join('\n')
+}
+showStatus()
+
+// MIDI in: faders and knobs (CC 5-36) set values, buttons (37-52) step on each press; the release (0) is ignored.
+// Re-evaluating replaces the old listener (shared name with the other boards).
+const OPTIONS = [WAVES, LENGTHS, FTYPES, FDIRS, RATIOS, OCTAVES, DTYPES, DTIMES]
+const onMidi = e => {
+  const [statusByte, num, value] = e.data
+  if ((statusByte & 0xf0) !== 0xb0) return
+  if (num >= 5 && num <= 36) S.val[num] = value / 127
+  else if (value === 0) return
+  else if (num >= 37 && num <= 44) S.sel[num - 37] = (S.sel[num - 37] + 1) % OPTIONS[num - 37].length
+  else if (num === 45) S.line = (S.line + 1) % BASSLINES.length
+  else if (num >= 46 && num <= 52) S.on[num - 45] = !S.on[num - 45]
+  else return
+  showStatus()
+}
+for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+
+// A stage only touches the sound while it is switched on; off = the parameters are not set at all.
+const stage = (i, fx) => pat => sig(() => S.on[i]).fmap(on => on ? fx(pat) : pat).innerJoin()
+
+const STAGES = [
+  // 2 volume envelope; without it Strudel uses a plain gate: instant on, full level, 10 ms release
+  stage(1, x => x.attack(p('attack')).decay(p('decay')).sustain(p('sustain')).release(p('release'))),
+  // 3 filter
+  stage(2, x => x.lpf(p('cutoff')).lpq(p('lpq')).hpf(p('hpf')).hpq(p('hpq')).ftype(sig(() => FTYPES[S.sel[2]]))),
+  // 4 filter envelope: lpenv in octaves above the cutoff, negative = closes instead of opens
+  stage(3, x => x.lpenv(sig(() => get('fenv') * FDIRS[S.sel[3]][1]))
+    .lpattack(p('fattack')).lpdecay(p('fdecay')).lpsustain(p('fsustain'))),
+  // 5 FM: fm = index (how strong), fmh = ratio of modulator to note frequency (integers sound harmonic)
+  stage(4, x => x.fm(p('fm')).fmh(sig(() => RATIOS[S.sel[4]] * (1 + get('fmdetune'))))
+    .fmdecay(p('fmdecay')).fmsustain(p('fmsustain'))),
+  // 6 pitch: a fast rise to +penv semitones, then a fall back to the note; vibrato on top
+  stage(5, x => x.penv(p('penv')).pattack(0.001).pdecay(p('pdecay')).psustain(0).vib(p('vib')).vibmod(p('vibmod'))),
+  // 7 drive
+  stage(6, x => x.distort(p('drive')).distorttype(sig(() => S.sel[6])).distortvol(p('distvol'))
+    .crush(p('crush')).coarse(p('coarse'))),
+  // 8 space
+  stage(7, x => x.room(p('room')).roomsize(p('roomsize'))
+    .delay(p('delay')).delayfeedback(p('feedback')).delaytime(sig(() => DTIMES[S.sel[7]][1] * 60 / bpm))),
+]
+
+// 1 source: bassline (button 2) in the chosen octave (column 6, button 1, works even with the stage off)
+// @ctl 16:1.b1 Waveform | sine, triangle, saw, square, pulse, supersaw.
+// @ctl 16:1.b2 Bassline | Offbeat → Rolling → Octaves → Syncopated.
+// @ctl 16:2.b1 Note length | ¼, ½, full, ×2 of the step.
+// @ctl 16:2.b2 Envelope on/off | Off = hard on/off switch (organ).
+// @ctl 16:3.b1 Filter type | 12 dB, 24 dB, ladder (Moog).
+// @ctl 16:3.b2 Filter on/off |
+// @ctl 16:4.b1 Direction | up / down per note.
+// @ctl 16:4.b2 Filter env on/off | Only works with filter on.
+// @ctl 16:5.b1 Ratio | 1, 2, 3, 0.5, 1.414 (bell-like).
+// @ctl 16:5.b2 FM on/off |
+// @ctl 16:6.b1 Octave | 0, +1, +2. Laptop: +1.
+// @ctl 16:6.b2 Pitch/vibrato on/off |
+// @ctl 16:7.b1 Distortion type | 9 types: scurve … chebyshev.
+// @ctl 16:7.b2 Drive on/off |
+// @ctl 16:8.b1 Delay time | 1/8, 3/16, 1/4, 1/16.
+// @ctl 16:8.b2 Space on/off |
+const notes = sig(() => S.line).pick(BASSLINES.map(l => note(l))).trans(sig(() => OCTAVES[S.sel[5]][1]))
+const source = notes
+  .s(sig(() => WAVES[S.sel[0]][0]))
+  .pw(p('pw')).unison(5).detune(p('detune')).noise(p('noise'))
+  .clip(sig(() => LENGTHS[S.sel[1]][1]))
+
+STAGES.reduce((pat, st) => st(pat), source)
+  .gain(sig(() => WAVES[S.sel[0]][1]))
+  .orbit(1)
+  .postgain(p('level'))

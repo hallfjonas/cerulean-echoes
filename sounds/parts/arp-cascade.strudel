@@ -1,0 +1,151 @@
+// ============================================================
+// ARP CASCADE: one 12-step dorian arpeggio played in ten registers at once (from tutorial.str)
+// ============================================================
+// Every layer plays the same motif, transposed from +24 down to -48 semitones; the low layers get quieter,
+// so the stack sounds like one bright line with a long shadow underneath. Sawtooth through an acid lowpass:
+// the filter opens briefly on every note (envelope), the resonance (q) makes it squelch.
+// Kick and tom-bass (also from tutorial.str) can switch density; 12 steps divide by 2, 3, 4 and 6, so every
+// density lands on arp notes: 4 = straight, 3 = floating triplet feel, kick 4 + tom 3 = 3-against-4.
+//
+// @layout Arp Cascade (sounds/parts)
+// @note One 12-step dorian arpeggio in ten registers at once, plus kick and tom-bass. All knobs at 0 and all faders up = the original sound from tutorial.str.
+// @note The knobs are set to 0 on load. Button row 1 steps on with every press (re-evaluating starts over). Density: 4 = straight, 3 = floating, 2 = half-time, 6 = driving; kick 4 + tom 3 = 3-against-4 polyrhythm. Each arp column has its own motif, so they can play against each other.
+// @mode 16 Mode 16 — Arp Cascade
+// @col 16:1 1 High (+24, +15)
+// @col 16:2 2 Mid (+12, +3)
+// @col 16:3 3 Root (0)
+// @col 16:4 4 Low (−12, −24)
+// @col 16:5 5 Sub (−31 … −48)
+// @col 16:6 6 Kick
+// @col 16:7 7 Tom-Bass
+// @col 16:8 8 Global
+// @row 16:k1 Row 1 \ HPF
+// @row 16:k2 Row 2 \ Acid / LPF
+// @row 16:k3 Row 3 \ Character
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Pattern
+// @ctl 16:1-5.k1 HPF | 20–2000 Hz: takes the body out of the layer; fully open only the chirp is left.
+// @ctl 16:1-5.k2 Acid | 0 = original, up = the filter opens up to 3× further per note: brighter, more squelchy.
+// @ctl 16:1-5.k3 Decay | 0 = original (0.12 s), up = up to 0.7 s: the filter closes slower, “wah” instead of “blip”.
+// @ctl 16:1-5.fader Level | 0–1, top = original level of the layers.
+// @ctl 16:1-5.b1 Motif | full → gaps → short.
+const cc = await midin()
+
+// The knobs are endless encoders that keep their own position; set them all to 0 once per page load,
+// so the first turn starts from the original sound instead of jumping
+if (globalThis.knobsSyncedFor !== 'arp-cascade' && globalThis.navigator?.requestMIDIAccess) {
+  const access = await navigator.requestMIDIAccess()
+  const out = [...access.outputs.values()].find(p => /LCXL|Launch Control/i.test(p.name) && !/DAW/i.test(p.name))
+  if (out) {
+    for (let n = 13; n <= 36; n++) out.send([0xBF, n, 0])   // 0xBF = control change on channel 16
+    globalThis.knobsSyncedFor = 'arp-cascade'
+  }
+}
+
+setcps(.54) // gentle, floating tempo
+
+const expRange = (knob, lo, hi) => knob.fmap(v => lo * Math.pow(hi / lo, v))
+const colMap = n => ({ hpf: cc(12 + n), k2: cc(20 + n), k3: cc(28 + n), level: cc(4 + n), btn: cc(36 + n) })
+
+// Momentary button that steps through n states, one step per press (counts presses, not the held value)
+const cycleButton = (button, n) => {
+  let prev = 0, state = 0
+  return button.fmap(v => {
+    if (v > 0.5 && prev <= 0.5) state = (state + 1) % n
+    prev = v
+    return state
+  })
+}
+
+// Gating: a stem is only queried while its fader and the master are up (its gain is 0 otherwise)
+const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
+const pick = (mode, pats) => mode.fmap(m => reify(pats[m])).innerJoin()
+
+// @ctl 16:8.fader Master | 0–1, overall volume.
+const master = cc(12)
+// @ctl 16:8.k1 Global HPF | 0–1000 Hz, added to every column's HPF: everything thinner, for breaks.
+const globalHpf = cc(20).fmap(v => 1000 * v * v)
+// @ctl 16:8.k2 Noise | 0–0.3: brown noise as a bed underneath (0.1 in the original).
+const noise = cc(28).range(0, 0.3)
+
+const strip = (pat, c, hpf) => {
+  const level = c.level.mul(master)
+  return gate(level.fmap(v => v > 0), pat.hpf(globalHpf.add(hpf)).postgain(level))
+}
+
+// ------------------------------------------------------------
+// ARP: columns 1-5
+// ------------------------------------------------------------
+const FULL  = "<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12"
+const FULLB = "<0 4 0 9 7 5 <3 2 1 4> 9 7 5 <3 2 1 4> -1>*12"   // ends the first turn upward too
+const GAPS  = "<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12"
+const SHORT = "<0 4 0 9 7 5>*12"
+
+// per column: [transpose, filter envelope, gain low, gain high, full motif]; random gain between low and high per note
+const arpCols = [
+  [[ 24, .4, 1,   1,   FULL], [ 15, .4, 1, 1, FULL]],
+  [[ 12, .3, .4,  .5,  FULL], [  3, .3, .4, .4, FULLB]],
+  [[  0, .3, .9,  1.1, FULL]],
+  [[-12, .2, .45, .55, FULL], [-24, .3, .25, .35, FULL]],
+  [[-31, .3, .15, .25, FULL], [-36, .2, .05, .15, FULL], [-48, .2, .05, .15, FULL]],
+]
+
+const arpModes = arpCols.map((_, i) => cycleButton(colMap(i + 1).btn, 3))
+
+const arp = arpCols.map((layers, i) => {
+  const c = colMap(i + 1)
+  const acid = c.k2.fmap(v => 1 + 2 * v)
+  const decay = c.k3.fmap(v => 0.12 + 0.6 * v)
+  return strip(stack(...layers.map(([t, env, lo, hi, full]) =>
+    n(pick(arpModes[i], [full, GAPS, SHORT])).scale('dorian').trans(t)
+      .sound('sawtooth')
+      .lpf(100).lpenv(acid.mul(env * 9)).lps(0.2).lpd(decay).lpq(2)
+      .gain(rand.range(lo, hi))
+  )).orbit(1), c, expRange(c.hpf, 20, 2000))
+})
+
+// Acid lowpass for the drums: closed at 100 Hz, every hit opens it by x * 9 octaves (the drums' own .lpf overrides the base)
+register('acidenv', (x, pat) => pat.lpf(100).lpenv(x * 9).lps(0.2).lpd(0.12).lpq(2))
+
+// ------------------------------------------------------------
+// DRUMS: columns 6-7, 808
+// ------------------------------------------------------------
+// @ctl 16:6.k1 HPF | 20–2000 Hz: fully open only the click is left.
+// @ctl 16:6.k2 LPF | 0 = original (200 Hz, muffled), up = up to 6.4 kHz: the attack comes through.
+// @ctl 16:6.k3 Drive | 0 = original, up = more saturation: harder, sounds louder.
+// @ctl 16:6.fader Level | 0–1.
+// @ctl 16:6.b1 Density | 4 → 3 → 2 → 6 per bar.
+const kickCol = colMap(6)
+const kickMode = cycleButton(kickCol.btn, 4)
+const kickLpf = kickCol.k2.fmap(v => Math.pow(2, 5 * v))
+const kick = strip(
+  pick(kickMode, [4, 3, 2, 6].map(d => s("bd:2").fast(d))).bank('RolandTR808')
+    .shape(kickCol.k3.fmap(v => 0.1 + 0.7 * v)).sustain(.8).acidenv(.1).gain(1.).lpf(kickLpf.mul(200)),
+  kickCol, expRange(kickCol.hpf, 20, 2000))
+
+// @ctl 16:7.k1 HPF | 20–2000 Hz.
+// @ctl 16:7.k2 LPF | 0 = original (300/200 Hz, just boom), up = up to 32× brighter: becomes a tom.
+// @ctl 16:7.k3 Length | 0 = original (1.8 s tail), up = shorter, down to 0.2 s: from drone to dab.
+// @ctl 16:7.fader Level | 0–1.
+// @ctl 16:7.b1 Density | 4 → 3 → 6 → 2. 1 press = 3 against 4.
+const tomCol = colMap(7)
+const tomMode = cycleButton(tomCol.btn, 4)
+const tomLpf = tomCol.k2.fmap(v => Math.pow(2, 5 * v))
+const toms = [4, 3, 6, 2].map(d => s("lt:2").fast(d))
+const tom = strip(stack(
+  pick(tomMode, toms).bank('RolandTR808').shape(.1).sustain(tomCol.k3.fmap(v => 1.8 - 1.6 * v)).acidenv(.5).gain(.8).lpf(tomLpf.mul(300)),
+  pick(tomMode, toms).bank('RolandTR808').shape(.1).sustain(.2).acidenv(2.).gain(.2).lpf(tomLpf.mul(200)),
+), tomCol, expRange(tomCol.hpf, 20, 2000))
+
+const brown = gate(noise.mul(master).fmap(v => v > 0), sound("brown").gain(noise).postgain(master))
+
+// Stateful buttons only count presses while queried, so query them every tick, even while their stem is gated
+const stateTaps = stack(...arpModes, kickMode, tomMode, master, globalHpf).filterValues(() => false)
+
+stack(
+  ...arp,
+  kick,
+  tom,
+  brown,
+  stateTaps
+).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
