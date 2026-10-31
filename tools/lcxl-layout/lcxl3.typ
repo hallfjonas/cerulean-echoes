@@ -4,9 +4,9 @@
 #let data = json(bytes(sys.inputs.data))
 
 #set page(paper: "a4", flipped: true, margin: 12mm, footer: align(right, text(size: 6pt, fill: luma(130))[
-  Generiert aus #raw(data.source) — Änderungen in den `@ctl`-Kommentaren des Tracks, nicht hier.
+  Generated from #raw(data.source) — edit the `@ctl` comments in the track, not this sheet.
 ]))
-#set text(font: "Helvetica", size: 7.5pt, lang: "de")
+#set text(font: "Helvetica", size: 7.5pt, lang: "en")
 
 #let c-knob   = rgb("#dbe7f5")
 #let c-fader  = rgb("#e3f1df")
@@ -48,11 +48,11 @@
 #for n in data.notes [#n #parbreak()]
 
 #text(size: 6.5pt)[
-  #box(fill: c-knob, inset: 2pt)[Knopf]
+  #box(fill: c-knob, inset: 2pt)[Knob]
   #box(fill: c-fader, inset: 2pt)[Fader]
   #box(fill: c-button, inset: 2pt)[Button]
-  #if data.global [#box(fill: c-global, inset: 2pt)[global (alle Modes)]]
-  #box(fill: c-unused, inset: 2pt)[frei]
+  #if data.global [#box(fill: c-global, inset: 2pt)[global (all modes)]]
+  #box(fill: c-unused, inset: 2pt)[unused]
 ]
 
 #for (i, page) in data.pages.enumerate() [

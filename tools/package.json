@@ -7,7 +7,7 @@
     "postinstall": "node strudel-sim/patch-core.mjs",
     "compare": "node strudel-sim/compare.mjs",
     "measure": "node strudel-sim/measure.mjs",
-    "layouts": "node lcxl-layout/gen-layout.mjs ../tracks/*.strudel ../sound-samples/*.strudel",
+    "layouts": "node lcxl-layout/gen-layout.mjs ../tracks/*.strudel ../sounds/*/*.strudel",
     "watch": "node lcxl-layout/watch.mjs"
   },
   "dependencies": {

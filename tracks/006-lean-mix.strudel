@@ -5,16 +5,16 @@
 // knob row 1 = hpf (CC 13-20), row 2 = lpf (21-28), row 3 = character (29-36: softness, density, acid, feedback; 36 = swing), fader = level (5-12)
 // The fader is the column's volume; every layer of a stem goes through it and the global level.
 // @layout Track 006 (lean, mix)
-// @note Zwei Custom Modes: Mode 16 (Kanal 16) spielt die Stems, Mode 2 die Melodien (alle CCs + 48). Spalte 8 ist in beiden Modes global und steuert dasselbe: Der Fader nimmt den zuletzt bewegten Wert, die Knöpfe sind gekoppelt (jeder Dreh verschiebt den gemeinsamen Wert relativ).
-// @note Filter-Knöpfe laufen exponentiell, damit der ganze Weg hörbar ist. Density (Knopfreihe 3) ist ein Crossfade: 0 = nur Hauptlayer, 0.5 = beide, 1 = nur Extra-Layer.
+// @note Two custom modes: Mode 16 (channel 16) plays the stems, Mode 2 the melodies (all CCs + 48). Column 8 is global in both modes and controls the same thing: the fader takes the last moved value, the knobs are coupled (every turn shifts the shared value relatively).
+// @note Filter knobs are exponential, so the whole travel is audible. Density (knob row 3) is a crossfade: 0 = main layer only, 0.5 = both, 1 = extra layer only.
 // @mode 16 Mode 16 — Stems
-// @mode 2 Mode 2 — Melodien (CC + 48)
-// @row 16:k1 Reihe 1 \ HPF
-// @row 16:k2 Reihe 2 \ LPF
-// @row 16:k3 Reihe 3 \ Charakter
-// @row 2:k1 Reihe 1 \ Charakter
-// @row 2:k2 Reihe 2 \ Baseline
-// @row 2:k3 Reihe 3 \ Density
+// @mode 2 Mode 2 — Melodies (CC + 48)
+// @row 16:k1 Row 1 \ HPF
+// @row 16:k2 Row 2 \ LPF
+// @row 16:k3 Row 3 \ Character
+// @row 2:k1 Row 1 \ Character
+// @row 2:k2 Row 2 \ Baseline
+// @row 2:k3 Row 3 \ Density
 const cc = await midin()
 
 const ramp = (sig, from, to) => sig.fmap(v => Math.min(1, Math.max(0, (v - from) / (to - from))))
@@ -61,14 +61,14 @@ const ccGlobalKnob = n => coupled(cc(n), cc(n + 48))
 const bpm = 140
 setcpm(bpm / 4)
 
-// @ctl g.k1 Global HPF | 0–1000 Hz (quadratisch), addiert auf Kick, Sub, Bass, Bongos, Space. Nicht auf Hats, Clap, Melodien.
+// @ctl g.k1 Global HPF | 0–1000 Hz (quadratic), added to kick, sub, bass, bongos, space. Not to hats, clap, melodies.
 const globalHpf   = ccGlobalKnob(20).fmap(v => 1000 * v * v)   // 0..1000 Hz, added to the stems' hpf; quadratic for fine control at the bottom
 // Swing: shifts every offbeat 8th later, from straight (0) to a heavy shuffle (1, a bit past triplet feel)
-// @ctl g.k3 Swing | Offbeat-8tel später: 0 gerade … 1 schwerer Shuffle.
+// @ctl g.k3 Swing | offbeat 8ths later: 0 straight … 1 heavy shuffle.
 const globalSwing = ccGlobalKnob(36).range(0, 0.25)
-// @ctl g.k2 Global LPF | 100–12800 Hz (exp.), nur Melodien (nicht Baselines).
+// @ctl g.k2 Global LPF | 100–12800 Hz (exp.), melodies only (not baselines).
 const globalLpf   = expRange(ccGlobalKnob(28), 100, 12800)   // melodies only
-// @ctl g.fader Master Level | Lautstärke von allem.
+// @ctl g.fader Master Level | volume of everything.
 const globalLevel = ccGlobal(12).range(0, 1)
 
 // Mode 2 (melodies): columns 1-7 use the Mode 16 layout with every CC + 48, continuing right after Mode 16
@@ -119,9 +119,9 @@ register('acidenv', (x, pat) => pat
 // STEMS Theb Beginning; Part 1: MAIN KICK
 // ============================================================
 // @col 16:1 1 Kick
-// @ctl 16:1.k1 HPF | 20–2000 Hz. Ganz offen: nur noch der Klick.
-// @ctl 16:1.k2 LPF | 100–12800 Hz (+1.5 kHz mit Softness)
-// @ctl 16:1.k3 Softness | 0 = 909. 1 = weicher Sinus-Kick + 808, leicht angezerrt.
+// @ctl 16:1.k1 HPF | 20–2000 Hz. Fully open: only the click is left.
+// @ctl 16:1.k2 LPF | 100–12800 Hz (+1.5 kHz with softness)
+// @ctl 16:1.k3 Softness | 0 = 909. 1 = soft sine kick + 808, slightly driven.
 // @ctl 16:1.fader Level | 0–1
 const kickCol   = col(1)
 const kickHpf   = expRange(kickCol.hpf, 20, 2000)   // up to 2 kHz: fully open takes out the whole body, only the click remains
@@ -170,7 +170,7 @@ const stem1_kick = strip(stack(
   // @col 16:2 2 Sub
   // @ctl 16:2.k1 HPF | 20–300 Hz
   // @ctl 16:2.k2 LPF | 80–2000 Hz
-  // @ctl 16:2.k3 Density | Viertel-Saw + Sinus-Sub → pulsierende 8tel
+  // @ctl 16:2.k3 Density | quarter-note saw + sine sub → pulsing 8ths
   // @ctl 16:2.fader Level | 0–2
   const subCol   = col(2)
   const subHpf   = expRange(subCol.hpf, 20, 300)
@@ -204,9 +204,9 @@ const stem1_kick = strip(stack(
   // STEM 3: BASS
   // @col 16:3 3 Bass
   // @ctl 16:3.k1 HPF | 20–600 Hz
-  // @ctl 16:3.k2 LPF / Cutoff | 150–4000 Hz. Mit Acid zusammen der 303-Cutoff.
-  // @ctl 16:3.k3 Acid | 0 = warme Saw. 1 = 303: Resonanz, Filterhüllkurve, Akzente, Drive.
-  // @ctl 16:3.fader Level | 0–2, sinkt leicht mit Acid
+  // @ctl 16:3.k2 LPF / Cutoff | 150–4000 Hz. Together with acid the 303 cutoff.
+  // @ctl 16:3.k3 Acid | 0 = warm saw. 1 = 303: resonance, filter envelope, accents, drive.
+  // @ctl 16:3.fader Level | 0–2, drops slightly with acid
   const bassCol   = col(3)
   const bassHpf   = expRange(bassCol.hpf, 20, 600)
   const bassLpf   = expRange(bassCol.lpf, 150, 4000)
@@ -238,7 +238,7 @@ const stem1_kick = strip(stack(
 // @col 16:4 4 Hats
 // @ctl 16:4.k1 HPF | 300–8000 Hz
 // @ctl 16:4.k2 LPF | 2–16 kHz
-// @ctl 16:4.k3 Density | Open Hats → 16tel Hats
+// @ctl 16:4.k3 Density | open hats → 16th hats
 // @ctl 16:4.fader Level | 0–0.4
 const hatsCol   = col(4)
 const hatsHpf   = expRange(hatsCol.hpf, 300, 8000)
@@ -264,9 +264,9 @@ const stem4_hats = strip(stack(
 // @col 16:5 5 Clap
 // @ctl 16:5.k1 HPF | 150–3000 Hz
 // @ctl 16:5.k2 LPF | 1.5–15 kHz
-// @ctl 16:5.k3 Density | Backbeat → Ghosts + Double Taps
+// @ctl 16:5.k3 Density | backbeat → ghosts + double taps
 // @ctl 16:5.fader Level | 0–1.4
-// @ctl 16:5.b1 Clap Room | aus / 0.5
+// @ctl 16:5.b1 Clap Room | off / 0.5
 const clapCol     = col(5)
 const clapHpf     = expRange(clapCol.hpf, 150, 3000)
 const clapLpf     = expRange(clapCol.lpf, 1500, 15000)
@@ -349,7 +349,7 @@ const stem7_acid = note("<[~ c4 ~ c4] [~ eb4 ~ d4] [~ c4 ~ bb3] [~ f4 ~ g4]>")
 // @col 16:6 6 Bongos
 // @ctl 16:6.k1 HPF | 60–600 Hz
 // @ctl 16:6.k2 LPF | 1–10 kHz
-// @ctl 16:6.k3 Density | Low/High Taps → Ghosts, Rolls, Fingers
+// @ctl 16:6.k3 Density | low/high taps → ghosts, rolls, fingers
 // @ctl 16:6.fader Level | 0–0.8
 const bongoCol     = col(6)
 const bongoHpf     = expRange(bongoCol.hpf, 60, 600)
@@ -412,8 +412,8 @@ const stem6_bongos = strip(stack(
 // LIQUID ACID SPACE
 // @col 16:7 7 Space
 // @ctl 16:7.k1 HPF | 80–1200 Hz
-// @ctl 16:7.k2 LPF-Sweep | Obergrenze des langsamen Filter-Sweeps, 0.8–12 kHz
-// @ctl 16:7.k3 Feedback | Delay-Feedback 0.23–1.14. Über ~0.9 schaukelt es sich auf!
+// @ctl 16:7.k2 LPF sweep | upper limit of the slow filter sweep, 0.8–12 kHz
+// @ctl 16:7.k3 Feedback | delay feedback 0.23–1.14. Above ~0.9 it builds up!
 // @ctl 16:7.fader Level | 0–0.7
 const spaceCol      = col(7)
 const spaceHpf      = expRange(spaceCol.hpf, 80, 1200)
@@ -453,10 +453,10 @@ const stem7_space = strip(stack(
 // Every melody uses the same controls, numbered from melody 1:
 // wobble knob (named ...Hpf), baseline lpf knob, density knob, level fader; see Mode 2 above
 // ============================================================
-// @ctl 2:1-7.k1 Wobble | 0 = trocken. 0.5 = organisch: Drift + Vibrato. 1 = Acid: 303-Hüllkurve, Akzente, Drive. Wirkt auch auf die Baseline.
-// @ctl 2:1-7.k2 Baseline LPF | 0–800 Hz. Bei 0 ist die Baseline stumm; aufdrehen blendet sie ein.
-// @ctl 2:1-7.k3 Obertöne | Blendet in 3 Stufen Stimmen ein (0–0.3, 0.3–0.6, 0.6–0.9). Welche, bestimmt der Button darunter.
-// @ctl 2:1-7.b1 Obertonmodus | Jeder Druck: Dur → Moll → Oktaven
+// @ctl 2:1-7.k1 Wobble | 0 = dry. 0.5 = organic: drift + vibrato. 1 = acid: 303 envelope, accents, drive. Also affects the baseline.
+// @ctl 2:1-7.k2 Baseline LPF | 0–800 Hz. At 0 the baseline is silent; turning up fades it in.
+// @ctl 2:1-7.k3 Overtones | fades voices in, in 3 stages (0–0.3, 0.3–0.6, 0.6–0.9). Which ones is set by the button below.
+// @ctl 2:1-7.b1 Overtone mode | every press: major → minor → octaves
 const melodyMainLpf = 100
 const baselineLpfMax = 800
 
@@ -564,8 +564,8 @@ const baseline = (notes, lpf, knob) => gate(audible(lpf), wobble(note(notes)
   .gain(globalLevel.mul(0.5)), knob))
 
 // MELODY 1
-// @col 2:1 Melodie 1
-// @ctl 2:1.fader Level | Melodie + Obertöne (nicht Baseline). E F G A in Oktaven
+// @col 2:1 Melody 1
+// @ctl 2:1.fader Level | melody + overtones (not baseline). E F G A in Oktaven
 const melody1 = col2(1)
 const melody1Mode = cycleButton(melody1.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody1 = melody("[e2 e3 f2 f3 g2 g3 a2 a3]", melody1.char, melody1.level, melody1.hpf, melody1Mode)
@@ -574,8 +574,8 @@ const baseline1Lpf = melody1.lpf.range(0, baselineLpfMax)
 const stem_baseline1 = baseline("<[e1 e2 e1 e2 f1 f2 e1 g2] [a1 a2 a1 a2 g1 g2 a1 e2]>", baseline1Lpf, melody1.hpf)
 
 // MELODY 2
-// @col 2:2 Melodie 2
-// @ctl 2:2.fader Level | Melodie + Obertöne (nicht Baseline). D E C F B G A
+// @col 2:2 Melody 2
+// @ctl 2:2.fader Level | melody + overtones (not baseline). D E C F B G A
 const melody2 = col2(2)
 const melody2Mode = cycleButton(melody2.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody2 = melody("[d3 e3 c3 f3 b2 g3 a2 a3]", melody2.char, melody2.level, melody2.hpf, melody2Mode)
@@ -584,8 +584,8 @@ const baseline2Lpf = melody2.lpf.range(0, baselineLpfMax)
 const stem_baseline2 = baseline("<[d1 d2 d1 d2 c2 d2 a1 d2] [d1 d2 f1 d2 g1 d2 a1 d2]>", baseline2Lpf, melody2.hpf).decay(sine.range(0.4,0.6))
 
 // MELODY 3
-// @col 2:3 Melodie 3
-// @ctl 2:3.fader Level | Melodie + Obertöne (nicht Baseline). 16 Töne, halbes Tempo
+// @col 2:3 Melody 3
+// @ctl 2:3.fader Level | melody + overtones (not baseline). 16 notes, half tempo
 const melody3 = col2(3)
 const melody3Mode = cycleButton(melody3.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody3 = melody("[a2 e3 c3 f3 b2 d3 g2 e3 a2 c3 f2 d3 g2 b2 e2 c3]*.5", melody3.char, melody3.level, melody3.hpf, melody3Mode)
@@ -594,8 +594,8 @@ const baseline3Lpf = melody3.lpf.range(0, baselineLpfMax)
 const stem_baseline3 = baseline("<[a1 a1 a2 a1] [g1 g1 g2 g1]>*2", baseline3Lpf, melody3.hpf)
 
 // MELODY 4
-// @col 2:4 Melodie 4
-// @ctl 2:4.fader Level | Melodie + Obertöne (nicht Baseline). C♯ F♯ A G / E
+// @col 2:4 Melody 4
+// @ctl 2:4.fader Level | melody + overtones (not baseline). C♯ F♯ A G / E
 const melody4 = col2(4)
 const melody4Mode = cycleButton(melody4.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody4 = melody("[c#3 f#3 a3 g3 c#3 f#3 a3 g3 c#3 f#3 g3 e3 c#3 f#3 g3 e3]*.5", melody4.char, melody4.level, melody4.hpf, melody4Mode)
@@ -604,8 +604,8 @@ const baseline4Lpf = melody4.lpf.range(0, baselineLpfMax)
 const stem_baseline4 = baseline("<[f#1 f#2 ~ c#2 a1 ~ f#2 c#2] [f#1 f#2 ~ g1 e1 ~ c#2 f#2]>", baseline4Lpf, melody4.hpf)
 
 // MELODY 5
-// @col 2:5 Melodie 5
-// @ctl 2:5.fader Level | Melodie + Obertöne (nicht Baseline). D♭ F B E
+// @col 2:5 Melody 5
+// @ctl 2:5.fader Level | melody + overtones (not baseline). D♭ F B E
 const melody5 = col2(5)
 const melody5Mode = cycleButton(melody5.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody5 = melody("[db3 f3 b3 e3]!2", melody5.char, melody5.level, melody5.hpf, melody5Mode)
@@ -614,8 +614,8 @@ const baseline5Lpf = melody5.lpf.range(0, baselineLpfMax)
 const stem_baseline5 = baseline("<[b1 b2 e1 b2 b1 b2 f1 db2] [b1 b2 e1 b2 db2 b2 f1 b2]>", baseline5Lpf, melody5.hpf)
 
 // MELODY 6
-// @col 2:6 Melodie 6
-// @ctl 2:6.fader Level | Melodie + Obertöne (nicht Baseline). C♯ F A/G E
+// @col 2:6 Melody 6
+// @ctl 2:6.fader Level | melody + overtones (not baseline). C♯ F A/G E
 const melody6 = col2(6)
 const melody6Mode = cycleButton(melody6.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody6 = melody("[c#3 f3 <a3 g3> e3]!2", melody6.char, melody6.level, melody6.hpf, melody6Mode)
@@ -624,8 +624,8 @@ const baseline6Lpf = melody6.lpf.range(0, baselineLpfMax)
 const stem_baseline6 = baseline("<[c#1 c#2 c#1 c#2] [f1 f2 g1 f2]>*2", baseline6Lpf, melody6.hpf)
 
 // MELODY 7
-// @col 2:7 Melodie 7
-// @ctl 2:7.fader Level | Melodie + Obertöne (nicht Baseline). D♭ E♭ B F
+// @col 2:7 Melody 7
+// @ctl 2:7.fader Level | melody + overtones (not baseline). D♭ E♭ B F
 const melody7 = col2(7)
 const melody7Mode = cycleButton(melody7.btn, 3)   // button row 1: steps Dur → Moll → Oktaven
 const stem_melody7 = melody("[db3 eb3 b3 f3]!", melody7.char, melody7.level, melody7.hpf, melody7Mode)

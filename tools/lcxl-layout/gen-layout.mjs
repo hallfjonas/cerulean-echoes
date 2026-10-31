@@ -10,7 +10,7 @@
 //   // @ctl <pos> <name> | <description>
 // <row>: k1 k2 k3 (knob rows), fader, b1 b2 (button rows)
 // <pos>: <mode>:<col>.<row>, e.g. 16:1.k1; a column range 2:1-7.k1 puts the description on the first column
-//        and "wie <its heading>" on the others; g.<row> = global column 8, shown on every page (CC n / n + 48).
+//        and "as <its heading>" on the others; g.<row> = global column 8, shown on every page (CC n / n + 48).
 // CC numbers are computed from the position: Mode 16 = fader 5-12, knobs 13-36, buttons 37-52; Mode 2 = +48.
 import fs from 'fs'
 import path from 'path'
@@ -21,7 +21,7 @@ const template = path.join(path.dirname(fileURLToPath(import.meta.url)), 'lcxl3.
 const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
 const BASE = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }
 const KIND = { k1: 'knob', k2: 'knob', k3: 'knob', fader: 'fader', b1: 'button', b2: 'button' }
-const LABEL = { k1: 'Reihe 1', k2: 'Reihe 2', k3: 'Reihe 3', fader: 'Fader \\ Level', b1: 'Buttons 1', b2: 'Buttons 2' }
+const LABEL = { k1: 'Row 1', k2: 'Row 2', k3: 'Row 3', fader: 'Fader \\ Level', b1: 'Buttons 1', b2: 'Buttons 2' }
 const cc = (mode, col, row) => BASE[row] + col + (mode === 2 ? 48 : 0)
 
 export function parse(src, source) {
@@ -58,7 +58,7 @@ export function build(d) {
     const grid = Object.fromEntries(ROWS.map(r => [r, [...Array(8).keys()].map(i => ({ cc: String(cc(mode, i + 1, r)), off: true }))]))
     for (const c of d.ctls.filter(c => c.mode === mode)) {
       for (let col = c.from; col <= c.to; col++) {
-        const desc = col === c.from ? c.desc : `wie ${heads[c.from - 1]}`
+        const desc = col === c.from ? c.desc : `as ${heads[c.from - 1]}`
         grid[c.row][col - 1] = { cc: String(cc(mode, col, c.row)), name: c.name, desc, kind: KIND[c.row] }
       }
     }

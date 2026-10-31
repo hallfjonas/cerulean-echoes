@@ -1,4 +1,4 @@
-// Regenerate layout sheets whenever a .strudel file in tracks/ or sound-samples/ is saved (for hand edits).
+// Regenerate layout sheets whenever a .strudel file in tracks/, sounds/lab/ or sounds/parts/ is saved (for hand edits).
 // usage: npm run watch (in tools/), stop with Ctrl+C
 import fs from 'fs'
 import path from 'path'
@@ -7,7 +7,7 @@ import { generate } from './gen-layout.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const timers = {}
-for (const dir of ['tracks', 'sound-samples']) {
+for (const dir of ['tracks', 'sounds/lab', 'sounds/parts']) {
   fs.watch(path.join(root, dir), (_, name) => {
     if (!name?.endsWith('.strudel')) return
     const file = path.join(root, dir, name)
@@ -20,4 +20,4 @@ for (const dir of ['tracks', 'sound-samples']) {
     }, 300)
   })
 }
-console.log('watching tracks/ and sound-samples/ …')
+console.log('watching tracks/ and sounds/ …')

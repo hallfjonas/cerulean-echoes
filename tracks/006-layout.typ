@@ -2,7 +2,7 @@
 // Compile: typst compile 006-layout.typ
 
 #set page(paper: "a4", flipped: true, margin: 12mm)
-#set text(font: "Helvetica", size: 7.5pt, lang: "de")
+#set text(font: "Helvetica", size: 7.5pt, lang: "en")
 
 #let c-knob   = rgb("#dbe7f5")
 #let c-fader  = rgb("#e3f1df")
@@ -34,27 +34,27 @@
 // Global column, the same in both modes (cc = Mode 16 CC; Mode 2 sends CC + 48)
 #let g(cc, name, desc, fill: c-global) = ctl([#cc / #(cc + 48)], name, desc, fill: fill)
 #let global = (
-  g(20, "Global HPF", [0–1000 Hz (quadratisch), addiert auf Kick, Sub, Bass, Bongos, Space. Nicht auf Hats, Clap, Melodien.]),
-  g(28, "Global LPF", [100–12800 Hz (exp.), nur Melodien (nicht Baselines).]),
-  g(36, "Swing", [Offbeat-8tel später: 0 gerade … 1 schwerer Shuffle.]),
-  g(12, "Master Level", [Lautstärke von allem.]),
+  g(20, "Global HPF", [0–1000 Hz (quadratic), added to kick, sub, bass, bongos, space. Not to hats, clap, melodies.]),
+  g(28, "Global LPF", [100–12800 Hz (exp.), melodies only (not baselines).]),
+  g(36, "Swing", [Offbeat 8ths later: 0 straight … 1 heavy shuffle.]),
+  g(12, "Master Level", [Volume of everything.]),
 )
 
 = Launch Control XL 3 — Track 006
 
-Zwei Custom Modes: *Mode 16* (Kanal 16) spielt die Stems, *Mode 2* die Melodien (alle CCs + 48).
-Spalte 8 ist in beiden Modes global und steuert dasselbe: Der Fader nimmt den zuletzt bewegten Wert, die Knöpfe sind gekoppelt (jeder Dreh verschiebt den gemeinsamen Wert relativ).
-Filter-Knöpfe laufen exponentiell, damit der ganze Weg hörbar ist.
+Two custom modes: *Mode 16* (channel 16) plays the stems, *Mode 2* the melodies (all CCs + 48).
+Column 8 is global in both modes and controls the same thing: the fader takes the last moved value, the knobs are coupled (every turn shifts the shared value relatively).
+Filter knobs are exponential, so the whole travel is audible.
 
-*Density* (Knopfreihe 3) ist ein Crossfade: 0 = nur Hauptlayer, 0.5 = beide, 1 = nur Extra-Layer.
+*Density* (knob row 3) is a crossfade: 0 = main layer only, 0.5 = both, 1 = extra layer only.
 
 #v(4pt)
 #text(size: 6.5pt)[
-  #box(fill: c-knob, inset: 2pt)[Knopf]
+  #box(fill: c-knob, inset: 2pt)[Knob]
   #box(fill: c-fader, inset: 2pt)[Fader]
   #box(fill: c-button, inset: 2pt)[Button]
-  #box(fill: c-global, inset: 2pt)[global (beide Modes)]
-  #box(fill: c-unused, inset: 2pt)[frei]
+  #box(fill: c-global, inset: 2pt)[global (both modes)]
+  #box(fill: c-unused, inset: 2pt)[unused]
 ]
 
 == Mode 16 — Stems
@@ -62,8 +62,8 @@ Filter-Knöpfe laufen exponentiell, damit der ganze Weg hörbar ist.
 #board(
   ("1 Kick", "2 Sub", "3 Bass", "4 Hats", "5 Clap", "6 Bongos", "7 Space", "8 Global"),
   (
-    (lbl[Reihe 1 \ HPF],
-      ctl(13, "HPF", [20–2000 Hz. Ganz offen: nur noch der Klick.]),
+    (lbl[Row 1 \ HPF],
+      ctl(13, "HPF", [20–2000 Hz. Fully open: only the click is left.]),
       ctl(14, "HPF", [20–300 Hz]),
       ctl(15, "HPF", [20–600 Hz]),
       ctl(16, "HPF", [300–8000 Hz]),
@@ -71,28 +71,28 @@ Filter-Knöpfe laufen exponentiell, damit der ganze Weg hörbar ist.
       ctl(18, "HPF", [60–600 Hz]),
       ctl(19, "HPF", [80–1200 Hz]),
       global.at(0)),
-    (lbl[Reihe 2 \ LPF],
-      ctl(21, "LPF", [100–12800 Hz (+1.5 kHz mit Softness)]),
+    (lbl[Row 2 \ LPF],
+      ctl(21, "LPF", [100–12800 Hz (+1.5 kHz with softness)]),
       ctl(22, "LPF", [80–2000 Hz]),
-      ctl(23, "LPF / Cutoff", [150–4000 Hz. Mit Acid zusammen der 303-Cutoff.]),
+      ctl(23, "LPF / Cutoff", [150–4000 Hz. Together with acid the 303 cutoff.]),
       ctl(24, "LPF", [2–16 kHz]),
       ctl(25, "LPF", [1.5–15 kHz]),
       ctl(26, "LPF", [1–10 kHz]),
-      ctl(27, "LPF-Sweep", [Obergrenze des langsamen Filter-Sweeps, 0.8–12 kHz]),
+      ctl(27, "LPF sweep", [Upper limit of the slow filter sweep, 0.8–12 kHz]),
       global.at(1)),
-    (lbl[Reihe 3 \ Charakter],
-      ctl(29, "Softness", [0 = 909. 1 = weicher Sinus-Kick + 808, leicht angezerrt.]),
-      ctl(30, "Density", [Viertel-Saw + Sinus-Sub → pulsierende 8tel]),
-      ctl(31, "Acid", [0 = warme Saw. 1 = 303: Resonanz, Filterhüllkurve, Akzente, Drive.]),
-      ctl(32, "Density", [Open Hats → 16tel Hats]),
-      ctl(33, "Density", [Backbeat → Ghosts + Double Taps]),
-      ctl(34, "Density", [Low/High Taps → Ghosts, Rolls, Fingers]),
-      ctl(35, "Feedback", [Delay-Feedback 0.23–1.14. Über ~0.9 schaukelt es sich auf!]),
+    (lbl[Row 3 \ Character],
+      ctl(29, "Softness", [0 = 909. 1 = soft sine kick + 808, slightly driven.]),
+      ctl(30, "Density", [Quarter-note saw + sine sub → pulsing 8ths]),
+      ctl(31, "Acid", [0 = warm saw. 1 = 303: resonance, filter envelope, accents, drive.]),
+      ctl(32, "Density", [Open hats → 16th hats]),
+      ctl(33, "Density", [Backbeat → ghosts + double taps]),
+      ctl(34, "Density", [Low/high taps → ghosts, rolls, fingers]),
+      ctl(35, "Feedback", [Delay feedback 0.23–1.14. Above ~0.9 it builds up!]),
       global.at(2)),
     (lbl[Fader \ Level],
       ctl(5,  "Level", [0–1], fill: c-fader),
       ctl(6,  "Level", [0–2], fill: c-fader),
-      ctl(7,  "Level", [0–2, sinkt leicht mit Acid], fill: c-fader),
+      ctl(7,  "Level", [0–2, drops slightly with acid], fill: c-fader),
       ctl(8,  "Level", [0–1], fill: c-fader),
       ctl(9,  "Level", [0–2.5], fill: c-fader),
       ctl(10, "Level", [0–0.8], fill: c-fader),
@@ -100,7 +100,7 @@ Filter-Knöpfe laufen exponentiell, damit der ganze Weg hörbar ist.
       global.at(3)),
     (lbl[Buttons 1],
       off(37), off(38), off(39), off(40),
-      ctl(41, "Clap Room", [aus / 0.5], fill: c-button),
+      ctl(41, "Clap Room", [off / 0.5], fill: c-button),
       off(42), off(43), off(44)),
     (lbl[Buttons 2],
       ..range(45, 53).map(off)),
@@ -109,43 +109,43 @@ Filter-Knöpfe laufen exponentiell, damit der ganze Weg hörbar ist.
 
 #pagebreak()
 
-== Mode 2 — Melodien (CC + 48)
+== Mode 2 — Melodies (CC + 48)
 
-Spalte _N_ = Melodie _N_ mit ihrer Baseline. Der Charakter-Knopf (Reihe 1) wirkt auf Melodie *und* Baseline.
+Column _N_ = melody _N_ with its baseline. The character knob (row 1) affects melody *and* baseline.
 
 #board(
-  ("Melodie 1", "Melodie 2", "Melodie 3", "Melodie 4", "Melodie 5", "Melodie 6", "Melodie 7", "8 Global"),
+  ("Melody 1", "Melody 2", "Melody 3", "Melody 4", "Melody 5", "Melody 6", "Melody 7", "8 Global"),
   (
-    (lbl[Reihe 1 \ Charakter],
+    (lbl[Row 1 \ Character],
       ..range(1, 8).map(i => ctl(60 + i, "Wobble",
-        if i == 1 [0 = trocken. 0.5 = organisch: Drift + Vibrato. 1 = Acid: 303-Hüllkurve, Akzente, Drive.]
-        else [wie Melodie 1])),
+        if i == 1 [0 = dry. 0.5 = organic: drift + vibrato. 1 = acid: 303 envelope, accents, drive.]
+        else [as Melody 1])),
       global.at(0)),
-    (lbl[Reihe 2 \ Baseline],
+    (lbl[Row 2 \ Baseline],
       ..range(1, 8).map(i => ctl(68 + i, "Baseline LPF",
-        if i == 1 [0–800 Hz. Bei 0 ist die Baseline stumm; aufdrehen blendet sie ein.]
-        else [wie Melodie 1])),
+        if i == 1 [0–800 Hz. At 0 the baseline is silent; turning up fades it in.]
+        else [as Melody 1])),
       global.at(1)),
-    (lbl[Reihe 3 \ Density],
-      ..range(1, 8).map(i => ctl(76 + i, "Obertöne",
-        if i == 1 [Blendet in 3 Stufen Stimmen ein (0–0.3, 0.3–0.6, 0.6–0.9). Welche, bestimmt der Button darunter.]
-        else [wie Melodie 1])),
+    (lbl[Row 3 \ Density],
+      ..range(1, 8).map(i => ctl(76 + i, "Overtones",
+        if i == 1 [Fades voices in, in 3 stages (0–0.3, 0.3–0.6, 0.6–0.9). Which ones is set by the button below.]
+        else [as Melody 1])),
       global.at(2)),
     (lbl[Fader \ Level],
       ..(
-        [E F G A in Oktaven],
+        [E F G A in octaves],
         [D E C F B G A],
-        [16 Töne, halbes Tempo],
+        [16 notes, half tempo],
         [C♯ F♯ A G / E],
         [D♭ F B E],
         [C♯ F A/G E],
         [D♭ E♭ B F],
-      ).enumerate().map(((i, d)) => ctl(53 + i, "Level", [Melodie + Obertöne (nicht Baseline). #d], fill: c-fader)),
+      ).enumerate().map(((i, d)) => ctl(53 + i, "Level", [Melody + overtones (not baseline). #d], fill: c-fader)),
       global.at(3)),
     (lbl[Buttons 1],
-      ..range(1, 8).map(i => ctl(84 + i, "Moll",
-        if i == 1 [große / kleine Terz]
-        else [wie Melodie 1], fill: c-button)),
+      ..range(1, 8).map(i => ctl(84 + i, "Minor",
+        if i == 1 [major / minor third]
+        else [as Melody 1], fill: c-button)),
       off(92)),
     (lbl[Buttons 2], ..range(93, 101).map(off)),
   ),

@@ -5,7 +5,9 @@ Talk to the user in German; code comments stay in English. Explain audio basics 
 
 ## Layout
 - `tracks/` — tracks (`NNN.strudel`, variants as `NNN-<name>.strudel`)
-- `sound-samples/` — boards for trying sounds (drum board, bass board); not tracks
+- `sounds/lab/` — experimental boards to understand sound design (drum board, bass board); not tracks
+- `sounds/parts/` — clean building blocks meant to be dropped into tracks (e.g. `arp-cascade.strudel`)
+- `samples/` — audio recordings
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
 - `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness, layout sheets
 
@@ -34,7 +36,7 @@ Strudel computes every event of every layer even when it is silent; dense tracks
 
 ## Layout sheets
 Each tagged track has a generated `<track>-layout.pdf` (Typst). The source of truth is the `// @ctl` comments in
-the track; a hook regenerates the PDF after every edit. See `/lcxl-layout`. Hand-written `*-layout.typ` files are older sheets.
+the track; a hook regenerates the PDF after every edit. See `/lcxl-layout`. Hand-written `*-layout.typ` files are older sheets; the lab boards keep theirs on purpose (they add pages the generator cannot make: sound descriptions, variant tables).
 
 ## Machine
 M2 Air, 16 GB, shared with other agents: the global resource rules apply (one heavy job at a time, test small first).
