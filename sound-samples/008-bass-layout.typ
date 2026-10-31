@@ -1,4 +1,4 @@
-// Launch Control XL 3 layout for tracks/008-bass.strudel
+// Launch Control XL 3 layout for sound-samples/008-bass.strudel
 // Compile: typst compile 008-bass-layout.typ
 
 #set page(paper: "a4", flipped: true, margin: 12mm)

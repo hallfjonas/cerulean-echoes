@@ -1,4 +1,4 @@
-// Launch Control XL 3 layout for tracks/007-kicks.strudel
+// Launch Control XL 3 layout for sound-samples/007-kicks.strudel
 // Compile: typst compile 007-kicks-layout.typ
 
 #set page(paper: "a4", flipped: true, margin: 12mm)
