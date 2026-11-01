@@ -1,0 +1,451 @@
+// ============================================================
+// TRACK 007 — dreamy ambient / soundscape on D, ~70 BPM, three switchable moods + a heartbeat pulse
+// Based on 007-ambient-floating.strudel. Mood button: D lydian (floating) → D dorian (melancholic) → D whole tone
+// (strange, no key), switching at the next bar. Pulse: a soft kick on D (heartbeat at resting pulse = the tempo).
+// Dream knob (global 3): echo, then a gentle tape wobble on the long sounds.
+// Two shared reverb buses and only the lead choir voice doubled keep the audio load at about half of real time.
+// ============================================================
+// Launch Control XL 3, Custom Mode 16 (ch 16) only: columns 1-7 = stems, column 8 = global.
+// Every stem column: knob row 1 = hpf, row 2 = lpf, row 3 = character, fader = level, button row 1 = variation.
+// Exception column 1: knob row 1 = pulse level, button row 2 = pulse rhythm; column 2, button row 2 = pulse softness. Column 8, button row 2 = mood.
+// Variation: each press steps to the next of 8 random variations (the stem's randomness is read from a
+// different point in time, so new notes/rhythms, but the same sound). Re-evaluating starts again at 0.
+// @layout Track 007 (ambient moods)
+// @note Dreamy ambient on D, about 70 BPM. Three moods on the global button 2, switching at the next bar: lydian (floating, bright), dorian (melancholic, misty), whole tone (strange, no key).
+// @note Every column: HPF, LPF, character, level, button 1 = next random variation (8 per stem). Column 1, knob 1 = level of a soft heartbeat thump on D, independent of the drone fader (pulse without drone works).
+// @note LPF knobs at 0 are almost closed: open row 2 first. The global knobs at 0 are neutral (dry, clear, no echo).
+// @note The status box at the bottom right of the Strudel page shows mood, pulse rhythm and each stem's variation. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
+// @mode 16 Mode 16 — Ambient
+// @col 16:1 1 Drone + Pulse
+// @col 16:2 2 Pad
+// @col 16:3 3 Glitter
+// @col 16:4 4 Sea / Wind
+// @col 16:5 5 Whale
+// @col 16:6 6 Choir
+// @col 16:7 7 Music Box
+// @col 16:8 8 Global
+// @row 16:k1 Row 1 \ HPF
+// @row 16:k2 Row 2 \ LPF
+// @row 16:k3 Row 3 \ Character
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Variation
+// @row 16:b2 Button 2 \ Pulse / Mood
+// MIDI input by name, so a second controller can be added later without the two getting mixed up.
+// If the name does not match, Strudel's error message lists the available devices.
+const LCXL_A = 'LCXL3 1 MIDI Out'
+const cc = await midin(LCXL_A)
+
+const ramp = (sig, from, to) => sig.fmap(v => Math.min(1, Math.max(0, (v - from) / (to - from))))
+// Row-3 crossfade: 0..0.5 brings the extra layer in, 0.5..1 fades the main layer out
+const fadeMain  = knob => ramp(knob, 1, 0.5)
+const fadeExtra = knob => ramp(knob, 0, 0.5)
+// Exponential knob range for filters (Hz), so every part of the knob travel is audible
+const expRange = (knob, lo, hi) => knob.fmap(v => lo * Math.pow(hi / lo, v))
+
+const bpm  = 70
+const beat = 60 / bpm   // seconds per quarter note, for delay times
+setcpm(bpm / 4)
+
+// Mapping of column n (1-8): knob rows 1-3, fader, button rows 1-2
+const col = n => ({ hpf: cc(12 + n), lpf: cc(20 + n), char: cc(28 + n), level: cc(4 + n), btn: cc(36 + n), btn2: cc(44 + n) })
+
+const gate  = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
+const above = (sig, x) => sig.fmap(v => v > x)
+const and   = (a, b) => a.fmap(x => y => x && y).appLeft(b)
+const plus  = (a, b) => a.fmap(x => y => x + y).appLeft(b)
+
+// Momentary button that steps through n states, one step per press (counts presses, not the held value).
+// onChange(state) runs on every step (for the status box). Re-evaluating the code starts again at 0.
+const cycleButton = (button, n, onChange = () => {}) => {
+  let prev = 0, state = 0
+  return button.fmap(v => {
+    if (v > 0.5 && prev <= 0.5) { state = (state + 1) % n; onChange(state) }
+    prev = v
+    return state
+  })
+}
+
+// ============================================================
+// MOODS — all on D, so a switch keeps the root and only the colour changes
+// ============================================================
+// Drone chords per mood (absolute notes, so each mood needs its own; the other stems use scale degrees).
+// Whole tone has no fifth (D E F♯ G♯ A♯ C): its drones use tritones and major thirds instead.
+const MOODS = [
+  { scale: 'lydian', name: 'lydisch',   // D E F♯ G♯ A B C♯
+    drones: ["[d1,a1]", "[d1,a1,e2]", "[g0,d1,a1]", "[d1,a1,c#2]", "[a0,e1,b1]", "[d1,g#1,a1]", "[e1,b1,f#2]", "[d1,d2,a2]"],
+    names: ['D–A', 'D–A–E', 'G–D–A', 'D–A–C♯', 'A–E–B', 'D–G♯–A', 'E–B–F♯', 'D–D–A'] },
+  { scale: 'dorian', name: 'dorisch',   // D E F G A B C
+    drones: ["[d1,a1]", "[d1,a1,e2]", "[g0,d1,a1]", "[d1,a1,c2]", "[a0,e1,b1]", "[d1,f1,a1]", "[e1,b1,g2]", "[d1,d2,a2]"],
+    names: ['D–A', 'D–A–E', 'G–D–A', 'D–A–C', 'A–E–B', 'D–F–A', 'E–B–G', 'D–D–A'] },
+  { scale: 'whole tone', name: 'Ganzton',   // D E F♯ G♯ A♯ C
+    drones: ["[d1,g#1]", "[d1,a#1,e2]", "[c1,f#1,d2]", "[d1,c2]", "[e1,a#1,d2]", "[d1,f#1,a#1]", "[g#0,d1,a#1]", "[d1,d2,g#2]"],
+    names: ['D–G♯', 'D–A♯–E', 'C–F♯–D', 'D–C', 'E–A♯–D', 'D–F♯–A♯', 'G♯–D–A♯', 'D–D–G♯'] },
+]
+const PULSE_NAMES = ['Herzschlag', 'Viertel', 'Halbe']
+const PULSE_SOFT_NAMES = ['weich', 'mittel', 'hart']
+
+// Status box at the bottom right: mood, pulse rhythm, and which of the 8 variations each stem plays.
+// Its button moves the text into a small always-on-top window (Document Picture-in-Picture, Chrome/Edge), so it
+// stays visible over the layout PDF; closing that window puts it back. Kept on globalThis, so re-evaluating
+// reuses the open window. Only in the browser; the Node tools have no page to draw on.
+const STEM_NAMES = ['Drone', 'Pad', 'Glitzer', 'Meer/Wind', 'Wal', 'Chor', 'Spieluhr']
+const shown = { own: STEM_NAMES.map(() => 0), global: 0, pulse: 0, pulseSoft: 0 }
+const effective = i => (shown.own[i] + shown.global) % 8
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const statusUi = !hasPage ? null : globalThis.ambientStatus ??= (() => {
+  document.getElementById('board-status')?.remove()   // the plain box of earlier versions
+  const box = document.createElement('div')
+  box.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  const text = document.createElement('pre')
+  text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  const pop = document.createElement('button')
+  pop.textContent = '⧉ als Fenster'
+  pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
+  pop.onclick = async () => {
+    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    const pip = await documentPictureInPicture.requestWindow({ width: 340, height: 250 })
+    pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
+    pip.document.body.append(text)
+    box.style.display = 'none'
+    pip.addEventListener('pagehide', () => { box.prepend(text); box.style.display = '' })
+  }
+  box.append(text, pop)
+  document.body.appendChild(box)
+  return { text }
+})()
+
+// Mood: the button sets the next mood, which takes over at the next bar line. moodAt(t) is asked with bar
+// starts in real time (outside any reseed shift); it remembers the previous mood for queries that still
+// reach back into the old bar.
+const moodState = { pending: 0, now: 0, prev: 0, bar: -Infinity }
+const moodAt = t => {
+  const bar = Math.floor(Number(t))
+  if (bar > moodState.bar) {
+    if (moodState.pending !== moodState.now) { moodState.prev = moodState.now; moodState.now = moodState.pending; showStatus() }
+    else moodState.prev = moodState.now
+    moodState.bar = bar
+  }
+  return bar >= moodState.bar ? moodState.now : moodState.prev
+}
+
+const showStatus = () => {
+  if (!statusUi) return
+  const dots = v => [...Array(8).keys()].map(k => k === v ? '●' : '○').join('')
+  const m = MOODS[moodState.now]
+  const next = moodState.pending !== moodState.now ? ' → ' + MOODS[moodState.pending].name + ' (nächster Takt)' : ''
+  statusUi.text.textContent = [
+    'Tonart      D ' + m.name + next,
+    'Puls        ' + PULSE_NAMES[shown.pulse] + ', ' + PULSE_SOFT_NAMES[shown.pulseSoft],
+    'Variationen' + ' '.repeat(16) + 'global +' + shown.global,
+    ...STEM_NAMES.map((name, i) => (i + 1) + ' ' + name.padEnd(10) + ' ' + dots(effective(i)) + ' ' +
+      (effective(i) + 1) + (i === 0 ? '  ' + m.names[effective(0)] : ''))
+  ].join('\n')
+}
+showStatus()
+// Button of stem i (0-6), or the global button (i = 'global'): steps 0..7 and updates the box
+const variationButton = (button, i) => cycleButton(button, 8, s => {
+  if (i === 'global') shown.global = s; else shown.own[i] = s
+  showStatus()
+})
+
+// ============================================================
+// GLOBAL (column 8)
+// ============================================================
+// @ctl 16:8.k1 Space | 0 = each stem's own reverb, 1 = everything drowns in reverb.
+// @ctl 16:8.k2 Fog | 0 = clear, 1 = every stem's LPF pulled down to ~6 %: distant, under water.
+// @ctl 16:8.k3 Dream | 0–0.5: echo on all stems (not the pulse). 0.5–1: + a slow, gentle wobble on drone, pad, choir.
+// @ctl 16:8.fader Master Level | volume of everything.
+// @ctl 16:8.b1 Re-roll all | all stems: next variation at once.
+// @ctl 16:8.b2 Mood | lydian → dorian → whole tone, at the next bar.
+const globalCol   = col(8)
+const globalSpace = globalCol.hpf
+const globalFog   = globalCol.lpf.fmap(f => Math.pow(0.06, f))   // factor on every stem's lpf
+const globalDream = globalCol.char
+const dreamEcho   = ramp(globalDream, 0, 0.5).mul(0.5)    // delay send, 0..0.5
+const dreamWobble = ramp(globalDream, 0.5, 1).mul(0.1)    // vibrato depth, 0..±0.1 semitones
+const globalLevel = globalCol.level.range(0, 1)
+const globalVar   = variationButton(globalCol.btn, 'global')
+const moodButton  = cycleButton(globalCol.btn2, MOODS.length, s => { moodState.pending = s; showStatus() })
+// Mood per bar, sampled at the bar start; scaleIn(octave) = the matching scale name for .scale()
+const mood    = signal(t => moodAt(t)).segment(1)
+const scaleIn = octave => mood.fmap(m => 'D' + octave + ':' + MOODS[m].scale)
+
+const audible = level => and(above(level, 0), above(globalLevel, 0))
+// Reverb amount: the stem's own base at Space 0, up to 0.95 at Space 1
+const roomOf = base => globalSpace.fmap(s => base + (0.95 - base) * s)
+// Dream wobble: a slow, shallow vibrato (old tape), only set while it is > 0 (a vibrato oscillator per note costs CPU).
+// Only on the long sounds; on bells and the music box any wobble sounds out of tune.
+const wobble = pat => above(dreamWobble, 0).fmap(on => on ? pat.vib(0.15).vibmod(dreamWobble) : pat).innerJoin()
+// Variation (own + global button, 8 in total): read the stem's randomness 1024 cycles further per step
+// (keeps bar alignment, new random values). Scales are applied after reseed, so the mood follows real time.
+const reseed = (variation, pat) => pat.early(plus(variation, globalVar).fmap(v => (v % 8) * 1024))
+
+// Effect buses. Each orbit has one reverb and one delay, and every reverb costs a lot of CPU (its length is
+// the room size in seconds), so the stems share two orbits; stems on one orbit share room size and echo time/feedback.
+// Orbit 1 = pulse, drone, sea/wind, whale, choir, music box (dotted-quarter echo). Orbit 2 = pad, glitter (dotted-8th echo).
+// bus(): reverb (base amount, raised by Space) and the orbit's echo; the echo send is the layer's own delay
+// amount or the Dream echo, whichever is larger. Every event on an orbit sets the same echo time and feedback.
+const BUSES = {
+  1: { hall: 6.5, time: beat * 1.5, feedback: 0.5 },
+  2: { hall: 6, time: beat * 0.75, feedback: 0.6 },
+}
+const bus = (pat, orbit, room) => pat
+  .fmap(v => e => ({ ...v, delay: Math.max(v.delay ?? 0, e) })).appLeft(dreamEcho)
+  .room(roomOf(room)).roomsize(BUSES[orbit].hall).orbit(orbit)
+  .delaytime(BUSES[orbit].time).delayfeedback(BUSES[orbit].feedback)
+
+// Channel strip: hpf (if given), lpf × fog, level × global level as postgain, gated while the fader or master is 0
+const strip = (stem, { hpf, lpf, level }) => {
+  let pat = stem
+  if (hpf !== undefined) pat = pat.hpf(hpf)
+  if (lpf !== undefined) pat = pat.lpf(lpf.mul(globalFog))
+  return gate(audible(level), pat.postgain(level.mul(globalLevel)))
+}
+
+// ============================================================
+// 1 DRONE — low fifths that breathe in and out once per bar
+// ============================================================
+// @ctl 16:1.k2 LPF | 80–4000 Hz
+// @ctl 16:1.k3 Beating | 0 = pure sines. Up = a detuned saw copy fades in, the two beat against each other (slow “wah-wah”).
+// @ctl 16:1.fader Level | drone, 0–1 (not the pulse)
+// @ctl 16:1.b1 Variation | next of 8 drone chords per mood (D-A, D-A-E, …).
+const drone      = col(1)
+const droneVar   = variationButton(drone.btn, 0)
+const droneBeat  = drone.char
+// Chord = mood (per bar) × variation
+const droneChord = mood.fmap(m => plus(droneVar, globalVar).fmap(i => note(MOODS[m].drones[i % 8])).innerJoin()).innerJoin()
+
+const stem1_drone = strip(bus(wobble(stack(
+  // Body: swells in over a bar, octave answer on the second half
+  droneChord.s("sine").attack(1.5).decay(1).sustain(0.7).release(3).gain(0.7),
+  droneChord.add(note(12)).s("triangle").late(0.5).attack(1).sustain(0.5).release(2.5).gain(0.25),
+  // Beating: same chord, detuned by up to a quarter tone
+  gate(above(droneBeat, 0), droneChord.add(note(droneBeat.mul(0.3))).s("sawtooth")
+    .attack(1.5).sustain(0.6).release(3).gain(droneBeat.mul(0.18)))
+)), 1, 0.4), {
+  lpf: expRange(drone.lpf, 80, 4000),
+  level: drone.level.range(0, 1),
+})
+
+// PULSE — a kick on D, its own level on knob row 1, so it plays with or without the drone. No echo.
+// Rhythm (column 1, button 2): heartbeat = lub-dub on every quarter, the dub softer → quarters → half notes.
+// Softness (column 2, button 2), for every rhythm:
+//   soft   = a plain sine (no click, no noise) that fades in over 15 ms and glides 4 semitones down into D, lpf 250 Hz
+//   medium = synth bass drum (triangle + pitch drop + short noise click + light saturation), 8-semitone drop, lpf 450 Hz
+//   hard   = the same with a 12-semitone drop and lpf 700 Hz: more punch and click
+// @ctl 16:1.k1 Pulse | level of a soft kick on D, 0 = off. Plays without the drone fader too.
+// @ctl 16:1.b2 Pulse rhythm | heartbeat → quarters → half notes.
+// @ctl 16:2.b2 Pulse softness | soft → medium → hard (all rhythms). Starts soft.
+const pulseLevel  = drone.hpf.range(0, 1)
+const pulseRhythm = cycleButton(drone.btn2, 3, s => { shown.pulse = s; showStatus() })
+const pulseSoft   = cycleButton(cc(46), 3, s => { shown.pulseSoft = s; showStatus() })
+const PULSE_GAINS = ["[1 0.55 ~ ~]*4", "0.9*4", "1 ~ 1 ~"]   // heartbeat, quarters, half notes
+const PULSE_SOUNDS = [
+  g => gain(g).s("sine").note("d2").attack(0.015).decay(0.45).sustain(0).release(0.15)
+    .penv(-4).pattack(0.08).lpf(globalFog.mul(250)),                                   // soft
+  g => gain(g).s("sbd").note("d2").decay(0.45).penv(8).pdecay(0.06).lpf(globalFog.mul(450)),    // medium
+  g => gain(g).s("sbd").note("d2").decay(0.45).penv(12).pdecay(0.06).lpf(globalFog.mul(700)),   // hard
+]
+const PULSES = PULSE_SOUNDS.map(sound => PULSE_GAINS.map(sound))   // PULSES[softness][rhythm], built once
+
+const stem_pulse = gate(audible(pulseLevel),
+  pulseSoft.fmap(s => pulseRhythm.fmap(r => PULSES[s][r]).innerJoin()).innerJoin()
+    .room(roomOf(0.15)).roomsize(BUSES[1].hall).orbit(1)
+    .postgain(pulseLevel.mul(globalLevel)))
+
+// ============================================================
+// 2 PAD — slow random chords from the mood's scale; character adds echoing chord pings
+// ============================================================
+// @ctl 16:2.k1 HPF | 40–1500 Hz
+// @ctl 16:2.k2 LPF | 150–8000 Hz
+// @ctl 16:2.k3 Shimmer | 0 = only the soft chord swells. Up = the chord an octave higher pings in a 3-in-8 rhythm with echoes.
+// @ctl 16:2.fader Level | 0–1
+// @ctl 16:2.b1 Variation | next of 8 random chord progressions.
+const pad      = col(2)
+const padVar   = variationButton(pad.btn, 1)
+const padShim  = pad.char
+// Scale-degree chords (stacked thirds on degrees 1, 2, 3, 4, 6, 7 of the mood's scale)
+const PADS = ["[0,2,4,6]", "[1,3,5,8]", "[2,4,6,8]", "[3,5,7,9]", "[5,7,9,11]", "[6,8,10,12]"]
+const padChord = reseed(padVar, irand(PADS.length).segment(1).slow(2).fmap(i => n(PADS[i])).innerJoin())
+
+const stem2_pad = strip(bus(wobble(stack(
+  padChord.scale(scaleIn(3)).s("sawtooth").attack(1.2).sustain(0.8).release(3).gain(0.22)
+    .pan(sine.slow(5).range(0.3, 0.7)),
+  padChord.scale(scaleIn(3)).s("triangle").attack(0.8).sustain(0.8).release(3).gain(0.35),
+  gate(above(padShim, 0), padChord.struct("x(3,8,2)").scale(scaleIn(4)).s("triangle")
+    .decay(0.5).sustain(0).release(0.5).gain(padShim.mul(0.35))
+    .delay(0.5))
+)), 2, 0.6), {
+  hpf: expRange(pad.hpf, 40, 1500),
+  lpf: expRange(pad.lpf, 150, 8000),
+  level: pad.level.range(0, 1),
+})
+
+// ============================================================
+// 3 GLITTER — random high bell drops on a 16th grid, long echoes
+// ============================================================
+// @ctl 16:3.k1 HPF | 200–4000 Hz
+// @ctl 16:3.k2 LPF | 1–16 kHz
+// @ctl 16:3.k3 Density | 0 = a drop now and then (~1 per bar), 1 = a sparkling rain (~70 % of the 16ths).
+// @ctl 16:3.fader Level | 0–1
+// @ctl 16:3.b1 Variation | next of 8 random drop patterns.
+const glit     = col(3)
+const glitVar  = variationButton(glit.btn, 2)
+const glitKeep = glit.char.fmap(d => 0.06 + 0.64 * d)   // share of 16ths that play
+
+const stem3_glitter = strip(bus(reseed(glitVar,
+  n(irand(12).segment(16))
+    .degradeBy(glitKeep.fmap(k => 1 - k))
+    .s("sine").fm(rand.range(0.5, 3)).fmh(3.5)   // non-integer FM ratio = bell / glass
+    .decay(rand.range(0.08, 0.5)).sustain(0).release(0.3)
+    .gain(rand.range(0.15, 0.4))
+    .pan(rand)
+    .delay(0.55)
+).scale(scaleIn(5)), 2, 0.6), {
+  hpf: expRange(glit.hpf, 200, 4000),
+  lpf: expRange(glit.lpf, 1000, 16000),
+  level: glit.level.range(0, 1),
+})
+
+// ============================================================
+// 4 SEA / WIND — noise: rolling waves ↔ whistling gusts
+// ============================================================
+// @ctl 16:4.k1 HPF | 20–2000 Hz
+// @ctl 16:4.k2 LPF | 200–12000 Hz (moves with the waves)
+// @ctl 16:4.k3 Sea ↔ Wind | 0 = brown-noise waves rolling in, 0.5 = both, 1 = only whistling wind gusts.
+// @ctl 16:4.fader Level | 0–1
+// @ctl 16:4.b1 Variation | next of 8 random wave / gust patterns.
+const wind     = col(4)
+const windVar  = variationButton(wind.btn, 3)
+const windMix  = wind.char
+const windLpf  = expRange(wind.lpf, 200, 12000).mul(globalFog)
+
+// Waves: a swell every half bar, sometimes skipped, each with its own length; the lpf breathes with them
+const sea = s("brown*2").degradeBy(0.25)
+  .attack(rand.range(0.6, 1.6)).sustain(0.8).release(rand.range(1.5, 3))
+  .lpf(windLpf.mul(sine.slow(3).range(0.35, 1)))
+  .pan(rand.range(0.2, 0.8)).gain(0.5)
+// Wind: overlapping 8th gusts through a resonant bandpass that wanders, so it whistles and moves
+const gusts = s("pink*8")
+  .attack(0.3).sustain(0.7).release(0.8)
+  .bpf(sine.slow(7).add(rand.mul(0.15)).range(400, 2200)).bpq(rand.range(2, 7))
+  .lpf(windLpf)
+  .pan(sine.slow(4)).gain(perlin.range(0.05, 0.35))
+
+const stem4_wind = strip(bus(reseed(windVar, stack(
+  gate(above(fadeMain(windMix), 0), sea.mul(gain(fadeMain(windMix)))),
+  gate(above(fadeExtra(windMix), 0), gusts.mul(gain(fadeExtra(windMix))))
+)), 1, 0.3), {
+  hpf: expRange(wind.hpf, 20, 2000),
+  level: wind.level.range(0, 1),
+})
+
+// ============================================================
+// 5 WHALE — slow calls that glide into their note
+// ============================================================
+// @ctl 16:5.k1 HPF | 20–800 Hz
+// @ctl 16:5.k2 LPF | 150–6000 Hz
+// @ctl 16:5.k3 Glide | how far each call slides into its note: 0 = ±2 semitones, 1 = ±12 (deep, eerie bends).
+// @ctl 16:5.fader Level | 0–1
+// @ctl 16:5.b1 Variation | next of 8 random call sequences.
+const whale      = col(5)
+const whaleVar   = variationButton(whale.btn, 4)
+const whaleDepth = whale.char.fmap(c => 2 + 10 * c)
+
+const stem5_whale = strip(bus(reseed(whaleVar,
+  n(irand(7).segment(1))
+    .degradeBy(0.35)   // about two calls in three bars
+    .s("<sine triangle>")
+    .penv(rand.range(-1, 1).mul(whaleDepth)).pattack(rand.range(0.8, 2.2)).prelease(2)
+    .vib(rand.range(3, 6)).vibmod(0.12)
+    .attack(0.8).sustain(0.8).release(2.5)
+    .gain(0.45).pan(rand.range(0.25, 0.75))
+    .delay(0.4)
+).scale(scaleIn(3)), 1, 0.7), {
+  hpf: expRange(whale.hpf, 20, 800),
+  lpf: expRange(whale.lpf, 150, 6000),
+  level: whale.level.range(0, 1),
+})
+
+// ============================================================
+// 6 CHOIR — breathy “aah/ooh” voices on half notes
+// ============================================================
+// @ctl 16:6.k1 HPF | 80–2000 Hz
+// @ctl 16:6.k2 LPF | 300–10000 Hz
+// @ctl 16:6.k3 Voices | 0 = one voice, 0.5 = + a third above, 1 = + a fifth: three-part harmony.
+// @ctl 16:6.fader Level | 0–1
+// @ctl 16:6.b1 Variation | next of 8 random melodies.
+const choir       = col(6)
+const choirVar    = variationButton(choir.btn, 5)
+const choirVoices = choir.char
+
+// One voice: a saw through a vowel filter (vowel per note: a, o, u, e). The vowel filter is 5 band-passes per
+// note, the most expensive part of the track, so only the lead voice gets a slightly detuned second saw (chorus).
+const choirVoice = (deg, g, detuned = false) => {
+  const v = reseed(choirVar, n(irand(5).segment(2).mul(2).add(deg))).scale(scaleIn(4))
+  return (detuned ? v.superimpose(x => x.add(note(0.12))) : v)
+    .s("sawtooth").vowel("<a o u e>/2")
+    .attack(0.7).sustain(0.8).release(1.8)
+    .gain(g)
+}
+
+const stem6_choir = strip(bus(wobble(stack(
+  choirVoice(0, 0.2, true),
+  gate(above(choirVoices, 0), choirVoice(2, ramp(choirVoices, 0, 0.5).mul(0.21))),
+  gate(above(choirVoices, 0.5), choirVoice(4, ramp(choirVoices, 0.5, 1).mul(0.17)))
+)), 1, 0.7), {
+  hpf: expRange(choir.hpf, 80, 2000),
+  lpf: expRange(choir.lpf, 300, 10000),
+  level: choir.level.range(0, 1),
+})
+
+// ============================================================
+// 7 MUSIC BOX — a slow 8th arpeggio that randomly leaps an octave
+// ============================================================
+// @ctl 16:7.k1 HPF | 100–3000 Hz
+// @ctl 16:7.k2 LPF | 1–14 kHz
+// @ctl 16:7.k3 Density | 0 = a few notes of the tune, 1 = every 8th plays.
+// @ctl 16:7.fader Level | 0–1
+// @ctl 16:7.b1 Variation | next of 8 random note choices and octave leaps.
+const box      = col(7)
+const boxVar   = variationButton(box.btn, 6)
+const boxKeep  = box.char.fmap(d => 0.3 + 0.7 * d)
+
+const stem7_box = strip(bus(reseed(boxVar,
+  n("<[0 2 4 6 7 6 4 2] [1 3 5 8 7 5 3 1] [2 4 6 8 9 8 6 4] [-1 1 3 5 4 3 1 -1]>")
+    .sometimesBy(0.25, x => x.add(n(7)))
+    .degradeBy(boxKeep.fmap(k => 1 - k))
+    .s("sine").fm(0.8).fmh(5)
+    .decay(0.6).sustain(0).release(0.6)
+    .gain(rand.range(0.2, 0.35)).pan(sine.slow(6).range(0.3, 0.7))
+    .delay(0.35)
+).scale(scaleIn(4)), 1, 0.5), {
+  hpf: expRange(box.hpf, 100, 3000),
+  lpf: expRange(box.lpf, 1000, 14000),
+  level: box.level.range(0, 1),
+})
+
+// Stateful controls (cycleButton, the mood clock) only see a change when they are queried.
+// Gated stems are not queried, so this queries every one of them on every scheduler tick and drops the result:
+// presses still count and the mood still switches while faders are down.
+const stateTaps = stack(
+  droneVar, padVar, glitVar, windVar, whaleVar, choirVar, boxVar, globalVar, moodButton, pulseRhythm, pulseSoft, mood
+).filterValues(() => false)
+
+
+// ============================================================
+// MASTER AUDIO MATRIX
+// ============================================================
+stack(
+  stem_pulse,
+  stem1_drone,
+  stem2_pad,
+  stem3_glitter,
+  stem4_wind,
+  stem5_whale,
+  stem6_choir,
+  stem7_box,
+  stateTaps
+)
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway

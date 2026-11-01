@@ -4,8 +4,10 @@ Live-performed Strudel tracks (strudel.cc), played with a Novation Launch Contro
 Talk to the user in German; code comments stay in English. Explain audio basics plainly.
 
 ## Layout
-- `tracks/` — tracks (`NNN.strudel`, variants as `NNN-<name>.strudel`)
+- `tracks/` — tracks (`NNN.strudel`, variants as `NNN-<name>.strudel`); superseded variants in `tracks/old/`
+- `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `sounds/lab/` — experimental boards to understand sound design (drum board, bass board); not tracks
+- `sounds/lab/tutorials/` — ear-training tutorials with live sliders + German handbook PDF (Typst): harmony, effects
 - `sounds/parts/` — clean building blocks meant to be dropped into tracks (e.g. `arp-cascade.strudel`)
 - `samples/` — audio recordings
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
@@ -17,11 +19,19 @@ Talk to the user in German; code comments stay in English. Explain audio basics 
 - Single quotes for plain text in Strudel (double quotes are parsed as mini-notation).
 - Boards and stems need rhythm, not just held notes.
 
+## Two-controller live tracks (007, 008, …)
+- Layout after `midi-layouts/templates/dual-lc.strudel`: Jojo's LC = foundation (8 columns, tagged B16), Jonas' LC =
+  colour on columns 1-7 + global column 8. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns;
+  all knobs at 0 must already sound good.
+- Each track is `NNN-<name>-dual.strudel` (edit this one) plus `NNN-<name>-single.strudel` for Jonas' LC alone
+  (Mode 2 = Jojo's columns 1-7). The single file is written by `tools/lcxl-layout/make-single.mjs` (run by the hook
+  after every edit of a dual file or the template) — never edit it by hand.
+
 ## Controller mapping (LC XL 3)
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.
 - Mode 2 = same layout, every CC + 48 (melodies). Column 8 is global in both modes:
   fader via `lastMoved` (last moved wins), knobs via `coupled` (endless encoders, relative deltas).
-- In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/006-lean.strudel`).
+- In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/006-arp.strudel`).
 
 ## Writing efficient Strudel (CPU)
 Strudel computes every event of every layer even when it is silent; dense tracks then drop out.
