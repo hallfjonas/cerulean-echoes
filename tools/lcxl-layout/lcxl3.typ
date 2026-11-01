@@ -15,14 +15,27 @@
 #let c-unused = luma(240)
 #let fills = (knob: c-knob, fader: c-fader, button: c-button, global: c-global)
 
-// One control: CC number, name, short description
+// One control: CC number, name, short description; s scales all text sizes (1 = normal)
+#let ctl-body(cc, name, desc, s) = {
+  set text(size: 7.5pt * s)
+  [
+    #text(size: 6pt * s, fill: luma(90))[CC #cc] \
+    #text(weight: "bold")[#name] \
+    #text(size: 6.5pt * s)[#desc]
+  ]
+}
+// Text that would run past the cell is set smaller, step by step, until it fits (down to 55 %)
 #let ctl(cc, name, desc, fill) = block(
   width: 100%, height: 100%, inset: 4pt, radius: 3pt, fill: fill,
   stroke: 0.4pt + luma(170),
 )[
-  #text(size: 6pt, fill: luma(90))[CC #cc] \
-  #text(weight: "bold")[#name] \
-  #text(size: 6.5pt)[#desc]
+  #layout(size => {
+    let s = 1.0
+    while s > 0.55 and measure(ctl-body(cc, name, desc, s), width: size.width).height > size.height {
+      s -= 0.05
+    }
+    ctl-body(cc, name, desc, s)
+  })
 ]
 #let cell(c) = if c.at("off", default: false) {
   ctl(c.cc, text(fill: luma(150))[—], [], c-unused)
@@ -60,4 +73,34 @@
   == #page.title
   #v(2pt)
   #board(page)
+]
+
+// Explanation pages (@guide, @recipe): what the controls do and how they are used
+#if data.at("guide", default: ()).len() > 0 or data.at("recipes", default: ()).len() > 0 [
+  #pagebreak()
+  == Guide
+  #set text(size: 8pt)
+  #set par(spacing: 0.7em)
+  #columns(2, gutter: 8mm)[
+    #for g in data.guide [
+      #block(breakable: false, below: 4mm)[
+        #text(weight: "bold", size: 9pt, fill: rgb("#2b6cb0"))[#g.head]
+        #v(-0.3em)
+        #for p in g.paras {
+          let i = p.position(":")
+          if p.starts-with("In ") and i != none and i < 30 [*#p.slice(0, i + 1)*#p.slice(i + 1) #parbreak()] else [#p #parbreak()]
+        }
+      ]
+    ]
+  ]
+  #if data.recipes.len() > 0 [
+    #pagebreak(weak: true)
+    == Recipes
+    #table(
+      columns: (32mm, 1fr, 62mm), inset: 4pt, stroke: 0.4pt + luma(170),
+      fill: (x, y) => if y == 0 { luma(232) } else { none },
+      [*Sound*], [*Settings*], [*Where in techno / house*],
+      ..data.recipes.map(r => ([*#r.name*], r.settings, r.use)).flatten(),
+    )
+  ]
 ]

@@ -5,11 +5,16 @@
 //   // @layout <title>
 //   // @note <paragraph>                     intro text, in order
 //   // @mode <16|2> <page title>             a page per mode, in order
+//                                           B16 / B2 = the same modes on a second controller (own MIDI input,
+//                                           same CCs); its pages leave out the global column 8
 //   // @col <mode>:<col> <heading>           column heading (default: column number; column 8 with g-tags: "8 Global")
 //   // @row <mode>:<row> <label>             row label, " \ " = line break
 //   // @ctl <pos> <name> | <description>
+//   // @guide <heading> | <paragraph>        explanation pages after the board; same heading = more paragraphs
+//   // @recipe <name> | <settings> | <use>   recipe table on the explanation pages
+//   // @globalcc same                        column 8 sends the same CCs in every mode (default: Mode 2 = +48)
 // <row>: k1 k2 k3 (knob rows), fader, b1 b2 (button rows)
-// <pos>: <mode>:<col>.<row>, e.g. 16:1.k1; a column range 2:1-7.k1 puts the description on the first column
+// <pos>: <mode>:<col>.<row>, e.g. 16:1.k1 or B16:1.k1; a column range 2:1-7.k1 puts the description on the first column
 //        and "as <its heading>" on the others; g.<row> = global column 8, shown on every page (CC n / n + 48).
 // CC numbers are computed from the position: Mode 16 = fader 5-12, knobs 13-36, buttons 37-52; Mode 2 = +48.
 import fs from 'fs'
@@ -22,27 +27,36 @@ const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
 const BASE = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }
 const KIND = { k1: 'knob', k2: 'knob', k3: 'knob', fader: 'fader', b1: 'button', b2: 'button' }
 const LABEL = { k1: 'Row 1', k2: 'Row 2', k3: 'Row 3', fader: 'Fader \\ Level', b1: 'Buttons 1', b2: 'Buttons 2' }
-const cc = (mode, col, row) => BASE[row] + col + (mode === 2 ? 48 : 0)
+const MODE = '(B?(?:16|2))'   // B = second controller
+const cc = (mode, col, row) => BASE[row] + col + (/^B?2$/.test(mode) ? 48 : 0)
+const second = mode => mode.startsWith('B')
 
 export function parse(src, source) {
-  const d = { title: path.basename(source), source, notes: [], modes: [], cols: {}, rows: {}, ctls: [], global: {} }
+  const d = { title: path.basename(source), source, notes: [], modes: [], cols: {}, rows: {}, ctls: [], global: {}, globalSame: false, guide: [], recipes: [] }
   for (const line of src.split('\n')) {
-    const m = line.match(/\/\/\s*@(layout|note|mode|col|row|ctl)\s+(.*?)\s*$/)
+    const m = line.match(/\/\/\s*@(layout|note|mode|col|row|ctl|guide|recipe|globalcc)\s+(.*?)\s*$/)
     if (!m) continue
     const [, tag, rest] = m
     const bad = () => { throw new Error(`${source}: cannot read tag: ${line.trim()}`) }
     if (tag === 'layout') d.title = rest
     else if (tag === 'note') d.notes.push(rest)
-    else if (tag === 'mode') { const [, mode, title] = rest.match(/^(16|2)\s+(.*)$/) ?? bad(); d.modes.push({ mode: +mode, title }) }
-    else if (tag === 'col') { const [, mode, col, head] = rest.match(/^(16|2):([1-8])\s+(.*)$/) ?? bad(); d.cols[`${mode}:${col}`] = head }
-    else if (tag === 'row') { const [, mode, row, label] = rest.match(/^(16|2):(\w+)\s+(.*)$/) ?? bad(); d.rows[`${mode}:${row}`] = label }
+    else if (tag === 'mode') { const [, mode, title] = rest.match(new RegExp(`^${MODE}\\s+(.*)$`)) ?? bad(); d.modes.push({ mode, title }) }
+    else if (tag === 'col') { const [, mode, col, head] = rest.match(new RegExp(`^${MODE}:([1-8])\\s+(.*)$`)) ?? bad(); d.cols[`${mode}:${col}`] = head }
+    else if (tag === 'guide') {
+      const [, head, text] = rest.match(/^(.*?)\s*\|\s*(.*)$/) ?? bad()
+      const sec = d.guide.find(g => g.head === head) ?? (d.guide.push({ head, paras: [] }), d.guide.at(-1))
+      sec.paras.push(text)
+    }
+    else if (tag === 'recipe') { const [, name, settings, use] = rest.match(/^(.*?)\s*\|\s*(.*?)\s*\|\s*(.*)$/) ?? bad(); d.recipes.push({ name, settings, use }) }
+    else if (tag === 'globalcc') { if (!/^(same|shifted)$/.test(rest)) bad(); d.globalSame = rest === 'same' }
+    else if (tag === 'row') { const [, mode, row, label] = rest.match(new RegExp(`^${MODE}:(\\w+)\\s+(.*)$`)) ?? bad(); d.rows[`${mode}:${row}`] = label }
     else {
       const [, pos, name, desc] = rest.match(/^(\S+)\s+(.*?)\s*\|\s*(.*)$/) ?? bad()
       const g = pos.match(/^g\.(\w+)$/)
       if (g && ROWS.includes(g[1])) { d.global[g[1]] = { name, desc }; continue }
-      const [, mode, from, to, row] = pos.match(/^(16|2):([1-8])(?:-([1-8]))?\.(\w+)$/) ?? bad()
+      const [, mode, from, to, row] = pos.match(new RegExp(`^${MODE}:([1-8])(?:-([1-8]))?\\.(\\w+)$`)) ?? bad()
       if (!ROWS.includes(row)) bad()
-      d.ctls.push({ mode: +mode, from: +from, to: +(to ?? from), row, name, desc })
+      d.ctls.push({ mode, from: +from, to: +(to ?? from), row, name, desc })
     }
   }
   return d
@@ -50,26 +64,27 @@ export function parse(src, source) {
 
 export function build(d) {
   if (!d.ctls.length && !Object.keys(d.global).length) return null
-  const modes = d.modes.length ? d.modes : [...new Set(d.ctls.map(c => c.mode))].sort((a, b) => b - a).map(mode => ({ mode, title: `Mode ${mode}` }))
-  const both = modes.length > 1
+  const modes = d.modes.length ? d.modes : [...new Set(d.ctls.map(c => c.mode))].sort((a, b) => second(a) - second(b) || b.replace('B', '') - a.replace('B', '')).map(mode => ({ mode, title: `Mode ${mode}` }))
+  const both = modes.filter(m => !second(m.mode)).length > 1
   const hasGlobal = Object.keys(d.global).length > 0
   const pages = modes.map(({ mode, title }) => {
-    const heads = [...Array(8).keys()].map(i => d.cols[`${mode}:${i + 1}`] ?? (i === 7 && hasGlobal ? '8 Global' : String(i + 1)))
-    const grid = Object.fromEntries(ROWS.map(r => [r, [...Array(8).keys()].map(i => ({ cc: String(cc(mode, i + 1, r)), off: true }))]))
+    const withGlobal = hasGlobal && !second(mode)
+    const heads = [...Array(8).keys()].map(i => d.cols[`${mode}:${i + 1}`] ?? (i === 7 && withGlobal ? '8 Global' : String(i + 1)))
+    const grid = Object.fromEntries(ROWS.map(r => [r, [...Array(8).keys()].map(i => ({ cc: String(cc(i === 7 && d.globalSame ? '16' : mode, i + 1, r)), off: true }))]))
     for (const c of d.ctls.filter(c => c.mode === mode)) {
       for (let col = c.from; col <= c.to; col++) {
         const desc = col === c.from ? c.desc : `as ${heads[c.from - 1]}`
         grid[c.row][col - 1] = { cc: String(cc(mode, col, c.row)), name: c.name, desc, kind: KIND[c.row] }
       }
     }
-    for (const [row, g] of Object.entries(d.global)) {
-      const n = cc(16, 8, row)
-      grid[row][7] = { cc: both ? `${n} / ${n + 48}` : String(n), name: g.name, desc: g.desc, kind: 'global' }
+    for (const [row, g] of Object.entries(withGlobal ? d.global : {})) {
+      const n = cc('16', 8, row)
+      grid[row][7] = { cc: both && !d.globalSame ? `${n} / ${n + 48}` : String(n), name: g.name, desc: g.desc, kind: 'global' }
     }
     const rows = ROWS.map(r => ({ row: r, label: d.rows[`${mode}:${r}`] ?? LABEL[r], cells: grid[r] }))
     return { title, heads, rows }
   })
-  return { title: d.title, source: d.source, notes: d.notes, global: hasGlobal, pages }
+  return { title: d.title, source: d.source, notes: d.notes, global: hasGlobal, pages, guide: d.guide, recipes: d.recipes }
 }
 
 export function generate(file, root = process.cwd()) {
