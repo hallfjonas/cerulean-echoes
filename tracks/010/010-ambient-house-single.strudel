@@ -4,7 +4,7 @@
 // Mood after Harmon's sunrise live set at Fusion 2026 (Bachstelzen): melodic, warm, organic percussion, a lot of air.
 // Dry and classy at all knobs 0; the room comes with row 2 and the global Room.
 // Jojo (foundation): kick, atmo pump, sub, rolling bass, clap / rim, hats, congas, shaker / ride.
-// Jonas (colour): pad, deep chords (e-piano), pluck arp, lead, marimba answer, glass bells, birds + the global column 8.
+// Jonas (colour): pad, deep chords (e-piano), pluck arp, lead, marimba answer, glockenspiel, birds + the global column 8.
 // Chapter (global button 1): the chord progression for everybody, at the next phrase (4 bars):
 //   Dämmerung i–VI–III–VII → Sonnenaufgang VI–VII–i–i → Schweben i–iv → Wärme III–VI–iv–i. Everything follows its root.
 // Drop: when the break ends, everything comes back on the one.
@@ -41,7 +41,7 @@
 // @col 2:3 3 Pluck Arp
 // @col 2:4 4 Lead
 // @col 2:5 5 Marimba
-// @col 2:6 6 Glass Bells
+// @col 2:6 6 Glockenspiel
 // @col 2:7 7 Birds
 // @col 2:8 8 Global
 // @row 2:k1 Row 1 \ Brightness
@@ -763,35 +763,37 @@ const stemN5_ans = strip(bus(stack(
 })
 
 // ============================================================
-// JONAS 6 GLASS BELLS — FM bells on chord tones on a 16th grid (low FM index: glass, not quack), long echoes
+// JONAS 6 GLOCKENSPIEL — a real glockenspiel (General MIDI soundfont) on chord tones, high up, struck as by hand:
+// loose velocities, a few notes per bar, each bar ringing out; long echoes
 // ============================================================
-// @ctl 2:6.k1 Brightness | soft glow ↔ glittering (lpf 3–16 kHz).
+// @ctl 2:6.k1 Brightness | soft glow ↔ ringing, bright (lpf 3–16 kHz).
 // @ctl 2:6.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 2:6.k3 Density | a few bells per bar ↔ a rain of bells (~60 % of the 16ths).
-// @ctl 2:6.fader Level | glass bells on the chord.
-// @ctl 2:6.b1 Change | next of 8 random bell patterns.
-// @ctl 2:6.b2 Burst | a quick rain of bells while held.
+// @ctl 2:6.k3 Density | a few notes per bar ↔ a busy pattern (~60 % of the 16ths).
+// @ctl 2:6.fader Level | glockenspiel on the chord.
+// @ctl 2:6.b1 Change | next of 8 random patterns.
+// @ctl 2:6.b2 Run | runs up and down the chord, denser and louder the longer it is held (full after 2 bars).
 const bells    = colJonas(6)
 const bellVar  = change(bells.btn, 'jonas', 'Glocken')
 const bellKeep = bells.char.fmap(d => 0.1 + 0.5 * d)   // share of 16ths
+const bellRise = heldRamp(bells.btn2, 2)                // 0 → 1 over 2 bars while held
 const BELL_TONES = [0, 2, 4, 6, 7, 9, 11]
 const bellNote = steps => n(irand(7).segment(steps).fmap(i => BELL_TONES[i]))
+// Every bar keeps ringing after the next is struck (a metal bar, no damper)
+const glock = pat => pat.s("gm_glockenspiel").release(1.2)
+// A player's sweep: up and down the chord tones in 32nds, two octaves (scale degrees above the root)
+const BELL_RUN = n("[0 2 4 6 7 9 11 13 14 13 11 9 7 6 4 2]*2")
 
 const stemN6_bells = strip(bus(onRoot(stack(
-  reseed(bellVar, bellNote(16)
-    .degradeBy(bellKeep.fmap(k => 1 - k))
-    .s("sine").fm(rand.range(0.3, 0.9)).fmh(3.5)   // non-integer ratio = bell, low index = no quack
-    .decay(rand.range(0.3, 0.8)).sustain(0).release(0.4)
-    .gain(rand.range(0.45, 0.9))
-    .pan(rand)
+  reseed(bellVar, glock(bellNote(16)
+    .degradeBy(bellKeep.fmap(k => 1 - k)))
+    .gain(rand.range(0.45, 0.85))
+    .pan(rand.range(0.25, 0.75))
     .delay(0.5)),
-  // Burst: wind chimes in a gust — 32nds against triplet 16ths with random gaps; how many get through drifts in
-  // slow waves (perlin), so it thickens and thins instead of ticking. Louder than the bells, so it stands out at any density.
-  gate(held(bells.btn2), stack(
-    bellNote(32).degradeBy(perlin.fast(1.5).range(0.25, 0.8)),
-    bellNote(24).degradeBy(perlin.fast(1.5).range(0.9, 0.45))
-  ).s("sine").fm(rand.range(0.4, 0.9)).fmh(3.5)
-    .decay(rand.range(0.06, 0.35)).sustain(0).gain(rand.range(0.45, 1.05)).pan(rand).delay(0.4))
+  // Run: starts as a few scattered notes of the sweep and fills in over 2 bars (15 % → 90 % of the 32nds), getting
+  // louder; random velocities keep it played, not ticking. Released = gone.
+  gate(held(bells.btn2), glock(BELL_RUN.degradeBy(bellRise.fmap(r => 0.85 - 0.75 * r)))
+    .gain(bellRise.fmap(r => v => (0.35 + 0.55 * r) * v).appLeft(rand.range(0.7, 1)))
+    .pan(sine.fast(2).range(0.3, 0.7)).delay(0.4))
 )).scale(scaleIn(5)), 2, bells.space), {
   lpf: expRange(bells.bright, 3000, 16000),
   level: bells.level.range(0, 1),

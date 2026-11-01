@@ -32,7 +32,7 @@ const BUTTON = r => r === 'b1' || r === 'b2'
 // Display names: short column name + control name, at most 15 characters. The short name is the heading's first word
 // ("Sea / Wind" → "Sea", "Noise Pump" → "Noise") unless listed here
 const SHORT_COL = { 'Organ Bass': 'OrgBass', 'Rubber Bass': 'RubBass', 'Funk Guitar': 'Guitar', 'Deep Chords': 'Chords',
-  'Dub Chord': 'DubChord', 'Dub Chords': 'DubChord', 'Glass Bells': 'Bells', 'Music Box': 'MusicBox', 'Percussion': 'Perc' }
+  'Dub Chord': 'DubChord', 'Dub Chords': 'DubChord', 'Glass Bells': 'Bells', Glockenspiel: 'Glock', 'Music Box': 'MusicBox', 'Percussion': 'Perc' }
 const shortCol = head => SHORT_COL[head] ?? (/^Melody \d$/.test(head) ? head.replace('Melody', 'Mel') : head.split(/\s*[\s/+]\s*/)[0])
 const SHORT_CTL = { Brightness: 'Bright', 'Ghost notes': 'Ghosts', 'Echo throw': 'Echo', 'Master Level': 'Master', 'Break / Drop': 'Break/Drop' }
 const MAX_LABEL = 15
