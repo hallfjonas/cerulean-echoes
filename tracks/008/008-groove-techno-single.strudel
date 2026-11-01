@@ -760,30 +760,35 @@ const stemN5_ans = strip(bus(stack(
 })
 
 // ============================================================
-// JONAS 6 PINGS — glassy FM pings on a 16th grid (low FM index: bell, not quack), long echoes
+// JONAS 6 PINGS — a real glockenspiel (General MIDI soundfont) pinging on a 16th grid, long echoes
 // ============================================================
-// @ctl 2:6.k1 Brightness | soft glow ↔ glittering (lpf 4–16 kHz).
+// @ctl 2:6.k1 Brightness | soft glow ↔ ringing, bright (lpf 4–16 kHz).
 // @ctl 2:6.k2 Space | dry ↔ far away (reverb + echo).
 // @ctl 2:6.k3 Density | a few pings per bar ↔ a rain of pings (~70 % of the 16ths).
-// @ctl 2:6.fader Level | glassy pings.
+// @ctl 2:6.fader Level | glockenspiel pings.
 // @ctl 2:6.b1 Change | next of 8 random ping patterns.
-// @ctl 2:6.b2 Burst | a loud rain of pings while held.
+// @ctl 2:6.b2 Run | runs up and down the chord, denser and louder the longer it is held (full after 2 bars).
 const pings    = colJonas(6)
 const pingVar  = change(pings.btn, 'jonas', 'Pings')
 const pingKeep = pings.char.fmap(d => 0.2 + 0.5 * d)   // share of 16ths
+const pingRise = heldRamp(pings.btn2, 2)                // 0 → 1 over 2 bars while held
+// Every bar keeps ringing after the next is struck (a metal bar, no damper)
+const glock = pat => pat.s("gm_glockenspiel").release(1.2)
+// A player's sweep: up and down the chord tones in 32nds, two octaves (scale degrees above the root)
+const PING_RUN = n("[0 2 4 6 7 9 11 13 14 13 11 9 7 6 4 2]*2")
 
 const stemN6_pings = strip(bus(onRoot(reseed(pingVar,
-  n(irand(10).segment(16))
-    .degradeBy(pingKeep.fmap(k => 1 - k))
-    .s("sine").fm(rand.range(0.3, 1.1)).fmh(3.5)   // non-integer ratio = glass / bell, low index = no quack
-    .decay(rand.range(0.2, 0.6)).sustain(0).release(0.3)
+  glock(n(irand(10).segment(16))
+    .degradeBy(pingKeep.fmap(k => 1 - k)))
     .gain(rand.range(0.14, 0.33))
     .pan(rand)
     .delay(0.5)
 ).stack(
-  // Burst: its own layer, every 32nd, louder than the pings, so it stands out at any density
-  gate(held(pings.btn2), n(irand(10).segment(32)).s("sine").fm(0.8).fmh(3.5)
-    .decay(rand.range(0.05, 0.15)).sustain(0).gain(rand.range(0.25, 0.4)).pan(rand).delay(0.4))
+  // Run: starts as a few scattered notes of the sweep and fills in over 2 bars (15 % → 90 % of the 32nds), getting
+  // louder; random velocities keep it played, not ticking. Released = gone.
+  gate(held(pings.btn2), glock(PING_RUN.degradeBy(pingRise.fmap(r => 0.85 - 0.75 * r)))
+    .gain(pingRise.fmap(r => v => (0.18 + 0.27 * r) * v).appLeft(rand.range(0.7, 1)))
+    .pan(sine.fast(2).range(0.3, 0.7)).delay(0.4))
 )).scale(scaleIn(5)), 2, pings.space), {
   lpf: expRange(pings.bright, 4000, 16000),
   level: pings.level.range(0, 0.61),   // was 1; mix: pings −10 dB

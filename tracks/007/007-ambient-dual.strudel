@@ -754,34 +754,38 @@ const stemN5_choir = strip(bus(wobble(stack(
 })
 
 // ============================================================
-// JONAS 6 GLITTER — a glockenspiel struck at random on a 16th grid: clear metal bars that ring out, random notes of the
-// mood's scale (without the 4th and 7th degree, the sharpest ones), long echoes
+// JONAS 6 GLITTER — a real glockenspiel (General MIDI soundfont) struck at random on a 16th grid: metal bars that ring
+// out, random notes of the mood's scale (without the 4th and 7th degree, the sharpest ones), long echoes
 // ============================================================
 // @ctl 16:6.k1 Brightness | soft mallets ↔ bright metal (lpf 3–16 kHz).
 // @ctl 16:6.k2 Space | dry ↔ far away (reverb + echo).
 // @ctl 16:6.k3 Density | a drop now and then (~1 per bar) ↔ a sparkling rain (~70 % of the 16ths).
 // @ctl 16:6.fader Level | random glockenspiel notes.
 // @ctl 16:6.b1 Change | high → very high → middle register.
-// @ctl 16:6.b2 Burst | a loud rain of sparkles while held.
+// @ctl 16:6.b2 Run | runs up and down the scale, denser and louder the longer it is held (full after 2 bars).
 const glit     = colJonas(6)
 const glitVar  = change(glit.btn, 'jonas', 'Glitzer', 3, ['hoch', 'sehr hoch', 'mittel'])
 const glitKeep = glit.char.fmap(d => 0.06 + 0.64 * d)   // share of 16ths
 const glitScale = glitVar.pat.fmap(i => [scaleIn(5), scaleIn(6), scaleIn(4)][i]).innerJoin()
 const GLIT_TONES = [0, 1, 2, 4, 5, 7, 8, 9, 11]   // scale degrees over 1.5 octaves, without the 4th and 7th
 const glitTone  = k => irand(GLIT_TONES.length).segment(k).fmap(i => GLIT_TONES[i])
+const glitRise  = heldRamp(glit.btn2, 2)                 // 0 → 1 over 2 bars while held
+// Every bar keeps ringing after the next is struck (a metal bar, no damper)
+const glock = pat => pat.s("gm_glockenspiel").release(1.2)
+// A player's sweep: up and down GLIT_TONES in 32nds
+const GLIT_RUN = n("[0 1 2 4 5 7 8 9 11 9 8 7 5 4 2 1]*2")
 
 const stemN6_glitter = strip(bus(stack(
-  reseed(glitVar, n(glitTone(16))
-    .degradeBy(glitKeep.fmap(k => 1 - k))
-    .s("sine").fm(rand.range(0.4, 1)).fmh(2.76)   // 2.76 = the first overtone of a metal bar: glockenspiel
-    .attack(0.001).decay(rand.range(0.6, 1.2)).sustain(0).release(0.6)
+  reseed(glitVar, glock(n(glitTone(16))
+    .degradeBy(glitKeep.fmap(k => 1 - k)))
     .gain(rand.range(0.15, 0.4))
     .pan(rand)
     .delay(0.55)),
-  // Burst: its own layer, every 32nd, louder and brighter than the drops, so it stands out at any density
-  gate(held(glit.btn2), n(glitTone(32))
-    .s("sine").fm(rand.range(0.4, 1)).fmh(2.76).attack(0.001).decay(rand.range(0.15, 0.35)).sustain(0)
-    .gain(rand.range(0.3, 0.5)).pan(rand).delay(0.4))
+  // Run: starts as a few scattered notes of the sweep and fills in over 2 bars (15 % → 90 % of the 32nds), getting
+  // louder; random velocities keep it played, not ticking. Released = gone.
+  gate(held(glit.btn2), glock(GLIT_RUN.degradeBy(glitRise.fmap(r => 0.85 - 0.75 * r)))
+    .gain(glitRise.fmap(r => v => (0.2 + 0.3 * r) * v).appLeft(rand.range(0.7, 1)))
+    .pan(sine.fast(2).range(0.3, 0.7)).delay(0.4))
 ).scale(glitScale), 2, glit.space), {
   lpf: expRange(glit.bright, 3000, 16000),
   level: glit.level.range(0, 0.6),   // was 1; mix: glockenspiel −12 dB under the pad
