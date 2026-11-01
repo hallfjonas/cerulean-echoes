@@ -1,4 +1,4 @@
-// Launch Control XL 3 layout for tracks/006.strudel
+// Launch Control XL 3 layout for tracks/old/006.strudel
 // Compile: typst compile 006-layout.typ
 
 #set page(paper: "a4", flipped: true, margin: 12mm)
