@@ -4,7 +4,8 @@ Live-performed Strudel tracks (strudel.cc), played with a Novation Launch Contro
 Talk to the user in German; code comments stay in English. Explain audio basics plainly.
 
 ## Layout
-- `tracks/` — tracks (`NNN.strudel`, variants as `NNN-<name>.strudel`); superseded variants in `tracks/old/`
+- `tracks/NNN/` — one folder per track number: the track (`NNN.strudel`, variants as `NNN-<name>.strudel`), its
+  layout sheets, custom modes (`.syx`) and feedback notes; superseded variants in `tracks/NNN/old/`
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `sounds/lab/` — experimental boards to understand sound design (drum board, bass board); not tracks
 - `sounds/lab/tutorials/` — ear-training tutorials with live sliders + German handbook PDF (Typst): harmony, effects
@@ -31,7 +32,7 @@ Talk to the user in German; code comments stay in English. Explain audio basics 
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.
 - Mode 2 = same layout, every CC + 48 (melodies). Column 8 is global in both modes:
   fader via `lastMoved` (last moved wins), knobs via `coupled` (endless encoders, relative deltas).
-- In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/006-arp.strudel`).
+- In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/006/006-arp.strudel`).
 
 ## Writing efficient Strudel (CPU)
 Strudel computes every event of every layer even when it is silent; dense tracks then drop out.
@@ -46,7 +47,10 @@ Strudel computes every event of every layer even when it is silent; dense tracks
 
 ## Layout sheets
 Each tagged track has a generated `<track>-layout.pdf` (Typst). The source of truth is the `// @ctl` comments in
-the track; a hook regenerates the PDF after every edit. See `/lcxl-layout`. Hand-written `*-layout.typ` files are older sheets; the lab boards keep theirs on purpose (they add pages the generator cannot make: sound descriptions, variant tables).
+the track; a hook regenerates the PDF after every edit. See `/lcxl-layout`.
+The same hook writes the track's LC XL 3 custom modes (`tools/lcxl-layout/make-syx.mjs`, control names on the display,
+all buttons momentary): dual → `-jojo.syx` / `-jonas.syx` (slot 16 on each LC), single → `-single-mode1.syx` /
+`-single-mode2.syx` (slots 1 and 2). Load them with Novation Components. Hand-written `*-layout.typ` files are older sheets; the lab boards keep theirs on purpose (they add pages the generator cannot make: sound descriptions, variant tables).
 
 ## Machine
 M2 Air, 16 GB, shared with other agents: the global resource rules apply (one heavy job at a time, test small first).

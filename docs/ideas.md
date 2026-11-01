@@ -1,6 +1,9 @@
 # Ideen für später
 
 ## Custom-Mode-Datei (.syx) aus dem Strudel-File erzeugen (Skill)
+**Umgesetzt:** `tools/lcxl-layout/make-syx.mjs` (läuft im Hook mit). Format der Namen: `<0x60 + Länge> <id> <Text>`,
+Modename `20 <Länge> <Text>`. Noch nicht am Gerät bestätigt.
+
 Ziel: Das OLED des Launch Control XL 3 zeigt für jeden Regler den Namen aus dem Track (z. B. „Kick Softness“),
 nicht nur die CC-Nummer. Ein Skill/Tool liest die `@col`/`@ctl`-Tags eines Tracks (dual und single) und schreibt
 pro Controller und Mode eine `.syx`, die man in Novation Components lädt.

@@ -1,14 +1,16 @@
-// Regenerate layout sheets whenever a .strudel file in tracks/, sounds/lab/ or sounds/parts/ is saved (for hand edits).
+// Regenerate layout sheets (and for tracks the .syx custom modes) whenever a .strudel file in tracks/ (with its
+// subfolders), sounds/lab/ or sounds/parts/ is saved (for hand edits).
 // usage: npm run watch (in tools/), stop with Ctrl+C
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { generate } from './gen-layout.mjs'
+import { generate as makeSyx } from './make-syx.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const timers = {}
 for (const dir of ['tracks', 'sounds/lab', 'sounds/parts']) {
-  fs.watch(path.join(root, dir), (_, name) => {
+  fs.watch(path.join(root, dir), { recursive: dir === 'tracks' }, (_, name) => {
     if (!name?.endsWith('.strudel')) return
     const file = path.join(root, dir, name)
     clearTimeout(timers[file])
@@ -16,6 +18,7 @@ for (const dir of ['tracks', 'sounds/lab', 'sounds/parts']) {
       try {
         const pdf = generate(file, root)
         if (pdf) console.log('layout:', path.relative(root, pdf))
+        if (pdf && dir === 'tracks') for (const { out } of makeSyx(file)) console.log('custom mode:', path.relative(root, out))
       } catch (e) { console.error(`${name}: ${e.stderr?.toString() || e.message}`) }
     }, 300)
   })
