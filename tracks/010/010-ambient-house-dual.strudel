@@ -496,7 +496,7 @@ const stemJ4_bass = beatOnly(strip(dryBus(stack(
 // ============================================================
 // JOJO 5 CLAP / RIM — a soft 909 clap on 2 and 4, or a dry 909 rimshot, or both
 // ============================================================
-// @ctl B16:5.k1 Brightness | soft and far ↔ sharp crack (lpf 1.5–12 kHz).
+// @ctl B16:5.k1 Brightness | 0 = natural, a little soft ↔ sharp crack (lpf 3.5–14 kHz).
 // @ctl B16:5.k2 Space | dry ↔ far away (reverb + echo).
 // @ctl B16:5.k3 Ghost notes | plain ↔ a quiet rim before beat 3 ↔ + small double taps.
 // @ctl B16:5.fader Level | clap / rim on 2 and 4. Also the level of Tension's snare roll.
@@ -505,7 +505,8 @@ const stemJ4_bass = beatOnly(strip(dryBus(stack(
 const clap      = colJojo(5)
 const clapVar   = change(clap.btn, 'jojo', 'Clap', 3, ['Clap', 'Rim', 'beides'])
 const clapGhost = clap.char
-const clapHit = g => gain(g).s("cp").bank("RolandTR909").decay(0.18).sustain(0).release(0.06)
+// The 909 clap sample as it is, with its own tail (an envelope cut it off after 0.18 s and sounded choked)
+const clapHit = g => gain(g).s("cp").bank("RolandTR909")
 const rimHit  = g => gain(g).s("rim").bank("RolandTR909")
 const CLAPS = [
   clapHit("~ 0.7 ~ 0.7"),
@@ -521,8 +522,8 @@ const stemJ5_clap = beatOnly(strip(bus(stack(
   // Tension roll: 8ths → 16ths, louder as Tension rises
   gate(above(tensionRoll, 0), drum("sd*16").degradeBy(tensionRoll.fmap(t => 0.5 * (1 - t)))
     .gain(tensionRoll.fmap(t => 0.1 + 0.35 * t)))
-).mul(gain(1.5)).hpf(300).pan(0.47), 1, clap.space, 0.2), {
-  lpf: expRange(clap.bright, 1500, 12000),
+).mul(gain(0.9)).hpf(300).pan(0.47), 1, clap.space, 0.2), {   // was 1.5: the open clap peaked at 1.34 (clipping)
+  lpf: expRange(clap.bright, 3500, 14000),   // was 1500: at knobs 0 only 300–1500 Hz were left, a boxy, honking clap
   level: clap.level.range(0, 1),
 }))
 
