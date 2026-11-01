@@ -23,8 +23,8 @@ Talk to the user in German; code comments stay in English. Explain audio basics 
 - Layout after `midi-layouts/templates/dual-lc.strudel`: Jojo's LC = foundation (8 columns, tagged B16), Jonas' LC =
   colour on columns 1-7 + global column 8. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns;
   all knobs at 0 must already sound good.
-- Each track is `NNN-<name>-dual.strudel` (edit this one) plus `NNN-<name>-single.strudel` for Jonas' LC alone
-  (Mode 2 = Jojo's columns 1-7). The single file is written by `tools/lcxl-layout/make-single.mjs` (run by the hook
+- Each track is `NNN-<name>-dual.strudel` (edit this one) plus `NNN-<name>-single.strudel` for one LC alone
+  (Mode 1 = Jojo, same CCs as Mode 16; Mode 2 = Jonas, CC + 48). The single file is written by `tools/lcxl-layout/make-single.mjs` (run by the hook
   after every edit of a dual file or the template) — never edit it by hand.
 
 ## Controller mapping (LC XL 3)

@@ -19,86 +19,29 @@
 // @note Basis for all three tracks. Every row means the same on both controllers and in every track: row 1 = brightness, row 2 = space, row 3 = character (calm ↔ lively), fader = how much of it, button 1 = change, button 2 = a moment, right now.
 // @note Jojo plays the foundation (beat and bass) on all 8 columns. Jonas plays the colour (chords and melodies) on columns 1–7; Jonas' column 8 controls everything: both controllers and the Launchkey.
 // @note Examples per column: A = ambient, T = groove techno, H = happy house. Every track starts with all faders down, and with all knobs at 0 it must already sound good.
-// @note Only Jonas' controller: Mode 16 = Jonas (colour), Mode 2 = Jojo (foundation, columns 1–7; Jojo's column 8 (Shaker / Ride) stays off). Column 8 is the same global column on both pages.
-// @col 2:1 1 Pulse / Kick
-// @col 2:2 2 Rumble / Noise
-// @col 2:3 3 Sub
-// @col 2:4 4 Bassline
-// @col 2:5 5 Backbeat
-// @col 2:6 6 Hats
-// @col 2:7 7 Percussion
-// @row 2:k1 Row 1 \ Brightness
-// @row 2:k2 Row 2 \ Space
-// @row 2:k3 Row 3 \ Character
-// @row 2:fader Fader \ Level
-// @row 2:b1 Button 1 \ Change
-// @row 2:b2 Button 2 \ Moment
-// @ctl 2:1.k1 Brightness | dull thump ↔ clicky attack. Never fully closed.
-// @ctl 2:2.k1 Brightness | deep rumble ↔ airy hiss.
-// @ctl 2:3.k1 Brightness | pure sine ↔ a little buzz on top.
-// @ctl 2:4.k1 Brightness | round and dark ↔ buzzing, squelchy.
-// @ctl 2:5.k1 Brightness | soft and far ↔ sharp crack.
-// @ctl 2:6.k1 Brightness | soft hiss ↔ crisp and sharp.
-// @ctl 2:7.k1 Brightness | woody ↔ metallic.
-// @ctl 2:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
-// @ctl 2:2.k2 Space | dry ↔ far away.
-// @ctl 2:3.k2 Space | dry ↔ far away.
-// @ctl 2:4.k2 Space | dry ↔ far away.
-// @ctl 2:5.k2 Space | dry ↔ far away.
-// @ctl 2:6.k2 Space | dry ↔ far away.
-// @ctl 2:7.k2 Space | dry ↔ far away.
-// @ctl 2:1.k3 Softness | 0 = soft and round (the default) ↔ a deep, soft thump. Punch comes from row 1 (click).
-// @ctl 2:2.k3 Motion | still ↔ rolling waves / sweeps.
-// @ctl 2:3.k3 Length | long held tones ↔ short blips.
-// @ctl 2:4.k3 Groove | few notes ↔ busy, bouncing line.
-// @ctl 2:5.k3 Ghost notes | 0 = plain backbeat ↔ extra quiet hits in between.
-// @ctl 2:6.k3 Density | the pattern as it is ↔ + quiet 16ths ↔ + little rolls.
-// @ctl 2:7.k3 Density | steady pattern ↔ + ghost notes and rolls.
-// @ctl 2:1.fader Level | 0 = gone. Tuned to the key. A: heartbeat thump · T: kick · H: four-on-the-floor kick.
-// @ctl 2:2.fader Level | A: sea and wind · T: rumble on the 3rd + 4th 16th, same pitch as the kick · H: noise sweeps.
-// @ctl 2:3.fader Level | A: deep drone sub · T: pumping sub between the kicks · H: sub under the bassline.
-// @ctl 2:4.fader Level | A: slow bass swells · T: raw off-beat bass · H: bouncy bassline.
-// @ctl 2:5.fader Level | A: soft rim click · T: clap on 2 and 4 · H: clap + snare.
-// @ctl 2:6.fader Level | A: clock ticks · T: 16th hats · H: off-beat open hat.
-// @ctl 2:7.fader Level | A: wood clicks, drops · T: tuned bongos, rimshot · H: congas, bongos.
-// @ctl 2:1.b1 Change | next of at most 3 patterns, at the next bar.
-// @ctl 2:2.b1 Change | next of at most 3 patterns.
-// @ctl 2:3.b1 Change | next of at most 3 patterns.
-// @ctl 2:4.b1 Change | next of at most 3 patterns.
-// @ctl 2:5.b1 Change | next of at most 3 patterns.
-// @ctl 2:6.b1 Change | next of at most 3 patterns.
-// @ctl 2:7.b1 Change | next of at most 3 patterns.
-// @ctl 2:1.b2 Drop out | kick pauses while held.
-// @ctl 2:2.b2 Riser | noise rises while held.
-// @ctl 2:3.b2 Slide | notes glide into each other while held.
-// @ctl 2:4.b2 Octave | one octave up while held.
-// @ctl 2:5.b2 Roll | snare roll while held.
-// @ctl 2:6.b2 Open | hats ring long while held.
-// @ctl 2:7.b2 Fill | a fill while held.
-// @mode 16 Jonas — Colour (chords + melodies) · column 8 = global for all devices
-// @mode 2 Mode 2 — Jojo: Foundation (beat + bass) · CC + 48
-// @col 2:8 8 Global
-// @col 16:1 1 Pad
-// @col 16:2 2 Chords
-// @col 16:3 3 Arp
-// @col 16:4 4 Lead
-// @col 16:5 5 Answer
-// @col 16:6 6 Sparkle
-// @col 16:7 7 FX / Risers
-// @col 16:8 8 Global (all devices)
+// @note One controller: Mode 1 = Jojo (foundation, columns 1–7; Jojo's column 8 (Shaker / Ride) stays off; Mode 1 sends the same CCs as Mode 16), Mode 2 = Jonas (colour). Column 8 is global on both pages.
+// @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
+// @col 16:8 8 Global
+// @col 16:1 1 Pulse / Kick
+// @col 16:2 2 Rumble / Noise
+// @col 16:3 3 Sub
+// @col 16:4 4 Bassline
+// @col 16:5 5 Backbeat
+// @col 16:6 6 Hats
+// @col 16:7 7 Percussion
 // @row 16:k1 Row 1 \ Brightness
 // @row 16:k2 Row 2 \ Space
 // @row 16:k3 Row 3 \ Character
 // @row 16:fader Fader \ Level
 // @row 16:b1 Button 1 \ Change
 // @row 16:b2 Button 2 \ Moment
-// @ctl 16:1.k1 Brightness | muffled ↔ open and airy.
-// @ctl 16:2.k1 Brightness | warm ↔ bright, glassy.
-// @ctl 16:3.k1 Brightness | soft plucks ↔ sharp, sparkling.
-// @ctl 16:4.k1 Brightness | soft and round ↔ biting (acid squelch).
-// @ctl 16:5.k1 Brightness | hushed ↔ clear.
-// @ctl 16:6.k1 Brightness | soft glow ↔ glittering.
-// @ctl 16:7.k1 Brightness | dark whoosh ↔ bright shimmer.
+// @ctl 16:1.k1 Brightness | dull thump ↔ clicky attack. Never fully closed.
+// @ctl 16:2.k1 Brightness | deep rumble ↔ airy hiss.
+// @ctl 16:3.k1 Brightness | pure sine ↔ a little buzz on top.
+// @ctl 16:4.k1 Brightness | round and dark ↔ buzzing, squelchy.
+// @ctl 16:5.k1 Brightness | soft and far ↔ sharp crack.
+// @ctl 16:6.k1 Brightness | soft hiss ↔ crisp and sharp.
+// @ctl 16:7.k1 Brightness | woody ↔ metallic.
 // @ctl 16:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
 // @ctl 16:2.k2 Space | dry ↔ far away.
 // @ctl 16:3.k2 Space | dry ↔ far away.
@@ -106,34 +49,91 @@
 // @ctl 16:5.k2 Space | dry ↔ far away.
 // @ctl 16:6.k2 Space | dry ↔ far away.
 // @ctl 16:7.k2 Space | dry ↔ far away.
-// @ctl 16:1.k3 Swell | still ↔ slowly breathing in and out.
-// @ctl 16:2.k3 Rhythm | long held chords ↔ short, choppy stabs.
-// @ctl 16:3.k3 Range | few slow notes ↔ fast and wide.
-// @ctl 16:4.k3 Glide | plain notes ↔ notes slide into each other.
-// @ctl 16:5.k3 Voices | one voice ↔ two-, three-part harmony.
-// @ctl 16:6.k3 Density | a sparkle now and then ↔ a rain of notes.
-// @ctl 16:7.k3 Amount | subtle ↔ wild.
-// @ctl 16:1.fader Level | 0 = gone. A: long floating chords · T: dark pad · H: warm strings.
-// @ctl 16:2.fader Level | A: soft chord swells · T: dub chord stabs · H: piano chords.
-// @ctl 16:3.fader Level | A: slow music box · T: hypnotic sequence · H: bright arp.
-// @ctl 16:4.fader Level | A: choir or whale calls · T: acid line · H: vocal hook / lead.
-// @ctl 16:5.fader Level | A: second choir voice · T: counter blips · H: melody that answers the lead.
-// @ctl 16:6.fader Level | A: glitter drops · T: metallic pings · H: bells, plucks.
-// @ctl 16:7.fader Level | A: shimmer swells · T: slowly breathing noise · H: risers, vocal chops.
-// @ctl 16:1.b1 Change | next pattern / melody, at the next bar.
-// @ctl 16:2.b1 Change | next pattern / melody.
-// @ctl 16:3.b1 Change | next pattern / melody.
-// @ctl 16:4.b1 Change | next pattern / melody.
-// @ctl 16:5.b1 Change | next pattern / melody.
-// @ctl 16:6.b1 Change | next pattern / melody.
-// @ctl 16:7.b1 Change | next pattern / melody.
-// @ctl 16:1.b2 Freeze | holds the current chord while held.
-// @ctl 16:2.b2 Stab | one accent chord, now.
-// @ctl 16:3.b2 Octave | one octave up while held.
-// @ctl 16:4.b2 Echo throw | the last note echoes away.
-// @ctl 16:5.b2 Answer | plays one phrase, now.
-// @ctl 16:6.b2 Burst | one quick run of sparkles.
-// @ctl 16:7.b2 Hit | one FX hit / impact.
+// @ctl 16:1.k3 Softness | 0 = soft and round (the default) ↔ a deep, soft thump. Punch comes from row 1 (click).
+// @ctl 16:2.k3 Motion | still ↔ rolling waves / sweeps.
+// @ctl 16:3.k3 Length | long held tones ↔ short blips.
+// @ctl 16:4.k3 Groove | few notes ↔ busy, bouncing line.
+// @ctl 16:5.k3 Ghost notes | 0 = plain backbeat ↔ extra quiet hits in between.
+// @ctl 16:6.k3 Density | the pattern as it is ↔ + quiet 16ths ↔ + little rolls.
+// @ctl 16:7.k3 Density | steady pattern ↔ + ghost notes and rolls.
+// @ctl 16:1.fader Level | 0 = gone. Tuned to the key. A: heartbeat thump · T: kick · H: four-on-the-floor kick.
+// @ctl 16:2.fader Level | A: sea and wind · T: rumble on the 3rd + 4th 16th, same pitch as the kick · H: noise sweeps.
+// @ctl 16:3.fader Level | A: deep drone sub · T: pumping sub between the kicks · H: sub under the bassline.
+// @ctl 16:4.fader Level | A: slow bass swells · T: raw off-beat bass · H: bouncy bassline.
+// @ctl 16:5.fader Level | A: soft rim click · T: clap on 2 and 4 · H: clap + snare.
+// @ctl 16:6.fader Level | A: clock ticks · T: 16th hats · H: off-beat open hat.
+// @ctl 16:7.fader Level | A: wood clicks, drops · T: tuned bongos, rimshot · H: congas, bongos.
+// @ctl 16:1.b1 Change | next of at most 3 patterns, at the next bar.
+// @ctl 16:2.b1 Change | next of at most 3 patterns.
+// @ctl 16:3.b1 Change | next of at most 3 patterns.
+// @ctl 16:4.b1 Change | next of at most 3 patterns.
+// @ctl 16:5.b1 Change | next of at most 3 patterns.
+// @ctl 16:6.b1 Change | next of at most 3 patterns.
+// @ctl 16:7.b1 Change | next of at most 3 patterns.
+// @ctl 16:1.b2 Drop out | kick pauses while held.
+// @ctl 16:2.b2 Riser | noise rises while held.
+// @ctl 16:3.b2 Slide | notes glide into each other while held.
+// @ctl 16:4.b2 Octave | one octave up while held.
+// @ctl 16:5.b2 Roll | snare roll while held.
+// @ctl 16:6.b2 Open | hats ring long while held.
+// @ctl 16:7.b2 Fill | a fill while held.
+// @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
+// @col 2:1 1 Pad
+// @col 2:2 2 Chords
+// @col 2:3 3 Arp
+// @col 2:4 4 Lead
+// @col 2:5 5 Answer
+// @col 2:6 6 Sparkle
+// @col 2:7 7 FX / Risers
+// @col 2:8 8 Global (all devices)
+// @row 2:k1 Row 1 \ Brightness
+// @row 2:k2 Row 2 \ Space
+// @row 2:k3 Row 3 \ Character
+// @row 2:fader Fader \ Level
+// @row 2:b1 Button 1 \ Change
+// @row 2:b2 Button 2 \ Moment
+// @ctl 2:1.k1 Brightness | muffled ↔ open and airy.
+// @ctl 2:2.k1 Brightness | warm ↔ bright, glassy.
+// @ctl 2:3.k1 Brightness | soft plucks ↔ sharp, sparkling.
+// @ctl 2:4.k1 Brightness | soft and round ↔ biting (acid squelch).
+// @ctl 2:5.k1 Brightness | hushed ↔ clear.
+// @ctl 2:6.k1 Brightness | soft glow ↔ glittering.
+// @ctl 2:7.k1 Brightness | dark whoosh ↔ bright shimmer.
+// @ctl 2:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
+// @ctl 2:2.k2 Space | dry ↔ far away.
+// @ctl 2:3.k2 Space | dry ↔ far away.
+// @ctl 2:4.k2 Space | dry ↔ far away.
+// @ctl 2:5.k2 Space | dry ↔ far away.
+// @ctl 2:6.k2 Space | dry ↔ far away.
+// @ctl 2:7.k2 Space | dry ↔ far away.
+// @ctl 2:1.k3 Swell | still ↔ slowly breathing in and out.
+// @ctl 2:2.k3 Rhythm | long held chords ↔ short, choppy stabs.
+// @ctl 2:3.k3 Range | few slow notes ↔ fast and wide.
+// @ctl 2:4.k3 Glide | plain notes ↔ notes slide into each other.
+// @ctl 2:5.k3 Voices | one voice ↔ two-, three-part harmony.
+// @ctl 2:6.k3 Density | a sparkle now and then ↔ a rain of notes.
+// @ctl 2:7.k3 Amount | subtle ↔ wild.
+// @ctl 2:1.fader Level | 0 = gone. A: long floating chords · T: dark pad · H: warm strings.
+// @ctl 2:2.fader Level | A: soft chord swells · T: dub chord stabs · H: piano chords.
+// @ctl 2:3.fader Level | A: slow music box · T: hypnotic sequence · H: bright arp.
+// @ctl 2:4.fader Level | A: choir or whale calls · T: acid line · H: vocal hook / lead.
+// @ctl 2:5.fader Level | A: second choir voice · T: counter blips · H: melody that answers the lead.
+// @ctl 2:6.fader Level | A: glitter drops · T: metallic pings · H: bells, plucks.
+// @ctl 2:7.fader Level | A: shimmer swells · T: slowly breathing noise · H: risers, vocal chops.
+// @ctl 2:1.b1 Change | next pattern / melody, at the next bar.
+// @ctl 2:2.b1 Change | next pattern / melody.
+// @ctl 2:3.b1 Change | next pattern / melody.
+// @ctl 2:4.b1 Change | next pattern / melody.
+// @ctl 2:5.b1 Change | next pattern / melody.
+// @ctl 2:6.b1 Change | next pattern / melody.
+// @ctl 2:7.b1 Change | next pattern / melody.
+// @ctl 2:1.b2 Freeze | holds the current chord while held.
+// @ctl 2:2.b2 Stab | one accent chord, now.
+// @ctl 2:3.b2 Octave | one octave up while held.
+// @ctl 2:4.b2 Echo throw | the last note echoes away.
+// @ctl 2:5.b2 Answer | plays one phrase, now.
+// @ctl 2:6.b2 Burst | one quick run of sparkles.
+// @ctl 2:7.b2 Hit | one FX hit / impact.
 // @ctl g.k1 Fog | all devices. 0 = clear, up = everything gets darker, as if under water.
 // @ctl g.k2 Room | all devices. 0 = each sound's own room, up = everything drowns in reverb.
 // @ctl g.k3 Tension | build-up for all devices: filters open, echo grows, rolls tighten. Back to 0 = release.
@@ -157,5 +157,5 @@
 // @guide Rules for every track | Start with all faders down and build the track up together. That way the controller and the code agree from the first second.
 // @guide Rules for every track | A track may leave columns empty or swap an example, but never move a role to another column or a meaning to another row.
 // @guide Launchkey 25 MK4 (open) | Still to be decided: what the Launchkey plays (keys for melody, pads for drums, …). Fixed already: Jonas' column 8 controls it too. Master level, Fog, Room and Tension act on its sound, Chapter changes its key and chords, Break / Drop includes it.
-// @guide Playing alone | A run is: build the beat in Mode 2, switch to Mode 16, add colour, use column 8 for the drop.
+// @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
 // @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
