@@ -7,6 +7,54 @@
 // Column 1 is the exception: its button row 2 steps through the basslines.
 // The status box at the bottom right shows every value live, with units.
 //
+// EFFECTS ON THIS BOARD: filter (LPF, HPF, 3 types), filter envelope, FM, pitch envelope + vibrato,
+// octave, drive (9 types), bitcrush, coarse, reverb, delay, volume envelope, waveform, pulse width, detune, noise.
+// NOT ON THIS BOARD (Strudel has them, e.g. pan, bpf, vowel, shape, tremolo, phaser, chorus, compressor, ring):
+// add them as one more stage in STAGES if you need them.
+//
+// PITCH: the note comes from the basslines (note names: 'a1' = A in octave 1, 'c#2' = C sharp in octave 2).
+// Octave switch: column 6, button row 1 (±0, +1, +2 octaves). Going down needs a negative entry in OCTAVES (e.g. ['-1 Okt.', -12]).
+// Transpose in code: .trans(n) moves by n semitones. Pitch envelope (column 6, fader) = each note starts higher and slides down;
+// vibrato (column 6, knobs) = slow pitch wobble.
+//
+// GUIDE AND RECIPES: shown on the explanation pages of synth-layout.pdf (@guide, @recipe).
+// Recipes are starting points, not yet tuned by ear; set every stage not mentioned to its default / off.
+//
+// @guide How to use this board | The columns run left to right in the order the sound is made: a waveform is shaped in volume, filtered, coloured with FM, bent in pitch, distorted and finally put into a room. Switch one stage on (button row 2), move its controls, switch it off again: the difference is what the stage adds.
+// @guide How to use this board | Almost every techno bass uses only columns 1-4 and a bit of 7. FM, pitch, heavy drive and space are for character sounds, percussion and effects. Live, you usually ride two or three controls: cutoff, resonance, filter decay or drive.
+// @guide 1 Source: the raw material | The waveform decides which overtones exist. Everything later can only remove (filter) or bend (drive, FM) them. Sine: no overtones, pure sub; a filter does nothing to it. Triangle: soft, a few overtones. Sawtooth: all overtones, bright and buzzy; the standard raw material for filtered basses, acid and stabs. Square / pulse: hollow, only odd overtones; narrow pulse widths get nasal. Supersaw: five detuned saws, wide and shimmering.
+// @guide 1 Source: the raw material | In techno: sine or triangle for sub basses and layers under the kick; sawtooth for acid, rolling and filtered basses; square/pulse for electro and Detroit basses; supersaw for rave stabs and hoover-like leads, rarely for basses (too wide, not mono). Noise adds breath and bite to stabs and risers.
+// @guide 2 Envelope: the shape in time | Attack, decay, sustain and release shape the volume of each note. Short attack = a click at the start (punch); sustain 0 = every note dies away (pluck); sustain 1 = organ. Note length (button 1) decides how long the note is held, so it decides how much of decay and sustain you hear.
+// @guide 2 Envelope: the shape in time | In techno: basses are short and tight (attack 1-5 ms, decay 100-300 ms, sustain 0-0.5, short release), so they leave room for the next kick. Rolling and offbeat lines use short notes (¼ or ½). Long attacks belong to pads, not basses. Decay is the "length" knob of a bass stab and a good live control.
+// @guide 3 Filter: brightness | The low-pass cutoff removes everything above it: low = dark and far, high = bright and close. Resonance boosts the cutoff region: from soft to whistling and squelchy. 12 dB is gentle, 24 dB steeper and darker, ladder (Moog style) fatter and more aggressive with resonance. The high-pass removes the body from below.
+// @guide 3 Filter: brightness | In techno: the cutoff is the most-ridden control of a live set; a slow sweep over 16-32 bars builds tension without a new note. Typical bass cutoffs sit between 200 and 800 Hz. 24 dB or ladder for basses. The high-pass is the breakdown move: the bass gets thin, then drops back in. In a mix, a high-pass at 25-35 Hz keeps the sub clean.
+// @guide 4 Filter envelope: movement in every note | Opens (or closes) the low-pass at the start of each note and lets it fall back: env amount = how far (in octaves), filter decay = how fast it closes. Short decay = "blubb", "pluck"; long attack = "wah". Needs the filter (column 3) on, and the cutoff should be low, otherwise there is nothing to open.
+// @guide 4 Filter envelope: movement in every note | In techno and house: the source of acid (ladder, resonance 10-20, 2-4 octaves, decay 100-300 ms, sustain 0) and of plucky tech-house basses (24 dB, 1-2 octaves, short decay). Riding filter decay and cutoff together turns one bassline into many. "Down" direction gives a reversed, swelling feel; rare on basses.
+// @guide 5 FM: overtones from a second oscillator | FM wobbles the pitch so fast that new overtones appear. Ratio 1, 2, 3 or 0.5 = harmonic (sounds in tune: warm, growling, organ-like); 1.414 = inharmonic (metal, bells). Amount = how many overtones. FM sustain 0 = only a short strike at the start, like an e-piano or a mallet.
+// @guide 5 FM: overtones from a second oscillator | In techno: small amounts on a sine bass add grit that survives on small speakers without distortion; larger amounts make growls and dark, metallic basses (industrial, breakbeat). Inharmonic ratios with sustain 0 give metallic hits and Detroit-style bell stabs. The FM e-piano (ratio 1, sustain 0) is a classic deep house chord sound.
+// @guide 6 Pitch: bends and wobble | The pitch envelope starts each note higher and lets it fall: 12-24 semitones with a short decay is a kick or tom, very fast and high is a "zap". Vibrato is a slow, steady wobble of the pitch.
+// @guide 6 Pitch: bends and wobble | In techno: every synthesized kick is a sine with a pitch envelope. On a bass, a small pitch envelope (1-3 semitones, 20-50 ms) gives each note a punchy "thump" at the start. Vibrato is rare on basses; slow and subtle it imitates drifting analog gear, fast and deep it sounds sci-fi. The octave button moves the whole line (laptop speakers need +1 to hear it).
+// @guide 7 Drive: distortion and lo-fi | Drive bends the waveform and adds overtones: the bass gets louder-feeling, rougher and audible on small speakers. scurve and soft = warm saturation; hard and cubic = aggressive; diode = acid grit; asym = tube-like; fold, sinefold and chebyshev = synthetic, metallic. Level after brings the volume back down. Bitcrush and coarse are digital destruction.
+// @guide 7 Drive: distortion and lo-fi | In techno: a little saturation sits on almost every bass. Heavy drive is the sound of hard, industrial and acid techno. Always compare at equal volume (Level after), otherwise louder wins. The filter sits before the drive here, so drive puts brightness back: lower the cutoff when you add drive. Bitcrush and coarse are for electro, breakbeat and lo-fi house textures.
+// @guide 8 Space: reverb and delay | Reverb puts the sound into a room (amount and size); delay repeats it in time (time button, amount, feedback). Both are shared effects: everything on the same orbit uses the same room and echo.
+// @guide 8 Space: reverb and delay | In techno: basses stay dry and mono; reverb on a bass turns the low end to mush. Exceptions are dub techno (delay 3/16 with high feedback on stabs and chords) and the hypnotic "rumble", a kick or sub with lots of reverb that is then low-passed. Use space on stabs, percussion and leads; a short feedback ride on the delay is a classic transition.
+// @recipe Sub bass | sine, envelope S 0.8, filter on, LPF ~300 Hz, Res 0 | layer under the kick: deep, dub and minimal techno
+// @recipe Rolling bass | sawtooth, bassline Rolling, length ½, envelope D ~150 ms S 0, filter 24 dB, LPF 300-600 Hz, filter env 1-2 oct., decay ~100 ms, drive scurve 1-2 | driving peak-time and Berlin techno
+// @recipe Plucky bass | sawtooth or square, bassline Offbeat, length ¼, envelope S 0 and D short, filter 24 dB, LPF ~800 Hz | tech house, minimal
+// @recipe Acid squelch | sawtooth, filter ladder, LPF low, Res 10-15, filter env on at 3 oct., filter decay short, filter sustain 0, drive diode 1-3 | acid house and acid techno; ride cutoff, resonance and filter decay
+// @recipe Electro bass | pulse width ~0.3, envelope S 0.5, filter 12 dB ~1 kHz, pitch env 2 semitones / 30 ms | electro, Detroit techno
+// @recipe Wah | filter on, filter env on, filter attack long (0.3-0.5 s), filter sustain 0.5 | funky house, slow movement in stabs
+// @recipe Organ bass | square or triangle, envelope S 1, envelope off, FM off, filter off | 90s house organ bass
+// @recipe FM growl | sine or sawtooth, FM ratio 0.5 or 1, amount 2-4, FM sustain 1, drive soft 1-2 | dark techno, breakbeat basses
+// @recipe E-piano / bell | FM on, ratio 1 or 2, FM sustain 0 (strike only), FM decay short, FM amount 1-2 | deep house chords and keys
+// @recipe Metallic bell | FM on, ratio 1.414 or 3, FM amount 4-8, FM sustain 0, FM detune small for beating | Detroit bell stabs, metallic percussion
+// @recipe Kick | sine, pitch envelope 12-24 semitones, pitch decay ~50 ms, envelope D short, S 0, filter off | every synthesized kick; tune it to the key
+// @recipe Supersaw lead | supersaw, detune 0.3-0.6, note length full or ×2, reverb 0.3 | rave stabs and leads, not for basses
+// @recipe Dirty bass | drive 2-4, type scurve or diode, Level after to bring the volume back, LPF to tame the top | hard and industrial techno
+// @recipe Lo-fi / 8-bit | bitcrush ~8 bit, coarse 4-8 | electro, lo-fi house, breaks
+// @recipe Dub echo | space on, delay 0.4, feedback 0.5-0.7, time 3/16 or 1/4 | dub techno stabs and chords
+// @recipe Big room | reverb 0.5-0.7, room size 4-8 | pads and stabs; on a bass only for a rumble
+//
 // @layout Synth Board (sounds/lab)
 // @note One bass voice; each column is one stage of the signal path: source → volume envelope → filter → filter envelope → FM → pitch → drive → space.
 // @note Button row 1 picks a choice within the stage, button row 2 switches the stage on/off (A/B comparison). Exception column 1: button 2 = bassline. At start only envelope and filter are on.

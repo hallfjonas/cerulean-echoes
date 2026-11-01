@@ -1,0 +1,443 @@
+// ============================================================
+// HARMONY TUTORIAL: intervals, scales, modes, chord types, keys. Learn by ear, with live sliders.
+// ============================================================
+// How to use:
+// - Set CHAPTER (0-12) and evaluate once (Ctrl+Enter).
+// - Then only move the sliders of that chapter. They change the sound live, no re-evaluate needed.
+// - Every chapter loops forever. Stay on one setting for 4-8 bars, then move ONE slider ONE step and listen
+//   to what changed. Read the LISTEN line of the chapter first: it says what to listen for.
+// - The piano roll under the last line shows the notes with their names (no fold: the vertical gaps are
+//   the real distances, so you can see whole and half steps). Important notes are orange.
+// - Drums have their own block at the end with a volume slider (DRUMS). For chapters 0-2 try DRUMS = 0 first.
+// Note names are English: B = German H, Bb = German B.
+
+setcpm(122 / 4)   // 122 BPM, one cycle = one bar
+
+const CHAPTER = 0
+
+// ---------- helpers (no need to read) ----------
+const NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
+const nm = m => NAMES[((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1)     // midi number -> name, 57 -> A3
+const A3 = 57
+// a slider picks one entry of a list (slider values are rounded)
+const by = (ctl, list) => ctl.fmap(v => list[Math.max(0, Math.min(list.length - 1, Math.round(v)))]).innerJoin()
+// chord from semitone steps above a root: ch(45, [0, 3, 7]) = A minor (A2 C3 E3)
+const ch = (root, steps) => note(stack(...steps.map(s => pure(nm(root + s)))))
+// melody from semitone steps above a root, null = rest
+const nt = (root, steps) => note(sequence(...steps.map(s => s === null ? silence : pure(nm(root + s)))))
+// orange for one scale degree (use before .scale()) or for note names (pitch classes like 'G#')
+const mark = (pat, degree) => pat.fmap(v => ((v.n % 7) + 7) % 7 === degree ? { ...v, color: 'orange' } : v)
+const hl = (pat, pcs) => pat.fmap(v => pcs.includes(String(v.note).replace(/-?\d+$/, '')) ? { ...v, color: 'orange' } : v)
+
+// ---------- sounds ----------
+const lead  = p => p.s('triangle').lpf(3200).delay(0.25).gain(0.55)
+const stab  = p => p.s('sawtooth').lpf(1600).decay(0.2).sustain(0).room(0.25).gain(0.3)
+const bass  = p => p.s('sawtooth').lpf(420).decay(0.25).sustain(0.3).gain(0.6)
+const drone = root => ch(root - 24, [0, 12]).s('triangle').attack(0.1).release(0.3).gain(0.3)
+
+// The 7 modes, sorted from bright to dark, and the degree that gives each its character (0 = root).
+const MODES = ['lydian', 'major', 'mixolydian', 'dorian', 'minor', 'phrygian', 'locrian']
+const CHAR  = [3, 6, 6, 5, 5, 1, 4]
+
+
+// ============================================================
+// PART A: HEARING DISTANCES
+// ============================================================
+
+// ------------------------------------------------------------
+// 0. HOME NOTE AND INTERVALS
+// ------------------------------------------------------------
+// The drone holds A, the home note (also called root or tonic). The lead plays A (white) and a second note
+// N semitones above it (orange). An interval is the distance between two notes, counted in semitones
+// (one piano key to the very next one, black or white = one semitone). Every scale and every chord is just a
+// choice of intervals above a home note, so this is the base of everything that follows.
+//
+//  N  name          sound                          where you meet it
+//  0  unison        the same note                  -
+//  1  minor 2nd     sharp friction, threat         phrygian techno basslines (A-Bb), horror
+//  2  major 2nd     a neutral step                 melodies, sus2 chords
+//  3  minor 3rd     dark, sad: THE minor sound     every minor chord, most techno
+//  4  major 3rd     bright, happy: THE major sound major chords, disco, euphoric house
+//  5  perfect 4th   open, hollow, waiting          sus4 chords, dub techno chords (stacked 4ths)
+//  6  tritone       unstable, eerie                diminished chords, industrial stabs, acid
+//  7  perfect 5th   strong, pure, "power"          root + fifth basslines, rave stabs
+//  8  minor 6th     dark, dramatic                 minor melodies (A-F), trance leads
+//  9  major 6th     warm, soulful                  dorian deep house, jazz chords
+// 10  minor 7th     bluesy, open, groovy           m7 chords (deep house), mixolydian riffs
+// 11  major 7th     dreamy, longing, tense         maj7 chords (nu-disco), the "leading tone"
+// 12  octave        the same note, higher          octave basslines (house, disco)
+//
+// LISTEN: move N from 0 to 12, one step every few bars. Which ones feel at rest (0, 12, 7, also 3, 4, 5)?
+// Which want to move on (1, 6, 11)? That wish to move is called tension. Music lives from building
+// tension and releasing it, and the rest of this tutorial is about where that tension comes from.
+const N = slider(7, 0, 12, 1)
+const ch0 = stack(
+  drone(A3),
+  lead(note('A3').struct("x ~ ~ ~ x ~ ~ ~")),
+  lead(by(N, [...Array(13).keys()].map(i => note(nm(A3 + i)).struct("~ ~ x ~ ~ x ~ x")))).color('orange'),
+)
+
+// ------------------------------------------------------------
+// 1. MAJOR OR MINOR: ONE NOTE DECIDES
+// ------------------------------------------------------------
+// A chord or scale is "major" or "minor" because of ONE note: the 3rd above the home note.
+//   minor 3rd = 3 semitones (A-C), major 3rd = 4 semitones (A-C#). Root, 5th and octave stay the same.
+// The arpeggio plays root, 3rd, 5th, octave one after another; the stab plays them at once. The 3rd is orange.
+// THIRD: 0 = minor, 1 = major, 2 = no 3rd at all (root + 5th, a "power chord").
+// LISTEN: switch between 0 and 1 every 4 bars. One note moves one semitone and the whole mood flips.
+// Then try 2: neither major nor minor, the mood stays open. Many techno stabs and basslines do this on
+// purpose, so they fit under any melody. Techno: mostly minor or no 3rd. Disco and French house: major.
+const THIRD = slider(0, 0, 2, 1)
+const ch1 = by(THIRD, [3, 4, null].map(T => stack(
+  drone(A3),
+  hl(lead(nt(A3, [0, T, 7, 12, T, 7, 0, T])), ['C', 'C#']),
+  hl(stab(ch(A3 - 12, T === null ? [0, 7, 12] : [0, T, 7]).struct("~ x ~ x ~ x ~ x")), ['C', 'C#']),
+  bass(note('A1').struct("x ~ ~ x ~ ~ x ~")),
+)))
+
+// ------------------------------------------------------------
+// 2. WHY SCALES: RANDOM NOTES BECOME MUSIC
+// ------------------------------------------------------------
+// A scale is a choice of 7 (or 5) of the 12 notes. The lead plays RANDOM notes; SET picks from which notes:
+//   0 chromatic:          all 12 notes. Sounds wrong and aimless: nothing tells the ear where home is.
+//   1 A minor:            7 notes, steps W H W W H W W (W = whole step = 2 semitones, H = half step = 1).
+//                         Suddenly it is a melody, because every note belongs to home note A.
+//   2 A minor pentatonic: 5 notes. The two notes that sit a half step from a neighbour (B and F) are gone,
+//                         so nothing can clash any more. That is why acid lines, rave leads and improvised
+//                         synth solos love the pentatonic: you cannot play a wrong note.
+// The random melody repeats every 2 bars, so you can learn it. SEED picks another random melody.
+// LISTEN: keep SEED, switch SET (same rhythm, same "randomness", only the note set changes).
+// Then keep SET on 1 or 2 and try other seeds: almost every one "works".
+const SET = slider(0, 0, 2, 1)
+const SEED = slider(0, 0, 31, 1)
+const rnd = seed => () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296
+const SETS = [['A:chromatic', 13], ['A:minor', 8], ['A:minor pentatonic', 6]]
+const randomMelody = (set, seed) => {
+  const r = rnd(seed * 7919 + 1), [sc, size] = SETS[set]
+  const steps = [...Array(16)].map(() => r() < 0.25 ? silence : pure(Math.floor(r() * size)))
+  return lead(n(sequence(...steps)).slow(2).scale(sc))
+}
+const ch2 = stack(
+  drone(A3),
+  bass(note('A1').struct("x ~ ~ x ~ ~ x ~")),
+  by(SET, [0, 1, 2].map(set => by(SEED, [...Array(32).keys()].map(seed => randomMelody(set, seed))))),
+)
+
+
+// ============================================================
+// PART B: SCALES AND MODES
+// ============================================================
+
+// ------------------------------------------------------------
+// 3. THE SEVEN MODES, FROM BRIGHT TO DARK
+// ------------------------------------------------------------
+// The 7 "modes" are the 7 scales you get from the white piano keys, each starting on another note.
+// Here all of them start on A. Sorted by brightness, every step down lowers exactly ONE note by a semitone,
+// so every step can be heard as one single changed note:
+//   MODE  name        steps          change          sound                  techno / house
+//   0     lydian      W W W H W W H  raised 4th D#   floating, dreamy       ambient, progressive house pads
+//   1     major       W W H W W W H  4th back to D   happy, resolved        disco, French house, piano house
+//   2     mixolydian  W W H W W H W  7th down to G   major but laid-back    funk/disco house, Chicago organs
+//   3     dorian      W H W W W H W  3rd down to C   minor but warm, soul   deep house, Detroit techno
+//   4     minor       W H W W H W W  6th down to F   dark, melancholic      techno, trance, dark house
+//   5     phrygian    H W W W H W W  2nd down to Bb  darkest usable, threat hard/industrial techno, EBM
+//   6     locrian     H W W H W W W  5th down to Eb  no stable home chord   short tension moments only
+// (major is also called ionian, minor is also called aeolian.)
+// The orange note is the CHARACTERISTIC note: the one that separates this mode from plain major or minor.
+//   lydian D#, major G#, mixolydian G, dorian F#, minor F, phrygian Bb, locrian Eb.
+// Bar 1 runs up, bar 2 runs down; the stab plays the home chord of the mode on the offbeats.
+// LISTEN: start at 4 (minor). Go one step at a time to 0, then down to 6. On every step find the one note
+// that moved (the piano roll helps). Notice how the home chord itself turns from major (0-2) to minor (3-5)
+// to diminished (6): in locrian even the home chord is unstable, so it never feels like home.
+const MODE = slider(4, 0, 6, 1)
+const ch3 = by(MODE, MODES.map((m, i) => stack(
+  drone(A3),
+  lead(mark(n("<[0 1 2 3 4 5 6 7] [7 ~ 6 5 4 3 2 1]>"), CHAR[i]).scale('A:' + m)),
+  stab(n("[0,2,4]").struct("~ x ~ x ~ x ~ x").scale('A:' + m).trans(-12)),
+)))
+
+// ------------------------------------------------------------
+// 4. EACH MODE IN ITS TYPICAL RIFF, AND WITHOUT ITS CHARACTERISTIC NOTE
+// ------------------------------------------------------------
+// Running scales up and down is only the first step. Each mode has typical moves that use its characteristic
+// note (orange). RIFF picks the mode (same order as chapter 3), COMPARE = 1 plays the same riff in the
+// neighbouring mode that lacks exactly that note. That is the best way to hear what one note does.
+//   RIFF  mode        chords (2 bars)       typical use                            COMPARE plays
+//   0     lydian      A - B (major II)      dreamy pads, film, progressive house   major (D# -> D)
+//   1     major       A - E                 piano house, disco, "hands up"         mixolydian (G# -> G)
+//   2     mixolydian  A - G (bVII)          funky house, disco, Chicago            major (G -> G#)
+//   3     dorian      Am7 - D7 (major IV)   THE deep house vamp, Detroit chords    minor (F# -> F)
+//   4     minor       Am - F (bVI)          techno, trance, melancholic house      dorian (F -> F#)
+//   5     phrygian    Am - Bb (bII)         hard techno basslines, EBM, threat     minor (Bb -> B)
+//   6     locrian     Adim only             tension, horror, industrial            phrygian (Eb -> E)
+// LISTEN: pick a riff, listen 4 bars, set COMPARE to 1 and back. The riff gets "normal" without the
+// orange note. Dorian vs minor (3 vs 4) is the most useful pair for house: same minor, but warm or sad.
+const RIFF = slider(3, 0, 6, 1)
+const COMPARE = slider(0, 0, 1, 1)
+const RIFFS = [
+  { lead: "0 4 [3 4] ~ 7 ~ 3 ~",  chords: "<[0,2,4] [1,3,5]>",     bass: "<0 1>", vs: 1 },
+  { lead: "0 2 4 6 7 ~ 4 ~",      chords: "<[0,2,4] [4,6,8]>",     bass: "<0 4>", vs: 2 },
+  { lead: "0 ~ 6 ~ 4 ~ 6 7",      chords: "<[0,2,4] [6,8,10]>",    bass: "<0 6>", vs: 1 },
+  { lead: "0 2 4 5 4 2 5 4",      chords: "<[0,2,4,6] [3,5,7,9]>", bass: "<0 3>", vs: 4 },
+  { lead: "0 2 5 4 ~ 5 4 2",      chords: "<[0,2,4] [5,7,9]>",     bass: "<0 5>", vs: 3 },
+  { lead: "0 ~ 1 0 ~ 0 1 ~",      chords: "<[0,2,4] [1,3,5]>",     bass: "<0 1>", vs: 4 },
+  { lead: "0 4 ~ 0 4 ~ 2 4",      chords: "[0,2,4]",               bass: "0",     vs: 5 },
+]
+const riff = (i, other) => {
+  const r = RIFFS[i], sc = 'A:' + MODES[other ? r.vs : i]
+  return stack(
+    lead(mark(n(r.lead), CHAR[i]).scale(sc)),
+    stab(mark(n(r.chords), CHAR[i]).struct("~ x ~ x ~ x ~ x").scale(sc).trans(-12)),
+    bass(n(r.bass).struct("x ~ ~ x ~ ~ x ~").scale(sc).trans(-24)),
+  )
+}
+const ch4 = by(RIFF, MODES.map((m, i) => by(COMPARE, [riff(i, 0), riff(i, 1)])))
+
+
+// ============================================================
+// PART C: CHORDS
+// ============================================================
+
+// ------------------------------------------------------------
+// 5. CHORDS FROM THE SCALE
+// ------------------------------------------------------------
+// A chord = every other note of the scale, stacked: degree d, d+2, d+4 (a triad = 3 notes),
+// plus d+6 (a 7th chord, 4 notes), plus d+8 (a 9th chord, 5 notes).
+// Because the scale has uneven steps (W and H), each stacked chord gets a different QUALITY:
+//   in A minor:   i Am    ii° Bdim    III C      iv Dm    v Em    VI F      VII G
+//   7th chords:   Am7     Bm7b5       Cmaj7      Dm7      Em7     Fmaj7     G7
+// Roman numerals: uppercase = major chord, lowercase = minor chord, ° = diminished (see chapter 6).
+// Bar: the stab plays the chord, the lead plays its notes one by one, the bass plays its root.
+// LISTEN: DEGREE walks through the 7 chords of the scale. Hear major vs minor, and the odd one: degree 1
+// (ii° = B D F) is diminished, it sounds squeezed and wants to move on. SIZE adds the 7th and 9th: the same
+// chord becomes softer and jazzier; minor 7th and 9th chords ARE the deep house sound.
+// SCALE5 changes the scale (same order as chapter 3): in dorian (3) degree 3 becomes D major, and so on.
+const DEGREE = slider(0, 0, 6, 1)
+const SIZE = slider(0, 0, 2, 1)
+const SCALE5 = slider(4, 0, 6, 1)
+const scaleChord = (m, d, size) => {
+  const sc = 'A:' + MODES[m], degs = [0, 2, 4, 6, 8].slice(0, 3 + size).map(x => x + d)
+  return stack(
+    stab(n(stack(...degs.map(x => pure(x)))).struct("~ x ~ x ~ x ~ [x x]").scale(sc).trans(-12)),
+    lead(n(sequence(...[...degs, ...degs.slice(1, -1).reverse()].map(x => pure(x)))).scale(sc)),
+    bass(n(d).struct("x ~ x ~ x ~ x ~").scale(sc).trans(-24)),
+  )
+}
+const ch5 = by(SCALE5, MODES.map((m, mi) => by(DEGREE, [0, 1, 2, 3, 4, 5, 6].map(d =>
+  by(SIZE, [0, 1, 2].map(size => scaleChord(mi, d, size)))))))
+
+// ------------------------------------------------------------
+// 6. CHORD TYPES: happy, sad, tense, floating
+// ------------------------------------------------------------
+// All chords here stand on A, built from semitone steps above the root (intervals: chapter 0).
+// Bar 1 plays the chord as a stab, bar 2 plays the same notes one by one, so you hear every note.
+//
+//  TYPE  name             steps          notes        sound                   techno / house
+//   0    5 (power)        0 7 12         A E A        neutral, strong         rave stabs, hoover, techno bass
+//   1    major            0 4 7          A C# E       bright, happy           disco, French house, piano house
+//   2    minor            0 3 7          A C E        dark, sad               most techno and trance
+//   3    sus2             0 2 7          A B E        open, unresolved        progressive house, melodic techno pads
+//   4    sus4             0 5 7          A D E        hollow, waiting         melodic techno stabs, resolves to 1 or 2
+//   5    diminished       0 3 6          A C Eb       squeezed, uneasy        tension stabs, passing chord, horror
+//   6    augmented        0 4 8          A C# F       eerie, floating         risers, breaks, short moments only
+//   7    maj7             0 4 7 11       A C# E G#    dreamy, longing         nu-disco, Balearic, lounge house
+//   8    7 (dominant)     0 4 7 10       A C# E G     bluesy, wants to move   Chicago house organs, gospel house
+//   9    m7               0 3 7 10       A C E G      soft, warm minor        deep house: THE house chord
+//  10    m9               0 3 7 10 14    A C E G B    lush, jazzy             deep house, Detroit, dub techno
+//  11    stacked 4ths     0 5 10 15      A D G C      hollow, modern, open    dub techno / Detroit stab (Basic Channel)
+//  12    m7b5 (half-dim)  0 3 6 10       A C Eb G     dark jazzy tension      deep house turnarounds, leads into minor
+//  13    dim7             0 3 6 9        A C Eb F#    very tense, symmetric   builds, horror, rides into a drop
+//
+// What makes them sound like that:
+// - The 3rd decides major (4) or minor (3). No 3rd (power, sus, 4ths) = neither, so the chord stays open.
+//   That is why techno loves 5, sus and stacked 4ths: they fit any bassline and never sound "happy" or "sad".
+// - The 5th decides stable or not: a perfect 5th (7) is stable. DIMINISHED lowers it to a tritone (6),
+//   AUGMENTED raises it (8). Both lose their stable centre, so they sound like they are falling or floating.
+// - Diminished = only minor 3rds stacked (3+3, dim7: 3+3+3). Augmented = only major 3rds stacked (4+4).
+//   Equal steps make them symmetric: no note sounds like the root, the ear loses "home". Great for tension,
+//   bad as a home chord.
+// - A 7th adds colour: minor 7th (10) = groove, blues, softness; major 7th (11) = longing, dream.
+// LISTEN: go 1 -> 2 -> 5 (major, minor, diminished): each step lowers one note by a semitone.
+// Then 1 -> 6 (augmented), 2 -> 9 -> 10 (minor, m7, m9: deeper and deeper house), and 9 -> 12 -> 13.
+const TYPE = slider(2, 0, 13, 1)
+const TYPES = [
+  [0, 7, 12], [0, 4, 7], [0, 3, 7], [0, 2, 7], [0, 5, 7], [0, 3, 6], [0, 4, 8],
+  [0, 4, 7, 11], [0, 4, 7, 10], [0, 3, 7, 10], [0, 3, 7, 10, 14], [0, 5, 10, 15], [0, 3, 6, 10], [0, 3, 6, 9],
+]
+const ch6 = stack(
+  by(TYPE, TYPES.map(steps => cat(
+    stab(ch(A3 - 12, steps).struct("x ~ ~ x ~ ~ x ~")),
+    lead(nt(A3, [...steps, ...[...steps].reverse()])),
+  ))),
+  bass(note('A1').struct("x ~ x ~ x ~ x ~")),
+)
+
+// ------------------------------------------------------------
+// 7. DIMINISHED CHORDS IN ACTION
+// ------------------------------------------------------------
+// Diminished chords are rarely "the chord" of a track. They are tools for tension. Three typical uses (USE):
+//   0 PASSING CHORD: Am | Dm | G#dim7 | Am. G#dim7 (G# B D F) is built one semitone under the home note A.
+//     Its notes all lean into Am (G# -> A, B -> C, F -> E). Listen to bar 4 -> bar 1: it falls home.
+//     Classic in house piano, garage and gospel house chords, also before a drop.
+//   1 SYMMETRY: a dim7 chord is 3+3+3 semitones, so moving it up 3 semitones gives the SAME four notes again.
+//     There are only 3 different dim7 chords. Here one shape climbs by semitones (Adim7, Bbdim7, Bdim7, Cdim7)
+//     over a bass that stays on A: it rises and never lands. A common build-up before a drop.
+//   2 THREAT STAB: bass stays on A, the stab switches every bar between A minor (A C E) and A diminished
+//     (A C Eb): only the 5th sinks a semitone (orange). The tritone A-Eb makes it menacing: hard techno, acid, EBM.
+// LISTEN: in 0, mute the drums and sing along: after bar 4 you feel where the music has to go.
+const USE = slider(0, 0, 2, 1)
+const ch7 = by(USE, [
+  stack(
+    hl(stab(cat(ch(0, [45, 48, 52]), ch(0, [45, 50, 53]), ch(0, [44, 47, 50, 53]), ch(0, [45, 48, 52]))
+      .struct("x ~ ~ x ~ ~ x ~")), ['G#']),
+    hl(lead(note("<[e4 ~ c4 ~ a3 ~ ~ ~] [f4 ~ d4 ~ a3 ~ ~ ~] [g#4 ~ f4 ~ d4 ~ b3 ~] [c4 ~ ~ ~ a3 ~ ~ ~]>")), ['G#']),
+    bass(note("<a1 d2 g#1 a1>").struct("x ~ x ~ x ~ x ~")),
+  ),
+  stack(
+    stab(cat(...[45, 46, 47, 48].map(r => ch(r, [0, 3, 6, 9]))).struct("x ~ x ~ x ~ x x")),
+    bass(note('A1').struct("x ~ x x ~ x x ~")),
+  ),
+  stack(
+    hl(stab(cat(ch(A3 - 12, [0, 3, 7]), ch(A3 - 12, [0, 3, 6]))).struct("x ~ ~ x ~ ~ x ~"), ['Eb']),
+    bass(note('A1').struct("x x ~ x x ~ x x")),
+  ),
+])
+
+// ------------------------------------------------------------
+// 8. CHORD MEMORY: ONE SHAPE, MOVED AROUND (Detroit, dub techno, deep house)
+// ------------------------------------------------------------
+// Many techno and house tracks ignore the scale completely: they take ONE chord shape and move the whole
+// shape up and down. Old synths had a "chord memory" button for this: one key played a whole stored chord.
+// The notes leave the key, but the ear accepts it, because the colour of the chord stays the same.
+//   SHAPE: 0 minor, 1 m7, 2 m9, 3 stacked 4ths (the dub techno chord), 4 maj7
+//   MOVE:  0 stays on A, 1 A-C-D-C (house), 2 A-G-F-G (dub, sinking), 3 A-Bb (dark techno semitone)
+// The long delay is the dub techno trick: the echoes fill the space between the stabs.
+// LISTEN: keep MOVE, change SHAPE: same rhythm, but minor = techno, m9 = deep house, 4ths = dub techno,
+// maj7 = nu-disco. Then compare with chapter 5: there the chords follow the scale, here they do not.
+const SHAPE = slider(3, 0, 4, 1)
+const MOVE = slider(1, 0, 3, 1)
+const SHAPES = [[0, 3, 7], [0, 3, 7, 10], [0, 3, 7, 10, 14], [0, 5, 10, 15], [0, 4, 7, 11]]
+const MOVES = [[0], [0, 3, 5, 3], [0, -2, -4, -2], [0, 1]]
+const ch8 = by(SHAPE, SHAPES.map(shape => by(MOVE, MOVES.map(move => stack(
+  stab(cat(...move.map(o => ch(A3 - 12 + o, shape)))).struct("~ x ~ ~ ~ x ~ x")
+    .delay(0.5).delaytime(0.369).delayfeedback(0.55),
+  bass(cat(...move.map(o => note(nm(A3 - 24 + o))))).struct("x ~ ~ x ~ ~ x ~"),
+)))))
+
+
+// ============================================================
+// PART D: KEYS
+// ============================================================
+
+// ------------------------------------------------------------
+// 9. A KEY: HOME AND PULL
+// ------------------------------------------------------------
+// A key = a scale + a home chord. In the key of A minor, Am is home and every other chord is a step away.
+// The loop plays Am | F | Dm | ? and then starts again on Am. LAST picks the chord before home:
+//   0 Am      stays home: no movement, flat
+//   1 G       (VII) natural minor: smooth, open, little pull. Typical techno/trance loop (Am F C G)
+//   2 Em      (v)   natural minor: soft, a bit sad
+//   3 E       (V)   with G# from harmonic minor: strong pull home
+//   4 E7      (V7)  even stronger: the classic cadence (cadence = the chord step that ends a phrase)
+//   5 G#dim7  (vii°7) the diminished version of the same pull (chapter 7)
+// The pull comes from G# (orange): one semitone under A. A note a semitone under the home note is called
+// the LEADING TONE, it "leads" home. Natural minor has G (two semitones under A) and does not pull.
+// That is why harmonic minor exists (A B C D E F G#): minor, but with a leading tone.
+// LISTEN: compare 1 and 3 several times. Techno often avoids the pull (0, 1): hypnotic, never resolving.
+// House and trance use 3-5 to land the drop.
+const LAST = slider(3, 0, 5, 1)
+const LASTS = [[[45, 48, 52], 'A1'], [[43, 47, 50], 'G1'], [[43, 47, 52], 'E1'], [[44, 47, 52], 'E1'],
+               [[44, 47, 50, 52], 'E1'], [[44, 47, 50, 53], 'G#1']]
+const ch9 = by(LAST, LASTS.map(([last, root]) => stack(
+  hl(stab(cat(ch(0, [45, 48, 52]), ch(0, [45, 48, 53]), ch(0, [45, 50, 53]), ch(0, last)))
+    .struct("x ~ ~ x ~ ~ x ~"), ['G#']),
+  bass(note(sequence('A1', 'F1', 'D2', root)).slow(4)).struct("x ~ x ~ x ~ x ~"),
+)))
+
+// ------------------------------------------------------------
+// 10. SAME NOTES, OTHER HOME
+// ------------------------------------------------------------
+// The lead plays only white keys (the notes of C major = the notes of A minor). Only drone and bass change:
+// they decide which note is home. Same order as chapter 3, bright to dark:
+//   HOME: 0 F lydian, 1 C major, 2 G mixolydian, 3 D dorian, 4 A minor, 5 E phrygian, 6 B locrian
+// This is the trick behind RELATIVE KEYS: C major and A minor share all notes (no sharps, no flats), only
+// the home differs. In a track the home is set by the bass (and a tuned kick), not by the melody.
+// LISTEN: hum the melody, then change HOME. Not one note of the melody changes, but its mood does.
+const HOME = slider(4, 0, 6, 1)
+const HOMES = [53, 60, 55, 62, 57, 64, 59]   // F3 C4 G3 D4 A3 E4 B3; drone and bass sit 1-2 octaves lower
+const ch10 = stack(
+  lead(note("<[c4 e4 g4 a4 g4 e4 d4 ~] [b3 d4 f4 a4 g4 ~ e4 ~]>")),
+  by(HOME, HOMES.map(h => stack(drone(h), bass(note(nm(h - 24))).struct("x ~ ~ x ~ ~ x ~")))),
+)
+
+// ------------------------------------------------------------
+// 11. ALL KEYS: TRANSPOSING AND THE CIRCLE OF FIFTHS
+// ------------------------------------------------------------
+// The same little track in any key (major: I V vi IV, minor: i VI III VII). KEY walks the circle of fifths:
+//   0 C   1 G   2 D   3 A   4 E   5 B   6 F#   7 Db   8 Ab   9 Eb   10 Bb   11 F   (then back to C)
+// Each step is a 5th (7 semitones) up. Neighbours on the circle share 6 of their 7 notes: one step clockwise
+// adds one sharp (or removes one flat). That new note is orange: in major it is the 7th (the leading tone
+// of the new key), in minor the 2nd. MINOR = 1 plays the minor key on the same root (C minor, G minor, ...).
+// Relative keys: every major key has a minor key with the same notes, 3 semitones lower (C major = A minor).
+// DJs use this as the Camelot wheel (8A = A minor, 8B = C major): neighbours mix cleanly, far keys clash.
+// LISTEN: step KEY by one and find the one changed note. Then jump 6 steps (C -> F#): almost all notes change.
+// Also notice: a low key (E, F) makes the bass heavy, a high one (B, C) brighter. Pick keys for the bass.
+const KEY = slider(3, 0, 11, 1)
+const MINOR = slider(0, 0, 1, 1)
+const ROOTS = ['C3', 'G2', 'D3', 'A2', 'E3', 'B2', 'F#2', 'Db3', 'Ab2', 'Eb3', 'Bb2', 'F2']
+const keyTrack = (root, minor) => {
+  const sc = root + (minor ? ':minor' : ':major'), c = minor ? 1 : 6
+  const prog = minor ? [0, 5, 2, 6] : [0, 4, 5, 3]
+  return stack(
+    lead(mark(n("7 9 11 ~ 14 13 [9 8] 7"), c).scale(sc)),
+    stab(mark(n(cat(...prog.map(d => stack(pure(d + 7), pure(d + 9), pure(d + 11))))), c)
+      .struct("~ x ~ x ~ x ~ x").scale(sc)),
+    bass(n(cat(...prog.map(d => pure(d)))).struct("x ~ ~ x ~ ~ x ~").scale(sc).trans(-12)),
+  )
+}
+const ch11 = by(KEY, ROOTS.map(r => by(MINOR, [keyTrack(r, 0), keyTrack(r, 1)])))
+
+// ------------------------------------------------------------
+// 12. PLAYGROUND: everything together
+// ------------------------------------------------------------
+// A small track written only in scale degrees, so it follows any key, mode and chord size:
+//   ROOT:   key, semitones above A (0 = A, 3 = C, 5 = D, -4 = F, ...)
+//   MODE12: scale, bright to dark (chapter 3)
+//   PROG:   0 i-VI-III-VII (techno/trance), 1 i-iv (deep house vamp, try with dorian), 2 i-VII (hypnotic),
+//           3 i-II (phrygian threat, try with phrygian)
+//   CHORDS: 0 triads, 1 7th chords, 2 9th chords (chapter 5)
+// LISTEN: build your own combinations. Try MODE12 3 + PROG 1 + CHORDS 2 (deep house), MODE12 5 + PROG 3 +
+// CHORDS 0 (hard techno), MODE12 1 + PROG 0 + CHORDS 1 (euphoric house).
+const ROOT = slider(0, -6, 5, 1)
+const MODE12 = slider(4, 0, 6, 1)
+const PROG = slider(0, 0, 3, 1)
+const CHORDS = slider(1, 0, 2, 1)
+const PROGS = [[0, 5, 2, 6], [0, 0, 3, 3], [0, 0, 6, 6], [0, 0, 1, 0]]
+const play = (m, p, size) => {
+  const sc = 'A:' + MODES[m], roots = PROGS[p]
+  const degs = r => [0, 2, 4, 6, 8].slice(0, 3 + size).map(x => pure(x + r))
+  return stack(
+    stab(n(cat(...roots.map(r => stack(...degs(r))))).struct("~ x ~ x ~ x ~ [x x]").scale(sc).trans(-12)),
+    bass(n(cat(...roots.map(r => pure(r)))).struct("x ~ [x x] ~ x ~ [~ x] ~").scale(sc).trans(-24)),
+    lead(mark(n("<[4 ~ 7 ~ 6 4 ~ 2] [~ 4 ~ 2 1 ~ 0 ~]>"), CHAR[m]).scale(sc)),
+  )
+}
+const ch12 = by(MODE12, MODES.map((m, mi) => by(PROG, PROGS.map((p, pi) =>
+  by(CHORDS, [0, 1, 2].map(size => play(mi, pi, size))))))).trans(ROOT.fmap(Math.round))
+
+
+// ============================================================
+// PLAY
+// ============================================================
+const CHAPTERS = [ch0, ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12]
+
+// Drums: own block, so they run under every chapter. DRUMS = volume, 0 = off.
+const DRUMS = slider(0.6, 0, 1)
+$: stack(
+  s("bd*4"),
+  s("[~ oh]*4").gain(0.45),
+  s("hh*16").gain("[0.2 0.35]*8"),
+  s("~ cp ~ cp").gain(0.55),
+).bank('RolandTR909').postgain(DRUMS)
+
+$: CHAPTERS[CHAPTER]._pianoroll({ labels: 1, fold: 0, autorange: 1 })
