@@ -14,7 +14,7 @@ console.log = () => {}   // superdough logs every sample load
 const [file, stem, json] = process.argv.slice(2)
 const pat = (await load(file, JSON.parse(json), stem)).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)
 
-const cps = 140 / 4 / 60, CYC = 4, TAIL = 2, sr = 48000
+const cps = Number(process.env.BPM ?? 140) / 4 / 60, CYC = 4, TAIL = 2, sr = 48000   // BPM=70 node measure.mjs … for slower tracks
 const ctx = new wa.OfflineAudioContext(2, Math.ceil(sr * (CYC / cps + TAIL)), sr)
 sd.setAudioContext(ctx)
 await sd.initAudio({})

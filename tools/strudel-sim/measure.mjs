@@ -3,7 +3,7 @@
 //   e.g. node measure.mjs ../tracks/006-lean-mix.strudel stem1_kick=5,29 stem4_hats=8,32 stem_melody1=53,77 stem_baseline1=69
 //   A stem with only one CC (like a baseline faded in by its lpf knob) gets that CC = 1.
 //   Default base: both global faders (CC 12, 60) = 1, Mode 16 knob row 2 (lpf, CC 21-28) = 1, everything else 0.
-// Renders run one after another (one process at a time).
+// Renders run one after another (one process at a time). Tempo: BPM=<n> in the environment (default 140).
 import { execFileSync } from 'child_process'
 import path from 'path'
 import { fileURLToPath } from 'url'
