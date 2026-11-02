@@ -1,0 +1,168 @@
+// ============================================================
+// DRUM BOARD: eight drum machines side by side, to compare and layer
+// ============================================================
+// Launch Control XL 3, a custom mode sending on MIDI channel 16 (any slot): column N = machine N
+// knob row 1 = reverb (CC 13-20), row 2 = length (21-28), row 3 = soft ↔ hard (29-36), fader = level (5-12)
+// button row 1 = variant (37-44), button row 2 = instrument (45-52); both momentary, each press steps on
+const cc = await midin()
+
+// The knobs are endless encoders that keep their own position (after power-on: 0), so the first turn
+// would jump from the default in the code to that position. Instead, tell the controller where the knobs
+// start: reverb 0 (dry), length 127 (open), soft ↔ hard 63 (middle = original). Once per page load and track, so re-evaluating
+// while playing doesn't reset the knobs.
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = await navigator.requestMIDIAccess()
+if (globalThis.knobsSyncedFor !== 'drums') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let i = 0; i < 8; i++) {
+      out.send([0xBF, 13 + i, 0])     // 0xBF = control change on channel 16
+      out.send([0xBF, 21 + i, 127])
+      out.send([0xBF, 29 + i, 63])
+    }
+    globalThis.knobsSyncedFor = 'drums'
+  }
+}
+
+const bpm = 125
+setcpm(bpm / 4)
+
+// Status box at the bottom right of the page: which instrument and variant each column plays.
+// Kept across re-evaluations (same element), but the states start again at instrument 1, variant 1.
+// The bass board uses the same box and listener, so switching tracks on one page replaces them.
+const MACHINES    = ['808', '909', '707', 'LinnDrum', 'DMX', 'SP-1200', 'Synth', 'Rumble']
+const INSTRUMENTS = ['Kick', 'Snare', 'Clap', 'Closed Hat', 'Open Hat']
+const status = MACHINES.map(() => ({ instrument: 0, variant: 0 }))
+let statusBox = document.getElementById('board-status')
+if (!statusBox) {
+  statusBox = document.createElement('pre')
+  statusBox.id = 'board-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);color:#eee;font:13px/1.5 monospace;border-radius:6px;pointer-events:none'
+  document.body.appendChild(statusBox)
+}
+const showStatus = () => {
+  statusBox.textContent = status.map(({ instrument, variant }, i) =>
+    (i + 1) + ' ' + MACHINES[i].padEnd(9) + (i < 6 ? INSTRUMENTS[instrument] : 'Kick').padEnd(11) + 'V' + (variant + 1)
+  ).join('\n')
+}
+showStatus()
+
+// Buttons: read straight from the MIDI input, so every press counts at once. (Reading them through cc() only
+// samples the value when a note plays, so a short press between two kicks could get lost.)
+// Each press (value > 0) steps on; the release (0) is ignored. Re-evaluating replaces the old listener.
+const onButton = e => {
+  const [statusByte, num, value] = e.data
+  if ((statusByte & 0xf0) !== 0xb0 || value === 0) return
+  if (num >= 37 && num <= 44) status[num - 37].variant    = (status[num - 37].variant + 1) % 4
+  else if (num >= 45 && num <= 52) status[num - 45].instrument = (status[num - 45].instrument + 1) % 5
+  else return
+  showStatus()
+}
+for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onButton)
+}
+globalThis.boardListener = onButton
+
+// cc() reads 0 until a control has been moved. knob() returns def until then,
+// so soft ↔ hard can start in the middle and length fully open.
+const knob = (n, def) => {
+  let moved = false
+  return cc(n).fmap(v => {
+    if (v !== 0) moved = true
+    return moved ? v : def
+  })
+}
+
+// One column: makeSound gets the variant (0..3), the instrument (0..4), length and hall, and returns the pattern.
+// Reverb:   0 = dry, turning right adds more reverb in a growing room. Each column has its own orbit
+//           (= own reverb), so the columns don't share one reverb setting. makeSound applies it with
+//           hall(pattern), so a column can keep a layer out of it (the rumble has its own reverb).
+// Length:   fully open = natural length, turning left cuts the sound shorter (baseDecay = longest length in s)
+// Soft ↔ hard: middle = original.
+//   left:  softer, a slower attack fades the start in (up to 25 ms), so the click disappears,
+//          and a lowpass closes from fully open down to 150 Hz, so only the round low thump remains
+//   right: harder, saturation (shape) squares off the waveform, louder and more aggressive;
+//          the level drops a little to make up for the extra loudness
+const column = (i, makeSound, baseDecay = 2) => {
+  const mid    = 63 / 127
+  const reverb = cc(13 + i)
+  const hall   = pat => pat.room(reverb.mul(0.8)).roomsize(reverb.range(1, 8)).orbit(i + 1)
+  const length = knob(21 + i, 1).fmap(v => baseDecay * Math.pow(0.03, 1 - v))
+  const char   = knob(29 + i, mid)
+  const soft   = char.fmap(v => Math.max(0, (mid - v) / mid))         // 0 in the middle, 1 fully left
+  const hard   = char.fmap(v => Math.max(0, (v - mid) / (1 - mid)))   // 0 in the middle, 1 fully right
+  const variant    = signal(() => status[i].variant)
+  const instrument = signal(() => status[i].instrument)
+  return makeSound(variant, instrument, length, hall)
+    .attack(soft.fmap(s => 0.025 * s * s))   // quadratic: fine control over the first few ms
+    .lpf(soft.fmap(s => 20000 * Math.pow(150 / 20000, s)))   // exponential: 20 kHz (open) .. 150 Hz
+    .shape(hard.mul(0.8))
+    .postgain(cc(5 + i).mul(hard.mul(-0.4).add(1)))
+}
+
+// Sample machines. Instrument: 0 kick, 1 snare, 2 clap, 3 closed hat, 4 open hat, each with its own rhythm.
+// The variant picks one of the instrument's samples (fewer samples repeat);
+// bdPicks = kick sample numbers for variants 1-4, spread over the bank so they sound clearly different.
+// bdTrim = gain per kick variant, so all kicks are about equally loud (measured: RMS of the first 150 ms,
+// matched to about -9 dB). Only for the kicks; the other instruments are not trimmed yet.
+const machine = (bank, bdPicks = [0, 1, 2, 3], bdTrim = [1, 1, 1, 1]) => (variant, instrument, length, hall) => hall(instrument.pick([
+  s("bd*4").n(variant.fmap(v => bdPicks[v])).gain(variant.fmap(v => bdTrim[v])),
+  s("~ sd ~ sd").n(variant),
+  s("~ cp ~ cp").n(variant),
+  s("hh*16").n(variant),
+  s("[~ oh]*4").n(variant),
+]).bank(bank).decay(length).sustain(0))
+
+// 1  808: 25 kick samples named BD<tone><decay> (each 00/10/25/50/75, the 808's own two knobs).
+// The kick variants keep tone at 25 and step the decay: 00 / 25 / 50 / 75, from short thump to long boom
+// The short 808 variants are much quieter (up to 10 dB), so they get the most boost.
+const col1 = column(0, machine("RolandTR808", [10, 12, 13, 14], [3.2, 1.9, 1.15, 1]))
+const col2 = column(1, machine("RolandTR909", [0, 1, 2, 3], [0.6, 0.47, 0.51, 0.56]))
+// 707 and DMX have fewer kicks, so variants repeat (n wraps around); the trims repeat with them
+const col3 = column(2, machine("RolandTR707", [0, 1, 2, 3], [0.82, 0.78, 0.82, 0.78]))
+const col4 = column(3, machine("LinnDrum", [0, 1, 2, 3], [0.9, 0.9, 0.9, 0.9]))
+const col5 = column(4, machine("OberheimDMX", [0, 1, 2, 3], [0.98, 1.02, 1.29, 0.98]))
+// E-mu SP-1200 (bank EmuSP12): 14 kick samples
+const col6 = column(5, machine("EmuSP12", [0, 4, 8, 12], [0.82, 0.82, 0.53, 0.68]))
+
+// Synth columns have only a kick; the instrument button does nothing there.
+
+// 7  Synth kick: sine with a fast pitch drop and a tiny noise click.
+// Variant = depth of the pitch drop: 24 / 36 / 48 / 12 semitones (deeper = more "punch")
+const col7 = column(6, (variant, instrument, length, hall) => hall(stack(
+  note("e1*4").s("sine")
+    .penv(variant.fmap(v => [24, 36, 48, 12][v]))
+    .pdecay(0.05)
+    .attack(0.001)
+    .decay(length)
+    .sustain(0)
+    .release(0.05),
+  s("white*4")
+    .hpf(3000)
+    .decay(0.01)
+    .sustain(0)
+    .gain(0.15)
+)), 0.6)
+
+// 8  Rumble kick (techno): dry 909 plus a low, reverb-smeared sine on the 16ths between the kicks.
+// The rumble runs on its own orbit (9) with its own long reverb; the reverb knob only adds reverb to the 909.
+// Variant = rumble pitch: e1 / g1 / d1 / a1. Length only shortens the 909, the rumble stays.
+const col8 = column(7, (variant, instrument, length, hall) => stack(
+  hall(s("bd*4").bank("RolandTR909").decay(length).sustain(0).gain(0.6)),   // same trim as column 2
+  note("[~ e1 e1 e1]*4").s("sine")
+    .trans(variant.fmap(v => [0, 3, -2, 5][v]))
+    .penv(12)
+    .pdecay(0.03)
+    .decay(0.2)
+    .sustain(0)
+    .lpf(140)
+    .room(0.8)
+    .roomsize(6)
+    .gain(0.7)
+    .orbit(9)
+))
+
+stack(col1, col2, col3, col4, col5, col6, col7, col8)

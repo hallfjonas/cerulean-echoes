@@ -1,0 +1,36 @@
+// MIDI diagnosis: plays a quiet tone without MIDI (sound check) and shows a box at the bottom right with
+// - whether this environment has Web MIDI at all
+// - which MIDI inputs it sees
+// - the last MIDI message that arrived (move any fader or knob)
+let box = document.getElementById("midi-test")
+if (!box) {
+  box = document.createElement("pre")
+  box.id = "midi-test"
+  box.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;" +
+    "background:rgba(0,0,0,.8);color:#eee;font:13px/1.5 monospace;border-radius:6px"
+  document.body.appendChild(box)
+}
+const show = (...lines) => { box.textContent = lines.join("\n") }
+
+if (!navigator.requestMIDIAccess) {
+  show("Kein Web MIDI hier.", "Diese Umgebung kann keine MIDI-Geräte lesen.")
+} else {
+  try {
+    const access = await navigator.requestMIDIAccess()
+    const inputs = [...access.inputs.values()].map(i => i.name)
+    const header = ["MIDI-Eingänge:", ...(inputs.length ? inputs.map(n => "  " + n) : ["  (keine)"])]
+    show(...header, "", "Letzte Nachricht: noch keine, dreh einen Regler")
+    for (const input of access.inputs.values()) {
+      input.onmidimessage = e => {
+        const [st, num, val] = e.data
+        show(...header, "", `Letzte Nachricht: ${input.name}`,
+          `  Kanal ${(st & 0x0f) + 1}, ${(st & 0xf0) === 0xb0 ? "CC" : "Typ " + (st >> 4)} ${num} = ${val}`)
+      }
+    }
+  } catch (err) {
+    show("MIDI-Zugriff verweigert:", String(err))
+  }
+}
+
+// Sound check: if you hear this tone, audio works; it does not depend on MIDI
+note("c3*4").s("triangle").gain(0.3)

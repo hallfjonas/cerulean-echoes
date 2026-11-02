@@ -1,0 +1,83 @@
+// Start values for LC XL 3 controls (test + reusable helpers)
+//
+// Knobs: on evaluation the start value is sent to the controller (channel 16, same CC). If the controller
+// takes it over, the LED shows it and the next turn continues from there, without a jump.
+// Faders have no motor, so they use soft takeover: the start value holds until the fader crosses it.
+//
+// Test:
+// 1. Evaluate. The box at the bottom right lists the MIDI outputs the values were sent to.
+// 2. Look at the LED of column 1, knob row 1: does it show about the middle?
+// 3. Turn the knob slightly: "code" must continue from ~0.50 (not jump to 0 or to an old position).
+//    If it jumps, the controller ignores incoming CCs in this custom mode (see Components settings).
+// 4. Fader column 1: the tone stays at 0.60 until the fader passes 0.60, then it follows the fader.
+
+// ---- reusable part (copy into tracks from here) ------------------------------------------------
+
+// Sends start values (0..1) to every LC XL 3 output on channel 16. Only outputs whose name contains `match`.
+const sendStartValues = async (values, match = 'LCXL3', channel = 16) => {
+  if (!navigator.requestMIDIAccess) return []
+  const access = await navigator.requestMIDIAccess()
+  const outs = [...access.outputs.values()].filter(o => o.name.includes(match))
+  for (const out of outs)
+    for (const [ccNum, v] of Object.entries(values))
+      out.send([0xb0 + channel - 1, Number(ccNum), Math.round(v * 127)])
+  return outs.map(o => o.name)
+}
+
+// Reads `start` until the control has sent anything, then the real value.
+// cc() reads 0 until the first message arrives; our own outgoing message does not come back as input.
+const withStart = (sig, start) => {
+  let first, touched = false
+  return sig.fmap(x => {
+    if (first === undefined) first = x
+    if (x !== first) touched = true
+    return touched ? x : start
+  })
+}
+
+// Fader with soft takeover: stays at `start` until the fader crosses that value, then follows it.
+const faderFrom = (sig, start) => {
+  let prev, seen, caught = false
+  return sig.fmap(x => {
+    if (prev === undefined) { prev = x; seen = x !== 0 }
+    if (!caught && x !== prev) {
+      if (seen && (prev - start) * (x - start) <= 0) caught = true
+      seen = true
+      prev = x
+    }
+    return caught ? x : start
+  })
+}
+
+// ---- end of reusable part ----------------------------------------------------------------------
+
+const cc = await midin()
+
+const START = { 13: 0.5 }   // CC 13 = column 1, knob row 1
+const sentTo = await sendStartValues(START)
+
+let box = document.getElementById('cc-start-test')
+if (!box) {
+  box = document.createElement('pre')
+  box.id = 'cc-start-test'
+  box.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.8);color:#eee;font:13px/1.5 monospace;border-radius:6px'
+  document.body.appendChild(box)
+}
+const shown = { knob: 0.5, fader: 0.6 }
+const show = () => {
+  box.textContent = ['Start values sent to:', ...(sentTo.length ? sentTo.map(n => '  ' + n) : ['  (no LCXL3 output found)']),
+    '', `knob  (CC 13) code: ${shown.knob.toFixed(2)}`, `fader (CC 5)  code: ${shown.fader.toFixed(2)}`].join('\n')
+}
+show()
+// Display only: records the value the code currently uses
+const watch = (sig, key) => sig.fmap(v => { if (v !== shown[key]) { shown[key] = v; show() } return v })
+
+// Create each stateful control once
+const knob  = watch(withStart(cc(13), START[13]), 'knob')
+const fader = watch(faderFrom(cc(5), 0.6), 'fader')
+
+// Knob = filter cutoff (exponential 200..8000 Hz), fader = volume
+note('<c3 eb3 g3 bb2>*8').s('sawtooth')
+  .lpf(knob.fmap(v => 200 * Math.pow(40, v)))
+  .gain(fader.mul(0.5))
