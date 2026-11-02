@@ -1,0 +1,162 @@
+// ============================================================
+// TEMPLATE — controller design shared by the three live tracks (ambient, groove techno, happy house)
+// Not a track: no sound code, only the layout. Copy the tags into a new track and replace the examples
+// with what that track really plays. Each track may deviate, but keep the meaning of rows and columns.
+// ============================================================
+// Two Launch Control XL 3, both in Custom Mode 16 (same CCs), told apart by their MIDI input:
+//   Jojo  = 'LCXL3 Jojo MIDI Out'  → foundation (rhythm + bass), all 8 columns, no global column. Tagged B16.
+//   Jonas = 'LCXL3 Jonas MIDI Out' → colour (harmony + melody) on columns 1-7, column 8 = global for ALL
+//           MIDI devices (both LCs and the Launchkey 25 MK4). Tagged 16.
+// No Mode 2: every person has exactly one page, nothing to switch.
+// Same meaning on both controllers, in every track:
+//   knob row 1 = brightness, row 2 = space, row 3 = character (calm ↔ lively), fader = level,
+//   button row 1 = change (next pattern, at the next bar), button row 2 = moment (an action right now).
+// Columns go from low/long (left) to high/short (right); Jojo's column 2 (rumble / noise) sits next to the kick it belongs to.
+// Cell texts: "A: … · T: … · H: …" = example for ambient · techno · house.
+// @layout Template (two controllers) — ambient · techno · house
+// @note Basis for all three tracks. Every row means the same on both controllers and in every track: row 1 = brightness, row 2 = space, row 3 = character (calm ↔ lively), fader = how much of it, button 1 = change, button 2 = a moment, right now.
+// @note Jojo plays the foundation (beat and bass) on all 8 columns. Jonas plays the colour (chords and melodies) on columns 1–7; Jonas' column 8 controls everything: both controllers and the Launchkey.
+// @note Examples per column: A = ambient, T = groove techno, H = happy house. Every track starts with all faders down, and with all knobs at 0 it must already sound good.
+// @mode B16 Jojo — Foundation (beat + bass, no global column)
+// @col B16:1 1 Pulse / Kick
+// @col B16:2 2 Rumble / Noise
+// @col B16:3 3 Sub
+// @col B16:4 4 Bassline
+// @col B16:5 5 Backbeat
+// @col B16:6 6 Hats
+// @col B16:7 7 Percussion
+// @col B16:8 8 Shaker / Ride
+// @row B16:k1 Row 1 \ Brightness
+// @row B16:k2 Row 2 \ Space
+// @row B16:k3 Row 3 \ Character
+// @row B16:fader Fader \ Level
+// @row B16:b1 Button 1 \ Change
+// @row B16:b2 Button 2 \ Moment
+// @ctl B16:1.k1 Brightness | dull thump ↔ clicky attack. Never fully closed.
+// @ctl B16:2.k1 Brightness | deep rumble ↔ airy hiss.
+// @ctl B16:3.k1 Brightness | pure sine ↔ a little buzz on top.
+// @ctl B16:4.k1 Brightness | round and dark ↔ buzzing, squelchy.
+// @ctl B16:5.k1 Brightness | soft and far ↔ sharp crack.
+// @ctl B16:6.k1 Brightness | soft hiss ↔ crisp and sharp.
+// @ctl B16:7.k1 Brightness | woody ↔ metallic.
+// @ctl B16:8.k1 Brightness | dark shimmer ↔ bright sizzle.
+// @ctl B16:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
+// @ctl B16:2.k2 Space | dry ↔ far away.
+// @ctl B16:3.k2 Space | dry ↔ far away.
+// @ctl B16:4.k2 Space | dry ↔ far away.
+// @ctl B16:5.k2 Space | dry ↔ far away.
+// @ctl B16:6.k2 Space | dry ↔ far away.
+// @ctl B16:7.k2 Space | dry ↔ far away.
+// @ctl B16:8.k2 Space | dry ↔ far away.
+// @ctl B16:1.k3 Softness | 0 = soft and round (the default) ↔ a deep, soft thump. Punch comes from row 1 (click).
+// @ctl B16:2.k3 Motion | still ↔ rolling waves / sweeps.
+// @ctl B16:3.k3 Length | long held tones ↔ short blips.
+// @ctl B16:4.k3 Groove | few notes ↔ busy, bouncing line.
+// @ctl B16:5.k3 Ghost notes | 0 = plain backbeat ↔ extra quiet hits in between.
+// @ctl B16:6.k3 Density | the pattern as it is ↔ + quiet 16ths ↔ + little rolls.
+// @ctl B16:7.k3 Density | steady pattern ↔ + ghost notes and rolls.
+// @ctl B16:8.k3 Swing | straight ↔ swung, lazy.
+// @ctl B16:1.fader Level | 0 = gone. Tuned to the key. A: heartbeat thump · T: kick · H: four-on-the-floor kick.
+// @ctl B16:2.fader Level | A: sea and wind · T: rumble on the 3rd + 4th 16th, same pitch as the kick · H: noise sweeps.
+// @ctl B16:3.fader Level | A: deep drone sub · T: pumping sub between the kicks · H: sub under the bassline.
+// @ctl B16:4.fader Level | A: slow bass swells · T: raw off-beat bass · H: bouncy bassline.
+// @ctl B16:5.fader Level | A: soft rim click · T: clap on 2 and 4 · H: clap + snare.
+// @ctl B16:6.fader Level | A: clock ticks · T: 16th hats · H: off-beat open hat.
+// @ctl B16:7.fader Level | A: wood clicks, drops · T: tuned bongos, rimshot · H: congas, bongos.
+// @ctl B16:8.fader Level | A: crackle, vinyl dust · T: ride · H: shaker, tambourine.
+// @ctl B16:1.b1 Change | next of at most 3 patterns, at the next bar.
+// @ctl B16:2.b1 Change | next of at most 3 patterns.
+// @ctl B16:3.b1 Change | next of at most 3 patterns.
+// @ctl B16:4.b1 Change | next of at most 3 patterns.
+// @ctl B16:5.b1 Change | next of at most 3 patterns.
+// @ctl B16:6.b1 Change | next of at most 3 patterns.
+// @ctl B16:7.b1 Change | next of at most 3 patterns.
+// @ctl B16:8.b1 Change | next of at most 3 patterns.
+// @ctl B16:1.b2 Drop out | kick pauses while held.
+// @ctl B16:2.b2 Riser | noise rises while held.
+// @ctl B16:3.b2 Slide | notes glide into each other while held.
+// @ctl B16:4.b2 Octave | one octave up while held.
+// @ctl B16:5.b2 Roll | snare roll while held.
+// @ctl B16:6.b2 Open | hats ring long while held.
+// @ctl B16:7.b2 Fill | a fill while held.
+// @ctl B16:8.b2 Double | double time while held.
+// @mode 16 Jonas — Colour (chords + melodies) · column 8 = global for all devices
+// @col 16:1 1 Pad
+// @col 16:2 2 Chords
+// @col 16:3 3 Arp
+// @col 16:4 4 Lead
+// @col 16:5 5 Answer
+// @col 16:6 6 Sparkle
+// @col 16:7 7 FX / Risers
+// @col 16:8 8 Global (all devices)
+// @row 16:k1 Row 1 \ Brightness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Character
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Change
+// @row 16:b2 Button 2 \ Moment
+// @ctl 16:1.k1 Brightness | muffled ↔ open and airy.
+// @ctl 16:2.k1 Brightness | warm ↔ bright, glassy.
+// @ctl 16:3.k1 Brightness | soft plucks ↔ sharp, sparkling.
+// @ctl 16:4.k1 Brightness | soft and round ↔ biting (acid squelch).
+// @ctl 16:5.k1 Brightness | hushed ↔ clear.
+// @ctl 16:6.k1 Brightness | soft glow ↔ glittering.
+// @ctl 16:7.k1 Brightness | dark whoosh ↔ bright shimmer.
+// @ctl 16:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
+// @ctl 16:2.k2 Space | dry ↔ far away.
+// @ctl 16:3.k2 Space | dry ↔ far away.
+// @ctl 16:4.k2 Space | dry ↔ far away.
+// @ctl 16:5.k2 Space | dry ↔ far away.
+// @ctl 16:6.k2 Space | dry ↔ far away.
+// @ctl 16:7.k2 Space | dry ↔ far away.
+// @ctl 16:1.k3 Swell | still ↔ slowly breathing in and out.
+// @ctl 16:2.k3 Rhythm | long held chords ↔ short, choppy stabs.
+// @ctl 16:3.k3 Range | few slow notes ↔ fast and wide.
+// @ctl 16:4.k3 Glide | plain notes ↔ notes slide into each other.
+// @ctl 16:5.k3 Voices | one voice ↔ two-, three-part harmony.
+// @ctl 16:6.k3 Density | a sparkle now and then ↔ a rain of notes.
+// @ctl 16:7.k3 Amount | subtle ↔ wild.
+// @ctl 16:1.fader Level | 0 = gone. A: long floating chords · T: dark pad · H: warm strings.
+// @ctl 16:2.fader Level | A: soft chord swells · T: dub chord stabs · H: piano chords.
+// @ctl 16:3.fader Level | A: slow music box · T: hypnotic sequence · H: bright arp.
+// @ctl 16:4.fader Level | A: choir or whale calls · T: acid line · H: vocal hook / lead.
+// @ctl 16:5.fader Level | A: second choir voice · T: counter blips · H: melody that answers the lead.
+// @ctl 16:6.fader Level | A: glitter drops · T: metallic pings · H: bells, plucks.
+// @ctl 16:7.fader Level | A: shimmer swells · T: slowly breathing noise · H: risers, vocal chops.
+// @ctl 16:1.b1 Change | next pattern / melody, at the next bar.
+// @ctl 16:2.b1 Change | next pattern / melody.
+// @ctl 16:3.b1 Change | next pattern / melody.
+// @ctl 16:4.b1 Change | next pattern / melody.
+// @ctl 16:5.b1 Change | next pattern / melody.
+// @ctl 16:6.b1 Change | next pattern / melody.
+// @ctl 16:7.b1 Change | next pattern / melody.
+// @ctl 16:1.b2 Freeze | holds the current chord while held.
+// @ctl 16:2.b2 Stab | one accent chord, now.
+// @ctl 16:3.b2 Octave | one octave up while held.
+// @ctl 16:4.b2 Echo throw | the last note echoes away.
+// @ctl 16:5.b2 Answer | plays one phrase, now.
+// @ctl 16:6.b2 Burst | one quick run of sparkles.
+// @ctl 16:7.b2 Hit | one FX hit / impact.
+// @ctl g.k1 Fog | all devices. 0 = clear, up = everything gets darker, as if under water.
+// @ctl g.k2 Room | all devices. 0 = each sound's own room, up = everything drowns in reverb.
+// @ctl g.k3 Tension | build-up for all devices: filters open, echo grows, rolls tighten. Back to 0 = release.
+// @ctl g.fader Master Level | volume of everything: both controllers and the Launchkey.
+// @ctl g.b1 Chapter | next mood / chords for all, next phrase.
+// @ctl g.b2 Break / Drop | 1st: beat out. 2nd: all back on the one.
+// @guide One language, three tracks | The rows never change their meaning: row 1 = brightness, row 2 = space, row 3 = character, fader = how much, button 1 = change, button 2 = a moment. Whoever learned it in the ambient track can play techno and house without a new explanation.
+// @guide One language, three tracks | The columns keep their role: Jojo's column 1 is always the heartbeat (a soft thump in ambient, the kick in techno and house) and column 2 the noise or rumble glued to it; Jonas' column 4 is always the main melody. The sound behind it changes, the job stays.
+// @guide One language, three tracks | Left = low and long, right = high and short, on both controllers.
+// @guide Two players | Jojo is the foundation: beat and bass, the floor everybody stands on. Jonas is the colour: chords and melodies on top, plus the global column 8, which acts on everything (both controllers and the Launchkey).
+// @guide Two players | Jojo has no global column on purpose: the global hand is one person, so there is never a fight about master level, tension or the drop.
+// @guide Learning path | In ambient: faders, brightness and space only. Slow, forgiving, nothing can go wrong. Buttons hardly matter yet.
+// @guide Learning path | In techno: the same controls, plus time. Button 1 (change) and button 2 (moments), row 3 for groove and density.
+// @guide Learning path | In house: plus harmony and drama. Chapter changes the chords, Tension and Break / Drop shape build-ups. Now the two players have to agree: Jojo drops the beat, Jonas brings it back.
+// @guide Rules for every track | Every position sounds good: ranges are limited, no fader is too loud, no filter goes silent, melodies stay in key.
+// @guide Rules for every track | All knobs at 0 is the default sound and must already sound good: soft kick, plain backbeat, steady percussion, warm colour. Turning up adds, it does not repair.
+// @guide Rules for every track | Jojo's button 1 has at most 3 patterns per column: the foundation should be easy to steer. Jonas may have more.
+// @guide Rules for every track | Kick, rumble, sub and bass are tuned to the key of the track, so the low end sounds like one instrument.
+// @guide Rules for every track | Sound: raw and warm rather than glossy (no EDM sheen): a little drive, noise and detune, gentle glides (at most a semitone), echoes and room instead of bright synth leads.
+// @guide Rules for every track | Every control is clearly audible. A control nobody can hear is left grey (unused) rather than mapped.
+// @guide Rules for every track | Start with all faders down and build the track up together. That way the controller and the code agree from the first second.
+// @guide Rules for every track | A track may leave columns empty or swap an example, but never move a role to another column or a meaning to another row.
+// @guide Launchkey 25 MK4 (open) | Still to be decided: what the Launchkey plays (keys for melody, pads for drums, …). Fixed already: Jonas' column 8 controls it too. Master level, Fog, Room and Tension act on its sound, Chapter changes its key and chords, Break / Drop includes it.
