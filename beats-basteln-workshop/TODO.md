@@ -1,3 +1,13 @@
+## 21-10-2026
+- density features:
+    - 140bpm groove techno bass line (sub); twice as fast and well designed sine/lpf/+ gain.
+    - kick needs trebble(?) or whatever is associated with a kick -->
+- stereo pan feature (maybe second global button)
+    - acid bongos
+    - acid space sounds
+
+---------------------
+
 - global LPF rwo not really used at all. I don't really understand how I should use it on a global level
 - density mechanism
     - clap (taking second hi-hat spot)
