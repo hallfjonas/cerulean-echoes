@@ -1,33 +1,19 @@
-## 21-10-2026
-- density features:
-    - 140bpm groove techno bass line (sub); twice as fast and well designed sine/lpf/+ gain.
-    - kick needs trebble(?) or whatever is associated with a kick -->
-- stereo pan feature (maybe second global button)
-    - acid bongos
-    - acid space sounds
 
----------------------
+## Action Items
+### Jonas
++ Sound design für Keys (pro Track)
++ LK + LC gemeinsam testen (Johannes' Testversion)
++ Lautsprecher, Ständer, Bassfänger bestellen
++ Raumdesign fixen
 
-- global LPF rwo not really used at all. I don't really understand how I should use it on a global level
-- density mechanism
-    - clap (taking second hi-hat spot)
-    - sub wummern --> IMMER AN, wieso? --> IIMER AUS?!
-    - acid tunes
-    - maybe even kick for a mid range clack sound
+### Johannes
++ Tracks finalisieren (Launchcontrols)
++ Lösung für wechsel der Tracks finden (möglichst seamless)
++ Testversionen aller Tracks (1x Launchcontrol + Launchkeys) --> Auch eine Fallback Lösung
++ Fallbackversionen aller Tracks (2x Launchcontrol)
 
-## I dislike (<20%)
-- groovy hats must be way way more groovey
-- sensity acid
-- overall mix when everything is at 100%
-- effects on 7 are nice but also a bit boring. want something with a bit more tension there
+### Zusammen (Asynchron)
++ 16 Samples auf Pads belegen (pro Track) [in diesem Dokument konzeptionieren](samples.md)
 
-## I like (>50%)
-- global HPF
-- global Density
-- kick on 1
-- sub on 2
-- bass on 3
-- oh on 4
-- bongos
-- space sounds
-- melody
+### Zusammen (Donnerstag/Freitag/Spätestens Samstag)?
++ Können alle drei Midicontroller effizient gleichzeitig laufen?
