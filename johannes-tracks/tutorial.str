@@ -1,0 +1,64 @@
+// .lpenv(x * 9).lps(.2).lpd(.12)
+
+scale("dorian")
+
+register('acidenv', (x, pat) => pat
+  .lpf(100)       // Basisfrequenz des Filters
+  .lpenv(x * 9)   // Filterhüllkurve (Envelope) basierend auf Eingabe x
+  .lps(0.2)       // Sustain (Haltezeit)
+  .lpd(0.12)      // Decay (Abklingzeit)
+  .lpq(2)         // Q-Faktor (Resonanz) für spitze Filterkurven
+)   
+
+setcps(.54) // gentle, floating tempo
+
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(24).orbit(1).sound("sawtooth").acidenv(.4).pianoroll()
+// $: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(19).orbit(1).sound("sawtooth").acidenv(.4).pianoroll()
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(15).orbit(1).sound("sawtooth").acidenv(.4).pianoroll()
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(12).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.4, .5))
+// $: n("<0 4 0 9 7 5 <3 2 1 4> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(4).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(.4)
+$: n("<0 4 0 9 7 5 <3 2 1 4> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(3).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(.4)
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(0).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.9, 1.1))
+// $: n("<0 4 0 9 7 5 <3 2 1 4> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-3).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(.2, .2))
+// $: n("<0 4 0 9 7 5 <3 2 1 4> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-7).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(.2, .2))
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-12).orbit(1).sound("sawtooth").acidenv(.2).pianoroll().gain(rand.range(0.45, .55))
+// $: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-19).orbit(1).sound("sawtooth").acidenv(.2).pianoroll().gain(rand.range(0.45, .55))
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-24).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.25, .35))
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-31).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.15, .25))
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-36).orbit(1).sound("sawtooth").acidenv(.2).pianoroll().gain(rand.range(0.05, .15))
+$: n("<0 4 0 9 7 5 <3 2 1 0> 9 7 5 <3 2 1 4> -1>*12").scale("dorian").trans(-48).orbit(1).sound("sawtooth").acidenv(.2).pianoroll().gain(rand.range(0.05, .15))
+
+// $: n("<0 4 2 0>*4").scale("g:minor").trans(-24).orbit(10).sound("sawtooth").acidenv(.7).detune(rand.range(-0.01, 0.01))
+
+
+// $: n("<- - - 9 7 5 1 9 7 5 1 ->*12").scale("dorian").trans(0).orbit(10).sound("sawtooth").acidenv(.3).pianoroll().gain(.5).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(0).orbit(1).sound("sawtooth").acidenv(.4).pianoroll().gain(1.2).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(-5).orbit(1).sound("sawtooth").acidenv(.4).pianoroll().gain(.6).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(-9).orbit(1).sound("sawtooth").acidenv(.4).pianoroll().gain(.6).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(3).orbit(1).sound("sawtooth").acidenv(.25).pianoroll().gain(1.).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(7).orbit(1).sound("sawtooth").acidenv(.25).pianoroll().gain(.5).detune(rand.range(-0.01, 0.01))
+// // // $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(11).orbit(1).sound("sawtooth").acidenv(.25).pianoroll().gain(rand.range(.5, .5))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(12).orbit(1).sound("sawtooth").acidenv(.4).pianoroll().gain(.5).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(-12).orbit(1).sound("sawtooth").acidenv(.4).pianoroll().gain(.5).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(0).orbit(10).sound("sawtooth").acidenv(.35).pianoroll().gain(rand.range(1.5, 1.5)).detune(rand.range(-0.01, 0.01))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(7).orbit(10).sound("sawtooth").acidenv(.35).pianoroll().gain(rand.range(1.5, 1.5))
+// $: n("<0 4 0 - - - <3 2 1 0> - - <3 2 1 0> - -1>*12").scale("dorian").trans(12).orbit(10).sound("sawtooth").acidenv(.35).pianoroll().gain(rand.range(.5, .5)).detune(rand.range(-0.01, 0.01))
+// // $: n("<0 4 0 9 7 5 <> 9 7 5 <> -1>*12").scale("dorian").trans(0).orbit(1).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.9, 1.1))
+
+// $: n("<0 4 0 9 7 5>*12").scale("dorian").trans(0).orbit(10).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.9, 1.1))
+// $: n("<0 4 0 9 7 5>*12").scale("dorian").trans(-7).orbit(10).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.6, .8))
+// $: n("<0 4 0 9 7 5>*12").scale("dorian").trans(-12).orbit(10).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.6, .8))
+// $: n("<0 4 0 9 7 5>*12").scale("dorian").trans(-19).orbit(10).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.5, .6))
+// $: n("<0 4 0 9 7 5>*12").scale("dorian").trans(-24).orbit(10).sound("sawtooth").acidenv(.3).pianoroll().gain(rand.range(0.5, .6))
+
+
+
+$: sound("lt:2!4").bank("RolandTR808").shape(.1).sustain(1.8).acidenv(.5).gain(.8).lpf(300)
+$: sound("lt:2!4").bank("RolandTR808").shape(.1).sustain(.2).acidenv(2.).gain(.2).lpf(200)
+$: sound("bd:2!4").bank("RolandTR808").shape(.1).sustain(.8).acidenv(.1).gain(1.).lpf(200)
+
+// // $: sound("lt:2!4*2").bank("RolandTR808").shape(.1).sustain(.8).acidenv(.0).gain(.3).lpenv(8).lpf(100).delay(0.1, 0.5).lpenv(10)
+
+// $: sound("lt:2!2").bank("RolandTR808").shape(.3).sustain(.8).acidenv(.1).gain(1.)
+
+$: sound("brown").gain(.1)

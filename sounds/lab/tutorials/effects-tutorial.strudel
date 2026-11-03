@@ -1,0 +1,439 @@
+// ============================================================
+// EFFECTS TUTORIAL: what every Strudel effect does, by ear, with live sliders. Handbook: effects-tutorial.pdf
+// ============================================================
+// How to use:
+// - Set CHAPTER (0-16) and evaluate once (Ctrl+Enter).
+// - Then only move the sliders of that chapter; they change the sound live. Most effects are read when a
+//   note starts, so a change is heard from the next note on.
+// - Every chapter loops forever. Move one slider at a time, slowly, and go back and forth.
+// - The spectrum under the last line shows which frequencies sound: left = low (bass), right = high (hats).
+// - Every chapter brings the drums it needs. To mute them, comment out the drum line of the chapter.
+
+setcpm(122 / 4)   // 122 BPM, one cycle = one bar
+
+const CHAPTER = 0
+
+// ---------- helpers (no need to read) ----------
+// a slider picks one entry of a list (slider values are rounded)
+const by = (ctl, list) => ctl.fmap(v => list[Math.max(0, Math.min(list.length - 1, Math.round(v)))]).innerJoin()
+const pick = (ctl, values) => by(ctl, values.map(v => pure(v)))
+// slider 0..1 -> lo..hi Hz on an exponential curve (the ear hears frequency in octaves, not in Hz)
+const hz = (ctl, lo, hi) => ctl.fmap(x => lo * Math.pow(hi / lo, x))
+const BEAT = 60 / 122   // one beat in seconds
+
+// ---------- the dry groove: every chapter adds effects to parts of it ----------
+const kick  = s("bd*4").bank('RolandTR909')
+const hats  = stack(s("[~ oh]*4").gain(0.45), s("hh*16").gain(0.3)).bank('RolandTR909')
+const clap  = s("~ cp ~ cp").bank('RolandTR909').gain(0.55)
+const drums = stack(kick, hats, clap)
+const bass  = note("<[a1 ~ a1 a2 ~ a1 ~ c2] [a1 ~ a1 a2 ~ g1 ~ e2]>")
+  .s('sawtooth').lpf(500).decay(0.15).sustain(0.5).gain(0.55)
+const chords = note("<[a2,c3,e3,g3] [f2,a2,c3,e3]>")
+const stab  = chords.struct("~ x ~ ~ x ~ x ~").s('sawtooth').lpf(1800).decay(0.2).sustain(0).gain(0.3)
+const pad   = chords.s('sawtooth').attack(0.1).release(0.4).lpf(1500).gain(0.2)
+const lead  = n("<[0 ~ 2 4 ~ 7 4 ~] [0 ~ 2 4 ~ 9 7 ~]>").scale('A:minor').trans(12)
+  .s('square').lpf(2500).decay(0.12).sustain(0.2).gain(0.22)
+const music = stack(bass, stab, lead)
+const groove = stack(drums, music)
+
+
+// ============================================================
+// PART A: LISTENING BASICS
+// ============================================================
+
+// ------------------------------------------------------------
+// 0. FREQUENCIES: where each sound lives
+// ------------------------------------------------------------
+// Every effect in this tutorial changes either the volume, the frequencies, the time or the space of a sound.
+// Frequencies first: low notes vibrate slowly (50 Hz = 50 times per second), high sounds fast (10000 Hz).
+// BAND plays the whole groove through a narrow band-pass filter, so you hear only one region:
+//   0 everything
+//   1 sub, 50 Hz        kick body and sub bass: felt more than heard, small speakers cannot play it
+//   2 bass, 120 Hz      kick punch, bass notes
+//   3 low mids, 400 Hz  body of chords and bass; too much here = "mud"
+//   4 mids, 1.2 kHz     chords, lead, clap: the core, what a phone speaker plays
+//   5 presence, 4 kHz   attack of every sound, clap snap, hats: makes things "close"
+//   6 air, 10 kHz       hat sizzle, shimmer, breath
+// LISTEN: step 1 -> 6 slowly. In which band is the kick? The bass? The hats? Then back to 0: now you can
+// hear the layers inside the full mix. Watch the spectrum while you do it.
+const BAND = slider(0, 0, 6, 1)
+const ch0 = by(BAND, [0, 50, 120, 400, 1200, 4000, 10000].map(f => f ? groove.bpf(f).bpq(3) : groove))
+
+// ------------------------------------------------------------
+// 1. VOLUME AND ACCENTS: gain, velocity, postgain
+// ------------------------------------------------------------
+// gain       volume of a sound, 0 = silent, 1 = normal. On a curve: 0.5 is clearly quieter, not "half".
+// velocity   0..1, multiplied with gain. Meant for accents: how hard a single hit is played.
+// postgain   volume AFTER all effects (distortion, filters...). Use it to fix a level without changing the
+//            sound: gain into a distortion changes how much it distorts, postgain does not.
+// ACCENT: how much quieter the off-beat 16th hats are. 0 = all equal (machine), 1 = strong accents.
+// BASSLEVEL: gain of the bass.
+// LISTEN: ACCENT 0 -> 0.6 -> 1. The rhythm does not change, but the groove does: accents create the swing
+// and the "drive" of hats. Then move BASSLEVEL: how loud must the bass be until it feels as big as the kick?
+const ACCENT = slider(0.6, 0, 1)
+const BASSLEVEL = slider(0.55, 0, 1)
+const ch1 = stack(
+  kick, clap,
+  s("hh*16").bank('RolandTR909').gain(0.45).velocity(ACCENT.fmap(a => sequence(1, 1 - a, 1 - a / 2, 1 - a).fast(4)).innerJoin()),
+  bass.gain(BASSLEVEL),
+  stab,
+)
+
+// ------------------------------------------------------------
+// 2. ENVELOPE: attack, decay, sustain, release (ADSR)
+// ------------------------------------------------------------
+// An envelope shapes the volume of ONE note over time:
+//   attack   seconds from silence to full volume (0 = click/punch, 0.5 = slow fade in)
+//   decay    seconds from full volume down to the sustain level
+//   sustain  level (0..1) held while the note is held. 0 = the note dies after the decay: a pluck or stab
+//   release  seconds from the end of the note to silence (the tail)
+// LEN is how long each note is held (clip: 1 = the full slot, 0.25 = very short, 4 = overlapping).
+// Presets to try (ATT DEC SUS REL):
+//   pluck 0 0.15 0 0.1 | techno stab 0 0.25 0 0.3 | organ 0 0 1 0.05 | pad 0.5 0.5 0.7 1.5 (LEN 4) | swell 1 0 1 0.5 (LEN 4)
+// LISTEN: start with the stab preset and only raise SUS from 0 to 1: from stab to organ. Then raise ATT:
+// the punch disappears. Notice that the attack can never be longer than the note (LEN) allows.
+const ATT = slider(0, 0, 1)
+const DEC = slider(0.25, 0.01, 1)
+const SUS = slider(0, 0, 1)
+const REL = slider(0.3, 0, 2)
+const LEN = slider(1, 0.25, 4)
+const ch2 = stack(
+  kick, hats,
+  chords.struct("x ~ ~ x ~ ~ x ~").s('sawtooth').lpf(1800).gain(0.3)
+    .attack(ATT).decay(DEC).sustain(SUS).release(REL).clip(LEN),
+  bass,
+)
+
+
+// ============================================================
+// PART B: FILTERS
+// ============================================================
+
+// ------------------------------------------------------------
+// 3. LOW-PASS FILTER: lpf, lpq, ftype
+// ------------------------------------------------------------
+// A low-pass filter lets the lows through and removes everything above the CUTOFF frequency.
+// Closed (low cutoff) = dark, muffled, far away. Open = bright, close, aggressive.
+// RES (resonance, lpq) boosts the frequencies right at the cutoff: from soft to "whistling" and "squelchy".
+// FTYPE: how steep the filter cuts. 0 = 12db (gentle), 1 = ladder (Moog style, fat and aggressive), 2 = 24db (steep).
+// CUT: 0 = 60 Hz, 0.5 = 775 Hz, 1 = 10 kHz. The filter works on bass, stab and lead; the drums stay dry.
+// LISTEN: move CUT slowly from 1 to 0.2 and back: the classic techno filter sweep, the most used move in
+// a live set. Then set RES to 15 and sweep again: now you hear the cutoff "sing". Compare the three FTYPEs
+// with RES at 10.
+const CUT = slider(0.6, 0, 1)
+const RES = slider(2, 0, 30)
+const FTYPE = slider(0, 0, 2, 1)
+const ch3 = stack(drums, music.lpf(hz(CUT, 60, 10000)).lpq(RES).ftype(pick(FTYPE, ['12db', 'ladder', '24db'])))
+
+// ------------------------------------------------------------
+// 4. HIGH-PASS AND BAND-PASS: hpf, bpf
+// ------------------------------------------------------------
+// A high-pass filter is the opposite: it removes everything BELOW the cutoff. A band-pass keeps only a
+// band around one frequency (the "telephone" or "radio" sound).
+// MODE: 0 = high-pass on the whole groove (the build-up move before a drop: the kick and bass disappear)
+//       1 = high-pass only on stab and lead (cleaning: chords do not need lows, the bass owns them)
+//       2 = band-pass on the stab (thin, nasal, a sound that stands out without being loud)
+// FREQ: 0 = 20 Hz, 0.5 = 400 Hz, 1 = 8 kHz.
+// LISTEN: MODE 0, push FREQ to 0.6 for 4 bars, then pull it back to 0 at a bar start: that is a drop.
+// MODE 1, FREQ around 0.5: the mix gets clearer and the bass "bigger", though the stab lost its lows.
+const MODE4 = slider(0, 0, 2, 1)
+const FREQ4 = slider(0, 0, 1)
+const ch4 = by(MODE4, [
+  groove.hpf(hz(FREQ4, 20, 8000)),
+  stack(drums, bass, stack(stab, lead).hpf(hz(FREQ4, 20, 8000))),
+  stack(drums, bass, stab.bpf(hz(FREQ4, 20, 8000)).bpq(4), lead),
+])
+
+// ------------------------------------------------------------
+// 5. FILTER ENVELOPE AND ACID: lpenv, lpattack, lpdecay, lpsustain
+// ------------------------------------------------------------
+// A filter envelope opens the filter at the start of every note and closes it again, like a hand turning
+// the cutoff knob very fast on every note. That gives each note a "wow" or "pew" movement.
+//   CUT    where the filter rests when closed (0 = 40 Hz, 1 = 4 kHz)
+//   ENV    how far the envelope opens it, in octaves above CUT (lpenv). 0 = no movement
+//   DECAY  how fast it closes again (lpdecay, seconds). Short = "tick", long = "wooow"
+//   RES    resonance, as in chapter 3
+// Low-pass + envelope + resonance on a sawtooth 16th bassline = ACID (the Roland TB-303 sound).
+// The velocity accents make some notes open wider, like the 303 accent button.
+// LISTEN: ENV 0 -> 4: the line comes alive. DECAY 0.05 vs 0.4. RES 0 vs 20. Then the acid live move:
+// slowly raise CUT and RES together over 16 bars.
+const CUT5 = slider(0.3, 0, 1)
+const ENV = slider(4, 0, 8)
+const DECAY5 = slider(0.15, 0.02, 0.6)
+const RES5 = slider(12, 0, 30)
+const acid = note("a1 a1 a2 a1 c2 a1 g1 a2 a1 a2 a1 e2 a1 a1 c2 g1").s('sawtooth')
+  .lpf(hz(CUT5, 40, 4000)).fanchor(0).lpenv(ENV).lpattack(0.003).lpdecay(DECAY5).lpsustain(0).lpq(RES5).ftype('ladder')
+  .decay(0.15).sustain(0.6).gain(0.45)
+  .velocity("1 .6 .9 .6 1 .6 .6 1 .6 .9 .6 1 .6 .6 1 .6")
+const ch5 = stack(drums, acid)
+
+// ------------------------------------------------------------
+// 6. PITCH ENVELOPE: build a kick from a sine wave: penv, pdecay, pcurve
+// ------------------------------------------------------------
+// A pitch envelope bends the pitch of every note: it starts higher and falls to the real note.
+// A kick drum is exactly that: a low sine wave (here A1 = 55 Hz) that starts much higher and drops fast.
+//   PENV    how many semitones higher it starts (36 = three octaves)
+//   PDEC    how fast the pitch falls (seconds). Short = tight "click", long = "boing"/"tom"
+//   PCURVE  0 = linear fall, 1 = exponential (falls fast first, then slowly: sounds like a real kick)
+//   KDEC    how long the kick sounds at all (amplitude decay): short = tight, long = boomy techno "rumble"
+//   SOURCE  0 = this synth kick, 1 = the 909 sample for comparison
+// LISTEN: PENV 0 (just a sine: a dull "boop"), then 12, 24, 36. PDEC 0.02 vs 0.3. KDEC 0.15 vs 0.8.
+// The kick is tuned to A, the key of the bass: listen how kick and bass merge. Tuned kicks are common in techno.
+const PENV = slider(36, 0, 48)
+const PDEC = slider(0.08, 0.01, 0.5)
+const PCURVE = slider(1, 0, 1, 1)
+const KDEC = slider(0.35, 0.05, 1)
+const SOURCE = slider(0, 0, 1, 1)
+const synthKick = note("a1*4").s('sine').penv(PENV).pattack(0.001).pdecay(PDEC).pcurve(PCURVE).panchor(0)
+  .decay(KDEC).sustain(0).gain(0.9)
+const ch6 = stack(by(SOURCE, [synthKick, kick]), hats, clap, bass)
+
+
+// ============================================================
+// PART C: SATURATION, DISTORTION, COLOUR
+// ============================================================
+
+// ------------------------------------------------------------
+// 7. DRIVE: distort (types), crush, coarse
+// ------------------------------------------------------------
+// Distortion pushes a wave beyond its limit and bends its shape. A bent wave has new overtones (higher
+// frequencies that were not there): the sound gets louder-feeling, brighter, rougher, more present.
+//   0 soft    soft saturation (tape, tube): warmer, fatter, "glue"
+//   1 hard    hard clipping: aggressive, buzzing
+//   2 diode   like an overdriven analog circuit: gritty, typical for acid and techno basses
+//   3 fold    wave folding: metallic, synthetic, changes strongly with the amount
+//   4 crush   bit crusher: fewer volume steps (16 bit -> 2 bit): digital, grainy, lo-fi
+//   5 coarse  lower sample rate: aliasing, robotic, metallic whistles (works best in Chrome)
+// AMOUNT 0..1 (scaled for every type). TARGET: 0 = bass, 1 = drums, 2 = everything.
+// The volume is compensated (postgain), because distortion makes things louder.
+// LISTEN: TARGET 0, TYPE 0, raise AMOUNT slowly: at first the bass just gets "bigger", later rough.
+// Saturation in small amounts is used on almost everything in techno; heavy distortion on kicks gives the
+// "rumble" and the hard/industrial sound. TARGET 1 with TYPE 2 or 4 for that.
+const TYPE7 = slider(0, 0, 5, 1)
+const AMOUNT = slider(0.3, 0, 1)
+const TARGET = slider(0, 0, 2, 1)
+const drive = (pat, type) => [
+  p => p.distort(AMOUNT.mul(6)).distorttype('soft'),
+  p => p.distort(AMOUNT.mul(6)).distorttype('hard'),
+  p => p.distort(AMOUNT.mul(6)).distorttype('diode'),
+  p => p.distort(AMOUNT.mul(4)).distorttype('fold'),
+  p => p.crush(AMOUNT.fmap(x => 16 - x * 14)),
+  p => p.coarse(AMOUNT.fmap(x => 1 + Math.round(x * 31))),
+][type](pat).postgain(AMOUNT.fmap(x => 1 - x * 0.5))
+const ch7 = by(TYPE7, [0, 1, 2, 3, 4, 5].map(t => by(TARGET, [
+  stack(drums, drive(bass, t), stab),
+  stack(drive(drums, t), bass, stab),
+  drive(stack(drums, bass, stab), t),
+])))
+
+// ------------------------------------------------------------
+// 8. VOWEL: a formant filter that makes synths "talk"
+// ------------------------------------------------------------
+// Our mouth is a filter: the vowels a, e, i, o, u differ only in which frequencies the mouth boosts (the
+// formants). vowel() copies that filter, so a synth sounds like it says the vowel.
+// VOWEL: 0 off, 1 a, 2 e, 3 i, 4 o, 5 u, 6 changing vowels on every 8th ("talking").
+// Works on bass and stab. Strongest on bright sounds (sawtooth).
+// LISTEN: 0 -> 1 -> 5: from open to closed. 6 = the "yoi" / talking bass of techno and electro.
+const VOWEL = slider(0, 0, 6, 1)
+const ch8 = stack(drums, by(VOWEL, [null, 'a', 'e', 'i', 'o', 'u', 'talk'].map(v =>
+  v === null ? music : v === 'talk' ? stack(stack(bass, stab).vowel("[a o e u]*2"), lead) : stack(stack(bass, stab).vowel(v), lead))))
+
+
+// ============================================================
+// PART D: MOVEMENT
+// ============================================================
+
+// ------------------------------------------------------------
+// 9. MODULATION: LFO on the filter, tremolo, gate, phaser
+// ------------------------------------------------------------
+// An LFO (low frequency oscillator) is a slow wave that turns a knob for you, again and again.
+//   MOD 0 = off
+//       1 = filter LFO: a sine wave moves the cutoff of the 16th bass and the pad (wah-wah over bars)
+//       2 = tremolo: the volume of the pad goes up and down (sine)
+//       3 = gate: the same with a square wave: the pad is chopped into a rhythm (the "trance gate")
+//       4 = phaser: a sweeping, swirling notch filter (70s, disco, psychedelic)
+//   SPEED: 0..4 = 1, 2, 4, 8, 16 per bar for 1-3 (for the filter LFO: one sweep every 16, 8, 4, 2, 1 bars);
+//          phaser 0.25, 0.5, 1, 2, 4 Hz
+//   DEPTH: how strong (0..1)
+// IMPORTANT STRUDEL DETAIL: effect values are read only when a note STARTS. The filter LFO (1) therefore
+// moves the pad only once per bar (one chord = one note), but the 16th bass smoothly. Tremolo, gate and
+// phaser run continuously inside the note.
+// LISTEN: MOD 1, SPEED 2. Then MOD 3, SPEED 3 and 4: rhythm out of a held chord. MOD 4 at SPEED 0.
+const MOD = slider(1, 0, 4, 1)
+const SPEED = slider(2, 0, 4, 1)
+const DEPTH = slider(0.8, 0, 1)
+const bass16 = note("a1*16").s('sawtooth').decay(0.1).sustain(0.3).gain(0.45)
+const lfoCut = bars => sine.slow(bars).mul(DEPTH).fmap(x => 250 * Math.pow(2, x * 4))
+const ch9 = stack(kick, hats, by(MOD, [
+  stack(bass16.lpf(600), pad),
+  by(SPEED, [16, 8, 4, 2, 1].map(b => stack(bass16.lpf(lfoCut(b)), pad.lpf(lfoCut(b))))),
+  by(SPEED, [1, 2, 4, 8, 16].map(r => stack(bass16.lpf(600), pad.tremolosync(r).tremolodepth(DEPTH).tremoloshape('sine')))),
+  by(SPEED, [1, 2, 4, 8, 16].map(r => stack(bass16.lpf(600), pad.tremolosync(r).tremolodepth(DEPTH).tremoloshape('square')))),
+  by(SPEED, [0.25, 0.5, 1, 2, 4].map(r => stack(bass16.lpf(600), pad.phaser(r).phaserdepth(DEPTH)))),
+]))
+
+
+// ============================================================
+// PART E: SPACE
+// ============================================================
+
+// ------------------------------------------------------------
+// 10. DELAY: echoes in time with the music
+// ------------------------------------------------------------
+// A delay records the sound and plays it back later, again and again, each time quieter.
+//   LEVEL     how loud the echoes are (delay)
+//   TIME      when the echo comes (delaytime): 0 = 1/16, 1 = 1/8, 2 = dotted 1/8 (3/16), 3 = 1/4 beat,
+//             4 = 1/8 triplet. Times in sync with the tempo make the echoes part of the rhythm.
+//   FEEDBACK  how much of each echo is fed back again: 0 = one echo, 0.8 = a long trail. Never 1 or more:
+//             it gets louder and louder.
+// The delay is only on the sparse stab and lead (orbit 2, see chapter 12).
+// LISTEN: TIME 2 (dotted 1/8): the echoes fall between the beats and create a new, rolling rhythm.
+// That is the dub techno and deep house delay. Compare TIME 3 (on the beat: echoes hide behind the kick).
+// Raise FEEDBACK to 0.8 for one bar and back: a classic live move ("delay throw").
+const LEVEL10 = slider(0.4, 0, 1)
+const TIME10 = slider(2, 0, 4, 1)
+const FEEDBACK = slider(0.45, 0, 0.9)
+const ch10 = stack(
+  drums, bass,
+  stack(chords.struct("~ x ~ ~ ~ ~ ~ ~").s('sawtooth').lpf(1800).decay(0.2).sustain(0).gain(0.3), lead.degradeBy(0.5))
+    .delay(LEVEL10).delaytime(pick(TIME10, [BEAT / 4, BEAT / 2, BEAT * 0.75, BEAT, BEAT / 3])).delayfeedback(FEEDBACK).orbit(2),
+)
+
+// ------------------------------------------------------------
+// 11. REVERB: room, roomsize, roomlp
+// ------------------------------------------------------------
+// Reverb imitates a room: thousands of tiny echoes melting into one tail. It places a sound in space:
+// dry = close and in your face, wet = far away and big.
+//   LEVEL  how much reverb (room)
+//   SIZE   0..3 = room size 0.5, 2, 4, 8: small room ... huge hall (roomsize)
+//   DARK   0..2 = tail brightness 16 kHz, 5 kHz, 1.5 kHz (roomlp). Dark tails stay out of the way.
+//   ONKICK 0 = reverb only on clap and stab, 1 = also on the kick
+// SIZE and DARK rebuild the reverb when changed, so they are steps on purpose; do not ride them like a knob.
+// LISTEN: LEVEL 0 -> 0.6 at SIZE 2: the stab moves backwards. DARK 0 vs 2 at high LEVEL. Then ONKICK = 1:
+// the low end gets washy and the kick loses punch. That is why techno keeps the kick (almost) dry.
+const LEVEL11 = slider(0.4, 0, 1)
+const SIZE11 = slider(2, 0, 3, 1)
+const DARK = slider(1, 0, 2, 1)
+const ONKICK = slider(0, 0, 1, 1)
+const wet = p => p.room(LEVEL11).roomsize(pick(SIZE11, [0.5, 2, 4, 8])).roomlp(pick(DARK, [16000, 5000, 1500])).orbit(2)
+const ch11 = stack(
+  by(ONKICK, [kick, wet(kick)]), hats, bass,
+  wet(stack(clap, stab)),
+)
+
+
+// ============================================================
+// PART F: ROUTING AND DYNAMICS
+// ============================================================
+
+// ------------------------------------------------------------
+// 12. ORBITS: why effects can steal from each other
+// ------------------------------------------------------------
+// Most effects are LOCAL: every note gets its own filter, distortion, envelope. Delay and reverb are GLOBAL:
+// there is only ONE delay and ONE reverb per orbit (a mixer channel), shared by all sounds on it. If two
+// sounds on the same orbit use different reverb sizes or delay times, the last note decides for everyone.
+// FIX: 0 = everything on orbit 1. The stab wants a huge hall (size 8) and a dotted delay; the hats ask for a
+//          tiny room and a 1/16 delay. They overwrite each other: the hall keeps collapsing, echoes jump.
+//      1 = the stab gets its own orbit 2: both keep their settings.
+// LISTEN: switch FIX 0 / 1 and listen to the stab tail. Rule for tracks: one orbit per kind of space
+// (e.g. 1 = dry drums, 2 = stabs/pads with reverb, 3 = delays).
+const FIX = slider(0, 0, 1, 1)
+const ch12 = by(FIX, [1, 2].map(o => stack(
+  kick, clap, bass,
+  s("hh*16").bank('RolandTR909').gain(0.3).room(0.05).roomsize(0.3).delay(0.1).delaytime(BEAT / 4),
+  stab.room(0.6).roomsize(8).delay(0.3).delaytime(BEAT * 0.75).delayfeedback(0.4).orbit(o),
+)))
+
+// ------------------------------------------------------------
+// 13. SIDECHAIN / DUCKING: the pumping house sound: duckorbit, duckdepth, duckattack
+// ------------------------------------------------------------
+// Ducking turns a whole orbit down every time the kick hits, and lets it come back up. Originally a trick
+// so that bass and kick do not fight (sidechain compression); then it became a sound of its own: the pump.
+//   DEPTH   how far the pad and bass are pushed down (0 = off, 1 = almost silent)
+//   RETURN  how fast they come back up (seconds; duckattack). Short = tight, long = deep breathing pump
+// The kick (orbit 1) ducks orbit 2, where pad and bass play.
+// LISTEN: DEPTH 0 vs 0.8. Then RETURN 0.05 vs 0.3: with 0.3 the pad "breathes" in quarter notes. That is
+// French house and a lot of modern house. In techno it is subtler: used to make room for the kick.
+const DEPTH13 = slider(0.8, 0, 1)
+const RETURN = slider(0.2, 0.02, 0.45)
+const ch13 = stack(
+  kick.duckorbit(2).duckattack(RETURN).duckdepth(DEPTH13), hats, clap,
+  stack(pad.lpf(2500).gain(0.3), bass).orbit(2),
+)
+
+// ------------------------------------------------------------
+// 14. COMPRESSOR: punch and sustain of single hits
+// ------------------------------------------------------------
+// A compressor turns loud parts down: everything above THRESH (dB) is reduced by RATIO (4 = above the
+// threshold, 4 dB in become 1 dB out). Quiet parts stay, so the sound gets more even and denser.
+//   ATTACK   how fast it reacts (seconds). SLOW (0.03) lets the first hit through -> MORE PUNCH.
+//            FAST (0.001) catches the hit too -> flat, softer
+//   RELEASE  how fast it lets go. Together with makeup gain this decides how much of the tail is raised.
+//   MAKEUP   volume afterwards (postgain), because compression makes things quieter
+// In Strudel the compressor works per note (local), not on the mix: it shapes every hit on its own. Here it
+// is on the drums. (Glue on a whole mix is done in a DAW or on the master; ducking (13) is the Strudel way
+// to make room.)
+// LISTEN: THRESH -40, RATIO 10, then ATTACK 0.001 vs 0.03: flat vs snappy. Then raise MAKEUP: the hat and
+// clap tails get louder, the drums sound denser.
+const THRESH = slider(-20, -50, 0)
+const RATIO = slider(4, 1, 20)
+const ATTACK14 = slider(0.01, 0.001, 0.05)
+const RELEASE14 = slider(0.1, 0.02, 0.5)
+const MAKEUP = slider(1, 0.5, 3)
+const ch14 = stack(
+  drums.compressor(THRESH).compressorRatio(RATIO).compressorKnee(6)
+    .compressorAttack(ATTACK14).compressorRelease(RELEASE14).postgain(MAKEUP),
+  bass,
+)
+
+// ------------------------------------------------------------
+// 15. STEREO: pan, jux
+// ------------------------------------------------------------
+// pan places a sound between left (0), centre (0.5) and right (1). jux plays a changed copy on the right
+// side only; juxBy sets how far apart the two sides are.
+//   MOVE   the hats wander from left to right (auto-pan), 0 = centred
+//   WIDTH  the stab gets a slightly later copy on one side (a few milliseconds): it sounds wide (Haas effect)
+// LISTEN on headphones: MOVE 0 -> 1, WIDTH 0 -> 1. Then sum to mono in your head: in clubs the system is
+// often mono, and wide sounds can get thinner. Rule: kick, bass and clap stay in the centre, only hats,
+// percussion, pads and effects go wide.
+const MOVE = slider(0.6, 0, 1)
+const WIDTH = slider(0.6, 0, 1)
+const ch15 = stack(
+  kick, clap, bass,
+  s("hh*16").bank('RolandTR909').gain(0.35).pan(sine.slow(2).sub(0.5).mul(MOVE).add(0.5)),
+  stab.juxBy(WIDTH, p => p.late(0.012)),
+)
+
+// ------------------------------------------------------------
+// 16. PERFORMANCE CHAIN: the effects you ride live
+// ------------------------------------------------------------
+// In a live set you rarely touch twenty parameters. These five macros cover most techno/house moves; they
+// match the controls of a stem in the tracks (col(n): hpf, lpf, char, level):
+//   HP      high-pass on the music (build-up, thinning)
+//   LP      low-pass on stab and lead (sweeps, darkness); the bass keeps its own low-pass
+//   CHAR    drive on the bass + resonance on the filter ("character")
+//   SPACE   reverb and delay on the stab (send amount)
+//   PUMP    ducking depth from the kick
+// LISTEN: build a 32-bar arc: start LP 0.3 and SPACE 0.2, open LP over 16 bars, raise CHAR, then
+// HP up for 4 bars and drop it back with PUMP high. Then think about which macro belongs on which knob.
+const HP = slider(0, 0, 1)
+const LP = slider(0.8, 0, 1)
+const CHAR = slider(0.2, 0, 1)
+const SPACE = slider(0.3, 0, 1)
+const PUMP = slider(0.4, 0, 1)
+const ch16 = stack(
+  kick.duckorbit(2).duckattack(0.2).duckdepth(PUMP), hats, clap,
+  bass.distort(CHAR.mul(5)).distorttype('diode').postgain(CHAR.fmap(x => 1 - x * 0.4)).hpf(hz(HP, 20, 3000)).orbit(2),
+  stack(
+    stab.room(SPACE).roomsize(4).delay(SPACE.mul(0.6)).delaytime(BEAT * 0.75).delayfeedback(0.4),
+    lead,
+  ).hpf(hz(HP, 20, 3000)).lpf(hz(LP, 100, 12000)).lpq(CHAR.mul(15)).orbit(2),
+)
+
+
+// ============================================================
+// PLAY
+// ============================================================
+const CHAPTERS = [ch0, ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12, ch13, ch14, ch15, ch16]
+
+$: CHAPTERS[CHAPTER]._spectrum()

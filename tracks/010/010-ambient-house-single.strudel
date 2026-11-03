@@ -1,0 +1,963 @@
+// ============================================================
+// GENERATED from 010-ambient-house-dual.strudel by tools/lcxl-layout/make-single.mjs — edit the dual file, not this one.
+// TRACK 010 — ambient house in D minor, 120 BPM, in the two-controller layout (midi-layouts/templates/dual-lc.strudel)
+// Mood after Harmon's sunrise live set at Fusion 2026 (Bachstelzen): melodic, warm, organic percussion, a lot of air.
+// Dry and classy at all knobs 0; the room comes with row 2 and the global Room.
+// Jojo (foundation): kick, atmo pump, sub, rolling bass, clap / rim, hats, congas, shaker / ride.
+// Jonas (colour): pad, deep chords (e-piano), pluck arp, lead, marimba answer, glockenspiel, birds + the global column 8.
+// Chapter (global button 1): the chord progression for everybody, at the next phrase (4 bars):
+//   Dämmerung i–VI–III–VII → Sonnenaufgang VI–VII–i–i → Schweben i–iv → Wärme III–VI–iv–i. Everything follows its root.
+// Drop: when the break ends, everything comes back on the one.
+// ============================================================
+// Two Launch Control XL 3, both in Custom Mode 16 (same CCs), told apart by their MIDI input.
+// Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
+// button row 1 = change (next pattern, at the next bar), button row 2 = a moment (while held).
+// One controller only (Jojo's missing, or the -single version): Mode 1 = Jojo (same CCs as Mode 16), Mode 2 = Jonas
+// (CC + 48). Jojo's column 8 (shaker) stays off; column 8 is the global column on both pages.
+// @layout Track 010 — ambient house (one controller)
+// @globalcc same
+// @note Ambient house in D minor, 120 BPM, a sunrise mood. Jojo plays the foundation (kick, bass, drums, congas), Jonas the colour (pad, chords, melodies, birds) and the global column 8.
+// @note Every row means the same everywhere: row 1 = brightness, row 2 = space, row 3 = character, fader = level, button 1 = next pattern (at the next bar), button 2 = a moment while held.
+// @note Start with all faders down. Nothing sounds until Jonas' master fader (column 8) is up. Chapter (Jonas, column 8) changes the chords for everybody at the next 4-bar phrase.
+// @note One controller: Mode 1 = Jojo (foundation, columns 1–7; Jojo's column 8 (Shaker / Ride) stays off; Mode 1 sends the same CCs as Mode 16), Mode 2 = Jonas (colour). Column 8 is global on both pages.
+// @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
+// @col 16:8 8 Global
+// @col 16:1 1 Kick
+// @col 16:2 2 Atmo Pump
+// @col 16:3 3 Sub
+// @col 16:4 4 Bassline
+// @col 16:5 5 Clap / Rim
+// @col 16:6 6 Hats
+// @col 16:7 7 Congas
+// @row 16:k1 Row 1 \ Brightness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Character
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Change
+// @row 16:b2 Button 2 \ Moment
+// @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
+// @col 2:1 1 Pad
+// @col 2:2 2 Deep Chords
+// @col 2:3 3 Pluck Arp
+// @col 2:4 4 Lead
+// @col 2:5 5 Marimba
+// @col 2:6 6 Glockenspiel
+// @col 2:7 7 Birds
+// @col 2:8 8 Global
+// @row 2:k1 Row 1 \ Brightness
+// @row 2:k2 Row 2 \ Space
+// @row 2:k3 Row 3 \ Character
+// @row 2:fader Fader \ Level
+// @row 2:b1 Button 1 \ Change
+// @row 2:b2 Button 2 \ Moment
+// @guide Sunrise | Start like the sky before dawn: Jonas brings pad and birds, Jojo the atmo pump and the sub. The kick comes only when both are ready.
+// @guide Playing together | Jojo builds the floor: kick, sub, off-beat hats, then the rolling bass and the groove (congas, shaker). Keep it dry; the room belongs to Jonas.
+// @guide Playing together | Jonas colours it: pad and deep chords first (all knobs at 0 is a good start), then arp and marimba. The lead is for the long, slow moments.
+// @guide Playing together | Chapter changes the chords for both players at the next 4-bar phrase: sub, bass and every melody follow. Pad button 2 (freeze) holds the chord for everybody.
+// @guide Build-up and drop | Jonas turns Tension up (echo, open filters, snare roll), presses Break at the top: the beat goes out, pad and birds float. Jojo holds the atmo riser, Jonas presses Break again: back on the one. Then let Tension go.
+// @guide Every position sounds good | No filter closes completely. Arp, lead and marimba keep a little room even at space 0.
+// @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
+// @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
+// @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
+const JOJO  = 'LCXL3 Jojo MIDI Out'
+const JONAS = 'LCXL3 Jonas MIDI Out'
+// Jonas' controller by its macOS name; if that name is missing (other computer, other USB port), the first MIDI input
+let ccJonas
+try { ccJonas = await midin(JONAS) } catch (e) { console.warn('Jonas not found: using the first MIDI input'); ccJonas = await midin() }
+// Single version (written by tools/lcxl-layout/make-single.mjs with SINGLE = true): don't look for Jojo's controller
+const SINGLE = true
+let ccJojo = null
+if (!SINGLE) {
+  try { ccJojo = await midin(JOJO) } catch (e) { console.warn('Jojo not found: one controller, Mode 1 = Jojo, Mode 2 = Jonas (CC + 48)') }
+}
+
+const ramp = (sig, from, to) => sig.fmap(v => Math.min(1, Math.max(0, (v - from) / (to - from))))
+// Row-3 crossfade: 0..0.5 brings the extra layer in, 0.5..1 fades the main layer out
+const fadeMain  = knob => ramp(knob, 1, 0.5)
+const fadeExtra = knob => ramp(knob, 0, 0.5)
+// Exponential knob range for filters (Hz), so every part of the knob travel is audible
+const expRange = (knob, lo, hi) => knob.fmap(v => lo * Math.pow(hi / lo, v))
+
+const bpm  = 120
+const beat = 60 / bpm   // seconds per quarter note, for delay times
+setcpm(bpm / 4)
+
+// Mapping of column n (1-8): brightness, space, character (knob rows 1-3), fader, button rows 1-2
+const colMap = (read, n) => ({ bright: read(12 + n), space: read(20 + n), char: read(28 + n), level: read(4 + n), btn: read(36 + n), btn2: read(44 + n) })
+const off = () => signal(() => 0)
+// Column 8 (global) is read from both its Mode 16 and Mode 2 CCs, last moved wins: it works on both pages even on a
+// controller whose column 8 sends CC + 48 in Mode 2
+// One controller: Jojo on the plain CCs (Mode 1), Jonas on CC + 48 (Mode 2)
+const alone    = !ccJojo
+const colJonas = n => colMap(n === 8 ? c => lastMoved(ccJonas(c), ccJonas(c + 48)) : alone ? c => ccJonas(c + 48) : ccJonas, n)
+const colJojo  = n => !alone ? colMap(ccJojo, n) : n === 8 ? colMap(off, n) : colMap(ccJonas, n)
+
+const gate  = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
+const above = (sig, x) => sig.fmap(v => v > x)
+const and   = (a, b) => a.fmap(x => y => x && y).appLeft(b)
+const held  = button => button.fmap(v => v > 0.5)
+
+// Stateful controls, collected so the master can query them every tick (see stateTaps)
+const taps = []
+
+// Two inputs for one control: the value follows whichever moved last (stateful, so it is queried via stateTaps)
+const lastMoved = (a, b) => {
+  let pa = null, pb = null, v = 0
+  const pat = a.fmap(x => y => {
+    if (pa === null) v = Math.max(x, y)
+    else if (y !== pb) v = y
+    else if (x !== pa) v = x
+    pa = x; pb = y
+    return v
+  }).appLeft(b)
+  taps.push(pat)
+  return pat
+}
+
+// Momentary button that steps through n states, one step per press (counts presses, not the held value).
+// onChange(state) runs on every step (for the status box). Re-evaluating the code starts again at 0.
+const cycleButton = (button, n, onChange = () => {}) => {
+  let prev = 0, state = 0
+  const pat = button.fmap(v => {
+    if (v > 0.5 && prev <= 0.5) { state = (state + 1) % n; onChange(state) }
+    prev = v
+    return state
+  })
+  taps.push(pat)
+  return pat
+}
+
+// A value that a button sets now but that takes over only at the next bar line, or with len = 4 at the next
+// 4-bar phrase (chapter). at(t) is asked with bar starts in real time (outside any reseed shift); it remembers the
+// previous value for queries that still reach back into the old bar. pat = the value per bar.
+const barLatch = (len = 1) => {
+  const l = { pending: 0, now: 0, prev: 0, bar: -Infinity }
+  l.at = t => {
+    const bar = Math.floor(Number(t) / len)
+    if (bar > l.bar) {
+      if (l.pending !== l.now) { l.prev = l.now; l.now = l.pending; showStatus() }
+      else l.prev = l.now
+      l.bar = bar
+    }
+    return bar >= l.bar ? l.now : l.prev
+  }
+  l.pat = signal(t => l.at(t)).segment(1)
+  taps.push(l.pat)
+  return l
+}
+
+// 0 → 1 over `cycles` while a button is held, back to 0 on release (for risers)
+const heldRamp = (button, cycles) => {
+  let start = null
+  const pat = button.fmap(v => t => {
+    if (v <= 0.5) { start = null; return 0 }
+    start ??= t
+    return Math.min(1, Math.max(0, (t - start) / cycles))
+  }).appLeft(signal(t => Number(t)))
+  taps.push(pat)
+  return pat
+}
+
+// Freeze: while the button is held, keep returning the value that was playing when it was pressed
+const freeze = (button, pat) => {
+  let kept = null
+  return pat.fmap(v => b => b > 0.5 ? (kept ??= v) : (kept = null, v)).appLeft(button)
+}
+
+// ============================================================
+// CHAPTERS — chord progressions in D minor, one chord per bar, 4 bars = one phrase
+// ============================================================
+// Roots as scale degrees of D natural minor (0 = D). Stacked thirds on them: Dm9, Fmaj7, Gm9, B♭maj7, C (add9).
+// A (degree 4) and E (degree 1) are never roots: their 9th would clash (B♭ over A, F over E).
+const CHAPTERS = [
+  { name: 'Dämmerung',     roots: [0, 5, 2, 6], chords: 'Dm9 – B♭maj7 – Fmaj7 – C' },   // i–VI–III–VII
+  { name: 'Sonnenaufgang', roots: [5, 6, 0, 0], chords: 'B♭maj7 – C – Dm9 – Dm9' },     // VI–VII–i–i
+  { name: 'Schweben',      roots: [0, 3, 0, 3], chords: 'Dm9 – Gm9 – Dm9 – Gm9' },      // i–iv
+  { name: 'Wärme',         roots: [2, 5, 3, 0], chords: 'Fmaj7 – B♭maj7 – Gm9 – Dm9' }, // III–VI–iv–i
+]
+const scaleIn = octave => 'D' + octave + ':minor'
+
+
+// Status box at the bottom right: chapter, break, and which pattern each stem plays.
+// Its button moves the text into a small always-on-top window (Document Picture-in-Picture, Chrome/Edge), so it
+// stays visible over the layout PDF; closing that window puts it back. Kept on globalThis, so re-evaluating
+// reuses the open window. Only in the browser; the Node tools have no page to draw on.
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const statusUi = !hasPage ? null : globalThis.houseStatus ??= (() => {
+  const box = document.createElement('div')
+  box.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  const text = document.createElement('pre')
+  text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  const pop = document.createElement('button')
+  pop.textContent = '⧉ als Fenster'
+  pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
+  pop.onclick = async () => {
+    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    const pip = await documentPictureInPicture.requestWindow({ width: 380, height: 490 })
+    pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
+    pip.document.body.append(text)
+    box.style.display = 'none'
+    pip.addEventListener('pagehide', () => { box.prepend(text); box.style.display = '' })
+  }
+  box.append(text, pop)
+  document.body.appendChild(box)
+  return { text, box }
+})()
+
+// LC view: a big, normal window (second screen, full screen) that draws the controller page in use: each control's
+// name from the @ctl tags in the editor, its value, and what the buttons have chosen. One controller: the page follows
+// the CCs that move (columns 1-7: plain = Mode 1 Jojo, CC + 48 = Mode 2 Jonas; column 8 is on both). Two controllers:
+// the page of the controller moved last. Values come from Web MIDI directly; a control not moved since loading shows –
+// (Strudel reads it as 0). Kept on globalThis like the status box; side, pageOf and draw are set anew on every evaluation.
+const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
+  const v = { win: null, cc: { jojo: {}, jonas: {} }, page: 'jojo', timer: null,
+    side: () => 'jonas', pageOf: side => side, draw: () => {}, css: '' }
+  v.update = () => {
+    if (!v.win || v.win.closed || v.timer) return
+    v.timer = setTimeout(() => { v.timer = null; if (v.win && !v.win.closed) v.draw() }, 40)
+  }
+  // Everything that is not a CC (a mode switch may send SysEx or a program change) is shown in the view as hex
+  const onMsg = (name, e) => {
+    const [status, cc, val] = e.data
+    if ((status & 0xf0) !== 0xb0) {
+      if (status === 0xf8 || status === 0xfe) return   // clock, active sensing
+      v.other = [...e.data].map(b => b.toString(16).padStart(2, '0')).join(' ').toUpperCase()
+      v.update()
+      return
+    }
+    const side = v.side(name)
+    v.cc[side][cc] = val / 127
+    v.page = v.pageOf(side, cc)
+    v.update()
+  }
+  // A second listener next to Strudel's own (addEventListener does not replace it)
+  const ports = new WeakSet()
+  const listen = input => {
+    if (ports.has(input)) return
+    ports.add(input)
+    input.addEventListener('midimessage', e => onMsg(input.name, e))
+    input.open?.()
+  }
+  // With SysEx if the browser allows it (Chrome asks once), else without
+  const midiAccess = !navigator.requestMIDIAccess ? Promise.reject(new Error('no Web MIDI'))
+    : navigator.requestMIDIAccess({ sysex: true }).catch(() => navigator.requestMIDIAccess())
+  midiAccess.then(access => {
+    access.inputs.forEach(listen)
+    access.addEventListener('statechange', e => { if (e.port.type === 'input' && e.port.state === 'connected') listen(e.port) })
+  }).catch(e => console.warn('LC view: no MIDI access', e))
+  // The button is a link that opens a tab named lcxl-view: a link click is never stopped by the pop-up blocker, and the
+  // tab can be dragged out into its own window. Strudel replaces globalThis.open (a control of its own), so the handle
+  // on that tab comes from the native open of a hidden iframe (with a name and no URL it only finds the open tab).
+  for (const old of document.querySelectorAll('button')) if (old.textContent.startsWith('▣ LC')) old.remove()
+  const opener = document.createElement('iframe')
+  opener.style.display = 'none'
+  document.body.append(opener)
+  const link = document.createElement('a')
+  link.textContent = '▣ LC groß'
+  link.href = 'about:blank'
+  link.target = 'lcxl-view'
+  link.style.cssText = 'display:inline-block;margin:6px 0 0 6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
+    'background:#ddd;border-radius:3px;text-decoration:none;cursor:pointer'
+  link.onclick = () => setTimeout(() => {
+    try {
+      const w = opener.contentWindow.open('', 'lcxl-view')
+      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      v.win = w
+      w.document.title = 'LC XL 3'
+      w.document.head.innerHTML = '<style>' + v.css + '</style>'
+      w.document.body.innerHTML = '<div id=lc></div>'
+      v.draw()
+      link.textContent = '▣ LC groß'
+    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+  }, 100)
+  if (statusUi.box) statusUi.box.append(link)
+  else { link.style.cssText += ';position:fixed;right:12px;bottom:4px;z-index:1001'; document.body.append(link) }
+  v.link = link
+  return v
+})()
+
+// Rows of the status box, filled by change(): { label, latch, n, names } per player
+const STATUS = { jojo: [], jonas: [] }
+const showStatus = () => {
+  if (!statusUi) return
+  const dots = v => [...Array(8).keys()].map(k => k === v ? '●' : '○').join('')
+  const show = (r, v) => !r.names ? String(v + 1) : r.names[v]
+  const line = (r, i) => (i + 1) + ' ' + r.label.padEnd(10) + ' ' + (r.n === 8 ? dots(r.latch.now) + ' ' : '') +
+    show(r, r.latch.now) + (r.latch.pending !== r.latch.now ? ' → ' + show(r, r.latch.pending) : '')
+  const ch = chapterLatch
+  statusUi.text.textContent = [
+    'Kapitel     ' + CHAPTERS[ch.now].name +
+      (ch.pending !== ch.now ? ' → ' + CHAPTERS[ch.pending].name + ' (nächste Phrase)' : ''),
+    'Akkorde     ' + CHAPTERS[ch.now].chords,
+    'Break       ' + (breakLatch.now ? 'Beat aus' : 'Beat an') +
+      (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'aus' : 'an') + ' (nächster Takt)' : ''),
+    '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
+    '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line),
+  ].join('\n')
+  lcView?.update()
+}
+// Button 1 of a stem: n patterns (default 8), one step per press, taking over at the next bar
+const change = (button, who, label, n = 8, names) => {
+  const latch = barLatch()
+  cycleButton(button, n, s => { latch.pending = s; showStatus() })
+  STATUS[who].push({ label, latch, n, names })
+  return latch
+}
+// Pattern number i of a list, switched by a change latch
+const pick = (latch, pats) => latch.pat.fmap(i => pats[i]).innerJoin()
+
+// ============================================================
+// GLOBAL (Jonas, column 8) — acts on both controllers
+// ============================================================
+// @ctl g.k1 Fog | 0 = clear, up = every filter pulled down to ~6 %: muffled, as if heard from outside the tent.
+// @ctl g.k2 Room | 0 = each sound's own room (row 2), up = everything drowns in reverb.
+// @ctl g.k3 Tension | build-up: echo grows, filters open, from the middle a snare roll (clap fader). 0 = release.
+// @ctl g.fader Master Level | volume of everything, both controllers. 0 = silence.
+// @ctl g.b1 Chapter | next chord progression for all, at the next 4-bar phrase.
+// @ctl g.b2 Break / Drop | 1st: beat out. 2nd: all back on the one.
+const glob        = colJonas(8)
+const globalFog   = glob.bright.fmap(f => Math.pow(0.06, f))
+const globalRoom  = glob.space
+const tension     = glob.char
+const tensionEcho = ramp(tension, 0, 0.5).mul(0.45)     // delay send, 0..0.45
+const tensionRoll = ramp(tension, 0.5, 1)               // snare roll, 0..1
+// Factor on every lpf: fog darkens (down to 0.06), tension opens (up to 2.5)
+const globalTone  = globalFog.fmap(f => o => f * o).appLeft(tension.fmap(t => 1 + 1.5 * t))
+const globalLevel = glob.level.range(0, 1)
+
+const chapterLatch = barLatch(4)
+cycleButton(glob.btn, CHAPTERS.length, s => { chapterLatch.pending = s; showStatus() })
+const breakLatch = barLatch()
+cycleButton(glob.btn2, 2, s => { breakLatch.pending = s; showStatus() })
+// Jojo's low end and backbeat, gated while the break is on
+const beatOn   = breakLatch.pat.fmap(b => b === 0)
+const beatOnly = pat => gate(beatOn, pat)
+
+const audible = level => and(above(level, 0), above(globalLevel, 0))
+// lpf × fog/tension, kept between 80 Hz and 18 kHz (fog never makes a stem silent)
+const toned  = lpf => lpf.fmap(f => g => Math.min(18000, Math.max(80, f * g))).appLeft(globalTone)
+// Reverb send: the stem's space knob (0..0.9), raised by the global Room up to 0.95
+const roomOf = space => space.fmap(s => g => { const r = 0.9 * s; return r + (0.95 - r) * g }).appLeft(globalRoom)
+// Change: read the stem's randomness 1024 cycles further per step (keeps bar alignment, new random values).
+// The chord root is applied after reseed, so it follows real time.
+const reseed = (latch, pat) => pat.early(latch.pat.fmap(v => v * 1024))
+
+// Effect buses. Each orbit has one reverb and one delay, and every reverb costs a lot of CPU, so the stems share
+// two orbits; stems on one orbit share room size and echo time/feedback.
+// Orbit 1 = drums and bass: small, dry room, short dotted-8th slap.
+// Orbit 2 = all of Jonas' colour (and the atmo riser): a wide open-air hall, long dotted-8th echo.
+const BUSES = {
+  1: { hall: 1.2, time: beat * 0.75, feedback: 0.25 },
+  2: { hall: 5, time: beat * 0.75, feedback: 0.55 },
+}
+// bus(): reverb from the space knob, and echo: the layer's own delay amount (or `echo` if it has none) × 2 × space,
+// so space 0.5 = the designed amount; Tension's echo takes over where it is larger.
+const bus = (pat, orbit, space, echo = 0) => pat
+  .fmap(v => sc => e => ({ ...v, delay: Math.max(Math.min(0.9, (v.delay ?? echo) * sc), e) }))
+  .appLeft(space.fmap(s => 2 * s)).appLeft(tensionEcho)
+  .room(roomOf(space)).roomsize(BUSES[orbit].hall).orbit(orbit)
+  .delaytime(BUSES[orbit].time).delayfeedback(BUSES[orbit].feedback)
+// Reverb only, no echo (kick, sub and bass would smear)
+const dryBus = (pat, orbit, space) => pat.room(roomOf(space)).roomsize(BUSES[orbit].hall).orbit(orbit)
+
+// Channel strip: lpf × fog/tension (if given), level × master as postgain, gated while the fader or master is 0
+const strip = (stem, { lpf, level }) => {
+  const pat = lpf === undefined ? stem : stem.lpf(toned(lpf))
+  return gate(audible(level), pat.postgain(level.mul(globalLevel)))
+}
+const drum = (names, bank = 'RolandTR909') => s(names).bank(bank)
+
+// ============================================================
+// HARMONY — Chapter picks the progression, everybody follows its root; pad button 2 freezes it for all
+// ============================================================
+const PROG_PATS = CHAPTERS.map(c => cat(...c.roots))   // one chord per bar, the phrase starts with chord 1
+const pad       = colJonas(1)
+const harmRoot  = freeze(pad.btn2, pick(chapterLatch, PROG_PATS))
+// Chord = shape (scale degrees above the root) on the current root; built once per root and shape
+const CHORD_CACHE = {}
+const chordOn = shape => harmRoot.fmap(r => CHORD_CACHE[shape + '@' + r] ??= n(stack(...shape.map(d => d + r)))).innerJoin()
+const onRoot  = pat => pat.add(n(harmRoot))
+
+// Roots for the low end: A, B♭ and C go an octave down, so sub and bass stay between A1 and G2
+const lowRoot  = harmRoot.fmap(r => r >= 4 ? r - 7 : r)
+const onLow    = pat => pat.add(n(lowRoot))
+
+// ============================================================
+// JOJO 1 KICK — four on the floor: a 909 kick with a sine body tuned to D2 (the root), firm at all knobs 0
+// ============================================================
+// Softness up = the pitch drop gets smaller and slower, the attack fades in, the 909 fades out: a deep, soft thump.
+// @ctl 16:1.k1 Brightness | 0 = firm, round kick with a little click ↔ clicky attack (lpf 1.5–10 kHz).
+// @ctl 16:1.k2 Space | dry and close ↔ in a room (reverb).
+// @ctl 16:1.k3 Softness | 0 = firm 909 kick ↔ 1 = deep, soft thump without click.
+// @ctl 16:1.fader Level | 0 = gone. Four-on-the-floor kick, tuned to D.
+// @ctl 16:1.b1 Change | straight → pickup before the 1 → gap every 4th bar.
+// @ctl 16:1.b2 Drop out | kick pauses while held.
+const kick     = colJojo(1)
+const kickVar  = change(kick.btn, 'jojo', 'Kick', 3, ['gerade', 'Auftakt', 'Lücke'])
+const kickSoft = kick.char
+const KICKS = ["1*4", "1 1 1 [1 ~ ~ 0.4]", "<[1*4] [1*4] [1*4] [1 1 1 ~]>"]
+  .map(g => stack(
+    gain(g).note("d2").s("sine").decay(kickSoft.fmap(s => 0.4 + 0.2 * s)).sustain(0).release(0.05)
+      .attack(kickSoft.fmap(s => 0.002 + 0.012 * s))
+      .penv(kickSoft.fmap(s => 24 - 12 * s)).pdecay(kickSoft.fmap(s => 0.035 + 0.045 * s)),
+    gain(g).mul(gain(kickSoft.fmap(s => 0.75 * (1 - s)))).s("bd").bank("RolandTR909")
+  ))
+
+const stemJ1_kick = beatOnly(gate(kick.btn2.fmap(v => v <= 0.5), strip(dryBus(
+  pick(kickVar, KICKS).mul(gain(0.8)), 1, kick.space), {
+  lpf: expRange(kick.bright, 1500, 10000),
+  level: kick.level.range(0, 1),
+})))
+
+// ============================================================
+// JOJO 2 ATMO PUMP — soft tape-hiss noise glued to the kick (swells in after every kick, like a sidechain),
+// or slow waves over two bars
+// ============================================================
+// @ctl 16:2.k1 Brightness | dull whoosh ↔ airy hiss (lpf 1.5–12 kHz).
+// @ctl 16:2.k2 Space | dry ↔ far away (reverb + echo).
+// @ctl 16:2.k3 Motion | still ↔ the filter breathes and the noise wanders left and right.
+// @ctl 16:2.fader Level | noise that pumps with the kick.
+// @ctl 16:2.b1 Change | pump → off-beat breath → slow waves.
+// @ctl 16:2.b2 Riser | a noise sweep rises over 2 bars while held.
+const noiseCol  = colJojo(2)
+const noiseVar  = change(noiseCol.btn, 'jojo', 'Atmo', 3, ['Pumpe', 'Offbeat', 'Wellen'])
+const noiseMove = noiseCol.char
+const noiseRise = heldRamp(noiseCol.btn2, 2)
+const NOISES = [
+  s("[~ pink@3]*4").attack(0.14).sustain(0.7).release(0.03).hpf(900).gain(2),
+  s("[~ pink]*4").attack(0.08).sustain(0.5).release(0.06).hpf(1800).gain(2),
+  // Waves: one long swell every 2 bars, like the sea at dawn
+  s("pink/2").attack(1.8).sustain(1).release(1.8).hpf(400).gain(1.4),
+]
+// Riser: 16th noise bursts through a bandpass that climbs from 300 Hz to 6 kHz, getting louder. Keeps playing in the break.
+const noiseRiser = gate(held(noiseCol.btn2), s("pink*16")
+  .attack(0.03).sustain(0.8).release(0.15)
+  .bpf(noiseRise.fmap(r => 300 * Math.pow(20, r))).bpq(4)
+  .gain(noiseRise.mul(0.35)).pan(sine.fast(2)))
+
+const stemJ2_noise = strip(stack(
+  beatOnly(bus(pick(noiseVar, NOISES)
+    .lpf(toned(expRange(noiseCol.bright, 1500, 12000)).fmap(f => m => w => f * (1 - 0.7 * m * w)).appLeft(noiseMove).appLeft(sine.slow(2)))
+    .pan(noiseMove.fmap(m => p => 0.5 + m * (p - 0.5)).appLeft(sine.slow(3))), 1, noiseCol.space, 0.15)),
+  bus(noiseRiser, 2, pure(0.3))
+), {
+  level: noiseCol.level.range(0, 1),
+})
+
+// ============================================================
+// JOJO 3 SUB — a sine on the low chord root (A1–G2): each note starts a 16th after the kick (ducked, without a compressor)
+// ============================================================
+// @ctl 16:3.k1 Brightness | 0 = sine with a few overtones (audible on small speakers) ↔ warm and full.
+// @ctl 16:3.k2 Space | dry ↔ a little room (reverb).
+// @ctl 16:3.k3 Length | long, pumping notes ↔ short, bouncing ones.
+// @ctl 16:3.fader Level | sub on the chord root, follows the chapter.
+// @ctl 16:3.b1 Change | pump → off-beat → one long note per bar.
+// @ctl 16:3.b2 Slide | every note bends up into its pitch while held.
+const sub      = colJojo(3)
+const subVar   = change(sub.btn, 'jojo', 'Sub', 3, ['Pumpe', 'Offbeat', 'lang'])
+const subClip  = sub.char.fmap(c => 1 - 0.65 * c)   // share of the note length that sounds
+const subSlide = sub.btn2.fmap(v => v > 0.5 ? -5 : 0)
+const SUBS = ["[~ 0@3]*4", "[~ 0]*4", "~ 0@15"].map(p => onLow(n(p)).scale(scaleIn(2)))
+const subNotes = pick(subVar, SUBS)
+
+const stemJ3_sub = beatOnly(strip(dryBus(stack(
+  subNotes.s("sine").gain(0.5),
+  subNotes.s("triangle").gain(sub.bright.fmap(b => 0.1 + 0.17 * b))
+).attack(0.015).sustain(1).release(0.04).clip(subClip).penv(subSlide).pattack(0.07), 1, sub.space), {
+  level: sub.level.range(0, 1),
+}))
+
+// ============================================================
+// JOJO 4 BASSLINE — rolling melodic-house bass: triangle + a quiet saw, round, a soft filter pluck, a little drive
+// ============================================================
+// @ctl 16:4.k1 Brightness | 0 = round and woody ↔ warm buzz (lpf 250–2000 Hz + envelope).
+// @ctl 16:4.k2 Space | dry ↔ a little room (reverb).
+// @ctl 16:4.k3 Groove | the line as it is ↔ extra 16th notes rolling in between.
+// @ctl 16:4.fader Level | rolling bass, follows the chapter.
+// @ctl 16:4.b1 Change | rolling → off-beat → melodic.
+// @ctl 16:4.b2 Octave | one octave up while held.
+const bassCol = colJojo(4)
+const bassVar = change(bassCol.btn, 'jojo', 'Bass', 3, ['rollend', 'Offbeat', 'Melodie'])
+const bassOct = bassCol.btn2.fmap(v => v > 0.5 ? 12 : 0)
+// [main line, extra 16ths], scale degrees above the low chord root (7 = octave, 4 = fifth, 2 = third)
+const BASS_LINES = [
+  ["[~ 0 0 ~] [~ 0 0 ~] [~ 0 0 ~] [~ 0 4 ~]", "[~ ~ ~ 0]*4"],
+  ["[~ 0]*4", "[~ ~ ~ 0]*4"],
+  ["[0 ~ ~ 0] [~ ~ 4 ~] [~ 0 ~ ~] [2 ~ 4 ~]", "[~ 0 ~ ~]*4"],
+].map(([main, extra]) => [onLow(n(main)), onLow(n(extra))])
+const bassSound = pat => pat.scale(scaleIn(2)).add(note(bassOct))
+  .s("triangle").superimpose(x => x.s("sawtooth").add(note(-0.07)).gain(0.35))
+  .attack(0.004).decay(0.2).sustain(0.35).release(0.07).lpq(3).lpenv(1.5).lpdecay(0.15).lpsustain(0).shape(0.2)
+
+const stemJ4_bass = beatOnly(strip(dryBus(stack(
+  bassSound(pick(bassVar, BASS_LINES.map(l => l[0]))).mul(gain(0.5)),
+  gate(above(bassCol.char, 0), bassSound(pick(bassVar, BASS_LINES.map(l => l[1]))).mul(gain(bassCol.char.mul(0.35))))
+), 1, bassCol.space), {
+  lpf: expRange(bassCol.bright, 250, 2000),
+  level: bassCol.level.range(0, 1),
+}))
+
+// ============================================================
+// JOJO 5 CLAP / RIM — a soft 909 clap on 2 and 4, or a dry 909 rimshot, or both
+// ============================================================
+// @ctl 16:5.k1 Brightness | 0 = natural, a little soft ↔ sharp crack (lpf 3.5–14 kHz).
+// @ctl 16:5.k2 Space | dry ↔ far away (reverb + echo).
+// @ctl 16:5.k3 Ghost notes | plain ↔ a quiet rim before beat 3 ↔ + small double taps.
+// @ctl 16:5.fader Level | clap / rim on 2 and 4. Also the level of Tension's snare roll.
+// @ctl 16:5.b1 Change | clap → rim with a pickup → clap + rim.
+// @ctl 16:5.b2 Roll | snare roll, growing over the bar, while held.
+const clap      = colJojo(5)
+const clapVar   = change(clap.btn, 'jojo', 'Clap', 3, ['Clap', 'Rim', 'beides'])
+const clapGhost = clap.char
+// The 909 clap sample as it is, with its own tail (an envelope cut it off after 0.18 s and sounded choked)
+const clapHit = g => gain(g).s("cp").bank("RolandTR909")
+const rimHit  = g => gain(g).s("rim").bank("RolandTR909")
+const CLAPS = [
+  clapHit("~ 0.7 ~ 0.7"),
+  rimHit("~ 0.6 ~ [0.6 ~ ~ 0.3]"),
+  stack(clapHit("~ 0.6 ~ 0.6"), rimHit("[~ ~ ~ 0.35] ~ [~ ~ 0.3 ~] ~")),
+]
+
+const stemJ5_clap = beatOnly(strip(bus(stack(
+  pick(clapVar, CLAPS),
+  gate(above(clapGhost, 0), rimHit("~ ~ 0.25 ~").mul(gain(ramp(clapGhost, 0, 0.5)))),
+  gate(above(clapGhost, 0.5), rimHit("~ [~ 0.18] ~ [~ ~ 0.15 ~]").mul(gain(ramp(clapGhost, 0.5, 1)))),
+  gate(held(clap.btn2), drum("sd*16").gain(saw.range(0.1, 0.5))),
+  // Tension roll: 8ths → 16ths, louder as Tension rises
+  gate(above(tensionRoll, 0), drum("sd*16").degradeBy(tensionRoll.fmap(t => 0.5 * (1 - t)))
+    .gain(tensionRoll.fmap(t => 0.1 + 0.35 * t)))
+).mul(gain(0.9)).hpf(300).pan(0.47), 1, clap.space, 0.2), {   // was 1.5: the open clap peaked at 1.34 (clipping)
+  lpf: expRange(clap.bright, 3500, 14000),   // was 1500: at knobs 0 only 300–1500 Hz were left, a boxy, honking clap
+  level: clap.level.range(0, 1),
+}))
+
+// ============================================================
+// JOJO 6 HATS — a short, dry open hat on the off-beat, closed 16ths in the other patterns
+// ============================================================
+// @ctl 16:6.k1 Brightness | soft hiss ↔ crisp and sharp (lpf 3–16 kHz).
+// @ctl 16:6.k2 Space | dry ↔ far away (reverb + echo).
+// @ctl 16:6.k3 Density | the pattern as it is ↔ + quiet 16ths ↔ + little 32nd rolls.
+// @ctl 16:6.fader Level | off-beat hat. Keeps playing in the break.
+// @ctl 16:6.b1 Change | off-beat → + 16ths → shuffled 16ths.
+// @ctl 16:6.b2 Open | long open hats on every 8th while held.
+const hats    = colJojo(6)
+const hatVar  = change(hats.btn, 'jojo', 'Hats', 3, ['Offbeat', '16tel', 'Shuffle'])
+const hatDens = hats.char
+const offHat  = drum("[~ oh]*4").decay(0.12).sustain(0).gain(0.4)
+const HATS = [
+  offHat,
+  stack(offHat, drum("hh*16").gain("[0.2 0.1 0 0.12]*4")),
+  stack(offHat, drum("hh*16").gain("[0.22 0.08 0.14 0.1]*4").swingBy(0.4, 8)),
+]
+
+const stemJ6_hats = strip(bus(stack(
+  pick(hatVar, HATS),
+  gate(above(hatDens, 0), drum("hh*16").degradeBy(0.4).gain(ramp(hatDens, 0, 0.5).mul(0.12))),
+  gate(above(hatDens, 0.5), drum("hh*32").degradeBy(0.8).gain(ramp(hatDens, 0.5, 1).mul(0.18))),
+  gate(held(hats.btn2), drum("oh*8").gain(0.3))
+).mul(gain(1.2)).pan(0.56), 1, hats.space, 0.2), {
+  lpf: expRange(hats.bright, 3000, 16000),
+  level: hats.level.range(0, 1),
+})
+
+// ============================================================
+// JOJO 7 CONGAS — TR-727 latin percussion: conga low (n 4), bongo high / low (n 2 / 3); agogo bells (n 0 / 1) with density
+// ============================================================
+// @ctl 16:7.k1 Brightness | soft and woody ↔ crisp slap (lpf 600–12000 Hz).
+// @ctl 16:7.k2 Space | dry ↔ far away (reverb + echo).
+// @ctl 16:7.k3 Density | steady pattern ↔ + fingertip ghost notes ↔ + agogo bells.
+// @ctl 16:7.fader Level | congas and bongos. Keep playing in the break.
+// @ctl 16:7.b1 Change | pillow → rolling → latin.
+// @ctl 16:7.b2 Fill | a conga run over the bar while held.
+const perc     = colJojo(7)
+const percVar  = change(perc.btn, 'jojo', 'Congas', 3, ['Kissen', 'rollend', 'Latin'])
+const percDens = perc.char
+const conga = (pat, g) => n(pat).s("perc").bank("RolandTR727").gain(g)
+const PERCS = ["4 ~ ~ 2 ~ ~ 3 ~ 4 ~ ~ 2 ~ 3 ~ ~", "~ ~ 4 2 ~ ~ 4 ~ ~ 3 ~ 2 ~ ~ 4 ~", "3 ~ 2 ~ 4 ~ 2 3 ~ 2 ~ 4 ~ ~ 2 ~"]
+  .map(p => conga(p, perlin.range(0.2, 0.3)))
+
+const stemJ7_perc = strip(bus(stack(
+  pick(percVar, PERCS),
+  gate(above(percDens, 0), conga(irand(2).add(2).segment(16), ramp(percDens, 0, 0.5).mul(0.09)).degradeBy(0.55)),
+  gate(above(percDens, 0.5), conga("~ 0 ~ ~ 1 ~ ~ 0 ~ ~ 1 ~ 0 ~ ~ ~", ramp(percDens, 0.5, 1).mul(0.13))),
+  gate(held(perc.btn2), conga("2 2 3 3 2 3 4 4 2 2 3 3 4 3 4 4", 0.25))
+).pan(sine.slow(4).range(0.35, 0.65)), 1, perc.space, 0.3), {
+  lpf: expRange(perc.bright, 600, 12000),
+  level: perc.level.range(0, 1),
+})
+
+// ============================================================
+// JOJO 8 SHAKER / RIDE — TR-727 maracas on 16ths, a quiet 909 ride on the off-beats
+// ============================================================
+const shake    = colJojo(8)
+const shakeVar = change(shake.btn, 'jojo', 'Shaker', 3, ['Shaker', 'Ride', 'beides'])
+const maracas  = g => gain(g).s("sh").bank("RolandTR727").n(1)
+const ride     = g => gain(g).s("rd").bank("RolandTR909")
+const SHAKERS = [
+  maracas("[0.35 0.18 0.26 0.18]*4"),
+  ride("[~ 0.16]*4"),
+  stack(maracas("[0.3 0.15 0.22 0.15]*4"), ride("[~ 0.12]*4")),
+]
+
+const stemJ8_shake = strip(bus(pick(shakeVar, SHAKERS)
+  .fast(shake.btn2.fmap(v => v > 0.5 ? 2 : 1))
+  .swingBy(shake.char.mul(0.6), 8)   // 0.6 = the off-16th lands on the last triplet
+  .mul(gain(3)).pan(0.62), 1, shake.space, 0.25), {
+  lpf: expRange(shake.bright, 4500, 16000),
+  level: shake.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 1 PAD — warm, soft pad: detuned saws + a triangle on the chapter's 7th / 9th chords, slow attack
+// ============================================================
+// @ctl 2:1.k1 Brightness | muffled ↔ open and airy (lpf 300–5000 Hz).
+// @ctl 2:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
+// @ctl 2:1.k3 Swell | still ↔ slowly breathing in and out (every 2 bars).
+// @ctl 2:1.fader Level | warm pad on the chapter's chords.
+// @ctl 2:1.b1 Change | voicing: warm → open (9th) → wide.
+// @ctl 2:1.b2 Freeze | holds the current chord while held, for everybody.
+const padVar   = change(pad.btn, 'jonas', 'Pad', 3, ['warm', 'offen', 'weit'])
+const padSwell = pad.char
+// Voicings in scale degrees above the root: seventh chord, upper tones with the 9th, spread (low root, 5th, 7th, 10th)
+const PAD_VOICINGS = [[0, 2, 4, 6], [2, 4, 6, 8], [-7, 4, 6, 9]].map(v => chordOn(v).scale(scaleIn(3)))
+const padChord = pick(padVar, PAD_VOICINGS)
+
+const stemN1_pad = strip(bus(stack(
+  padChord.s("sawtooth").superimpose(x => x.add(note(0.14))).gain(0.2),
+  padChord.s("triangle").gain(0.25)
+).attack(0.8).sustain(0.8).release(1.8).pan(sine.slow(5).range(0.3, 0.7))
+  .mul(gain(padSwell.fmap(c => w => 1 - 0.75 * c * w).appLeft(sine.slow(2)))), 2, pad.space, 0.15), {
+  lpf: expRange(pad.bright, 300, 5000),
+  level: pad.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 2 DEEP CHORDS — deep-house minor-9 / maj-7 stabs, rootless (the bass has the root), a soft FM e-piano tone
+// ============================================================
+// FM sine with ratio 1 and low index = a mellow, Rhodes-like bark; a triangle underneath for warmth. Dry at space 0.
+// @ctl 2:2.k1 Brightness | warm and muffled ↔ bright, barking (lpf 600–8000 Hz).
+// @ctl 2:2.k2 Space | dry ↔ the dotted-8th echoes repeat far into the room.
+// @ctl 2:2.k3 Rhythm | long ringing chords ↔ short, choppy stabs.
+// @ctl 2:2.fader Level | chord stabs on the chapter's chords.
+// @ctl 2:2.b1 Change | next of 8 deep-house rhythms.
+// @ctl 2:2.b2 Stab | a chord on every off-beat while held.
+const keys      = colJonas(2)
+const keysVar   = change(keys.btn, 'jonas', 'Akkorde')
+const keysLen   = keys.char.fmap(c => 1.2 * Math.pow(0.1, c))   // decay seconds: 1.2 ↔ 0.12
+// Rootless voicing: 3rd, 5th, 7th, 9th (Dm9 = F A C E)
+const keysChord = chordOn([2, 4, 6, 8]).scale(scaleIn(3))
+const KEYS_RHYTHMS = ["~ ~ ~ x ~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ ~", "x ~ ~ x ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~", "~ ~ x ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ x ~",
+  "x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~", "~ ~ ~ x ~ ~ ~ x ~ ~ ~ ~ ~ ~ x ~", "<[x ~ ~ x ~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ x ~ ~]>",
+  "~ x ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ x ~ ~", "x ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ x ~ ~ ~"]
+const KEYS_PATS = KEYS_RHYTHMS.map(r => keysChord.struct(r))
+const keysSound = pat => stack(
+  pat.s("sine").fm(0.7).fmh(1).gain(0.32),
+  pat.s("triangle").gain(0.14)
+).attack(0.005).decay(keysLen).sustain(0.05).release(keysLen.mul(0.6)).shape(0.1).pan(0.45)
+
+const stemN2_keys = strip(bus(stack(
+  keysSound(pick(keysVar, KEYS_PATS)).delay(0.4),
+  gate(held(keys.btn2), keysSound(keysChord.struct("[~ x]*4")).delay(0.3))
+), 2, keys.space), {
+  lpf: expRange(keys.bright, 600, 8000),
+  level: keys.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 3 PLUCK ARP — soft melodic-house pluck on the chord tones (stepwise, no octave leaps), with echo
+// ============================================================
+// Keeps a little room even at space 0.
+// @ctl 2:3.k1 Brightness | soft, woody plucks ↔ clear, sparkling (lpf 900–8000 Hz).
+// @ctl 2:3.k2 Space | a little room ↔ far away (reverb + echo).
+// @ctl 2:3.k3 Range | some notes left out ↔ every 16th, plus passing notes (9th, 6th).
+// @ctl 2:3.fader Level | pluck arp on the chord.
+// @ctl 2:3.b1 Change | next of 8 arp shapes.
+// @ctl 2:3.b2 Octave | one octave up while held.
+const arp      = colJonas(3)
+const arpVar   = change(arp.btn, 'jonas', 'Arp')
+const arpRange = arp.char
+const arpOct   = arp.btn2.fmap(v => v > 0.5 ? 12 : 0)
+// Scale degrees above the root: 0 2 4 6 = seventh chord, 8 = 9th (reached stepwise)
+const ARPS = ["[0 2 4 2]*4", "[0 2 4 6]*4", "[4 2 0 2]*4", "[2 4 6 8 6 4 2 4]*2", "[0 ~ 2 4 ~ 2 4 ~]*2",
+  "{0 2 4 6 4}%16", "[6 4 2 4]*4", "<[0 2 4 6]*4 [2 4 6 8]*4>"].map(p => n(p))
+
+const stemN3_arp = strip(bus(onRoot(pick(arpVar, ARPS)
+  .degradeBy(arpRange.fmap(r => 0.35 * (1 - r)))
+  .sometimesBy(arpRange.mul(0.25), x => x.add(n("<1 5>"))))   // passing notes: 9th / 6th
+  .scale(scaleIn(4)).add(note(arpOct))
+  .s("triangle").superimpose(x => x.s("sawtooth").gain(0.3))
+  .attack(0.003).decay(0.16).sustain(0).release(0.1)
+  .gain(perlin.range(0.45, 0.65)).pan(sine.slow(3).range(0.3, 0.7)).delay(0.35),
+  2, arp.space.fmap(s => 0.3 + 0.7 * s)), {
+  lpf: expRange(arp.bright, 900, 8000),
+  level: arp.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 4 LEAD — a slow, breathy line: triangle + quiet saw through an “ooh” vowel, slight vibrato; long notes
+// ============================================================
+// Melodies as scale degrees above the chord root (0 root, 2 third, 4 fifth, 6 seventh, 7 octave), so they always fit.
+// @ctl 2:4.k1 Brightness | soft and hushed ↔ open, clear voice (lpf 600–5000 Hz).
+// @ctl 2:4.k2 Space | a little room ↔ far away (reverb + echo).
+// @ctl 2:4.k3 Glide | plain notes ↔ notes bend gently into their pitch (at most a semitone).
+// @ctl 2:4.fader Level | slow lead on the chord.
+// @ctl 2:4.b1 Change | next of 8 melodies.
+// @ctl 2:4.b2 Echo throw | long echo on the lead while held.
+const lead      = colJonas(4)
+const leadVar   = change(lead.btn, 'jonas', 'Lead')
+const leadGlide = lead.char
+const LEADS = ["4 _ _ _ ~ ~ 2 _ 0 _ _ _ ~ ~ ~ ~", "~ ~ 7 _ _ _ 6 _ 4 _ _ _ ~ ~ ~ ~", "0 _ _ 2 _ _ 4 _ _ _ _ _ ~ ~ ~ ~",
+  "<[4 _ _ _ 5 _ 4 _ 2 _ _ _ ~ ~ ~ ~] [~ ~ ~ ~ ~ ~ ~ ~ 0 _ _ _ _ _ ~ ~]>", "~ ~ ~ ~ 2 _ _ _ 4 _ _ _ 6 _ _ _",
+  "7 _ _ _ _ _ ~ ~ 4 _ _ _ _ _ ~ ~", "~ ~ 4 _ 2 _ 0 _ _ _ _ _ ~ ~ ~ ~", "<[0 _ 2 _ 4 _ _ _ _ _ _ _ ~ ~ ~ ~] [~ ~ ~ ~ 6 _ _ _ 4 _ _ _ _ _ ~ ~]>"]
+  .map(p => n(p))
+const throwEcho = (pat, button) => pat.fmap(v => b => b > 0.5 ? { ...v, delay: 0.85 } : v).appLeft(button)
+const leadNotes = onRoot(pick(leadVar, LEADS)).scale(scaleIn(4))
+
+const stemN4_lead = strip(throwEcho(bus(stack(
+  leadNotes.s("triangle").gain(0.35),
+  leadNotes.s("sawtooth").vowel("o").gain(0.1)
+).attack(0.08).decay(0.3).sustain(0.7).release(0.4)
+  .vib(4.5).vibmod(0.07)
+  .penv(leadGlide.fmap(g => -g)).pattack(0.12)
+  .delay(0.3), 2, lead.space.fmap(s => 0.25 + 0.75 * s)), lead.btn2), {
+  lpf: expRange(lead.bright, 600, 5000),
+  level: lead.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 5 MARIMBA — the answer: a short wooden phrase at the end of every second bar, bouncing left and right
+// ============================================================
+// Marimba = a short sine + a quiet partial two octaves up (the bright “tok” of the bar).
+// @ctl 2:5.k1 Brightness | soft, woody ↔ clear and bright (lpf 1.2–9 kHz).
+// @ctl 2:5.k2 Space | some room and echo ↔ far away.
+// @ctl 2:5.k3 Voices | 0 = one voice, 0.5 = + a third above, 1 = + a fifth: three-part marimba.
+// @ctl 2:5.fader Level | marimba phrase, every second bar.
+// @ctl 2:5.b1 Change | next of 8 phrase rhythms (new notes too).
+// @ctl 2:5.b2 Answer | the phrase plays in every bar while held.
+const ans       = colJonas(5)
+const ansVar    = change(ans.btn, 'jonas', 'Marimba')
+const ansVoices = ans.char
+const ANS_RHYTHMS = ["~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ x ~ x ~", "~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ x ~ ~ x ~", "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x x x ~",
+  "~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ x ~ x ~ x", "~ ~ ~ ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~", "~ ~ ~ ~ ~ ~ ~ ~ x ~ x ~ ~ ~ ~ ~",
+  "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x x ~ x ~ ~", "~ ~ ~ ~ x ~ ~ ~ ~ ~ x ~ ~ ~ x x"]
+// Every second bar normally, every bar while button 2 is held
+const ansEvery2 = pick(ansVar, ANS_RHYTHMS.map(r => pure(1).struct(r).mask("<0 1>")))
+const ansEvery  = pick(ansVar, ANS_RHYTHMS.map(r => pure(1).struct(r)))
+const ansRhythm = held(ans.btn2).fmap(b => b ? ansEvery : ansEvery2).innerJoin()
+// Notes: random chord tones (root, 3rd, 5th, 7th, octave), new ones per change
+const ANS_TONES = [0, 2, 4, 6, 7]
+const ansNotes = n(reseed(ansVar, irand(5).segment(16).fmap(i => ANS_TONES[i])))
+const ansVoice = (deg, g) => {
+  const notes = onRoot(ansRhythm.fmap(() => v => v).appLeft(ansNotes).add(n(deg))).scale(scaleIn(4))
+  return stack(notes.s("sine").gain(g), notes.add(note(24)).s("sine").gain(g * 0.15))
+    .attack(0.002).decay(0.22).sustain(0).release(0.1)
+}
+
+const stemN5_ans = strip(bus(stack(
+  ansVoice(0, 0.6),
+  gate(above(ansVoices, 0), ansVoice(2, 0.5).mul(gain(ramp(ansVoices, 0, 0.5)))),
+  gate(above(ansVoices, 0.5), ansVoice(4, 0.42).mul(gain(ramp(ansVoices, 0.5, 1))))
+).pan("[0.3 0.7]*8").delay(0.45), 2, ans.space.fmap(s => 0.35 + 0.65 * s)), {
+  lpf: expRange(ans.bright, 1200, 9000),
+  level: ans.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 6 GLOCKENSPIEL — a real glockenspiel (General MIDI soundfont) on chord tones, high up, struck as by hand:
+// loose velocities, a few notes per bar, each bar ringing out; long echoes
+// ============================================================
+// @ctl 2:6.k1 Brightness | soft glow ↔ ringing, bright (lpf 3–16 kHz).
+// @ctl 2:6.k2 Space | dry ↔ far away (reverb + echo).
+// @ctl 2:6.k3 Density | a few notes per bar ↔ a busy pattern (~60 % of the 16ths).
+// @ctl 2:6.fader Level | glockenspiel on the chord.
+// @ctl 2:6.b1 Change | next of 8 random patterns.
+// @ctl 2:6.b2 Run | runs up and down the chord, denser and louder the longer it is held (full after 2 bars).
+const bells    = colJonas(6)
+const bellVar  = change(bells.btn, 'jonas', 'Glocken')
+const bellKeep = bells.char.fmap(d => 0.1 + 0.5 * d)   // share of 16ths
+const bellRise = heldRamp(bells.btn2, 2)                // 0 → 1 over 2 bars while held
+const BELL_TONES = [0, 2, 4, 6, 7, 9, 11]
+const bellNote = steps => n(irand(7).segment(steps).fmap(i => BELL_TONES[i]))
+// Every bar keeps ringing after the next is struck (a metal bar, no damper)
+const glock = pat => pat.s("gm_glockenspiel").release(1.2)
+// A player's sweep: up and down the chord tones in 32nds, two octaves (scale degrees above the root)
+const BELL_RUN = n("[0 2 4 6 7 9 11 13 14 13 11 9 7 6 4 2]*2")
+
+const stemN6_bells = strip(bus(onRoot(stack(
+  reseed(bellVar, glock(bellNote(16)
+    .degradeBy(bellKeep.fmap(k => 1 - k)))
+    .gain(rand.range(0.45, 0.85))
+    .pan(rand.range(0.25, 0.75))
+    .delay(0.5)),
+  // Run: starts as a few scattered notes of the sweep and fills in over 2 bars (15 % → 90 % of the 32nds), getting
+  // louder; random velocities keep it played, not ticking. Released = gone.
+  gate(held(bells.btn2), glock(BELL_RUN.degradeBy(bellRise.fmap(r => 0.85 - 0.75 * r)))
+    .gain(bellRise.fmap(r => v => (0.35 + 0.55 * r) * v).appLeft(rand.range(0.7, 1)))
+    .pan(sine.fast(2).range(0.3, 0.7)).delay(0.4))
+)).scale(scaleIn(5)), 2, bells.space), {
+  lpf: expRange(bells.bright, 3000, 16000),
+  level: bells.level.range(0, 1),
+})
+
+// ============================================================
+// JONAS 7 BIRDS — the sunrise: short sine chirps on chord tones high up, each a quick pitch sweep (no samples)
+// ============================================================
+// Each chirp starts up to 10 semitones off its note and sweeps onto it within ~50 ms: “tsiu” down or “tuii” up.
+// @ctl 2:7.k1 Brightness | far, muffled birds ↔ close and clear (lpf 2–14 kHz).
+// @ctl 2:7.k2 Space | a little room ↔ far away across the field (reverb + echo).
+// @ctl 2:7.k3 Amount | a few calls ↔ a busy dawn chorus, an octave higher too.
+// @ctl 2:7.fader Level | bird chirps on the chord.
+// @ctl 2:7.b1 Change | next of 8 call rhythms (new notes too).
+// @ctl 2:7.b2 Flock | a whole flock calls while held.
+const birds   = colJonas(7)
+const birdVar = change(birds.btn, 'jonas', 'Vögel')
+const birdAmt = birds.char
+const BIRD_RHYTHMS = ["~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [x x] ~ ~ ~ ~ ~", "~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ ~", "~ ~ ~ ~ ~ ~ [x x x] ~ ~ ~ ~ ~ ~ ~ ~ ~",
+  "<[~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [x x] ~ x ~] ~>", "~ [x x] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~", "~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ x ~",
+  "<~ [~ ~ ~ ~ ~ ~ ~ ~ [x x x x] ~ ~ ~ ~ ~ ~ ~]>", "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [x x] x"]
+const BIRD_TONES = [0, 2, 4, 7]
+const birdNotes  = n(reseed(birdVar, irand(4).segment(32).fmap(i => BIRD_TONES[i])))
+const chirp = (pat, octave, g) => onRoot(pat).scale(scaleIn(octave))
+  .s("sine").penv(rand.range(-8, 10)).pdecay(0.05)
+  .attack(0.003).decay(rand.range(0.05, 0.1)).sustain(0).release(0.03).gain(g)
+const birdMain = pick(birdVar, BIRD_RHYTHMS.map(r => pure(1).struct(r))).fmap(() => v => v).appLeft(birdNotes)
+
+const stemN7_birds = strip(bus(stack(
+  chirp(birdMain, 6, 0.22).pan(rand.range(0.25, 0.75)).delay(0.3),
+  gate(above(birdAmt, 0), chirp(birdNotes.degradeBy(birdAmt.fmap(a => 1 - 0.18 * a)), 7, 0.15)
+    .mul(gain(birdAmt)).pan(rand).delay(0.5)),
+  gate(held(birds.btn2), chirp(birdNotes.degradeBy(0.4), 6, 0.2).pan(rand).delay(0.4))
+), 2, birds.space.fmap(s => 0.3 + 0.7 * s)), {
+  lpf: expRange(birds.bright, 2000, 14000),
+  level: birds.level.range(0, 1),
+})
+
+// Stateful controls (button counters, bar latches, risers) only see a change when they are queried.
+// Gated stems are not queried, so this queries every one of them on every scheduler tick and drops the result:
+// presses still count and chapter/break still switch while faders are down.
+const stateTaps = stack(...taps).filterValues(() => false)
+
+// What the LC view shows for this track: the chapter (now, next) on column 8 button 1, and extra lines at the top
+const lcChapter = () => [CHAPTERS[chapterLatch.now].name, CHAPTERS[chapterLatch.pending].name]
+const lcHead    = () => [['Akkorde', CHAPTERS[chapterLatch.now].chords]]
+
+// LC view of this evaluation: names from the tags in the editor (strudel.cc keeps the text in strudelMirror),
+// buttons from the change() rows (row i = column i + 1), chapter and break on column 8
+if (lcView) {
+  const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 16 / Mode 1)
+  const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
+  const code = globalThis.strudelMirror?.code ?? ''
+  const TAGS = {}
+  for (const m of code.matchAll(/^\/\/ @(?:mode|col|ctl) (\S+) (.*)$/gm)) TAGS[m[1]] = m[2]
+  // Tag prefix of a page: dual file B16 (Jojo) / 16 (Jonas), single file 16 (Mode 1) / 2 (Mode 2)
+  const isSingleFile = /^\/\/ @ctl 2:/m.test(code)
+  const prefix = page => page === 'jojo' ? (isSingleFile ? '16' : 'B16') : (isSingleFile ? '2' : '16')
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])
+  const isGlobal = (page, n) => n === 8 && (alone || page === 'jonas')
+  // Short page title without the players' names: 'Mode 2 — Jonas: Colour (chords + melodies)' → 'Mode 2 — Chords +
+  // melodies', 'Jonas — Colour (chords + melodies)' → 'Chords + melodies'
+  const shortTitle = t => {
+    const m = t.match(/^(.*?) — .*?\((.+?)\)/)
+    if (!m) return t.split(' · ')[0]
+    const what = m[2][0].toUpperCase() + m[2].slice(1)
+    return /^Mode \d/.test(m[1]) ? m[1] + ' — ' + what : what
+  }
+
+  lcView.side = name => !alone && /jojo/i.test(name ?? '') ? 'jojo' : 'jonas'
+  // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page
+  lcView.pageOf = (side, cc) => !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
+  const valueOf = (page, n, row) => {
+    const base = CC_ROW[row] + n
+    const t = lcView.cc[alone ? 'jonas' : page]
+    return alone && page === 'jonas' && n < 8 ? t[base + 48] : t[base] ?? (n === 8 ? t[base + 48] : undefined)
+  }
+  const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+  const choice = (page, n) => {
+    if (isGlobal(page, n)) return pending(...lcChapter())
+    const r = STATUS[page][n - 1]
+    if (!r) return ''
+    const show = i => !r.names ? (i + 1) + ' / ' + r.n : typeof r.names === 'function' ? r.names(i) : r.names[i]
+    return pending(show(r.latch.now), show(r.latch.pending))
+  }
+  const cell = (page, n, row) => {
+    const val = valueOf(page, n, row)
+    const [name, desc] = (TAGS[isGlobal(page, n) ? 'g.' + row : prefix(page) + ':' + n + '.' + row] ?? '').split(' | ')
+    const num = val === undefined ? '–' : Math.round(val * 100)
+    const v = 'style="--v:' + (val ?? 0) + '"'
+    const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
+    if (row === 'fader') return '<div class="cell fader"' + title + '><div class=bar ' + v + '><i></i></div>' +
+      '<b>' + num + '</b><span>' + esc(name) + '</span></div>'
+    if (row === 'b1') return '<div class="cell btn"' + title + '><span>' + esc(name) + '</span><b>' + choice(page, n) + '</b></div>'
+    if (row === 'b2') {
+      const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
+      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
+        : on ? 'gedrückt' : ''
+      return '<div class="cell btn' + (on ? ' on' : '') + '"' + title + '><span>' + esc(name) + '</span><b>' + what + '</b></div>'
+    }
+    return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
+  }
+  lcView.css = [
+    'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+    '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+    '.head{display:flex;gap:2.5vw;align-items:baseline;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:var(--acc)}',
+    '.head .k{opacity:.6;margin-right:.4em}.next{color:var(--acc)}',
+    '.grid{flex:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) auto auto;gap:.8vh .8vw}',
+    '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.g{color:var(--acc)}',
+    '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+    '.cell span{opacity:.7;font-size:.85em;overflow-wrap:anywhere}.cell b{font-variant-numeric:tabular-nums}',
+    '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+    'background:conic-gradient(from -135deg,var(--acc) 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+    '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+    '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+    '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:var(--acc)}',
+    '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start}.btn.on{background:var(--acc);color:#111}',
+    '.btn.on span{opacity:.8}.btn b{font-size:1.05em}',
+  ].join('\n')
+  lcView.draw = () => {
+    const doc = lcView.win.document
+    const root = doc.getElementById('lc')
+    if (!root) return
+    const page = lcView.page
+    doc.documentElement.style.setProperty('--acc', page === 'jojo' ? '#f0a040' : '#50c8e8')
+    const cols = [1, 2, 3, 4, 5, 6, 7, 8]
+    root.innerHTML = '<div class=head><h1>' + esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h1>' +
+      '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
+      lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
+      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
+      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div>' +
+      '<div class=grid>' +
+      cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
+        esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
+      ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div>'
+  }
+  // Another track's status box may be the one on the page now: the link moves into it
+  if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)
+  if (lcView.win && !lcView.win.closed) lcView.win.document.head.innerHTML = '<style>' + lcView.css + '</style>'
+}
+showStatus()
+
+
+// ============================================================
+// MASTER AUDIO MATRIX
+// ============================================================
+stack(
+  stemJ1_kick,
+  stemJ2_noise,
+  stemJ3_sub,
+  stemJ4_bass,
+  stemJ5_clap,
+  stemJ6_hats,
+  stemJ7_perc,
+  stemJ8_shake,
+  stemN1_pad,
+  stemN2_keys,
+  stemN3_arp,
+  stemN4_lead,
+  stemN5_ans,
+  stemN6_bells,
+  stemN7_birds,
+  stateTaps
+)
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
