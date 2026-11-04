@@ -2,6 +2,12 @@ Samples in diesem Dokument konzeptionieren.
     - entweder direkte Samples aus Strudel referenzieren, dann Strudel: <sample> benutzen
     - oder .wav dateien, dann unter beats-basteln-workshop/samples/<track>/<sample>.wav benutzen
 
+## Sample-Ideen passend zum Event-Thema
++ Basteln: Karton+Schere, Papier+Reißen, Papier+Falten, Transparentpapier+Knistern, Feuerzeug, Kerze+Brennen, Kerze+Pusten
++ Wein: Korken ziehen, anstoßen, eingießen, tasting-sounds
++ Stimmung: Menschenmenge+Gesprächen, Menschenmenge+Lachen, Menschenmenge+Jubeln
++ Anfahrt: Berliner S-Bahn, Fahrrad+Klingel, Fahrrad+Rostige Kette, Fahrrad+Quitschende Bremse, Bus+Hydraulik, Bus+Nächster Halt (Dammweg); S-Bahn+Nächster Halt (Plänterwald)
+
 ## Ambient
 + Gesprochen von David Attenborogh: Eine diffuse verwirrende Geschichte über Wale, Meer, Wind, etc vermischt mit unserem Event
 +
