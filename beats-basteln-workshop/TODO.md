@@ -3,17 +3,14 @@
 ### Jonas
 + Sound design für Keys (pro Track)
 + LK + LC gemeinsam testen (Johannes' Testversion)
-+ Lautsprecher, Ständer, Bassfänger bestellen
-+ Raumdesign fixen
++ Raumdesign fixen (Tisch, Bassfänger, Stoffe, gemütliches Licht, Platzierung Geräte (2x LC, LK, Interface, Mac, Bildschirme))
 
 ### Johannes
-+ Tracks finalisieren (Launchcontrols)
++ Tracks finalisieren (2x Launchcontrols (OHNE KEYS!))
 + Lösung für wechsel der Tracks finden (möglichst seamless)
-+ Testversionen aller Tracks (1x Launchcontrol + Launchkeys) --> Auch eine Fallback Lösung
-+ Fallbackversionen aller Tracks (2x Launchcontrol)
 
 ### Zusammen (Asynchron)
-+ 16 Samples auf Pads belegen (pro Track) [in diesem Dokument konzeptionieren](samples.md)
++ 16 Samples auf Pads belegen (pro Track) [in diesem Dokument konzeptionieren](samples.md) (@JOJO, trage gerne bei wenn du magst, ist aber vermutlich leichter für mich zu machen wenn ich das direkt an den Keys testen kann)
 
 ### Zusammen (Donnerstag/Freitag/Spätestens Samstag)?
 + Können alle drei Midicontroller effizient gleichzeitig laufen?

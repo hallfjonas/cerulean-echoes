@@ -21,24 +21,25 @@ Samples in diesem Dokument konzeptionieren.
 +
 
 ## Groove Techno
++ Letzte Wiese
++ Brace
++ Triller Pfeife
++ Jaaaaa Diggha (Phil)
++ Publikum Pfeift
++ Crash
++ Fetter Lang-abklingender Bass
++
++ Card-Shuffle
 +
 +
 +
 +
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
++ Geflüsterter Text kurz
++ Geflüsterter Text lang
++ Rabimmel Rabammel Rabumm?
 
 ## House
++ Gorillaz Melancholy Hill Whistle Melody
 +
 +
 +
@@ -53,5 +54,4 @@ Samples in diesem Dokument konzeptionieren.
 +
 +
 +
-+
-+
++ Rabimmel Rabammel Rabumm?
