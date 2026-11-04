@@ -7,9 +7,11 @@
     "postinstall": "node strudel-sim/patch-core.mjs",
     "compare": "node strudel-sim/compare.mjs",
     "measure": "node strudel-sim/measure.mjs",
-    "layouts": "node lcxl-layout/gen-layout.mjs ../tracks/*/*.strudel ../sounds/*/*.strudel",
+    "layouts": "node lcxl-layout/gen-layout.mjs ../tracks/*/*.strudel ../lab/*/*.strudel",
     "watch": "node lcxl-layout/watch.mjs",
-    "syx": "node lcxl-layout/make-syx.mjs ../tracks/*/*.strudel"
+    "syx": "node lcxl-layout/make-syx.mjs ../tracks/*/*.strudel",
+    "set": "node set/make-set.mjs && node set/check-set.mjs 2",
+    "continuum": "node set/check-continuum.mjs"
   },
   "dependencies": {
     "@strudel/core": "1.2.6",

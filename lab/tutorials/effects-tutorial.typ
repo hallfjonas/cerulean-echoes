@@ -71,7 +71,7 @@
   #v(-0.5em)
   #text(size: 12pt, fill: luma(90))[Was jeder Strudel-Effekt macht, wie er klingt und welche Rolle er in Techno und House spielt]
   #v(-0.3em)
-  #text(size: 9pt, fill: luma(110))[Handbuch zu `sounds/lab/tutorials/effects-tutorial.strudel`]
+  #text(size: 9pt, fill: luma(110))[Handbuch zu `lab/tutorials/effects-tutorial.strudel`]
 ]
 
 #v(0.5em)

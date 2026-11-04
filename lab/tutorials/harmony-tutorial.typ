@@ -80,7 +80,7 @@
   #v(-0.5em)
   #text(size: 12pt, fill: luma(90))[Intervalle, Skalen, Modi, Akkorde und Tonarten hören lernen, für Techno und House]
   #v(-0.3em)
-  #text(size: 9pt, fill: luma(110))[Handbuch zu `sounds/lab/tutorials/harmony-tutorial.strudel`]
+  #text(size: 9pt, fill: luma(110))[Handbuch zu `lab/tutorials/harmony-tutorial.strudel`]
 ]
 
 #v(0.5em)

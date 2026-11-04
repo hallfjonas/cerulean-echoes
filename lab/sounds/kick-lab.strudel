@@ -1,0 +1,217 @@
+// ============================================================
+// KICK LAB: seven kick candidates for the continuum (011), side by side, all tuned to A
+// ============================================================
+// Question behind this board: which kick for which part of the set? Ambient wants a soft attack and some room,
+// house the DRIEST kick of all (short, tight, no tail: the room comes from clap, hats and chords), techno a harder,
+// often driven kick whose tail goes into the rumble. Each column is one candidate with its three most telling knobs.
+// Column 8 is the context: a quiet dry house loop (hats, clap, bass on A), the rhythm and the tempo.
+//
+// Launch Control XL 3 in Custom Mode 16 (channel 16). Columns 1-7: fader = level, knobs = the candidate's three
+// parameters, button 1 = solo (only this one; press again = all), button 2 = the candidate's switch.
+// Column 8: fader = context loop, knob 1 = room for all (to hear dry against wet), button 1 = rhythm, button 2 = tempo.
+// @layout Kick Lab (lab/sounds)
+// @note Seven kick candidates for the continuum, all tuned to A. Pull up one fader at a time, or solo with button 1. Column 8: a quiet house loop as context, room for all, rhythm and tempo.
+// @note House wants the driest kick: listen to 3, 4 and 5 with Room at 0. Then turn Room up and hear how a tail blurs the groove.
+// @note The status box at the bottom right shows every value with units.
+// @guide What to listen for | Click (the first few ms: audible on small speakers), punch (the pitch drop, 20-80 ms), body (the low tail). House: short body, firm click, no reverb. Techno: harder click or drive, shorter body, the space comes from the rumble. Ambient: little click, slow attack, a little room.
+// @guide How to compare | Context fader up (column 8), then one kick at a time for 8 bars. Then solo against each other with button 1. Check on small speakers too: a kick without click disappears there.
+// @guide Why tuned | Kick, rumble, sub and bass sit in the same octave. A kick on A sounds like one instrument with the bass; off-key it makes the low end muddy.
+// @mode 16 Mode 16 — Kick Lab
+// @col 16:1 1 Ambient: soft pulse
+// @col 16:2 2 Ambient: deep 808
+// @col 16:3 3 House: 909 dry
+// @col 16:4 4 House: 909 + body
+// @col 16:5 5 Deep house: 707
+// @col 16:6 6 Techno: 909 driven
+// @col 16:7 7 Techno: sine + FM
+// @col 16:8 8 Context
+
+const clamp01 = x => Math.min(1, Math.max(0, x))
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const lin = (lo, hi) => v => lo + (hi - lo) * v
+const ms  = x => x < 1 ? Math.round(x * 1000) + ' ms' : x.toFixed(2) + ' s'
+const hz  = x => x < 1000 ? Math.round(x) + ' Hz' : (x / 1000).toFixed(1) + ' kHz'
+const num = d => x => x.toFixed(d)
+const st  = x => (x >= 0 ? '+' : '') + x.toFixed(1) + ' HT'
+
+// Candidates: name, knobs [label, start 0..1, map, format] for rows 1-3, the button-2 switch, and the sound.
+// play(k, alt, g) returns the events of one kick: k = mapped knob values, alt = switch on, g = velocity.
+const A1 = 33
+const CANDIDATES = [
+  { name: 'Ambient: weicher Puls', alt: 'Glide',
+    // @ctl 16:1.k1 Softness | 2–30 ms attack: the click fades away, a soft thump.
+    // @ctl 16:1.k2 Length | 0.25–0.9 s: the body.
+    // @ctl 16:1.k3 Tone | 120 Hz–3 kHz low-pass: from felt to a little click.
+    // @ctl 16:1.fader Level | 007's kick: a sine on A1, no sample. Little click, slow attack.
+    // @ctl 16:1.b2 Glide | on: glides up into A (007's soft boom).
+    knobs: [['Weich', 0.6, exp(0.002, 0.03), ms], ['Länge', 0.5, lin(0.25, 0.9), ms], ['Ton', 0.35, exp(120, 3000), hz]],
+    play: ([att, dec, lpf], alt, g) => [{ s: 'sine', note: A1, gain: 0.95 * g, attack: att, decay: dec, sustain: 0, release: 0.1,
+      cutoff: lpf, ...(alt ? { penv: -4, pattack: 0.08 } : { penv: 6, pdecay: 0.05 }) }] },
+  { name: 'Ambient: tiefe 808', alt: 'HPF 40',
+    // @ctl 16:2.k1 Length | 0.2–1.5 s: the 808's long boom.
+    // @ctl 16:2.k2 Tone | 100 Hz–2 kHz low-pass.
+    // @ctl 16:2.k3 Tune | ±5 semitones (the sample's speed).
+    // @ctl 16:2.fader Level | the long 808 kick: a deep, soft boom, hip hop and ambient pop.
+    // @ctl 16:2.b2 HPF 40 | on: high-pass at 40 Hz, tighter and less boomy.
+    knobs: [['Länge', 0.5, exp(0.2, 1.5), ms], ['Ton', 0.4, exp(100, 2000), hz], ['Tune', 0.5, lin(-5, 5), st]],
+    play: ([dec, lpf, tune], alt, g) => [{ s: 'bd', bank: 'RolandTR808', n: 14, gain: 1 * g, decay: dec, sustain: 0, release: 0.05,
+      cutoff: lpf, speed: Math.pow(2, tune / 12), ...(alt ? { hcutoff: 40 } : {}) }] },
+  { name: 'House: 909 trocken', alt: 'HPF 40',
+    // @ctl 16:3.k1 Length | 80–600 ms: house = short (~150–250 ms), the groove breathes between the kicks.
+    // @ctl 16:3.k2 Click | 0–1: an extra short noise click on top.
+    // @ctl 16:3.k3 Tune | ±3 semitones.
+    // @ctl 16:3.fader Level | the classic house kick: 909, dry and short.
+    // @ctl 16:3.b2 HPF 40 | on: high-pass at 40 Hz, tighter.
+    knobs: [['Länge', 0.35, exp(0.08, 0.6), ms], ['Klick', 0.2, lin(0, 1), num(2)], ['Tune', 0.5, lin(-3, 3), st]],
+    play: ([dec, click, tune], alt, g) => [
+      { s: 'bd', bank: 'RolandTR909', n: 0, gain: 0.6 * g, decay: dec, sustain: 0, release: 0.03, speed: Math.pow(2, tune / 12),
+        ...(alt ? { hcutoff: 40 } : {}) },
+      ...(click > 0.01 ? [{ s: 'white', gain: 0.25 * click * g, hcutoff: 3000, attack: 0.001, decay: 0.012, sustain: 0 }] : [])] },
+  { name: 'House: 909 + Sinus-Körper', alt: 'Sättigung',
+    // @ctl 16:4.k1 Body | 0–1: a sine on A1 under the 909 (the 909's click and punch, a tuned, round body).
+    // @ctl 16:4.k2 Body length | 0.12–0.6 s.
+    // @ctl 16:4.k3 909 | 0–1: how much of the 909 on top.
+    // @ctl 16:4.fader Level | modern house: layered kick, tuned body, still dry.
+    // @ctl 16:4.b2 Saturation | on: a little drive, rounder and louder.
+    knobs: [['Körper', 0.5, lin(0, 1), num(2)], ['K-Länge', 0.35, exp(0.12, 0.6), ms], ['909', 0.7, lin(0, 1), num(2)]],
+    play: ([body, dec, top], alt, g) => [
+      { s: 'sine', note: A1, gain: 0.8 * body * g, decay: dec, sustain: 0, release: 0.03, penv: 18, pdecay: 0.035, ...(alt ? { shape: 0.35 } : {}) },
+      { s: 'bd', bank: 'RolandTR909', n: 0, gain: 0.6 * top * g, decay: Math.min(dec, 0.25), sustain: 0, release: 0.03, ...(alt ? { shape: 0.35 } : {}) }] },
+  { name: 'Deep House: 707 rund', alt: 'LinnDrum',
+    // @ctl 16:5.k1 Length | 80–500 ms.
+    // @ctl 16:5.k2 Warmth | 0–0.6: soft saturation, a rounder, fuller kick.
+    // @ctl 16:5.k3 Tone | 300 Hz–12 kHz low-pass: darker = deeper, more classy.
+    // @ctl 16:5.fader Level | the rounder, older kick of deep house (TR-707).
+    // @ctl 16:5.b2 LinnDrum | on: LinnDrum instead, tighter, 80s.
+    knobs: [['Länge', 0.4, exp(0.08, 0.5), ms], ['Wärme', 0.3, lin(0, 0.6), num(2)], ['Ton', 0.6, exp(300, 12000), hz]],
+    play: ([dec, warm, lpf], alt, g) => [{ s: 'bd', bank: alt ? 'LinnDrum' : 'RolandTR707', n: 0, gain: (alt ? 0.9 : 0.82) * g,
+      decay: dec, sustain: 0, release: 0.03, shape: warm, cutoff: lpf }] },
+  { name: 'Techno: 909 verzerrt', alt: 'hart',
+    // @ctl 16:6.k1 Drive | 0–0.9: from warm to hard (hard techno kicks are heavily driven).
+    // @ctl 16:6.k2 Length | 80–400 ms.
+    // @ctl 16:6.k3 Tone | 300 Hz–10 kHz low-pass after the drive.
+    // @ctl 16:6.fader Level | the 909 kick with drive: Berlin techno.
+    // @ctl 16:6.b2 Hard | on: a bigger pitch drop on top, more punch.
+    knobs: [['Drive', 0.4, lin(0, 0.9), num(2)], ['Länge', 0.4, exp(0.08, 0.4), ms], ['Ton', 0.7, exp(300, 10000), hz]],
+    play: ([drive, dec, lpf], alt, g) => [{ s: 'bd', bank: 'RolandTR909', n: 2, gain: 0.51 * g * (1 - 0.4 * drive), decay: dec,
+      sustain: 0, release: 0.03, shape: drive, cutoff: lpf, ...(alt ? { penv: 7, pdecay: 0.03 } : {}) }] },
+  { name: 'Techno: Sinus + FM', alt: '909-Klick',
+    // @ctl 16:7.k1 Punch | 12–36 semitones pitch drop: from round to a hard “zap”.
+    // @ctl 16:7.k2 Length | 0.15–0.5 s.
+    // @ctl 16:7.k3 FM | 0–3: overtones on the attack, a darker, metallic thud.
+    // @ctl 16:7.fader Level | 008's kick: a synthesized sine on A1, hard and short.
+    // @ctl 16:7.b2 909 click | on: a little 909 on top for the click.
+    knobs: [['Punch', 0.5, lin(12, 36), st], ['Länge', 0.4, exp(0.15, 0.5), ms], ['FM', 0.2, lin(0, 3), num(1)]],
+    play: ([pe, dec, fm], alt, g) => [
+      { s: 'sine', note: A1, gain: 0.8 * g, attack: 0.001, decay: dec, sustain: 0, release: 0.04, penv: pe, pdecay: 0.03, fmi: fm, fmh: 1, fmdecay: 0.03, fmsustain: 0 },
+      ...(alt ? [{ s: 'bd', bank: 'RolandTR909', n: 0, gain: 0.35 * g, decay: 0.08, sustain: 0 }] : [])] },
+]
+// @ctl 16:1.b1 Solo | only this kick; press again = all.
+// @ctl 16:2.b1 Solo | only this kick; press again = all.
+// @ctl 16:3.b1 Solo | only this kick; press again = all.
+// @ctl 16:4.b1 Solo | only this kick; press again = all.
+// @ctl 16:5.b1 Solo | only this kick; press again = all.
+// @ctl 16:6.b1 Solo | only this kick; press again = all.
+// @ctl 16:7.b1 Solo | only this kick; press again = all.
+// @ctl 16:8.k1 Room | 0 = all kicks dry (the house way) ↔ every kick in a room: hear what a tail does to the groove.
+// @ctl 16:8.fader Context | a quiet dry house loop: off-beat hat, clap on 2 and 4, bass on A.
+// @ctl 16:8.b1 Rhythm | 4/4 → half time → 4/4 + pickup.
+// @ctl 16:8.b2 Tempo | 120 → 124 → 128 → 140 BPM.
+const RHYTHMS = [['4/4', 'x...x...x...x...'], ['Halftime', 'x.......x.......'], ['4/4 + Auftakt', 'x...x...x...x..o']]
+const TEMPOS = [120, 124, 128, 140]
+
+// All state on globalThis: re-evaluating keeps knobs and buttons
+const S = globalThis.kickLab ??= { val: {}, solo: -1, alt: CANDIDATES.map(() => false), rhythm: 0, tempo: 2 }
+CANDIDATES.forEach((c, i) => {
+  S.val[5 + i] ??= i === 2 ? 0.8 : 0                            // fader: only the dry 909 is up at the start
+  c.knobs.forEach(([, start], r) => { S.val[13 + 8 * r + i] ??= start })
+})
+S.val[12] ??= 0.5; S.val[20] ??= 0
+const knobVals = i => CANDIDATES[i].knobs.map(([, , map], r) => map(S.val[13 + 8 * r + i]))
+const bpm = () => TEMPOS[S.tempo]
+
+// MIDI (browser only): the endless encoders are told where the knobs start, buttons are read straight from the port
+const hasPage = typeof document !== 'undefined'
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== 'kick-lab') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = 'kick-lab'
+  }
+}
+let statusBox = hasPage ? document.getElementById('board-status') : null
+if (hasPage && !statusBox) {
+  statusBox = document.createElement('pre')
+  statusBox.id = 'board-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);color:#eee;font:13px/1.5 monospace;border-radius:6px;pointer-events:none'
+  document.body.appendChild(statusBox)
+}
+const showStatus = () => {
+  if (!statusBox) return
+  statusBox.textContent = [
+    'Rhythmus ' + RHYTHMS[S.rhythm][0] + ' · ' + bpm() + ' BPM · Kontext ' + Math.round(S.val[12] * 100) + ' · Raum ' + Math.round(S.val[20] * 100),
+    ...CANDIDATES.map((c, i) => (i + 1) + (S.solo === i ? ' SOLO ' : S.solo >= 0 ? '  --  ' : '      ') + c.name.padEnd(26) +
+      ('Pegel ' + Math.round(S.val[5 + i] * 100)).padEnd(10) +
+      c.knobs.map(([label, , , fmt], r) => (label + ' ' + fmt(knobVals(i)[r])).padEnd(18)).join('') + (S.alt[i] ? c.alt : '')),
+  ].join('\n')
+}
+const onMidi = e => {
+  const [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if (cc >= 5 && cc <= 36) S.val[cc] = value / 127
+  else if (value === 0) return
+  else if (cc >= 37 && cc <= 43) S.solo = S.solo === cc - 37 ? -1 : cc - 37
+  else if (cc >= 45 && cc <= 51) S.alt[cc - 45] = !S.alt[cc - 45]
+  else if (cc === 44) S.rhythm = (S.rhythm + 1) % RHYTHMS.length
+  else if (cc === 52) S.tempo = (S.tempo + 1) % TEMPOS.length
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// A pattern of 16 steps per bar, each step asks fn(step, bar) for its events (state read at that moment)
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  for (let k = Math.ceil(b0 * 16 - 1e-9); k < e0 * 16 - 1e-9; k++)
+    for (const v of fn(((k % 16) + 16) % 16, Math.floor(k / 16)) ?? [])
+      out.push(new Hap(new TimeSpan(k / 16, (k + 4) / 16), new TimeSpan(k / 16, Math.min((k + 4) / 16, e0)), v, {}))
+  return out
+})
+const room = () => S.val[20]
+
+const kicks = grid(step => {
+  const c = RHYTHMS[S.rhythm][1][step]
+  if (c === '.') return
+  const g = c === 'o' ? 0.45 : 1
+  return CANDIDATES.flatMap((cand, i) => {
+    const level = S.val[5 + i]
+    if (level <= 0 || (S.solo >= 0 && S.solo !== i)) return []
+    return cand.play(knobVals(i), S.alt[i], g).map(v => ({ ...v, postgain: level, orbit: 1, room: 0.8 * room(), roomsize: 2.5 }))
+  })
+})
+// Context: a dry house loop, quiet (off-beat 909 hat, clap on 2 and 4, a short bass on A on the off-beats)
+const context = grid(step => {
+  const l = S.val[12]
+  if (l <= 0) return
+  const out = []
+  if (step % 4 === 2) out.push({ s: 'oh', bank: 'RolandTR909', gain: 0.3, decay: 0.12, sustain: 0, postgain: l })
+  if (step === 4 || step === 12) out.push({ s: 'cp', bank: 'RolandTR909', gain: 0.45, postgain: l })
+  if (step % 4 === 2) out.push({ s: 'triangle', note: 45, gain: 0.3, decay: 0.15, sustain: 0.2, release: 0.05, cutoff: 900, postgain: l })
+  return out
+})
+const tempoStem = pure(0).segment(8).fmap(() => ({ cps: bpm() / 240 })).onTrigger(() => {}, true)
+setcps(bpm() / 240)
+
+stack(
+  stack(kicks, context).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0),
+  tempoStem
+)

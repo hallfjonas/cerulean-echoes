@@ -1,0 +1,212 @@
+// ============================================================
+// RUMBLE LAB: seven candidates for Jojo's column 2 (rumble / breath) in the continuum (011), all on A
+// ============================================================
+// Question behind this board: what glues the kick to the low end, from ambient to techno? Five tonal rumbles that
+// play on chosen 16ths of every beat (column 8, button 1: 3+4 → 2+4 → 3 → 4, as in 008) and two noises that breathe
+// (house pump, ambient sea). A reference kick on column 8 shows how each one sits between the kicks.
+//
+// Launch Control XL 3 in Custom Mode 16 (channel 16). Columns 1-7: fader = level, knobs = the candidate's three
+// parameters, button 1 = solo (press again = all), button 2 = the candidate's switch.
+// Column 8: fader = reference kick (dry 909, four on the floor), button 1 = which 16ths, button 2 = tempo.
+// @layout Rumble Lab (lab/stems)
+// @note Seven rumble candidates for the continuum, all on A. Pull up the reference kick (column 8), then one rumble at a time; solo with button 1.
+// @note Column 8, button 1 chooses the 16ths of every beat the tonal rumbles (1-5) play on: 3+4, 2+4, 3 or 4. The noises (6, 7) breathe on their own.
+// @note The status box at the bottom right shows every value with units.
+// @guide What a rumble is | A low sound between the kicks, on the same pitch, so kick and rumble feel like one long, rolling instrument. In techno it is often the kick's own reverb, low-passed; in house a noise that swells after every kick (like a sidechain); in ambient the sea.
+// @guide Which 16ths | 3+4 = the rolling standard (008). 2+4 = more motion, almost a gallop. 3 = only the off-beat 16th, sparse and bouncy. 4 = only the last 16th, pulls into the next kick.
+// @guide What to listen for | Does it still sound like one low end with the kick and the bass, or like a second, muddy layer? Low-pass low and short = tight; more reverb = a dark cloud. Check at the volume you play at: rumble below the kick.
+// @mode 16 Mode 16 — Rumble Lab
+// @col 16:1 1 Reverb rumble (008)
+// @col 16:2 2 Dry sine hits
+// @col 16:3 3 Driven cloud
+// @col 16:4 4 Delay rumble
+// @col 16:5 5 Rolling saw
+// @col 16:6 6 Noise pump (house)
+// @col 16:7 7 Sea (ambient)
+// @col 16:8 8 Reference + pattern
+
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const lin = (lo, hi) => v => lo + (hi - lo) * v
+const ms  = x => x < 1 ? Math.round(x * 1000) + ' ms' : x.toFixed(2) + ' s'
+const hz  = x => x < 1000 ? Math.round(x) + ' Hz' : (x / 1000).toFixed(1) + ' kHz'
+const num = d => x => x.toFixed(d)
+const hash = (k, salt = 0) => { const x = Math.sin(k * 12.9898 + salt * 78.233) * 43758.5453; return x - Math.floor(x) }
+
+const A1 = 33
+const POSITIONS = [['3+4', [2, 3]], ['2+4', [1, 3]], ['3', [2]], ['4', [3]]]   // 16ths within a beat (0 = the kick)
+const TEMPOS = [120, 128, 140]
+const beatSec = () => 60 / TEMPOS[S.tempo]
+
+// Candidates: tonal = plays on the chosen 16ths; noise ones get every 16th and decide themselves.
+// play(k, alt, ctx) → events; ctx = { step, bar, k (16th count), first (the first chosen 16th of the beat) }
+const CANDIDATES = [
+  { name: 'Hall-Rumble (008)', alt: '16tel-Echo', tonal: true,
+    // @ctl 16:1.k1 Brightness | 150 Hz–1.8 kHz low-pass: warm rumble ↔ more of the kick's body.
+    // @ctl 16:1.k2 Reverb | 0.4–1: short ↔ a long dark cloud (the reverb is the sound).
+    // @ctl 16:1.k3 Length | 0.15–0.6 s per hit.
+    // @ctl 16:1.fader Level | 008's rumble: a sine kick on A1 + a little 909, low-passed into a big reverb.
+    // @ctl 16:1.b2 16th echo | on: the hits echo in 16ths (more rolling).
+    knobs: [['LPF', 0.4, exp(150, 1800), hz], ['Hall', 0.5, lin(0.4, 1), num(2)], ['Länge', 0.4, exp(0.15, 0.6), ms]],
+    play: ([lpf, room, dec], alt) => [
+      { s: 'sine', note: A1, penv: 12, pdecay: 0.05, decay: dec, sustain: 0, gain: 0.5, cutoff: lpf, room, roomsize: 4, orbit: 3,
+        ...(alt ? { delay: 0.4, delaytime: beatSec() / 4, delayfeedback: 0.4 } : {}) },
+      { s: 'bd', bank: 'RolandTR909', gain: 0.2, cutoff: lpf, room, roomsize: 4, orbit: 3 }] },
+  { name: 'Trockene Sinus-Stöße', alt: 'Oktave', tonal: true,
+    // @ctl 16:2.k1 Length | 50–300 ms: short = a tight bounce, long = almost a bassline.
+    // @ctl 16:2.k2 Tone | 0–1: a triangle on top, audible on small speakers.
+    // @ctl 16:2.k3 Punch | 0–12 semitones pitch drop per hit.
+    // @ctl 16:2.fader Level | short sine hits on A1, no reverb: the tightest rumble.
+    // @ctl 16:2.b2 Octave | on: one octave up (A2).
+    knobs: [['Länge', 0.4, exp(0.05, 0.3), ms], ['Ton', 0.3, lin(0, 1), num(2)], ['Punch', 0.3, lin(0, 12), x => x.toFixed(0) + ' HT']],
+    play: ([dec, tone, pe], alt) => {
+      const note = A1 + (alt ? 12 : 0), env = { decay: dec, sustain: 0, release: 0.03, penv: pe, pdecay: 0.03 }
+      return [{ s: 'sine', note, gain: 0.55, ...env }, ...(tone > 0.01 ? [{ s: 'triangle', note, gain: 0.25 * tone, ...env }] : [])]
+    } },
+  { name: 'Verzerrte Wolke (Berlin)', alt: 'Crush', tonal: true,
+    // @ctl 16:3.k1 Drive | 0–0.9: from warm to gritty.
+    // @ctl 16:3.k2 Brightness | 100 Hz–1 kHz low-pass after the drive.
+    // @ctl 16:3.k3 Reverb | 0.3–1.
+    // @ctl 16:3.fader Level | the reverb rumble, driven: a dark, grainy cloud (Berlin techno).
+    // @ctl 16:3.b2 Crush | on: bit reduction, rougher still.
+    knobs: [['Drive', 0.5, lin(0, 0.9), num(2)], ['LPF', 0.4, exp(100, 1000), hz], ['Hall', 0.6, lin(0.3, 1), num(2)]],
+    play: ([drive, lpf, room], alt) => [
+      { s: 'bd', bank: 'RolandTR909', n: 2, gain: 0.4 * (1 - 0.4 * drive), shape: drive, cutoff: lpf, room, roomsize: 4, orbit: 3, ...(alt ? { crush: 6 } : {}) },
+      { s: 'sine', note: A1, gain: 0.35, decay: 0.25, sustain: 0, penv: 10, pdecay: 0.04, shape: drive, cutoff: lpf, room, roomsize: 4, orbit: 3 }] },
+  { name: 'Delay-Rumble', alt: 'Stereo', tonal: true, firstOnly: true,
+    // @ctl 16:4.k1 Feedback | 0.2–0.75: how many echoes roll after each hit.
+    // @ctl 16:4.k2 Brightness | 120 Hz–1.2 kHz low-pass.
+    // @ctl 16:4.k3 Echo time | a 16th ↔ a dotted 8th.
+    // @ctl 16:4.fader Level | one hit per beat (the first chosen 16th) that echoes on: rolls by itself.
+    // @ctl 16:4.b2 Stereo | on: the hits move left and right.
+    knobs: [['Feedb.', 0.4, lin(0.2, 0.75), num(2)], ['LPF', 0.4, exp(120, 1200), hz], ['Echo', 0, lin(0.25, 0.75), x => x.toFixed(2) + ' Schl.']],
+    play: ([fb, lpf, time], alt, ctx) => [{ s: 'sine', note: A1, gain: 0.5, decay: 0.15, sustain: 0, penv: 8, pdecay: 0.04, cutoff: lpf,
+      delay: 0.7, delaytime: time * beatSec(), delayfeedback: fb, orbit: 4, ...(alt ? { pan: ctx.step < 8 ? 0.25 : 0.75 } : {}) }] },
+  { name: 'Rollender Saw-Bass', alt: 'Resonanz', tonal: true,
+    // @ctl 16:5.k1 Brightness | 100 Hz–1.2 kHz low-pass.
+    // @ctl 16:5.k2 Envelope | 0–4: the filter snaps open on every hit (a “dow”).
+    // @ctl 16:5.k3 Length | 60–300 ms.
+    // @ctl 16:5.fader Level | a saw on A1 through a filter: the rolling bass-rumble of techno.
+    // @ctl 16:5.b2 Resonance | on: a resonant filter, close to acid.
+    knobs: [['LPF', 0.3, exp(100, 1200), hz], ['Env', 0.5, lin(0, 4), num(1)], ['Länge', 0.4, exp(0.06, 0.3), ms]],
+    play: ([lpf, env, dec], alt) => [{ s: 'sawtooth', note: A1, gain: 0.3, decay: dec, sustain: 0, release: 0.03, cutoff: lpf,
+      lpenv: env, lpdecay: 0.08, lpsustain: 0, resonance: alt ? 14 : 4, shape: 0.2 }] },
+  { name: 'Rauschen pumpt (House)', alt: 'Offbeat-Atem',
+    // @ctl 16:6.k1 Pump | 0–1: how deep the noise ducks under the kick.
+    // @ctl 16:6.k2 Brightness | 1–12 kHz low-pass.
+    // @ctl 16:6.k3 Low cut | 200 Hz–3 kHz high-pass: thin hiss ↔ full noise.
+    // @ctl 16:6.fader Level | 010's atmo: noise that swells after every kick, like a sidechain.
+    // @ctl 16:6.b2 Off-beat breath | on: the swell peaks on the off-beat instead.
+    knobs: [['Pumpe', 0.8, lin(0, 1), num(2)], ['LPF', 0.5, exp(1000, 12000), hz], ['HPF', 0.4, exp(200, 3000), hz]],
+    play: ([pump, lpf, hpf], alt, ctx) => {
+      const shape = (alt ? [0.3, 0.8, 1, 0.6] : [0, 0.55, 0.85, 1])[ctx.step % 4]
+      return [{ s: 'pink', gain: 1.4 * (1 - pump + pump * shape), attack: 0.05, sustain: 1, release: 0.09, cutoff: lpf, hcutoff: hpf, dur: 1.7, orbit: 2 }]
+    } },
+  { name: 'Meer (Ambient, 007)', alt: 'Wind',
+    // @ctl 16:7.k1 Wave length | short swells ↔ long, slow waves.
+    // @ctl 16:7.k2 Brightness | 300 Hz–6 kHz low-pass: deep roar ↔ hissing surf.
+    // @ctl 16:7.k3 Space | 0–1 reverb.
+    // @ctl 16:7.fader Level | 007's sea: brown-noise waves rolling in, each with its own length.
+    // @ctl 16:7.b2 Wind | on: whistling gusts through a wandering band on top.
+    knobs: [['Welle', 0.5, lin(0.5, 2), x => '×' + x.toFixed(1)], ['LPF', 0.4, exp(300, 6000), hz], ['Raum', 0.3, lin(0, 1), num(2)]],
+    play: ([wl, lpf, room], alt, ctx) => {
+      const out = []
+      if (ctx.step % 8 === 0 && hash(ctx.k, 3) > 0.25) out.push({ s: 'brown', gain: 5, attack: wl * (0.6 + hash(ctx.k, 5)), sustain: 0.8,
+        release: wl * (1.5 + 1.5 * hash(ctx.k, 7)), cutoff: lpf * (0.5 + 0.5 * hash(ctx.k, 9)), pan: 0.2 + 0.6 * hash(ctx.k, 11), room, roomsize: 4, orbit: 2, dur: 8 })
+      if (alt && ctx.step % 2 === 0) out.push({ s: 'pink', gain: 6 + 20 * hash(ctx.k, 13), attack: 0.3, sustain: 0.7, release: 0.8,
+        bandf: 400 + 1800 * (0.5 + 0.5 * Math.sin(ctx.k / 9)), bandq: 3 + 4 * hash(ctx.k, 15), cutoff: lpf, pan: 0.5 + 0.4 * Math.sin(ctx.k / 5), room, roomsize: 4, orbit: 2, dur: 2 })
+      return out
+    } },
+]
+// @ctl 16:1.b1 Solo | only this rumble; press again = all.
+// @ctl 16:2.b1 Solo | only this rumble; press again = all.
+// @ctl 16:3.b1 Solo | only this rumble; press again = all.
+// @ctl 16:4.b1 Solo | only this rumble; press again = all.
+// @ctl 16:5.b1 Solo | only this rumble; press again = all.
+// @ctl 16:6.b1 Solo | only this noise; press again = all.
+// @ctl 16:7.b1 Solo | only the sea; press again = all.
+// @ctl 16:8.fader Reference kick | a dry 909 on every beat, so you hear the rumble between the kicks.
+// @ctl 16:8.b1 16ths | 3+4 → 2+4 → 3 → 4 (tonal rumbles 1-5).
+// @ctl 16:8.b2 Tempo | 120 → 128 → 140 BPM.
+
+const S = globalThis.rumbleLab ??= { val: {}, solo: -1, alt: CANDIDATES.map(() => false), pos: 0, tempo: 2 }
+CANDIDATES.forEach((c, i) => {
+  S.val[5 + i] ??= i === 0 ? 0.7 : 0
+  c.knobs.forEach(([, start], r) => { S.val[13 + 8 * r + i] ??= start })
+})
+S.val[12] ??= 0.7
+const knobVals = i => CANDIDATES[i].knobs.map(([, , map], r) => map(S.val[13 + 8 * r + i]))
+
+const hasPage = typeof document !== 'undefined'
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== 'rumble-lab') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = 'rumble-lab'
+  }
+}
+let statusBox = hasPage ? document.getElementById('board-status') : null
+if (hasPage && !statusBox) {
+  statusBox = document.createElement('pre')
+  statusBox.id = 'board-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);color:#eee;font:13px/1.5 monospace;border-radius:6px;pointer-events:none'
+  document.body.appendChild(statusBox)
+}
+const showStatus = () => {
+  if (!statusBox) return
+  statusBox.textContent = [
+    '16tel ' + POSITIONS[S.pos][0] + ' · ' + TEMPOS[S.tempo] + ' BPM · Referenz-Kick ' + Math.round(S.val[12] * 100),
+    ...CANDIDATES.map((c, i) => (i + 1) + (S.solo === i ? ' SOLO ' : S.solo >= 0 ? '  --  ' : '      ') + c.name.padEnd(26) +
+      ('Pegel ' + Math.round(S.val[5 + i] * 100)).padEnd(10) +
+      c.knobs.map(([label, , , fmt], r) => (label + ' ' + fmt(knobVals(i)[r])).padEnd(18)).join('') + (S.alt[i] ? c.alt : '')),
+  ].join('\n')
+}
+const onMidi = e => {
+  const [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if (cc >= 5 && cc <= 36) S.val[cc] = value / 127
+  else if (value === 0) return
+  else if (cc >= 37 && cc <= 43) S.solo = S.solo === cc - 37 ? -1 : cc - 37
+  else if (cc >= 45 && cc <= 51) S.alt[cc - 45] = !S.alt[cc - 45]
+  else if (cc === 44) S.pos = (S.pos + 1) % POSITIONS.length
+  else if (cc === 52) S.tempo = (S.tempo + 1) % TEMPOS.length
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; each step asks fn for its events; an event may carry dur (in 16ths, default 4)
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  for (let k = Math.ceil(b0 * 16 - 1e-9); k < e0 * 16 - 1e-9; k++)
+    for (const { dur = 4, ...v } of fn(((k % 16) + 16) % 16, Math.floor(k / 16), k) ?? [])
+      out.push(new Hap(new TimeSpan(k / 16, (k + dur) / 16), new TimeSpan(k / 16, Math.min((k + dur) / 16, e0)), v, {}))
+  return out
+})
+
+const rumbles = grid((step, bar, k) => {
+  const chosen = POSITIONS[S.pos][1], inBeat = step % 4
+  return CANDIDATES.flatMap((c, i) => {
+    const level = S.val[5 + i]
+    if (level <= 0 || (S.solo >= 0 && S.solo !== i)) return []
+    if (c.tonal && !(c.firstOnly ? inBeat === chosen[0] : chosen.includes(inBeat))) return []
+    return c.play(knobVals(i), S.alt[i], { step, bar, k }).map(v => ({ orbit: 1, ...v, postgain: level }))
+  })
+})
+const refKick = grid(step => step % 4 === 0 && S.val[12] > 0
+  ? [{ s: 'bd', bank: 'RolandTR909', gain: 0.6, decay: 0.3, sustain: 0, postgain: S.val[12] }] : [])
+const tempoStem = pure(0).segment(8).fmap(() => ({ cps: TEMPOS[S.tempo] / 240 })).onTrigger(() => {}, true)
+setcps(TEMPOS[S.tempo] / 240)
+
+stack(
+  stack(rumbles, refKick).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0),
+  tempoStem
+)

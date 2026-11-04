@@ -1,4 +1,4 @@
-// Launch Control XL 3 layout for sounds/lab/bass-synths-comparison.strudel
+// Launch Control XL 3 layout for lab/sounds/bass-synths-comparison.strudel
 // Compile: typst compile bass-synths-comparison-layout.typ
 
 #set page(paper: "a4", flipped: true, margin: 12mm)

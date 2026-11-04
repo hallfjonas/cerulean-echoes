@@ -7,7 +7,7 @@
 // Kick and tom-bass (also from tutorial.str) can switch density; 12 steps divide by 2, 3, 4 and 6, so every
 // density lands on arp notes: 4 = straight, 3 = floating triplet feel, kick 4 + tom 3 = 3-against-4.
 //
-// @layout Arp Cascade (sounds/parts)
+// @layout Arp Cascade (lab/stems)
 // @note One 12-step dorian arpeggio in ten registers at once, plus kick and tom-bass. All knobs at 0 and all faders up = the original sound from tutorial.str.
 // @note The knobs are set to 0 on load. Button row 1 steps on with every press (re-evaluating starts over). Density: 4 = straight, 3 = floating, 2 = half-time, 6 = driving; kick 4 + tom 3 = 3-against-4 polyrhythm. Each arp column has its own motif, so they can play against each other.
 // @mode 16 Mode 16 — Arp Cascade
