@@ -13,6 +13,7 @@ Talk to the user in German; code comments stay in English. Explain audio basics 
   - `lab/stems/` — building blocks for tracks: versions of one column (sound + rhythm/riff in context), quicker to
     tune, fed into several tracks (e.g. `arp-cascade.strudel`, `house-piano-lab.strudel`)
   - `lab/tutorials/` — ear-training tutorials with live sliders + German handbook PDF (Typst): harmony, effects
+- `docs/references.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
 - `samples/` — audio recordings
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
 - `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness, layout sheets
