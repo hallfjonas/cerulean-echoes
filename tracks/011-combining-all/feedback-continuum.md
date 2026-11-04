@@ -1,0 +1,25 @@
+- rumble sollte eher auf 3 4, 2 4 , 3, 4 und so eingestellt werden können (16.)
+- sub sollte keine töne ändern, ist teil der bass / rumble fraktion
+- perc toms klingen cheap digital 
+- hats zu leise 
+- grund als besfchriftung nicht descriptiv; zb bei hats: 8tel oder bei kick 4/4 etc
+- kick ist keine 4/4, sondern hat einen zweiten schlag; das ist doch mist! 
+- jojo und jonas als namen haben im single track nichts zu suchen: das ist rhythmus und melody oder denk dir was deskriptives aus 
+- wie kann man die bpm verändern? 
+- house chords sollten mehr house piano sein; nutze bitte klasssiche gute samples für die sachen! sollte ikonischere einwürfe haben, nicht nur trembling chord progressions, das ist schnell langweilig
+- glide gefällt mir nicht so als effekt, das ist bisschen verschenkt
+- sollte irgendwo mehr acid optionen geben 
+- voices ist bisschen lost (im house teil zumindest)
+- ambient bells machen vielleicht im house und tehcno teil dann nicht mehr so viel sinn
+- air wardavor im ambient teil viel toller! das muss wieder so werden! 
+- ah, sub und bass sind viel besser im techno part! perc / tom bleibt furchtbar; und eigentlich zu melodisch 
+- beim drop sollten eigentlich die heads nicht aussetzen 
+- pads auf techno komplett lost; da geht nichts so sphärisches
+- chords auf techno auch lost; 
+- arp besser bei tehcno; dafür bei anderen bsischen lost
+- lead bei allen eher lame; vbielleciht bisschen randomness? 
+- voices bei techno eher los und unfassbar leise 
+- bass könnte mehr optionen haben 
+
+- vielleicht macht das doch keinen sinn insgesamt? oder nur für die rhytmusgruppe das kontinuirliche? 
+
