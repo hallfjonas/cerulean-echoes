@@ -7,9 +7,10 @@ Samples in diesem Dokument konzeptionieren.
 + Wein: Korken ziehen, anstoßen, eingießen, tasting-sounds
 + Stimmung: Menschenmenge+Gesprächen, Menschenmenge+Lachen, Menschenmenge+Jubeln
 + Anfahrt: Berliner S-Bahn, Fahrrad+Klingel, Fahrrad+Rostige Kette, Fahrrad+Quitschende Bremse, Bus+Hydraulik, Bus+Nächster Halt (Dammweg); S-Bahn+Nächster Halt (Plänterwald)
++ Musik: Elektromagnetische Störungen, ...?
 
 ## Ambient
-+ Gesprochen von David Attenborogh: Eine diffuse verwirrende Geschichte über Wale, Meer, Wind, etc vermischt mit unserem Event
++
 +
 +
 +
