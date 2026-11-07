@@ -28,7 +28,7 @@ Auftrag: `prompt-naechster-agent.md` (Punkte 1–5). Sprache mit dem Nutzer Deut
    per Spalten-Gain (`GAIN` in makeCols) auf ≈ −19 LUFS, Spitzen ≤ 0,9; Jubel bleibt bei −22 (sehr spitzes Signal).
    Inhalt sonst unverändert.
 4. ☑ Morgen-Übersicht in `stems-ideen.md` (oben) und hier.
-5. ☐ Commit + Push auf `johannes` → danach Phrasen-URLs von raw.githubusercontent.com in Chrome prüfen.
+5. ☑ Commit + Push auf `johannes` (bbe18e2); alle 20 Phrasen laden und dekodieren von raw.githubusercontent.com in Headless-Chrome.
 
 ## Entscheidungen (ohne Rückfrage, naheliegend)
 - Flöte als 6. Spalte dazu: echte, ruhige Aufnahme, schon in A-Moll; VCSL-Flöte (Multisample) war verworfen, die
