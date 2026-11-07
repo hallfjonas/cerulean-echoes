@@ -1,5 +1,20 @@
 # 009 — mögliche Stems für Jonas 2–7 (Entwurf, nicht final)
 
+## ▶ Für morgen früh (Nachtschicht 2026-11-08) — Details: uebergabe-nacht-2026-11-08.md
+Nichts davon gehört; alles in Node / Headless-Chrome geprüft.
+1. **009, Jonas 3 Vibraphon „Ruf-Echo“**: F♯ wird in den Moll-Folgen (alle außer „Am9 D9“) zu F. Anhören: Jonas 1
+   Taste 1 auf eine Moll-Folge (z. B. „Am F G“), Chapter auf Wechsel, Jonas 3 Taste 1 auf „Ruf-Echo“ (Takt 7–8).
+   Set 011 neu gebaut.
+2. **`lab/melodie/melodie-3.strudel`** — echte Bläser-Phrasen für Jonas 4: Spalte 2–4 Trompete A/B/C, 5 Tenorsax,
+   6 Flöte (je 3–5 ruhige Phrasen aus langen Freesound-Improvisationen, nach A transponiert), Spalte 1 Vibraphon zum
+   Vergleich. Fader hoch, Taste 1 = nächste Phrase, Reihe 3 = wie oft (16 / 8 / 4 Takte). Worauf achten: warm und
+   lebendig statt mechanisch? Welche Phrase hält Wiederholung aus? Alle 8 oder alle 4 Takte? Rauschen bei leisen
+   Aufnahmen (bis +14 dB angehoben)? Akkordfolge in Mode 2 Spalte 5 Taste 1 wechseln: Phrasen mit F♯/F weichen
+   in unpassenden Folgen auf die nächste passende aus.
+3. **`lab/einwurf/einwurf-1.strudel`** — technisch ok (alle 26 Samples laden), war aber viel zu laut (bis −13,7 LUFS,
+   drei Spalten übersteuerten) → Spalten auf ≈ −19 LUFS angeglichen. Inhalt unverändert, jetzt zum ersten Mal anhören.
+Danach: Gewinner aus melodie-3 / einwurf-1 per `lab-to-track` in Jonas 4–6; Harmonie im Browser feinschleifen.
+
 Ziel: happy / jazzy House, trocken. Jonas 1 = Keys (fertig, aus dem Keys-Lab). Die übrigen Spalten sollen bunt,
 verspielt und melodisch sein, ohne den Takt zu verändern (Beständigkeit über 8 Takte ist wichtig, siehe feedback.md).
 Vor dem Bauen: Referenz-Tracks anhören (docs/references.md) und nachlesen, welche Rollen dort wirklich vorkommen;

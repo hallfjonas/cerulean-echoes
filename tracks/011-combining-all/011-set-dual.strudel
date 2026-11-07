@@ -2850,6 +2850,10 @@ const vibBusy = p => p.sometimesBy(vibCx.fmap(c => c < 0.75 ? 0 : 0.35 * (c - 0.
 const vibLayered = (core, rest, gaps) => vibBusy(stack(mini(core), vibFrom(0.15, mini(rest)), vibFills(mini(gaps))))
 const VIB_CALL = ['[g5@3 ~ f#5 e5@2 d5@7 ~ d5]', '[c5@2 b4 c5@2 e5@2 d5@5 ~@4]']   // Escravos, bars 7–8
 const vibLower = (bar, k) => bar.replace(/([a-g]#?)(\d)/g, (_, n, o) => n + (+o + k))
+// The call is in A dorian (F♯); in the aeolian progressions (all but Am9 D9) F♯ rubs, so it becomes F there
+const vibModeFix = p => new Pattern(state => p.query(state).map(h => h.withValue(v =>
+  typeof v.note === 'string' && v.note.startsWith('f#') && modeAt(Math.floor((h.whole ?? h.part).begin.valueOf())) === 'aeolian'
+    ? { ...v, note: 'f' + v.note.slice(2) } : v)))
 const vibPhrases = [
   ['Offbeat', vibArp(vibLayered(
     '[~ ~ ~ 1 ~@5 3 ~@6]',
@@ -2859,7 +2863,7 @@ const vibPhrases = [
     '[0 ~ ~ 4 ~ ~ 0 ~@9]',
     '<[~@10 -1 ~ 2 ~@3]!3 [~@10 2 ~ [4 4] ~@3]>',
     '[~ 2 ~ ~ 1 ~ ~ 4 ~ 3 ~ 4 ~ 5 4 ~]').add(vibRootDeg)).scale(vibScale)],
-  ['Ruf-Echo', vibBusy(note(mini('<' + ['~', '~', '~', '~', '~', '~', ...VIB_CALL.map(b => vibLower(b, -2))].join(' ') + '>')))],
+  ['Ruf-Echo', vibBusy(vibModeFix(note(mini('<' + ['~', '~', '~', '~', '~', '~', ...VIB_CALL.map(b => vibLower(b, -2))].join(' ') + '>'))))],
 ].map(([name, p]) => [name, p.s('vibraphone').velocity(perlin.range(0.6, 1)).pan(sine.slow(3).range(0.4, 0.6))
   .clip(vibSoft.fmap(s => 4 * Math.pow(4, s)))])          // Soft: ring ×4 … ×16 of a 16th
 const vibVar = change(vib.btn, 'jonas', 'Vibraphon', vibPhrases.length, vibPhrases.map(p => p[0]))

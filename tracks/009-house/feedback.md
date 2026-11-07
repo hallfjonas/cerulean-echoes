@@ -43,3 +43,7 @@
 - Set 011 neu gebaut (make-set: Track-Funktionen jetzt async, weil 009 Samples mit await lädt). check-set: 009 zeigt
   Abweichungen nur im allerersten Moment (erster Harmonie-Anschlag bei 0 bzw. Keys bei 0.07: Reihenfolge, in der die
   Regler-Zustände beim ersten Abfragen gesetzt werden), sonst identisch.
+
+## 2026-11-08 (Nacht) — Ruf-Echo ohne Reibung
+- Vibraphon (Jonas 3) „Ruf-Echo“: F♯ → F, wenn die Folge aeolisch ist (`vibModeFix`, `modeAt`); Vamp und „Am9 D9“
+  unverändert. Set 011 neu gebaut; check-set unverändert gegenüber vorher (Start-Abweichungen, bei „ride“ in Takt 0–1).

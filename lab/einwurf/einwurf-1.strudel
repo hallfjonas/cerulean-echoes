@@ -110,7 +110,10 @@ const makeCols = h => {
     const v = typeof pool[n] === 'function' ? pool[n](k) : pool[n]
     return { ...v, release: undefined, delay: 0.25 }                       // no release: the sample plays to its end
   }).segment(16).filterValues(v => v !== null)
-  const col = (name, i, range) => ({ name, k3: 'own', k3name: 'Wie oft', b1: 'fire', b1name: 'Jetzt!', fireAt: AT[i],
+  // column gain (2026-11-08, technical check, not heard): measured offline at fader 1 the columns were −13.7 … −19.3 LUFS
+  // (kick of 009 ≈ −14) and three peaked above 1 → each scaled to ≈ −19 LUFS, peaks ≤ 0.9 (crowd stays at −22: peaky)
+  const GAIN = [0.6, 0.56, 0.72, 0.71, 0.54, 0.9, 0.65, 0.71]
+  const col = (name, i, range) => ({ name, gain: GAIN[i], k3: 'own', k3name: 'Wie oft', b1: 'fire', b1name: 'Jetzt!', fireAt: AT[i],
     space: 'bus', floor: 0.3, range, pats: [['Pool', shots(i)]] })
   return [
     col('Rufe', 0, [800, 14000]),
