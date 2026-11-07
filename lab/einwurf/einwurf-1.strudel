@@ -163,7 +163,7 @@ const CH = {
 // push, 2 = an 8th); scale = the mode melodies use over it (dorian has F♯, aeolian F).
 const x2 = bars => [...bars, ...bars]
 const HARMONIES = [
-  // 1–8: on button 1 (under the faders) where a board asks for it (PROG_KEYS); all 16 by next / previous in Mode 2
+  // a board's button 1 steps through them (PROG_NEXT) or picks 1–8 directly (PROG_KEYS); Mode 2 col. 5: next / previous
   ['Am9 D9', x2(['Am9', 'Am9', 'D9', 'D9']), 2, 'dorian'],                         // track 009 as it is
   ['Am7 C Em7', x2(['Am7', 'Am7', 'Cmaj7', 'Em7']), 2, 'dorian'],                // To Be In Love
   ['Am7 D6 G', x2(['Am7', 'Am7', 'D6', 'Gadd9']), 2, 'dorian'],          // You Don't Know Me
@@ -214,8 +214,8 @@ const padPat = (lo, n, push = true) => new Pattern(state => {
   const startOf = k => {
     const name = chordAt(k, push)
     let c = k
-    while (c > k - 256 && chordAt(c - 1, push) === name) c--
-    if (c === k - 256) c = 64 * Math.floor(k / 64)   // no change in sight (one chord): strike on the 4-bar grid
+    while (c > k - 64 && chordAt(c - 1, push) === name) c--   // (CPU) no chord lasts longer than 4 bars but one
+    if (c === k - 64) c = 64 * Math.floor(k / 64)   // no change in sight (one chord): strike on the 4-bar grid
     return c + 64 * Math.floor((k - c) / 64)
   }
   for (let s = startOf(Math.floor(b0 * 16)); s < e0 * 16;) {
@@ -331,7 +331,9 @@ const drawView = () => {
       k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
         pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
-      b1: typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
+      b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
+        pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
+        typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
         (harmNow() === PROG_KEYS.indexOf(37 + i) ? ' on' : '') + '"><b>' +
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
@@ -398,6 +400,11 @@ const onMidi = e => {
   const [status, cc, value] = e.data
   if ((status & 0xf0) !== 0xb0) return
   if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if (typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(cc)) {   // a board's “next progression” buttons
+    if (value > 63 && !S.held[cc]) { S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length; S.held[cc] = true; showStatus() }
+    else if (value <= 63) S.held[cc] = false
+    return
+  }
   else if (typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(cc)) {   // a board's direct progression buttons
     if (value > 63 && !S.held[cc]) { S.pend.harm = PROG_KEYS.indexOf(cc); S.held[cc] = true; showStatus() }
     else if (value <= 63) S.held[cc] = false
@@ -457,8 +464,9 @@ const chordName = bar => chordAt(bar * 16, false)
 // low-pass (e.g. a recipe's lpf) is kept when it is lower than the Brightness knob's.
 const column = i => {
   const c = COLS[i], built = c.pats.map(([, p]) => p)
-  const sel = signal(t => latch(i, Math.floor(t))).segment(1)
-  return sel.fmap(p => built[p]).innerJoin()
+  // gate (CPU): a column whose fader is at 0 is not queried at all; checked per 16th, so it starts right away
+  const sel = signal(t => (S.val[5 + i] ?? 0) > 0 ? latch(i, Math.floor(t)) : -1).segment(16)
+  return sel.fmap(p => p < 0 ? silence : built[p]).innerJoin()
     .swingBy(signal(() => 2 * (swingPct() - 0.5)), 8)
     .filterValues(() => (S.val[5 + i] ?? 0) > 0)
     .fmap(({ bright = 1, ...v }) => {

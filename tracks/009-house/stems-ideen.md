@@ -21,14 +21,16 @@ Notizen
 - Ladezeit: jede neue Sample-Quelle braucht Internet beim ersten Anschlag; möglichst wenige Quellen.
 
 ## ✗ Verworfen (vor jedem Lab prüfen!)
-- Klänge: M1-Orgel (Stabs, Dub, Riff), String-Machine, echte Streicher-Section (VSCO), Marimba, Trompeten aus
+- Klänge: M1-Orgel (Stabs, Dub, Riff), „Orgel wie Strings“ (Pulse-Orgel), Strings + Orgel, String-Machine, echte Streicher-Section (VSCO), Marimba, Trompeten aus
   Einzelton-Multisamples (VSCO harmon / sus / vib, auch tpt_stac), Tenorsax/Flöte VCSL, Panflöte-Ersatz,
   synthetische Vocals (ah/oh), Chor, Bläser-Stabs „POP HORNS“, Orchestra Hit, Vinyl-Knistern, Rhodes/Orgel-Samples
   (verstaubter Jazz), Gitarren-Loops (messy), Rhodes-Antworten (A C E), M1/Trompeten-Dub.
 - Spielweisen: 1-Takt-Loops, reine Zufallsmelodien, selbst ausgedachte brave Melodien, schnelle unruhige Jazz-Phrasen,
   Techno-Übernahmen aus 008/010, FX ohne hörbare Wirkung (Filter-Downer, Hochpass, Siren, Snare-Build).
-- Gut / behalten: JX-10, Orgel wie Strings, B3 (Harmonie); Vibraphon (Melodie); Dub Brass (Synth, „besser“);
+- Gut / behalten: JX-10, B3 weich, Strings + B3 (Harmonie; Akkordfolgen auf Taste 1 = weiterschalten); Vibraphon (Melodie); Dub Brass (Synth, „besser“);
   Flöten-Triller (selten), „yeah yeah yeah“; Akkordfolgen auf direkten Tasten.
+
+## ☑ Im Track (2026-11-08): Jonas 1 Harmonie (harmonie-4 Sp. 2) mit 10 Akkordfolgen, Jonas 2 Keys, Jonas 3 Vibraphon — Details: uebergabe-harmonie-in-009.md, feedback.md
 
 ## ▶ Neu-Konzeption (Nutzer, 2026-11-08) — HIER WEITERMACHEN
 Ziel des Ganzen: MIDI-Belegung, mit der Leute niederschwellig und schnell ausprobieren und bei einem Treffen gemeinsam

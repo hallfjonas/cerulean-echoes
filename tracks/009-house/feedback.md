@@ -26,3 +26,20 @@
   M1, vibes → marimba, fader = overtones), its swing (56 %), space mapping and start values. Track additions: chords
   from Chapter (D9 voicing F♯ A C E), global Fog / Room / Tension. −21 LUFS at the lab's settings. New skill:
   .claude/skills/lab-to-track.
+
+## Vibraphon → Jonas 3 (2026-11-07)
+- Aus lab/melodie/melodie-2 Spalte 1, 1:1 (Hell, Weich, Komplex, Pegel, Taste 1 Phrase, Taste 2 Echo-Wurf); 40 % lauter
+  als im Labor (Nutzer: 30–50 %). Akkorde vom Kapitel (Am9 / D9) statt der Labor-Progressionen; eigener Orbit 3.
+- Jonas 2 bleibt frei für die Harmonie (harmonie-4). Offen: Track auf die 16 Akkordfolgen umstellen.
+- Set 011 nicht neu gebaut: make-set scheitert seit dem Keys-Port an `await samples(…)` in 009 (nicht durch diese Änderung).
+
+## 2026-11-08 — Harmonie-Spalte + Akkordfolgen (aus lab/harmonie/harmonie-4, Spalte 2)
+- Jonas 1 = Harmonie (JX-10-Strings ↔ B3 16'+8' auf Reihe 3, gehaltene Akkorde, Echo-Wurf), Taste 1 = nächste von
+  10 Akkordfolgen (nächste 8-Takt-Phrase). Keys auf Jonas 2 verschoben (unverändert).
+- Chapter (Jonas 8): Vamp = alle Am9; Wechsel = die Folge von Jonas 1 (Start: Am9 D9 = wie bisher).
+- Keys bleiben monoton auf Am9 (Nutzer: Keys sind nicht für Akkordfolgen da); nur in „Am9 D9“ gehen sie auf D9.
+  Sub, Bass, Harmonie und Vibraphon folgen der Folge; Vibraphon-Tonleiter dorisch/aeolisch je Folge.
+- Nur Folgen, die unter Am9 nicht reiben (kein F♯ außer Am9 D9). Nicht gehört; Harmonie −27,8 LUFS bei Fader 1.
+- Set 011 neu gebaut (make-set: Track-Funktionen jetzt async, weil 009 Samples mit await lädt). check-set: 009 zeigt
+  Abweichungen nur im allerersten Moment (erster Harmonie-Anschlag bei 0 bzw. Keys bei 0.07: Reihenfolge, in der die
+  Regler-Zustände beim ersten Abfragen gesetzt werden), sonst identisch.

@@ -19,3 +19,7 @@
 - Akkordfolgen gehören auf die Taste unter dem Fader (Reihe b1, CC 37–44) — dort ist üblicherweise das Wechseln; Rhythmus-Wechsel auf die untere Reihe.
 - Mehr Klang-Optionen: Strings + B3 zusammen klingt gut; B3 braucht weicheren Anschlag.
 - Harmonie 3 (Akkordfolgen auf Taste 1, Charakter auf Reihe 3, Mischungen): „passt jetzt ganz gut“. Beschriftung = die Akkorde selbst, nicht Künstler.
+- Taste unter dem Fader = durch die Akkordfolgen schalten (wie „Wechsel“ überall), nicht direkt wählen.
+
+## harmonie-3 (Nutzer, 2026-11-08)
+- Vorschläge reduzieren: Orgel wie Strings raus, Strings + Orgel raus. Reihe 3: zwischen Strings, Strings + B3 und B3 durchfaden.
