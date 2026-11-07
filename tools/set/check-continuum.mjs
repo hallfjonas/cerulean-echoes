@@ -1,4 +1,4 @@
-// Check the continuum (tracks/011/011-continuum-dual.strudel) in Node:
+// Check the continuum (tracks/011-combining-all/011-continuum-dual.strudel) in Node:
 // 1. it evaluates and plays at every position with all controls at 0, 0.5 and 1 (events per bar, query time = CPU)
 // 2. continuity: per column, the summed loudness of every 16th step, compared between neighbouring positions
 //    (a step of 1 % of the set). A column that swaps instruments or patterns shows as a jump.
@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url'
 import { load, run } from '../strudel-sim/harness.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
-const FILE = path.join(ROOT, 'tracks/011/011-continuum-dual.strudel')
+const FILE = path.join(ROOT, 'tracks/011-combining-all/011-continuum-dual.strudel')
 globalThis.continuumCheck = true
 const CCS = [...Array(47).keys()].map(i => i + 5).flatMap(n => [n, n + 48])
 const BUTTONS = new Set(CCS.filter(n => (n % 48 >= 37 && n % 48 <= 51) || n >= 85))

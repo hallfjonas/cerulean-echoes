@@ -8,7 +8,7 @@
 // Launch Control XL 3 in Custom Mode 16 (channel 16). Columns 1-7: fader = level, knobs = the candidate's three
 // parameters, button 1 = solo (press again = all), button 2 = the candidate's switch.
 // Column 8: fader = reference kick (dry 909, four on the floor), button 1 = which 16ths, button 2 = tempo.
-// @layout Rumble Lab (lab/stems)
+// @layout Rumble Lab (lab/bass)
 // @note Seven rumble candidates for the continuum, all on A. Pull up the reference kick (column 8), then one rumble at a time; solo with button 1.
 // @note Column 8, button 1 chooses the 16ths of every beat the tonal rumbles (1-5) play on: 3+4, 2+4, 3 or 4. The noises (6, 7) breathe on their own.
 // @note The status box at the bottom right shows every value with units.

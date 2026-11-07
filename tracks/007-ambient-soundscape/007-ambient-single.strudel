@@ -5,6 +5,8 @@
 // Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, clock ticks, wood/drops, crackle.
 // Jonas (colour): pad, chord pings, music box, whale, choir, glitter, shimmer swells + the global column 8.
 // Chapter (global button 1): D lydian (floating) → D dorian (melancholic) → D whole tone (strange), at the next bar.
+// Feedback 1 (feedback.md): sea/wind quieter, drone and bass fader ranges cut to the old 40 % (they were too heavy
+//   in the lows with the kick). Previous version: old/007-ambient-dual-before-feedback1.strudel.
 // ============================================================
 // Two Launch Control XL 3, both in Custom Mode 16 (same CCs), told apart by their MIDI input.
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
@@ -434,7 +436,7 @@ const stemJ2_wind = strip(bus(stack(
   )),
   riser
 ), 1, wind.space), {
-  level: wind.level.range(0, 0.68),   // was 1; mix: sea/wind −10 dB
+  level: wind.level.range(0, 0.4),   // was 1, then 0.68 (mix); feedback 1: too loud, −4.6 dB
 })
 
 // ============================================================
@@ -461,7 +463,7 @@ const stemJ3_drone = strip(bus(wobble(stack(
     .attack(1.5).sustain(0.6).release(3).gain(droneBeat.mul(0.18)))
 )), 1, drone.space), {
   lpf: expRange(drone.bright, 120, 4000),
-  level: drone.level.range(0, 1.15),   // was 1; mix: drone −2 dB
+  level: drone.level.range(0, 0.46),   // was 1, then 1.15 (mix); feedback 1: played at most 40 % → full fader = old 40 %
 })
 
 // ============================================================
@@ -498,7 +500,7 @@ const stemJ4_bass = beatOnly(strip(dryBus(stack(
   gate(above(fadeExtra(bassMix), 0), bassPulse.mul(gain(fadeExtra(bassMix))))
 ).add(note(bassOct)), 1, bassCol.space), {
   lpf: expRange(bassCol.bright, 80, 2000),
-  level: bassCol.level.range(0, 0.94),   // was 1; mix: bass −5 dB
+  level: bassCol.level.range(0, 0.38),   // was 1, then 0.94 (mix); feedback 1: played at most 40 % → full fader = old 40 %
 }))
 
 // ============================================================

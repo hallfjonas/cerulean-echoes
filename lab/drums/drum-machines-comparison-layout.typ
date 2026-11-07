@@ -1,4 +1,4 @@
-// Launch Control XL 3 layout for lab/sounds/drum-machines-comparison.strudel
+// Launch Control XL 3 layout for lab/drums/drum-machines-comparison.strudel
 // Compile: typst compile drum-machines-comparison-layout.typ
 
 #set page(paper: "a4", flipped: true, margin: 12mm)

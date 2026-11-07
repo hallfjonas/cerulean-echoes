@@ -9,7 +9,7 @@
 // Launch Control XL 3 in Custom Mode 16 (channel 16). Columns 1-7: fader = level, knobs = the candidate's three
 // parameters, button 1 = solo (only this one; press again = all), button 2 = the candidate's switch.
 // Column 8: fader = context loop, knob 1 = room for all (to hear dry against wet), button 1 = rhythm, button 2 = tempo.
-// @layout Kick Lab (lab/sounds)
+// @layout Kick Lab (lab/kick)
 // @note Seven kick candidates for the continuum, all tuned to A. Pull up one fader at a time, or solo with button 1. Column 8: a quiet house loop as context, room for all, rhythm and tempo.
 // @note House wants the driest kick: listen to 3, 4 and 5 with Room at 0. Then turn Room up and hear how a tail blurs the groove.
 // @note The status box at the bottom right shows every value with units.

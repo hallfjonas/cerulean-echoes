@@ -595,7 +595,7 @@ const stem_melody6 = melody("[c#3 f3 <a3 g3> e3]!2", melody6.char, melody6.level
 const baseline6Lpf = melody6.lpf.range(0, baselineLpfMax)
 const stem_baseline6 = baseline("<[c#1 c#2 c#1 c#2] [f1 f2 g1 f2]>*2", baseline6Lpf, melody6.hpf)
 
-// ARP (replaces melody 7): the arp cascade from lab/stems/arp-cascade.strudel
+// ARP (replaces melody 7): the arp cascade from lab/synth/arp-cascade.strudel
 // One 12-step dorian arpeggio played in several registers at once; the root line is the "melody",
 // the other registers come in with the density knob; the button switches to the line only or adds the upper arp.
 // Sawtooth through an acid lowpass: the filter opens briefly on every note (envelope), the resonance (q) makes it squelch.

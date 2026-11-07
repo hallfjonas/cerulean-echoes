@@ -1,4 +1,4 @@
-// Build the set (tracks/011/011-set-dual.strudel) from the four dual tracks and set-frame.strudel.
+// Build the set (tracks/011-combining-all/011-set-dual.strudel) from the four dual tracks and set-frame.strudel.
 // usage: node make-set.mjs   (also: npm run set in tools/) — run it again after changing one of the tracks.
 //
 // Each track's code (helpers, harmony, stems) goes into its own function scope, unchanged except for a few patches:
@@ -17,14 +17,14 @@ import { generate } from '../lcxl-layout/gen-layout.mjs'
 import { generate as makeSyx } from '../lcxl-layout/make-syx.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUT = path.join(ROOT, 'tracks/011/011-set-dual.strudel')
+const OUT = path.join(ROOT, 'tracks/011-combining-all/011-set-dual.strudel')
 // grid = BPM of the clock on its plateau; slow = how many clock bars make one bar of the track; phrase = chapter
 // latch length in the set (orig = in the track); orbit0 = added to the track's orbits; transpose in semitones
 const TRACKS = [
-  { id: '007', name: 'Ambient',       file: 'tracks/007/007-ambient-dual.strudel',       grid: 140, slow: 2, phrase: 4, orig: 1, orbit0: 0, transpose: 0 },
-  { id: '010', name: 'Ambient House', file: 'tracks/010/010-ambient-house-dual.strudel', grid: 120, slow: 1, phrase: 8, orig: 4, orbit0: 3, transpose: 0 },
-  { id: '009', name: 'Cool House',    file: 'tracks/009/009-cool-house-dual.strudel',    grid: 122, slow: 1, phrase: 8, orig: 4, orbit0: 0, transpose: 0 },
-  { id: '008', name: 'Groove Techno', file: 'tracks/008/008-groove-techno-dual.strudel', grid: 140, slow: 1, phrase: 4, orig: 1, orbit0: 3, transpose: 4,
+  { id: '007', name: 'Ambient',       file: 'tracks/007-ambient-soundscape/007-ambient-dual.strudel',       grid: 140, slow: 2, phrase: 4, orig: 1, orbit0: 0, transpose: 0 },
+  { id: '010', name: 'Ambient House', file: 'tracks/010-ambient-house/010-ambient-house-dual.strudel', grid: 120, slow: 1, phrase: 8, orig: 4, orbit0: 3, transpose: 0 },
+  { id: '009', name: 'Cool House',    file: 'tracks/009-house/009-house-dual.strudel',    grid: 122, slow: 1, phrase: 8, orig: 4, orbit0: 0, transpose: 0 },
+  { id: '008', name: 'Groove Techno', file: 'tracks/008-groove-techno/008-groove-techno-dual.strudel', grid: 140, slow: 1, phrase: 4, orig: 1, orbit0: 3, transpose: 4,
     text: [[/'F ' \+ MOODS/g, "'A ' + MOODS"], [/'Kapitel {5}F '/g, "'Kapitel     A '"]] },
 ]
 const TAG = /^\/\/ @(layout|note|mode|col|row|ctl|guide|recipe|globalcc)\b/

@@ -1,0 +1,510 @@
+// ============================================================
+// HOUSE KEYS LAB 17: hardness and touch from real recordings. Each source has several recordings per note, from a
+// soft to a hard strike (velocity layers); knob row 1 picks which one plays, the touch moves accents through them
+// ============================================================
+// Round 17 for 009. Earlier rounds and their grades: feedback.md; their files: old/.
+// One chord only (Am9, Kerri Chandler's shape); chord changes have their own board (house-harmony-lab.strudel).
+// Round 16: an accent that jumps to a harder recording sounds played when the step is small (Steinway); with few,
+// far-apart recordings it is far too strong (Rhodes, Kawai). Here: as many recordings as the sources have.
+//   1 Salamander grand (the grand used so far, now all 16 recordings)   2 Steinway B (3)   3 Kawai (3)
+//   4 Rhodes Mark I (jRhodes3d, 5)   5 Yamaha upright (3)   6 vibraphone (soft mallets 2, hard mallets 2)
+//   7 organ (GM drawbar / percussive / rock organ: an organ does not react to touch, so no touch)
+//   8 reference: the GM Rhodes used so far (1 recording)
+// Knob row 1 = hardness: which recording a normal hit plays (soft and dull ↔ hard with many overtones). Every
+// recording is levelled to the same loudness (measured, LUFS), so the knob changes the timbre only, the fader the
+// loudness. It replaces the brightness filter: no filter on the keys any more.
+// Shift + fader (1-6) = touch: how far accents move to harder recordings and soft hits to softer ones (0 = every hit
+// the same recording; full = up to half the source's range). Each hit is exactly one recording (no blending).
+// The samples load the first time they play: give it a few seconds. Salamander Grand Piano V3: Alexander Holm,
+// CC-BY 3.0; jRhodes3d: Jeff Learman, free to use; VCSL: CC0. Controls: Hardness, Space, Length, Level, button 1 =
+// rhythm, button 2 = shift (fader = touch). Dashboard: “▣ LC groß” in the status box.
+//
+// Launch Control XL 3: rhythms in Custom Mode 16 (channel 16), drums and bass in Mode 2 (CC + 48).
+// @layout House Keys Lab 17 (lab/keys, round 17 for 009: hardness and touch from real recordings)
+// @note Each source plays real recordings from a soft to a hard strike: 1 Salamander grand (16), 2 Steinway (3), 3 Kawai (3), 4 Rhodes (5), 5 Yamaha upright (3), 6 vibraphone (4: soft and hard mallets), 7 organ (3 GM organs, no touch), 8 GM Rhodes (reference). All recordings levelled: hardness = timbre only.
+// @note Knob row 1 = hardness: which recording a normal hit plays. Shift + fader = touch: how far accents go harder and soft hits softer (0 = all the same recording). No brightness filter any more.
+// @note The samples load the first time they play: give it a few seconds. In Mode 2: fader 6 = drums (knob 1 = swing, button 2 = drums out), fader 7 = bass.
+// @guide What to listen for | Hardness per column: where does each source sound best? Touch at 0, half and full: do the hits sound played, not like copies, without single hits standing out? Note per column: keep / drop, hardness and touch position.
+// @guide Why off the kick | Stab rhythms that avoid the kick and sit on the off-16ths pull against the beat; hits on the kick double it and sound like a band. Two hits and 3-3-2 do start on the one: that is their weight.
+// @guide Harmony | One chord only: Am9 in Kerri Chandler's shape (the 7th at the bottom, the 9 instead of the root). Chord changes have their own board: house-harmony-lab.
+// @mode 16 Mode 16 — Rhythms
+// @col 16:1 1 Salamander grand
+// @col 16:2 2 Steinway
+// @col 16:3 3 Kawai
+// @col 16:4 4 Rhodes
+// @col 16:5 5 Upright
+// @col 16:6 6 Vibraphone
+// @col 16:7 7 Organ
+// @col 16:8 8 GM Rhodes (so far)
+// @row 16:k1 Row 1 \ Hardness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Length
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Change
+// @row 16:b2 Button 2 \ Shift
+// @ctl 16:1-6.k1 Hardness | which recording a normal hit plays: soft and dull ↔ hard with many overtones (all equally loud).
+// @ctl 16:7.k1 Hardness | drawbar organ ↔ percussive organ ↔ rock organ.
+// @ctl 16:8.k1 Hardness | nothing (one recording).
+// @ctl 16:1-8.k2 Space | 0 = dry; a 1/8 echo is there from the first turn (full at half), from about a third on the room joins (full at the top).
+// @ctl 16:1-8.k3 Length | 0 = short stab ↔ hits ring four times longer.
+// @ctl 16:1-8.b1 Change | 8 patterns: chain → shifted chain → pairs → 3-3-2 → Kerri syncope → Kerri riff → chain + shifted chain → chain + pairs.
+// @ctl 16:1.fader Level | Salamander grand (16 recordings per note).
+// @ctl 16:2.fader Level | Steinway B grand (VCSL, 3).
+// @ctl 16:3.fader Level | Kawai grand (VCSL, 3).
+// @ctl 16:4.fader Level | Rhodes Mark I, 1977 (jRhodes3d, 5).
+// @ctl 16:5.fader Level | Yamaha upright piano (VCSL, 3).
+// @ctl 16:6.fader Level | vibraphone (VCSL: soft mallets 2, hard mallets 2).
+// @ctl 16:7.fader Level | organ (GM soundfont): an organ does not react to touch.
+// @ctl 16:8.fader Level | reference: the GM Rhodes used so far (1 recording).
+// @ctl 16:1-6.b2 Shift | press = on / off: the fader = touch, how far accents and soft hits move through the recordings (0 = all the same); knobs and button 1 do nothing.
+// @ctl 16:7-8.b2 Shift | press = on / off: nothing to set (no touch).
+// @mode 2 Mode 2 — Drums + bass
+// @col 2:6 6 Drums
+// @col 2:7 7 Bass
+// @ctl 2:6.fader Drums | 909 kick, off-beat hat, clap, shaker.
+// @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %; 55–58 % = house.
+// @ctl 2:6.b2 Drums out | keys and bass alone while held.
+// @ctl 2:7.fader Bass | off-beat bass on the chord root.
+
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const bpm = 124
+
+// Patterns: [name, loop, (unused: old bar 4 / bar 8 variations)]. The loop can be any length (16 = one bar, 32 = two
+// bars) and repeats unchanged. x = chord, g = ghost chord, t = top note, u = chord tone
+// above the top, d = note below the top, - = the hit before is held one more 16th, . = rest.
+// X = accented hit (louder, and brighter in column()); overlays: O = both rhythms hit (a little louder), a / b = only one
+const VEL = { x: 0.8, X: 1, g: 0.3, t: 0.7, u: 0.7, d: 0.65, O: 1, a: 0.8, b: 0.8 }
+// Two rhythms played at once, as one loop: O where both hit, a / b where only the first / second does
+const overlay = (a, b) => [...a].map((c, i) => c === 'x' ? (b[i] === 'x' ? 'O' : 'a') : b[i] === 'x' ? 'b' : '.').join('')
+// Pedal chords for a pattern with its own chord sequence (none here: the Kerri riff's chords are on the harmony board)
+const PEDAL = {
+  // Kerri's shape (♭7 9 ♭3 5, no root), registers as in the video: Gm9 a whole step under Am9, Dm9 a fifth under it
+  A: { pcs: [7, 11, 0, 4], notes: [55, 59, 60, 64] },
+  G: { pcs: [5, 9, 10, 2], notes: [53, 57, 58, 62] },
+  D: { pcs: [0, 4, 5, 9], notes: [48, 52, 53, 57] },
+  a: { pcs: [0, 4, 7, 11], notes: [60, 64, 67, 71] },
+  b: { pcs: [0, 4, 6, 9], notes: [60, 64, 66, 69] },
+  c: { pcs: [11, 2, 4, 7], notes: [59, 62, 64, 67] },
+}
+// The rhythms on button 1, the same on every column (change them while the keys are off)
+const PATS = [
+    ['Kette',            '.x..x..x.x..x..x', '.x..x..x.x..x.x.', '.x..x..x.x.x.x.x'],
+    ['versetzte Kette',  '...x..x..x.x..x.', '...x..x..x.x.x..', '...x..x..x.x.x.x'],
+    ['Paare',            '.x.x..x..x.x..x.'],
+    ['3-3-2',            'x..x..x...x..x..'],
+    ['Kerri-Synkope',    '..x..x...x.x..x.'],
+    // The Kerri video's riff rhythm, all on Am9 and as short as every other pattern (Length knob = how long)
+    ['Kerri-Riff auf A', 'x..x..x..x..x.x.'],
+    // Overlays: liked in round 6 when two columns played different patterns at once (the hits differ, more organic)
+    // 8th element = the reference rhythm: the overlay is levelled to its energy (as loud as the chain alone)
+    ['Kette + versetzt', overlay('.x..x..x.x..x..x', '...x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x'],
+    ['Kette + Paare',    overlay('.x..x..x.x..x..x', '.x.x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x']]
+// Touch schemes: touch(k, pat, pos) = how hard the hit at 16th k is played, 0 soft … 0.5 as written … 1
+// hard (gain 0.6 – 1.4, brightness ×0.5 – ×2); vel / cut = other gain / brightness per symbol. Fixed per position:
+// the loop stays constant.
+const md = (k, n) => ((k % n) + n) % n
+const isHit = c => c !== '.' && c !== '-'
+const hitsBefore = (pat, pos) => [...pat.slice(0, pos)].filter(isHit).length
+// 16ths from this hit to the next one (around the loop)
+const gapAfter = (pat, pos) => { for (let d = 1; d < pat.length; d++) if (isHit(pat[(pos + d) % pat.length])) return d; return pat.length }
+// 16ths since the hit before (around the loop)
+const gapBefore = (pat, pos) => { for (let d = 1; d < pat.length; d++) if (isHit(pat[md(pos - d, pat.length)])) return d; return pat.length }
+// Accent before gaps at strength s (0 = flat): each hit deviates from the pattern's average by how long the rest after it
+// is, so the slider spreads the hits around the middle; full = about 6 dB between the hardest and the softest hit
+// (the round-9/10 accent was only 1-2 dB)
+const clamp01 = x => Math.max(0, Math.min(1, x))
+const gapT = (pat, pos) => Math.min(0.9, 0.2 + 0.2 * gapAfter(pat, pos))
+const meanCache = {}
+const gapMean = pat => meanCache[pat] ??= (() => { let t = 0, n = 0
+  for (let p = 0; p < pat.length; p++) if (isHit(pat[p])) { t += gapT(pat, p); n++ }
+  return n ? t / n : 0.5 })()
+const accent = (k, pat, pos, s) => clamp01(0.5 + (gapT(pat, pos) - gapMean(pat)) * 4 * s)
+// The touch decided in round 11, the same on every column: accent before gaps at ACCENT with brighter accents
+// (bright 4 = brightness ×0.25 … ×4 over the touch range) and, in the overlays, the second rhythm b SECOND softer
+// (0.8 = as loud as the first) and darker. vel / cut = gain / brightness per symbol.
+const ACCENT = 0.25, SECOND = 0.45
+const TOUCH = { touch: accent, bright: 4, vel: () => ({ ...VEL, b: 0.8 * (1 - SECOND) }), cut: () => ({ b: 1 - 0.8 * SECOND }) }
+// Columns: [name, patterns, (unused), (unused), touch, source]
+const COLS = [
+  ['Salamander-Flügel', PATS, null, null, TOUCH, 'salamander'],
+  ['Steinway', PATS, null, null, TOUCH, 'steinway'],
+  ['Kawai', PATS, null, null, TOUCH, 'kawai'],
+  ['Rhodes', PATS, null, null, TOUCH, 'rhodes'],
+  ['Upright', PATS, null, null, TOUCH, 'upright'],
+  ['Vibraphon', PATS, null, null, TOUCH, 'vibes'],
+  ['Orgel', PATS, null, null, TOUCH, 'organ'],
+  ['GM-Rhodes (bisher)', PATS, null, null, TOUCH, 'gmrhodes'],
+]
+// The sources: [sound names, one per recording from the softest to the hardest strike, loudness of each recording
+// (LUFS of the column's chain loop at gain 1, touch 0, rendered offline with superdough; null = not measurable
+// offline), touch (the accent moves the recording), level of the source]. Every recording is levelled to L_REF, the
+// loudness of the keys in round 16: the hardness changes the timbre, not the loudness.
+const L_REF = -20.4
+const names = (pre, n) => [...Array(n).keys()].map(l => pre + (l + 1))
+const SRC = {
+  salamander: [names('sal', 16), [-31.3, -27.3, -25.1, -23.5, -22.3, -21.4, -20.6, -19.7, -18.9, -17.8, -16.8, -16.0, -15.5, -13.7, -13.3, -12.8], true, 0.955],
+  // VCSL: normalized (NORMALIZED.txt), the three recordings are about equally loud
+  steinway: [names('stein_v', 3), [-14.9, -14.1, -13.9], true, 0.955],
+  // v1 (−63 LUFS) left out: levelled up it would bring the recording's noise
+  kawai: [names('kawai_v', 3), [-42.4, -26.4, -23.2], true, 0.955],
+  // jRhodes3d: normalized by its maker (the softer, the louder)
+  rhodes: [names('jrh', 5), [-8.2, -8.5, -9.1, -9.8, -11.4], true, 0.955],
+  upright: [names('upr_v', 3), [-36.9, -23.9, -13.2], true, 0.955],
+  // soft mallets v1, v2, hard mallets v2, v3 (in order of brightness)
+  vibes: [names('vib_v', 4), [-39.1, -26.0, -26.7, -16.5], true, 0.955],
+  // GM soundfont organs, in order of brightness; not measurable offline: level by ear
+  organ: [['gm_drawbar_organ', 'gm_percussive_organ', 'gm_rock_organ'], [null, null, null], false, 1],
+  gmrhodes: [['gm_epiano1'], [null], false, 1.22],
+}
+const recGain = (src, l) => SRC[src][1][l] == null ? 1 : Math.pow(10, (L_REF - SRC[src][1][l]) / 20)
+// Which recording a hit plays: the one the hardness knob points at, moved by the touch: accents (touch above the
+// pattern's average) harder, soft hits softer, at most half the source's range at shift + fader full
+const recording = (src, hard, hitT, e) => {
+  const [snd, , touch] = SRC[src], n = snd.length, base = Math.round(hard * (n - 1))
+  const off = touch ? Math.round(e * (n - 1) / 2 * Math.max(-1, Math.min(1, (hitT - 0.5) / 0.13))) : 0
+  return Math.max(0, Math.min(n - 1, base + off))
+}
+// Level every column, pattern and strength to the same energy (sum of squared hit gains over the loop, like LUFS):
+// a touch column to equal hits, an overlay to its reference rhythm (8th element). Cached per column, pattern, strength.
+const touchGain = (dyn, k, pat, pos, s, st) => (dyn?.vel ? dyn.vel(st) : VEL)[s] * (dyn ? 0.6 + 0.8 * dyn.touch(k, pat, pos, st) : 1)
+const normCache = {}
+const norm = (i, e, st) => normCache[i + '|' + e[1] + '|' + st.toFixed(2)] ??= (() => {
+  const pat = e[1], ref = e[7] ?? pat
+  let w = 0, d = 0   // over two bars (a pattern may be two bars long)
+  for (let p = 0; p < 32; p++) { const r = ref[p % ref.length], q = pat[p % pat.length]
+    if (VEL[r]) w += VEL[r] ** 2
+    if (VEL[q]) d += touchGain(COLS[i][4], p, pat, p % pat.length, q, st) ** 2 }
+  return d > 0 ? Math.sqrt(w / d) : 1
+})()
+
+// Samples, loaded the first time they play; only the notes around the chord (G3 B3 C4 E4). Measured offline
+// (round 17): the VCSL Kawai, Yamaha upright and vibraphone files sound an octave above their names, so a file named
+// C3 sits on C4. Salamander: every minor third (A C D♯ F♯), 16 recordings. jRhodes3d: files 5 = softest … 1 = hardest.
+// VCSL from our repo (samples/vcsl-keys, trimmed to 3 s): the browser refuses VCSL's own raw files (a comma in the
+// folder names breaks a header) and jsDelivr refuses some (package over 50 MB). The paths below name the VCSL originals.
+const JRH = 'https://raw.githubusercontent.com/sfzinstruments/jlearman.jRhodes3d/master/jRhodes3d-mono/'
+const SAL = 'https://raw.githubusercontent.com/sfzinstruments/SalamanderGrandPiano/master/Samples/'
+const VCSL = 'https://cdn.jsdelivr.net/gh/sgossner/VCSL@master/'
+const GRAND = VCSL + 'Chordophones/Zithers/', VIB = VCSL + 'Idiophones/Struck%20Idiophones/Vibraphone/'
+const enc = k => k.replace('#', '%23')
+const OWN = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/johannes/samples/vcsl-keys/'
+const own = u => u.startsWith(VCSL) ? OWN + enc(decodeURIComponent(u.split('/').pop()).replace('.wav', '.flac')) : u
+const notesMap = (keys, file) => Object.fromEntries(keys.map(k => [k.toLowerCase(), own(file(k))]))
+const down = k => k.slice(0, -1) + (+k.slice(-1) - 1)   // the file name an octave under the note it sounds on
+const layerMap = (pre, n, keys, file) => Object.fromEntries([...Array(n).keys()].map(l => [pre + (l + 1), notesMap(keys, k => file(k, l + 1))]))
+const SAMPLE_MAP = {
+  ...layerMap('sal', 16, ['F#3', 'A3', 'C4', 'D#4', 'F#4'], (k, l) => SAL + enc(k) + 'v' + l + '.flac'),
+  ...layerMap('stein_v', 3, ['F#3', 'G#3', 'A#3', 'C4', 'D4', 'E4'], (k, l) =>
+    GRAND + 'Grand%20Piano%2C%20Steinway%20B/Sus/JHPiano_Sus_Close_' + enc(k) + '_vl' + (l + 1) + '_rr1.wav'),
+  ...layerMap('kawai_v', 3, ['F#3', 'G#3', 'A#3', 'C4', 'D4', 'E4'], (k, l) =>
+    GRAND + 'Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_' + enc(down(k)) + '_v' + (l + 1) + '_rr1_Player.wav'),
+  ...layerMap('jrh', 5, ['G3', 'B3', 'D4', 'F4'], (k, l) =>
+    JRH + { G3: 'A_055__G3', B3: 'A_059__B3', D4: 'A_062__D4', F4: 'A_065__F4' }[k] + '_' + (6 - l) + '.flac'),
+  ...layerMap('upr_v', 3, ['G3', 'C4', 'G4'], (k, l) =>
+    GRAND + 'Upright%20Piano%2C%20Yamaha/Sustains/Upright1_Sus_' + down(k) + '_vl' + l + '_rr1.wav'),
+  // soft mallets v1 has no rr1 for C3 / E3: rr2 there
+  ...layerMap('vib_v', 4, ['F3', 'A3', 'C4', 'E4'], (k, l) => VIB + [
+    'Soft%20Mallets/Vibes_soft_' + down(k) + '_v1_' + (['C4', 'E4'].includes(k) ? 'rr2' : 'rr1'),
+    'Soft%20Mallets/Vibes_soft_' + down(k) + '_v2_rr1', 'Hard%20Mallets/Vibes_hard_' + down(k) + '_v2_rr1',
+    'Hard%20Mallets/Vibes_hard_' + down(k) + '_v3_rr1'][l - 1] + '_Main.wav'),
+}
+if (typeof samples === 'function') await samples(SAMPLE_MAP)
+
+// Harmony: one chord only (chord changes have their own board, house-harmony-lab.strudel): [name, root, pitch classes]
+const HARMONIES = [
+  // Kerri Chandler's stab shape (Attack Magazine): third inversion, the 7th at the bottom, the 9 instead of the root
+  // (Am9 = G B C E: the 9 sits a semitone under the 3rd), moved as a block
+  ['Ein Akkord', [['Am9', 9, [7, 11, 0, 4]]], 'kerri'],
+]
+// Voice leading: each chord as the close voicing (G3–E5) that moves least from the chord before
+const voiceLead = chords => {
+  let prev = null, out = []
+  for (let pass = 0; pass < 2; pass++) out = chords.map(([name, root, pcs]) => {
+    const cands = []
+    for (let low = 55; low <= 66; low++) if (pcs.includes(low % 12))
+      cands.push(pcs.map(p => low + ((p - low) % 12 + 12) % 12).sort((a, b) => a - b))
+    const cost = c => prev ? c.reduce((s, n, i) => s + Math.abs(n - (prev[i] ?? prev[prev.length - 1])), 0)
+      : Math.abs(c.reduce((a, b) => a + b) / c.length - 66)
+    prev = cands.sort((a, b) => cost(a) - cost(b))[0]
+    return { name, root, pcs, notes: prev }
+  })
+  return out
+}
+// parallel: every chord the same shape on its root (root between D3 and C♯4), so the whole block slides
+// kerri: ♭7 9 ♭3 5 above the root (root between G2 and F♯3), the same shape on every chord
+const SHAPES = { parallel: [50, [3, 7, 10, 14]], kerri: [43, [10, 14, 15, 19]] }
+const VOICED = HARMONIES.map(([, chords, mode]) => !SHAPES[mode] ? voiceLead(chords)
+  : chords.map(([name, root, pcs]) => { const [lo, ds] = SHAPES[mode], r = lo + ((root - lo) % 12 + 12) % 12
+    return { name, root, pcs, notes: ds.map(d => r + d) } }))
+
+// State survives re-evaluation. Mode 16: fader 5-12, knobs 13-36, buttons 37-52. Mode 2 = + 48.
+const S = globalThis.houseKeysLab17 ??= { val: {}, held: {}, pend: {}, at: {} }
+S.val[5] ??= 0.8
+for (let i = 0; i < 8; i++) S.val[13 + i] ??= 0.5   // hardness: the middle recording
+for (let i = 0; i < 8; i++) S.val['rec' + i] ??= 0.5   // touch: how far the accent moves through the recordings (shift + fader)
+S.val[58] ??= 0.6; S.val[66] ??= 0.3; S.val[59] ??= 0.6   // drums, swing, bass
+const swingPct = () => 0.5 + 0.2 * S.val[66], bassLevel = () => S.val[59]
+const drumsLevel = () => S.held[98] ? 0 : S.val[58]
+// A choice made now takes over at the next bar (len 4: at the next 4-bar phrase); fixed once a bar is first asked
+const latch = (key, bar, len = 1) => {
+  const b = Math.floor(bar / len), m = S.at[key] ??= {}
+  if (!(b in m)) { m[b] = S.pend[key] ?? 0; for (const x in m) if (+x < b - 8) delete m[x] }
+  return m[b]
+}
+const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
+const harmNow = () => latchNow('harm')
+
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== 'house-keys-lab-17') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = 'house-keys-lab-17'
+  }
+}
+
+// Status box (bottom right) with the dashboard link; other boards' boxes are removed
+let statusBox = null, statusText = null
+if (hasPage) {
+  for (const id of ['board-status', 'keys-lab-status']) document.getElementById(id)?.remove()
+  statusBox = document.createElement('div')
+  statusBox.id = 'keys-lab-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  statusText = document.createElement('pre')
+  statusText.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  statusBox.append(statusText)
+  document.body.appendChild(statusBox)
+}
+const beatNow = { bar: null, beat: null }
+const pct = v => Math.round((v ?? 0) * 100)
+
+// DASHBOARD — a big window: Mode 16 grid (every control, value, pattern) and the Mode 2 sound mix + globals on top.
+// The link opens a tab named keys-lab-view (never stopped by the pop-up blocker); strudel.cc replaces window.open,
+// so the handle on that tab comes from the native open of a hidden iframe.
+const view = !hasPage ? null : globalThis.keysLabView ??= { win: null }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const VIEW_CSS = [
+  'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+  '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+  '.head{display:flex;gap:2.5vw;align-items:center;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:#50c8e8}',
+  '.k{opacity:.6;margin-right:.4em}.next,.acc{color:#50c8e8}',
+  '.mix{display:flex;gap:1.5vw;align-items:center}.mix div{display:flex;align-items:center;gap:.4em}',
+  '.mix i{display:inline-block;width:5vw;height:.7em;background:#333;border-radius:3px;overflow:hidden}',
+  '.mix i b{display:block;height:100%;width:calc(var(--v)*100%);background:#50c8e8}',
+  '.grid{flex:1;display:grid;grid-template-columns:repeat(' + COLS.length + ',1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 4.2em 4.2em;gap:.8vh .8vw}',
+  '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.live{color:#50c8e8;border-color:#50c8e8}',
+  '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+  '.cell span,.cell b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cell span{opacity:.7;font-size:.85em}.cell b{font-variant-numeric:tabular-nums}.btn{overflow:hidden}',
+  '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+  'background:conic-gradient(from -135deg,#50c8e8 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+  '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+  '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+  '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:#50c8e8}',
+  '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start}.btn.on{background:#50c8e8;color:#111}',
+  '.pat{font:.75em monospace;letter-spacing:.05em;opacity:.85;overflow-wrap:anywhere}',
+  '.beats i,.bars i{display:inline-block;background:#333;margin-left:.3em}.beats i{width:.75em;height:.75em;border-radius:50%}',
+  '.bars i{width:1.1em;height:.55em;border-radius:2px}.beats i.on,.bars i.on{background:#50c8e8}',
+].join('\n')
+const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+// While a column's shift is on, its cells show what the controls do then: the fader sets how far the accent moves
+// through the recordings (sources with only one: nothing), everything else does nothing
+const SHIFT_FADER = Object.fromEntries(COLS.map((c, i) => [i, ['rec' + i, 'Anschlag']]).filter(([i]) => SRC[COLS[i][5]][2]))
+const catchHint = () => ''
+const drawView = () => {
+  if (!view?.win || view.win.closed) return
+  const root = view.win.document.getElementById('lc')
+  if (!root) return
+  const h = harmNow(), hp = S.pend.harm ?? 0, chords = HARMONIES[h][1]
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const bar = beatNow.bar
+  const where = bar === null ? '–' : '<span class=bars>' + marks(4, ((bar % 4) + 4) % 4) + '</span><span class=beats>' +
+    marks(4, beatNow.beat) + '</span> <b class=acc>' + esc(chords[bar % chords.length][0]) + '</b>'
+  const knob = (v, name, txt) => '<div class="cell knob"><div class=dial style="--v:' + (v ?? 0) + '"></div><b>' + (txt ?? pct(v)) +
+    '</b><span>' + esc(name) + '</span></div>'
+  const off = name => '<div class="cell" style="opacity:.25"><span>' + esc(name) + '</span></div>'
+  const cells = COLS.map(([, pats], i) => {
+    const now = latchNow(i), next = S.pend[i] ?? 0
+    if (S.held[45 + i]) {
+      const hp = S.pend.harm ?? 0, f = SHIFT_FADER[i]
+      return {
+        k1: off('—'), k2: off('—'), k3: off('—'),
+        fader: !f ? off('—') : '<div class="cell fader"><div class=bar style="--v:' + (S.val[f[0]] ?? 0) + '"><i></i></div><b>' +
+          pct(S.val[f[0]]) + '</b><span>' + f[1] + catchHint(f[0]) + '</span></div>',
+        b1: off('—'),
+        b2: '<div class="cell btn on"><b>Shift an</b></div>',
+      }
+    }
+    return {
+      k1: knob(S.val[13 + i], 'Härte', (() => { const n = SRC[COLS[i][5]][0].length; return n < 2 ? '–' : (recording(COLS[i][5], S.val[13 + i] ?? 0.5, 0.5, 0) + 1) + '/' + n })()), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], 'Länge'),
+      fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
+        pct(S.val[5 + i]) + '</b><span>Pegel' + catchHint(5 + i) + '</span></div>',
+      b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b><div class=pat>' +
+        esc(pats[now][1]) + '</div></div>',
+      b2: '<div class="cell btn"><b>Shift</b></div>',
+    }
+  })
+  root.innerHTML = '<div class=head><h1>House Keys Lab 17</h1>' +
+    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Takt</span>' + where + '</div></div>' +
+    '<div class="head mix">' + ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? '<b class=acc>SHIFT</b>' : '') +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(bassLevel()) + '</div></div>' +
+    '<div class=grid>' +
+    COLS.map(([name], i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 ? ' live' : '') + '">' + (i + 1) + ' ' + esc(name) + '</div>').join('') +
+    ['k1', 'k2', 'k3', 'fader', 'b1', 'b2'].map(r => cells.map(c => c[r]).join('')).join('') + '</div>'
+}
+if (view) {
+  for (const old of document.querySelectorAll('a')) if (old.target === 'keys-lab-view') old.remove()
+  view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
+  const link = document.createElement('a')
+  link.textContent = '▣ LC groß'
+  link.href = 'about:blank'
+  link.target = 'keys-lab-view'
+  link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
+    'background:#ddd;border-radius:3px;text-decoration:none;cursor:pointer'
+  link.onclick = () => setTimeout(() => {
+    try {
+      const w = view.opener.contentWindow.open('', 'keys-lab-view')
+      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      view.win = w
+      w.document.title = 'House Keys Lab 17'
+      w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+      w.document.body.innerHTML = '<div id=lc></div>'
+      drawView()
+    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+  }, 100)
+  statusBox.append(link)
+  if (view.win && !view.win.closed) {
+    view.win.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+    if (!view.win.document.getElementById('lc')) view.win.document.body.innerHTML = '<div id=lc></div>'
+  }
+}
+
+const showStatus = () => {
+  if (statusText) {
+    const h = harmNow(), hp = S.pend.harm ?? 0
+    statusText.textContent = [
+      'Harmonie ' + HARMONIES[h][0] + ': ' + HARMONIES[h][1].map(c => c[0]).join(' – ') + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? 'SHIFT · ' : '') + 'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(bassLevel()) + ' · ' + bpm + ' BPM',
+      '',
+      ...COLS.map(([name, pats], i) => {
+        const now = latchNow(i), next = S.pend[i] ?? 0
+        return (i + 1) + ' ' + name.padEnd(19) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+          pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
+      }),
+    ].join('\n')
+  }
+  drawView()
+}
+// Shift per column (button 2 switches it on / off): its fader sets how far the accent moves through the recordings
+const onMidi = e => {
+  let [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if (cc >= 45 && cc <= 52) {
+    const i = cc - 45, L = S.latched ??= []
+    if (value > 63) { L[i] = !L[i]; S.held[cc] = L[i] }   // every press switches shift on or off; release does nothing
+    if (!S.held[cc]) S.held[cc + 48] = false
+    showStatus()
+    return
+  }
+  const col = cc >= 5 && cc <= 12 ? cc - 5 : cc >= 13 && cc <= 36 ? (cc - 13) % 8 : cc >= 37 && cc <= 44 ? cc - 37 : -1
+  if (col >= 0 && S.held[45 + col]) {
+    const sf = cc >= 5 && cc <= 12 ? SHIFT_FADER[cc - 5] : null
+    if (sf) { S.val[sf[0]] = value / 127; showStatus(); return }   // shift fader: recordings
+    return   // shift: everything else does nothing
+  }
+  if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if ((cc >= 45 && cc <= 52) || (cc >= 93 && cc <= 100)) S.held[cc] = value > 63
+  else if (value === 0) return
+  else if (cc >= 37 && cc <= 44) { if (!COLS[cc - 37]) return; S.pend[cc - 37] = ((S.pend[cc - 37] ?? 0) + 1) % COLS[cc - 37][1].length }
+  else if (cc === 89) S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; fn(step, bar, k) returns events with dur in 16ths; swing moves the odd 16ths late
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const late = k => ((k % 2) + 2) % 2 === 1 ? 2 * (swingPct() - 0.5) : 0
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 1; k++) {
+    const t0 = (k + late(k)) / 16
+    if (t0 < b0 - 1 / 16 || t0 >= e0 + 1 / 16) continue   // only hits that swing could move into this window
+    for (const { dur = 1, jit = 0, ...v } of fn(((k % 16) + 16) % 16, Math.floor(k / 16), k) ?? []) {
+      const t = t0 + jit
+      if (t < b0 - 1e-9 || t >= e0 - 1e-9) continue
+      out.push(new Hap(new TimeSpan(t, t + dur / 16), new TimeSpan(t, Math.min(t + dur / 16, e0)), v, {}))
+    }
+  }
+  return out
+})
+const chordOf = bar => { const ch = VOICED[latch('harm', bar, 4)]; return ch[((bar % ch.length) + ch.length) % ch.length] }
+
+const column = i => grid((step, bar, k) => {
+  if (step === 0) latch(i, bar)   // latch every bar, also while silent
+  const level = S.val[5 + i] ?? 0
+  if (level <= 0) return
+  // The loop repeats unchanged (any length, read from the step number)
+  const pat = COLS[i][1][latch(i, bar)][1], len = pat.length
+  const pos = ((k % len) + len) % len
+  const sym = pat[pos]
+  if (sym === '.' || sym === '-') return
+  let ties = 0
+  while (pos + ties + 1 < len && pat[pos + ties + 1] === '-') ties++
+  const entry = COLS[i][1][latch(i, bar)], seq = entry[4]
+  // Push (Kerri Chandler): hits on the last two 16ths of a bar already play the next bar's chord
+  const kk = k
+  const { pcs, notes } = seq ? PEDAL[seq[((kk % seq.length) + seq.length) % seq.length]] : chordOf(step >= 14 ? bar + 1 : bar), top = notes[notes.length - 1]
+  const above = top + Math.min(...pcs.map(p => ((p - top) % 12 + 12) % 12).filter(d => d > 0))
+  const play0 = { x: notes, X: notes, O: notes, a: notes, b: notes, g: notes, t: [top], u: [above], d: [notes[notes.length - 2]] }[sym]
+  const play = play0
+  const lenF = exp(1, 4)(S.val[29 + i] ?? 0), lengths = entry[5], mod = entry[6] ?? {}
+  const hit = [...pat.slice(0, pos)].filter(c => c !== '.' && c !== '-').length   // which hit of the loop this is
+  const dur = (lengths ? lengths[hit] * lenF : sym === 'g' ? Math.min(1, lenF) : (1 + ties) * lenF)
+  // Space: the echo comes first (1/8, clearly there from the first turn, full at half the knob), the room joins from
+  // 0.35 (full at the top); the only echo: no pattern has its own
+  const sp = S.val[21 + i] ?? 0, room = 0.8 * Math.max(0, (sp - 0.35) / 0.65)
+  const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0, ef = ev > 0 ? { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev } : {}
+  // Touch: sources with several recordings: the accent only picks the recording (no extra gain); the others keep the
+  // round-11 accent in loudness. vel = gain per symbol (overlays: the second rhythm softer)
+  const dyn = COLS[i][4], st = ACCENT, hitT = dyn.touch(k, pat, pos, st), vt = dyn.vel(st)
+  const src = COLS[i][5], [snd, , touch, srcG] = SRC[src], tT = touch ? 0.5 : hitT
+  const hitGain = (0.6 + 0.8 * tT) * norm(i, entry, touch ? 0 : st)
+  const r = recording(src, S.val[13 + i] ?? 0.5, hitT, S.val['rec' + i] ?? 0.5)
+  return play.map(note => ({ s: snd[r], note, release: 0.15, dur, gain: 0.6 * vt[sym] * recGain(src, r) * srcG,
+    ...(src === 'salamander' ? { hcutoff: 120 } : {}), room, roomsize: 2, orbit: 2, postgain: level * hitGain, ...mod, ...ef }))
+})
+
+// Context: a dry house loop (909 kick, off-beat open hat, clap on 2 and 4, quiet shaker) and the bass on the root
+const context = grid((step, bar) => {
+  const out = [], l = drumsLevel(), bl = bassLevel()
+  if (step === 0) chordOf(bar)   // latches the harmony every bar
+  if (l > 0) {
+    if (step % 4 === 0) out.push({ s: 'bd', bank: 'RolandTR909', gain: 0.6, decay: 0.25, sustain: 0, postgain: l })
+    if (step % 4 === 2) out.push({ s: 'oh', bank: 'RolandTR909', gain: 0.3, decay: 0.12, sustain: 0, postgain: l })
+    if (step === 4 || step === 12) out.push({ s: 'cp', bank: 'RolandTR909', gain: 0.5, postgain: l })
+    out.push({ s: 'sh', bank: 'RolandTR727', n: 1, gain: step % 2 ? 0.3 : 0.18, postgain: l })
+  }
+  if (bl > 0 && step % 4 === 2) out.push({ s: 'triangle', note: 33 + ((chordOf(step >= 14 ? bar + 1 : bar).root - 9 + 12) % 12), gain: 0.45,
+    decay: 0.15, sustain: 0.3, release: 0.05, cutoff: 900, postgain: bl, dur: 1.5 })
+  return out.map(v => ({ ...v, orbit: 1 }))
+})
+
+const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
+  const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), b = Math.floor((pos - bar) * 4 + 1e-9)
+  setTimeout(() => { beatNow.bar = bar; beatNow.beat = b; showStatus() }, Math.max(0, (t - now) * 1000))
+}, true)
+setcpm(bpm / 4)
+
+stack(...COLS.map((_, i) => column(i)), context)
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
+  .stack(beatTick)   // silent, after the safety net: moves the dashboard and the status box with the beat

@@ -55,7 +55,7 @@
 // @recipe Dub echo | space on, delay 0.4, feedback 0.5-0.7, time 3/16 or 1/4 | dub techno stabs and chords
 // @recipe Big room | reverb 0.5-0.7, room size 4-8 | pads and stabs; on a bass only for a rumble
 //
-// @layout Synth Board (lab/sounds)
+// @layout Synth Board (lab/bass)
 // @note One bass voice; each column is one stage of the signal path: source → volume envelope → filter → filter envelope → FM → pitch → drive → space.
 // @note Button row 1 picks a choice within the stage, button row 2 switches the stage on/off (A/B comparison). Exception column 1: button 2 = bassline. At start only envelope and filter are on.
 // @note The status box at the bottom right shows all values live, with units. Faders jump from their start value to their real position on first movement.

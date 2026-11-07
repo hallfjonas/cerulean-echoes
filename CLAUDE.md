@@ -7,12 +7,12 @@ Talk to the user in German; code comments stay in English. Explain audio basics 
 - `tracks/NNN/` — one folder per track number: the track (`NNN.strudel`, variants as `NNN-<name>.strudel`), its
   layout sheets, custom modes (`.syx`) and feedback notes; superseded variants in `tracks/NNN/old/`
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
-- `lab/` — boards, not tracks. Work flows sounds → stems → tracks:
-  - `lab/sounds/` — the finest work: one sound optimised on its own (kick, bass, synth voice, drum-machine/bass
-    comparisons)
-  - `lab/stems/` — building blocks for tracks: versions of one column (sound + rhythm/riff in context), quicker to
-    tune, fed into several tracks (e.g. `arp-cascade.strudel`, `house-piano-lab.strudel`)
-  - `lab/tutorials/` — ear-training tutorials with live sliders + German handbook PDF (Typst): harmony, effects
+- `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
+  `harmonie/`, `melodie/`, `einwurf/`, `samples/`, `tools/`
+  (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + German handbook PDF).
+  A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
+  column), worked in rounds: the current round in the folder, older rounds in `old/`, the result of each round in
+  the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
 - `docs/references.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
 - `samples/` — audio recordings
 - `snippets/` — small helpers and tests (`midi-test.strudel`)

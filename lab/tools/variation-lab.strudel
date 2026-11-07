@@ -10,7 +10,7 @@
 // The global column has no per-sound filters: Thin (highpass for everything), Room, Drift (the patterns change
 // by themselves, one column at a time), Chapter (chord root) and Reroll (new dice for all columns at once).
 //
-// @layout Variation Lab (lab/stems)
+// @layout Variation Lab (lab/tools)
 // @note Seven voices, each with the same three knobs: Variation (which pattern), Density (how many hits) and Push (syncopation). All knobs at 0 = a plain house groove: four-on-the-floor, off-beat hats, clap on 2 and 4, off-beat bass, syncopated stab.
 // @note The knobs are set to 0 on load. Variation: every position is a different pattern; the same position always gives the same one back. Button 1 = next instrument, button 2 = loop length 16 → 12 → 10 → 7 steps (runs against the bar). Column 6 plays slices of a recording: Variation picks where in the recording.
 // @mode 16 Mode 16 — Variation Lab

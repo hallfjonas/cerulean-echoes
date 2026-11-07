@@ -27,7 +27,7 @@
 // @recipe FM thud | sine kick, FM on, ratio 1, amount 2-3, FM sustain 0, FM decay ~30 ms | dark, metallic kicks
 // @recipe Lo-fi kick | SP-1200 or DMX, drive on, bitcrush ~8, coarse 4 | breaks, lo-fi house
 //
-// @layout Synth Kick Board (lab/sounds)
+// @layout Synth Kick Board (lab/kick)
 // @note The synth board with a bass drum as the source. Column 1: button 1 = kick (sine kick or a drum machine), button 2 = rhythm.
 // @note At start every stage is off (raw kick). Button row 2 switches each stage on/off. FM, Drop and Noise only affect the sine kick.
 // @note The status box at the bottom right shows all values live, with units. Faders jump from their start value to their real position on first movement.
