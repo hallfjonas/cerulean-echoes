@@ -1,0 +1,283 @@
+// ============================================================
+// SYNTH KICK BOARD: the synth board, but the source is a bass drum you can swap
+// ============================================================
+// Same layout as synth.strudel (MIDI channel 16), same eight stages:
+// source → volume envelope → filter → filter envelope → FM → pitch → drive → space.
+// Column 1, button 1 steps through the kicks: a synthesized sine kick and the kicks of the classic drum machines
+// (808, 909, 707, LinnDrum, DMX, SP-1200; sample picks and loudness trims from drum-machines-comparison.strudel).
+// Column 1, button 2 steps through the kick rhythms. Column 6, button 1 tunes the kick (semitones instead of octaves).
+//
+// SAMPLES vs. SYNTH: the drum machine kicks are recordings. Envelope, filter, filter envelope, pitch envelope,
+// vibrato, drive and space work on them. FM, Drop and Noise only work on the sine kick (they need an oscillator).
+// Tuning a sample changes its speed, so it also gets shorter (up) or longer (down).
+// The click (column 1, knob 1) is a separate noise layer that bypasses the stages, so the envelope cannot stretch it.
+//
+// Each kick is held until the next one; note length (column 2, button 1) cuts it shorter (or lets it overlap with ×2).
+//
+// @guide How to use this board | At start every stage is off: you hear the raw kick. Step through the kicks (column 1, button 1), then switch one stage on at a time and hear what it does to the kick.
+// @guide Anatomy of a kick | A kick has three parts: the click (the first few ms, makes it audible on small speakers), the punch (the pitch drop from high to low, 20-80 ms) and the body or tail (the low sine that rings out). The drum machines differ mostly in how long and how deep the body is and how hard the click is.
+// @guide The machines | 808: deep, boomy sine, long tail; hip hop, electro, trap. 909: punchier, with a click and a shorter body; the house and techno kick. 707, LinnDrum, DMX, SP-1200: sampled 80s kicks, shorter and tighter; electro, hip hop, breaks. Sine kick: fully synthetic, every part adjustable (Drop, Noise, FM).
+// @guide Shaping a kick | Envelope decay = length of the tail; short for fast techno, long for deep or 808 styles. Low-pass = darker, removes the click. High-pass at 30-50 Hz = tighter, less rumble. Pitch envelope = extra punch on top of the sample. Drive = louder, harder (hard techno kicks are distorted). Space = rumble (lots of reverb, then a low-pass).
+// @guide Tuning | A kick has a pitch. Tune it to the key of the track (here A minor): a kick that clashes with the bass makes the low end muddy.
+// @recipe Hard techno kick | 909, drive hard 3-5, Level after down, envelope D ~200 ms S 0, filter 24 dB ~3 kHz | hard and industrial techno
+// @recipe Long 808 | 808 lang, envelope off, tune -3 or ±0, drive scurve 1 | hip hop, trap, electro
+// @recipe Tight house kick | 909 A, envelope D ~150 ms S 0, HPF ~40 Hz, click 0.3 | house, tech house
+// @recipe Rumble | 909, space on, reverb 0.7, room size 6, filter LPF ~150 Hz | hypnotic techno: the reverb tail becomes a low drone
+// @recipe Zap kick | sine kick, pitch env on 24 HT, pitch decay ~20 ms, drop 0 | electro, minimal
+// @recipe FM thud | sine kick, FM on, ratio 1, amount 2-3, FM sustain 0, FM decay ~30 ms | dark, metallic kicks
+// @recipe Lo-fi kick | SP-1200 or DMX, drive on, bitcrush ~8, coarse 4 | breaks, lo-fi house
+//
+// @layout Synth Kick Board (lab/kick)
+// @note The synth board with a bass drum as the source. Column 1: button 1 = kick (sine kick or a drum machine), button 2 = rhythm.
+// @note At start every stage is off (raw kick). Button row 2 switches each stage on/off. FM, Drop and Noise only affect the sine kick.
+// @note The status box at the bottom right shows all values live, with units. Faders jump from their start value to their real position on first movement.
+// @mode 16 Mode 16 — Synth Kick Board
+// @col 16:1 1 Kick
+// @col 16:2 2 Envelope
+// @col 16:3 3 Filter
+// @col 16:4 4 Filter env.
+// @col 16:5 5 FM
+// @col 16:6 6 Pitch
+// @col 16:7 7 Drive
+// @col 16:8 8 Space
+
+const bpm = 118
+setcpm(bpm / 4)
+
+// Kicks (column 1, button 1): [label, bank, sample number, trim]. bank null = synthesized sine kick.
+// Trims from drum-machines-comparison.strudel (about equally loud); the sine kick trim is a guess, not measured.
+const KICKS = [
+  ['Sinus-Kick', null,          0,  0.6],
+  ['808 kurz',   'RolandTR808', 10, 3.2],
+  ['808 lang',   'RolandTR808', 14, 1],
+  ['909 A',      'RolandTR909', 0,  0.6],
+  ['909 B',      'RolandTR909', 2,  0.51],
+  ['707',        'RolandTR707', 0,  0.82],
+  ['LinnDrum',   'LinnDrum',    0,  0.9],
+  ['DMX',        'OberheimDMX', 0,  0.98],
+  ['SP-1200',    'EmuSP12',     0,  0.82],
+]
+// Rhythms (column 1, button 2), one bar = 16 sixteenths; @n holds each kick until the next one.
+// Double quotes: only those are parsed as mini-notation in the REPL.
+const RHYTHMS = [
+  ['4/4',      "x*4"],                 // four on the floor
+  ['Broken',   "x@3 x@3 x@4 x@6"],     // 1, 4, 7, 11: broken techno / breaks
+  ['Galopp',   "[x@3 x]*4"],           // kick plus a ghost before the next beat
+  ['Halftime', "x@10 x@6"],            // 1 and 11: slow, heavy
+]
+
+// Choices for button row 1, per column (as on the synth board, column 6 = tuning instead of octaves).
+const LENGTHS  = [['kurz ¼', 0.25], ['halb ½', 0.5], ['voll', 1], ['lang ×2', 2]]   // clip: kick length relative to its step
+const FTYPES   = ['12db', '24db', 'ladder']
+const FDIRS    = [['auf', 1], ['ab', -1]]
+const RATIOS   = [1, 2, 3, 0.5, 1.414]                                               // fmh: modulator frequency / note frequency
+const TUNES    = [['±0', 0], ['+2 HT', 2], ['+5 HT', 5], ['-3 HT', -3], ['-5 HT', -5]]
+const DTYPES   = ['scurve', 'soft', 'hard', 'cubic', 'diode', 'asym', 'fold', 'sinefold', 'chebyshev']
+const DTIMES   = [['1/8', 0.5], ['3/16', 0.75], ['1/4', 1], ['1/16', 0.25]]          // delay time in beats
+
+// Continuous controls: [CC, label, start (0..1), map 0..1 → value, format].
+// Faders: 4 + column, knob rows: 12 / 20 / 28 + column.
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)   // exponential: every bit of travel is equally audible
+const lin = (lo, hi) => v => lo + (hi - lo) * v
+const sec = x => x < 1 ? Math.round(x * 1000) + ' ms' : x.toFixed(2) + ' s'
+const hz  = x => x < 1000 ? Math.round(x) + ' Hz' : (x / 1000).toFixed(1) + ' kHz'
+const num = d => x => x.toFixed(d)
+const CTL = {
+  // 1 kick
+  // @ctl 16:1.fader Level | 0–1, overall volume.
+  level:     [5,  'Lautst.',    0.7,  lin(0, 1),        num(2)],
+  // @ctl 16:1.k1 Click | 0–1: short noise click on every kick (all kicks): attack, audible on small speakers.
+  click:     [13, 'Klick',      0,    lin(0, 1),        num(2)],
+  // @ctl 16:1.k2 Drop | 0–48 semitones: built-in pitch drop of the sine kick (punch). Samples have theirs baked in.
+  drop:      [21, 'Drop',       0.75, lin(0, 48),       x => x.toFixed(0) + ' HT'],
+  // @ctl 16:1.k3 Noise | 0–1: noise mixed into the sine kick: dirtier, more like a sampled kick.
+  noise:     [29, 'Rauschen',   0,    lin(0, 1),        num(2)],
+  // 2 volume envelope (ADSR)
+  // @ctl 16:2.k1 Attack | 1 ms–1 s: fade-in. Anything above a few ms softens the click away.
+  attack:    [14, 'A',          0,    exp(0.001, 1),    sec],
+  // @ctl 16:2.k2 Decay | 10 ms–2 s: length of the tail (with sustain 0). The main kick-length control.
+  decay:     [22, 'D',          0.6,  exp(0.01, 2),     sec],
+  // @ctl 16:2.fader Sustain | 0–1: level while held. 0 = the kick dies away after the decay.
+  sustain:   [6,  'S',          0,    lin(0, 1),        num(2)],
+  // @ctl 16:2.k3 Release | 10 ms–2 s: fade-out after the step ends.
+  release:   [30, 'R',          0.3,  exp(0.01, 2),     sec],
+  // 3 filter
+  // @ctl 16:3.fader Cutoff (LPF) | 40 Hz–12 kHz: low-pass, low = dull and soft (click gone), high = open.
+  cutoff:    [7,  'LPF',        0.6,  exp(40, 12000),   hz],
+  // @ctl 16:3.k1 Resonance | 0–20: boosts the cutoff region; on a kick a tonal, booming ring.
+  lpq:       [15, 'Res',        0.1,  lin(0, 20),       num(1)],
+  // @ctl 16:3.k2 HPF | 20 Hz–2 kHz: high-pass. 30-50 Hz = tighter; higher = thin, breakdown kick.
+  hpf:       [23, 'HPF',        0,    exp(20, 2000),    hz],
+  // @ctl 16:3.k3 HPF resonance | 0–20: resonance of the high-pass.
+  hpq:       [31, 'HPF-Res',    0,    lin(0, 20),       num(1)],
+  // 4 filter envelope
+  // @ctl 16:4.fader Env amount | 0–6 octaves: the filter opens on each kick and closes again. Needs column 3 on.
+  fenv:      [8,  'Menge',      0.5,  lin(0, 6),        x => x.toFixed(1) + ' Okt.'],
+  // @ctl 16:4.k1 Filter attack | 1 ms–1 s: how fast the filter opens.
+  fattack:   [16, 'A',          0,    exp(0.001, 1),    sec],
+  // @ctl 16:4.k2 Filter decay | 10 ms–2 s: how fast it closes. Short = bright click, dark body.
+  fdecay:    [24, 'D',          0.3,  exp(0.01, 2),     sec],
+  // @ctl 16:4.k3 Filter sustain | 0–1: how far open it stays.
+  fsustain:  [32, 'S',          0,    lin(0, 1),        num(2)],
+  // 5 FM (sine kick only)
+  // @ctl 16:5.fader FM amount | 0–8: sine kick only. Overtones: thud, metallic, growl.
+  fm:        [9,  'Stärke',     0.25, lin(0, 8),        num(1)],
+  // @ctl 16:5.k1 FM decay | 10 ms–2 s: how fast the FM overtones fade.
+  fmdecay:   [17, 'D',          0.2,  exp(0.01, 2),     sec],
+  // @ctl 16:5.k2 FM sustain | 0–1: 0 = only a strike at the start of the kick.
+  fmsustain: [25, 'S',          0,    lin(0, 1),        num(2)],
+  // @ctl 16:5.k3 Detune | 0–5 % off the ratio: inharmonic, metallic.
+  fmdetune:  [33, 'Verst.',     0,    lin(0, 0.05),     x => (x * 100).toFixed(1) + ' %'],
+  // 6 pitch (works on samples too)
+  // @ctl 16:6.fader Pitch env | 0–24 semitones: extra pitch drop at the start: more punch, high + short = „zap“.
+  penv:      [10, 'P-Env',      0.5,  lin(0, 24),       x => x.toFixed(1) + ' HT'],
+  // @ctl 16:6.k1 Pitch decay | 10 ms–1 s: how fast the pitch falls.
+  pdecay:    [18, 'P-Dec',      0.3,  exp(0.01, 1),     sec],
+  // @ctl 16:6.k2 Vibrato rate | 0–12 Hz: pitch wobble of the tail.
+  vib:       [26, 'Vib',        0.4,  lin(0, 12),       x => x.toFixed(1) + ' Hz'],
+  // @ctl 16:6.k3 Vibrato depth | 0–2 semitones.
+  vibmod:    [34, 'Tiefe',      0.25, lin(0, 2),        x => x.toFixed(2) + ' HT'],
+  // 7 drive
+  // @ctl 16:7.fader Drive | 0–6: distortion; hard techno kicks are heavily driven.
+  drive:     [11, 'Drive',      0.3,  lin(0, 6),        num(1)],
+  // @ctl 16:7.k1 Level after | 0.1–1: bring the volume back down after drive.
+  distvol:   [19, 'Pegel',      0.5,  lin(0.1, 1),      num(2)],
+  // @ctl 16:7.k2 Bitcrush | 16–2 bit: digital, 8-bit.
+  crush:     [27, 'Bits',       0,    lin(16, 2),       x => x.toFixed(1)],
+  // @ctl 16:7.k3 Coarse | 1–32: lower sample rate, lo-fi sampler.
+  coarse:    [35, 'Coarse',     0,    v => 1 + Math.round(31 * v), x => String(x)],
+  // 8 space
+  // @ctl 16:8.fader Reverb | 0–1: amount of reverb. With a low LPF: the techno rumble.
+  room:      [12, 'Hall',       0.3,  lin(0, 1),        num(2)],
+  // @ctl 16:8.k1 Room size | 0.5–8: small room … cathedral.
+  roomsize:  [20, 'Größe',      0.3,  exp(0.5, 8),      num(1)],
+  // @ctl 16:8.k2 Delay | 0–0.8: volume of the echoes.
+  delay:     [28, 'Delay',      0.3,  lin(0, 0.8),      num(2)],
+  // @ctl 16:8.k3 Feedback | 0–0.9: how many echoes.
+  feedback:  [36, 'Feedb.',     0.4,  lin(0, 0.9),      num(2)],
+}
+
+// All state lives on globalThis, so re-evaluating while playing keeps knobs and buttons where they are.
+const S = globalThis.synthKickLab ??= {
+  val: Object.fromEntries(Object.values(CTL).map(([cc, , start]) => [cc, start])),
+  sel: [3, 2, 1, 0, 0, 0, 0, 0],        // button row 1 per column; starts on 909 A, full length, 24 dB
+  line: 0,                              // column 1, button 2: rhythm
+  on: [true, false, false, false, false, false, false, false],   // button row 2: all stages off = raw kick
+}
+const get = name => CTL[name][3](S.val[CTL[name][0]])
+const p = name => signal(() => get(name))
+const sig = f => signal(() => f())
+
+// The knobs are endless encoders that keep their own position, so tell the controller where they are.
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = await navigator.requestMIDIAccess()
+if (globalThis.knobsSyncedFor !== 'synth-kick') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round(S.val[cc] * 127)])   // 0xBF = CC on channel 16
+    globalThis.knobsSyncedFor = 'synth-kick'
+  }
+}
+
+// Status box at the bottom right.
+const COLUMNS = [
+  ['Kick',       () => KICKS[S.sel[0]][0] + '  ' + RHYTHMS[S.line][0],  ['level', 'click', 'drop', 'noise']],
+  ['Hüllkurve',  () => 'Länge ' + LENGTHS[S.sel[1]][0],                 ['attack', 'decay', 'sustain', 'release']],
+  ['Filter',     () => FTYPES[S.sel[2]],                                ['cutoff', 'lpq', 'hpf', 'hpq']],
+  ['Filter-Env', () => FDIRS[S.sel[3]][0],                              ['fenv', 'fattack', 'fdecay', 'fsustain']],
+  ['FM',         () => 'Verh. ' + RATIOS[S.sel[4]],                     ['fm', 'fmdecay', 'fmsustain', 'fmdetune']],
+  ['Tonhöhe',    () => 'Tune ' + TUNES[S.sel[5]][0],                    ['penv', 'pdecay', 'vib', 'vibmod']],
+  ['Verzerrung', () => DTYPES[S.sel[6]],                                ['drive', 'distvol', 'crush', 'coarse']],
+  ['Raum',       () => 'Delay ' + DTIMES[S.sel[7]][0],                  ['room', 'roomsize', 'delay', 'feedback']],
+]
+let statusBox = document.getElementById('board-status')
+if (!statusBox) {
+  statusBox = document.createElement('pre')
+  statusBox.id = 'board-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);color:#eee;font:13px/1.5 monospace;border-radius:6px;pointer-events:none'
+  document.body.appendChild(statusBox)
+}
+const showStatus = () => {
+  statusBox.textContent = COLUMNS.map(([name, choice, names], i) =>
+    (i + 1) + ' ' + name.padEnd(11) + (i === 0 ? '   ' : S.on[i] ? 'AN ' : 'aus') + ' ' + choice().padEnd(21) +
+    names.map(n => (CTL[n][1] + ' ' + CTL[n][4](get(n))).padEnd(15)).join('')
+  ).join('\n')
+}
+showStatus()
+
+// MIDI in: faders and knobs (CC 5-36) set values, buttons (37-52) step on each press; the release (0) is ignored.
+// Re-evaluating replaces the old listener (shared name with the other boards).
+const OPTIONS = [KICKS, LENGTHS, FTYPES, FDIRS, RATIOS, TUNES, DTYPES, DTIMES]
+const onMidi = e => {
+  const [statusByte, num, value] = e.data
+  if ((statusByte & 0xf0) !== 0xb0) return
+  if (num >= 5 && num <= 36) S.val[num] = value / 127
+  else if (value === 0) return
+  else if (num >= 37 && num <= 44) S.sel[num - 37] = (S.sel[num - 37] + 1) % OPTIONS[num - 37].length
+  else if (num === 45) S.line = (S.line + 1) % RHYTHMS.length
+  else if (num >= 46 && num <= 52) S.on[num - 45] = !S.on[num - 45]
+  else return
+  showStatus()
+}
+for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+
+// A stage only touches the sound while it is switched on; off = the parameters are not set at all.
+const stage = (i, fx) => pat => sig(() => S.on[i]).fmap(on => on ? fx(pat) : pat).innerJoin()
+
+const STAGES = [
+  // 2 volume envelope; off = the kick plays as it is (sample) or with its built-in decay (sine kick)
+  stage(1, x => x.attack(p('attack')).decay(p('decay')).sustain(p('sustain')).release(p('release'))),
+  // 3 filter
+  stage(2, x => x.lpf(p('cutoff')).lpq(p('lpq')).hpf(p('hpf')).hpq(p('hpq')).ftype(sig(() => FTYPES[S.sel[2]]))),
+  // 4 filter envelope
+  stage(3, x => x.lpenv(sig(() => get('fenv') * FDIRS[S.sel[3]][1]))
+    .lpattack(p('fattack')).lpdecay(p('fdecay')).lpsustain(p('fsustain'))),
+  // 5 FM (no effect on samples)
+  stage(4, x => x.fm(p('fm')).fmh(sig(() => RATIOS[S.sel[4]] * (1 + get('fmdetune'))))
+    .fmdecay(p('fmdecay')).fmsustain(p('fmsustain'))),
+  // 6 pitch: replaces the sine kick's built-in drop while on
+  stage(5, x => x.penv(p('penv')).pattack(0.001).pdecay(p('pdecay')).psustain(0).vib(p('vib')).vibmod(p('vibmod'))),
+  // 7 drive
+  stage(6, x => x.distort(p('drive')).distorttype(sig(() => S.sel[6])).distortvol(p('distvol'))
+    .crush(p('crush')).coarse(p('coarse'))),
+  // 8 space
+  stage(7, x => x.room(p('room')).roomsize(p('roomsize'))
+    .delay(p('delay')).delayfeedback(p('feedback')).delaytime(sig(() => DTIMES[S.sel[7]][1] * 60 / bpm))),
+]
+
+// @ctl 16:1.b1 Kick | sine, 808 s/l, 909 A/B, 707, Linn, DMX, SP-1200.
+// @ctl 16:1.b2 Rhythm | 4/4 → Broken → Gallop → Halftime.
+// @ctl 16:2.b1 Note length | ¼, ½, full, ×2 of the step (step = until the next kick).
+// @ctl 16:2.b2 Envelope on/off | Off = the kick as it is.
+// @ctl 16:3.b1 Filter type | 12 dB, 24 dB, ladder (Moog).
+// @ctl 16:3.b2 Filter on/off |
+// @ctl 16:4.b1 Direction | up / down per kick.
+// @ctl 16:4.b2 Filter env on/off | Only works with filter on.
+// @ctl 16:5.b1 Ratio | 1, 2, 3, 0.5, 1.414 (metallic).
+// @ctl 16:5.b2 FM on/off | Sine kick only.
+// @ctl 16:6.b1 Tune | ±0, +2, +5, -3, -5 semitones (samples: speed).
+// @ctl 16:6.b2 Pitch/vibrato on/off |
+// @ctl 16:7.b1 Distortion type | 9 types: scurve … chebyshev.
+// @ctl 16:7.b2 Drive on/off |
+// @ctl 16:8.b1 Delay time | 1/8, 3/16, 1/4, 1/16.
+// @ctl 16:8.b2 Space on/off |
+const tune = () => TUNES[S.sel[5]][1]
+const kickOf = (rhythm, [, bank, n, trim]) => (bank
+  ? s('bd').struct(rhythm).bank(bank).n(n).speed(sig(() => Math.pow(2, tune() / 12)))
+  : note('e1').struct(rhythm).trans(sig(tune)).s('sine').noise(p('noise'))
+      .penv(p('drop')).pattack(0.001).pdecay(0.05).psustain(0).decay(0.4).sustain(0)
+).gain(trim)
+const kick = sig(() => S.line).pick(RHYTHMS.map(([, r]) => sig(() => S.sel[0]).pick(KICKS.map(k => kickOf(r, k)))))
+  .clip(sig(() => LENGTHS[S.sel[1]][1]))
+const click = sig(() => S.line).pick(RHYTHMS.map(([, r]) => s('white').struct(r)))
+  .hpf(3000).attack(0.001).decay(0.012).sustain(0).gain(p('click'))
+
+stack(STAGES.reduce((pat, st) => st(pat), kick), click)
+  .orbit(1)
+  .postgain(p('level'))

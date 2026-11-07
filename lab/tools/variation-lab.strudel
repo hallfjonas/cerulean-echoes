@@ -1,0 +1,239 @@
+// ============================================================
+// VARIATION LAB: knobs that generate material instead of colouring it
+// ============================================================
+// Seven voices. Every column has the same three knobs, and none of them is a filter:
+//   Variation = a "dice roll": every position is a different, fixed pattern (same position = same pattern again)
+//   Density   = how many of the steps play, spread as evenly as possible (Euclidean rhythm)
+//   Push      = syncopation: notes on the 8ths jump one 16th early, they "push" into the beat
+// Button 1 swaps the instrument (the role stays: column 4 is always the bass), button 2 changes the loop length
+// (16 / 12 / 10 / 7 sixteenths): a short loop against the 4/4 bar only lines up again after many bars.
+// The global column has no per-sound filters: Thin (highpass for everything), Room, Drift (the patterns change
+// by themselves, one column at a time), Chapter (chord root) and Reroll (new dice for all columns at once).
+//
+// @layout Variation Lab (lab/tools)
+// @note Seven voices, each with the same three knobs: Variation (which pattern), Density (how many hits) and Push (syncopation). All knobs at 0 = a plain house groove: four-on-the-floor, off-beat hats, clap on 2 and 4, off-beat bass, syncopated stab.
+// @note The knobs are set to 0 on load. Variation: every position is a different pattern; the same position always gives the same one back. Button 1 = next instrument, button 2 = loop length 16 → 12 → 10 → 7 steps (runs against the bar). Column 6 plays slices of a recording: Variation picks where in the recording.
+// @mode 16 Mode 16 — Variation Lab
+// @col 16:1 1 Low drum
+// @col 16:2 2 Hats
+// @col 16:3 3 Snap
+// @col 16:4 4 Bass
+// @col 16:5 5 Chords
+// @col 16:6 6 Texture
+// @col 16:7 7 Lead
+// @col 16:8 8 Global
+// @row 16:k1 Row 1 \ Variation
+// @row 16:k2 Row 2 \ Density
+// @row 16:k3 Row 3 \ Push
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Sound
+// @row 16:b2 Button 2 \ Loop length
+// @ctl 16:1-7.k1 Variation | 0 = the plain pattern; every other position is a different, fixed variant (32 in all).
+// @ctl 16:1-7.k2 Density | 0 = few hits ↔ many hits, spread as evenly as possible.
+// @ctl 16:1-7.k3 Push | 0 = on the grid ↔ more and more hits come a 16th early (syncopation).
+// @ctl 16:1-7.fader Level | 0 = gone.
+// @ctl 16:1-7.b2 Loop length | 16 → 12 → 10 → 7 steps, drifts against the bar.
+const cc = await midin()
+
+// The knobs are endless encoders that keep their own position; set them all to 0 once per page load,
+// so the first turn starts from the plain pattern instead of jumping
+if (globalThis.knobsSyncedFor !== 'variation-lab' && globalThis.navigator?.requestMIDIAccess) {
+  const access = await navigator.requestMIDIAccess()
+  const out = [...access.outputs.values()].find(p => /LCXL|Launch Control/i.test(p.name) && !/DAW/i.test(p.name))
+  if (out) {
+    for (let n = 13; n <= 36; n++) out.send([0xBF, n, 0])   // 0xBF = control change on channel 16
+    globalThis.knobsSyncedFor = 'variation-lab'
+  }
+}
+
+setcps(.5) // 120 BPM
+
+// Momentary button that steps through n states, one step per press (counts presses, not the held value)
+const cycleButton = (button, n) => {
+  let prev = 0, state = 0
+  return button.fmap(v => {
+    if (v > 0.5 && prev <= 0.5) state = (state + 1) % n
+    prev = v
+    return state
+  })
+}
+const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
+const pick = (mode, pats) => mode.fmap(m => reify(pats[m])).innerJoin()
+// Read several controls at once: f gets their current values and returns a pattern
+const withAll = (pats, f) => {
+  const go = (i, vals) => i === pats.length ? f(...vals) : pats[i].fmap(v => go(i + 1, [...vals, v])).innerJoin()
+  return go(0, [])
+}
+
+// Small seeded random generator: the same seed always gives the same numbers
+const rng = seed => {
+  let a = seed >>> 0
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0
+    let t = Math.imul(a ^ (a >>> 15), a | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const LENGTHS = [16, 12, 10, 7]
+const ROOTS = [0, -2, -4, -1]   // chapter roots as steps of A minor: A, F, D, G
+const WALK = [-2, -1, -1, 0, 1, 1, 2]
+
+// ------------------------------------------------------------
+// THE GENERATOR: one loop of `len` sixteenths for a voice, from seed, number of hits and push
+// ------------------------------------------------------------
+const cache = new Map()
+const makeLoop = (v, seed, pulses, push, len, root) => {
+  const key = [v.id, seed, pulses, push, len, root].join('|')
+  if (cache.has(key)) return cache.get(key)
+  const r = rng(seed * 7919 + v.id * 104729 + 1)
+  // Euclidean rhythm: `pulses` hits spread evenly over `len` steps, turned by the voice's offset (+ a random one)
+  const turn = v.rotate && seed > 0 ? Math.floor(r() * len) : 0
+  const steps = Array.from({ length: len }, (_, i) => {
+    const j = (((i - v.rot - turn) % len) + len) % len
+    return (j * pulses) % len < pulses ? { g: 1 } : null
+  })
+  // Variation > 0: flip a few steps (a hit drops out or a quiet ghost note appears) and accent the hits unevenly
+  if (seed > 0) {
+    const flips = 1 + Math.floor(r() * 3)
+    for (let f = 0; f < flips; f++) {
+      const i = Math.floor(r() * len)
+      if (!steps[i]) steps[i] = { g: 0.45 }
+      else if (!(v.keepBeats && i % 4 === 0)) steps[i] = null
+    }
+    for (const x of steps) if (x && x.g === 1) x.g = 0.7 + 0.3 * r()
+  }
+  // Pitches (or slice positions) per hit, in order; independent of push, so pushing never changes the melody
+  const rn = rng(seed * 4231 + v.id * 7 + 3)
+  let k = 0, d = v.motif ? v.motif[0] : 0
+  for (const x of steps) if (x) {
+    if (v.kind === 'note') {
+      if (seed === 0) x.d = v.motif[k % v.motif.length]
+      else {
+        if (k > 0) d = Math.max(v.dlo, Math.min(v.dhi, d + WALK[Math.floor(rn() * WALK.length)]))
+        x.d = d
+      }
+    } else if (v.kind === 'slice') {
+      x.b = seed === 0 ? (k * 0.25) % 1 : rn() * 0.9
+      x.sp = seed === 0 ? 1 : [1, 1, 0.5, -1][Math.floor(rn() * 4)]
+    }
+    k++
+  }
+  // Push: a hit on an 8th moves one 16th earlier if that spot is free. Each step has its own fixed dice value,
+  // so turning Push up only adds pushed notes, it never reshuffles
+  const rp = rng(seed * 131 + v.id * 977 + 5)
+  const out = steps.slice()
+  for (let i = 0; i < len; i += 2) {
+    const x = rp(), e = (i - 1 + len) % len
+    if (steps[i] && !steps[e] && !out[e] && x < push) { out[e] = steps[i]; out[i] = null }
+  }
+  const value = x => v.kind === 'note' ? { velocity: x.g, n: x.d + root }
+    : v.kind === 'slice' ? { velocity: x.g, begin: x.b, end: x.b + 0.08, speed: x.sp }
+    : { velocity: x.g }
+  const pat = fastcat(...out.map(x => x ? pure(value(x)) : silence)).slow(len / 16)
+  cache.set(key, pat)
+  return pat
+}
+
+// ------------------------------------------------------------
+// GLOBAL: column 8
+// ------------------------------------------------------------
+// @ctl 16:8.fader Master | 0–1, overall volume.
+const master = cc(12)
+// @ctl 16:8.k1 Thin | 0 = full ↔ everything loses its low end (highpass up to 1.5 kHz): for breaks.
+const thin = cc(20).fmap(t => 20 + 1500 * t * t)
+// @ctl 16:8.k2 Room | 0 = dry ↔ every voice in reverb (the low drum and the bass only a little).
+const room = cc(28)
+// @ctl 16:8.k3 Drift | 0 = patterns stay ↔ every 16 / 8 / 4 / 2 / 1 bars one column rolls a new variant by itself, in turn.
+const DRIFT_BARS = [16, 8, 4, 2, 1]
+const driftStep = cc(36).fmap(d => d < 0.05 ? pure(0)
+  : signal(t => Math.floor(t / DRIFT_BARS[Math.min(4, Math.floor(d * 5))]))).innerJoin()
+// @ctl 16:8.b1 Chapter | next chord root for bass, chords and lead: A → F → D → G.
+const chapter = cycleButton(cc(44), ROOTS.length)
+// @ctl 16:8.b2 Reroll | new dice for every column at once.
+const reroll = cycleButton(cc(52), 1000)
+
+// ------------------------------------------------------------
+// THE VOICES: columns 1-7, four instruments each (button 1)
+// ------------------------------------------------------------
+// @ctl 16:1.b1 Sound | 909 kick → 808 kick → sine thump → 808 tom.
+// @ctl 16:2.b1 Sound | 909 hats → 808 hats → metallic FM tick → noise click.
+// @ctl 16:3.b1 Sound | 909 clap → 808 rim → 909 snare → FM wood block.
+// @ctl 16:4.b1 Sound | rubber saw bass → FM bass → square pluck → deep sine.
+// @ctl 16:5.b1 Sound | FM glass → organ → saw stab → warm pad.
+// @ctl 16:6.b1 Sound | slices of: wind → insects → crows → gongs.
+// @ctl 16:7.b1 Sound | FM pluck → glockenspiel → acid saw → muted guitar.
+const fm = (p, ratio, amount, dec) => p.s('sine').fm(amount).fmh(ratio).fmdecay(dec).fmsustain(0)
+const VOICES = [
+  { id: 1, kind: 'drum', lo: 4, hi: 9, rot: 0, keepBeats: true, room: 0.1, inst: [
+    p => p.s('bd').bank('RolandTR909').gain(0.95),
+    p => p.s('bd').bank('RolandTR808').gain(1),
+    p => p.s('sine').note(33).penv(36).pattack(0.001).pdecay(0.07).decay(0.35).sustain(0).gain(0.9),
+    p => p.s('lt').bank('RolandTR808').gain(0.9),
+  ] },
+  { id: 2, kind: 'drum', lo: 4, hi: 14, rot: 2, rotate: true, room: 0.6, inst: [
+    p => p.s('hh').bank('RolandTR909').gain(0.5),
+    p => p.s('hh').bank('RolandTR808').gain(0.55),
+    p => fm(p.note(90), 1.414, 8, 0.03).decay(0.04).sustain(0).gain(0.25),
+    p => p.s('white').bpf(9000).bpq(2).decay(0.025).sustain(0).gain(0.4),
+  ] },
+  { id: 3, kind: 'drum', lo: 2, hi: 7, rot: 4, rotate: true, room: 0.8, inst: [
+    p => p.s('cp').bank('RolandTR909').gain(0.6),
+    p => p.s('rim').bank('RolandTR808').gain(0.6),
+    p => p.s('sd').bank('RolandTR909').gain(0.55),
+    p => fm(p.note(72), 2.76, 1.6, 0.05).decay(0.08).sustain(0).gain(0.5),
+  ] },
+  { id: 4, kind: 'note', lo: 4, hi: 11, rot: 2, motif: [0], dlo: -3, dhi: 5, room: 0.1, scale: 'A1:minor', inst: [
+    p => p.s('sawtooth').lpf(260).lpenv(3).lpd(0.12).lps(0.1).lpq(6).gain(0.5),
+    p => fm(p, 1, 2.5, 0.12).gain(0.65),
+    p => p.s('square').lpf(600).decay(0.18).sustain(0).gain(0.4),
+    p => p.s('sine').attack(0.005).gain(0.8),
+  ], shape: p => p.clip(1.6).release(0.04) },
+  { id: 5, kind: 'note', lo: 2, hi: 7, rot: 3, motif: [0], dlo: -2, dhi: 3, room: 1, scale: 'A3:minor', chord: true, inst: [
+    p => fm(p, 1.41, 3, 0.4).decay(0.9).sustain(0).gain(0.18),
+    p => p.s('gm_percussive_organ').clip(2).gain(0.3),
+    p => p.s('sawtooth').lpf(1600).decay(0.25).sustain(0).gain(0.16),
+    p => p.s('gm_pad_warm').attack(0.05).clip(6).release(0.4).gain(0.25),
+  ] },
+  { id: 6, kind: 'slice', lo: 1, hi: 9, rot: 0, rotate: true, room: 1, inst: [
+    p => p.s('wind').gain(0.6),
+    p => p.s('insect').gain(0.6),
+    p => p.s('crow').gain(0.45),
+    p => p.s('east').gain(0.5),
+  ], shape: p => p.release(0.05) },
+  { id: 7, kind: 'note', lo: 3, hi: 10, rot: 0, rotate: true, motif: [4, 2, 0, 2], dlo: -2, dhi: 7, room: 0.8, scale: 'A4:minor', inst: [
+    p => fm(p, 3.01, 1.5, 0.15).decay(0.3).sustain(0).gain(0.35),
+    p => p.s('gm_glockenspiel').gain(0.35),
+    p => p.s('sawtooth').lpf(350).lpenv(4).lpd(0.1).lps(0).lpq(12).decay(0.2).sustain(0).gain(0.25),
+    p => p.s('gm_electric_guitar_muted').gain(0.45),
+  ] },
+]
+
+const taps = []
+const voices = VOICES.map(v => {
+  const c = { seed: cc(12 + v.id), dens: cc(20 + v.id), push: cc(28 + v.id), level: cc(4 + v.id) }
+  const slot = cycleButton(cc(36 + v.id), v.inst.length)
+  const len = cycleButton(cc(44 + v.id), LENGTHS.length)
+  taps.push(slot, len)
+  const seed = c.seed.fmap(x => Math.round(x * 31))
+  const drift = driftStep.fmap(s => Math.floor((s + 7 - v.id) / 7))   // column v.id's turn every 7th drift step
+  const loop = withAll([seed, reroll, drift, c.dens, c.push, len, v.kind === 'note' ? chapter : pure(0)],
+    (sk, rr, dr, d, p, l, ch) => makeLoop(v, sk + rr + dr, Math.round(v.lo + d * (v.hi - v.lo)),
+      Math.round(p * 8) / 8, LENGTHS[l], ROOTS[ch]))
+  // chords: a triad on every hit (scale steps 0, 2, 4 above the generated note)
+  const notes = v.chord ? stack(...[0, 2, 4].map(t => loop.fmap(x => ({ ...x, n: x.n + t })))) : loop
+  const tuned = v.scale ? notes.scale(v.scale) : notes
+  const sound = pick(slot, v.inst.map(f => (v.shape ?? (p => p))(f(tuned))))
+  const level = c.level.mul(master)
+  return gate(level.fmap(x => x > 0),
+    sound.room(room.mul(v.room)).size(3).hpf(thin).postgain(level).orbit(1))
+})
+
+// Stateful buttons only count presses while queried, so query them every tick, even while their voice is gated
+const stateTaps = stack(...taps, chapter, reroll, master).filterValues(() => false)
+
+stack(
+  ...voices,
+  stateTaps
+).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway

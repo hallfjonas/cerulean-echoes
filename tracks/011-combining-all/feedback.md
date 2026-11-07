@@ -1,0 +1,10 @@
+- house should rather be 128bpm
+- on atmo, the fade is not smooth, it interpolates and jumps between things; maybe should in all have something breathing; i think, we even had something like this in the techno track; and then it could have a single code for all tracks, where only the parameters are varied
+- not sure, i like the atmo on 2
+- have the feeling the kick sounded so much better in the ambient track 007 alone compared to now in 011
+- in the kick: when the track slider is at 20, then sometimes the 007 kick, sometimes the 010 kick (or even a much harder one) plays; this is horrible; this is exactly what should not happen; all columns should ideally stay the same instrument, just possibly their range and parameters should change; like this, this is not even close to playable
+- is it intentional that the kicks change their pitch between the tracks? or is this not the case? 
+- the kick at 010 and 009 have revers hard - soft slider than 008; also, the naming should be the same; not only there, but accross things; we need maximal consistency, where it does not limit expressability
+- doyou think the ambient track is too hard to fit in? then we might have to split it? or maybe reorganize to fit the rest better? 
+- perc behaves very differently from 008-010; again: the cols should be as consistent as possible! including the filter knobs! their values and precise behavior might change of course
+- same story for pads, chords, everything else: they should not blend over / laternate between them when beeing somewhere between tracks; everything needs to transform seemmingly; also, dont think of "interpolating between the 4 ready tracks", everything should be a new smooth continuum, just the vibe and sound of the tracks shouldroughly be the things contained in the continuum, if that makes sense? 
