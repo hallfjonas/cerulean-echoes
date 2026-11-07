@@ -1,0 +1,25 @@
+// Tempo glide test: can Strudel change the tempo smoothly while playing?
+// The scheduler takes over the `cps` value of any event it plays (and keeps the bar count continuous),
+// so a silent "tempo stem" that sends a cps value every 8th note steers the tempo.
+// Listen for: stumbles, double hits or gaps in the kick while the slider moves; echoes that drift off the beat.
+// Slider: 0 = 120 BPM, 1 = 140 BPM. With auto = 1 it glides 120 → 140 → 120 by itself over 32 bars.
+
+const pos  = slider(0, 0, 1)
+const auto = 0   // set to 1 for the automatic glide
+
+const glide = auto ? tri.slow(32) : pos
+const bpm   = glide.fmap(v => 120 + 20 * v)
+const cps   = bpm.fmap(b => b / 60 / 4)
+
+// Silent tempo stem: one event per 8th note carries the current tempo
+const tempo = s('sine*8').gain(0).cps(cps)
+
+stack(
+  s('bd*4').bank('RolandTR909').gain(0.9),
+  s('[~ hh]*4').bank('RolandTR909').gain(0.4),
+  s('~ cp').bank('RolandTR909').gain(0.5),
+  // Echo synced to the tempo: dotted 8th, recomputed per note from the same bpm
+  note('<d4 f4 a4 c5>').s('triangle').decay(0.15).sustain(0).gain(0.5)
+    .delay(0.5).delayfeedback(0.45).delaytime(bpm.fmap(b => 0.75 * 60 / b)),
+  tempo
+)
