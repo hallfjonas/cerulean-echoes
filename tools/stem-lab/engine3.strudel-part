@@ -30,6 +30,10 @@ const CH = {
   Dm7: { name: 'Dm7', bass: 38, deg: 3, keys: [53, 57, 60, 62] },
   D6: { name: 'D6', bass: 38, deg: 3, keys: [54, 57, 59, 62] },
   Bm7: { name: 'Bm7', bass: 35, deg: 1, keys: [54, 57, 59, 62] },
+  // 2026-11-08 for progressions 17–21
+  'G7/F': { name: 'G7/F', bass: 41, deg: 5, keys: [53, 55, 59, 62] },     // G7 over F (Modjo), F G B D
+  G7sus2: { name: 'G7sus2', bass: 43, deg: 6, keys: [53, 55, 57, 62] },   // F G A D (Roger Sanchez)
+  'Am/C': { name: 'Am/C', bass: 36, deg: 2, keys: [55, 57, 60, 64] },     // Am7 shape over C
 }
 // Progressions over 8 bars: [name = the chords, as on the buttons; bars, push, scale]; the record is in the comment. Sources: tracks/009-house/recherche-harmonie.md (round 1:
 // Attack / MAW / Kerri; round 2: Hooktheory TheoryTabs of the records — chord order from there, BAR LENGTHS MINE).
@@ -55,6 +59,13 @@ const HARMONIES = [
   ['Am9 D9 (4+4)', ['Am9', 'Am9', 'Am9', 'Am9', 'D9', 'D9', 'D9', 'D9'], 2, 'dorian'],
   ['Am9 D9 (3/8+5/8)', Array(8).fill([['Am9', 6], ['D9', 10]]), 0, 'dorian'],
   ['Am9', Array(8).fill('Am9'), 2, 'dorian'],
+  // 17–21 (2026-11-08): more classic house records from recherche-harmonie.md (Hooktheory / Attack), at the end so the
+  // numbers of 1–16 stay; chord order from the sources, BAR LENGTHS MINE. Mode 2 col. 5 button 2 (previous) reaches them fast
+  ['C F', x2(['Cmaj7', 'Cmaj7', 'Fmaj7', 'Fmaj7']), 2, 'aeolian'],            // Frankie Knuckles, The Whistle Song (relative)
+  ['F Em Am G', x2(['Fmaj7', 'Em7', 'Am7', 'G11']), 2, 'aeolian'],            // Daft Punk, Digital Love (G7sus4 = G11 shape)
+  ['Am G/F F Dm', ['Am9', 'Am7', 'G7/F', 'Fadd9', 'Dm7', 'Dm7', 'Am9', 'Am7'], 2, 'aeolian'],   // Modjo, Lady
+  ['F C G Am', ['Fmaj7', 'Cmaj7', 'Fmaj7', 'G7sus2', 'Am7', 'G7sus2', 'Am7', 'Am/C'], 2, 'aeolian'],   // Roger Sanchez, Another Chance
+  ['Em Am', x2(['Em7', 'Em7', 'Am9', 'Am9']), 2, 'aeolian'],                  // Kerri Chandler, Keep Me Inside
 ]
 // each progression as 128 chord names, one per 16th
 const H128 = HARMONIES.map(([, bars]) => bars.flatMap(b => typeof b === 'string' ? Array(16).fill(b)

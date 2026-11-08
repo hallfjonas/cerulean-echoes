@@ -1,5 +1,18 @@
 # 009 — mögliche Stems für Jonas 2–7 (Entwurf, nicht final)
 
+## ▶ Stand 2026-11-08 abends — Disco-Labs für Jonas 5–7 (NICHT gehört)
+Nutzer: Disco-Gitarre, Disco-Streicher, Bläser — warm, organisch, an House angelehnt (Referenz: Vera „Take Me to the Bridge“).
+Vocals kommen auf ein eigenes Sample-Pad, nicht in eine Spalte.
+- Im Track (2026-11-08 spät): Jonas 5 Bläser (disco-blaeser-3), Jonas 6 Streicher (disco-streicher-4), Jonas 7 Gitarre
+  (disco-gitarre-3) — Streicher und Gitarre NICHT gehört. Offen: Bläser-Komplexität (`lab/blaeser/komplexitaet-1`), Gitarrenklang.
+- Aktuell: `lab/streicher/disco-streicher-4` (5 Figuren, sauberer Klang, harter Anschlag oben), `lab/gitarre/disco-gitarre-3`
+  (Linien, Komplexität in 4 Stufen, offen ↔ gedämpft) und `lab/gitarre/gitarren-klaenge-1` (8 Klänge). Ältere Runden in `old/`.
+Details und Quellen: `feedback.md` im jeweiligen Ordner. Danach: Gewinner per `lab-to-track` in Jonas 5–7.
+
+## ▶ Stand 2026-11-08 (spät) — Details: uebergabe-2026-11-08-spaet.md
+Spaltenplan: Jonas 4 Flöte hoch · 5 Bläser mit Aufbau · 6 Acid (Probe) · 7 Vocal-Hook nur mit ikonischen Samples.
+Neue Labs zum Anhören: lab/bass/house-bass-1 (Jojo 4), lab/keys/house-keys-lab-22, lab/melodie/melodie-4, lab/acid/acid-1.
+
 ## ▶ Für morgen früh (Nachtschicht 2026-11-08) — Details: uebergabe-nacht-2026-11-08.md
 Nichts davon gehört; alles in Node / Headless-Chrome geprüft.
 1. **009, Jonas 3 Vibraphon „Ruf-Echo“**: F♯ wird in den Moll-Folgen (alle außer „Am9 D9“) zu F. Anhören: Jonas 1
@@ -42,6 +55,8 @@ Notizen
   (verstaubter Jazz), Gitarren-Loops (messy), Rhodes-Antworten (A C E), M1/Trompeten-Dub.
 - Spielweisen: 1-Takt-Loops, reine Zufallsmelodien, selbst ausgedachte brave Melodien, schnelle unruhige Jazz-Phrasen,
   Techno-Übernahmen aus 008/010, FX ohne hörbare Wirkung (Filter-Downer, Hochpass, Siren, Snare-Build).
+- Einwürfe (einwurf-1, 2026-11-08): alle — Rufe, Jubel, Flöten-Triller/-Lauf, Zither, Posaunen-Fall, Cuíca. Wenn, dann
+  ikonische Vocal-Samples. Progressive-House-Akkordfolgen (vi IV V I …): nein, klassischer House.
 - Gut / behalten: JX-10, B3 weich, Strings + B3 (Harmonie; Akkordfolgen auf Taste 1 = weiterschalten); Vibraphon (Melodie); Dub Brass (Synth, „besser“);
   Flöten-Triller (selten), „yeah yeah yeah“; Akkordfolgen auf direkten Tasten.
 

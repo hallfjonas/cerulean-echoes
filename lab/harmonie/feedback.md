@@ -23,3 +23,69 @@
 
 ## harmonie-3 (Nutzer, 2026-11-08)
 - Vorschläge reduzieren: Orgel wie Strings raus, Strings + Orgel raus. Reihe 3: zwischen Strings, Strings + B3 und B3 durchfaden.
+
+## ambient-2 (Nutzer, 2026-11-08)
+- Gas-Schleier gefällt (bleibt für Jojo vorgemerkt).
+- Eno-Bogen ziemlich gut, fast besser als Chor und Akkorde; liegt aber nah am Chor. Chor bleibt trotzdem (Flirren,
+  höher; Drone viel tiefer).
+- Gewünscht: etwas Nicht-Breiiges. Richtung: Midori Takada („Catastrophe Σ“): sich verschiebende, überlagerte,
+  einfache Marimba-Rhythmen → ambient-3 (Takada 3:4, 5·7·12, Kanon, Additiv + Vibraphon-Motiv, Flöte, Eno-Bogen).
+
+## ambient-3 (Nutzer, 2026-11-08)
+- Takada 3:4 zu simpel. 5·7·12 besser, darf abgefahrener sein → Taste 1 schaltet Optionen mit steigender Komplexität.
+- Bei Takada sind sich die einzelnen Rhythmen wohl ähnlicher.
+- Kanon gut. Additiv nichts → raus.
+- Vibraphon, Flöte, Eno-Bogen raus aus diesem Board (Flötenartiges gibt es schon; Vibraphon später evtl. eine Option).
+  Das Board bleibt bei Takada → midori-1 (7 Marimba-Spalten).
+- Erinnerung: eine Lab-Spalte ist später eine Track-Spalte (allein spielbar), keine Gruppe aus mehreren Spalten.
+
+## midori-1 (Nutzer, 2026-11-08)
+- Klingt insgesamt ganz gut. Zyklen, Kanon, Ähnliche Zellen, Euklid bleiben; Phase, Polytempo, Akzente raus.
+- Vermutung: bei Takada beginnt ein Pattern allein, die anderen kommen dazu und überlagern sich; eher dasselbe
+  Pattern in etwas anderem Tempo als klare 5/7/12. Nachgelesen: das Marimba-Stück ist „Crossing“ (RA, Spectrum
+  Culture), „Catastrophe Σ“ = Kuhglocke/Toms, Harmonium-Drone, wird schneller. Wie „Crossing“ gebaut ist, steht nirgends.
+- Toms als Option: Taste 2 schaltet Marimba ↔ Toms → midori-2 (+ Aufbau, Drift, Glockenpuls).
+
+## midori-2 (Nutzer, 2026-11-08)
+- Aufbau schön, aber zu niedrige Decke an Komplexität/Intensität → Reihe 3 soll auch das Anschwellen steuern.
+- Drift: zu schnelle Töne → raus. Glockenpuls: das beste der neuen. Toms gefallen, aber es muss beides geben.
+- Zyklen, Kanon, Ähnliche Zellen zusammen auf Spalte 1.
+- Es fehlte eine Überlagerung, die einen Rhythmus verschiebt. Nachgelesen: „Crossing“ ist von japanischen
+  Bahnübergängen inspiriert (Vinyl Factory), Reichs „Clapping Music“ ist ein genannter Einfluss
+  → midori-3: Bahnübergang, Clapping Music; Taste 2 = Marimba → Toms → beides.
+
+## midori-3 (Nutzer, 2026-11-08)
+- Bahnübergang: muss bei „weit“ starten (das Nächste, was ok ist), eher noch weiter → midori-4: weit → weiter → sehr weit.
+- Clapping Music: gut vom Prinzip, aber zu wenig komplex → midori-4: 2 Stimmen → 3 Stimmen → 3 Stimmen + 12/8-Glockenpattern.
+- Mit Toms klingt das Driften auch cool.
+- Offene Frage: zwei Spalten (Marimba / Toms), um sie getrennt mischen zu können?
+
+## midori-4 (Nutzer, 2026-11-08)
+- Bahnübergang: verschiedene Tonhöhen pro Übergang — unsicher, ob gut (vielleicht doch). Offen: Variante mit gleicher Tonhöhe.
+- Clapping Music besser mit Toms, sonst etwas langweilig. Drift klingt mit Toms cool.
+- Plan für 007 (Jonas 2–4): 1 Eno-Bogen, 1 Marimba, 1 Toms (nicht 1:1; Zyklen eher für Toms; manches auf beiden).
+  Marimba: Zyklen, Kanon, Zellen, Euklid, Aufbau (Glockenpuls, Bahnübergang, Clapping raus).
+  Toms: Zyklen, Kanon, Zellen, Drift/Schnelligkeitsknopf, Euklid, Aufbau, Bahnübergang, Clapping; evtl. noch aussortieren.
+  → midori-5 (Toms: Reihe 3 = Verschiebung).
+
+- Toms: mehrere Schichten = Brei (bei Marimba gut) → Toms vorerst nur erste Schicht (midori-5).
+- Toms ohne Drift mit verschiedenen Spuren klingt schlecht → Reihe 3 blendet Kopien DERSELBEN Figur ein, die wegdriften (midori-5).
+- Eno-Bogen: sind die 3 Optionen unterschiedlich genug? (offen).
+- Eno-Bogen: Optionen neu = ruhig (Quinten) → lydisch (G♯, C♯) → tief und langsamer; alle unter dem Shimmer.
+- Verschiebung nur bei einfachen Rhythmen (Bahnübergang) sinnvoll, bei komplexen Gewusel → Toms Reihe 3: Bahnübergang = Verschiebung, sonst Dichte (Geisterschläge) (midori-5).
+
+## midori-5 (Nutzer, 2026-11-08 abends)
+- Viel zu viele Optionen pro Pattern-Familie — lieber mit dem Knopf steigern statt mit mehreren Optionen (hatte er schon gesagt).
+- Marimba raus: Kanon einfach + mittel, Zellen 2 + 6 Töne, Aufbau 2 + 8 Takte; Euklid nur einmal, Schichten-Knopf steuert auch die Dichte.
+- Toms: der Dichte-Knopf tat nichts (Geisterschläge unhörbar) → muss wirken. Raus: Kanon mittel + lang, alle Zellen,
+  Aufbau 2 + 8 Takte, Bahnübergang gleich, Clapping 2/3 Stimmen und mit Glocke; Euklid nur einmal mit Dichte;
+  nicht zu viele Stimmen (muddy).
+- Beides lauter, Toms noch lauter als Marimba.
+- → midori-5 (5b): Marimba 5 Optionen, Toms 6 Optionen mit echtem Dichte-Knopf; Version davor old/midori-5a.strudel.
+
+## midori-5b (Nutzer, 2026-11-08 abends)
+- Toms: Kanon hat eine viel zu laute 1; Kanon-Komplexität (Pausen füllen) klingt weird → Komplexität = Kanon-Stimmen.
+- Aufbau (Toms): viel zu laute Töne, ungute Überlagerung → eine Figur, die sich selbst auffüllt. Betonungen auf Toms leiser (1 → 0.76).
+- Toms insgesamt nicht mehr zu leise.
+- Knopf überall „Komplexität“ (Überbegriff), für einfache Bedienung gleiche Beschriftung.
+- → in 007 übernommen (Jonas 2 Eno-Bogen, 3 Marimba, 4 Toms).
