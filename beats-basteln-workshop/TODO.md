@@ -1,9 +1,10 @@
 
 ## Action Items
 ### Jonas
-+ LK + LC Tech Stack
-+ Recording
++ Ableton + Strudel (Incognito) + LC + LK --> Drei verschiedene Tracks Laden und Spielen
++ Samples auf Keys Laden
 + Sound design für Keys (pro Track)
++ Recording
 
 ### Johannes
 + Tracks finalisieren (2x Launchcontrols (OHNE KEYS!))
