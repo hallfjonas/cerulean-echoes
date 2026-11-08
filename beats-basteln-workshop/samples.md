@@ -3,11 +3,15 @@ Samples in diesem Dokument konzeptionieren.
     - oder .wav dateien, dann unter beats-basteln-workshop/samples/<track>/<sample>.wav benutzen
 
 ## Sample-Ideen passend zum Event-Thema
-+ Basteln: Karton+Schere, Papier+Reißen, Papier+Falten, Transparentpapier+Knistern, Feuerzeug, Kerze+Brennen, Kerze+Pusten
++ Basteln: Karton+Schere, Papier+Reißen, Papier+Falten, Transparentpapier+Knistern, Feuerzeug, Streichholz anzünden, Kerze+Brennen, Kerze+Pusten
 + Wein: Korken ziehen, anstoßen, eingießen, tasting-sounds
 + Stimmung: Menschenmenge+Gesprächen, Menschenmenge+Lachen, Menschenmenge+Jubeln
-+ Anfahrt: Berliner S-Bahn, Fahrrad+Klingel, Fahrrad+Rostige Kette, Fahrrad+Quitschende Bremse, Bus+Hydraulik, Bus+Nächster Halt (Dammweg); S-Bahn+Nächster Halt (Plänterwald)
++ Anfahrt: , Fahrrad+Klingel, Fahrrad+Rostige Kette, Fahrrad+Quitschende Bremse, Bus+Hydraulik, Bus+Nächster Halt (Dammweg); S-Bahn+Nächster Halt (Plänterwald)
 + Musik: Elektromagnetische Störungen, ...?
+
+## Gefundene Samples
++ Berliner S-Bahn Türen (alt)
++
 
 ## Ambient
 +
@@ -16,8 +20,8 @@ Samples in diesem Dokument konzeptionieren.
 +
 +
 +
-+
-+
++ Feuerzeug
++ Streichholz anzünden
 +
 +
 +
@@ -53,8 +57,8 @@ Samples in diesem Dokument konzeptionieren.
 +
 +
 +
-+
-+
++ Triller Pfeife Tief
++ Triller Pfeife Hoch
 +
 +
 +

@@ -1,9 +1,9 @@
 
 ## Action Items
 ### Jonas
++ LK + LC Tech Stack
++ Recording
 + Sound design für Keys (pro Track)
-+ LK + LC gemeinsam testen (Johannes' Testversion)
-+ Raumdesign fixen (Tisch, Bassfänger, Stoffe, gemütliches Licht, Platzierung Geräte (2x LC, LK, Interface, Mac, Bildschirme))
 
 ### Johannes
 + Tracks finalisieren (2x Launchcontrols (OHNE KEYS!))
