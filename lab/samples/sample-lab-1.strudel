@@ -1,0 +1,452 @@
+// ============================================================
+// SAMPLE LAB 1: listening board for track 009, Jonas column 4 — real recorded phrases, auditioned in the groove
+// ============================================================
+// Classic house takes its playful top from recorded material (stabs, licks, phrases), not from synth figures. I cannot
+// listen, so this board only plays the candidates of tracks/009-house/hoerliste.md in time over drums, bass and keys:
+// you pick by ear, then the winners get cut to the key and the grid (chop / slice / splice) in a next round.
+// Every column = one category, button 1 = the next candidate in it, row 3 = which part of the file (start point).
+// Short hits (under 1.5 s) play as stabs in the keys' gaps; longer phrases start on every second bar and play for
+// two bars from the chosen start, at their own speed and pitch (not yet fitted to 124 BPM or A minor: some will clash).
+// Sources: Freesound previews (128 kbps MP3, CORS checked), CC0 or CC BY — credits below (CC BY needs them when published).
+// Levels: unknown (previews are not normalised): level with the faders. Nothing here has been heard by me.
+//
+// Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass and keys in Mode 2 (CC + 48).
+// @layout Sample Lab 1 (lab/samples, round 1 for 009 column 4: recorded phrases from the listening list)
+// @note Plays the candidates of hoerliste.md in time: one category per column, button 1 = next candidate, row 3 = start point in the file. Not fitted to key or tempo yet: pick by ear, fitting comes next.
+// @note Mode 2: fader 6 = drums (knob 1 = swing, button 2 = drums out), fader 7 = bass, fader 8 = keys of 009; column 5 button 1 = harmony.
+// @guide What to listen for | Which recordings have the right feel (real, warm, groovy)? Note the column and name (dashboard) of each favourite.
+// @guide Not yet fitted | Phrases play at their own tempo and key; a clash is expected. The fit (cutting, pitch) comes after you pick.
+// @mode 16 Mode 16 — Candidates
+// @col 16:1 1 Horn stabs
+// @col 16:2 2 Sax
+// @col 16:3 3 Trumpet
+// @col 16:4 4 Guitar
+// @col 16:5 5 Flute
+// @col 16:6 6 Voice
+// @col 16:7 7 Rhodes / organ
+// @col 16:8 8 Vinyl / strings
+// @row 16:k1 Row 1 \ Brightness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Start
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Next
+// @row 16:b2 Button 2 \ Echo throw
+// @ctl 16:1-8.k1 Brightness | dull ↔ bright (low-pass).
+// @ctl 16:1-8.k2 Space | 0 = dry; echo, then room.
+// @ctl 16:1-8.k3 Start | where in the file playback starts (0 = beginning, 1 = near the end).
+// @ctl 16:1-8.fader Level | 0 = off.
+// @ctl 16:1-8.b1 Next | next candidate of this category (see the dashboard), next bar.
+// @ctl 16:1-8.b2 Echo throw | held: long dotted-8th echo, the tail rings on.
+// @mode 2 Mode 2 — Context
+// @col 2:5 5 Harmony
+// @col 2:6 6 Drums
+// @col 2:7 7 Bass
+// @col 2:8 8 Keys
+// @ctl 2:5.b1 Harmony | Ein Akkord ↔ Wechsel, at the next 4-bar phrase.
+// @ctl 2:6.fader Drums | 909 kick, off-beat hat, clap, shaker.
+// @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %; 55–58 % = house.
+// @ctl 2:6.b2 Drums out | samples, keys and bass alone while held.
+// @ctl 2:7.fader Bass | off-beat bass on the chord root.
+// @ctl 2:8.fader Keys | the keys of 009 (Steinway + Rhodes, chain rhythm), to hear the answers.
+
+// Credits (Freesound; CC BY = attribution required when published):
+//   POP HORNS FALL A unison.wav · flakdemier · https://freesound.org/s/450882/ · CC0
+//   POP HORNS FALL Emaj.wav · flakdemier · https://freesound.org/s/450881/ · CC0
+//   Eb Orch Hit Sym 5 Op.67 - I [Beethoven] stab 03 · astro_denticle · https://freesound.org/s/822414/ · CC0
+//   AltoSax3.wav · fredgalist · https://freesound.org/s/32237/ · CC BY 3.0
+//   AltoSax1.wav · fredgalist · https://freesound.org/s/32235/ · CC BY 3.0
+//   Tenor Sax Phrase with Ghosted Note · Adam_in_Tokyo · https://freesound.org/s/479052/ · CC0
+//   Sax-Ten-Phrase1.wav · omegagroove · https://freesound.org/s/620501/ · CC BY 3.0
+//   tenor_short.wav · mdholland · https://freesound.org/s/256217/ · CC BY 3.0
+//   Tenor Saxophone Noodling · Hockinfinger · https://freesound.org/s/388055/ · CC0
+//   Trumpet#09.aif · musicmangoldy · https://freesound.org/s/59820/ · CC BY 4.0
+//   Trumpet Blues Lick.wav · trumpetplayer · https://freesound.org/s/651201/ · CC0
+//   Funk_Tele_Am@110_bpm.flac · guitarelement · https://freesound.org/s/167390/ · CC BY 3.0
+//   guitar mute pluck riff 122bpm · CVLTIV8R · https://freesound.org/s/811473/ · CC0
+//   120_Dm_PMVibesRhythmGtr_01 · oceansonmars · https://freesound.org/s/716617/ · CC0
+//   120_C_SummerRhythmGtr_01 · oceansonmars · https://freesound.org/s/716615/ · CC0
+//   Wah Wah Guitar Riff 2.wav · amackenzie · https://freesound.org/s/150427/ · CC BY 3.0
+//   Jazz guitar #7 109bpm.wav · Sub-d · https://freesound.org/s/47465/ · CC0
+//   guitar be-bop4.wav · kaponja · https://freesound.org/s/54223/ · CC BY 3.0
+//   Funk guitar sounds · Destructo20 · https://freesound.org/s/669643/ · CC0
+//   Flute: trill & tremolo · Maria_Mannone · https://freesound.org/s/427560/ · CC BY 4.0
+//   Flute Play C - 04.wav · cms4f · https://freesound.org/s/159119/ · CC0
+//   Humming C D A for alexggqs · drotzruhn · https://freesound.org/s/439504/ · CC0
+//   janie_joelle_yeah_yeah_yeah_yeah_yeah1.wav · hugo_nl · https://freesound.org/s/529175/ · CC BY 4.0
+//   Scat-05 (fast happy) · unfa · https://freesound.org/s/184280/ · CC0
+//   Beautiful Soul Woman Vocal Shots · CVLTIV8R · https://freesound.org/s/817609/ · CC0
+//   BRRRRR-OOHOO 01.wav · sandyrb · https://freesound.org/s/86213/ · CC BY 4.0
+//   Janie Joelle accapella.wav · juskiddink · https://freesound.org/s/93668/ · CC BY 4.0
+//   funkloop113bpm.wav · RealRhodesSounds · https://freesound.org/s/4049/ · CC BY 3.0
+//   bone-ponies-rhodes.wav · krestivo · https://freesound.org/s/28070/ · CC BY 4.0
+//   Rhodes melody.aif · iimar10ii · https://freesound.org/s/214320/ · CC0
+//   Hammond Tonewheel Organ · MrAuralization · https://freesound.org/s/158628/ · CC BY 4.0
+//   Organ 1.wav · HenKonen · https://freesound.org/s/682251/ · CC0
+//   Vinyl Crackle (Real).mp3 · beautifuldaymonster1968 · https://freesound.org/s/434822/ · CC0
+//   Vinyl Crackle Analogue 1.wav · HenKonen · https://freesound.org/s/682193/ · CC0
+//   Violin, Glissando, Ascending, A (H6 XY).wav · InspectorJ · https://freesound.org/s/411726/ · CC BY 4.0
+//   v_riff1_by_iktinus.wav · iktinus · https://freesound.org/s/23110/ · CC BY 4.0
+const BOARD = { id: 'sampleLab1', title: 'Sample Lab 1' }
+const bpm = 124
+
+// Freesound previews (MP3, CORS ok)
+const FS = {
+  fs450882: 'https://cdn.freesound.org/previews/450/450882_3294293-hq.mp3',
+  fs450881: 'https://cdn.freesound.org/previews/450/450881_3294293-hq.mp3',
+  fs822414: 'https://cdn.freesound.org/previews/822/822414_5338633-hq.mp3',
+  fs32237: 'https://cdn.freesound.org/previews/32/32237_273669-hq.mp3',
+  fs32235: 'https://cdn.freesound.org/previews/32/32235_273669-hq.mp3',
+  fs479052: 'https://cdn.freesound.org/previews/479/479052_10267485-hq.mp3',
+  fs620501: 'https://cdn.freesound.org/previews/620/620501_3416904-hq.mp3',
+  fs256217: 'https://cdn.freesound.org/previews/256/256217_4767772-hq.mp3',
+  fs388055: 'https://cdn.freesound.org/previews/388/388055_5233408-hq.mp3',
+  fs59820: 'https://cdn.freesound.org/previews/59/59820_676781-hq.mp3',
+  fs651201: 'https://cdn.freesound.org/previews/651/651201_4772755-hq.mp3',
+  fs167390: 'https://cdn.freesound.org/previews/167/167390_3023152-hq.mp3',
+  fs811473: 'https://cdn.freesound.org/previews/811/811473_2520418-hq.mp3',
+  fs716617: 'https://cdn.freesound.org/previews/716/716617_15225418-hq.mp3',
+  fs716615: 'https://cdn.freesound.org/previews/716/716615_15225418-hq.mp3',
+  fs150427: 'https://cdn.freesound.org/previews/150/150427_2104498-hq.mp3',
+  fs47465: 'https://cdn.freesound.org/previews/47/47465_514283-hq.mp3',
+  fs54223: 'https://cdn.freesound.org/previews/54/54223_68531-hq.mp3',
+  fs669643: 'https://cdn.freesound.org/previews/669/669643_13444791-hq.mp3',
+  fs427560: 'https://cdn.freesound.org/previews/427/427560_8599523-hq.mp3',
+  fs159119: 'https://cdn.freesound.org/previews/159/159119_2018306-hq.mp3',
+  fs439504: 'https://cdn.freesound.org/previews/439/439504_6616150-hq.mp3',
+  fs529175: 'https://cdn.freesound.org/previews/529/529175_348492-hq.mp3',
+  fs184280: 'https://cdn.freesound.org/previews/184/184280_1038806-hq.mp3',
+  fs817609: 'https://cdn.freesound.org/previews/817/817609_2520418-hq.mp3',
+  fs86213: 'https://cdn.freesound.org/previews/86/86213_14771-hq.mp3',
+  fs93668: 'https://cdn.freesound.org/previews/93/93668_649468-hq.mp3',
+  fs4049: 'https://cdn.freesound.org/previews/4/4049_7740-hq.mp3',
+  fs28070: 'https://cdn.freesound.org/previews/28/28070_199891-hq.mp3',
+  fs214320: 'https://cdn.freesound.org/previews/214/214320_3504078-hq.mp3',
+  fs158628: 'https://cdn.freesound.org/previews/158/158628_2843367-hq.mp3',
+  fs682251: 'https://cdn.freesound.org/previews/682/682251_10938187-hq.mp3',
+  fs434822: 'https://cdn.freesound.org/previews/434/434822_340588-hq.mp3',
+  fs682193: 'https://cdn.freesound.org/previews/682/682193_10938187-hq.mp3',
+  fs411726: 'https://cdn.freesound.org/previews/411/411726_5121236-hq.mp3',
+  fs23110: 'https://cdn.freesound.org/previews/23/23110_30688-hq.mp3',
+}
+if (typeof samples === 'function') await samples(FS)
+
+// [name, sample, duration in seconds]
+const CANDIDATES = [
+  { name: 'Bläser-Stabs', pats: [['POP HORNS FALL A unison', 'fs450882', 1.0], ['POP HORNS FALL Emaj', 'fs450881', 0.8], ['Eb Orch Hit Sym 5 Op.67 - I ', 'fs822414', 1.1]] },
+  { name: 'Sax', pats: [['AltoSax3', 'fs32237', 4.7], ['AltoSax1', 'fs32235', 2.3], ['Tenor Sax Phrase with Ghoste', 'fs479052', 5.4], ['Sax-Ten-Phrase1', 'fs620501', 4.1], ['tenor_short', 'fs256217', 4.7], ['Tenor Saxophone Noodling', 'fs388055', 16.1]] },
+  { name: 'Trompete', pats: [['Trumpet#09', 'fs59820', 16.6], ['Trumpet Blues Lick', 'fs651201', 13.3]] },
+  { name: 'Gitarre', pats: [['Funk_Tele_Am@110_bpm', 'fs167390', 45.8], ['guitar mute pluck riff 122bp', 'fs811473', 31.5], ['120_Dm_PMVibesRhythmGtr_01', 'fs716617', 8.0], ['120_C_SummerRhythmGtr_01', 'fs716615', 8.0], ['Wah Wah Guitar Riff 2', 'fs150427', 10.0], ['Jazz guitar #7 109bpm', 'fs47465', 3.3], ['guitar be-bop4', 'fs54223', 3.3], ['Funk guitar sounds', 'fs669643', 54.4]] },
+  { name: 'Flöte', pats: [['Flute: trill & tremolo', 'fs427560', 8.6], ['Flute Play C - 04', 'fs159119', 6.2]] },
+  { name: 'Stimme', pats: [['Humming C D A for alexggqs', 'fs439504', 161.6], ['janie_joelle_yeah_yeah_yeah_', 'fs529175', 3.1], ['Scat-05 (fast happy)', 'fs184280', 56.4], ['Beautiful Soul Woman Vocal S', 'fs817609', 32.6], ['BRRRRR-OOHOO 01', 'fs86213', 2.7], ['Janie Joelle accapella', 'fs93668', 44.1]] },
+  { name: 'Rhodes / Orgel', pats: [['funkloop113bpm', 'fs4049', 4.2], ['bone-ponies-rhodes', 'fs28070', 4.3], ['Rhodes melody', 'fs214320', 75.4], ['Hammond Tonewheel Organ', 'fs158628', 23.4], ['Organ 1', 'fs682251', 26.6]] },
+  { name: 'Vinyl / Streicher', pats: [['Vinyl Crackle (Real)', 'fs434822', 29.2], ['Vinyl Crackle Analogue 1', 'fs682193', 6.4], ['Violin, Glissando, Ascending', 'fs411726', 2.1], ['v_riff1_by_iktinus', 'fs23110', 5.1]] },
+]
+// Short hits as stabs in the keys' gaps (two bars); longer ones: a two-bar window from the start point, every 2 bars
+const STAB = '<[~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ ~] [~ ~ ~ x ~ ~ x ~ ~ ~ x ~ ~ ~ ~ ~]>'
+const makeCols = h => CANDIDATES.map((c, i) => ({
+  name: c.name, k3: 'own', k3name: 'Start', b2name: 'Echo-Wurf', range: [500, 16000], gain: i === 7 ? 0.5 : 0.8,
+  pats: c.pats.map(([label, snd, dur]) => [label, dur < 1.5
+    ? s(snd).struct(mini(STAB)).begin(h.knob(29 + i).mul(0.5))
+    : s(snd).struct(mini('<x ~>')).begin(h.knob(29 + i).mul(0.95)).clip(2)]),
+}))
+
+// ============================================================
+// ENGINE 2 — the same in every stem lab of 009 from round 2 on (stems in Strudel's own pattern language, as in track
+// 008); only the part above differs. Source: tools/stem-lab/engine2.strudel-part, copied in by sync.mjs
+// ============================================================
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const md = (k, n) => ((k % n) + n) % n
+const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x))
+const hash = (a, b, c) => {
+  let h = Math.imul(a + 0x9e3779b9 | 0, 0x85ebca6b) ^ Math.imul(b + 0x632be59b | 0, 0xc2b2ae35) ^ Math.imul(c + 0x27d4eb2f | 0, 0x165667b1)
+  h ^= h >>> 15; h = Math.imul(h, 0x2c1b3c6d); h ^= h >>> 12; h = Math.imul(h, 0x297a2d39); h ^= h >>> 15
+  return (h >>> 0) / 4294967296
+}
+
+// Harmony as in track 009: Am9 in Kerri Chandler's shape (G3 B3 C4 E4), D9 = F♯3 A3 C4 E4; the melody notes are the
+// pentatonic of the chord (A minor pentatonic over Am9, D major pentatonic over D9, as PENTA in the track)
+const CH = {
+  Am9: { name: 'Am9', bass: 33, keys: [55, 59, 60, 64], tones: [9, 0, 4, 7, 11], penta: [9, 0, 2, 4, 7] },
+  D9: { name: 'D9', bass: 38, keys: [54, 57, 60, 64], tones: [2, 6, 9, 0, 4], penta: [2, 4, 6, 9, 11] },
+}
+const HARMONIES = [['Ein Akkord', ['Am9', 'Am9', 'Am9', 'Am9']], ['Wechsel', ['Am9', 'Am9', 'D9', 'D9']]]
+const POOL = {}
+const inRange = (pcs, lo, hi) => POOL[pcs.join() + ':' + lo + ':' + hi] ??= (() => {
+  const o = []; for (let m = lo; m <= hi; m++) if (pcs.includes(md(m, 12))) o.push(m); return o })()
+// A stab: the n lowest notes from `lo` up whose pitch classes are in the keys' voicing (Am9: E G B, D9: E F♯ A, …)
+const stabOf = (c, lo, n) => inRange(c.keys.map(x => md(x, 12)), lo, lo + 24).slice(0, n)
+// The chord as a pattern (one value per 16th): the voicing's notes from `lo` up, `n` of them. push: the last two 16ths
+// of a bar already play the next bar's chord (Kerri Chandler's push, as the keys). chordName is defined below.
+const CHORD_PATS = {}
+const chordPat = (lo, n, push = true) => signal(t => chordName(Math.floor(t + (push ? 1 / 8 : 0)))).segment(16)
+  .fmap(name => CHORD_PATS[name + lo + ':' + n] ??= note(stack(...stabOf(CH[name], lo, n)))).innerJoin()
+// The chord's root as a MIDI note per 16th: oct 1 = the bass (A1 / D2), 2 = an octave up, …
+const rootPat = (oct = 2, push = true) => signal(t => CH[chordName(Math.floor(t + (push ? 1 / 8 : 0)))].bass + 12 * (oct - 1)).segment(16)
+// The chord's root as a scale degree of A dorian (Am9 = 0, D9 = 3: D mixolydian has the same notes), per 16th
+const rootDeg = (push = false) => signal(t => chordName(Math.floor(t + (push ? 1 / 8 : 0))) === 'D9' ? 3 : 0).segment(16)
+// Live controls for boards whose row 3 / button 2 do their own job (column option k3 / b2 = 'own'):
+// knob(cc) = the knob's value 0..1, held(cc) = 1 while the button is held (S is defined below; read at query time)
+const knobSig = cc => signal(() => S.val[cc] ?? 0)
+const heldSig = cc => signal(() => S.held[cc] ? 1 : 0)
+// 0 → 1 over `bars` while the button is held (a ramp for risers / sweeps), 0 when released
+const rampSig = (cc, bars) => signal(() => S.held[cc] ? Math.min(1, (performance.now() - (S.since?.[cc] ?? performance.now())) / (bars * 240000 / bpm)) : 0)
+// Helpers handed to the board's makeCols
+const H = { chord: chordPat, root: rootPat, rootDeg, knob: knobSig, held: heldSig, ramp: rampSig }
+const COLS = makeCols(H)
+
+// State survives re-evaluation. Mode 16: fader 5-12, knobs 13-36, buttons 37-52. Mode 2 = + 48.
+const S = globalThis[BOARD.id] ??= { val: {}, held: {}, pend: {}, at: {}, seed: {} }
+COLS.forEach((c, i) => { S.val[5 + i] ??= i === 0 ? 0.8 : 0; S.val[13 + i] ??= 0.6; S.val[21 + i] ??= 0; S.val[29 + i] ??= 0.3 })
+S.val[58] ??= 0.6; S.val[66] ??= 0.3; S.val[59] ??= 0.6; S.val[60] ??= 0.5   // drums, swing, bass, keys
+const swingPct = () => 0.5 + 0.2 * S.val[66]
+const drumsLevel = () => S.held[98] ? 0 : S.val[58]
+// A column's pattern list: [name, pattern]
+const patsOf = i => COLS[i].pats
+// A choice made now takes over at the next bar (len 4: at the next 4-bar phrase); fixed once a bar is first asked
+const latch = (key, bar, len = 1) => {
+  const b = Math.floor(bar / len), m = S.at[key] ??= {}
+  if (!(b in m)) { m[b] = S.pend[key] ?? 0; for (const x in m) if (+x < b - 8) delete m[x] }
+  return m[b]
+}
+const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== BOARD.id) {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = BOARD.id
+  }
+}
+
+// Status box (bottom right) with the dashboard link; other boards' boxes are removed
+let statusBox = null, statusText = null
+if (hasPage) {
+  for (const id of ['board-status', 'keys-lab-status', 'stem-lab-status']) document.getElementById(id)?.remove()
+  statusBox = document.createElement('div')
+  statusBox.id = 'stem-lab-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  statusText = document.createElement('pre')
+  statusText.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  statusBox.append(statusText)
+  document.body.appendChild(statusBox)
+}
+const beatNow = { bar: null, beat: null }
+const pct = v => Math.round((v ?? 0) * 100)
+const harmNow = () => latchNow('harm')
+
+// DASHBOARD — a big window with every control of Mode 16 and the Mode 2 context on top. The link opens a tab named
+// stem-lab-view; strudel.cc replaces window.open, so the handle comes from the native open of a hidden iframe.
+const view = !hasPage ? null : globalThis.stemLabView ??= { win: null }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const VIEW_CSS = [
+  'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+  '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+  '.head{display:flex;gap:2.5vw;align-items:center;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:#50c8e8}',
+  '.k{opacity:.6;margin-right:.4em}.next,.acc{color:#50c8e8}',
+  '.grid{flex:1;display:grid;grid-template-columns:repeat(' + COLS.length + ',1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 4.6em 3em;gap:.8vh .8vw}',
+  '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.live{color:#50c8e8;border-color:#50c8e8}',
+  '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+  '.cell span,.cell b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cell span{opacity:.7;font-size:.85em}.cell b{font-variant-numeric:tabular-nums}',
+  '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+  'background:conic-gradient(from -135deg,#50c8e8 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+  '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+  '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+  '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:#50c8e8}',
+  '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start;overflow:hidden}.btn.on{background:#50c8e8;color:#111}',
+  '.pat{font:.7em monospace;letter-spacing:.03em;opacity:.85;overflow-wrap:anywhere}',
+  '.beats i,.bars i{display:inline-block;background:#333;margin-left:.3em}.beats i{width:.75em;height:.75em;border-radius:50%}',
+  '.bars i{width:1.1em;height:.55em;border-radius:2px}.beats i.on,.bars i.on{background:#50c8e8}',
+].join('\n')
+const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+const drawView = () => {
+  if (!view?.win || view.win.closed) return
+  const root = view.win.document.getElementById('lc')
+  if (!root) return
+  const h = harmNow(), hp = S.pend.harm ?? 0, chords = HARMONIES[h][1]
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const bar = beatNow.bar
+  const where = bar === null ? '–' : '<span class=bars>' + marks(4, md(bar, 4)) + '</span><span class=beats>' +
+    marks(4, beatNow.beat) + '</span> <b class=acc>' + esc(chords[md(bar, 4)]) + '</b>'
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + (v ?? 0) + '"></div><b>' + pct(v) +
+    '</b><span>' + esc(name) + '</span></div>'
+  const cells = COLS.map((c, i) => {
+    const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
+    return {
+      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
+        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+      b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+    }
+  })
+  root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
+    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Takt</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
+    '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
+    '<div class=grid>' +
+    COLS.map((c, i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 ? ' live' : '') + '">' + (i + 1) + ' ' + esc(c.name) + '</div>').join('') +
+    ['k1', 'k2', 'k3', 'fader', 'b1', 'b2'].map(r => cells.map(c => c[r]).join('')).join('') + '</div>'
+}
+if (view) {
+  for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
+  view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
+  const link = document.createElement('a')
+  link.textContent = '▣ LC groß'
+  link.href = 'about:blank'
+  link.target = 'stem-lab-view'
+  link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
+    'background:#ddd;border-radius:3px;text-decoration:none;cursor:pointer'
+  link.onclick = () => setTimeout(() => {
+    try {
+      const w = view.opener.contentWindow.open('', 'stem-lab-view')
+      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      view.win = w
+      w.document.title = BOARD.title
+      w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+      w.document.body.innerHTML = '<div id=lc></div>'
+      drawView()
+    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+  }, 100)
+  statusBox.append(link)
+  if (view.win && !view.win.closed) {
+    view.win.document.title = BOARD.title
+    view.win.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+    if (!view.win.document.getElementById('lc')) view.win.document.body.innerHTML = '<div id=lc></div>'
+  }
+}
+const showStatus = () => {
+  if (statusText) {
+    const h = harmNow(), hp = S.pend.harm ?? 0
+    statusText.textContent = [
+      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+        ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
+      '',
+      ...COLS.map((c, i) => {
+        const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+          pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
+      }),
+    ].join('\n')
+  }
+  drawView()
+}
+const onMidi = e => {
+  const [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if ((cc >= 45 && cc <= 52) || (cc >= 93 && cc <= 100)) {
+    if (value > 63 && !S.held[cc]) (S.since ??= {})[cc] = performance.now()   // when it was pressed (for ramps)
+    S.held[cc] = value > 63
+  }
+  else if (value === 0) return
+  else if (cc >= 37 && cc <= 44) {
+    const i = cc - 37
+    if (!COLS[i]) return
+    S.pend[i] = ((S.pend[i] ?? 0) + 1) % patsOf(i).length
+  }
+  else if (cc === 89) S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; fn(step, bar, k) returns events with dur in 16ths; swing moves the odd 16ths late
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const late = k => md(k, 2) === 1 ? 2 * (swingPct() - 0.5) : 0
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 1; k++) {
+    const t0 = (k + late(k)) / 16
+    if (t0 < b0 - 1 / 16 || t0 >= e0 + 1 / 16) continue
+    for (const { dur = 1, ...v } of fn(md(k, 16), Math.floor(k / 16), k) ?? []) {
+      if (t0 < b0 - 1e-9 || t0 >= e0 - 1e-9) continue
+      out.push(new Hap(new TimeSpan(t0, t0 + dur / 16), new TimeSpan(t0, Math.min(t0 + dur / 16, e0)), v, {}))
+    }
+  }
+  return out
+})
+const chordName = bar => HARMONIES[latch('harm', bar, 4)][1][md(bar, 4)]
+const chordOf = bar => CH[chordName(bar)]
+
+// A column: the pattern picked by button 1 (taking over at the next bar), swung like the drums, then the channel
+// strip per event from the knobs: Brightness = low-pass over the column's range (brighter also ±2 dB louder), Space =
+// a 1/8 echo first, the room from 0.35 on, Length = note length ×0.5 … ×4 (clip), Level = fader, button 2 held = echo
+// throw (dotted 8th, long tail). A voice may carry `bright` (a factor on its cutoff, e.g. for accents); a voice's own
+// low-pass (e.g. a recipe's lpf) is kept when it is lower than the Brightness knob's.
+const column = i => {
+  const c = COLS[i], built = c.pats.map(([, p]) => p)
+  const sel = signal(t => latch(i, Math.floor(t))).segment(1)
+  return sel.fmap(p => built[p]).innerJoin()
+    .swingBy(signal(() => 2 * (swingPct() - 0.5)), 8)
+    .filterValues(() => (S.val[5 + i] ?? 0) > 0)
+    .fmap(({ bright = 1, ...v }) => {
+      const level = S.val[5 + i] ?? 0, br = S.val[13 + i] ?? 0.6, sp = S.val[21 + i] ?? 0, ln = S.val[29 + i] ?? 0.3
+      const [clo, chi] = c.range ?? [300, 8000]
+      let room, ef
+      if (c.space === 'bus') {
+        // as the tracks' bus(): the voice's own echo amount × 2 × space, space never below the column's floor (a
+        // little room even at 0), dotted-8th echo with a long tail; room 0.9 × space
+        const s2 = (c.floor ?? 0.3) + (1 - (c.floor ?? 0.3)) * sp
+        room = 0.9 * s2
+        ef = { delay: Math.min(0.9, (v.delay ?? 0) * 2 * s2), delaytime: 0.75 * 60 / bpm, delayfeedback: 0.55 }
+      } else {
+        room = 0.8 * Math.max(0, (sp - 0.35) / 0.65)
+        const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+        ef = ev > 0 ? { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev } : {}
+      }
+      const fx = c.b2 !== 'own' && S.held[45 + i] ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62 } : {}
+      const clip = c.k3 === 'own' ? {} : { clip: (v.clip ?? 1) * (c.len ?? 1) * exp(0.5, 4)(ln) }
+      return { release: 0.1, ...v, cutoff: Math.min(18000, v.cutoff ?? 18000, exp(clo, chi)(br) * bright), room, roomsize: c.hall ?? 2,
+        ...clip, postgain: level * Math.pow(10, 4 * (br - 0.5) / 20) * (c.gain ?? 1), ...ef, ...fx, orbit: 3 }
+    })
+}
+
+// Context: a dry house loop (909 kick, off-beat open hat, clap on 2 and 4, quiet shaker), the bass on the root and
+// the keys of 009 (Steinway + Rhodes Mark I half each, Kerri voicing, the chain rhythm with push)
+const JRH = 'https://raw.githubusercontent.com/sfzinstruments/jlearman.jRhodes3d/master/jRhodes3d-mono/'
+const OWN = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/johannes/samples/vcsl-keys/'
+const notesMap = (keys, file) => Object.fromEntries(keys.map(k => [k.toLowerCase(), file(k)]))
+if (typeof samples === 'function') await samples({
+  stein: notesMap(['F#3', 'G#3', 'A#3', 'C4', 'D4', 'E4'], k => OWN + 'JHPiano_Sus_Close_' + k.replace('#', '%23') + '_vl3_rr1.flac'),
+  jrh: notesMap(['G3', 'B3', 'D4', 'F4'], k => JRH + { G3: 'A_055__G3', B3: 'A_059__B3', D4: 'A_062__D4', F4: 'A_065__F4' }[k] + '_3.flac'),
+})
+const KEYS_PAT = '.x..x..x.x..x..x'
+const context = grid((step, bar) => {
+  const out = [], l = drumsLevel(), bl = S.val[59], kl = S.val[60]
+  const ch = chordOf(bar), next = step >= 14 ? chordOf(bar + 1) : ch
+  if (l > 0) {
+    if (step % 4 === 0) out.push({ s: 'bd', bank: 'RolandTR909', gain: 0.6, decay: 0.25, sustain: 0, postgain: l })
+    if (step % 4 === 2) out.push({ s: 'oh', bank: 'RolandTR909', gain: 0.3, decay: 0.12, sustain: 0, postgain: l })
+    if (step === 4 || step === 12) out.push({ s: 'cp', bank: 'RolandTR909', gain: 0.5, postgain: l })
+    out.push({ s: 'sh', bank: 'RolandTR727', n: 1, gain: step % 2 ? 0.3 : 0.18, postgain: l })
+  }
+  if (bl > 0 && step % 4 === 2) out.push({ s: 'triangle', note: next.bass, gain: 0.45,
+    decay: 0.15, sustain: 0.3, release: 0.05, cutoff: 900, postgain: bl, dur: 1.5 })
+  if (kl > 0 && KEYS_PAT[step] === 'x') for (const n of next.keys) out.push(
+    { s: 'stein', note: n, gain: 0.6 * 0.49 / 0.955 * 0.99 * 0.707, cutoff: 2800, postgain: kl, dur: 1.2, release: 0.15 },
+    { s: 'jrh', note: n, gain: 0.6 * 0.292 / 0.955 * 0.902 * 0.707, cutoff: 1100, postgain: kl, dur: 1.2, release: 0.15 })
+  return out.map(v => ({ ...v, orbit: 1 }))
+})
+
+const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
+  const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), b = Math.floor((pos - bar) * 4 + 1e-9)
+  setTimeout(() => { beatNow.bar = bar; beatNow.beat = b; showStatus() }, Math.max(0, (t - now) * 1000))
+}, true)
+setcpm(bpm / 4)
+
+// A board may define MASTER(pattern) (e.g. a filter on everything, FX lab); it gets columns + context
+const master = typeof MASTER === 'function' ? MASTER : (p => p)
+stack(master(stack(...COLS.map((_, i) => column(i)), context)))
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
+  .stack(beatTick)   // silent, after the safety net: moves the dashboard and the status box with the beat
