@@ -232,3 +232,49 @@
   2 echo throw (held: dotted-8th echo, feedback 0.62, own orbit 3, tail keeps going; about +3 dB while held),
   3 push on / off (Kerri's push; harmony "Wechsel" Am9 ↔ D9 added to hear it), 4 stutter (held: chord on every 16th,
   brighter over 2 s). Not taken: octave (gimmicky), sustain pedal (= Length knob), mute (= fader). Feedback: open.
+
+## Round 21 — feedback (2026-11-08)
+- Of the one-bar riffs only “Am D” (column 6) okay. Add the Kerri video riff again; piano that runs over 4 or 8 bars
+  (Sarah Wild set: lots of house piano, partly 8-bar progressions, always groovy). Watch the transitions.
+
+## Round 22 — house-keys-lab-22.strudel (2026-11-08)
+- 1 Am D (round 21 col. 6), 2 Kerri video riff (Am9 Dm9 Gm9) with the video's own rhythm first on button 1, 3–8 piano
+  progressions with the keys' groove: Am F G (Can You Feel It, 4 bars), Am7 C Em7 (To Be In Love, 4), F G Am (Finally, 4),
+  Am7 Dm7 (Everybody Everybody, 4), parallel minor-9 block Am Em F♯m (Kerri “Mommy What's a Record”, 8), Am7 Em7 … C♯m7
+  (Attack example with the surprise chord in bar 8, 8). Push 2 16ths; the bass (Mode 2 fader 7) follows any length now.
+- Voicings by hand with a line on top (E F D E, E G F♯ E, E F E, … F♯ G♯ E), F3–G♯4 (samples' range), no seconds below G3.
+- Checked in Node (chords per bar, bass, transpile; ~1.1 ms/tick per column). Levels as round 21 (same sounds and touch). Not heard.
+
+## Round 22 — feedback (user, 2026-11-08 night)
+- Not sure chords should be separated from the rhythm: the Kerri video riff is great in its own rhythm, not necessarily
+  on the other rhythms. The progressions (3–8) are not what was meant (though they work); maybe couple the keys to the
+  harmony column and add a button for it instead. Wanted: riffs that do NOT change chord every bar, playful ones where
+  the rhythm is not the same every bar but fitted to the chord changes (rhythm and chords composed together). Find real
+  ones rather than invent („finden immer besser als ausdenken“).
+
+## Round 23 — house-keys-lab-23.strudel (2026-11-08 night)
+- Every column = one riff with its own rhythm written for its chord changes, from analyses (Attack: Kerri Chandler chords
+  1/2, disco chords; MusicRadar: Chicago spread piano), moved to A: 1 Kerri video, 2 Am D (8 rhythms, kept), 3 Checkmate
+  (Am → Gm on the last 16th, 2 bars), 4 Turn Off The Lights (Am Dm Em | Bm, 2 bars), 5 Atmosphere (Am7 + fill stab |
+  Em/G), 6 Chicago spread (Am9 | Cmaj9 | Fmaj7 | D9, 4 bars, rhythm from MusicRadar), 7 retro disco (Am7 Fmaj7 G, 16 bars:
+  on the beats, then off the beats). Exact 16ths of 3/4/5/7 mine where the sources only describe them (images).
+- Node: chords + bass per bar ok, ~1 ms/tick per column. Levels as rounds 21/22. Not heard.
+
+## Round 23 — feedback (user, 2026-11-08 evening)
+- For track 009: the Kerri video riff goes in (maybe instead of the Kerri riff rhythm), plus Retro-Disco, Chicago spread,
+  Atmosphere, Turn Off The Lights, Checkmate. The keys must still be able to stay monotone.
+- Open question: the riffs bring their own chords; bass and harmony follow the progression. User: try coupling them.
+
+## Round 24 — house-keys-lab-24.strudel (2026-11-08)
+- One chord clock read by bass, harmony pad and keys. Whoever was chosen last leads: a riff column raised from 0 (its
+  chords), or the monotone keys (column 2) raised from 0 / a new progression (Mode 2 column 1 button 1: the 10 of 009).
+  Leading riff pulled to 0 → the progression leads again. Switch at the next 4-bar phrase; the new leader starts from
+  its first bar. Only the leading keys column sounds (as one keys column on the track).
+- Column 2 = the monotone keys of 009 (8 rhythms on Am9, D9 only in “Am9 D9”) instead of “Am D” (= progression 1).
+  Riffs 1, 3–7 unchanged from round 23.
+- New: harmony pad on Mode 2 column 1 = 009's Jonas 1 (JX-10 strings ↔ B3, held, its strip, without random velocity
+  and swing). Under a riff it holds the riff's chords in the riff's voicing (one strike per chord name: no restrike on
+  Atmosphere's fill stab or Turn Off's second Bm voicing); under a progression the track's voicings with the push.
+- Node: switches at the phrase, bass and pad follow (Kerri, Am F G, Chicago, Checkmate, Am9 D9 with keys on D9), transpile
+  ok, ~0.8 ms/tick. Pad −27.6 LUFS at fader 1 offline (track: −27). Not heard.
+- Known: pulling the leading riff to 0 leaves the keys silent until the phrase (the monotone keys come in then).

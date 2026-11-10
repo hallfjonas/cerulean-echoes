@@ -2,15 +2,19 @@
 // GENERATED from 009-house-dual.strudel by tools/lcxl-layout/make-single.mjs — edit the dual file, not this one.
 // TRACK 009 HOUSE — happy, jazzy, dry house (Chicago / deep house), A minor with a major colour, 124 BPM,
 // two-controller layout (midi-layouts/templates/dual-lc.strudel). Rhythm section from 009 dry (old/).
-// Keys (Jonas 1) 1:1 from the keys lab (lab/keys round 19, column 2): Steinway ↔ Rhodes Mark I (+ organs, mallets
-// in sound mode), Kerri Chandler's stab voicing, eight off-beat rhythms, accents whose overtones follow them.
-// Jonas 2-7 are empty for now (new colourful, melodic stems to come). Harmony: HARMONY below sets the start, Chapter
+// Harmony (Jonas 1) 1:1 from the harmony lab (lab/harmonie/harmonie-4, column 2): held JX-10 strings ↔ soft B3 organ,
+// button 1 = the chord progression (10, classic house records, all in A minor). Keys (Jonas 2) 1:1 from the keys lab
+// (lab/keys round 19, column 2): Steinway ↔ Rhodes Mark I (+ organs, mallets in sound mode), Kerri Chandler's stab
+// voicing, eight off-beat rhythms, accents whose overtones follow them. The keys stay on Am9 (monotone, as in house);
+// only in progression 1 (Am9 D9, the old Wechsel) they move to D9.
+// Jonas 3 = the vibraphone of the melody lab (lab/melodie/melodie-2); Jonas 4 = the flute of melodie-4 (column 6);
+// Jonas 5-7 are empty for now. Harmony: HARMONY below sets the start, Chapter
 // (Jonas, column 8, button 1) switches live:
 //   Vamp    = one chord, Am9, for the intro and the break: tension only from rhythm, voicing, filter
-//   Wechsel = Am9 (2 bars) ↔ D9 (2 bars), for the drop. D9 brings the F♯: the happy, gospel colour.
-// Sub and bass stay on the chord's root and follow the change.
+//   Wechsel = the progression chosen on Jonas 1 (start: Am9 2 bars ↔ D9 2 bars, the happy, gospel colour).
+// Sub, bass, harmony and vibraphone follow the progression; the keys stay on Am9 (except in Am9 D9).
 // Jojo (rhythm): kick, noise pump, sub, bass, clap, hats / shaker, congas, tambourine / ride.
-// Jonas (melody): keys (2-7 empty) + the global column 8.
+// Jonas (melody): harmony (column 1), keys (2), vibraphone (3), flute (4; 5-7 empty) + the global column 8.
 // Drop: when the break ends, everything comes back on the one.
 // ============================================================
 // Two Launch Control XL 3, both in Custom Mode 16 (same CCs), told apart by their MIDI input.
@@ -24,9 +28,9 @@
 // copied, they load from its own repository).
 // @layout Track 009 — house (one controller)
 // @globalcc same
-// @note Happy, jazzy, dry house in A minor, 124 BPM. Jojo plays the rhythm (kick, bass, drums, percussion), Jonas the keys (column 1; columns 2-7 empty for now) and the global column 8.
+// @note Happy, jazzy, dry house in A minor, 124 BPM. Jojo plays the rhythm (kick, bass, drums, percussion), Jonas the harmony with the chord progressions (column 1), the keys (column 2), the vibraphone (column 3), the flute (column 4; 5-7 empty for now) and the global column 8.
 // @note Every row means the same everywhere: row 1 = brightness, row 2 = space, row 3 = character, fader = level, button 1 = next pattern (at the next bar), button 2 = a moment while held.
-// @note Start with all faders down. Nothing sounds until Jonas' master fader (column 8) is up. Chapter (Jonas, column 8) switches between one chord (Vamp) and two chords (Wechsel) at the next 4-bar phrase.
+// @note Start with all faders down. Nothing sounds until Jonas' master fader (column 8) is up. Chapter (Jonas, column 8) switches between one chord (Vamp) and the progression chosen on Jonas 1 (Wechsel) at the next 4-bar phrase.
 // @note One controller: Mode 1 = Jojo (foundation, columns 1–7; Jojo's column 8 (Tamb / Ride) stays off; Mode 1 sends the same CCs as Mode 16), Mode 2 = Jonas (colour). Column 8 is global on both pages.
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
 // @col 16:8 8 Global
@@ -44,7 +48,13 @@
 // @row 16:b1 Button 1 \ Change
 // @row 16:b2 Button 2 \ Moment
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
-// @col 2:1 1 Keys
+// @col 2:1 1 Harmony
+// @col 2:2 2 Keys
+// @col 2:3 3 Vibraphone
+// @col 2:4 4 Flute
+// @col 2:5 5 Brass
+// @col 2:6 6 Strings
+// @col 2:7 7 Guitar
 // @col 2:8 8 Global
 // @row 2:k1 Row 1 \ Brightness
 // @row 2:k2 Row 2 \ Space
@@ -53,8 +63,9 @@
 // @row 2:b1 Button 1 \ Change
 // @row 2:b2 Button 2 \ Moment
 // @guide Building it up | One layer after the other, not all at once: drums (kick, hats, clap), then bass and sub, then the keys, then percussion (congas, tambourine). Start in Vamp.
+// @guide Harmony | Button 1 of column 1 picks the progression (at the next 8-bar phrase); it plays when Chapter is Wechsel. Row 3 fades strings → strings + B3 → B3.
 // @guide Keys | 1:1 from the keys lab (round 19, column 2): brightness, space, length; button 1 = stab rhythm (8); button 2 = sound: the knobs mix the sound (piano → Rhodes, organ B3 → M1, vibraphone → marimba), the fader sets how strongly the overtones follow the accent.
-// @guide Break and drop | Jonas presses Break: the whole rhythm goes out at the next bar, only the keys keep playing. Jojo holds the riser (noise pump, button 2). Jonas switches Chapter to Wechsel and presses Break again: everything is back on the one, now with two chords.
+// @guide Break and drop | Jonas presses Break: the whole rhythm goes out at the next bar, only the keys keep playing. Jojo holds the riser (noise pump, button 2). Jonas switches Chapter to Wechsel and presses Break again: everything is back on the one, now with the progression.
 // @guide Every position sounds good | All knobs at 0 is dry, close and clear, as the track is meant to be. Space adds room, it does not repair. Every column has its own fader: each layer can be muted on its own.
 // @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
 // @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
@@ -198,7 +209,34 @@ const CHAPTERS = [
   { name: 'Vamp',    chords: [Am9, Am9, Am9, Am9] },   // one chord: intro and break
   { name: 'Wechsel', chords: [Am9, Am9, D9, D9] },     // i – IV, two bars each: the drop
 ]
-const CHORDS = CHAPTERS.flatMap(c => c.chords)   // chord id = chapter * 4 + bar
+// More chords for the progressions (harmony lab, Hooktheory; all in A minor, F not F♯): bass between E1 and D2,
+// right hand close around middle C. Scale = A aeolian.
+const AEOL = 'a b c d e f g'
+const Am7   = chord('Am7',   'a1', 'c4 e4 g4 a4', AEOL)
+const Cmaj7 = chord('Cmaj7', 'c2', 'c4 e4 g4 b4', AEOL)
+const Em7   = chord('Em7',   'e1', 'd4 e4 g4 b4', AEOL)
+const Fmaj7 = chord('Fmaj7', 'f1', 'c4 e4 f4 a4', AEOL)
+const Fadd9 = chord('Fadd9', 'f1', 'c4 f4 g4 a4', AEOL)
+const Gadd9 = chord('Gadd9', 'g1', 'd4 g4 a4 b4', AEOL)
+const G11   = chord('G11',   'g1', 'c4 d4 f4 g4', AEOL)
+const Dm7   = chord('Dm7',   'd2', 'c4 d4 f4 a4', AEOL)
+const CHORDS = [Am9, D9, Am7, Cmaj7, Em7, Fmaj7, Fadd9, Gadd9, G11, Dm7]   // chord id = index
+const CID = Object.fromEntries(CHORDS.map((c, i) => [c.name, i]))
+// The progressions (harmony lab, harmonie-4; chord order from the records via Hooktheory, bar lengths from the lab):
+// 8 bars each; only those whose chords sit well under the keys' Am9 (G B C E); 1 = the old Wechsel (keys follow it)
+const x2 = bars => [...bars, ...bars]
+const PROGS = [
+  ['Am9 D9',     x2(['Am9', 'Am9', 'D9', 'D9'])],                                          // track 009 as it was
+  ['Am7 C Em7',  x2(['Am7', 'Am7', 'Cmaj7', 'Em7'])],                                      // MAW, To Be In Love
+  ['Am F G',     x2(['Am9', 'Am9', 'Fmaj7', 'Gadd9'])],                                    // Mr Fingers, Can You Feel It
+  ['F G Am',     x2(['Fadd9', 'G11', 'Am9', 'Am9'])],                                      // CeCe Peniston, Finally
+  ['Em7 Fmaj7',  ['Em7', 'Fmaj7', 'Em7', 'Fmaj7', 'Em7', 'Fmaj7', 'Em7', 'Am7']],          // Stardust
+  ['Fmaj7 G',    x2(['Fmaj7', 'Fmaj7', 'Gadd9', 'Gadd9'])],                                // Daft Punk, One More Time
+  ['F Am C Dm',  ['Fmaj7', 'Fmaj7', 'Am7', 'Am7', 'Cmaj7', 'Cmaj7', 'Dm7', 'Dm7']],        // Livin' Joy, Dreamer
+  ['Am7 Dm7',    x2(['Am7', 'Am7', 'Dm7', 'Dm7'])],                                        // Black Box
+  ['C F Am Em',  x2(['Cmaj7', 'Fadd9', 'Am7', 'Em7'])],                                    // Basement Jaxx, Romeo
+  ['F Em Am',    x2(['Fmaj7', 'Em7', 'Am7', 'Am7'])],                                      // Joey Negro
+].map(([name, bars]) => ({ name, ids: bars.map(b => CID[b]) }))
 const START  = HARMONY === 'wechsel' ? 1 : 0
 
 // Status box at the bottom right: chapter, break, and which pattern each stem plays.
@@ -315,11 +353,12 @@ const showStatus = () => {
   statusUi.text.textContent = [
     'Kapitel     ' + CHAPTERS[ch.now].name +
       (ch.pending !== ch.now ? ' → ' + CHAPTERS[ch.pending].name + ' (nächste Phrase)' : ''),
-    'Akkorde     ' + CHAPTERS[ch.now].chords.map(c => c.name).join(' – '),
+    'Akkorde     ' + (ch.now === 0 ? 'Am9' : PROGS[progLatch.now].name) +
+      (progLatch.pending !== progLatch.now ? ' → ' + PROGS[progLatch.pending].name + ' (nächste 8 Takte)' : ''),
     'Break       ' + (breakLatch.now ? 'Beat aus' : 'Beat an') +
       (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'aus' : 'an') + ' (nächster Takt)' : ''),
     '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
-    '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line),
+    '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line).filter(Boolean),   // filter: empty columns leave holes
   ].join('\n')
   lcView?.update()
 }
@@ -340,7 +379,7 @@ const pick = (latch, pats) => latch.pat.fmap(i => pats[i]).innerJoin()
 // @ctl g.k2 Room | 0 = each sound's own room (row 2), up = everything drowns in reverb.
 // @ctl g.k3 Tension | build-up: echo grows, filters open, from the middle a snare roll (clap fader). 0 = release.
 // @ctl g.fader Master Level | volume of everything, both controllers. 0 = silence.
-// @ctl g.b1 Chapter | Vamp ↔ Wechsel, at the next phrase.
+// @ctl g.b1 Chapter | Vamp (Am9) ↔ Wechsel (col. 1 chords).
 // @ctl g.b2 Break / Drop | 1st: beat out. 2nd: all back on the one.
 const glob        = colJonas(8)
 const globalFog   = glob.bright.fmap(f => Math.pow(0.06, f))
@@ -398,10 +437,21 @@ const drum = (names, bank = 'RolandTR909') => s(names).bank(bank)
 
 
 // ============================================================
-// HARMONY — Chapter picks Vamp or Wechsel, everybody follows
+// HARMONY — Chapter picks Vamp (Am9) or Wechsel (the progression of Jonas 1); sub, bass, harmony and vibraphone
+// follow it, the keys stay on Am9 (keysHarm) unless the progression is the old Wechsel (Am9 D9)
 // ============================================================
-const PROG_PATS = CHAPTERS.map((c, ci) => cat(...c.chords.map((_, i) => ci * 4 + i)))   // chord id per bar
-const harmId  = pick(chapterLatch, PROG_PATS)
+// Jonas 1 button 1: the next progression, taking over at the next 8-bar phrase (status row 0 = column 1)
+const harmCol   = colJonas(1)
+const progLatch = barLatch(8)
+cycleButton(harmCol.btn, PROGS.length, s => { progLatch.pending = s; showStatus() })
+STATUS.jonas.push({ label: 'Akkorde', latch: progLatch, n: PROGS.length, names: PROGS.map(p => p.name) })
+// Chord id of a bar; keys: Am9, or the old Wechsel when that is the progression
+const chordIdAt = bar => chapterLatch.at(bar) === 0 ? CID.Am9 : PROGS[progLatch.at(bar)].ids[((bar % 8) + 8) % 8]
+const keysIdAt  = bar => chapterLatch.at(bar) === 0 || progLatch.at(bar) !== 0 ? CID.Am9 : PROGS[0].ids[((bar % 8) + 8) % 8]
+// Mode of the bar for melodies: dorian (F♯) in Vamp and in Am9 D9, aeolian (F) in the others
+const modeAt    = bar => chapterLatch.at(bar) === 0 || progLatch.at(bar) === 0 ? 'dorian' : 'aeolian'
+const harmId  = signal(t => chordIdAt(Math.floor(t))).segment(1)
+const keysHarm = signal(t => keysIdAt(Math.floor(t))).segment(1)
 const bassOf  = harm => harm.fmap(id => CHORDS[id].bass)
 // A pattern of semitone offsets → notes above the bar's bass note (+ shift)
 const fromBass = (offsets, shift = 0) => note(reify(offsets).fmap(d => id => CHORDS[id].bass + shift + d).appLeft(harmId))
@@ -545,40 +595,97 @@ const stemJ3_sub = lowEnd(strip(dryBus(stack(
 }))
 
 // ============================================================
-// JOJO 4 BASS — a melodic, slightly syncopated synth bass (the M1 organ-bass kind: sine + an octave + a little
-// square), short and clear. Root, octave, fifth and seventh of the chord, never on the kick (it pumps around it).
+// JOJO 4 BASS — from the bass lab (lab/bass/house-bass-4.strudel): six of its lines on button 1 (the user's best
+// grades, different enough from each other), row 3 fades through three of its sounds: FM (Daft Punk) → M1 organ → warm
+// analog (user, 2026-11-08). Lines after what analyses describe of real records (tracks/009-house/recherche-bass.md),
+// notes mine within those rules; every line follows the chord (Chapter + progression of Jonas 1, the change two 16ths
+// early) and walks into each change with an approach note (A = a semitone below the next note).
+// Deviations from the lab: row 3 = sound instead of length (length fixed at the lab's start value, ×0.93); the three
+// sounds blended with equal power (a side at exactly 0 is not computed); chords from the track. Swing as the lab (56 %).
+// Level: each sound at the lab's measured −25 LUFS (its column gain), then one stem level (see BASS_LEVEL).
 // ============================================================
-// Lines: semitones above the chord's bass note an octave up (A2 / D3): 0 = root, 7 = fifth, 10 = seventh, 12 = octave.
-// @ctl 16:4.k1 Brightness | round ↔ a clear, buzzing edge (lpf 700–5000 Hz).
+// Tokens per 16th: R root, r root short, O / o octave long / short, 3 5 7 scale steps above (diatonic in the
+// progression's mode), F fifth below, g dead note, A approach the next note, - hold, . rest.
+// @ctl 16:4.k1 Brightness | dull ↔ bright (low-pass over each sound's own range); brighter also a little louder.
 // @ctl 16:4.k2 Space | dry ↔ a little room (reverb).
-// @ctl 16:4.k3 Groove | the line as it is ↔ random ghost notes (root, fifth, seventh) rolling in between.
-// @ctl 16:4.fader Level | bass line, follows the chapter.
-// @ctl 16:4.b1 Change | syncopated → two-bar melody → off-beat.
+// @ctl 16:4.k3 Sound | FM (Daft Punk) → M1 organ → warm analog.
+// @ctl 16:4.fader Level | bass line, follows the chords.
+// @ctl 16:4.b1 Change | 6 lines: around the 1 + dead notes → dead notes → around the 1 → beat 4 open → pluck → Alright.
 // @ctl 16:4.b2 Octave | one octave up while held.
 const bassCol = colJojo(4)
-const bassVar = change(bassCol.btn, 'jojo', 'Bass', 3, ['Synkope', 'Melodie', 'Offbeat'])
-const bassOct = bassCol.btn2.fmap(v => v > 0.5 ? 12 : 0)
 const BASS_LINES = [
-  "~ ~ 0 ~ ~ 0 ~ 12 ~ ~ 0 ~ ~ 7 ~ 10",
-  "<[~ ~ 0 ~ ~ 0 ~ 12 ~ ~ 0 ~ ~ 10 ~ 12] [~ ~ 0 ~ ~ 0 ~ 7 ~ ~ 0 ~ ~ 5 ~ 7]>",
-  "~ ~ 0 ~ ~ ~ 0 ~ ~ ~ 0 ~ ~ ~ 12 ~",
-].map(p => fromBass(p, 12))
-// Ghost notes from the improviser: a one-bar figure on root, fifth and seventh that varies more as Groove rises
-const bassGhosts = improv({ latch: bassVar, play: bassCol.char, len: 1, salt: 5,
-  cells: ['.o..', '...o', '.o.o', '....', '..o.', 'o..o'], wild: ['.oo.', 'o.oo', '.o.o', 'oo.o'],
-  pcs: c => [pc(c.bass), pc(c.bass + 7), pc(c.bass + 10)], lo: midi('a2'), hi: midi('a3'), up: 0 })
-const bassSound = pat => stack(
-  pat.s("sine").gain(0.4),
-  pat.add(note(12)).s("sine").gain(0.1),
-  pat.s("square").gain(0.05)
-).add(note(bassOct)).attack(0.003).decay(0.16).sustain(0.35).release(0.05)
-
-const stemJ4_bass = beatOnly(strip(dryBus(stack(
-  bassSound(pick(bassVar, BASS_LINES)),
-  gate(above(bassCol.char, 0), bassSound(bassGhosts).mul(gain(bassCol.char.mul(0.6))))
-), 1, bassCol.space), {
-  lpf: expRange(bassCol.bright, 700, 5000),
-  level: bassCol.level.range(0, 1),
+  ['Um die 1 + Dead', ['.R.5g.7.O.gR.5.F', '.R.5g.7.O.7g5.3A']],    // lab 14 (new in round 4)
+  ['Dead Notes', ['RgRgO.RgRg5.RgO7', 'RgRgO.RgRg5.R.7A']],         // lab 10 (Da Funk / Attack: dead notes)
+  ['Um die 1', ['.R.5..7.O..R.5.F', '.R.5..7.O.7.5.3A']],           // lab 1 (Tensnake “Coma Cat”: around the 1)
+  ['Beat 4 frei', ['r.ro.r5.r7.o....', 'r.ro.r5.o7.5....']],        // lab 4 (52nd Street: beat 4 left to the clap)
+  ['Zupfen', ['R.R.O.R.RgROg7R5', 'R-------....O.7A']],             // lab 7 (Daft Punk “Voyager”)
+  ['Alright', ['R.O.R.O.R.O.R.O.', 'R.3.R.3.R.5.O.7A']],            // lab 13 (Jamiroquai “Alright”)
+]
+const bassVar = change(bassCol.btn, 'jojo', 'Bass', BASS_LINES.length, BASS_LINES.map(l => l[0]))
+const bassOct = bassCol.btn2.fmap(v => v > 0.5 ? 12 : 0)
+// The lab's line engine, with the track's chord (vibChord: the chord at 16th k, two 16ths early) and mode (modeAt)
+const BMD = (k, n) => ((k % n) + n) % n
+const BSC = { dorian: [9, 11, 0, 2, 4, 6, 7], aeolian: [9, 11, 0, 2, 4, 5, 7] }
+const BSTEP = { R: 0, r: 0, g: 0, o: 7, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5, '7': 6, O: 7, '9': 8, F: -3 }
+const bScale = k => BSC[modeAt(Math.floor(k / 16))]
+// root in F2–E3: short moves between the chords; chord tones from the chord's own root, above the bass note
+const bassTone = (k, tok) => {
+  const c = vibChord(k, true), sc = bScale(k), rp = pc(c.bass), r = 41 + BMD(rp - 5, 12), j = BSTEP[tok] ?? 0
+  const onBass = 'RrgOoF'.includes(tok), d0 = onBass ? (sc.includes(rp) ? sc.indexOf(rp) : 0) : 'ABCDEFG'.indexOf(c.name[0])
+  const iv = BMD(sc[BMD(d0 + j, 7)] - rp, 12)
+  return r + (iv === 0 && !onBass ? 12 : iv) + 12 * Math.floor(j / 7)
+}
+const BNOTE = 'Rr234567Oo9F'
+const bassApproach = (line, k) => {
+  let t = 1
+  while (t < 16 && !BNOTE.includes(line[BMD(k + t, line.length)])) t++
+  const tok = BNOTE.includes(line[BMD(k + t, line.length)]) ? line[BMD(k + t, line.length)] : 'R'
+  return bassTone(k + t, tok) - 1
+}
+const bassLine = bars => {
+  const line = bars.join(''), L = line.length
+  return new Pattern(state => {
+    const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+    for (let k = Math.ceil(b0 * 16 - 1e-9); k < e0 * 16 - 1e-9; k++) {
+      const tok = line[BMD(k, L)]
+      if (tok === '.' || tok === '-') continue
+      let dur = 1
+      while (dur < L && line[BMD(k + dur, L)] === '-') dur++
+      const short = tok === 'r' || tok === 'o'
+      // touch as the lab: the off-beat 8ths full, the rest a little softer, dead notes quiet, short and duller
+      const v = { note: tok === 'A' ? bassApproach(line, k) : bassTone(k, tok),
+        velocity: tok === 'g' ? 0.3 : BMD(k, 4) === 2 ? 1 : BMD(k, 2) ? 0.8 : 0.9,
+        clip: 0.933 * (tok === 'g' ? 0.35 : short ? 0.4 : line[BMD(k + dur, L)] === '.' ? 0.85 : 1.02), dark: tok === 'g' }
+      out.push(new Hap(new TimeSpan(k / 16, (k + dur) / 16), new TimeSpan(k / 16, Math.min((k + dur) / 16, e0)), v, {}))
+    }
+    return out
+  })
+}
+// The lab's three sounds with their column gains (−25 LUFS each); brightness = low-pass over each one's own range
+const BASS_SOUNDS = [
+  [p => stack(p.s('sine').fm(2).fmh(1).fmdecay(0.12).fmsustain(0.1).gain(0.45), p.add(note(-12)).s('sine').gain(0.2))
+    .attack(0.002).decay(0.2).sustain(0.5).release(0.05), 0.77, 400, 5000],                      // FM (Daft Punk)
+  [p => stack(p.s('triangle').gain(0.5), p.add(note(19)).s('sine').gain(0.12), p.add(note(-12)).s('sine').gain(0.35))
+    .attack(0.002).decay(0.2).sustain(0.45).release(0.06), 0.71, 300, 3000],                     // M1 organ bass
+  [p => stack(p.s('sawtooth').gain(0.2), p.s('square').gain(0.15), p.add(note(-12)).s('sine').gain(0.3))
+    .lpenv(2).lpdecay(0.2).lpsustain(0.3).lpq(2).attack(0.003).decay(0.3).sustain(0.6).release(0.08), 0.69, 250, 3500],  // warm
+]
+// Row 3: 0 → 0.5 FM → M1, 0.5 → 1 M1 → warm, equal power; each side gated where its gain is exactly 0 (CPU)
+const bassBlend = [
+  v => v < 0.5 ? Math.cos(v * Math.PI) * (v < 0.499) : 0,
+  v => v < 0.5 ? Math.sin(v * Math.PI) * (v > 0.001) : Math.cos((v - 0.5) * Math.PI) * (v < 0.999),
+  v => v > 0.5 ? Math.sin((v - 0.5) * Math.PI) * (v > 0.501) : 0,
+]
+const bassPlayed = pick(bassVar, BASS_LINES.map(l => bassLine(l[1]))).swingBy(0.12, 8).add(note(bassOct))
+const bassSides = BASS_SOUNDS.map(([sound, g, lo, hi], i) => gate(bassCol.char.fmap(v => bassBlend[i](v) > 0),
+  sound(bassPlayed).lpf(toned(expRange(bassCol.bright, lo, hi)))
+    .fmap(({ dark, ...v }) => dark ? { ...v, cutoff: v.cutoff * 0.6 } : v)
+    .mul(gain(bassCol.char.fmap(v => g * bassBlend[i](v))))))
+// Level: fader × BASS_LEVEL × brightness ±2 dB (the lab's postgain). BASS_LEVEL 1.55 (+3.8 dB): offline at fader 1, all
+// knobs 0 the old Jojo 4 measured −24.2 LUFS, this one −28.0 → now as loud as before (FM / M1 / warm within ±1 dB).
+const BASS_LEVEL = 1.55
+const stemJ4_bass = beatOnly(strip(dryBus(stack(...bassSides), 1, bassCol.space), {
+  level: bassCol.level.fmap(l => b => l * BASS_LEVEL * Math.pow(10, 4 * (b - 0.5) / 20)).appLeft(bassCol.bright),
 }))
 
 // ============================================================
@@ -691,7 +798,125 @@ const stemJ8_shake = beatOnly(strip(bus(pick(shakeVar, SHAKERS)
 }))
 
 // ============================================================
-// JONAS 1 KEYS — 1:1 from the keys lab (lab/keys/old/house-keys-lab-19.strudel, column 2: Steinway + Rhodes Mark I):
+// A control's value at time t (controls are continuous signals); a percentage for the LC view
+const valAt = (pat, t) => { const h = pat.queryArc(t, t + 1e-4)[0]; return h ? h.value : 0 }
+const pct = v => Math.round((v ?? 0) * 100)
+
+// ============================================================
+// JONAS 1 HARMONY — 1:1 from the harmony lab (lab/harmonie/harmonie-4.strudel, column 2 “Liegend, B3 sanft”): the
+// same controls, sounds, voicing, levels and channel strip. Held chords, as long as each chord lasts (struck again
+// after 4 bars), the next chord two 16ths early (push, as the keys).
+// ============================================================
+// Sounds (lab): JX-10 strings (two saws ~4 cents + a layer 0.1 semitone up) and a soft Hammond B3 (16' + 8' drawbars
+// as sines, slow Leslie, 60 ms attack); row 3 fades strings → both (equal power) → B3, a side at exactly 0 is not
+// computed. Voicing (lab): the Kerri shape around F3–E4, four notes from E3 up. Channel strip (lab engine 3):
+// brightness = low-pass 400–6000 Hz, ±2 dB with it; space = a 1/8 echo first, the room from 0.35; button 2 held =
+// echo throw (dotted 8th). Fog / Tension, global Room and Tension's echo on top, as for the vibraphone.
+// Only deviation: the chord comes from the track's harmony (Chapter + progression) instead of the lab's engine.
+// Orbit 3 (shared with the vibraphone, as in the lab where all candidates shared one orbit).
+// @ctl 2:1.k1 Brightness | dull ↔ bright (low-pass over the sound's range).
+// @ctl 2:1.k2 Space | echo and room.
+// @ctl 2:1.k3 Strings ↔ B3 | strings → both → B3 alone.
+// @ctl 2:1.fader Level | held chords, follow the progression.
+// @ctl 2:1.b1 Progression | next of 10, at the next 8-bar phrase (plays in Wechsel).
+// @ctl 2:1.b2 Echo throw | held: long dotted-8th echo.
+const HARM_LEVEL = 1   // the lab's column gain (held: −27 LUFS at fader 1 in the lab, 6 dB under the keys)
+// The column's state: [brightness, space, strings ↔ B3, level] with the lab's start values; untouched knobs keep them
+const HS = { val: [0.6, 0, 0.3, 0], held: false, prev: null }
+const harmCtl = signal(t => {
+  const now = [harmCol.bright, harmCol.space, harmCol.char, harmCol.level].map(p => valAt(p, t))
+  now.forEach((v, i) => {
+    if (HS.prev === null ? i !== 3 && v === 0 : v === HS.prev[i]) return
+    HS.val[i] = v
+    lcView?.update()
+  })
+  HS.prev = now
+  const h = valAt(harmCol.btn2, t) > 0.5
+  if (h !== HS.held) { HS.held = h; lcView?.update() }
+  return 0
+}).segment(16)
+taps.push(harmCtl)
+// Voicing (lab CH keys): the pitch classes; notes from E3 (52) up, four of them
+const HARM_VOICING = { Am9: [55, 59, 60, 64], D9: [54, 57, 60, 64], Am7: [55, 57, 60, 64], Cmaj7: [55, 59, 60, 64],
+  Em7: [55, 59, 62, 64], Fmaj7: [53, 57, 60, 64], Fadd9: [53, 55, 57, 60], Gadd9: [55, 57, 59, 62], G11: [53, 55, 60, 62],
+  Dm7: [53, 57, 60, 62] }
+const HARM_POOL = {}
+const harmNotes = name => HARM_POOL[name] ??= (() => {
+  const pcs = HARM_VOICING[name].map(pc), o = []
+  for (let m = 52; m <= 76; m++) if (pcs.includes(pc(m))) o.push(m)
+  return o.slice(0, 4)
+})()
+// The chord at 16th k, the next one two 16ths early (push)
+const harmAtRaw = k => CHORDS[chordIdAt(Math.floor((k + 2) / 16))].name
+// Held chords (lab padPat): one event per chord as long as it lasts, struck again every 4 bars
+let harmPadLast = { key: null, haps: [] }   // (CPU) the layers ask for the same span one after the other: build it once
+const harmPad = new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const key = b0 + ':' + e0
+  if (harmPadLast.key === key) return harmPadLast.haps
+  const memo = {}, harmAt = k => memo[k] ??= harmAtRaw(k)   // (CPU) each 16th asked once per query
+  const startOf = k => {
+    const name = harmAt(k)
+    let c = k
+    while (c > k - 64 && harmAt(c - 1) === name) c--
+    if (c === k - 64) c = 64 * Math.floor(k / 64)   // no change in sight (one chord): strike on the 4-bar grid
+    return c + 64 * Math.floor((k - c) / 64)
+  }
+  for (let st = startOf(Math.floor(b0 * 16)); st < e0 * 16;) {
+    const name = harmAt(st)
+    let e = st + 1
+    while (e - st < 64 && harmAt(e) === name) e++
+    const w0 = st / 16, w1 = e / 16, p0 = Math.max(w0, b0), p1 = Math.min(w1, e0)
+    if (p1 > p0) for (const m of harmNotes(name)) out.push(new Hap(new TimeSpan(w0, w1), new TimeSpan(p0, p1), { note: m }, {}))
+    st = e
+  }
+  harmPadLast = { key, haps: out }
+  return out
+})
+const harmJx = notes => stack(notes.s('supersaw').unison(2).detune(0.08).spread(0.6).gain(0.5),
+  notes.add(note(0.1)).s('supersaw').unison(2).detune(0.05).spread(0.9).gain(0.3))
+  .attack(0.35).decay(0.1).sustain(1).release(0.8).mul(gain(0.24))
+const harmB3 = notes => stack(...[[0, 0.14], [12, 0.11]].flatMap(([d, g]) => [[-0.04, 0.3], [0.04, 0.7]].map(([dt, pan]) =>
+  notes.add(note(d + dt)).s('sine').gain(g).pan(pan))))
+  .vib(0.8).vibmod(0.08).attack(0.06).release(0.25).mul(gain(0.47))
+const harmX = signal(() => HS.val[2])
+// (CPU) the gate is checked per bar: a side switched on starts with the next chord strike
+const harmSide = (r, f) => harmX.fmap(v => f(v) > 0).segment(1).fmap(on => on ? r(harmPad).mul(gain(harmX.fmap(f))) : silence).innerJoin()
+const harmVoices = stack(harmSide(harmJx, v => Math.cos(v * Math.PI / 2) * (v < 0.999)),
+  harmSide(harmB3, v => Math.sin(v * Math.PI / 2) * (v > 0.001))).velocity(perlin.range(0.85, 1)).swingBy(0.12, 8)
+// The lab's channel strip per event
+// (CPU) only the haps that start in this query are played: the global controls are read once per query for them,
+// the held chords' later fragments pass unchanged (they never sound)
+const harmStrip = new Pattern(state => {
+  const haps = harmVoices.query(state), on = haps.filter(h => h.hasOnset())
+  if (!on.length) return haps
+  const t = state.span.begin.valueOf(), [br, sp] = HS.val
+  const r = 0.8 * Math.max(0, (sp - 0.35) / 0.65), gRoom = valAt(globalRoom, t), tone = valAt(globalTone, t)
+  const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+  const ef = HS.held ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62 }
+    : { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev }
+  ef.delay = Math.max(ef.delay, valAt(tensionEcho, t))
+  return haps.map(h => !h.hasOnset() ? h : h.withValue(v => {
+    const cutoff = Math.min(18000, Math.max(80, Math.min(18000, v.cutoff ?? 18000, 400 * Math.pow(15, br)) * tone))
+    return { release: 0.1, ...v, cutoff, room: r + (0.95 - r) * gRoom, roomsize: 2, ...(ef.delay > 0 ? ef : {}), orbit: 3 }
+  }))
+})
+const stemN1_harm = strip(harmStrip, { level: signal(() => HS.val[3] * HARM_LEVEL * Math.pow(10, 4 * (HS.val[0] - 0.5) / 20)) })
+// LC view: the lab's dashboard column (Hell, Raum, Strings ↔ B3, Pegel, the progression, Echo-Wurf)
+const harmMix = v => v <= 0.001 ? 'Strings' : v >= 0.999 ? 'B3' : 'beide ' + pct(v)
+COLVIEW['jonas:1'] = (row, { esc, pending }) => {
+  const knob = (v, name, txt) => '<div class="cell knob"><div class=dial style="--v:' + v + '"></div><b>' + (txt ?? pct(v)) +
+    '</b><span>' + esc(name) + '</span></div>'
+  return {
+    k1: knob(HS.val[0], 'Hell'), k2: knob(HS.val[1], 'Raum'), k3: knob(HS.val[2], 'Strings ↔ B3', harmMix(HS.val[2])),
+    fader: '<div class="cell fader"><div class=bar style="--v:' + HS.val[3] + '"><i></i></div><b>' + pct(HS.val[3]) +
+      '</b><span>Pegel</span></div>',
+    b1: '<div class="cell btn"><b>' + pending(PROGS[progLatch.now].name, PROGS[progLatch.pending].name) + '</b></div>',
+    b2: '<div class="cell btn' + (HS.held ? ' on' : '') + '"><b>Echo-Wurf</b></div>',
+  }[row]
+}
+
+// JONAS 2 KEYS — 1:1 from the keys lab (lab/keys/old/house-keys-lab-19.strudel, column 2: Steinway + Rhodes Mark I):
 // the same controls, sounds, rhythms, touch and levels. Short stabs in Kerri Chandler's voicing.
 // ============================================================
 // Voicing (Kerri Chandler, Attack Magazine): the 7th at the bottom, the 9 instead of the root, moved as a block:
@@ -702,13 +927,13 @@ const stemJ8_shake = beatOnly(strip(bus(pick(shakeVar, SHAKERS)
 // Brightness per sound over its own range (lab round 19), top third a presence peak; ±2 dB with it.
 // Sound (button 2, every press on / off; the lab's “shift”): the knobs mix the sound (1 piano → Rhodes, 2 organ B3 → M1, 3 vibraphone
 // → marimba), the fader sets the overtones. Only moves count: a control keeps its value until it is moved again.
-// @ctl 2:1.k1 Brightness | dull ↔ bright over each sound's own range (lpf from 250 Hz); top third: a presence peak; brighter also plays a little harder (±2 dB).
-// @ctl 2:1.k2 Space | 0 = dry; a 1/8 echo is there from the first turn (full at half), from about a third on the room joins (full at the top).
-// @ctl 2:1.k3 Length | 0 = short stab ↔ hits ring four times longer.
-// @ctl 2:1.fader Level | keys: Steinway (VCSL) and Rhodes Mark I (jRhodes3d), organs, mallets.
-// @ctl 2:1.b1 Change | 8 stab rhythms (chain, shifted, pairs, 3-3-2, two Kerri, two overlays).
-// @ctl 2:1.b2 Sound | on / off: knobs = sound mix (piano → Rhodes, B3 → M1, vibes → marimba); fader = overtones.
-const keys = colJonas(1)
+// @ctl 2:2.k1 Brightness | dull ↔ bright over each sound's own range (lpf from 250 Hz); top third: a presence peak; brighter also plays a little harder (±2 dB).
+// @ctl 2:2.k2 Space | 0 = dry; a 1/8 echo is there from the first turn (full at half), from about a third on the room joins (full at the top).
+// @ctl 2:2.k3 Length | 0 = short stab ↔ hits ring four times longer.
+// @ctl 2:2.fader Level | keys: Steinway (VCSL) and Rhodes Mark I (jRhodes3d), organs, mallets.
+// @ctl 2:2.b1 Change | 8 stab rhythms (chain, shifted, pairs, 3-3-2, two Kerri, two overlays).
+// @ctl 2:2.b2 Sound | on / off: knobs = sound mix (piano → Rhodes, B3 → M1, vibes → marimba); fader = overtones.
+const keys = colJonas(2)
 // x = chord, . = rest, - = the hit before is held one more 16th; overlays: O = both rhythms hit, a / b = only one
 const KEY_VEL = { x: 0.8, X: 1, O: 1, a: 0.8, b: 0.8 * (1 - 0.45) }   // b: the second rhythm 45 % softer (lab round 11)
 const KEY_CUT = { b: 1 - 0.8 * 0.45 }                                 // … and darker
@@ -773,8 +998,6 @@ const keyLayers = m => [['piano', pairLevels(m[0], -1.3)[0]], ['rhodes', pairLev
   ['b3', pairLevels(m[1], 1.3)[0]], ['m1', pairLevels(m[1], 1.3)[1]],
   ['vibes', pairLevels(m[2])[0]], ['marimba', pairLevels(m[2])[1]]].filter(([, l]) => l > 0)
 const KEY_LEVEL = 0.88   // the stem in the track: −21 LUFS at fader 1 with the lab's settings (kick −14, clap −23.5)
-// A control's value at time t (controls are continuous signals)
-const valAt = (pat, t) => { const h = pat.queryArc(t, t + 1e-4)[0]; return h ? h.value : 0 }
 // The column's state, as in the lab: knobs and fader [brightness, space, length, level], sound mix, overtones, shift.
 // Shift: every press of button 2 switches it on or off. A control that moves goes to its normal job, or with shift
 // on to the sound mix (knobs) / overtones (fader). The lab's start values for what has not been moved yet.
@@ -782,10 +1005,9 @@ const K = { val: [0.6, 0, 0, 0], mix: [0.5, 0, 0], e: 0.5, shift: 0, prev: null 
 cycleButton(keys.btn2, 2, s => { K.shift = s; keysRow.label = s ? 'Keys KLANG' : 'Keys'; showStatus() })
 // LC view: the lab's dashboard column, as it was (labels, values, the rhythm under button 1; with shift on the mix)
 const MIX_NAMES = [['Klavier', 'Rhodes'], ['B3', 'M1'], ['Vibra', 'Marimba']]
-const pct = v => Math.round((v ?? 0) * 100)
 const mixText = r => { const [a, b] = MIX_NAMES[r], v = K.mix[r]
   return v <= 0 ? 'aus' : v < 1 / 3 ? a + ' ' + pct(3 * v) : v > 2 / 3 ? b + ' ' + pct(3 - 3 * v) : a + ' → ' + b + ' ' + pct(3 * v - 1) }
-COLVIEW['jonas:1'] = (row, { esc, pending }) => {
+COLVIEW['jonas:2'] = (row, { esc, pending }) => {
   const knob = (v, name, txt) => '<div class="cell knob"><div class=dial style="--v:' + v + '"></div><b>' + (txt ?? pct(v)) +
     '</b><span>' + esc(name) + '</span></div>'
   const fader = (v, name) => '<div class="cell fader"><div class=bar style="--v:' + v + '"><i></i></div><b>' + pct(v) +
@@ -826,7 +1048,7 @@ const keyStabs = new Pattern(state => {
     if (!isHit(sym)) continue
     let ties = 0
     while (step + ties + 1 < 16 && pat[step + ties + 1] === '-') ties++
-    const ch = CHORDS[valAt(harmId, (step >= 14 ? bar + 1 : bar) + 0.01)], notes = KEY_VOICING[ch.name] ?? ch.tones
+    const ch = CHORDS[keysIdAt(step >= 14 ? bar + 1 : bar)], notes = KEY_VOICING[ch.name] ?? ch.tones
     const [br, sp, len] = K.val
     const kt = KEY_TOUCH[pi], hitT = kt.touch[step]
     const hitGain = (0.6 + 0.8 * hitT) * kt.norm * KEY_VEL[sym]
@@ -847,7 +1069,555 @@ const keyStabs = new Pattern(state => {
   return out
 })
 
-const stemN1_keys = strip(keyStabs, { level: signal(() => K.val[3]) })
+const stemN2_keys = strip(keyStabs, { level: signal(() => K.val[3]) })
+
+// ============================================================
+// JONAS 3 VIBRAPHONE — 1:1 from the melody lab (lab/melodie/melodie-2.strudel, column 1): the same controls, phrases,
+// Complexity layers, touch, swing and effects; 40 % louder than in the lab (user, 2026-11-07: 30–50 % louder).
+// ============================================================
+// Phrases follow the chord: Offbeat = chord tones on off-beat 16ths (bar 8 climbs); Tresillo = 3-3-2 on root / fifth
+// in A dorian above the chord's root, every 4th bar different; Ruf-Echo = the Escravos call an octave lower in bars 7–8.
+// Complexity (row 3), as 008's Pings density: 0 = the core (2–3 notes a bar) → from 15 % the written figure (start
+// 30 %) → from 45 % the gaps fill in at random with chord tones → from 75 % quick doubles and neighbour notes.
+// Soft (row 2) = the lab's Space (1/8 echo first, room from 0.35) plus longer notes (ring ×4 … ×16 of a 16th).
+// Only deviation: the chord comes from the track (Chapter + the progression of Jonas 1) instead of the lab's engine; as there, the last two 16ths of a bar play the next bar's chord (push) in Offbeat.
+// Own orbit 3 as in the lab, so its echo throw does not change the keys' echo. Sound: VCSL vibraphone (CC0, built in).
+// @ctl 2:3.k1 Brightness | dull ↔ bright (low-pass).
+// @ctl 2:3.k2 Soft | dry and short ↔ long notes, echo and room.
+// @ctl 2:3.k3 Complexity | core notes → figure → fills → doubles.
+// @ctl 2:3.fader Level | vibraphone phrases, follow the chords.
+// @ctl 2:3.b1 Phrase | off-beat → tresillo → echo of the call, next bar.
+// @ctl 2:3.b2 Echo throw | held: long dotted-8th echo.
+const vib = colJonas(3)
+const VIB_LEVEL = 0.7   // the lab's column gain 0.5, +40 %
+// The column's state: [brightness, soft, complexity, level] with the lab's start values; untouched knobs keep them
+const V = { val: [0.6, 0, 0.3, 0], held: false, prev: null }
+const vibCtl = signal(t => {
+  const now = [vib.bright, vib.space, vib.char, vib.level].map(p => valAt(p, t))
+  now.forEach((v, i) => {
+    if (V.prev === null ? i !== 3 && v === 0 : v === V.prev[i]) return
+    V.val[i] = v
+    lcView?.update()
+  })
+  V.prev = now
+  const h = valAt(vib.btn2, t) > 0.5
+  if (h !== V.held) { V.held = h; lcView?.update() }
+  return 0
+}).segment(16)
+taps.push(vibCtl)
+const vibCx = signal(() => V.val[2]), vibSoft = signal(() => V.val[1])
+// The chord at 16th k (with push: two 16ths early), its notes from E3 (52) up as in the lab's arp, its root as a degree
+const vibChord = (k, push) => CHORDS[valAt(harmId, Math.floor((k + (push ? 2 : 0)) / 16) + 0.01)]
+const VIB_POOL = {}
+const vibNotes = c => VIB_POOL[c.name] ??= (() => {
+  const pcs = (KEY_VOICING[c.name] ?? c.tones).map(pc), o = []
+  for (let m = 52; m <= 76; m++) if (pcs.includes(pc(m))) o.push(m)
+  return o.slice(0, 8)
+})()
+// the root as a scale degree, counted by letter from A (A 0, B 1, C 2, D 3, E 4, F 5, G 6): same in dorian and aeolian
+const VIB_DEG = { 9: 0, 11: 1, 0: 2, 2: 3, 4: 4, 5: 5, 7: 6 }
+const vibArp = idx => new Pattern(state => idx.query(state).map(h => h.withValue(i => {
+  const notes = vibNotes(vibChord(Math.round(h.whole.begin.valueOf() * 16), true))
+  return { note: notes[((i % notes.length) + notes.length) % notes.length] }
+})))
+const vibRootDeg = signal(t => VIB_DEG[pc(vibChord(Math.round(t * 16), false).bass)] ?? 0).segment(16)
+const vibScale   = signal(t => 'A3:' + modeAt(Math.floor(t))).segment(16)   // dorian / aeolian per progression
+// Layers of a figure, switched in by Complexity (degradeBy 1 = silent, 0 = all) — the lab's code
+const vibFrom = (lo, p) => p.degradeBy(vibCx.fmap(c => c > lo ? 0 : 1))
+const vibFills = p => p.degradeBy(vibCx.fmap(c => c < 0.45 ? 1 : 1 - 0.7 * (c - 0.45) / 0.55))
+const vibBusy = p => p.sometimesBy(vibCx.fmap(c => c < 0.75 ? 0 : 0.35 * (c - 0.75) / 0.25), x => x.ply(2))
+  .sometimesBy(vibCx.fmap(c => c < 0.75 ? 0 : 0.2 * (c - 0.75) / 0.25), x => x.add(1))
+const vibLayered = (core, rest, gaps) => vibBusy(stack(mini(core), vibFrom(0.15, mini(rest)), vibFills(mini(gaps))))
+const VIB_CALL = ['[g5@3 ~ f#5 e5@2 d5@7 ~ d5]', '[c5@2 b4 c5@2 e5@2 d5@5 ~@4]']   // Escravos, bars 7–8
+const vibLower = (bar, k) => bar.replace(/([a-g]#?)(\d)/g, (_, n, o) => n + (+o + k))
+// The call is in A dorian (F♯); in the aeolian progressions (all but Am9 D9) F♯ rubs, so it becomes F there
+const vibModeFix = p => new Pattern(state => p.query(state).map(h => h.withValue(v =>
+  typeof v.note === 'string' && v.note.startsWith('f#') && modeAt(Math.floor((h.whole ?? h.part).begin.valueOf())) === 'aeolian'
+    ? { ...v, note: 'f' + v.note.slice(2) } : v)))
+const vibPhrases = [
+  ['Offbeat', vibArp(vibLayered(
+    '[~ ~ ~ 1 ~@5 3 ~@6]',
+    '<[~ 0 ~ ~ ~@2 2 ~@5 2 ~ 1 ~]!7 [~ 0 ~ ~ ~@2 2 ~@5 3 ~ 4 ~]>',
+    '[~ ~ 4 ~ 3 1 ~ 5 2 ~ 4 0 ~ 3 ~ 5]'))],
+  ['Tresillo', n(vibLayered(
+    '[0 ~ ~ 4 ~ ~ 0 ~@9]',
+    '<[~@10 -1 ~ 2 ~@3]!3 [~@10 2 ~ [4 4] ~@3]>',
+    '[~ 2 ~ ~ 1 ~ ~ 4 ~ 3 ~ 4 ~ 5 4 ~]').add(vibRootDeg)).scale(vibScale)],
+  ['Ruf-Echo', vibBusy(vibModeFix(note(mini('<' + ['~', '~', '~', '~', '~', '~', ...VIB_CALL.map(b => vibLower(b, -2))].join(' ') + '>'))))],
+].map(([name, p]) => [name, p.s('vibraphone').velocity(perlin.range(0.6, 1)).pan(sine.slow(3).range(0.4, 0.6))
+  .clip(vibSoft.fmap(s => 4 * Math.pow(4, s)))])          // Soft: ring ×4 … ×16 of a 16th
+const vibVar = change(vib.btn, 'jonas', 'Vibraphon', vibPhrases.length, vibPhrases.map(p => p[0]))
+// status rows: 0 = harmony (column 1), 1 = keys (column 2), 2 = vibraphone (column 3), 3 = flute (column 4)
+// Swing as in the lab (56 %: the odd 16ths 0.12 of a 16th late), then the lab's channel strip per event; Fog /
+// Tension on the cutoff, global Room and Tension's echo on top, as for the keys
+const vibPlayed = pick(vibVar, vibPhrases.map(p => p[1])).swingBy(0.12, 8)
+const vibStrip = new Pattern(state => vibPlayed.query(state).map(h => h.withValue(v => {
+  const t = (h.whole ?? h.part).begin.valueOf(), [br, sp] = V.val
+  const r = 0.8 * Math.max(0, (sp - 0.35) / 0.65), gRoom = valAt(globalRoom, t)
+  const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+  const ef = V.held ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62 }
+    : { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev }
+  ef.delay = Math.max(ef.delay, valAt(tensionEcho, t))
+  const cutoff = Math.min(18000, Math.max(80, Math.min(18000, v.cutoff ?? 18000, 600 * Math.pow(20, br)) * valAt(globalTone, t)))
+  return { release: 0.1, ...v, cutoff, room: r + (0.95 - r) * gRoom, roomsize: 2, ...(ef.delay > 0 ? ef : {}), orbit: 3 }
+})))
+// Level: fader × the lab's gain (+40 %) × brightness ±2 dB, as the lab's postgain
+const stemN3_vibes = strip(vibStrip, { level: signal(() => V.val[3] * VIB_LEVEL * Math.pow(10, 4 * (V.val[0] - 0.5) / 20)) })
+// LC view: the lab's dashboard column (Hell, Weich, Komplex, Pegel, the phrase, Echo-Wurf)
+COLVIEW['jonas:3'] = (row, { esc, pending }) => {
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + v + '"></div><b>' + pct(v) +
+    '</b><span>' + esc(name) + '</span></div>'
+  return {
+    k1: knob(V.val[0], 'Hell'), k2: knob(V.val[1], 'Weich'), k3: knob(V.val[2], 'Komplex'),
+    fader: '<div class="cell fader"><div class=bar style="--v:' + V.val[3] + '"><i></i></div><b>' + pct(V.val[3]) +
+      '</b><span>Pegel</span></div>',
+    b1: '<div class="cell btn"><b>' + pending(vibPhrases[vibVar.now][0], vibPhrases[vibVar.pending][0]) + '</b></div>',
+    b2: '<div class="cell btn' + (V.held ? ' on' : '') + '"><b>Echo-Wurf</b></div>',
+  }[row]
+}
+
+// ============================================================
+// JONAS 4 FLUTE — 1:1 from the melody lab (lab/melodie/melodie-4.strudel, column 6 “Flöte höher”): the same controls,
+// motifs, Playful layers, flute notes, swing and effects; louder than in the lab (user, 2026-11-08: too quiet).
+// ============================================================
+// Single notes cut from the recorded flute (juskiddink “Flute2”, Freesound, CC BY 4.0 — the lab's phrase files, see
+// samples/horn-phrases/README.md), moved to the wanted pitch by playback speed; motifs on the chord tones from G4 up,
+// A A B A over 8 bars. Playful (row 3, start 30 %): from a third on two extra notes in the gaps, from three quarters a
+// short trill into a note (about every second time). Space (row 2) as the lab's bus: a little room even at 0.
+// Only deviation: the chord comes from the track (Chapter + the progression of Jonas 1), two 16ths early (push), as the
+// lab's engine; chord tones from the track's keys voicing / chord tones. Level: the lab's gain 0.6 → 2.0 (+10.5 dB),
+// measured offline in the track at fader 1 (start values, vamp): the vibraphone (Jonas 3) −23.8 LUFS, the flute now the same.
+// Orbit 3, shared with the vibraphone (in the lab all candidates shared one orbit).
+// @ctl 2:4.k1 Brightness | dull ↔ bright (low-pass).
+// @ctl 2:4.k2 Space | echo and room (a little at 0).
+// @ctl 2:4.k3 Playful | core motif → + neighbour notes → + a short trill.
+// @ctl 2:4.fader Level | flute melody from real flute notes, follows the chords.
+// @ctl 2:4.b1 Motif | hopping → call and answer → turn, next bar.
+// @ctl 2:4.b2 Echo throw | held: long dotted-8th echo.
+const flu = colJonas(4)
+const FLUTE_LEVEL = 2.0   // the lab's column gain 0.6, +10.5 dB (measured in the track, see above)
+// The column's state: [brightness, space, playful, level] with the lab's start values; untouched knobs keep them
+const F = { val: [0.6, 0, 0.3, 0], held: false, prev: null }
+const fluCtl = signal(t => {
+  const now = [flu.bright, flu.space, flu.char, flu.level].map(p => valAt(p, t))
+  now.forEach((v, i) => {
+    if (F.prev === null ? i !== 3 && v === 0 : v === F.prev[i]) return
+    F.val[i] = v
+    lcView?.update()
+  })
+  F.prev = now
+  const h = valAt(flu.btn2, t) > 0.5
+  if (h !== F.held) { F.held = h; lcView?.update() }
+  return 0
+}).segment(16)
+taps.push(fluCtl)
+const fluPlay = signal(() => F.val[2])
+// The flute phrases (as the lab's m4_fl) and the single notes in them: [phrase, from s, to s, MIDI] (lab's YIN analysis)
+const FLU_FILES = ['flute-65509-0003', 'flute-65509-0068', 'flute-65509-0133'], FLU_LEN = [6.45, 6.11, 7.12]
+if (typeof samples === 'function') await samples({ m4_fl: FLU_FILES.map(f =>
+  'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/johannes/samples/horn-phrases/' + f + '.flac') })
+const FLUTE_NOTES = [[2, 1.86, 4.46, 61.97], [0, 3.87, 4.53, 64.07], [2, 0.45, 0.71, 65.12], [1, 2.02, 2.61, 67.11],
+  [1, 0.11, 1.63, 68.94], [1, 2.67, 3.14, 70.98], [0, 0.77, 2.39, 72.03]]
+const fluteNote = m0 => {
+  let m = m0
+  while (m > 77) m -= 12   // above F5 the notes would be sped up too far: an octave down
+  const [f, a, b, base] = FLUTE_NOTES.reduce((best, x) => Math.abs(x[3] - m) < Math.abs(best[3] - m) ? x : best)
+  return { s: 'm4_fl', n: f, begin: a / FLU_LEN[f], end: b / FLU_LEN[f], speed: Math.pow(2, (m - base) / 12), clip: 1, attack: 0.02, release: 0.09 }
+}
+// Chord tones from G4 (67) up, 8 of them, of the track's chord at 16th k with push (as the lab's arp)
+const FLU_POOL = {}
+const fluNotes = c => FLU_POOL[c.name] ??= (() => {
+  const pcs = (KEY_VOICING[c.name] ?? c.tones).map(pc), o = []
+  for (let m = 67; m <= 91; m++) if (pcs.includes(pc(m))) o.push(m)
+  return o.slice(0, 8)
+})()
+const fluArp = idx => new Pattern(state => idx.query(state).map(h => h.withValue(i => {
+  const notes = fluNotes(vibChord(Math.round(h.whole.begin.valueOf() * 16), true))
+  return { note: notes[((i % notes.length) + notes.length) % notes.length] }
+})))
+// The lab's motifs: [name, [bar A, bar B, bar D], extra notes, trill], 8 bars A A B A A A B D
+const FLU_MOTIFS = [
+  ['Hüpfer', ['[~ ~ 2 ~ ~ 3 ~ 2 ~ ~ 1 ~ ~ 2 ~ ~]', '[~ ~ 2 ~ ~ 3 ~ 4 ~ ~ 3 ~ 2 ~ 1 ~]', '[~ ~ 2 ~ ~ 3 ~ 2 ~ ~ 1 ~ 0 ~ ~ ~]'],
+    '[~ ~ ~ 3 ~ ~ ~ ~ ~ 1 ~ ~ ~ ~ ~ ~]', '[~ ~ ~ ~ 2 ~@11]'],
+  ['Ruf-Antwort', ['[3@3 ~ 2 ~ 3@4 ~@6]', '[~ ~ 1 ~ 2 ~ ~ 1@3 ~ 0@3 ~@3]', '[3@3 ~ 4 ~ 3@3 2 ~ ~ ~@4]'],
+    '[~@8 2 ~@4 3 ~ ~]', '[~ ~ ~ 2 ~@12]'],
+  ['Drehung', ['[2 ~ 3 2 ~ 1 ~ 2 ~ ~ ~ ~ ~ ~ ~ ~]', '[2 ~ 3 2 ~ 1 ~ 0@2 ~ 1 ~ 2@3 ~]', '[4 ~ 3 2 ~ 3 ~ 2 ~ ~ ~ ~ ~ ~ ~ ~]'],
+    '[~@8 ~ 1 ~ ~ ~ 3 ~ ~]', '[~@14 2 ~]'],
+]
+const fluPhrases = FLU_MOTIFS.map(([name, [a, b, d], extra, trill]) => {
+  const core = mini('<' + [a, a, b, a, a, a, b, d].join(' ') + '>')
+  const nb = mini(extra).degradeBy(fluPlay.fmap(v => v < 0.33 ? 1 : 1 - (v - 0.33) / 0.67))
+  const tr = mini(trill).fmap(x => mini('[' + x + ' ' + (x + 1) + ' ' + x + ' ' + (x + 1) + ']')).squeezeJoin()
+    .degradeBy(fluPlay.fmap(v => v < 0.75 ? 1 : 0)).degradeBy(0.4)
+  return [name, fluArp(stack(core, nb, tr)).fmap(v => fluteNote(v.note)).velocity(perlin.range(0.75, 1)).pan(0.55)]
+})
+const fluVar = change(flu.btn, 'jonas', 'Flöte', fluPhrases.length, fluPhrases.map(p => p[0]))
+// Swing as in the lab (56 %), then the lab's channel strip per event (space 'bus', floor 0.2: room 0.9 × space, never
+// below 0.2; echo throw dotted 8th); Fog / Tension on the cutoff, global Room and Tension's echo on top, as the vibraphone
+const fluPlayed = pick(fluVar, fluPhrases.map(p => p[1])).swingBy(0.12, 8)
+const fluStrip = new Pattern(state => fluPlayed.query(state).map(h => h.withValue(v => {
+  const t = (h.whole ?? h.part).begin.valueOf(), [br, sp] = F.val
+  const s2 = 0.2 + 0.8 * sp, r = 0.9 * s2, gRoom = valAt(globalRoom, t)
+  const ef = F.held ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62 }
+    : { delay: Math.min(0.9, (v.delay ?? 0) * 2 * s2), delaytime: 0.75 * 60 / bpm, delayfeedback: 0.55 }
+  ef.delay = Math.max(ef.delay, valAt(tensionEcho, t))
+  const cutoff = Math.min(18000, Math.max(80, Math.min(18000, v.cutoff ?? 18000, 900 * Math.pow(14000 / 900, br)) * valAt(globalTone, t)))
+  return { ...v, cutoff, room: r + (0.95 - r) * gRoom, roomsize: 2, ...(ef.delay > 0 ? ef : {}), orbit: 3 }
+})))
+// Level: fader × the gain × brightness ±2 dB, as the lab's postgain
+const stemN4_flute = strip(fluStrip, { level: signal(() => F.val[3] * FLUTE_LEVEL * Math.pow(10, 4 * (F.val[0] - 0.5) / 20)) })
+// LC view: the lab's dashboard column (Hell, Raum, Verspielt, Pegel, the motif, Echo-Wurf)
+COLVIEW['jonas:4'] = (row, { esc, pending }) => {
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + v + '"></div><b>' + pct(v) +
+    '</b><span>' + esc(name) + '</span></div>'
+  return {
+    k1: knob(F.val[0], 'Hell'), k2: knob(F.val[1], 'Raum'), k3: knob(F.val[2], 'Verspielt'),
+    fader: '<div class="cell fader"><div class=bar style="--v:' + F.val[3] + '"><i></i></div><b>' + pct(F.val[3]) +
+      '</b><span>Pegel</span></div>',
+    b1: '<div class="cell btn"><b>' + pending(fluPhrases[fluVar.now][0], fluPhrases[fluVar.pending][0]) + '</b></div>',
+    b2: '<div class="cell btn' + (F.held ? ' on' : '') + '"><b>Echo-Wurf</b></div>',
+  }[row]
+}
+
+// ============================================================
+// JONAS 5 BRASS — from the brass lab (lab/blaeser/disco-blaeser-3.strudel): its six figures that stayed (user,
+// 2026-11-08: “auf der a” and “Schweller + Fall” out), the ensemble sound, row 3 Complexity and the Lift on button 2.
+// ============================================================
+// Full section (Sonatina Symphonic Orchestra, CC Sampling Plus 1.0: trumpets, horns, trombones staccato + sustain), warm
+// voicing: lead = the chord tone nearest C5, horns double it, trombones an octave under, two chord tones under the lead;
+// every player a few ms late (fixed per position). Row 3 = complexity (pickups and answers come in, softer); button 2
+// HELD = lift (over two bars the doubling and harmony grow, brighter, up to +3 dB, back over one bar).
+// Deviations from the lab (all because one column has two buttons): button 1 steps through the six figures (in the lab
+// each figure was a column and button 1 was solo ↔ ensemble): the track plays the ensemble. Chords from the track
+// (Chapter + the progression of Jonas 1, two 16ths early as the lab's engine; same pitch classes as the lab's chords).
+// Orbit 3 with the vibraphone and the flute (room size 2 there; 2.5 in the lab). Level: −6.6 dB against the lab (see
+// BRASS_LEVEL). Complexity is being reworked in a lab.
+// @ctl 2:5.k1 Brightness | dull ↔ bright (low-pass 0.9–8 kHz).
+// @ctl 2:5.k2 Space | room at 0 ↔ hall and dotted-8th echo.
+// @ctl 2:5.k3 Complexity | core figure → + pickups and answers → + small extra hits.
+// @ctl 2:5.fader Level | full brass section, follows the chords.
+// @ctl 2:5.b1 Figure | push → 3-3-2 → shout → double push → 3-3-2 long → swell + push, next bar.
+// @ctl 2:5.b2 Lift | held: the section grows over 2 bars (voices, brightness, +3 dB); back over 1 bar after.
+const brs = colJonas(5)
+const BRASS_LEVEL = 0.42   // the lab's gain 0.9 measured −14.6 LUFS at fader 1 (vamp, push, start values): −6.6 dB → −21 LUFS = the keys
+// The column's state: [brightness, space, complexity, level] with the lab's start values; lift 0..1 (button 2)
+const B = { val: [0.6, 0, 0.3, 0], held: false, prev: null, lift: 0, t: null }
+const brsCtl = signal(t => {
+  const now = [brs.bright, brs.space, brs.char, brs.level].map(p => valAt(p, t))
+  now.forEach((v, i) => {
+    if (B.prev === null ? i !== 3 && v === 0 : v === B.prev[i]) return
+    B.val[i] = v
+    lcView?.update()
+  })
+  B.prev = now
+  const h = valAt(brs.btn2, t) > 0.5
+  if (h !== B.held) { B.held = h; lcView?.update() }
+  // lift: up over 2 bars while held, down over 1 bar after (in cycles = bars)
+  const dt = B.t === null ? 0 : Math.max(0, Math.min(0.25, Number(t) - B.t))
+  B.t = Number(t)
+  B.lift = B.held ? Math.min(1, B.lift + dt / 2) : Math.max(0, B.lift - dt)
+  return 0
+}).segment(16)
+taps.push(brsCtl)
+const SSO = 'https://raw.githubusercontent.com/peastman/sso/master/Sonatina%20Symphonic%20Orchestra/Samples/'
+const ssoMap = (dir, pre, names, post = '') => Object.fromEntries(names.map(n => [n, SSO + dir + '/' + pre + n.replace('#', '%23') + post + '.wav']))
+if (typeof samples === 'function') await samples({
+  sso_tp: ssoMap('Trumpets', 'trumpets-stc-rr1-', ['e3', 'g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'g5', 'a#5']),
+  sso_tb: ssoMap('Trombones', 'trombones-stc-rr1-', ['e2', 'g2', 'a#2', 'c#3', 'e3', 'g3', 'a#3', 'c#4', 'e4']),
+  sso_hn: ssoMap('Horns', 'horns-stc-rr1-', ['e2', 'g2', 'a#2', 'c#3', 'e3', 'g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4']),
+  sso_tp_sus: ssoMap('Trumpets', 'trumpets-sus-', ['e3', 'g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'g5']),
+  sso_tb_sus: ssoMap('Trombones', 'trombones-sus-', ['e2', 'g2', 'a#2', 'c#3', 'e3', 'g3', 'a#3', 'c#4', 'e4']),
+  sso_hn_sus: ssoMap('Horns', 'horns-sus-mp-', ['e2', 'g2', 'a#2', 'c#3', 'e3', 'g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4'], '-PB-loop'),
+})
+// The lab's figures: N(16th, length, complexity level, kind); L = figure length in 16ths
+const BN = (p, len, lv = 0, kind = 'hit') => ({ p, len, lv, kind })
+const BRASS_FIGS = [
+  ['Push', 32, [BN(14, 1), BN(16, 3), BN(30, 1), BN(0, 3), BN(13, 1, 1), BN(29, 1, 1), BN(22, 1, 2), BN(8, 1, 2)]],
+  ['3-3-2 + Antwort', 32, [BN(0, 1), BN(3, 1), BN(6, 2), BN(24, 1), BN(27, 3), BN(10, 1, 1), BN(23, 1, 1), BN(31, 1, 2), BN(14, 1, 2)]],
+  ['Shout', 16, [BN(0, 1), BN(3, 1), BN(6, 1), BN(10, 2), BN(12, 1), BN(14, 1, 1), BN(15, 1, 2), BN(8, 1, 2)]],
+  ['Doppel-Push', 32, [BN(13, 1), BN(14, 1), BN(16, 2), BN(29, 1), BN(30, 1), BN(0, 2), BN(6, 1, 1), BN(22, 1, 1), BN(23, 1, 2), BN(10, 1, 2)]],
+  ['3-3-2 lang', 32, [BN(0, 1), BN(3, 1), BN(6, 1), BN(16, 1), BN(19, 1), BN(22, 2), BN(28, 1, 1), BN(30, 1, 1), BN(12, 1, 2), BN(27, 1, 2)]],
+  ['Schweller + Push', 32, [BN(24, 6, 0, 'swell'), BN(30, 1), BN(0, 2), BN(3, 1, 1), BN(6, 1, 1), BN(10, 1, 2), BN(14, 1, 2)]],
+]
+const BMS = 16 / (240 / bpm * 1000)   // 16ths per millisecond
+const brsPcs = c => [...new Set(chordPcs(c))]
+const brsLead = c => { const p = brsPcs(c); let best = 67; for (let m = 67; m <= 76; m++) if (p.includes(pc(m)) && Math.abs(m - 72) < Math.abs(best - 72)) best = m; return best }
+const brsBelow = (c, top, n) => { const p = brsPcs(c), o = []; for (let m = top - 1; m >= top - 12 && o.length < n; m--) if (p.includes(pc(m))) o.push(m); return o }
+const BRS_ENS = { lead: [['sso_tp', 0.45, 0, 0.45], ['sso_hn', 0.45, 6, 0.55]], dbl: [['sso_tp', 0.32, 9, 0.6]],
+  harm: [['sso_hn', 0.4, 8, 0.5], ['sso_tp', 0.25, 4, 0.6]], low: [['sso_tb', 0.5, 11, 0.6]] }
+const BRS_SUS = { sso_tp: ['sso_tp_sus', 0.8], sso_hn: ['sso_hn_sus', 0.45], sso_tb: ['sso_tb_sus', 0.6] }
+const brassFig = (L, notes) => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const lvl = B.val[2] < 0.33 ? 0 : B.val[2] < 0.66 ? 1 : 2, lift = B.lift, lg = Math.pow(10, 3 * lift / 20)
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 2; k++) {
+    const p = ((k % L) + L) % L
+    for (const n of notes) {
+      if (n.p !== p || n.lv > lvl) continue
+      const c = vibChord(k, true), lead = brsLead(c), held = n.kind === 'swell', soft = n.lv > 0 ? 0.7 : 1
+      const base = { clip: 1, bright: 0.75 + 0.6 * lift, attack: held ? 0.6 * n.len / 16 * 240 / bpm : 0.003,
+        release: held ? 0.35 : n.len >= 3 ? 0.2 : 0.12 }
+      const dur = n.len === 1 ? 0.9 : n.len - 0.3
+      const close = brsBelow(c, lead, 3), harm = held ? [close[1], close[2], close[0] - 12] : close.slice(0, 2)
+      const voices = [...BRS_ENS.lead.map(x => [x, lead, 1]), ...BRS_ENS.low.map(x => [x, lead - 12, 1]),
+        ...BRS_ENS.dbl.map(x => [x, lead, 0.6 + 0.4 * lift]), ...harm.flatMap(m => BRS_ENS.harm.map(x => [x, m, 0.7 + 0.3 * lift])),
+        ...(lift > 0.5 ? [[BRS_ENS.lead[0], lead + 12, 0.5 * (lift - 0.5) * 2]] : [])]
+      for (const [[s0, g, ms, pan], note, f] of voices) {
+        if (note === undefined) continue
+        const [s, g2] = held ? BRS_SUS[s0] : [s0, 1]
+        const t0 = (k + (ms + 8 * hash(k, note, s.length)) * BMS) / 16   // never early: an event before its 16th is lost in the swing
+        if (t0 < b0 - 1e-9 || t0 >= e0 - 1e-9) continue
+        out.push(new Hap(new TimeSpan(t0, t0 + dur / 16), new TimeSpan(t0, Math.min(t0 + dur / 16, e0)),
+          { ...base, s, note, gain: g * g2 * soft * f * lg, pan }, {}))
+      }
+    }
+  }
+  return out
+})
+const brsFigs = BRASS_FIGS.map(([name, L, notes]) => [name, brassFig(L, notes)])
+const brsVar = change(brs.btn, 'jonas', 'Bläser', brsFigs.length, brsFigs.map(f => f[0]))
+// Swing as in the lab (56 %), then the lab's channel strip per event (space 'bus', floor 0.3: room 0.9 × space, never
+// below 0.3); Fog / Tension on the cutoff, global Room and Tension's echo on top, as the flute
+const brsPlayed = pick(brsVar, brsFigs.map(f => f[1])).swingBy(0.12, 8)
+const brsStrip = new Pattern(state => brsPlayed.query(state).map(h => h.withValue(({ bright = 1, ...v }) => {
+  const t = (h.whole ?? h.part).begin.valueOf(), [br, sp] = B.val
+  const s2 = 0.3 + 0.7 * sp, r = 0.9 * s2, gRoom = valAt(globalRoom, t)
+  const ef = { delay: Math.max(0, valAt(tensionEcho, t)), delaytime: 0.75 * 60 / bpm, delayfeedback: 0.55 }
+  const cutoff = Math.min(18000, Math.max(80, 900 * Math.pow(8000 / 900, br) * bright * valAt(globalTone, t)))
+  return { ...v, cutoff, room: r + (0.95 - r) * gRoom, roomsize: 2, ...(ef.delay > 0 ? ef : {}), orbit: 3 }
+})))
+// Level: fader × the gain × brightness ±2 dB, as the lab's postgain
+const stemN5_brass = strip(brsStrip, { level: signal(() => B.val[3] * BRASS_LEVEL * Math.pow(10, 4 * (B.val[0] - 0.5) / 20)) })
+// LC view: the lab's dashboard column (Hell, Raum, Komplexität, Pegel, the figure, Steigerung)
+COLVIEW['jonas:5'] = (row, { esc, pending }) => {
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + v + '"></div><b>' + pct(v) +
+    '</b><span>' + esc(name) + '</span></div>'
+  return {
+    k1: knob(B.val[0], 'Hell'), k2: knob(B.val[1], 'Raum'), k3: knob(B.val[2], 'Komplexität'),
+    fader: '<div class="cell fader"><div class=bar style="--v:' + B.val[3] + '"><i></i></div><b>' + pct(B.val[3]) +
+      '</b><span>Pegel</span></div>',
+    b1: '<div class="cell btn"><b>' + pending(brsFigs[brsVar.now][0], brsFigs[brsVar.pending][0]) + '</b></div>',
+    b2: '<div class="cell btn' + (B.held ? ' on' : '') + '"><b>Steigerung ' + pct(B.lift) + '</b></div>',
+  }[row]
+}
+
+// ============================================================
+// JONAS 6 STRINGS — from the strings lab (lab/streicher/disco-streicher-4.strudel), all five figures, NOT HEARD yet
+// (user, 2026-11-08: put the current state into the track).
+// ============================================================
+// Sonatina Symphonic Orchestra (CC Sampling Plus 1.0) + VSCO 2 CE (CC0) string sections: one section per note (they
+// alternate), the octave by the other section, staccato rings out; runs land on the one with the full echo-stab chord
+// (violas, celli on the root) + a pizzicato click. Row 3 = build-up (unison → + octave → + thirds under the runs → +
+// celli two octaves down); button 2 HELD = lift (octave and voices over two bars, brighter, +3 dB; back over one bar).
+// Deviations from the lab: button 1 steps through the five figures (in the lab: one column each; button 1 = ensemble ↔
+// solo) → the track plays the ensemble; chords from the track (two 16ths early); orbit 3 (room size 2; 3 in the lab).
+// @ctl 2:6.k1 Brightness | dull ↔ bright (low-pass 1.2–12 kHz).
+// @ctl 2:6.k2 Space | room at 0 ↔ hall and dotted-8th echo.
+// @ctl 2:6.k3 Build-up | unison → + octave → + thirds under the runs → + celli two octaves down.
+// @ctl 2:6.fader Level | string section, disco figures on the chords.
+// @ctl 2:6.b1 Figure | echo stab → run up → long run → stab + swell → 16th figure, next bar.
+// @ctl 2:6.b2 Lift | held: octave and voices come in over 2 bars, brighter, +3 dB; back over 1 bar after.
+const str = colJonas(6)
+const STRINGS_LEVEL = 0.59   // the lab's gain 0.9 = −17.3 LUFS at fader 1 (echo stab, start values): −3.7 dB → −21 LUFS = keys, brass
+const SG = { val: [0.6, 0, 0.3, 0], held: false, prev: null, lift: 0, t: null }
+// one state reader for the new columns: knobs keep the lab's start values until moved; lift 0 → 1 over 2 bars held
+const labCtl = (col, st) => signal(t => {
+  const now = [col.bright, col.space, col.char, col.level].map(p => valAt(p, t))
+  now.forEach((v, i) => {
+    if (st.prev === null ? i !== 3 && v === 0 : v === st.prev[i]) return
+    st.val[i] = v
+    lcView?.update()
+  })
+  st.prev = now
+  const h = valAt(col.btn2, t) > 0.5
+  if (h !== st.held) { st.held = h; lcView?.update() }
+  const dt = st.t === null ? 0 : Math.max(0, Math.min(0.25, Number(t) - st.t))
+  st.t = Number(t)
+  st.lift = st.held ? Math.min(1, st.lift + dt / 2) : Math.max(0, st.lift - dt)
+  return 0
+}).segment(16)
+taps.push(labCtl(str, SG))
+const VSCO_STR = 'https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Strings/'
+const vscoUp8 = n => n.replace(/\d$/, d => +d + 1)   // VSCO sounds an octave above the file name
+const vscoMap = (dir, file, names) => Object.fromEntries(names.map(n => [vscoUp8(n).toLowerCase(), VSCO_STR + dir + '/' + file(n).replace('#', '%23')]))
+const STR_VA = ['c3', 'd#3', 'f#3', 'a3', 'c4', 'd#4', 'f#4', 'a4', 'c5']
+if (typeof samples === 'function') await samples({
+  sso_vn: ssoMap('1st%20Violins', '1st-violins-stc-rr1-', ['g3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'g5', 'a#5', 'c#6', 'e6', 'g6']),
+  sso_vn2: ssoMap('2nd%20Violins', '2nd-violins-stc-rr1-', ['g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'g5', 'a#5']),
+  sso_va: ssoMap('Violas', 'violas-stc-rr1-', STR_VA),
+  sso_vc: ssoMap('Celli', 'celli-stc-rr1-', ['c2', 'd#2', 'f#2', 'a2', 'c3', 'd#3', 'f#3', 'a3', 'c4']),
+  sso_vn_sus: ssoMap('1st%20Violins', '1st-violins-sus-', ['g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'g5', 'a#5', 'c#6']),
+  sso_va_sus: ssoMap('Violas', 'violas-sus-', STR_VA),
+  sso_vn_piz: ssoMap('1st%20Violins', '1st-violins-piz-rr1-', ['g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'a#5', 'c#6']),
+  vs_vn: vscoMap('Violin%20Section/Spic', n => 'VlnEns_Spic_' + n + '_v2_rr1.wav', ['G2', 'A2', 'B2', 'D3', 'F#3', 'A3', 'C4', 'E4', 'G4', 'B4', 'D5']),
+  vs_va: vscoMap('Viola%20Section/spic', n => 'Violas_spic_' + n + '_v2_rr1.wav', ['C2', 'E2', 'G2', 'B2', 'D3', 'F3', 'A3', 'C4', 'E4', 'G4']),
+})
+// helpers shared by strings and guitar: chord tones of a track chord, the scale at 16th k, scale / chord steps
+const labPcs = c => [...new Set(chordPcs(c))]
+const labScale = k => BSC[modeAt(Math.floor(k / 16))]
+const labSteps = (m, sc, n) => { let x = m; const d = Math.sign(n); for (let i = 0; i < Math.abs(n); i++) { x += d; while (!sc.includes(pc(x))) x += d } return x }
+const labBelow = (c, top, n) => { const p = labPcs(c), o = []; for (let m = top - 1; m >= top - 12 && o.length < n; m--) if (p.includes(pc(m))) o.push(m); return o }
+const labNear = (c, lo, hi, target) => { const p = labPcs(c); let best = lo; for (let m = lo; m <= hi; m++) if (p.includes(pc(m)) && Math.abs(m - target) < Math.abs(best - target)) best = m; return best }
+const LMS = 16 / (240 / bpm * 1000)   // 16ths per millisecond
+// events on the 16th grid from fn(k) → [{ dur, dt, …value }]; dt ≥ 0 (an event before its 16th is lost in the swing)
+const labEvents = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 1; k++)
+    for (const { dur = 1, dt = 0, ...v } of fn(k) ?? []) {
+      const t0 = (k + dt) / 16
+      if (t0 < b0 - 1e-9 || t0 >= e0 - 1e-9) continue
+      out.push(new Hap(new TimeSpan(t0, t0 + dur / 16), new TimeSpan(t0, Math.min(t0 + dur / 16, e0)), v, {}))
+    }
+  return out
+})
+// the lab's channel strip (space 'bus', floor 0.3), Fog / Tension on the cutoff, global Room and Tension's echo on top
+// (style 'echo' = the lab engine's other space mapping, as the guitar board: a 1/8 echo first, the room from 0.35 on)
+const labStrip = (pat, st, lo, hi, style = 'bus') => new Pattern(state => pat.query(state).map(h => h.withValue(({ bright = 1, ...v }) => {
+  const t = (h.whole ?? h.part).begin.valueOf(), [br, sp] = st.val, gRoom = valAt(globalRoom, t)
+  let r, ef
+  if (style === 'bus') {
+    const s2 = 0.3 + 0.7 * sp
+    r = 0.9 * s2
+    ef = { delay: Math.max(Math.min(0.9, (v.delay ?? 0) * 2 * s2), valAt(tensionEcho, t)), delaytime: 0.75 * 60 / bpm, delayfeedback: 0.55 }
+  } else {
+    r = 0.8 * Math.max(0, (sp - 0.35) / 0.65)
+    const e = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+    ef = e > 0 ? { delay: Math.max(0.6 * e, valAt(tensionEcho, t)), delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * e }
+      : { delay: Math.max(v.delay ?? 0, valAt(tensionEcho, t)), delaytime: 0.75 * 60 / bpm, delayfeedback: 0.55 }
+  }
+  const cutoff = Math.min(18000, Math.max(80, Math.min(v.cutoff ?? 18000, lo * Math.pow(hi / lo, br) * bright) * valAt(globalTone, t)))
+  return { release: 0.1, ...v, cutoff, room: r + (0.95 - r) * gRoom, roomsize: 2, ...(ef.delay > 0 ? ef : { delay: 0 }), orbit: 3 }
+})))
+const SN = (p, kind, len, off = 0, at = 0, more = {}) => ({ p, kind, len, off, at, acc: 1, ...more })
+const STR_TOP = { acc: 1.5, hard: true, echo: 0.3 }
+const strRunTo = (end, n, L) => [...Array.from({ length: n }, (_, i) => SN(((end - n + i) % L + L) % L, 'line', 1, i - n, n - i)), SN(((end % L) + L) % L, 'stab', 2, 0, 0, STR_TOP)]
+const STR_FIGS = [
+  ['Echo-Stab', 32, [SN(0, 'stab', 2, 0, 0, { echo: 0.5, hard: true })]],
+  ['Lauf hoch', 32, strRunTo(32, 4, 32)],
+  ['Langer Lauf', 64, strRunTo(64, 8, 64)],
+  ['Stab + Schweller', 64, [SN(0, 'stab', 2, 0, 0, { echo: 0.5, hard: true }), SN(32, 'swell', 30)]],
+  ['16tel-Figur', 64, [...[0, -1, 0, 1, 0, -1, -2, -1].map((o, i) => SN(56 + i, 'line', 1, o, 8 - i)), SN(0, 'stab', 2, 0, 0, STR_TOP)]],
+]
+const STR_LINE = [['sso_vn', 0.55, 0.42], ['vs_vn', 1.6, 0.52], ['sso_vn2', 0.5, 0.58]]
+const STR_FILL = [['sso_va', 0.45, 0.6], ['vs_va', 1.25, 0.45]]
+const strFig = (L, notes) => labEvents(k => {
+  const p = ((k % L) + L) % L, hits = notes.filter(n => n.p === p)
+  if (!hits.length) return []
+  const lift = SG.lift, v3 = SG.val[2], stage = Math.max(v3 < 0.25 ? 0 : v3 < 0.5 ? 1 : v3 < 0.75 ? 2 : 3, Math.floor(lift * 3))
+  const out = [], lg = Math.pow(10, 3 * lift / 20), rr = ((k + 5) % 3 + 3) % 3
+  for (const n of hits) {
+    const c = vibChord(k + n.at, true), sc = labScale(k + n.at), top = labNear(c, 72, 81, 76), m = labSteps(top, sc, n.off)
+    const swell = n.kind === 'swell'
+    const base = swell ? { dur: n.len, clip: 1, attack: 0.9, release: 0.8 } : { dur: 6, attack: 0.002, release: 0.4 }
+    const voice = (s, note, gain, ms, pan) => out.push({ ...base, s, note, gain: gain * n.acc * lg, pan, delay: n.echo ?? 0,
+      bright: 0.8 + 0.5 * lift + (n.hard ? 0.3 : 0), dt: (ms + 4 * hash(k, note, s.length)) * LMS })
+    if (swell) {
+      voice('sso_vn_sus', m, 0.35, 0, 0.45)
+      if (stage >= 1) voice('sso_va_sus', m - 12, 0.3, 6, 0.6)
+      for (const x of labBelow(c, m, 2)) voice('sso_va_sus', x, 0.28, 9, 0.55)
+      continue
+    }
+    const [s1, g1, p1] = STR_LINE[rr], [s2, g2, p2] = STR_LINE[(rr + 1) % 3]
+    voice(s1, m, g1, 0, p1)
+    if (stage >= 1) voice(s2, m + 12, g2 * 0.6, 12, p2)
+    if (n.kind === 'stab') {
+      labBelow(c, m, 2).forEach((x, j) => { const [s, g, pn] = STR_FILL[(rr + j) % 2]; voice(s, x, g, 8, pn) })
+      voice('sso_vc', c.bass + 12, 0.5, 4, 0.65)
+      if (n.hard) voice('sso_vn_piz', m, 0.55, 0, 0.5)
+    } else {
+      if (stage >= 2) voice(STR_FILL[rr % 2][0], labSteps(m, sc, -2), STR_FILL[rr % 2][1] * 0.8, 8, 0.6)
+      if (stage >= 3) voice('sso_vc', m - 24, 0.4, 5, 0.65)
+    }
+  }
+  return out
+})
+const strFigs = STR_FIGS.map(([name, L, notes]) => [name, strFig(L, notes)])
+const strVar = change(str.btn, 'jonas', 'Streicher', strFigs.length, strFigs.map(f => f[0]))
+const stemN6_strings = strip(labStrip(pick(strVar, strFigs.map(f => f[1])).swingBy(0.12, 8), SG, 1200, 12000),
+  { level: signal(() => SG.val[3] * STRINGS_LEVEL * Math.pow(10, 4 * (SG.val[0] - 0.5) / 20)) })
+const labView = (st, k3name, b1names, latch) => (row, { esc, pending }) => {
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + v + '"></div><b>' + pct(v) + '</b><span>' + esc(name) + '</span></div>'
+  return {
+    k1: knob(st.val[0], 'Hell'), k2: knob(st.val[1], 'Raum'), k3: knob(st.val[2], k3name),
+    fader: '<div class="cell fader"><div class=bar style="--v:' + st.val[3] + '"><i></i></div><b>' + pct(st.val[3]) + '</b><span>Pegel</span></div>',
+    b1: '<div class="cell btn"><b>' + pending(b1names[latch.now], b1names[latch.pending]) + '</b></div>',
+    b2: '<div class="cell btn' + (st.held ? ' on' : '') + '"><b>Steigerung ' + pct(st.lift) + '</b></div>',
+  }[row]
+}
+COLVIEW['jonas:6'] = labView(SG, 'Aufbau', strFigs.map(f => f[0]), strVar)
+
+// ============================================================
+// JONAS 7 GUITAR — from the guitar lab (lab/gitarre/disco-gitarre-3.strudel), all eight lines, open sound, NOT HEARD
+// yet (user, 2026-11-08: put the current state into the track; the guitar sound is still being compared on
+// lab/gitarre/gitarren-klaenge-1).
+// ============================================================
+// Plucked single notes of a real Stratocaster (nyanshell.strat, MIT: every note recorded, three takes), on the chord
+// tones. Row 3 = complexity in four steps (line → + dead notes → + slides and a variation in bars 4 and 8 → + 16th
+// motor of dead notes and a pentatonic fill in bar 8); button 2 HELD = lift (phaser, brighter, echo, +3 dB).
+// Deviations from the lab: button 1 steps through the eight lines (in the lab: one column each; button 1 = open ↔
+// muted) → the track plays them open; chords from the track (two 16ths early); orbit 3.
+// @ctl 2:7.k1 Brightness | dull ↔ bright (low-pass 0.8–7 kHz).
+// @ctl 2:7.k2 Space | dry ↔ a 1/8 echo, then room.
+// @ctl 2:7.k3 Complexity | line → + dead notes → + slides, bar 4/8 variation → + 16th motor and a fill in bar 8.
+// @ctl 2:7.fader Level | plucked guitar lines on the chords.
+// @ctl 2:7.b1 Line | Stardust → e & a 4 → call + answer → repeated note → lick → dead-note groove → off-16th pairs → pickup.
+// @ctl 2:7.b2 Lift | held: phaser, brighter, echo, +3 dB over 2 bars; back over 1 bar after.
+const gtr = colJonas(7)
+const GUITAR_LEVEL = 0.38   // the lab's gain 1 = −15.3 LUFS at fader 1 (Stardust, start values): −8.5 dB → −23.8 LUFS = vibraphone, flute
+const GT = { val: [0.6, 0, 0.3, 0], held: false, prev: null, lift: 0, t: null }
+taps.push(labCtl(gtr, GT))
+const STRAT = 'https://raw.githubusercontent.com/nyanshell/nyanshell.strat/master/samples/'
+const STRAT_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'], STRAT_KEY = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
+const stratMap = take => Object.fromEntries(Array.from({ length: 86 - 52 + 1 }, (_, i) => 52 + i).map(m => {
+  const n = STRAT_FLAT[m % 12] + (Math.floor(m / 12) - 1), [dir, pre] = m < 62 ? ['d_mp', 'D'] : m < 65 ? ['g_mp', 'G'] : ['e4_mp', 'E4']
+  return [STRAT_KEY[m % 12] + (Math.floor(m / 12) - 1), STRAT + dir + '/' + pre + '_' + n + '_mp_' + take + '.wav']
+}))
+if (typeof samples === 'function') await samples({ strat1: stratMap(1), strat2: stratMap(2), strat3: stratMap(3) })
+const GPENTA = [9, 0, 2, 4, 7]
+const GN = (p, len, what, acc = 1) => ({ p, len, what, acc })
+const GTR_LINES = [
+  ['Stardust', 16, [GN(2, 2, ['top', 0]), GN(6, 1, ['ch', 0]), GN(8, 2, ['top', 12]), GN(11, 1, ['strum']), GN(15, 1, ['strum'])]],
+  ['e & a 4', 16, [GN(9, 1, ['ch', 2]), GN(10, 1, ['ch', 1]), GN(11, 1, ['ch', 0]), GN(12, 3, ['top', 0], 1.1)]],
+  ['Ruf + Antwort', 32, [GN(4, 1, ['ch', 1]), GN(6, 1, ['ch', 0]), GN(7, 2, ['top', 0]), GN(20, 1, ['top', -1]), GN(22, 1, ['ch', 0]), GN(24, 2, ['ch', 1])]],
+  ['Wiederholter Ton', 16, [GN(0, 2, ['top', 0], 1.1), GN(3, 2, ['top', 0]), GN(6, 2, ['top', 0]), GN(10, 1, ['top', 0], 0.8)]],
+  ['Lick', 64, [GN(56, 1, ['pen', 4]), GN(57, 1, ['pen', 3]), GN(58, 2, ['pen', 2]), GN(60, 1, ['pen', 1]), GN(61, 3, ['pen', 0]), GN(0, 2, ['top', 0])]],
+  ['Dead-Note-Groove', 16, [GN(3, 1, ['top', 0]), GN(6, 1, ['top', 0]), GN(7, 1, ['ch', 0]), GN(11, 1, ['top', 0]), GN(14, 2, ['top', -1])]],
+  ['Offbeat-Paare', 16, [GN(1, 1, ['top', 0]), GN(2, 1, ['ch', 0]), GN(5, 1, ['top', 0]), GN(6, 1, ['ch', 0]), GN(9, 1, ['top', 0]), GN(10, 1, ['ch', 1]), GN(13, 2, ['top', 0])]],
+  ['Auftakt', 16, [GN(13, 1, ['ch', 1]), GN(14, 1, ['ch', 0]), GN(15, 1, ['top', -1]), GN(0, 2, ['top', 0], 1.25), GN(6, 1, ['top', 0], 0.8)]],
+]
+const gChordUp = (c, m) => { const p = labPcs(c); let x = m + 1; while (!p.includes(pc(x))) x++; return x }
+const gPitch = (what, c, sc, up) => {
+  const t0 = labNear(c, 67, 79, 72), top = up ? gChordUp(c, t0) : t0, [w, r] = what
+  if (w === 'top') return [r === 12 ? top + 12 : labSteps(top, sc, r)]
+  if (w === 'ch') return [labBelow(c, top, 3)[r]]
+  if (w === 'pen') return [57 + 12 + GPENTA[r] - 9 + (GPENTA[r] < 9 ? 12 : 0) + (up ? 2 : 0)]
+  if (w === 'strum') return labBelow(c, top + 1, 2)
+  return []
+}
+const gtrLine = (ci, L, notes) => labEvents(k => {
+  const p = ((k % L) + L) % L, s16 = ((k % 16) + 16) % 16, p128 = ((k % 128) + 128) % 128, bar8 = Math.floor(p128 / 16)
+  const v3 = GT.val[2], lvl = v3 < 0.25 ? 0 : v3 < 0.5 ? 1 : v3 < 0.75 ? 2 : 3, lift = GT.lift, lg = Math.pow(10, 3 * lift / 20), out = []
+  const c = vibChord(k, true), sc = labScale(k)
+  const inFill = lvl >= 3 && p128 >= 120
+  const hits = inFill ? [GN(p, 1, ['pen', 4 - Math.min(4, Math.floor((p128 - 120) * 5 / 8))], p128 === 120 ? 1.1 : 0.9)] : notes.filter(n => n.p === p)
+  const up = lvl >= 2 && (bar8 === 3 || bar8 === 7)
+  const fx = { bright: 0.85 + 0.5 * lift, delay: 0.25 * lift,
+    ...(lift > 0 ? { phaserrate: 0.4, phaserdepth: 0.75 * lift, phasercenter: 1200, phasersweep: 900 } : {}) }
+  for (const n of hits) gPitch(n.what, c, sc, up).filter(m => m !== undefined).forEach((m, j) => {
+    const strum = n.what[0] === 'strum'
+    out.push({ s: 'strat' + (1 + Math.floor(hash(p, m, ci) * 3)), note: m, begin: 0.0032, clip: 1, attack: 0.002,
+      dur: strum ? 0.6 : n.len * 0.9, release: strum ? 0.03 : 0.12, gain: 5 * n.acc * lg * (strum ? 0.7 : 1), pan: 0.4,
+      dt: (j * 4 + 3 * hash(k, m, j)) * LMS, ...(lvl >= 2 && n.len >= 2 ? { penv: 1, pattack: 0.05, prelease: 4 } : {}), ...fx })
+  })
+  if (!hits.length && (lvl >= 3 || (lvl >= 1 && [1, 5, 9, 13].includes(s16))) && !notes.some(n => n.p === ((p - 1) % L + L) % L && n.len >= 2))
+    out.push({ s: 'strat' + (1 + ((k % 3) + 3) % 3), note: labBelow(c, labNear(c, 67, 79, 72), 3)[2] ?? 60, begin: 0.0032, clip: 1,
+      dur: 0.35, attack: 0.001, release: 0.02, gain: (s16 % 2 ? 2.2 : 1.6) * lg, cutoff: 900, pan: 0.4, dt: 2 * LMS, ...fx })
+  return out
+})
+const gtrLines = GTR_LINES.map(([name, L, notes], i) => [name, gtrLine(i, L, notes)])
+const gtrVar = change(gtr.btn, 'jonas', 'Gitarre', gtrLines.length, gtrLines.map(f => f[0]))
+const stemN7_guitar = strip(labStrip(pick(gtrVar, gtrLines.map(f => f[1])).swingBy(0.12, 8), GT, 800, 7000, 'echo'),
+  { level: signal(() => GT.val[3] * GUITAR_LEVEL * Math.pow(10, 4 * (GT.val[0] - 0.5) / 20)) })
+COLVIEW['jonas:7'] = labView(GT, 'Komplexität', gtrLines.map(f => f[0]), gtrVar)
 
 // Stateful controls (button counters, bar latches, risers) only see a change when they are queried.
 // Gated stems are not queried, so this queries every one of them on every scheduler tick and drops the result:
@@ -856,11 +1626,11 @@ const stateTaps = stack(...taps).filterValues(() => false)
 
 // What the LC view shows for this track: the chapter (now, next) on column 8 button 1, and extra lines at the top
 const lcChapter = () => [CHAPTERS[chapterLatch.now].name, CHAPTERS[chapterLatch.pending].name]
-const lcHead    = () => [['Akkorde', CHAPTERS[chapterLatch.now].chords.map(c => c.name).join(' – ')]]
+const lcHead    = () => [['Akkorde', chapterLatch.now === 0 ? 'Am9' : PROGS[progLatch.now].name]]
 // Where the music is (LC view): the beat in the bar and the bar in the big cycle. A silent event per beat moves it at
 // the moment the beat sounds (onTrigger, as in the set). chordAt(bar) = the chord of that bar ('' = none shown)
-const CYCLE   = 4   // one phrase: 4 chords, one per bar
-const chordAt = bar => CHAPTERS[chapterLatch.now].chords[bar % 4].name
+const CYCLE   = 8   // one progression: 8 bars
+const chordAt = bar => CHORDS[chordIdAt(bar)].name
 const beatNow = { bar: null, beat: null }
 const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
   const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), beat = Math.floor((pos - bar) * 4 + 1e-9)
@@ -988,7 +1758,13 @@ stack(
   stemJ6_hats,
   stemJ7_perc,
   stemJ8_shake,
-  stemN1_keys,
+  stemN1_harm,
+  stemN2_keys,
+  stemN3_vibes,
+  stemN4_flute,
+  stemN5_brass,
+  stemN6_strings,
+  stemN7_guitar,
   stateTaps
 )
   .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
