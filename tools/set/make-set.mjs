@@ -185,7 +185,7 @@ const trackCode = parts.map((p, k) => {
     `// TRACK ${t.id} — ${t.name} (from ${t.file})`,
     '// ============================================================',
     retag(p.tags.join('\n'), t.id),
-    `const T${t.id} = (() => {`,
+    `const T${t.id} = await (async () => {`,   // async: a track may load samples with await
     `const ID = ${k}`,
     `const PHRASE = phraseOf(SET_TRACKS[${k}])`,
     `const ORBIT0 = ${t.orbit0}`,

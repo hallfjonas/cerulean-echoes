@@ -1,102 +1,140 @@
 // ============================================================
-// HARMONIE 3: JX-10 strings, two organs and their blends; progressions on button 1, character on row 3
+// DISCO-BLÄSER 1: a real brass section on disco / house figures (009 Jonas 5–7)
 // ============================================================
 // @engine 3
-// Round 2 feedback (feedback.md): the button under the fader (button 1) changes the progression, as everywhere
-// (template: button 1 = change, button 2 = a moment); more ways to change the sound — strings + B3 together sounds
-// good; the B3 needs a softer attack. So: button 1 of columns 1–8 = progressions 1–8 (direct, at the next 8-bar
-// phrase; all 16 by next / previous in Mode 2 column 5); button 2 = echo throw again; row 3 = character as in the
-// template (calm ↔ lively): held → breathing (struck every half bar) → one off-beat stab per bar, with more movement
-// (detune / vibrato / Leslie) the further up. New blends: strings + B3, strings + organ. B3: soft attack (60 ms instead
-// of 4 ms); a second B3 with only the 16' and 8' drawbars (softer, no twelfth — my registration).
-// Progressions: chord order from the records (Hooktheory; tracks/009-house/recherche-harmonie.md), bar lengths mine.
-// Levels: single sounds as round 1 (offline −27 LUFS held); blends = both at −3 dB each (equal power), not measured.
+// User (2026-11-08): horns, warm and organic, really leaning on house — not classic jazz (melodie-4: "too jazzy"). Earlier
+// stabs were rejected: Dirt / GM horns "quacky, cheap", POP HORNS "awful", single trumpet multisamples "not warm,
+// mechanical" as a MELODY. So here: real section recordings (several players per note, which is what makes a section
+// warm), playing what a disco horn section plays — short stabs on the chord, the push into the one, a 3-3-2 call with
+// an answer, and a short riff in octaves — and trombone falls on the long notes. No solo lines.
+// Figures (sources in this folder's feedback.md): off-beat stabs and the push are the house "kick-push"; 3-3-2 is the
+// tresillo of disco / Latin horns; the riff = the brass-stab line of Native Instruments' disco walkthrough (A G F♯ D E in
+// E minor → D C B G A in our A), rhythms MINE.
+// Sounds: Sonatina Symphonic Orchestra (peastman/sso, CC Sampling Plus 1.0) trumpets, trombones, horns staccato (section
+// recordings); VSCO 2 CE (CC0) trombone falls. Pitches checked file by file: SSO rr1 = its name (rr2 a semitone sharp,
+// not used), VSCO an octave above its name.
+// Row 3 = BUILD-UP: 1 the call alone (the figure's first hit; the riff on one voice) → 2 the whole figure, lead doubled
+// → 3 + the harmony (chord voicing / thirds) and the octave below → 4 + trombone falls on the long notes.
+// Players are never exactly together: every voice a few ms apart (fixed per position, the same every bar). A little
+// room always. Not heard; levels from the files' RMS, not rendered.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass, keys and the progression in Mode 2.
-// @layout Harmonie 3 (lab/harmonie, 009: strings, organs and blends; progressions on button 1)
-// @note Columns 1–6: JX-10, organ as strings, B3 soft, B3 16'+8', strings + B3, strings + organ. Button 1 of every column = a progression (next 8-bar phrase).
-// @note Row 3 = character: held → breathing → off-beat stab, more movement further up. Mode 2 col. 5: next / previous through all 16.
-// @guide What to listen for | Which sound or blend carries a party? Which progressions?
-// @guide Harmony | Chord order from the records (Hooktheory), bar lengths mine; the dashboard shows the chord now.
+// @layout Disco-Bläser 1 (lab/blaeser, 009 Jonas 5–7: real brass section, disco / house figures)
+// @note Real section recordings (SSO trumpets, trombones, horns; VSCO trombone falls); stabs and short riffs, no solos.
+// @note Same four figures on every column; the columns differ only in which instruments play.
+// @guide What to listen for | Warm and happy, or still jazzy / cheap? Which mix sounds like a disco record? Do the falls help?
+// @guide Live | Row 3 builds from a single call to the full section with falls. Button 2 = echo throw.
 // @mode 16 Mode 16 — Candidates
-// @col 16:1 1 JX-10 strings
-// @col 16:2 2 Organ as strings
-// @col 16:3 3 B3 soft
-// @col 16:4 4 B3 16'+8'
-// @col 16:5 5 Strings + B3
-// @col 16:6 6 Strings + organ
+// @col 16:1 1 Trumpets + trombones
+// @col 16:2 2 Trumpets + horns
+// @col 16:3 3 Trombones + horns
+// @col 16:4 4 Full section
 // @row 16:k1 Row 1 \ Brightness
 // @row 16:k2 Row 2 \ Space
-// @row 16:k3 Row 3 \ Character
+// @row 16:k3 Row 3 \ Build-up
 // @row 16:fader Fader \ Level
-// @row 16:b1 Button 1 \ Progression
+// @row 16:b1 Button 1 \ Figure
 // @row 16:b2 Button 2 \ Echo throw
-// @ctl 16:1-6.k1 Brightness | dull ↔ bright (low-pass over the sound's range).
-// @ctl 16:1-6.k2 Space | echo and room.
-// @ctl 16:1-6.k3 Character | held → breathing → off-beat stab; more movement.
-// @ctl 16:1-6.fader Level | 0 = off.
-// @ctl 16:1.b1 Am9 D9 | track 009 as it is.
-// @ctl 16:2.b1 Am7 C Em7 | Masters at Work, To Be In Love.
-// @ctl 16:3.b1 Am7 D6 G | Armand Van Helden, You Don't Know Me.
-// @ctl 16:4.b1 Am F G | Mr Fingers, Can You Feel It.
-// @ctl 16:5.b1 F G Am | CeCe Peniston, Finally.
-// @ctl 16:6.b1 Em7 Fmaj7 | Stardust, Music Sounds Better.
-// @ctl 16:7.b1 Fmaj7 G | Daft Punk, One More Time.
-// @ctl 16:8.b1 F Am C Dm | Livin' Joy, Dreamer.
-// @ctl 16:1-6.b2 Echo throw | held: long dotted-8th echo.
+// @ctl 16:1-4.k1 Brightness | dull ↔ bright (low-pass 1.2–12 kHz).
+// @ctl 16:1-4.k2 Space | a little room at 0 ↔ hall and dotted-8th echo.
+// @ctl 16:1-4.k3 Build-up | the call alone → whole figure → + harmony and octave → + trombone falls.
+// @ctl 16:1-4.fader Level | 0 = off.
+// @ctl 16:1-4.b1 Figure | off-beat stabs → push into the one → 3-3-2 call + answer → riff in octaves.
+// @ctl 16:1-4.b2 Echo throw | held: long dotted-8th echo.
 // @mode 2 Mode 2 — Context
 // @col 2:5 5 Progression
 // @col 2:6 6 Drums
 // @col 2:7 7 Bass
 // @col 2:8 8 Keys
-// @ctl 2:5.b1 Next | next progression (all 16), at the next 8-bar phrase.
+// @ctl 2:5.b1 Next | next progression (all 21), at the next 8-bar phrase.
 // @ctl 2:5.b2 Previous | previous progression, at the next 8-bar phrase.
 // @ctl 2:6.fader Drums | 909 kick, off-beat hat, clap, shaker.
 // @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %; 55–58 % = house.
-// @ctl 2:6.b2 Drums out | harmony, keys and bass alone while held.
+// @ctl 2:6.b2 Drums out | everything but the drums while held.
 // @ctl 2:7.fader Bass | off-beat bass on the chord root.
-// @ctl 2:8.fader Keys | the keys of 009 (Steinway + Rhodes, chain rhythm), following the progression.
+// @ctl 2:8.fader Keys | the keys of 009, following the progression.
 
-const BOARD = { id: 'harmonie3', title: 'Harmonie 3' }
+const BOARD = { id: 'blaeser1', title: 'Disco-Bläser 1' }
 const bpm = 124
-const PROG_KEYS = [37, 38, 39, 40, 41, 42, 43, 44]   // button 1 of columns 1–8 = progressions 1–8
+const BAR = 240 / bpm   // seconds per bar
+
+// Sample maps: note name = sounding pitch
+const SSO = 'https://raw.githubusercontent.com/peastman/sso/master/Sonatina%20Symphonic%20Orchestra/Samples/'
+const VSCO = 'https://raw.githubusercontent.com/sgossner/VSCO-2-CE/master/Brass/OldTrombone/Fall/'
+const ssoMap = (dir, pre, notes) => Object.fromEntries(notes.map(n => [n, SSO + dir + '/' + pre + n.replace('#', '%23') + '.wav']))
+const up8 = n => n.replace(/\d$/, d => +d + 1)   // VSCO: sounds an octave above the file name
+if (typeof samples === 'function') await samples({
+  sso_tp: ssoMap('Trumpets', 'trumpets-stc-rr1-', ['e3', 'g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4', 'c#5', 'e5', 'g5', 'a#5']),
+  sso_tb: ssoMap('Trombones', 'trombones-stc-rr1-', ['e2', 'g2', 'a#2', 'c#3', 'e3', 'g3', 'a#3', 'c#4', 'e4']),
+  sso_hn: ssoMap('Horns', 'horns-stc-rr1-', ['e2', 'g2', 'a#2', 'c#3', 'e3', 'g3', 'a#3', 'c#4', 'e4', 'g4', 'a#4']),
+  vs_fall: Object.fromEntries(['G1', 'A1', 'A#1', 'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'G2', 'G#2', 'A2', 'A#2', 'B2']
+    .map(n => [up8(n).toLowerCase(), VSCO + 'Trombone_Fall_' + n.replace('#', '%23') + '_1.wav'])),
+})
 
 const makeCols = h => {
-  // Character (row 3): 0–⅓ held, ⅓–⅔ breathing, ⅔–1 one off-beat stab per bar; mv = 0..1 movement for the recipe
-  const zone = i => h.knob(29 + i).fmap(v => v < 0.34 ? 0 : v < 0.67 ? 1 : 2).segment(16)
-  const mv = i => h.knob(29 + i)
-  const character = (i, recipe) => stack(
-    recipe(h.pad(52, 4)).mask(zone(i).fmap(z => z === 0)),
-    recipe(h.chord(52, 4).struct(mini('x*2'))).clip(0.95).mask(zone(i).fmap(z => z === 1)),
-    recipe(h.chord(52, 4).struct(mini('~ ~ x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~'))).attack(0.01).release(0.3).clip(2)
-      .delay(0.3).delaytime(30 / bpm).delayfeedback(0.3).mask(zone(i).fmap(z => z === 2)),
-  ).velocity(perlin.range(0.85, 1))
-  // JX-10: two saws ~4 cents apart + a layer 0.1 semitone up (the chorus stand-in); detune grows with row 3
-  const jx = m => notes => stack(notes.s('supersaw').unison(2).detune(m.fmap(v => 0.05 + 0.08 * v)).spread(0.6).gain(0.5),
-    notes.add(note(0.1)).s('supersaw').unison(2).detune(0.05).spread(0.9).gain(0.3))
-    .attack(0.35).decay(0.1).sustain(1).release(0.8)
-  // Organ like strings (Mr Fingers): square + sub octave, slow attack, vibrato grows with row 3
-  const organStr = m => notes => stack(notes.s('pulse').pw(0.5).gain(0.08), notes.add(note(-12)).s('pulse').pw(0.5).gain(0.05))
-    .vib(5.5).vibmod(m.fmap(v => 0.05 + 0.2 * v)).attack(0.25).decay(0.1).sustain(1).release(0.6)
-  // Hammond B3 (keys lab 14): drawbars as sines, slow Leslie as vibrato + two copies ±4 cents left / right;
-  // soft attack (60 ms). bars: [[interval, gain], …] — 16' 5⅓' 8' (“888”) or 16' 8' only
-  const b3 = (bars, att) => m => notes => stack(...bars.flatMap(([d, g]) => [[-0.04, 0.3], [0.04, 0.7]].map(([dt, pan]) =>
-    notes.add(note(d + dt)).s('sine').gain(g).pan(pan))))
-    .vib(0.8).vibmod(m.fmap(v => 0.03 + 0.12 * v)).attack(att).release(0.25)
-  const B888 = [[0, 0.12], [19, 0.07], [12, 0.1]], B808 = [[0, 0.14], [12, 0.11]]
-  // a recipe at a level (the columns' measured gains: JX 0.24, organ 1.78, B3 0.47; blends −3 dB each)
-  const lv = (r, k) => m => notes => r(m)(notes).mul(gain(k))
-  const one = (i, name, r, k, range) => ({ name, k3: 'own', k3name: 'Charakter', range, gain: 1,
-    pats: [['Charakter', character(i, lv(r, k)(mv(i)))]] })
-  const blend = (i, name, r1, k1, r2, k2, range) => ({ name, k3: 'own', k3name: 'Charakter', range, gain: 1,
-    pats: [['Charakter', character(i, notes => stack(lv(r1, k1 * 0.707)(mv(i))(notes), lv(r2, k2 * 0.707)(mv(i))(notes)))]] })
+  const SC = { dorian: [9, 11, 0, 2, 4, 6, 7], aeolian: [9, 11, 0, 2, 4, 5, 7] }
+  const modeAt = k => SC[HARMONIES[latch('harm', Math.floor(k / 16), 8)][3]]
+  const pcsOf = name => { const c = CH[name]; return [...new Set([md(c.bass, 12), ...c.keys.map(x => md(x, 12))])] }
+  // lead: the chord tone nearest D5 (74), from A4 to F♯5; the voicing under it = the next chord tones down
+  const leadOf = name => { const p = pcsOf(name); let best = 69; for (let m = 69; m <= 78; m++) if (p.includes(md(m, 12)) && Math.abs(m - 74) < Math.abs(best - 74)) best = m; return best }
+  const below = (name, top, n) => { const p = pcsOf(name), o = []; for (let m = top - 1; m >= top - 12 && o.length < n; m--) if (p.includes(md(m, 12))) o.push(m); return o }
+  const third = (m, sc) => { let x = m, s = 0; while (s < 2) { x--; if (sc.includes(md(x, 12))) s++ } return x }   // a diatonic third below
+  const stageOf = c => { const v = S.val[29 + c] ?? 0.3; return v < 0.25 ? 0 : v < 0.5 ? 1 : v < 0.75 ? 2 : 3 }
+  const ev = fn => new Pattern(state => {
+    const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+    for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 2; k++)
+      for (const { dur = 1, dt = 0, ...v } of fn(k) ?? []) {
+        const t0 = (k + dt) / 16
+        if (t0 < b0 - 1e-9 || t0 >= e0 - 1e-9) continue
+        out.push(new Hap(new TimeSpan(t0, t0 + dur / 16), new TimeSpan(t0, Math.min(t0 + dur / 16, e0)), v, {}))
+      }
+    return out
+  })
+  const MS = 16 / (BAR * 1000)   // 16ths per millisecond
+  // Figures over 2 bars: [16th, length in 16ths, riff note (MIDI) or null = the chord]; the first entry = the call
+  const FIG = [
+    ['Offbeat-Stabs', [[6, 1], [14, 1], [22, 1], [30, 1]]],
+    ['Push in die Eins', [[14, 1], [16, 3], [30, 1], [0, 3]]],
+    ['3-3-2 + Antwort', [[0, 1], [3, 1], [6, 2], [24, 1], [27, 3]]],
+    ['Riff (Oktaven)', [[0, 2, 74], [3, 2, 72], [6, 2, 71], [10, 2, 67], [16, 4, 69]]],
+  ]
+  // a column = which instruments take the lead, the harmony and the low octave; shift = all an octave down (dark)
+  const play = (c, sec) => FIG.map(([name, notes]) => [name, ev(k => {
+    const p = md(k, 32), hits = notes.filter(n => n[0] === p)
+    if (!hits.length) return []
+    const stage = stageOf(c), out = []
+    if (stage === 0 && notes[0][0] !== p && notes[0][2] === undefined) return []   // build-up 1: the call alone
+    for (const [, len, riff] of hits) {
+      const name = h.chordAt(k, true), sc = modeAt(k), sh = sec.shift ?? 0
+      const lead = riff ?? leadOf(name), long = len >= 3
+      const base = { dur: len === 1 ? 0.9 : len - 0.3, clip: 1, attack: 0.003, release: long ? 0.2 : 0.12 }
+      const voice = (s, note, gain, ms, pan) => out.push({ ...base, s, note, gain,
+        dt: (ms + 8 * h.hash(k, note, s.length)) * MS, pan })   // never early (lost in the swing)
+      for (const [s, g, ms, pan] of sec.lead) voice(s, lead + sh, g, ms, pan)
+      if (stage >= 1) for (const [s, g, ms, pan] of sec.dbl) voice(s, lead + sh, g, ms, pan)
+      if (stage >= 2) {
+        const harm = riff !== undefined ? [third(lead, sc)] : below(name, lead, 2)
+        for (const n of harm) for (const [s, g, ms, pan] of sec.harm) voice(s, n + sh, g, ms, pan)
+        for (const [s, g, ms, pan] of sec.low) voice(s, lead - 12 + sh, g, ms, pan)
+      }
+      // build-up 4: a real trombone fall on the long notes (the recordings speak ~190 ms in: started that early)
+      if (stage >= 3 && long) out.push({ s: 'vs_fall', note: md(lead - 12 + sh - 43, 12) + 43, gain: 1.1, dur: len + 2,
+        dt: -190 * MS, attack: 0.01, release: 0.25, pan: 0.6 })
+    }
+    return out
+  })])
+  let ci = 0
+  const col = (name, gain, sec) => ({ name, k3: 'own', k3name: 'Aufbau', space: 'bus', floor: 0.25, hall: 2.5,
+    range: [1200, 12000], gain, pats: play(ci++, sec) })
+  // [sound, gain (SSO files ≈ −22 dB RMS each), timing offset ms, pan]
+  const TP = ['sso_tp', 0.55, 0, 0.45], TP2 = ['sso_tp', 0.4, 9, 0.6], HN = ['sso_hn', 0.5, 6, 0.55], TB = ['sso_tb', 0.5, 11, 0.6]
   return [
-    one(0, 'JX-10-Strings', jx, 0.24, [400, 5000]),
-    one(1, 'Orgel wie Strings', organStr, 1.78, [400, 4000]),
-    one(2, 'B3 weich', b3(B888, 0.06), 0.47, [400, 6000]),
-    one(3, 'B3 16 + 8 Fuß', b3(B808, 0.06), 0.47, [400, 6000]),
-    blend(4, 'Strings + B3', jx, 0.24, b3(B888, 0.06), 0.47, [400, 6000]),
-    blend(5, 'Strings + Orgel', jx, 0.24, organStr, 1.78, [400, 5000]),
+    col('Trp + Pos', 1, { lead: [TP], dbl: [TP2], harm: [['sso_tp', 0.35, 5, 0.55]], low: [TB] }),
+    col('Trp + Hörner', 1, { lead: [TP], dbl: [HN], harm: [['sso_hn', 0.4, 8, 0.5]], low: [['sso_hn', 0.45, 4, 0.6]] }),
+    // dark: the lead an octave down on the horns, the trombones under it — round and soft (towards the liked Dub Brass)
+    col('Pos + Hörner', 1.1, { lead: [['sso_hn', 0.55, 0, 0.45]], dbl: [['sso_tb', 0.4, 7, 0.55]], harm: [['sso_hn', 0.4, 9, 0.6]],
+      low: [TB], shift: -12 }),
+    col('Ganzer Satz', 0.8, { lead: [TP], dbl: [TP2, HN], harm: [['sso_hn', 0.35, 8, 0.5], ['sso_tp', 0.3, 4, 0.6]], low: [TB] }),
   ]
 }
 
@@ -132,6 +170,10 @@ const CH = {
   Dm7: { name: 'Dm7', bass: 38, deg: 3, keys: [53, 57, 60, 62] },
   D6: { name: 'D6', bass: 38, deg: 3, keys: [54, 57, 59, 62] },
   Bm7: { name: 'Bm7', bass: 35, deg: 1, keys: [54, 57, 59, 62] },
+  // 2026-11-08 for progressions 17–21
+  'G7/F': { name: 'G7/F', bass: 41, deg: 5, keys: [53, 55, 59, 62] },     // G7 over F (Modjo), F G B D
+  G7sus2: { name: 'G7sus2', bass: 43, deg: 6, keys: [53, 55, 57, 62] },   // F G A D (Roger Sanchez)
+  'Am/C': { name: 'Am/C', bass: 36, deg: 2, keys: [55, 57, 60, 64] },     // Am7 shape over C
 }
 // Progressions over 8 bars: [name = the chords, as on the buttons; bars, push, scale]; the record is in the comment. Sources: tracks/009-house/recherche-harmonie.md (round 1:
 // Attack / MAW / Kerri; round 2: Hooktheory TheoryTabs of the records — chord order from there, BAR LENGTHS MINE).
@@ -139,7 +181,7 @@ const CH = {
 // push, 2 = an 8th); scale = the mode melodies use over it (dorian has F♯, aeolian F).
 const x2 = bars => [...bars, ...bars]
 const HARMONIES = [
-  // 1–8: on button 1 (under the faders) where a board asks for it (PROG_KEYS); all 16 by next / previous in Mode 2
+  // a board's button 1 steps through them (PROG_NEXT) or picks 1–8 directly (PROG_KEYS); Mode 2 col. 5: next / previous
   ['Am9 D9', x2(['Am9', 'Am9', 'D9', 'D9']), 2, 'dorian'],                         // track 009 as it is
   ['Am7 C Em7', x2(['Am7', 'Am7', 'Cmaj7', 'Em7']), 2, 'dorian'],                // To Be In Love
   ['Am7 D6 G', x2(['Am7', 'Am7', 'D6', 'Gadd9']), 2, 'dorian'],          // You Don't Know Me
@@ -157,6 +199,13 @@ const HARMONIES = [
   ['Am9 D9 (4+4)', ['Am9', 'Am9', 'Am9', 'Am9', 'D9', 'D9', 'D9', 'D9'], 2, 'dorian'],
   ['Am9 D9 (3/8+5/8)', Array(8).fill([['Am9', 6], ['D9', 10]]), 0, 'dorian'],
   ['Am9', Array(8).fill('Am9'), 2, 'dorian'],
+  // 17–21 (2026-11-08): more classic house records from recherche-harmonie.md (Hooktheory / Attack), at the end so the
+  // numbers of 1–16 stay; chord order from the sources, BAR LENGTHS MINE. Mode 2 col. 5 button 2 (previous) reaches them fast
+  ['C F', x2(['Cmaj7', 'Cmaj7', 'Fmaj7', 'Fmaj7']), 2, 'aeolian'],            // Frankie Knuckles, The Whistle Song (relative)
+  ['F Em Am G', x2(['Fmaj7', 'Em7', 'Am7', 'G11']), 2, 'aeolian'],            // Daft Punk, Digital Love (G7sus4 = G11 shape)
+  ['Am G/F F Dm', ['Am9', 'Am7', 'G7/F', 'Fadd9', 'Dm7', 'Dm7', 'Am9', 'Am7'], 2, 'aeolian'],   // Modjo, Lady
+  ['F C G Am', ['Fmaj7', 'Cmaj7', 'Fmaj7', 'G7sus2', 'Am7', 'G7sus2', 'Am7', 'Am/C'], 2, 'aeolian'],   // Roger Sanchez, Another Chance
+  ['Em Am', x2(['Em7', 'Em7', 'Am9', 'Am9']), 2, 'aeolian'],                  // Kerri Chandler, Keep Me Inside
 ]
 // each progression as 128 chord names, one per 16th
 const H128 = HARMONIES.map(([, bars]) => bars.flatMap(b => typeof b === 'string' ? Array(16).fill(b)
@@ -190,8 +239,8 @@ const padPat = (lo, n, push = true) => new Pattern(state => {
   const startOf = k => {
     const name = chordAt(k, push)
     let c = k
-    while (c > k - 256 && chordAt(c - 1, push) === name) c--
-    if (c === k - 256) c = 64 * Math.floor(k / 64)   // no change in sight (one chord): strike on the 4-bar grid
+    while (c > k - 64 && chordAt(c - 1, push) === name) c--   // (CPU) no chord lasts longer than 4 bars but one
+    if (c === k - 64) c = 64 * Math.floor(k / 64)   // no change in sight (one chord): strike on the 4-bar grid
     return c + 64 * Math.floor((k - c) / 64)
   }
   for (let s = startOf(Math.floor(b0 * 16)); s < e0 * 16;) {
@@ -307,7 +356,9 @@ const drawView = () => {
       k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
         pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
-      b1: typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
+      b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
+        pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
+        typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
         (harmNow() === PROG_KEYS.indexOf(37 + i) ? ' on' : '') + '"><b>' +
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
@@ -374,6 +425,11 @@ const onMidi = e => {
   const [status, cc, value] = e.data
   if ((status & 0xf0) !== 0xb0) return
   if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if (typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(cc)) {   // a board's “next progression” buttons
+    if (value > 63 && !S.held[cc]) { S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length; S.held[cc] = true; showStatus() }
+    else if (value <= 63) S.held[cc] = false
+    return
+  }
   else if (typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(cc)) {   // a board's direct progression buttons
     if (value > 63 && !S.held[cc]) { S.pend.harm = PROG_KEYS.indexOf(cc); S.held[cc] = true; showStatus() }
     else if (value <= 63) S.held[cc] = false
@@ -433,8 +489,9 @@ const chordName = bar => chordAt(bar * 16, false)
 // low-pass (e.g. a recipe's lpf) is kept when it is lower than the Brightness knob's.
 const column = i => {
   const c = COLS[i], built = c.pats.map(([, p]) => p)
-  const sel = signal(t => latch(i, Math.floor(t))).segment(1)
-  return sel.fmap(p => built[p]).innerJoin()
+  // gate (CPU): a column whose fader is at 0 is not queried at all; checked per 16th, so it starts right away
+  const sel = signal(t => (S.val[5 + i] ?? 0) > 0 ? latch(i, Math.floor(t)) : -1).segment(16)
+  return sel.fmap(p => p < 0 ? silence : built[p]).innerJoin()
     .swingBy(signal(() => 2 * (swingPct() - 0.5)), 8)
     .filterValues(() => (S.val[5 + i] ?? 0) > 0)
     .fmap(({ bright = 1, ...v }) => {

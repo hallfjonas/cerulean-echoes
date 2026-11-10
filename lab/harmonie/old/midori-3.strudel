@@ -1,0 +1,544 @@
+// ============================================================
+// MIDORI 3: Takada-style marimba layers for track 007 (Jonas' free columns 2–4); button 2: marimba → toms → both
+// ============================================================
+// Follows lab/harmonie/old/midori-2.strudel (feedback.md, “midori-2”): drift out; cycles, canon and similar cells now
+// share column 1 (button 1 steps through all 9); build-up gets a higher ceiling; bell pulse and Euclid unchanged.
+// New: railway crossing, Clapping Music. Button 2 now has three states: marimba → toms → both.
+// Engine: the adapted engine-3 copy of the ambient rounds (007 harmony, no swing, 007 context), plus the tom switch on
+// button 2. Do NOT run stem-lab/sync.mjs on it.
+// Sources (2026-11-08):
+//   - Takada on “Crossing”: its rhythms were “inspired by the sound of Japanese train crossings” (The Vinyl Factory
+//     interview); “endless layers of percolating marimba … subtly shifting both rhythmically and melodically” (Bored in
+//     Pittsburgh review); a steady bell pulse throughout (Spectrum Culture). Column 5: two-tone crossing bells, several
+//     at slightly different speeds, drifting out of and back into step (the crossing behaviour is my reading).
+//   - Takada names Reich's early work, “Clapping Music”, as an influence (The Vinyl Factory). Column 6: its 12-pulse
+//     pattern (x x x . x x . x . x x .); the second voice moves one pulse ahead after every N bars, 12 moves until it is
+//     back in unison (Reich: each bar repeated 12 times, here fewer).
+//   - “Catastrophe Σ”: a constant cowbell / tom-tom beat, gaining speed (Spectrum Culture, The Quietus) — hence the toms.
+// Figures (except Clapping Music) written by me, in D lydian; every figure's first note accented, so its cycle can be heard.
+// Every column: button 1 = options from plain to wild, row 3 = how many layers sound (one by one).
+//   1 Cycles / canon / cells: 5·7 → 5·7·12 → 5·7·11·13 → canon (3 figures) → similar cells (2, 4, 6 notes).
+//   2 Euclid: evenly spread hits of different cycle lengths (3 in 8, 5 in 13, 7 in 16 …).
+//   3 Build-up: one figure starts alone, the others enter by themselves every 8 / 4 / 2 bars and stay (64-bar round);
+//     row 3 = intensity: how many may enter (up to 7, the last two dense and high) and how loud and bright they swell.
+//   4 Bell pulse: a steady agogo bell on the quarters, two marimba lines interlocking, then sliding against each other.
+//   5 Railway crossing: two-tone bells in 8ths, 2–4 crossings at slightly different speeds.
+//   6 Clapping Music: Reich's pattern in two voices, the second moving one pulse every 8 / 4 / 2 bars.
+// Sounds: GM marimba, GM melodic tom (button 2), GM agogo (preloaded on strudel.cc). Levels guessed. Not heard.
+//
+// Launch Control XL 3: candidates in Custom Mode 16 (channel 16), context in Mode 2.
+// @layout Midori 3 (lab/harmonie, 007: Takada-style marimba layers)
+// @note Six ways of laying plain marimba figures over each other, in D lydian over 007's context (Mode 2). Button 1 = plain → wild, row 3 = layers, button 2 = marimba → toms → both.
+// @guide What to listen for | Railway crossing and Clapping Music: does the shifting rhythm come through? How high can build-up go?
+// @mode 16 Mode 16 — Candidates
+// @col 16:1 1 Cycles / Canon / Cells
+// @col 16:2 2 Euclid
+// @col 16:3 3 Build-up
+// @col 16:4 4 Bell Pulse
+// @col 16:5 5 Railway Crossing
+// @col 16:6 6 Clapping Music
+// @row 16:k1 Row 1 \ Brightness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Character
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Change
+// @row 16:b2 Button 2 \ Moment
+// @ctl 16:1-6.k1 Brightness | soft mallet ↔ bright (low-pass).
+// @ctl 16:1-6.k2 Space | room and dotted-8th echo (a little at 0).
+// @ctl 16:1.k3 Layers | 0 = one figure / voice ↔ all of them.
+// @ctl 16:2.k3 Layers | 0 = one layer ↔ all 4.
+// @ctl 16:3.k3 Intensity | 0 = the figure alone ↔ up to 7 layers, louder and brighter.
+// @ctl 16:4.k3 Layers | 0 = bell + line 1 ↔ + line 2 ↔ + line 3.
+// @ctl 16:5.k3 Crossings | 0 = one bell ↔ 4 bells at different speeds.
+// @ctl 16:6.k3 Layers | 0 = the pattern alone ↔ + the moving voice ↔ + a low anchor.
+// @ctl 16:1-6.fader Level | 0 = off.
+// @ctl 16:1.b1 Change | 9 options: 3 cycles → 3 canons → 3 cells.
+// @ctl 16:2.b1 Change | sparse → middle → dense.
+// @ctl 16:3.b1 Change | a new layer every 8 → 4 → 2 bars.
+// @ctl 16:4.b1 Change | interlocked → line 2 slides → all slide.
+// @ctl 16:5.b1 Change | speeds close → apart → far apart.
+// @ctl 16:6.b1 Change | moves every 8 → 4 → 2 bars.
+// @ctl 16:1-6.b2 Toms | press: marimba → toms (an octave lower) → both, stays.
+// @mode 2 Mode 2 — Context
+// @col 2:5 5 Progression
+// @col 2:6 6 Heartbeat
+// @col 2:7 7 Drone
+// @col 2:8 8 Pad
+// @ctl 2:5.b1 Progression | next of 3, at the next 8 bars.
+// @ctl 2:5.b2 Back | previous progression.
+// @ctl 2:6.fader Heartbeat | 007's soft pulse on D.
+// @ctl 2:6.b2 Pulse out | the pulse pauses while held.
+// @ctl 2:7.fader Drone | D–A drone, swelling every 2 bars.
+// @ctl 2:8.fader Pad | 007's pad, high-passed (less mud).
+
+const BOARD = { id: 'midori3', title: 'Midori 3' }
+const bpm = 70
+
+const makeCols = h => {
+  const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
+  // D lydian (D E F♯ G♯ A B C♯): scale degree → MIDI note, 0 = D3
+  const LYD = [0, 2, 4, 6, 7, 9, 11]
+  const deg = d => 50 + LYD[md(d, 7)] + 12 * Math.floor(d / 7)
+  const toks = fig => fig.trim().split(/\s+/)
+  const accOf = t => { const f = t.findIndex(x => x !== '~'); return t.map((_, j) => j === f ? 1 : 0.6) }
+  // A layer: a figure of scale degrees (~ = rest), one per step (`steps` per bar, 16 = 16ths), cycling over its own
+  // length regardless of the bar; its first note accented
+  const layer = (fig, oct = 1, pan = 0.5, g = 0.5, steps = 16) => {
+    const t = toks(fig)
+    return note(mini('{' + t.join(' ') + '}%' + steps).fmap(d => deg(d) + 12 * oct))
+      .velocity(mini('{' + accOf(t).join(' ') + '}%' + steps)).s('gm_marimba').gain(g).pan(pan)
+  }
+  // Layers on row 3 of column i: layer 1 always, the others one by one as the knob goes up
+  const layers = (i, ls) => stack(...ls.map((l, v) => v === 0 ? l
+    : gate(h.knob(29 + i).fmap(k => v < 1 + Math.round((ls.length - 1) * k)), l))).delay(0.12)
+  const opts = (i, list) => list.map(([name, ls]) => [name, layers(i, ls)])
+  // A figure padded with rests to length L
+  const pad = (fig, L) => { const t = toks(fig); return [...t, ...Array(Math.max(0, L - t.length)).fill('~')].join(' ') }
+  // A figure moved by `sh` scale degrees
+  const shift = (fig, sh) => toks(fig).map(x => x === '~' ? x : String(+x + sh)).join(' ')
+  // Euclid: `hits` spread evenly over L steps, rotated by `rot`, the hits play `notes` in turn
+  const euclid = (hits, L, notes, rot = 0) => {
+    let j = 0
+    return [...Array(L).keys()].map(k => ((md(k + rot, L) * hits) % L) < hits ? String(notes[j++ % notes.length]) : '~').join(' ')
+  }
+  // A step offset that grows by 1 every `every` bars, `n` moves to a round (as a pattern of time offsets, 1 = a bar)
+  const moving = (every, n, stepLen, dir = 1) =>
+    mini('<' + [...Array(n).keys()].flatMap(k => Array(every).fill(md(dir * k, n) * stepLen)).join(' ') + '>')
+
+  // 1a Cycles: [figure, octave, pan]
+  const C5 = ['4 ~ 7 ~ 9', 1, 0.3], C7 = ['0 ~ ~ 2 ~ 4 ~', 0, 0.7], ANCHOR = ['0 ~ ~ ~ ~ ~ ~ ~ 4 ~ ~ ~ ~ ~ ~ ~', 0, 0.5]
+  const CYCLES = [
+    ['Zyklen 5·7', [C5, C7]],
+    ['Zyklen 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
+    ['Zyklen 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
+  ].map(([n, ls]) => [n, ls.map(s => layer(...s))])
+  // 1b Canon: one figure, voices [late by 16ths, octave, pan]
+  const VOICES = [[0, 1, 0.3], [3, 1, 0.7], [5, 0, 0.5], [11, 2, 0.6]]
+  const canon = fig => VOICES.map(([o, oct, pan]) => layer(fig, oct, pan, oct === 2 ? 0.35 : 0.5).late(o / 16))
+  const CANON = [['Kanon einfach', '0 4 ~ 7 4 ~ 2 ~'], ['Kanon mittel', '4 ~ 2 4 ~ 7 ~ ~'], ['Kanon lang', '7 ~ 6 4 ~ 2 4 ~ 9 ~ 7 ~']]
+    .map(([n, f]) => [n, canon(f)])
+  // 1c Similar cells: one cell, padded to slightly different lengths, each layer a little moved in pitch and place
+  const CELLS = [['Zellen 2 Töne', '0 ~ 4', [4, 5, 6, 7]], ['Zellen 4 Töne', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Zellen 6 Töne', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
+  const SIM = [[0, 1, 0.3], [2, 1, 0.7], [-3, 1, 0.5], [4, 0, 0.45]]   // [shift, octave, pan] per layer
+  const similar = CELLS.map(([n, cell, lens]) => [n, lens.map((L, v) => layer(pad(shift(cell, SIM[v][0]), L), SIM[v][1], SIM[v][2]))])
+  // 2 Euclid: [hits, length, notes, octave, pan]
+  const eu = list => list.map(([k, L, ns, oct, pan, rot = 0]) => layer(euclid(k, L, ns, rot), oct, pan))
+  const EUCLID = [
+    ['Locker', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
+    ['Mittel', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
+    ['Dicht', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
+      [4, 9, [0, 4, -3, 2], 0, 0.5]])],
+  ]
+  // 3 Build-up: layer v enters at bar v × every of a 64-bar round and stays to its end; row 3 (intensity) caps how many
+  // may enter and swells them: gain ×0.7 → ×1.4, brightness ×0.6 → ×2. Layers 6–7: dense 16ths, high.
+  const BUILD = [['0 ~ 4 7 ~ 4 2 ~', 1, 0.35], ['0 ~ 4 7 ~ 4 2 ~ ~', 1, 0.65], ['7 ~ ~ 9 ~ ~ 4', 1, 0.5],
+    ['0 ~ ~ ~ ~ ~ -3 ~ ~ ~', 0, 0.5], ['11 ~ ~ 9 ~ ~ ~ ~ ~ 7 ~', 2, 0.55, 0.35],
+    ['4 7 9 7 4 2 4 7 9 11', 1, 0.3, 0.35], ['7 9 11 9 7 4 7 9 11', 2, 0.7, 0.3]]
+  const swell = p => p.fmap(v => { const k = S.val[31] ?? 0.3; return { ...v, gain: v.gain * (0.7 + 0.7 * k), bright: 0.6 + 1.4 * k } })
+  const entering = every => BUILD.map((s, v) => v === 0 ? layer(...s)
+    : gate(signal(t => md(Math.floor(t + 1e-9), 64) >= v * every).segment(1), layer(...s)))
+  const BUILDUP = [['alle 8 Takte', entering(8)], ['alle 4 Takte', entering(4)], ['alle 2 Takte', entering(2)]]
+    .map(([n, ls]) => [n, ls.map(swell)])
+  // 4 Bell pulse: an agogo bell on the quarters with line 1; line 2 fills the gaps of line 1 (interlocked), or runs a
+  // step shorter and slides; line 3 (row 3) slides too
+  const bell = note(mini('{77 ~ ~ ~}%16')).s('gm_agogo').gain(0.25).pan(0.5)
+  const L1 = '4 ~ 7 ~ 2 ~ 4 ~', L2 = '~ 9 ~ 6 ~ 7 ~ 4', L2s = '~ 9 ~ 6 ~ 7 ~', L3 = '0 ~ ~ 2 ~ ~ 4 ~ ~'
+  const BELL = [
+    ['verzahnt', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['Linie 2 rutscht', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['alle rutschen', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(L3, 0, 0.5)]],
+  ]
+  // 5 Railway crossing: each crossing = a two-tone bell in 8ths, [high, low, octave, pan]; crossing v runs at speed
+  // 1 + spread × SPEEDS[v], so they fall out of step and come back (spread 0.01 = a 16th apart after ~6 bars)
+  const CROSSINGS = [[4, 2, 1, 0.35], [7, 6, 1, 0.65], [9, 7, 1, 0.5], [2, 0, 0, 0.5]]
+  const SPEEDS = [0, 1, -0.7, 1.6]
+  const crossing = spread => CROSSINGS.map(([a, b, oct, pan], v) => layer(a + ' ' + b, oct, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
+  const CROSS = [['nah', crossing(0.008)], ['auseinander', crossing(0.02)], ['weit', crossing(0.045)]]
+  // 6 Clapping Music (Reich 1972): 12 pulses per bar (8th triplets), x x x . x x . x . x x .; voice 2 one pulse ahead
+  // after every `every` bars, back in unison after 12 moves; the hits play the notes in turn
+  const CLAP = 'x x x ~ x x ~ x ~ x x ~'
+  const clapFig = notes => { let j = 0; return toks(CLAP).map(x => x === '~' ? x : String(notes[j++ % notes.length])).join(' ') }
+  const clap = every => [layer(clapFig([0, 4, 7, 4, 2, 4, 7, 9]), 1, 0.3, 0.5, 12),
+    layer(clapFig([7, 9, 11, 9, 7, 4, 7, 6]), 1, 0.7, 0.5, 12).early(moving(every, 12, 1 / 12)),
+    layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]
+  const CLAPPING = [['alle 8 Takte', clap(8)], ['alle 4 Takte', clap(4)], ['alle 2 Takte', clap(2)]]
+
+  // b2: 'tom' = button 2 steps marimba → toms (GM melodic tom, an octave lower) → both (see column() below)
+  const col = (name, k3name, pats) => ({ name, space: 'bus', floor: 0.25, hall: 6, k3: 'own', k3name, b2: 'tom', b2name: 'Toms',
+    range: [600, 6000], gain: 1, pats })
+  return [
+    col('Zyklen/Kanon/Zellen', 'Schichten', opts(0, [...CYCLES, ...CANON, ...similar])),
+    col('Euklid', 'Schichten', opts(1, EUCLID)),
+    col('Aufbau', 'Intensität', opts(2, BUILDUP)),
+    col('Glockenpuls', 'Schichten', opts(3, BELL)),
+    col('Bahnübergang', 'Übergänge', opts(4, CROSS)),
+    col('Clapping Music', 'Schichten', opts(5, CLAPPING)),
+  ]
+}
+
+// ============================================================
+// ENGINE 3 — engine 2 + chord progressions over 8 bars (Mode 2 column 5 button 1, at the next 8-bar phrase; keys,
+// bass and every chord-following voice go along) + “fire” buttons for interjections. Only the part above differs.
+// ADAPTED COPY for track 007 (see the head of this file): harmony, swing and context differ from engine3.strudel-part.
+// ============================================================
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const md = (k, n) => ((k % n) + n) % n
+const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x))
+const hash = (a, b, c) => {
+  let h = Math.imul(a + 0x9e3779b9 | 0, 0x85ebca6b) ^ Math.imul(b + 0x632be59b | 0, 0xc2b2ae35) ^ Math.imul(c + 0x27d4eb2f | 0, 0x165667b1)
+  h ^= h >>> 15; h = Math.imul(h, 0x2c1b3c6d); h ^= h >>> 12; h = Math.imul(h, 0x297a2d39); h ^= h >>> 15
+  return (h >>> 0) / 4294967296
+}
+
+// Harmony of track 007, chapter “floating” (D lydian: D E F♯ G♯ A B C♯): the pad's chords (stacked thirds on the
+// scale degrees), voiced F♯3–F♯4; deg = the root as a scale degree of D lydian
+const CH = {
+  'Dmaj7': { name: 'Dmaj7', bass: 38, deg: 0, keys: [54, 57, 61, 62] },
+  'E7': { name: 'E7', bass: 40, deg: 1, keys: [56, 59, 62, 64] },
+  'F♯m7': { name: 'F♯m7', bass: 42, deg: 2, keys: [54, 57, 61, 64] },
+  'G♯ø7': { name: 'G♯ø7', bass: 44, deg: 3, keys: [56, 59, 62, 66] },
+  'Bm7': { name: 'Bm7', bass: 35, deg: 5, keys: [57, 59, 62, 66] },
+  'C♯m7': { name: 'C♯m7', bass: 37, deg: 6, keys: [56, 59, 61, 64] },
+}
+// The pad's three progressions in 007 (one chord per 2 bars): [name, bars, push, scale]
+const HARMONIES = [
+  ['Ruhig: I–IV', ['Dmaj7', 'Dmaj7', 'Dmaj7', 'Dmaj7', 'G♯ø7', 'G♯ø7', 'G♯ø7', 'G♯ø7'], 0, 'lydian'],
+  ['Kreisend: I–iii–IV–ii', ['Dmaj7', 'Dmaj7', 'F♯m7', 'F♯m7', 'G♯ø7', 'G♯ø7', 'E7', 'E7'], 0, 'lydian'],
+  ['Offen: I–vi–IV–vii', ['Dmaj7', 'Dmaj7', 'Bm7', 'Bm7', 'G♯ø7', 'G♯ø7', 'C♯m7', 'C♯m7'], 0, 'lydian'],
+]
+// each progression as 128 chord names, one per 16th
+const H128 = HARMONIES.map(([, bars]) => bars.flatMap(b => typeof b === 'string' ? Array(16).fill(b)
+  : b.flatMap(([n, len]) => Array(len).fill(n))))
+const POOL = {}
+const inRange = (pcs, lo, hi) => POOL[pcs.join() + ':' + lo + ':' + hi] ??= (() => {
+  const o = []; for (let m = lo; m <= hi; m++) if (pcs.includes(md(m, 12))) o.push(m); return o })()
+// A stab: the n lowest notes from `lo` up whose pitch classes are in the keys' voicing (Am9: E G B, D9: E F♯ A, …)
+const stabOf = (c, lo, n) => inRange(c.keys.map(x => md(x, 12)), lo, lo + 24).slice(0, n)
+// The chord as a pattern (one value per 16th): the voicing's notes from `lo` up, `n` of them. push: the last two 16ths
+// of a bar already play the next bar's chord (Kerri Chandler's push, as the keys). chordName is defined below.
+const CHORD_PATS = {}
+// The chord at 16th k (absolute), with or without the progression's push
+const chordAt = (k, push = true) => {
+  const p = push ? HARMONIES[latch('harm', Math.floor(k / 16), 8)][2] : 0, kk = k + p
+  return H128[latch('harm', Math.floor(kk / 16), 8)][md(kk, 128)]
+}
+const k16 = t => Math.round(t * 16)
+const chordPat = (lo, n, push = true) => signal(t => chordAt(k16(t), push)).segment(16)
+  .fmap(name => CHORD_PATS[name + lo + ':' + n] ??= note(stack(...stabOf(CH[name], lo, n)))).innerJoin()
+// The chord's root as a MIDI note per 16th: oct 1 = the bass (A1 / C2 / D2 / E2), 2 = an octave up, …
+const rootPat = (oct = 2, push = true) => signal(t => CH[chordAt(k16(t), push)].bass + 12 * (oct - 1)).segment(16)
+// The chord's root as a scale degree of A dorian (A 0, C 2, D 3, E 4), per 16th
+const rootDeg = (push = false) => signal(t => CH[chordAt(k16(t), push)].deg).segment(16)
+// The progression's mode as a Strudel scale name per 16th, e.g. 'A3:aeolian' (for melodies: n(…).scale(h.scale(3)))
+const scalePat = oct => signal(t => 'D' + oct + ':' + HARMONIES[latch('harm', Math.floor(k16(t) / 16), 8)][3]).segment(16)
+// Held chords: one event per chord, as long as the chord lasts (at most 4 bars, then struck again), from `lo` up, n notes
+const padPat = (lo, n, push = true) => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  // the chord sounding at 16th k starts at its change point c, struck again every 64 16ths after c
+  const startOf = k => {
+    const name = chordAt(k, push)
+    let c = k
+    while (c > k - 256 && chordAt(c - 1, push) === name) c--
+    if (c === k - 256) c = 64 * Math.floor(k / 64)   // no change in sight (one chord): strike on the 4-bar grid
+    return c + 64 * Math.floor((k - c) / 64)
+  }
+  for (let s = startOf(Math.floor(b0 * 16)); s < e0 * 16;) {
+    const name = chordAt(s, push)
+    let e = s + 1
+    while (e - s < 64 && chordAt(e, push) === name) e++
+    const w0 = s / 16, w1 = e / 16, p0 = Math.max(w0, b0), p1 = Math.min(w1, e0)
+    if (p1 > p0) for (const m of stabOf(CH[name], lo, n))
+      out.push(new Hap(new TimeSpan(w0, w1), new TimeSpan(p0, p1), { note: m }, {}))
+    s = e
+  }
+  return out
+})
+// A voice that follows the chord: idx = a pattern of indexes into the chord's notes from `lo` up (0 = lowest)
+const arpPat = (lo, idx, push = true) => new Pattern(state => idx.query(state).map(h => h.withValue(i => {
+  const notes = stabOf(CH[chordAt(k16(h.whole.begin.valueOf()), push)], lo, 8)
+  return { note: notes[md(i, notes.length)] }
+})))
+// Live controls for boards whose row 3 / button 2 do their own job (column option k3 / b2 = 'own'):
+// knob(cc) = the knob's value 0..1, held(cc) = 1 while the button is held (S is defined below; read at query time)
+const knobSig = cc => signal(() => S.val[cc] ?? 0)
+const heldSig = cc => signal(() => S.held[cc] ? 1 : 0)
+// 0 → 1 over `bars` while the button is held (a ramp for risers / sweeps), 0 when released
+const rampSig = (cc, bars) => signal(() => S.held[cc] ? Math.min(1, (performance.now() - (S.since?.[cc] ?? performance.now())) / (bars * 240000 / bpm)) : 0)
+// Helpers handed to the board's makeCols
+// fired(i, bar) = button 1 of column i (option b1: 'fire') was pressed for this bar; occurrence-free helpers for boards
+const firedFor = (i, bar) => (S.fire?.[i] ?? null) === bar
+const H = { chord: chordPat, pad: padPat, arp: arpPat, root: rootPat, rootDeg, scale: scalePat, chordAt, knob: knobSig, held: heldSig,
+  ramp: rampSig, fired: firedFor, hash }
+const COLS = makeCols(H)
+
+// State survives re-evaluation. Mode 16: fader 5-12, knobs 13-36, buttons 37-52. Mode 2 = + 48.
+const S = globalThis[BOARD.id] ??= { val: {}, held: {}, pend: {}, at: {}, seed: {} }
+COLS.forEach((c, i) => { S.val[5 + i] ??= i === 0 ? 0.7 : 0;   // column 1 on
+  S.val[13 + i] ??= 0.6; S.val[21 + i] ??= 0; S.val[29 + i] ??= 0.3 })
+S.val[58] ??= 0.5; S.val[59] ??= 0.5; S.val[60] ??= 0.6   // heartbeat, drone, pad
+const swingPct = () => 0.5   // ambient: straight, no swing
+const drumsLevel = () => S.held[98] ? 0 : S.val[58]
+// A column's pattern list: [name, pattern]
+const patsOf = i => COLS[i].pats
+// A choice made now takes over at the next bar (len 8: at the next 8-bar phrase); fixed once a bar is first asked
+const latch = (key, bar, len = 1) => {
+  const b = Math.floor(bar / len), m = S.at[key] ??= {}
+  if (!(b in m)) { m[b] = S.pend[key] ?? 0; for (const x in m) if (+x < b - 8) delete m[x] }
+  return m[b]
+}
+const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== BOARD.id) {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = BOARD.id
+  }
+}
+
+// Status box (bottom right) with the dashboard link; other boards' boxes are removed
+let statusBox = null, statusText = null
+if (hasPage) {
+  for (const id of ['board-status', 'keys-lab-status', 'stem-lab-status']) document.getElementById(id)?.remove()
+  statusBox = document.createElement('div')
+  statusBox.id = 'stem-lab-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  statusText = document.createElement('pre')
+  statusText.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  statusBox.append(statusText)
+  document.body.appendChild(statusBox)
+}
+const beatNow = { bar: null, beat: null }
+const pct = v => Math.round((v ?? 0) * 100)
+const harmNow = () => latchNow('harm')
+
+// DASHBOARD — a big window with every control of Mode 16 and the Mode 2 context on top. The link opens a tab named
+// stem-lab-view; strudel.cc replaces window.open, so the handle comes from the native open of a hidden iframe.
+const view = !hasPage ? null : globalThis.stemLabView ??= { win: null }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const VIEW_CSS = [
+  'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+  '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+  '.head{display:flex;gap:2.5vw;align-items:center;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:#50c8e8}',
+  '.k{opacity:.6;margin-right:.4em}.next,.acc{color:#50c8e8}',
+  '.grid{flex:1;display:grid;grid-template-columns:repeat(' + COLS.length + ',1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 4.6em 3em;gap:.8vh .8vw}',
+  '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.live{color:#50c8e8;border-color:#50c8e8}',
+  '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+  '.cell span,.cell b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cell span{opacity:.7;font-size:.85em}.cell b{font-variant-numeric:tabular-nums}',
+  '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+  'background:conic-gradient(from -135deg,#50c8e8 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+  '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+  '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+  '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:#50c8e8}',
+  '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start;overflow:hidden}.btn.on{background:#50c8e8;color:#111}',
+  '.pat{font:.7em monospace;letter-spacing:.03em;opacity:.85;overflow-wrap:anywhere}',
+  '.beats i,.bars i{display:inline-block;background:#333;margin-left:.3em}.beats i{width:.75em;height:.75em;border-radius:50%}',
+  '.bars i{width:1.1em;height:.55em;border-radius:2px}.beats i.on,.bars i.on{background:#50c8e8}',
+].join('\n')
+const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+const drawView = () => {
+  if (!view?.win || view.win.closed) return
+  const root = view.win.document.getElementById('lc')
+  if (!root) return
+  const h = harmNow(), hp = S.pend.harm ?? 0
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const bar = beatNow.bar
+  const where = bar === null ? '–' : '<span class=bars>' + marks(8, md(bar, 8)) + '</span><span class=beats>' +
+    marks(4, beatNow.beat) + '</span> <b class=acc>' + esc(chordAt(bar * 16 + 4 * beatNow.beat, false)) + '</b>'
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + (v ?? 0) + '"></div><b>' + pct(v) +
+    '</b><span>' + esc(name) + '</span></div>'
+  const cells = COLS.map((c, i) => {
+    const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
+    return {
+      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
+        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+      b1: c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
+        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: c.b2 === 'tom' ? '<div class="cell btn' + (S.tog?.[45 + i] ? ' on' : '') + '"><b>' + ['Marimba', 'Toms', 'Marimba + Toms'][S.tog?.[45 + i] ?? 0] + '</b></div>'
+        : '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+    }
+  })
+  root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
+    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Takt</span>' + where + '</div>' +
+    '<div><span class=k>Puls</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Drone</span>' + pct(S.val[59]) +
+    '</div><div><span class=k>Pad</span>' + pct(S.val[60]) + '</div></div>' +
+    '<div class=grid>' +
+    COLS.map((c, i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 ? ' live' : '') + '">' + (i + 1) + ' ' + esc(c.name) + '</div>').join('') +
+    ['k1', 'k2', 'k3', 'fader', 'b1', 'b2'].map(r => cells.map(c => c[r]).join('')).join('') + '</div>'
+}
+if (view) {
+  for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
+  view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
+  const link = document.createElement('a')
+  link.textContent = '▣ LC groß'
+  link.href = 'about:blank'
+  link.target = 'stem-lab-view'
+  link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
+    'background:#ddd;border-radius:3px;text-decoration:none;cursor:pointer'
+  link.onclick = () => setTimeout(() => {
+    try {
+      const w = view.opener.contentWindow.open('', 'stem-lab-view')
+      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      view.win = w
+      w.document.title = BOARD.title
+      w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+      w.document.body.innerHTML = '<div id=lc></div>'
+      drawView()
+    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+  }, 100)
+  statusBox.append(link)
+  if (view.win && !view.win.closed) {
+    view.win.document.title = BOARD.title
+    view.win.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+    if (!view.win.document.getElementById('lc')) view.win.document.body.innerHTML = '<div id=lc></div>'
+  }
+}
+const showStatus = () => {
+  if (statusText) {
+    const h = harmNow(), hp = S.pend.harm ?? 0
+    statusText.textContent = [
+      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Puls ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Drone ' + pct(S.val[59]) +
+        ' · Pad ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
+      '',
+      ...COLS.map((c, i) => {
+        const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+          (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
+      }),
+    ].join('\n')
+  }
+  drawView()
+}
+const onMidi = e => {
+  const [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if (typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(cc)) {   // a board's direct progression buttons
+    if (value > 63 && !S.held[cc]) { S.pend.harm = PROG_KEYS.indexOf(cc); S.held[cc] = true; showStatus() }
+    else if (value <= 63) S.held[cc] = false
+    return
+  }
+  else if (cc === 97) {   // Mode 2 column 5 button 2: previous progression (on press)
+    if (value > 63 && !S.held[97]) { S.pend.harm = ((S.pend.harm ?? 0) - 1 + HARMONIES.length) % HARMONIES.length; S.held[97] = true; showStatus() }
+    else if (value <= 63) S.held[97] = false
+    return
+  }
+  else if ((cc >= 45 && cc <= 52) || (cc >= 93 && cc <= 100)) {
+    if (value > 63 && !S.held[cc]) {
+      (S.since ??= {})[cc] = performance.now()   // when it was pressed (for ramps)
+      ;(S.tog ??= {})[cc] = ((S.tog[cc] ?? 0) + 1) % 3   // button 2 of a 'tom' column: marimba → toms → both
+    }
+    S.held[cc] = value > 63
+  }
+  else if (value === 0) return
+  else if (cc >= 37 && cc <= 44) {
+    const i = cc - 37
+    if (!COLS[i]) return
+    if (COLS[i].b1 === 'fire') {
+      // fire at the column's step (fireAt, default 14 = the “and” of beat 4) of this bar, or of the next bar when too late
+      const at = COLS[i].fireAt ?? 14, bar = beatNow.bar ?? 0, step = 4 * (beatNow.beat ?? 0)
+      ;(S.fire ??= {})[i] = step + 2 < at ? bar : bar + 1
+    } else S.pend[i] = ((S.pend[i] ?? 0) + 1) % patsOf(i).length
+  }
+  else if (cc === 89) S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; fn(step, bar, k) returns events with dur in 16ths; swing moves the odd 16ths late
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const late = k => md(k, 2) === 1 ? 2 * (swingPct() - 0.5) : 0
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 1; k++) {
+    const t0 = (k + late(k)) / 16
+    if (t0 < b0 - 1 / 16 || t0 >= e0 + 1 / 16) continue
+    for (const { dur = 1, ...v } of fn(md(k, 16), Math.floor(k / 16), k) ?? []) {
+      if (t0 < b0 - 1e-9 || t0 >= e0 - 1e-9) continue
+      out.push(new Hap(new TimeSpan(t0, t0 + dur / 16), new TimeSpan(t0, Math.min(t0 + dur / 16, e0)), v, {}))
+    }
+  }
+  return out
+})
+const chordName = bar => chordAt(bar * 16, false)
+
+// A column: the pattern picked by button 1 (taking over at the next bar), swung like the drums, then the channel
+// strip per event from the knobs: Brightness = low-pass over the column's range (brighter also ±2 dB louder), Space =
+// a 1/8 echo first, the room from 0.35 on, Length = note length ×0.5 … ×4 (clip), Level = fader, button 2 held = echo
+// throw (dotted 8th, long tail). A voice may carry `bright` (a factor on its cutoff, e.g. for accents); a voice's own
+// low-pass (e.g. a recipe's lpf) is kept when it is lower than the Brightness knob's.
+const column = i => {
+  const c = COLS[i], built = c.pats.map(([, p]) => p)
+  const sel = signal(t => latch(i, Math.floor(t))).segment(1)
+  let pat = sel.fmap(p => built[p]).innerJoin()
+  // button 2 of a 'tom' column (S.tog: 0 marimba, 1 toms, 2 both): marimba notes become GM melodic toms an octave lower
+  if (c.b2 === 'tom') {
+    const mode = () => S.tog?.[45 + i] ?? 0
+    pat = stack(pat.filterValues(v => mode() !== 1 || v.s !== 'gm_marimba'),
+      pat.filterValues(v => mode() !== 0 && v.s === 'gm_marimba').fmap(v => ({ ...v, s: 'gm_melodic_tom', note: v.note - 12 })))
+  }
+  return pat
+    .swingBy(signal(() => 2 * (swingPct() - 0.5)), 8)
+    .filterValues(() => (S.val[5 + i] ?? 0) > 0)
+    .fmap(({ bright = 1, ...v }) => {
+      const level = S.val[5 + i] ?? 0, br = S.val[13 + i] ?? 0.6, sp = S.val[21 + i] ?? 0, ln = S.val[29 + i] ?? 0.3
+      const [clo, chi] = c.range ?? [300, 8000]
+      let room, ef
+      if (c.space === 'bus') {
+        // as the tracks' bus(): the voice's own echo amount × 2 × space, space never below the column's floor (a
+        // little room even at 0), dotted-8th echo with a long tail; room 0.9 × space
+        const s2 = (c.floor ?? 0.3) + (1 - (c.floor ?? 0.3)) * sp
+        room = 0.9 * s2
+        ef = { delay: Math.min(0.9, (v.delay ?? 0) * 2 * s2), delaytime: 0.75 * 60 / bpm, delayfeedback: 0.55 }
+      } else {
+        room = 0.8 * Math.max(0, (sp - 0.35) / 0.65)
+        const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+        ef = ev > 0 ? { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev } : {}
+      }
+      const fx = c.b2 !== 'own' && c.b2 !== 'tom' && S.held[45 + i] ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62 } : {}
+      const clip = c.k3 === 'own' ? {} : { clip: (v.clip ?? 1) * (c.len ?? 1) * exp(0.5, 4)(ln) }
+      return { release: 0.1, ...v, cutoff: Math.min(18000, v.cutoff ?? 18000, exp(clo, chi)(br) * bright), room, roomsize: c.hall ?? 2,
+        ...clip, postgain: level * Math.pow(10, 4 * (br - 0.5) / 20) * (c.gain ?? 1), ...ef, ...fx, orbit: 3 }
+    })
+}
+
+// Context: 007 in short. Heartbeat = the soft pulse (sine on D2, gliding 4 semitones down into the note, “[1 0.55 ~ ~]*4”),
+// drone = D2 + A2 sines swelling every 2 bars, pad = 007's saw + triangle chord on the progression, high-passed at 250 Hz with less room (round 2: less mud).
+const context = grid((step, bar) => {
+  const out = [], l = drumsLevel(), dl = S.val[59], pl = S.val[60]
+  if (l > 0 && step % 4 < 2) out.push({ s: 'sine', note: 38, gain: step % 4 ? 0.5 : 0.9, attack: 0.015, decay: 0.45,
+    sustain: 0, release: 0.15, penv: -4, pattack: 0.08, cutoff: 600, postgain: l, room: 0.2 })
+  if (step === 0 && md(bar, 2) === 0) {
+    if (dl > 0) for (const m of [38, 45]) out.push({ s: 'sine', note: m, gain: 0.3, attack: 1.5, decay: 1, sustain: 0.7,
+      release: 3, postgain: dl, dur: 32, room: 0.5 })
+    if (pl > 0) for (const m of CH[chordName(bar)].keys) out.push(
+      { s: 'sawtooth', note: m, gain: 0.17, attack: 1.2, sustain: 0.8, release: 3, cutoff: 1800, pan: 0.4, postgain: pl, dur: 32, room: 0.35, hpf: 250 },
+      { s: 'triangle', note: m, gain: 0.28, attack: 0.8, sustain: 0.8, release: 3, cutoff: 1800, pan: 0.6, postgain: pl, dur: 32, room: 0.35, hpf: 250 })
+  }
+  return out.map(v => ({ roomsize: 6, ...v, orbit: 1 }))
+})
+
+const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
+  const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), b = Math.floor((pos - bar) * 4 + 1e-9)
+  setTimeout(() => { beatNow.bar = bar; beatNow.beat = b; showStatus() }, Math.max(0, (t - now) * 1000))
+}, true)
+setcpm(bpm / 4)
+
+// A board may define MASTER(pattern) (e.g. a filter on everything, FX lab); it gets columns + context
+const master = typeof MASTER === 'function' ? MASTER : (p => p)
+stack(master(stack(...COLS.map((_, i) => column(i)), context)))
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
+  .stack(beatTick)   // silent, after the safety net: moves the dashboard and the status box with the beat

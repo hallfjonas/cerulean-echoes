@@ -1,5 +1,33 @@
 # 009 — mögliche Stems für Jonas 2–7 (Entwurf, nicht final)
 
+## ▶ Stand 2026-11-08 abends — Disco-Labs für Jonas 5–7 (NICHT gehört)
+Nutzer: Disco-Gitarre, Disco-Streicher, Bläser — warm, organisch, an House angelehnt (Referenz: Vera „Take Me to the Bridge“).
+Vocals kommen auf ein eigenes Sample-Pad, nicht in eine Spalte.
+- Im Track (2026-11-08 spät): Jonas 5 Bläser (disco-blaeser-3), Jonas 6 Streicher (disco-streicher-4), Jonas 7 Gitarre
+  (disco-gitarre-3) — Streicher und Gitarre NICHT gehört. Offen: Bläser-Komplexität (`lab/blaeser/komplexitaet-1`), Gitarrenklang.
+- Aktuell: `lab/streicher/disco-streicher-4` (5 Figuren, sauberer Klang, harter Anschlag oben), `lab/gitarre/disco-gitarre-3`
+  (Linien, Komplexität in 4 Stufen, offen ↔ gedämpft) und `lab/gitarre/gitarren-klaenge-1` (8 Klänge). Ältere Runden in `old/`.
+Details und Quellen: `feedback.md` im jeweiligen Ordner. Danach: Gewinner per `lab-to-track` in Jonas 5–7.
+
+## ▶ Stand 2026-11-08 (spät) — Details: uebergabe-2026-11-08-spaet.md
+Spaltenplan: Jonas 4 Flöte hoch · 5 Bläser mit Aufbau · 6 Acid (Probe) · 7 Vocal-Hook nur mit ikonischen Samples.
+Neue Labs zum Anhören: lab/bass/house-bass-1 (Jojo 4), lab/keys/house-keys-lab-22, lab/melodie/melodie-4, lab/acid/acid-1.
+
+## ▶ Für morgen früh (Nachtschicht 2026-11-08) — Details: uebergabe-nacht-2026-11-08.md
+Nichts davon gehört; alles in Node / Headless-Chrome geprüft.
+1. **009, Jonas 3 Vibraphon „Ruf-Echo“**: F♯ wird in den Moll-Folgen (alle außer „Am9 D9“) zu F. Anhören: Jonas 1
+   Taste 1 auf eine Moll-Folge (z. B. „Am F G“), Chapter auf Wechsel, Jonas 3 Taste 1 auf „Ruf-Echo“ (Takt 7–8).
+   Set 011 neu gebaut.
+2. **`lab/melodie/melodie-3.strudel`** — echte Bläser-Phrasen für Jonas 4: Spalte 2–4 Trompete A/B/C, 5 Tenorsax,
+   6 Flöte (je 3–5 ruhige Phrasen aus langen Freesound-Improvisationen, nach A transponiert), Spalte 1 Vibraphon zum
+   Vergleich. Fader hoch, Taste 1 = nächste Phrase, Reihe 3 = wie oft (16 / 8 / 4 Takte). Worauf achten: warm und
+   lebendig statt mechanisch? Welche Phrase hält Wiederholung aus? Alle 8 oder alle 4 Takte? Rauschen bei leisen
+   Aufnahmen (bis +14 dB angehoben)? Akkordfolge in Mode 2 Spalte 5 Taste 1 wechseln: Phrasen mit F♯/F weichen
+   in unpassenden Folgen auf die nächste passende aus.
+3. **`lab/einwurf/einwurf-1.strudel`** — technisch ok (alle 26 Samples laden), war aber viel zu laut (bis −13,7 LUFS,
+   drei Spalten übersteuerten) → Spalten auf ≈ −19 LUFS angeglichen. Inhalt unverändert, jetzt zum ersten Mal anhören.
+Danach: Gewinner aus melodie-3 / einwurf-1 per `lab-to-track` in Jonas 4–6; Harmonie im Browser feinschleifen.
+
 Ziel: happy / jazzy House, trocken. Jonas 1 = Keys (fertig, aus dem Keys-Lab). Die übrigen Spalten sollen bunt,
 verspielt und melodisch sein, ohne den Takt zu verändern (Beständigkeit über 8 Takte ist wichtig, siehe feedback.md).
 Vor dem Bauen: Referenz-Tracks anhören (docs/references.md) und nachlesen, welche Rollen dort wirklich vorkommen;
@@ -21,14 +49,18 @@ Notizen
 - Ladezeit: jede neue Sample-Quelle braucht Internet beim ersten Anschlag; möglichst wenige Quellen.
 
 ## ✗ Verworfen (vor jedem Lab prüfen!)
-- Klänge: M1-Orgel (Stabs, Dub, Riff), String-Machine, echte Streicher-Section (VSCO), Marimba, Trompeten aus
+- Klänge: M1-Orgel (Stabs, Dub, Riff), „Orgel wie Strings“ (Pulse-Orgel), Strings + Orgel, String-Machine, echte Streicher-Section (VSCO), Marimba, Trompeten aus
   Einzelton-Multisamples (VSCO harmon / sus / vib, auch tpt_stac), Tenorsax/Flöte VCSL, Panflöte-Ersatz,
   synthetische Vocals (ah/oh), Chor, Bläser-Stabs „POP HORNS“, Orchestra Hit, Vinyl-Knistern, Rhodes/Orgel-Samples
   (verstaubter Jazz), Gitarren-Loops (messy), Rhodes-Antworten (A C E), M1/Trompeten-Dub.
 - Spielweisen: 1-Takt-Loops, reine Zufallsmelodien, selbst ausgedachte brave Melodien, schnelle unruhige Jazz-Phrasen,
   Techno-Übernahmen aus 008/010, FX ohne hörbare Wirkung (Filter-Downer, Hochpass, Siren, Snare-Build).
-- Gut / behalten: JX-10, Orgel wie Strings, B3 (Harmonie); Vibraphon (Melodie); Dub Brass (Synth, „besser“);
+- Einwürfe (einwurf-1, 2026-11-08): alle — Rufe, Jubel, Flöten-Triller/-Lauf, Zither, Posaunen-Fall, Cuíca. Wenn, dann
+  ikonische Vocal-Samples. Progressive-House-Akkordfolgen (vi IV V I …): nein, klassischer House.
+- Gut / behalten: JX-10, B3 weich, Strings + B3 (Harmonie; Akkordfolgen auf Taste 1 = weiterschalten); Vibraphon (Melodie); Dub Brass (Synth, „besser“);
   Flöten-Triller (selten), „yeah yeah yeah“; Akkordfolgen auf direkten Tasten.
+
+## ☑ Im Track (2026-11-08): Jonas 1 Harmonie (harmonie-4 Sp. 2) mit 10 Akkordfolgen, Jonas 2 Keys, Jonas 3 Vibraphon — Details: uebergabe-harmonie-in-009.md, feedback.md
 
 ## ▶ Neu-Konzeption (Nutzer, 2026-11-08) — HIER WEITERMACHEN
 Ziel des Ganzen: MIDI-Belegung, mit der Leute niederschwellig und schnell ausprobieren und bei einem Treffen gemeinsam

@@ -13,3 +13,12 @@
   uninspired. Open to: other chords, something else harmonic, or slow low tones that modulate (no chords) with a
   better sound.
 - Overall: much is really nice, but whale and chords hardly get played.
+
+## Feedback 2 (user, 2026-11-08)
+- Chords (Jonas 2), music box (Jonas 3: boring, not good) and whale (Jonas 4) out. Done in 007-ambient-dual.strudel
+  (columns 2–4 free, stems kept as silence for the set); previous version old/007-ambient-dual-before-feedback2.strudel.
+- Successors are tried in lab/harmonie/ambient-3.strudel: Takada-style shifting marimba layers, a melodic voice on top,
+  Eno bowed (liked, maybe better than the choir and instead of the chords).
+- Choir stays (good shimmer, sits higher; the drone is much lower).
+- 2026-11-08: Jonas 2–4 = Eno-Bogen, Marimba, Toms (Takada) aus lab/harmonie/midori-5.strudel übernommen; Version davor
+  old/007-ambient-dual-before-midori.strudel. Abweichung: Tonleiter folgt dem Kapitel. Pegel der GM-Klänge noch nicht gemessen.
