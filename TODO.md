@@ -1,10 +1,21 @@
 
 ## Action Items
 ### Jonas
-+ Ableton + Strudel (Incognito) + LC + LK --> Drei verschiedene Tracks Laden und Spielen
-+ Samples auf Keys Laden
-+ Sound design für Keys (pro Track)
-+ Recording
++ Letzte Wiese sample
++ Improve groove track
+    + less cringe more techno; more groove; more trippy space sounds
+    + densitiy (missing kicks and crash and a lot of other stuff, maybe voice?; maybe draw a build up trajectory in terms of lows/mids/highs)
++ Have fun
++ Bessere Samples
++ Bessere Keys
+
++ Adopt new UI layout from Johannes? NOT PUSHED YET
+    + BLOCKS: Fix UI layout in strudel
+    + Extend all strudel tracks by LK and align layouts
+
+## Ideas
++ translate everything to English in this repo
++
 
 ### Johannes
 + Tracks finalisieren (2x Launchcontrols (OHNE KEYS!))

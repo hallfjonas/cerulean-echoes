@@ -28,7 +28,9 @@
 //   starts at 90 %, percussion at 65 % and pans slowly (before: old/008-groove-techno-dual-round8.strudel).
 // Jojo (foundation): kick, rumble, sub, bassline, clap, hats, percussion, ride.
 // Jonas (colour): pad, techno pad, sequence, stab, answer, dark percussion, FX + the global column 8.
-// Chapter: fixed to F minor (dark). Global button 1 = drop fill (hold it while the beat is out).
+// Round 9: global button 1 = chapter again (starts dark: dark → tense → warm), the drop fill is gone; global Room →
+//   Thin (the mirror of Fog, from the low side), Tension also raises the reverb; Tension's snare roll plays in the break.
+// Chapter (global button 1): F minor (dark) → F phrygian (tense) → F dorian (warm), at the next bar.
 // Harmony: Jonas' pad button 1 picks the chord progression; Jojo's sub and bassline follow its root.
 // ============================================================
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
@@ -74,11 +76,10 @@
 // @guide Playing together | Jojo builds the floor: kick first, rumble right next to it, then sub and hats, then clap, bassline and the groove (percussion, ride).
 // @guide Playing together | Jonas colours it: pad first, then the techno pad under it (all knobs at 0 is a good start), then dark percussion and the sequence. Stab and answer are for the peaks, the breathing FX for long transitions.
 // @guide Playing together | The pad's button 1 changes the chords for both players: Jojo's sub and bassline move with it. Pad button 2 (freeze) holds the chord for everybody.
-// @guide Playing together | Break: one press takes out kick, rumble, sub, bassline and clap at the next bar; hats, percussion, ride and all of Jonas' sounds keep going. Turn Tension up during the break, press again: everything is back on the one. Then let Tension go.
-// @guide Playing together | Drop fill: while the beat is out, hold global button 1. From the next bar a 4-bar fill builds (kick and snare get denser bar by bar, a noise sweep rises); after the 16th beat the beat is back. Let go earlier = the fill stops, the beat stays out.
+// @guide Playing together | Break: one press takes out kick, rumble, sub, bassline and clap at the next bar; hats, percussion, ride and all of Jonas' sounds keep going. Turn Tension up during the break (its snare roll keeps playing), press again: everything is back on the one. Then let Tension go.
 // @guide Every position sounds good | No filter closes completely. Sequence, answer and FX keep a little room even at space 0.
 // @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
-// @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
+// @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 (chapter, break, tension) for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
 // @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
 // @guide Playing together | Both Launch Controls have the full layout and steer the same sounds: whoever moves a control last sets its value, a button press counts from either. Agree who plays which page.
 // Every Launch Control XL 3 that is connected (by the port name, whatever it is renamed to; not its DAW port).
@@ -200,10 +201,12 @@ const freeze = (button, pat) => {
 }
 
 // ============================================================
-// MOODS — round 8: one chapter only, F minor (dark); global button 1 is the drop fill now
+// MOODS — all on F, so a switch keeps the root and only the colour changes; starts dark (round 8 feedback)
 // ============================================================
 const MOODS = [
-  { scale: 'minor',    name: 'dunkel' },     // F G A♭ B♭ C D♭ E♭
+  { scale: 'minor',    name: 'dunkel' },  // F G A♭ B♭ C D♭ E♭
+  { scale: 'phrygian', name: 'eng' },     // F G♭ A♭ B♭ C D♭ E♭
+  { scale: 'dorian',   name: 'warm' },    // F G A♭ B♭ C D E♭
 ]
 
 // Status box at the bottom right: chapter, break, and which pattern each stem plays.
@@ -250,13 +253,14 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
     if (!v.side(name)) return
     const [status, cc, val] = e.data
     if ((status & 0xf0) !== 0xb0) {
-      if (status === 0xf8 || status === 0xfe) return   // clock, active sensing
+      if (status === 0xf8 || status === 0xfe || v.side(name) === 'lk') return   // clock, active sensing, keys and pads
       v.other = [...e.data].map(b => b.toString(16).padStart(2, '0')).join(' ').toUpperCase()
       v.update()
       return
     }
     const side = v.side(name)
-    v.cc[side][cc] = val / 127
+    const values = v.cc[side] ??= {}
+    values[cc] = val / 127
     v.page = v.pageOf(side, cc)
     v.update()
   }
@@ -338,15 +342,18 @@ const pick = (latch, pats) => latch.pat.fmap(i => pats[i]).innerJoin()
 // GLOBAL (Jonas, column 8) — acts on both controllers
 // ============================================================
 // @ctl g.k1 Fog | 0 = clear, up = every filter pulled down to ~6 %: muffled, as if from the room next door.
-// @ctl g.k2 Room | 0 = each sound's own room (row 2), up = everything drowns in reverb.
-// @ctl g.k3 Tension | build-up: echo grows (answer, sequence), filters open, only in the last fifth a snare roll (clap fader). 0 = release.
+// @ctl g.k2 Thin | the mirror of Fog: 0 = full, up = every high-pass pushed up ~17×: the lows fade, thin as from a small radio.
+// @ctl g.k3 Tension | build-up: echo grows (answer, sequence), filters open, everything drowns in reverb, only in the last fifth a snare roll (clap fader). 0 = release.
 // @ctl g.fader Master Level | volume of everything, both controllers. 0 = silence.
-// @ctl g.b1 Drop fill | hold while the beat is out: 4-bar fill from the next bar, the beat is back after the 16th beat. Let go = stop.
+// @ctl g.b1 Chapter | mood: dark → tense → warm, at the next bar.
 // @ctl g.b2 Break / Drop | 1st: beat out. 2nd: all back on the one.
 const glob        = colJonas(8)
 const globalFog   = glob.bright.fmap(f => Math.pow(0.06, f))
-const globalRoom  = glob.space
 const tension     = glob.char
+// Tension also raises every reverb send (it was the Room knob before)
+const globalRoom  = tension
+// Thin: the mirror of fog, a factor on every hpf from 1 up to 1 / 0.06 (≈ 17)
+const globalThin  = glob.space.fmap(t => Math.pow(1 / 0.06, t))
 const tensionEcho = ramp(tension, 0, 0.5).mul(0.45)     // delay send, 0..0.45
 const tensionRoll = ramp(tension, 0.8, 1)               // snare roll, 0..1 (round 4: only the last fifth, was from 0.5)
 // Factor on every lpf: fog darkens (down to 0.06), tension opens (up to 2.5)
@@ -354,8 +361,8 @@ const globalTone  = globalFog.fmap(f => o => f * o).appLeft(tension.fmap(t => 1 
 const globalLevel = glob.level.range(0, 1)
 
 const moodLatch  = barLatch()
+cycleButton(glob.btn, MOODS.length, s => { moodLatch.pending = s; showStatus() })
 const breakLatch = barLatch()
-// Toggles from the latch itself, not from the press count: the drop fill also switches the beat back on
 cycleButton(glob.btn2, 2, () => { breakLatch.pending = 1 - breakLatch.pending; showStatus() })
 const mood    = moodLatch.pat
 const scaleIn = octave => mood.fmap(m => 'F' + octave + ':' + MOODS[m].scale)
@@ -363,29 +370,17 @@ const scaleIn = octave => mood.fmap(m => 'F' + octave + ':' + MOODS[m].scale)
 const beatOn   = breakLatch.pat.fmap(b => b === 0)
 const beatOnly = pat => gate(beatOn, pat)
 
-// Drop fill: held while the beat is out, it starts at the next bar and runs 4 bars (16 beats); in the last beat it
-// switches the beat back on, so it lands on the one after the fill. Let go earlier = the fill stops, the beat stays out.
-const FILL_BARS = 4
-const dropFill = { start: null }
-// The time signal carries the structure: with the button's (one event per bar) it would only see bar starts
-taps.push(signal(t => Number(t)).fmap(t => v => {
-  if (v <= 0.5) { dropFill.start = null; return 0 }
-  if (dropFill.start === null) {
-    if (breakLatch.now !== 1 || breakLatch.pending !== 1) return 0
-    dropFill.start = Math.floor(t) + 1
-  }
-  if (t >= dropFill.start + FILL_BARS - 0.25 && breakLatch.pending === 1) { breakLatch.pending = 0; showStatus() }
-  return 0
-}).appLeft(glob.btn))
-// Bar of the fill (0..3), -1 outside it; progress 0 → 1 over the whole fill
-const fillBar      = signal(t => dropFill.start === null ? -1 : Math.floor(Number(t)) - dropFill.start).segment(1)
-const fillProgress = signal(t => dropFill.start === null ? 0 : Math.min(1, Math.max(0, (Number(t) - dropFill.start) / FILL_BARS)))
-const fillOn       = and(held(glob.btn), fillBar.fmap(b => b >= 0 && b < FILL_BARS))
-
 const audible = level => and(above(level, 0), above(globalLevel, 0))
 // lpf × fog/tension, kept between 80 Hz and 18 kHz (fog never makes a stem silent)
 const toned  = lpf => lpf.fmap(f => g => Math.min(18000, Math.max(80, f * g))).appLeft(globalTone)
-// Reverb send: the stem's space knob (0..0.9), raised by the global Room up to 0.95
+// hpf × thin (a stem without its own hpf starts at 30 Hz), raised at most to 5 kHz (the mirror of fog's 80 Hz floor);
+// an own hpf above 5 kHz stays. Thin at 0 adds no filter.
+const thinned = pat => pat.fmap(v => f => {
+  if (f <= 1) return v
+  const own = v.hcutoff ?? 30
+  return { ...v, hcutoff: Math.max(own, Math.min(5000, own * f)) }
+}).appLeft(globalThin)
+// Reverb send: the stem's space knob (0..0.9), raised by Tension up to 0.95
 const roomOf = space => space.fmap(s => g => { const r = 0.9 * s; return r + (0.95 - r) * g }).appLeft(globalRoom)
 // Change: read the stem's randomness 1024 cycles further per step (keeps bar alignment, new random values).
 // Scales and the chord root are applied after reseed, so they follow real time.
@@ -413,9 +408,9 @@ const bus = (pat, orbit, space, echo = 0) => pat
 const dryBus = (pat, orbit, space) => pat.room(roomOf(space)).roomsize(BUSES[orbit].hall).orbit(orbit)
   .delaytime(BUSES[orbit].time).delayfeedback(BUSES[orbit].feedback)
 
-// Channel strip: lpf × fog/tension (if given), level × master as postgain, gated while the fader or master is 0
+// Channel strip: lpf × fog/tension (if given), hpf ≥ thin, level × master as postgain, gated while the fader or master is 0
 const strip = (stem, { lpf, level }) => {
-  const pat = lpf === undefined ? stem : stem.lpf(toned(lpf))
+  const pat = thinned(lpf === undefined ? stem : stem.lpf(toned(lpf)))
   return gate(audible(level), pat.postgain(level.mul(globalLevel)))
 }
 const drum = (names, bank = 'RolandTR909') => s(names).bank(bank)
@@ -593,18 +588,21 @@ const CLAPS = [
   clapFull(gain("~ 0.8 ~ <0.8 [0.8 0.5]>")),
 ]
 
-const stemJ5_clap = beatOnly(strip(dryBus(stack(
-  pick(clapVar, CLAPS),
-  gate(above(clapGhost, 0), clapSound(gain("~ ~ 0.22 ~").mul(gain(ramp(clapGhost, 0, 0.5))))),
-  gate(above(clapGhost, 0.5), clapSound(gain("~ [~ 0.15] ~ ~").mul(gain(ramp(clapGhost, 0.5, 1))))),
-  snareSwell,
+// The Tension roll keeps playing in the break (it builds up the drop); the claps pause with the beat
+const stemJ5_clap = strip(dryBus(stack(
+  beatOnly(stack(
+    pick(clapVar, CLAPS),
+    gate(above(clapGhost, 0), clapSound(gain("~ ~ 0.22 ~").mul(gain(ramp(clapGhost, 0, 0.5))))),
+    gate(above(clapGhost, 0.5), clapSound(gain("~ [~ 0.15] ~ ~").mul(gain(ramp(clapGhost, 0.5, 1))))),
+    snareSwell,
+  )),
   // Tension roll (last fifth of the knob): loose hits → 16ths, swelling on a curve
   gate(above(tensionRoll, 0), drum("sd*16").degradeBy(tensionRoll.fmap(t => 0.8 * Math.pow(1 - t, 1.5)))
     .gain(tensionRoll.fmap(t => 0.05 + 0.4 * t * t)))
 ).mul(gain(1.75)).hpf(400).pan(0.48), 1, clap.space), {
   lpf: expRange(clap.bright.fmap(b => 0.9 + 0.1 * b), 1500, 12000),   // round 8: knob 0 = the old 90 %
   level: clap.level.range(0, 0.58),   // was 1; mix: clap −8 dB: players found it too loud, LUFS underrates transients
-}))
+})
 
 // ============================================================
 // JOJO 6 HATS — open 909 hats on the off-beats, crisp: high-passed and bright already at knob 0
@@ -973,29 +971,6 @@ const stemN7_fx = strip(dryBus(stack(
   level: fx.level.range(0, 0.17),   // was 1, then 0.48 (mix), 0.3 (round 2), 0.19 (round 3); round 8: ≈ −3 dB (LUFS)
 })
 
-// ============================================================
-// DROP FILL (global button 1) — while the beat is out: 4 bars that get denser bar by bar, then the beat is back
-// ============================================================
-// Kick: on the 1 → half notes → quarters → quarters; snare: quarters → 8ths → 16ths → 16ths ending in 32nds, louder
-// and higher bar by bar; a noise sweep rises over all 4 bars. Its own stem at the master level only: the beat's faders
-// may be anywhere while it is out.
-const FILL_KICKS  = ["x ~ ~ ~", "x ~ x ~", "x*4", "x*4"].map(k => note('c2').struct(k).s('sine').gain(0.8)
-  .attack(0.004).decay(0.4).sustain(0).release(0.05).penv(24).pdecay(0.05))
-const FILL_SNARES = ["sd*4", "sd*8", "sd*16", "[sd*4] [sd*4] [sd*4] [sd*8]"].map((p, k) => drum(p)
-  .gain(saw.range(0.25, 0.4).add(0.12 * k)).speed(saw.range(0.95, 1.05).add(0.08 * k)))
-const fillPick = pats => fillBar.fmap(k => pats[k] ?? silence).innerJoin()
-const fillSweep = s("pink*16").attack(0.03).sustain(0.8).release(0.15)
-  .bpf(fillProgress.fmap(p => 300 * Math.pow(25, p))).bpq(3)
-  .gain(fillProgress.fmap(p => 0.2 + 1.2 * p)).pan(sine.fast(2).range(0.3, 0.7))
-
-const stemG_fill = strip(gate(fillOn, dryBus(stack(
-  fillPick(FILL_KICKS),
-  fillPick(FILL_SNARES).hpf(300).pan(0.48),
-  fillSweep
-), 1, pure(0.25))), {
-  level: pure(0.6),   // new sound (round 8): not yet measured
-})
-
 // Stateful controls (button counters, bar latches, risers) only see a change when they are queried.
 // Gated stems are not queried, so this queries every one of them on every scheduler tick and drops the result:
 // presses still count and chapter/break still switch while faders are down.
@@ -1022,6 +997,7 @@ if (lcView) {
   const code = globalThis.strudelMirror?.code ?? ''
   const TAGS = {}
   for (const m of code.matchAll(/^\/\/ @(?:mode|col|ctl) (\S+) (.*)$/gm)) TAGS[m[1]] = m[2]
+  for (const m of code.matchAll(/^\/\/ @lk (\S+) (.*)$/gm)) TAGS['lk.' + m[1]] = m[2]
   // Tag prefix of a page: dual file B16 (Jojo) / 16 (Jonas), single file 16 (Mode 1) / 2 (Mode 2)
   const isSingleFile = /^\/\/ @ctl 2:/m.test(code)
   const prefix = page => page === 'jojo' ? (isSingleFile ? '16' : 'B16') : (isSingleFile ? '2' : '16')
@@ -1036,9 +1012,11 @@ if (lcView) {
     return /^Mode \d/.test(m[1]) ? m[1] + ' — ' + what : what
   }
 
-  lcView.side = name => name?.includes(LC_PORT) ? 'jonas' : null
-  // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page
-  lcView.pageOf = (side, cc) => !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
+  lcView.side = name => name?.includes(LC_PORT) ? 'jonas'
+    : name?.includes(LK_NAME) && !name.includes('DAW') ? 'lk' : null
+  // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page; the Launchkey keeps it too
+  lcView.pageOf = (side, cc) => side === 'lk' ? lcView.page
+    : !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
   const valueOf = (page, n, row) => {
     const base = CC_ROW[row] + n
     const t = lcView.cc[alone ? 'jonas' : page]
@@ -1069,6 +1047,21 @@ if (lcView) {
     }
     return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
   }
+  // Launchkey row: mod wheel (keys level) and knobs 1-8, names from the @lk tags; shown while a Launchkey is connected
+  lcView.cc.lk ??= {}
+  const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, LK_KNOB_1 + n - 1])]
+  const lkCell = ([key, cc]) => {
+    const val = lcView.cc.lk[cc]
+    const [name, desc] = (TAGS['lk.' + key] ?? key).split(' | ')
+    const num = val === undefined ? '–' : Math.round(val * 100)
+    const v = 'style="--v:' + (val ?? 0) + '"'
+    const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
+    const mark = key === 'level' ? '<div class=bar ' + v + '><i></i></div>' : '<div class=dial ' + v + '></div>'
+    return '<div class="cell ' + (key === 'level' ? 'fader' : 'knob') + '"' + title + '>' + mark + '<b>' + num + '</b><span>' +
+      esc(name) + '</span></div>'
+  }
+  const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkrow>' +
+    LK_CTLS.map(lkCell).join('') + '</div></div>'
   // Bar in the cycle (bars) and beat in the bar (dots, the one ringed), then the bar's chord
   const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
   const beatHtml = () => beatNow.bar === null ? '–' : (beatNow.bar % CYCLE + 1) + ' / ' + CYCLE +
@@ -1079,7 +1072,7 @@ if (lcView) {
     '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
     '.head{display:flex;gap:2.5vw;align-items:baseline;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:var(--acc)}',
     '.head .k{opacity:.6;margin-right:.4em}.next{color:var(--acc)}',
-    '.grid{flex:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) auto auto;gap:.8vh .8vw}',
+    '.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) auto auto;gap:.8vh .8vw}',
     '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.g{color:var(--acc)}',
     '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
     '.cell span{opacity:.7;font-size:.85em;overflow-wrap:anywhere}.cell b{font-variant-numeric:tabular-nums}',
@@ -1094,6 +1087,7 @@ if (lcView) {
     '.beats i:first-child{outline:2px solid #555}.beats i.on{background:var(--acc)}',
     '.bars{margin-left:.6em}.bars i{display:inline-block;width:1.1em;height:.55em;border-radius:2px;background:#333;margin-left:.15em}',
     '.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}',
+    '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(9,1fr);gap:.8vw;height:14vh}',
   ].join('\n')
   lcView.draw = () => {
     const doc = lcView.win.document
@@ -1112,7 +1106,7 @@ if (lcView) {
       '<div class=grid>' +
       cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
         esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
-      ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div>'
+      ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div>' + lkHtml()
   }
   // Another track's status box may be the one on the page now: the link moves into it
   if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)
@@ -1127,6 +1121,16 @@ showStatus()
 // Mod wheel (CC 1) = keys level (× master). Knob 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune,
 // 6 reverb, 7 echo, 8 one-shot darkness (0 = open). Drum pads (Drum mode, channel 10, notes 36-51) ignore the keys'
 // knobs 1-7.
+// Names for the LC view (its Launchkey row); not read by the layout sheet tools.
+// @lk level Keys Level | mod wheel: volume of the keys pad (× master). 0 = keys silent, pads still play.
+// @lk k1 Cutoff | dark ↔ open (lpf 600–9000 Hz, × fog/tension).
+// @lk k2 Resonance | flat ↔ whistling filter peak.
+// @lk k3 Attack | quick (0.15 s) ↔ slow fade-in (2 s).
+// @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
+// @lk k5 Detune | narrow ↔ wide, wobbly supersaw.
+// @lk k6 Reverb | some room ↔ far away.
+// @lk k7 Echo | dry ↔ long dub echo.
+// @lk k8 Shot Dark | drum pads: open ↔ dark (lpf 18 kHz → 800 Hz).
 const LK_PAD_CHAN = 10
 const LK_PAD_NOTE_1 = 36
 const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
@@ -1195,7 +1199,7 @@ const lkShots = lkNotes.filterValues(isPadHit)
   .orbit(1)
   .postgain(globalLevel)
 
-const stemLK = stack(lkPad, lkShots)
+const stemLK = thinned(stack(lkPad, lkShots))
 
 // ============================================================
 // MASTER AUDIO MATRIX
@@ -1216,7 +1220,6 @@ stack(
   stemN5_ans,
   stemN6_perc,
   stemN7_fx,
-  stemG_fill,
   stemLK,
   stateTaps
 )
