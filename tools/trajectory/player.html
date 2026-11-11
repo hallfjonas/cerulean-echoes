@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trajectory Player</title>
+<style>
+  :root { --bg: #071521; --fg: #eef4f2; --dim: #7fa3b2; --line: #2c4e63 }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 15px system-ui, sans-serif }
+  button, select { background: #163449; color: var(--fg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 6px 10px; font: inherit; cursor: pointer }
+  p { color: var(--dim); max-width: 640px }
+</style>
+</head>
+<body>
+<!-- Plays a tapped demo track (make-tapped.mjs --demo) right here, without strudel.cc and without controllers: the
+     events reach the trajectory page over this same origin, which works where a browser blocks strudel.cc → localhost. -->
+<select id="track"><option>008-groove-techno-tapped-demo.strudel</option></select>
+<button id="play">Play</button>
+<button id="stop">Stop</button>
+<span id="status">lädt Strudel …</span>
+<p>Öffne die Visualisierung in einem zweiten Tab (<a href="/" target="_blank" style="color:#4fb3e0">/</a>) und klicke dort
+„Strudel“. Ohne Launch Control spielt die Demo-Automatik; mit angeschlossener Launch Control steuerst du selbst
+(nur in Browsern mit Web MIDI, hier nicht).</p>
+<script type="module">
+import { initStrudel, evaluate, samples, hush } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
+
+const $ = id => document.getElementById(id)
+globalThis.WebMidi ??= { inputs: [], outputs: [] }
+const ready = initStrudel({
+  prebake: () => Promise.all([
+    samples('github:tidalcycles/dirt-samples'),
+    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json'),
+  ]),
+})
+ready.then(() => { $('status').textContent = 'bereit' })
+
+$('play').onclick = async () => {
+  await ready
+  $('status').textContent = 'lädt Track …'
+  const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
+  try {
+    await evaluate(code)
+    $('status').textContent = 'spielt: ' + $('track').value
+  } catch (error) {
+    $('status').textContent = 'Fehler: ' + error.message
+  }
+}
+$('stop').onclick = () => { hush(); $('status').textContent = 'gestoppt' }
+</script>
+</body>
+</html>

@@ -1,4 +1,14 @@
-## Drop Funktionalität
+# VISION: THE LIVE PERFORMANCE FRAMEWORK
+
+
+## IDEAS
+### MUSIC-ARCHITECTUR
+- See fucking music architect visuals
+
+### GAMIFICATION (WARNING ANNOYING TECH BUSINESS DIRECTION)
+You should be able to turn this into a 1 vs 1 player game (ACHTUNG DIE KURVE... YOU SHOULD BE ABLTE TO PLAY ACHTUNG THE SOUND FEATURE).
+
+### Drop Funktionalität
 ### Variante 1: Verhalten rotieren (wie bei anderen Instrumenten)
 + Beim ersten Mal drücken --> einen Cycle Tiefen herausnehmen, dann wieder rein
 + Beim zweiten Mal drücken --> zwei Cycles Tiefen herausnehmen, dann Crash auf 1 und wieder rein
