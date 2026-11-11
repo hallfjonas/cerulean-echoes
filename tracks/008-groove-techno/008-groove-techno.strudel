@@ -1143,12 +1143,16 @@ const shareQuery = pat => {
   })
 }
 
+const OWN_SAMPLES = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/'
+if (typeof samples === 'function') await samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a' }, OWN_SAMPLES)
+
 const LK_SHOTS = [
-  { s: 'rolandtr909_bd', speed: 0.85, cutoff: 3000 },
+  { s: 'brace' },
   { s: 'rolandtr909_lt', speed: 0.7, room: 0.5 },
   { s: 'rolandtr909_rim', speed: 0.8, delay: 0.4 },
   { s: 'rolandtr808_cb', speed: 0.5, cutoff: 2500, delay: 0.3 },
-  { s: 'rolandtr909_cp', speed: 0.85, room: 0.8 },
+  // pad 5 = E1: spoken two-word voice sample
+  { s: 'lw' },
   { s: 'rolandtr909_oh', speed: 0.9, hcutoff: 3000 },
   { s: 'rolandtr909_rd', speed: 0.75 },
   // negative speed plays the crash backwards: a swell into the next beat
