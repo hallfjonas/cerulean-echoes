@@ -32,8 +32,10 @@ cd tools && node trajectory/make-tapped.mjs ../tracks/008-groove-techno/008-groo
 **Am schnellsten: `http://localhost:8766/player.html`** – Track wählen (alle getappten Tracks, z. B. 008 oder
 `009-house-single`), Play. Der Player spielt den Track direkt auf localhost (kein strudel.cc nötig) und zeigt die
 Visualisierung gleich dahinter. Gespielt wird nur von Menschen: jeder Regler, den der Track über `midin()` liest,
-kommt von den angeschlossenen Controllern (Web MIDI); ein noch nicht bewegter Regler steht auf 0. Ohne Controller
-bleibt es still. Die Statusbox des Tracks (unten rechts) verschwindet, solange seine LC-Ansicht („▣ LC groß“) in
+kommt von den angeschlossenen Controllern (Web MIDI, jeder Port für sich wie in strudel.cc); ein noch nicht bewegter
+Regler steht auf 0 (oder auf dem Startwert, den der Track ihm gibt). Der Launchkey spielt mit: Tasten und Drum-Pads
+(`midikeys`), Mod-Rad und Knöpfe. Ohne Controller bleibt es still.
+Startwerte der Seite: Hart, Glatt 302 ms, Achsen und Beschriftung aus, Beat-Ringe an. Die Statusbox des Tracks (unten rechts) verschwindet, solange seine LC-Ansicht („▣ LC groß“) in
 einem anderen Fenster offen ist. Zwei Homotopie-Regler:
 
 - **Hart ↔ Weich** (0…1): Charakter der Visuals. 0 = Sägezahn-Kämme, eckige Linien, jede vergangene Zeitscheibe
@@ -96,7 +98,7 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 | `strudel-source.mjs` | Strudel-Events → Zeilen, jedes Event erscheint, wenn es klingt (`delay`) |
 | `make-tapped.mjs` | Kopie eines Tracks: jeder Stem bekommt seinen Namen als `.tag()`, Master sendet per `.onTrigger` (Klang unverändert) |
 | `server.mjs` | statische Dateien + Relay POST `/events` → SSE `/stream`; CORS- und Private-Network-Header für strudel.cc |
-| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI, Regler Hart ↔ Weich, Roh ↔ Glatt |
+| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI (`midin` pro Port, `midikeys` für Launchkey-Tasten und -Pads), Regler Hart ↔ Weich, Roh ↔ Glatt; ohne `gm_*`-Klänge (siehe Grenzen) |
 | `index.html` | die Seite: Quellen, Kanalwahl, Aufnahme, Tasten |
 
 ## Was wir gelernt haben
@@ -110,6 +112,40 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 - **Gefallen hat:** Tag 2 („10/10“). **Nicht gefallen:** scharfe Linien („Klingen“), blendendes Additiv-Licht.
   Gewünscht: dichte Flüssigkeit mit Wellen obendrauf, weiches Licht, schräger Blick mit wanderndem Blickwinkel –
   daraus wurde „ocean“. Danach: zurück zum Look von Folie 6 des Decks („deck“, jetzt Standard).
+
+## Grenzen des Players
+
+`player.html` ist für Visualisierung und Proben gedacht, nicht als vollständiger Ersatz für strudel.cc.
+
+**Klingt im Player:** Strudels eingebaute Synths (`sine`, `sawtooth`, `supersaw`, …), Dirt-Samples, Drum-Machines
+(909, 808, 727, 707), VCSL, Piano und alle Samples, die ein Track selbst lädt (Stimmen, Rhodes, Steinway). Controller:
+jeder Launch Control XL 3 und der Launchkey (Tasten, Drum-Pads, Mod-Rad, Knöpfe).
+
+**Klingt nicht:** General-MIDI-Klänge (`gm_*`). `@strudel/web` (1.2.6 wie 1.3.0) registriert sie nicht, im Bundle
+ist `registerSoundfonts()` auskommentiert. Ein Event mit `gm_*` bleibt still, ohne Fehlermeldung.
+
+| Track | stumm im Player |
+|---|---|
+| 008 | nichts |
+| 007 | Marimba, Toms, Glockenspiel, Chor, Vibrafon, Agogo (auch Launchkey-Pads) |
+| 009, 009-riffs | Vibrafon, Marimba u. a.; Launchkey: Orgel-, Bläser-Stab, „ooh“ |
+| 010 | Glockenspiel, Marimba, Vibrafon, Agogo; Launchkey: das Pad (`gm_pad_warm`) und mehrere Pads |
+
+Für den vollen Klang dieser Tracks: den getappten Track in strudel.cc spielen (Weg „Strudel“ oben). Bild und
+Controller sind dort dieselben.
+
+**Versucht, gescheitert:** `@strudel/soundfonts@1.2.6` per Import-Map an dasselbe `@strudel/web`-Bundle hängen (die
+Exporte, die es braucht, sind alle da). Es importiert `sfumato@0.1.2`, und dessen `soundfont2@^0.4.0` liefert über
+esm.sh kein `DEFAULT_GENERATOR_VALUES`; auch mit `soundfont2@0.5.0` nicht. Das Modul lädt dann nicht, und die ganze
+Seite bleibt bei „lädt Strudel …“ stehen.
+
+**Mögliche nächste Schritte** (Empfehlung zuerst):
+
+1. **`sfumato` durch einen leeren Platzhalter ersetzen** (ein paar Zeilen in der Import-Map): `sfumato` wird nur für
+   `.sf2`-Dateien gebraucht, die `gm_*`-Klänge kommen aus webaudiofont-Daten. Klein, aber erst im Browser beweisen.
+2. **Eigenes Bundle bauen** (`@strudel/web` + `@strudel/soundfonts` mit esbuild in `tools/`): eine Datei, eine
+   Klang-Registry, unabhängig von esm.sh. Sauberer, aber ein Build-Schritt mehr.
+3. **Auf strudel.cc bleiben** für Tracks mit `gm_*`; der Player nur für 008 und Proben.
 
 ## Offen (nach Priorität)
 
