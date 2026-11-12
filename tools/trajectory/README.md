@@ -9,52 +9,48 @@ Emotionen über Publikumsfeedback.
 
 Pitch-Deck (12 Folien, Bewertung + Plan): https://claude.ai/artifact/5gM7MWgHqHCLvk3BveX9AZ
 
-## In 5 Minuten wieder drin
+## Start: der Player
 
 ```bash
-cd tools && node trajectory/server.mjs          # → http://localhost:8766
+cd tools && node trajectory/server.mjs
 ```
 
-Dann im Chrome `http://localhost:8766` öffnen. Drei Wege, Musik hineinzubekommen:
+Dann in Chrome **http://localhost:8766/player.html** öffnen (nicht `http://localhost:8766`).
 
-| Weg | So geht's | Was man bekommt |
-|---|---|---|
-| **Datei** | „Datei …“ → z. B. `recordings/2026-11-14-beats-und-basteln/Scarlett 2i2 Input 3&4 #10.wav` (008-Mitschnitt) | Audio-Analyse, 5 Frequenzbänder als Pseudo-Stems |
-| **Live-Eingang** | Scarlett wählen, **Kanal 3/4** (Loopback = was der Mac abspielt), „Live starten“ | wie Datei, live |
-| **Strudel** (exakt) | Track tappen (unten), in strudel.cc einfügen und spielen; auf der Seite „Strudel“ klicken | jeder Stem mit Namen, Tempo aus Strudels Uhr |
+Der Player spielt einen Track direkt auf localhost (kein strudel.cc nötig) und zeigt die Visualisierung gleich
+dahinter: jeder Stem mit Namen, Tempo aus Strudels Uhr.
 
-Track für den Strudel-Weg vorbereiten (landet in `trajectory/tapped/` und in der Zwischenablage):
+1. Track tappen (einmal pro Track und nach jeder Änderung am Track; landet in `trajectory/tapped/` und in der
+   Zwischenablage):
 
-```bash
-cd tools && node trajectory/make-tapped.mjs ../tracks/008-groove-techno/008-groove-techno.strudel
-```
+   ```bash
+   cd tools && node trajectory/make-tapped.mjs ../tracks/008-groove-techno/008-groove-techno.strudel
+   ```
 
-**Am schnellsten: `http://localhost:8766/player.html`** – Track wählen (alle getappten Tracks, z. B. 008 oder
-`009-house-single`), Play. Der Player spielt den Track direkt auf localhost (kein strudel.cc nötig) und zeigt die
-Visualisierung gleich dahinter. Gespielt wird nur von Menschen: jeder Regler, den der Track über `midin()` liest,
-kommt von den angeschlossenen Controllern (Web MIDI); ein noch nicht bewegter Regler steht auf 0. Ohne Controller
-bleibt es still. Die Statusbox des Tracks (unten rechts) verschwindet, solange seine LC-Ansicht („▣ LC groß“) in
-einem anderen Fenster offen ist. Zwei Homotopie-Regler:
+2. Im Player oben den Track wählen (alle getappten Tracks stehen in der Liste), **Play**.
+3. Controller spielen. Gespielt wird nur von Menschen: jeder Regler, den der Track über `midin()` liest, kommt von
+   den angeschlossenen Controllern (Web MIDI, jeder Port für sich wie in strudel.cc); ein noch nicht bewegter Regler
+   steht auf 0 (oder auf dem Startwert, den der Track ihm gibt). Der Launchkey spielt mit: Tasten und Drum-Pads
+   (`midikeys`), Mod-Rad und Knöpfe. Ohne Controller bleibt es still: zuerst den Master-Fader (Spalte 8) hoch.
+
+Die Statusbox des Tracks (unten rechts) verschwindet, solange seine LC-Ansicht („▣ LC groß“) in einem anderen Fenster
+offen ist.
+
+**Regler in der Leiste** (Startwerte: Hart, Glatt 302 ms):
 
 - **Hart ↔ Weich** (0…1): Charakter der Visuals. 0 = Sägezahn-Kämme, eckige Linien, jede vergangene Zeitscheibe
   mit Kante, sofortige Reaktion, Kamera vom Beat gestoßen; 1 = runde Wellen, dicke weiche Kämme, Bewegungsschmiere,
-  träges Folgen, gleitende Kamera. (Auch auf der Visualizer-Seite.)
+  träges Folgen, gleitende Kamera.
 - **Roh ↔ Glatt** (0…1): gleitender Mittelwert (exponentiell gewichtet) über N = 2^(53·Regler) Zeilen auf alle
-  Signale, die das Bild sieht: 0 = roh, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 Tage, 1 = 2^53 (max_int), eingefroren.
-  Nur fürs Bild; Ton und Aufnahme bleiben roh. (Auch auf der Visualizer-Seite.)
+  Signale, die das Bild sieht: 0 = roh, 0.06 ≈ 302 ms, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 Tage, 1 = 2^53
+  (max_int), eingefroren. Nur fürs Bild; der Ton bleibt roh.
 
-Tracks direkt tappen (`tracks/009-house/009-house.strudel`); alte Dual-Versionen über ihre Single-Version in `old/`.
+**Schalter und Tasten** (Startwerte: Achsen und Beschriftung aus, Beat-Ringe an): **A** Achsen · **L** Beschriftung
+(Stem-Namen, Achsenwörter) · **B** Beat-Ringe (die Kreise von der Kick) – alle drei auch als Häkchen in der Leiste.
+**F** Vollbild · **V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus. Die Leiste oben blendet sich nach 3 s
+ohne Maus aus.
 
-Schalter und Tasten auf der Seite: **A** Achsen · **L** Beschriftung (Stem-Namen, Achsenwörter, Statuszeile) ·
-**B** Beat-Ringe (die Kreise von der Kick) – alle drei auch als Häkchen in der Leiste. **F** Vollbild ·
-**V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus.
-Die Leiste oben blendet sich nach 3 s ohne Maus aus.
-
-Offline-Analyse einer Datei mit Zusammenfassung pro Band:
-
-```bash
-cd tools && node trajectory/analyse-file.mjs <audio> [--out x.jsonl] [--from s] [--to s]
-```
+Alte Dual-Versionen über ihre Single-Version in `old/` tappen (z. B. `tracks/009-house/old/009-house-single.strudel`).
 
 ## Fortschritt
 
@@ -96,7 +92,7 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 | `strudel-source.mjs` | Strudel-Events → Zeilen, jedes Event erscheint, wenn es klingt (`delay`) |
 | `make-tapped.mjs` | Kopie eines Tracks: jeder Stem bekommt seinen Namen als `.tag()`, Master sendet per `.onTrigger` (Klang unverändert) |
 | `server.mjs` | statische Dateien + Relay POST `/events` → SSE `/stream`; CORS- und Private-Network-Header für strudel.cc |
-| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI, Regler Hart ↔ Weich, Roh ↔ Glatt |
+| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI (`midin` pro Port, `midikeys` für Launchkey-Tasten und -Pads), Regler Hart ↔ Weich, Roh ↔ Glatt; ohne `gm_*`-Klänge (siehe Grenzen) |
 | `index.html` | die Seite: Quellen, Kanalwahl, Aufnahme, Tasten |
 
 ## Was wir gelernt haben
@@ -110,6 +106,40 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 - **Gefallen hat:** Tag 2 („10/10“). **Nicht gefallen:** scharfe Linien („Klingen“), blendendes Additiv-Licht.
   Gewünscht: dichte Flüssigkeit mit Wellen obendrauf, weiches Licht, schräger Blick mit wanderndem Blickwinkel –
   daraus wurde „ocean“. Danach: zurück zum Look von Folie 6 des Decks („deck“, jetzt Standard).
+
+## Grenzen des Players
+
+`player.html` ist für Visualisierung und Proben gedacht, nicht als vollständiger Ersatz für strudel.cc.
+
+**Klingt im Player:** Strudels eingebaute Synths (`sine`, `sawtooth`, `supersaw`, …), Dirt-Samples, Drum-Machines
+(909, 808, 727, 707), VCSL, Piano und alle Samples, die ein Track selbst lädt (Stimmen, Rhodes, Steinway). Controller:
+jeder Launch Control XL 3 und der Launchkey (Tasten, Drum-Pads, Mod-Rad, Knöpfe).
+
+**Klingt nicht:** General-MIDI-Klänge (`gm_*`). `@strudel/web` (1.2.6 wie 1.3.0) registriert sie nicht, im Bundle
+ist `registerSoundfonts()` auskommentiert. Ein Event mit `gm_*` bleibt still, ohne Fehlermeldung.
+
+| Track | stumm im Player |
+|---|---|
+| 008 | nichts |
+| 007 | Marimba, Toms, Glockenspiel, Chor, Vibrafon, Agogo (auch Launchkey-Pads) |
+| 009, 009-riffs | Vibrafon, Marimba u. a.; Launchkey: Orgel-, Bläser-Stab, „ooh“ |
+| 010 | Glockenspiel, Marimba, Vibrafon, Agogo; Launchkey: das Pad (`gm_pad_warm`) und mehrere Pads |
+
+Für den vollen Klang dieser Tracks: den getappten Track in strudel.cc einfügen und spielen; die Controller sind
+dort dieselben.
+
+**Versucht, gescheitert:** `@strudel/soundfonts@1.2.6` per Import-Map an dasselbe `@strudel/web`-Bundle hängen (die
+Exporte, die es braucht, sind alle da). Es importiert `sfumato@0.1.2`, und dessen `soundfont2@^0.4.0` liefert über
+esm.sh kein `DEFAULT_GENERATOR_VALUES`; auch mit `soundfont2@0.5.0` nicht. Das Modul lädt dann nicht, und die ganze
+Seite bleibt bei „lädt Strudel …“ stehen.
+
+**Mögliche nächste Schritte** (Empfehlung zuerst):
+
+1. **`sfumato` durch einen leeren Platzhalter ersetzen** (ein paar Zeilen in der Import-Map): `sfumato` wird nur für
+   `.sf2`-Dateien gebraucht, die `gm_*`-Klänge kommen aus webaudiofont-Daten. Klein, aber erst im Browser beweisen.
+2. **Eigenes Bundle bauen** (`@strudel/web` + `@strudel/soundfonts` mit esbuild in `tools/`): eine Datei, eine
+   Klang-Registry, unabhängig von esm.sh. Sauberer, aber ein Build-Schritt mehr.
+3. **Auf strudel.cc bleiben** für Tracks mit `gm_*`; der Player nur für 008 und Proben.
 
 ## Offen (nach Priorität)
 
