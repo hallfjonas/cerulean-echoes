@@ -43,7 +43,7 @@ einem anderen Fenster offen ist. Zwei Homotopie-Regler:
   Signale, die das Bild sieht: 0 = roh, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 Tage, 1 = 2^53 (max_int), eingefroren.
   Nur fürs Bild; Ton und Aufnahme bleiben roh. (Auch auf der Visualizer-Seite.)
 
-Dual-Tracks über ihre Single-Version tappen (`tracks/009-house/009-house-single.strudel`).
+Tracks direkt tappen (`tracks/009-house/009-house.strudel`); alte Dual-Versionen über ihre Single-Version in `old/`.
 
 Schalter und Tasten auf der Seite: **A** Achsen · **L** Beschriftung (Stem-Namen, Achsenwörter, Statuszeile) ·
 **B** Beat-Ringe (die Kreise von der Kick) – alle drei auch als Häkchen in der Leiste. **F** Vollbild ·
