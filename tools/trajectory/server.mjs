@@ -2,6 +2,7 @@
 // usage (in tools/): node trajectory/server.mjs [port]   (default 8766) → open http://localhost:8766
 //   POST /events  a JSON array of events from the tapped track in strudel.cc (see make-tapped.mjs)
 //   GET  /stream  server-sent events: each POST body is passed on as one message
+//   GET  /tapped/ the tapped tracks (make-tapped.mjs) as a JSON list, for player.html
 // strudel.cc is a public https page; Chrome lets it reach localhost only with the CORS and private-network headers.
 import http from 'http'
 import fs from 'fs'
@@ -29,6 +30,11 @@ http.createServer((request, response) => {
       response.writeHead(204, CORS).end()
     })
     return
+  }
+  if (url.pathname === '/tapped/') {
+    const dir = path.join(root, 'tapped')
+    const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.strudel')).sort() : []
+    return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json' }).end(JSON.stringify(files))
   }
   if (url.pathname === '/stream') {
     response.writeHead(200, { ...CORS, 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache',

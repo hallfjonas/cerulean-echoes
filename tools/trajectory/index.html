@@ -18,6 +18,7 @@
   .meter { display: flex; flex-direction: column; gap: 3px; width: 90px }
   .meter span { display: block; height: 5px; background: #4fb3e0; border-radius: 3px; width: 0; transition: width 0.1s }
   #status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums }
+  label.switch { display: flex; gap: 6px; align-items: center; color: var(--dim); font-size: 13px }
   canvas { display: block }
 </style>
 </head>
@@ -34,16 +35,26 @@
   <button id="record">Aufnehmen</button>
   <button id="download" disabled>JSONL laden</button>
   <button id="fullscreen" title="Taste F">Vollbild</button>
-  <span id="status">bereit · F Vollbild · V Look · L Beschriftung · W Pan-Weite</span>
+  <label title="0 = hart, scharf, wild · 1 = weich, verschmiert, träge" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Hart
+    <input id="character" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px;accent-color:#4fb3e0"> Weich</label>
+  <label title="0 = rohe Signale · 1 = gleitender Mittelwert über 2^53 Zeilen (max_int); die Aufnahme bleibt roh" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Roh
+    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0" style="width:120px;accent-color:#4fb3e0"> Glatt
+    <output id="smoothingValue" style="color:#eef4f2;min-width:4em">roh</output></label>
+  <label class="switch" title="Taste A"><input id="axes" type="checkbox" checked> Achsen</label>
+  <label class="switch" title="Taste L"><input id="labels" type="checkbox" checked> Beschriftung</label>
+  <label class="switch" title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
+  <span id="status">bereit · F Vollbild · V Look · A Achsen · L Beschriftung · B Beat-Ringe · W Pan-Weite</span>
 </header>
 <canvas id="view"></canvas>
 <script type="module">
 import { createAnalyser } from './analyse.mjs'
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
+import { createSmoother, describeWindow } from './smoothing.mjs'
 
 const $ = id => document.getElementById(id)
 const renderer = createRenderer($('view'))
+const smoother = createSmoother(renderer.push)
 
 const TAP = `registerProcessor('tap', class extends AudioWorkletProcessor {
   process([input]) {
@@ -81,7 +92,7 @@ function stop() {
 }
 
 function emit(line) {
-  renderer.push(line)
+  smoother.push(line)
   if (recording) recorded.push(line)
 }
 
@@ -170,12 +181,25 @@ $('download').onclick = () => {
   link.click()
 }
 
-const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
+$('character').oninput = () => renderer.setCharacter(Number($('character').value))
+$('smoothing').oninput = () => {
+  smoother.setAmount(Number($('smoothing').value))
+  renderer.setSmoothing(Number($('smoothing').value))
+  $('smoothingValue').textContent = describeWindow(Number($('smoothing').value))
+}
+
+for (const [id, apply] of [['axes', renderer.setAxes], ['labels', renderer.setLabels], ['rings', renderer.setRings]]) {
+  $(id).onchange = () => apply($(id).checked)
+}
+
+const toggleFullscreen =() => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
 $('fullscreen').onclick = toggleFullscreen
 addEventListener('keydown', event => {
-  if (event.target.tagName === 'SELECT') return
+  if (['SELECT', 'INPUT'].includes(event.target.tagName)) return
   if (event.key === 'f') toggleFullscreen()
-  if (event.key === 'l') renderer.toggleLabels()
+  if (event.key === 'a') $('axes').click()
+  if (event.key === 'l') $('labels').click()
+  if (event.key === 'b') $('rings').click()
   if (event.key === 'w') renderer.toggleWiden()
   if (event.key === 'v') renderer.toggleLook()
 })

@@ -29,11 +29,25 @@ Track für den Strudel-Weg vorbereiten (landet in `trajectory/tapped/` und in de
 cd tools && node trajectory/make-tapped.mjs ../tracks/008-groove-techno/008-groove-techno.strudel
 ```
 
-Ohne Controller oder wenn der Browser strudel.cc → localhost blockiert: `--demo` anhängen (Automatik fährt die
-Fader) und `http://localhost:8766/player.html` → Play. Der Player spielt den Track direkt auf localhost; die
-Visualisierung im zweiten Tab bekommt die Events.
+**Am schnellsten: `http://localhost:8766/player.html`** – Track wählen (alle getappten Tracks, z. B. 008 oder
+`009-house-single`), Play. Der Player spielt den Track direkt auf localhost (kein strudel.cc nötig) und zeigt die
+Visualisierung gleich dahinter. Gespielt wird nur von Menschen: jeder Regler, den der Track über `midin()` liest,
+kommt von den angeschlossenen Controllern (Web MIDI); ein noch nicht bewegter Regler steht auf 0. Ohne Controller
+bleibt es still. Die Statusbox des Tracks (unten rechts) verschwindet, solange seine LC-Ansicht („▣ LC groß“) in
+einem anderen Fenster offen ist. Zwei Homotopie-Regler:
 
-Tasten auf der Seite: **F** Vollbild · **V** Look (ocean / clean) · **L** Beschriftung · **W** Pan-Weite an/aus.
+- **Hart ↔ Weich** (0…1): Charakter der Visuals. 0 = Sägezahn-Kämme, eckige Linien, jede vergangene Zeitscheibe
+  mit Kante, sofortige Reaktion, Kamera vom Beat gestoßen; 1 = runde Wellen, dicke weiche Kämme, Bewegungsschmiere,
+  träges Folgen, gleitende Kamera. (Auch auf der Visualizer-Seite.)
+- **Roh ↔ Glatt** (0…1): gleitender Mittelwert (exponentiell gewichtet) über N = 2^(53·Regler) Zeilen auf alle
+  Signale, die das Bild sieht: 0 = roh, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 Tage, 1 = 2^53 (max_int), eingefroren.
+  Nur fürs Bild; Ton und Aufnahme bleiben roh. (Auch auf der Visualizer-Seite.)
+
+Dual-Tracks über ihre Single-Version tappen (`tracks/009-house/009-house-single.strudel`).
+
+Schalter und Tasten auf der Seite: **A** Achsen · **L** Beschriftung (Stem-Namen, Achsenwörter, Statuszeile) ·
+**B** Beat-Ringe (die Kreise von der Kick) – alle drei auch als Häkchen in der Leiste. **F** Vollbild ·
+**V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus.
 Die Leiste oben blendet sich nach 3 s ohne Maus aus.
 
 Offline-Analyse einer Datei mit Zusammenfassung pro Band:
@@ -48,8 +62,9 @@ cd tools && node trajectory/analyse-file.mjs <audio> [--out x.jsonl] [--from s] 
 |---|---|---|
 | 1 · Ton rein | Web-Audio-Analyse → JSONL | fertig; BPM exakt (Synth 126.0, 008: 139.9 bei 140) |
 | 2 · Bild raus | Renderer, Vollbild, Mono-Fix, Pegelanzeige | fertig, von Jonas mit 10/10 bewertet |
-| 3 · Strudel | getappter Track → Server → exakte Stems | fertig; 008 läuft mit 11–16 Stems, 140.0 BPM |
+| 3 · Strudel | getappter Track → Server → exakte Stems | fertig; 008 (11–16 Stems, 140.0 BPM), 009 House (15 Stems, 124.0 BPM) |
 | Nachbesserung | Kanal 3/4, Look „ocean“ (Flüssigkeit, 4D, weich) | gebaut, Hardware-Test steht aus |
+| Deck-Look | Standard-Look wie Folie 6 des Pitch-Decks (Kometen, Ringe, Achsen); ocean/clean über V | gebaut, mit simulierten Stems geprüft |
 | 4 · Festhalten | Wiedergabe, Video-Export, Demucs | zurückgestellt |
 | 5 · Probe | Beamer, Feinschliff, KPI-Anzeige | offen |
 
@@ -76,11 +91,12 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 |---|---|
 | `analyse.mjs` | Kern der Audio-Analyse (Browser + Node): FFT 2048 für Pegel/Pan/Onsets, 8192 für die Tonhöhe von Kick und Bass, Tempo per Autokorrelation |
 | `analyse-file.mjs` | CLI: Datei → JSONL + Zusammenfassung (Drift = Bewegung innerhalb von 8 Takten) |
-| `render.mjs` | Bild. „ocean“: Stems als Flüssigkeitsschichten, Zeit in die Tiefe, schwebende Kamera. „clean“: Kometen, Ringe |
+| `render.mjs` | Bild. „deck“ (Standard, wie Folie 6 des Decks): leuchtende Kometen mit Schweifen, Ringe von der Kick, Achsen. „ocean“: Stems als Flüssigkeitsschichten, Zeit in die Tiefe, schwebende Kamera. „clean“: Kometen, Ringe |
+| `smoothing.mjs` | Regler Roh ↔ Glatt: gleitender Mittelwert, Fenster wächst exponentiell bis 2^53 Zeilen |
 | `strudel-source.mjs` | Strudel-Events → Zeilen, jedes Event erscheint, wenn es klingt (`delay`) |
 | `make-tapped.mjs` | Kopie eines Tracks: jeder Stem bekommt seinen Namen als `.tag()`, Master sendet per `.onTrigger` (Klang unverändert) |
 | `server.mjs` | statische Dateien + Relay POST `/events` → SSE `/stream`; CORS- und Private-Network-Header für strudel.cc |
-| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost |
+| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI, Regler Hart ↔ Weich, Roh ↔ Glatt |
 | `index.html` | die Seite: Quellen, Kanalwahl, Aufnahme, Tasten |
 
 ## Was wir gelernt haben
@@ -93,7 +109,7 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 - **Der 008-Mix ist im Panorama mittig.** Darum streckt die Pan-Weite (×1 bis ×5, Taste W) auf den genutzten Bereich.
 - **Gefallen hat:** Tag 2 („10/10“). **Nicht gefallen:** scharfe Linien („Klingen“), blendendes Additiv-Licht.
   Gewünscht: dichte Flüssigkeit mit Wellen obendrauf, weiches Licht, schräger Blick mit wanderndem Blickwinkel –
-  das ist der aktuelle Look „ocean“.
+  daraus wurde „ocean“. Danach: zurück zum Look von Folie 6 des Decks („deck“, jetzt Standard).
 
 ## Offen (nach Priorität)
 

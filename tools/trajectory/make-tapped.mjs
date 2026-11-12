@@ -1,11 +1,9 @@
 // Writes a tapped copy of a track: every stem in the master stack gets its variable name as a tag, and the master
 // sends each event to the trajectory server (server.mjs) while it plays. The sound is unchanged (the tap is not the
 // dominant output). The track itself is not touched; paste the copy into strudel.cc instead of the track.
-// usage (in tools/): node trajectory/make-tapped.mjs <track.strudel> [--port 8766] [--demo]
-//   → trajectory/tapped/<track>-tapped[-demo].strudel, also copied to the clipboard (macOS)
-//   --demo: when no Launch Control is connected, an automatic ride stands in (foundation faders up, the colour faders
-//   of Mode 2 swelling in and out one after another, brightness knobs at 0.7), so the track plays and moves on its
-//   own. Needs a one-file track (008: `if (!lcInputs.length)`).
+// usage (in tools/): node trajectory/make-tapped.mjs <track.strudel> [--port 8766]
+//   → trajectory/tapped/<track>-tapped.strudel, also copied to the clipboard (macOS)
+// Or play the copy in player.html: it feeds every midin() from the connected controllers (Web MIDI).
 import fs from 'fs'
 import path from 'path'
 import { execFileSync } from 'child_process'
@@ -55,24 +53,10 @@ const trajectoryTap = (hap, currentTime, cps, targetTime) => {
 }
 
 `
-const demo = args.includes('--demo')
-const RIDE = `// TRAJECTORY DEMO (make-tapped.mjs --demo): no Launch Control connected → an automatic ride stands in
-const trajectoryRide = (c, t) => {
-  if (c === 12 || c === 60 || (c >= 5 && c <= 11)) return 1
-  if (c >= 53 && c <= 59) return Math.max(0, Math.sin((t / 32 + (c - 53) / 7) * 2 * Math.PI))
-  if ((c >= 21 && c <= 28) || (c >= 69 && c <= 76)) return 0.7
-  return 0
-}
-if (!lcInputs.length) lcInputs.push(c => signal(t => trajectoryRide(c, t)))
-`
-const head = src.slice(0, master.index)
-const anchor = head.search(/^if \(!lcInputs\.length\)/m)
-if (demo && anchor < 0) throw new Error(`${file}: --demo needs a one-file track (no \`if (!lcInputs.length)\` found)`)
-const body = demo ? head.slice(0, anchor) + RIDE + head.slice(anchor) : head
-const out = body + tap + masterCode.trimEnd() + '\n  .onTrigger(trajectoryTap, false)\n'
+const out = src.slice(0, master.index) + tap + masterCode.trimEnd() + '\n  .onTrigger(trajectoryTap, false)\n'
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'tapped')
 fs.mkdirSync(dir, { recursive: true })
-const target = path.join(dir, path.basename(file, '.strudel') + (demo ? '-tapped-demo.strudel' : '-tapped.strudel'))
+const target = path.join(dir, path.basename(file, '.strudel') + '-tapped.strudel')
 fs.writeFileSync(target, out)
 try { execFileSync('pbcopy', { input: out }); console.log('copied to clipboard') } catch {}
 console.log(`${target}: ${stems.length} stems tapped (${stems.join(', ')})`)

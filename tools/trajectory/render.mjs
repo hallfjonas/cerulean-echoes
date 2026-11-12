@@ -2,11 +2,23 @@
 // sixteen stems of a tapped Strudel track. Feed it lines in the trajectory format (see analyse.mjs) with `push`.
 // Pan is widened to the range the music used over the last ~20 s (up to ×5), so a narrow mix still shows its
 // left-right movement.
-// Two looks (toggleLook):
-//   'ocean' (default): every stem is a layer of liquid seen from a slowly drifting camera. Across = pan (the wave
-//     swells where the stem sits), height = pitch, wave height = energy, depth = time: the last seconds flow away
-//     from the viewer as slices, so each stem leaves a liquid sheet of its trajectory. Plain alpha blending, no flashes.
+// Three looks (toggleLook cycles them):
+//   'deck' (default): the look of the pitch deck's experience slide. Every stem a soft glowing comet on deep blue
+//     (#0A1A26), left-right = pan, low-high = pitch, glow = energy; the picture fades a little each frame, so moving
+//     comets leave soft trails; every beat sends a ring out from the kick; thin axes, plain labels. Colours and sizes
+//     by role (kick orange, bass cerulean, hats near-white, pads indigo, leads teal), as on the slide.
+//     Character: hard = short trails and tight glows, soft = long trails and wide glows.
+//   'ocean': every stem is a layer of liquid seen from a slowly drifting camera. Across = pan (the wave
+//     swells where the stem sits), height = pitch, wave height = the stem's level (a slow envelope, not each hit),
+//     depth = time: the last seconds flow away from the viewer as slices, so each stem leaves a liquid sheet of its
+//     trajectory. The ripples on top drift at each stem's own, irregular pace, faster when it is louder, never in step
+//     with the tempo. Plain alpha blending, no flashes.
+// Smoothing (setSmoothing, 0..1) slows that drift and the camera's beat kick down to a standstill at 1.
 //   'clean': each stem a comet with a tail, rings on the beat, sparks on onsets, fixed colours.
+// Character (setCharacter, 0..1) bends the ocean between two moods: 0 = hard and wild (sawtooth crests, angular
+// lines, every past slice edged, instant response, the camera kicked by the beat), 1 = soft and slow (round waves,
+// thick smooth crests, motion smear, sluggish response, a gliding camera).
+// Labels (stem names, axis words, the status line), axes and beat rings can each be switched off.
 
 const BAND_STYLE = {
   kick: { color: [245, 165, 90], size: 40, hue: 30 },
@@ -26,27 +38,57 @@ const clamp = (v, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v))
 const rgba = ([r, g, b], a) => `rgba(${r}, ${g}, ${b}, ${clamp(a)})`
 const hsla = (h, s, l, a) => `hsla(${((h % 360) + 360) % 360}, ${s}%, ${l}%, ${clamp(a)})`
 
+const DECK_ROLES = {
+  kick: { color: [245, 165, 90], size: 46 },
+  bass: { color: [79, 179, 224], size: 30 },
+  hats: { color: [220, 236, 240], size: 14 },
+  pad: { color: [120, 140, 230], size: 70 },
+  lead: { color: [110, 220, 200], size: 20 },
+}
+const BAND_ROLES = { kick: 'kick', bass: 'bass', mid: 'pad', presence: 'lead', air: 'hats' }
+
+function roleOf(stem) {
+  if (BAND_ROLES[stem]) return BAND_ROLES[stem]
+  if (/kick/i.test(stem)) return 'kick'
+  if (/sub|bass|rumble/i.test(stem)) return 'bass'
+  if (/hat|ride|shake|perc|clap|conga|tamb|noise/i.test(stem)) return 'hats'
+  if (/pad|harm|string/i.test(stem)) return 'pad'
+  return 'lead'
+}
+
 function styleFor(stem, index) {
-  if (BAND_STYLE[stem]) return BAND_STYLE[stem]
+  const role = roleOf(stem), base = DECK_ROLES[role], lift = (index % 3) * 0.14
+  const deck = { color: base.color.map(c => Math.round(c + (255 - c) * lift)), size: base.size * (1 - lift * 0.6) }
+  if (BAND_STYLE[stem]) return { ...BAND_STYLE[stem], deck }
   const low = /kick|sub|bass|rumble/i.test(stem), high = /hat|ride|perc|clap|fx/i.test(stem)
   const hue = (index * 137.5 + 90) % 360
   const [r, g, b] = [0, 8, 4].map(k => Math.round(255 * (0.55 + 0.45 * Math.cos((hue / 360 + k / 12) * 2 * Math.PI))))
-  return { color: [r, g, b], size: /kick/i.test(stem) ? 40 : low ? 30 : high ? 15 : 22, hue }
+  return { color: [r, g, b], size: /kick/i.test(stem) ? 40 : low ? 30 : high ? 15 : 22, hue, deck }
 }
 
 export function createRenderer(canvas) {
-  const g = canvas.getContext('2d')
+  const screen = canvas.getContext('2d')
+  const sceneCanvas = document.createElement('canvas'), scene = sceneCanvas.getContext('2d')
+  const trailCanvas = document.createElement('canvas'), trail = trailCanvas.getContext('2d')
+  let g = screen
   const scale = Math.min(devicePixelRatio, 2)
-  let W = 0, H = 0, labels = true, look = 'ocean', pulse = null, lastPhase = 0, energy = 0
+  let W = 0, H = 0, labels = true, axes = true, rings = true, look = 'deck', pulse = null, lastPhase = 0, energy = 0
+  let character = 0.5, motion = 1
   let previous = performance.now() / 1000, widen = true, panReach = 0.1, panGain = 1
   const comets = new Map()
-  const rings = [], sparks = []
+  const beatRings = [], sparks = []
   const bubbles = Array.from({ length: 90 }, () => ({ x: Math.random() * 2 - 1, y: Math.random(), z: Math.random(),
     speed: 0.01 + Math.random() * 0.03, size: 1 + Math.random() * 3 }))
 
+  const clearTrail = () => {
+    trail.globalCompositeOperation = 'source-over'
+    trail.fillStyle = '#0a1a26'
+    trail.fillRect(0, 0, W, H)
+  }
   const resize = () => {
-    W = canvas.width = Math.round(innerWidth * scale)
-    H = canvas.height = Math.round(innerHeight * scale)
+    W = canvas.width = sceneCanvas.width = trailCanvas.width = Math.round(innerWidth * scale)
+    H = canvas.height = sceneCanvas.height = trailCanvas.height = Math.round(innerHeight * scale)
+    clearTrail()
     canvas.style.width = innerWidth + 'px'
     canvas.style.height = innerHeight + 'px'
   }
@@ -60,15 +102,15 @@ export function createRenderer(canvas) {
   function push(line) {
     const now = performance.now() / 1000
     if (line.pulse) {
-      if (line.pulse.bpm && line.pulse.phase < lastPhase - 0.5) rings.push({ born: now, strength: 0.4 + (kickComet()?.e ?? 0.5) })
+      if (line.pulse.bpm && line.pulse.phase < lastPhase - 0.5) beatRings.push({ born: now, strength: 0.4 + (kickComet()?.e ?? 0.5) })
       lastPhase = line.pulse.phase
       pulse = line.pulse
       return
     }
     let comet = comets.get(line.stem)
     if (!comet) {
-      comet = { style: styleFor(line.stem, comets.size), x: line.x, y: line.y, e: 0, z: 0, tail: [], history: [],
-        seen: now, phase: Math.random() * 10 }
+      comet = { style: styleFor(line.stem, comets.size), x: line.x, y: line.y, e: 0, z: 0, level: 0, drift: 0,
+        tail: [], history: [], seen: now, phase: Math.random() * 10, pace: 0.7 + Math.random() * 0.6 }
       comets.set(line.stem, comet)
     }
     comet.target = line
@@ -77,19 +119,25 @@ export function createRenderer(canvas) {
   }
 
   function step(now, dt) {
-    const follow = 1 - Math.exp(-dt * 5)
+    const follow = 1 - Math.exp(-dt * (16 - 14 * character))
+    const attack = 1 - Math.exp(-dt * (60 - 52 * character)), release = 1 - Math.exp(-dt * (12 - 10.5 * character))
     for (const [stem, comet] of comets) {
       if (now - comet.seen > 10) { comets.delete(stem); continue }
       const target = comet.target
       comet.x += (target.x - comet.x) * follow
       comet.y += (target.y - comet.y) * follow
-      comet.e += (target.e - comet.e) * (target.e > comet.e ? 1 - Math.exp(-dt * 40) : 1 - Math.exp(-dt * 6))
+      comet.e += (target.e - comet.e) * (target.e > comet.e ? attack : release)
       comet.z += (target.z - comet.z) * (1 - Math.exp(-dt * 3))
+      comet.level += (target.e - comet.level) * (1 - Math.exp(-dt * (target.e > comet.level ? 7 : 1.1) * (0.5 + 1.5 * (1 - character))))
+      comet.drift += dt * motion * comet.pace * (0.08 + 0.35 * comet.level)
       comet.tail.push({ x: comet.x, y: comet.y, e: comet.e, t: now })
       while (comet.tail.length && comet.tail[0].t < now - TAIL_SECONDS) comet.tail.shift()
       const last = comet.history.at(-1)
-      if (!last || now - last.t >= 1 / SLICE_RATE) comet.history.push({ x: comet.x, y: comet.y, e: comet.e, t: now })
-      else last.e = Math.max(last.e, comet.e)
+      if (!last || now - last.t >= 1 / SLICE_RATE) {
+        comet.history.push({ x: comet.x, y: comet.y, e: comet.e, level: comet.level, drift: comet.drift, t: now })
+      } else {
+        last.e = Math.max(last.e, comet.e)
+      }
       while (comet.history.length && comet.history[0].t < now - HISTORY_SECONDS) comet.history.shift()
     }
     const all = [...comets.values()]
@@ -98,7 +146,7 @@ export function createRenderer(canvas) {
     panGain += ((widen ? clamp(0.8 / Math.max(panReach, 0.05), 1, 5) : 1) - panGain) * (1 - Math.exp(-dt))
     const mean = all.length ? all.reduce((s, c) => s + c.e, 0) / all.length : 0
     energy += (mean - energy) * (1 - Math.exp(-dt * 1.5))
-    while (rings.length && rings[0].born < now - RING_SECONDS) rings.shift()
+    while (beatRings.length && beatRings[0].born < now - RING_SECONDS) beatRings.shift()
     while (sparks.length && sparks[0].born < now - SPARK_SECONDS) sparks.shift()
     for (const bubble of bubbles) {
       bubble.y += dt * bubble.speed * (0.4 + energy)
@@ -106,11 +154,76 @@ export function createRenderer(canvas) {
     }
   }
 
+  // ---------- deck ----------
+
+  const deckPoint = (x, y) => [W / 2 + clamp(x * panGain, -1, 1) * W * 0.42, H * (0.9 - y * 0.82)]
+
+  function drawDeck(now) {
+    const k = W / 1920, arc = 0.6 + 0.4 * clamp(energy * 1.6), dim = crowd()
+    const fade = 0.04 + 0.12 * (1 - character), glowAlpha = 0.85
+    trail.globalCompositeOperation = 'source-over'
+    trail.fillStyle = `rgba(10, 26, 38, ${fade})`
+    trail.fillRect(0, 0, W, H)
+    trail.globalCompositeOperation = 'lighter'
+    const kick = kickComet()
+    const [kx, ky] = kick ? deckPoint(kick.x, kick.y) : deckPoint(0, 0.07)
+    for (const ring of rings ? beatRings : []) {
+      const age = (now - ring.born) / RING_SECONDS
+      trail.strokeStyle = rgba(DECK_ROLES.kick.color, (1 - age) * 0.3 * arc * Math.min(1, ring.strength))
+      trail.lineWidth = 3 * k
+      trail.beginPath()
+      trail.arc(kx, ky, 40 * k + age * W * 0.35, 0, 2 * Math.PI)
+      trail.stroke()
+    }
+    const spread = 2.5 * (0.8 + 0.5 * character)
+    for (const comet of [...comets.values()].sort((a, b) => b.style.deck.size - a.style.deck.size)) {
+      const { color, size } = comet.style.deck
+      const [x, y] = deckPoint(comet.x, comet.y), radius = size * k * (0.6 + comet.e * 0.9)
+      const glow = trail.createRadialGradient(x, y, 0, x, y, radius * spread)
+      glow.addColorStop(0, rgba(color, glowAlpha * Math.min(1, comet.e + 0.2) * arc * dim))
+      glow.addColorStop(1, rgba(color, 0))
+      trail.fillStyle = glow
+      trail.beginPath()
+      trail.arc(x, y, radius * spread, 0, 2 * Math.PI)
+      trail.fill()
+    }
+
+    g.globalCompositeOperation = 'copy'
+    g.drawImage(trailCanvas, 0, 0)
+    g.globalCompositeOperation = 'source-over'
+    if (axes) {
+      g.strokeStyle = 'rgba(184, 207, 214, 0.25)'
+      g.lineWidth = 2 * scale
+      g.beginPath()
+      g.moveTo(W / 2, H * 0.04); g.lineTo(W / 2, H * 0.96)
+      g.moveTo(W * 0.04, H * 0.96); g.lineTo(W * 0.96, H * 0.96)
+      g.stroke()
+    }
+    if (!labels) return
+    g.font = `${14 * scale}px system-ui, sans-serif`
+    g.fillStyle = 'rgba(184, 207, 214, 0.8)'
+    if (axes) {
+      g.fillText('links', W * 0.05, H * 0.92)
+      g.fillText('rechts', W * 0.92, H * 0.92)
+      g.fillText('hoch', W / 2 + 10 * scale, H * 0.06)
+      g.fillText('tief', W / 2 + 10 * scale, H * 0.93)
+    }
+    for (const [stem, comet] of comets) {
+      if (comet.e < 0.03) continue
+      const { color, size } = comet.style.deck
+      const [x, y] = deckPoint(comet.x, comet.y), radius = size * k * (0.6 + comet.e * 0.9)
+      g.fillStyle = rgba(color, 0.95)
+      g.fillText(stem, x + radius * 1.6 + 8 * scale, y + 5 * scale)
+    }
+  }
+
   // ---------- ocean ----------
 
   function camera(now) {
-    const yaw = 0.32 * Math.sin(now * 0.043) + 0.12 * Math.sin(now * 0.011)
-    const tilt = 0.42 + 0.12 * Math.sin(now * 0.031 + 1)
+    const wild = 1 - character, beat = pulse?.bpm ? (1 - pulse.phase) ** 4 : 0
+    const shake = Math.max(0, 1 - character / 0.3) * beat * (kickComet()?.e ?? 0.5) * 0.04 * motion
+    const yaw = 0.32 * Math.sin(now * 0.043 * (0.6 + wild)) + 0.12 * Math.sin(now * 0.011) + shake * Math.sin(now * 53)
+    const tilt = 0.42 + 0.12 * Math.sin(now * 0.031 * (0.6 + wild) + 1) + shake * Math.sin(now * 41)
     const [cy, sy, ct, st] = [Math.cos(yaw), Math.sin(yaw), Math.cos(tilt), Math.sin(tilt)]
     const focal = Math.min(W, H) * 1.15, distance = 3.1, centreY = H * 0.64
     return (x, y, z) => {
@@ -122,23 +235,32 @@ export function createRenderer(canvas) {
 
   function profile(comet, slice, now, age) {
     const crest = clamp(slice.x * panGain, -1, 1) * 1.5
-    const amplitude = (0.03 + 0.32 * slice.e) * (0.4 + 0.6 * (1 - comet.style.size / 60))
+    const amplitude = (0.03 + 0.32 * slice.level) * (0.4 + 0.6 * (1 - comet.style.size / 60))
     const wavelength = 0.9 - 0.6 * slice.y
-    const tempo = (pulse?.bpm || 120) / 60
-    const t = now - age
+    const wild = 1 - character, d = slice.drift
+    const saw = v => 2 * (v / (2 * Math.PI) - Math.floor(v / (2 * Math.PI) + 0.5))
     const points = []
     for (let i = 0; i <= PROFILE_POINTS; i++) {
       const x = -1.9 + 3.8 * i / PROFILE_POINTS
-      const swell = Math.exp(-(((x - crest) / 0.7) ** 2))
-      const wave = 0.65 * Math.sin(x / wavelength * 2 * Math.PI - t * tempo * 1.2 + comet.phase)
-        + 0.35 * Math.sin(x / (wavelength * 0.43) * 2 * Math.PI + t * tempo * 0.7 + comet.phase * 2)
-      points.push([x, (slice.y - 0.45) * 1.5 + amplitude * (swell * (0.75 + 0.35 * wave) + 0.18 * wave)])
+      const swell = Math.exp(-(((x - crest) / (0.45 + 0.4 * character)) ** 2))
+      const a = x / wavelength * 2 * Math.PI - d * 2.1 + comet.phase
+      const b = x / (wavelength * 0.61) * 2 * Math.PI + d * 1.37 + comet.phase * 2
+      const c = x / (wavelength * 1.73) * 2 * Math.PI - d * 0.53 + comet.phase * 3
+      const smooth = 0.5 * Math.sin(a) + 0.3 * Math.sin(b) + 0.2 * Math.sin(c)
+      const sharp = 0.6 * saw(a) + 0.4 * Math.sign(Math.sin(b * 1.7)) * Math.abs(Math.sin(b * 1.7)) ** 0.3
+      const wave = character * smooth + wild * sharp
+      const jitter = Math.max(0, 1 - character / 0.4) * slice.e * 0.25 * motion * (Math.random() - 0.5)
+      points.push([x, (slice.y - 0.45) * 1.5 + amplitude * (swell * (0.85 + 0.15 * wave) + 0.08 * wave + jitter)])
     }
     return points
   }
 
   function curve(points) {
     g.moveTo(points[0][0], points[0][1])
+    if (character < 0.35) {
+      for (const [x, y] of points.slice(1)) g.lineTo(x, y)
+      return
+    }
     for (let i = 1; i < points.length - 1; i++) {
       const [x, y] = points[i], [nx, ny] = points[i + 1]
       g.quadraticCurveTo(x, y, (x + nx) / 2, (y + ny) / 2)
@@ -147,27 +269,30 @@ export function createRenderer(canvas) {
   }
 
   function drawOcean(now) {
+    const wild = 1 - character
     g.globalCompositeOperation = 'source-over'
     const sky = g.createLinearGradient(0, 0, 0, H)
     sky.addColorStop(0, '#04060d')
     sky.addColorStop(0.55, hsla(250 + now * 2, 45, 7 + 5 * energy, 1))
     sky.addColorStop(1, '#03050a')
+    g.globalAlpha = 1 - 0.8 * character
     g.fillStyle = sky
     g.fillRect(0, 0, W, H)
+    g.globalAlpha = 1
     const project = camera(now)
     const beat = pulse?.bpm ? (1 - pulse.phase) ** 2 : 0
 
     for (const bubble of bubbles) {
       const [x, y, depth] = project(bubble.x * 1.8, bubble.y * 1.6 - 0.7, bubble.z * 3)
-      g.fillStyle = hsla(200 + bubble.z * 120 + now * 4, 60, 70, (0.05 + 0.08 * energy) * (1 - bubble.z * 0.6))
-      g.beginPath(); g.arc(x, y, bubble.size * scale * 3 / depth, 0, 2 * Math.PI); g.fill()
+      g.fillStyle = hsla(200 + bubble.z * 120 + now * 4, 60, 70 + 20 * wild, (0.05 + 0.08 * energy) * (1 - bubble.z * 0.6))
+      g.beginPath(); g.arc(x, y, bubble.size * scale * (1 + 4 * character) / depth, 0, 2 * Math.PI); g.fill()
     }
 
     const slices = []
     for (const comet of comets.values()) {
       for (const slice of comet.history) {
         const age = now - slice.t
-        if (slice.e > 0.02) slices.push({ comet, slice, age })
+        if (slice.level > 0.02) slices.push({ comet, slice, age })
       }
     }
     slices.sort((a, b) => b.age - a.age || b.slice.y - a.slice.y)
@@ -177,10 +302,11 @@ export function createRenderer(canvas) {
       const points = profile(comet, slice, now, age).map(([x, y]) => project(x, y, z))
       const [, floorY] = project(0, (slice.y - 0.45) * 1.5 - 0.22, z)
       const top = Math.min(...points.map(p => p[1]))
-      const hue = comet.style.hue + now * 3 + slice.e * 25
+      const hue = comet.style.hue + now * 3 + slice.level * 25
+      const fill = (0.4 + 0.8 * character) * dim
       const body = g.createLinearGradient(0, top, 0, Math.max(top + 1, floorY))
-      body.addColorStop(0, hsla(hue, 70, 44, (0.16 + 0.4 * slice.e) * nearness ** 0.6 * dim))
-      body.addColorStop(0.5, hsla(hue + 20, 70, 28, (0.08 + 0.2 * slice.e) * nearness ** 0.8 * dim))
+      body.addColorStop(0, hsla(hue, 70 + 20 * wild, 44, (0.16 + 0.4 * slice.level) * nearness ** 0.6 * fill))
+      body.addColorStop(0.5, hsla(hue + 20, 70, 28, (0.08 + 0.2 * slice.level) * nearness ** 0.8 * fill))
       body.addColorStop(1, hsla(hue + 30, 65, 12, 0))
       g.fillStyle = body
       g.beginPath()
@@ -189,24 +315,28 @@ export function createRenderer(canvas) {
       g.lineTo(points[0][0], floorY)
       g.closePath()
       g.fill()
-      if (comet.history.at(-1) !== slice) continue
-      g.strokeStyle = hsla(hue - 10, 75, 60 + 6 * beat * slice.e, (0.15 + 0.45 * slice.e) * dim)
-      g.lineWidth = scale * (1.5 + 2.5 * slice.e)
+      const front = comet.history.at(-1) === slice
+      const edge = front ? 1 : Math.max(0, 1 - 2 * character) * nearness ** 2
+      if (edge <= 0.01) continue
+      g.strokeStyle = hsla(hue - 10, 75 + 20 * wild, 60 + 15 * wild + 6 * beat * slice.level,
+        (0.15 + 0.3 * slice.level + 0.15 * slice.e) * edge * dim * (1 + 0.6 * wild))
+      g.lineWidth = scale * (front ? 0.8 + character * (1.5 + 3 * slice.level) : 0.6 + 0.6 * character)
       g.beginPath()
       curve(points)
       g.stroke()
     }
+  }
 
-    if (labels) {
-      g.font = `${12 * scale}px system-ui, sans-serif`
-      for (const [stem, comet] of comets) {
-        const slice = comet.history.at(-1)
-        if (!slice || comet.e < 0.05) continue
-        const crest = clamp(slice.x * panGain, -1, 1) * 1.5
-        const [x, y] = project(crest, (slice.y - 0.45) * 1.5 + 0.05 + 0.32 * slice.e, -0.6)
-        g.fillStyle = hsla(comet.style.hue + now * 3, 60, 75, 0.7)
-        g.fillText(stem, x + 8 * scale, y)
-      }
+  function drawOceanLabels(now) {
+    const project = camera(now)
+    g.font = `${12 * scale}px system-ui, sans-serif`
+    for (const [stem, comet] of comets) {
+      const slice = comet.history.at(-1)
+      if (!slice || comet.e < 0.05) continue
+      const crest = clamp(slice.x * panGain, -1, 1) * 1.5
+      const [x, y] = project(crest, (slice.y - 0.45) * 1.5 + 0.05 + 0.32 * slice.level, -0.6)
+      g.fillStyle = hsla(comet.style.hue + now * 3, 60, 75, 0.7)
+      g.fillText(stem, x + 8 * scale, y)
     }
   }
 
@@ -226,7 +356,7 @@ export function createRenderer(canvas) {
     g.fillRect(0, 0, W, H)
     g.globalCompositeOperation = 'lighter'
     const dim = crowd()
-    for (const ring of rings) {
+    for (const ring of rings ? beatRings : []) {
       const age = (now - ring.born) / RING_SECONDS
       g.strokeStyle = rgba(BAND_STYLE.kick.color, (1 - age) ** 2 * 0.35 * ring.strength)
       g.lineWidth = (1 + 5 * (1 - age)) * scale
@@ -283,8 +413,19 @@ export function createRenderer(canvas) {
     const now = performance.now() / 1000, dt = Math.min(0.1, now - previous)
     previous = now
     step(now, dt)
-    if (look === 'ocean') drawOcean(now)
-    else drawClean(now)
+    if (look === 'deck') {
+      drawDeck(now)
+    } else if (look === 'ocean') {
+      g = scene
+      drawOcean(now)
+      g = screen
+      g.globalCompositeOperation = 'copy'
+      g.drawImage(sceneCanvas, 0, 0)
+      g.globalCompositeOperation = 'source-over'
+      if (labels) drawOceanLabels(now)
+    } else {
+      drawClean(now)
+    }
     if (labels) drawStatus()
     requestAnimationFrame(frame)
   }
@@ -292,8 +433,12 @@ export function createRenderer(canvas) {
 
   return {
     push,
-    toggleLabels: () => { labels = !labels },
+    setLabels: on => { labels = on },
+    setAxes: on => { axes = on },
+    setRings: on => { rings = on; clearTrail() },
     toggleWiden: () => { widen = !widen },
-    toggleLook: () => { look = look === 'ocean' ? 'clean' : 'ocean' },
+    toggleLook: () => { look = { deck: 'ocean', ocean: 'clean', clean: 'deck' }[look] },
+    setCharacter: value => { character = clamp(value) },
+    setSmoothing: value => { motion = (1 - clamp(value)) ** 2 },
   }
 }
