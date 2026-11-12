@@ -84,13 +84,16 @@ function modeName(file, player) {
 }
 
 export function generate(file) {
-  const d = parse(fs.readFileSync(file, 'utf8'), file)
+  const src = fs.readFileSync(file, 'utf8')
+  const d = parse(src, file)
+  // One file for any number of Launch Controls (e.g. 008) uses the single layout without the -single suffix
+  const singleLayout = file.endsWith('-single.strudel') || /^\/\/ @mode 16 Mode 1 /m.test(src)
   const base = file.replace(/(-dual)?\.strudel$/, '')
   const plus48 = col => col === 8 && d.globalSame ? 0 : 48
   const hasGlobal = Object.keys(d.global).length > 0
   // [tag mode, file suffix, word in the mode name, column 8 global, CC shift]
   // Role names, not player names: Beat = foundation (beat + bass), Chords = colour (chords + melodies)
-  const modes = file.endsWith('-single.strudel')
+  const modes = singleLayout
     ? [['16', 'mode1', 'Beat', true, () => 0], ['2', 'mode2', 'Chords', true, plus48]]
     : file.endsWith('-dual.strudel')
     ? [['B16', 'jojo', 'Beat', false, () => 0], ['16', 'jonas', 'Chords', true, () => 0]]

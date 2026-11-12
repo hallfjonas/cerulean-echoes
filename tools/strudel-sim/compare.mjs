@@ -1,11 +1,17 @@
 // Compare two versions of a track: events per cycle, query time, and whether the audible events are identical.
-// usage: node compare.mjs <old.strudel> <new.strudel> [--ignore-cutoff0]
+// usage: node compare.mjs <old.strudel> <new.strudel> [--ignore-cutoff0] [--stem <name>]
 //   --ignore-cutoff0: drop old events with lpf 0 (e.g. baselines faded out by their lpf knob) before comparing
+//   --stem <name>: compare only this stem variable of both files instead of the master
 import { load, run, sig, audible } from './harness.mjs'
 
-const [OLD, NEW] = process.argv.slice(2).filter(a => !a.startsWith('--'))
+const args = process.argv.slice(2)
+const STEM = args.includes('--stem') ? args[args.indexOf('--stem') + 1] : undefined
+const [OLD, NEW] = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--stem')
 const ignoreCutoff0 = process.argv.includes('--ignore-cutoff0')
-if (!OLD || !NEW) { console.error('usage: node compare.mjs <old.strudel> <new.strudel> [--ignore-cutoff0]'); process.exit(1) }
+if (!OLD || !NEW) {
+  console.error('usage: node compare.mjs <old.strudel> <new.strudel> [--ignore-cutoff0] [--stem <name>]')
+  process.exit(1)
+}
 
 const CCS = [...Array(47).keys()].map(i => i + 5).flatMap(n => [n, n + 48])   // Mode 16 CC 5-51 and Mode 2 CC 53-99
 const BUTTONS = new Set(CCS.filter(n => (n % 48 >= 37 && n % 48 <= 51) || (n >= 85)))
@@ -50,7 +56,7 @@ let ok = true
 for (const [name, vals] of Object.entries(statics)) {
   const r = {}
   for (const [k, f] of [['old', OLD], ['new', NEW]]) {
-    const pat = await load(f, { ...vals })
+    const pat = await load(f, { ...vals }, STEM)
     const t0 = performance.now()
     r[k] = run(pat, 0, CYC)
     r[k + 'ms'] = (performance.now() - t0) / CYC
@@ -61,7 +67,7 @@ for (const [name, script] of Object.entries(dynamics)) {
   const r = {}
   for (const [k, f] of [['old', OLD], ['new', NEW]]) {
     const vals = {}; script(vals, 0)
-    r[k] = run(await load(f, vals), 0, CYC, t => script(vals, t))
+    r[k] = run(await load(f, vals, STEM), 0, CYC, t => script(vals, t))
   }
   ok = report(name, r.old, r.new) && ok
 }
