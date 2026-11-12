@@ -32,6 +32,10 @@
 //   Thin (the mirror of Fog, from the low side), Tension also raises the reverb; Tension's snare roll plays in the break.
 // Chapter (global button 1): F minor (dark) → F phrygian (tense) → F dorian (warm), at the next bar.
 // Harmony: Jonas' pad button 1 picks the chord progression; Jojo's sub and bassline follow its root.
+// Space version (008-space-plan.html, 008-space-implementation.md): the bassline owns 125–350 Hz (pads, techno pad,
+//   stab and keys pad high-passed, rumble filter lower), comes forward (filter floor 350 Hz, louder) and gets a wide
+//   top layer above 300 Hz while its core stays mono; pads, percussion and FX reach further left and right.
+//   Merged into this file from 008-groove-techno-space.strudel; the version before is in git history (bc37698).
 // ============================================================
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
 // button row 1 = change (next pattern, at the next bar), button row 2 = a moment (while held).
@@ -119,9 +123,27 @@ setcpm(bpm / 4)
 const colMap = (read, n) => ({ bright: read(12 + n), space: read(20 + n), char: read(28 + n), level: read(4 + n), btn: read(36 + n), btn2: read(44 + n) })
 const off = () => signal(() => 0)
 // One CC across all Launch Controls: the one moved last wins. Made once per CC (lastMoved is stateful).
+// Knob defaults (space version, chosen by the space KPIs, see FEEDBACK.md): a knob that has sent nothing yet reads its
+// default instead of 0; its first value that is not 0 takes over (also after re-evaluating, when Strudel still knows
+// the knob). A knob turned back to exactly 0 reads 0 once it was seen. Missing = 0. Only with Web MIDI: the Node tools
+// set every value themselves (space.mjs --defaults reads these tables).
+// KNOB_DEFAULTS: LC CC (Mode 1, Mode 2 = CC + 48) → 0..1. LK_DEFAULTS: Launchkey knob 1-8 → 0..1.
+const KNOB_DEFAULTS = { 69: 0.5, 70: 0.75 }   // Jonas: pad and techno pad Space (reverb share ≥ 0.4, K8)
+const LK_DEFAULTS   = { 6: 0.4 }                // keys pad reverb (K8)
+const useDefaults = !!globalThis.WebMidi
+const withDefault = (sig, d) => !useDefaults || !d ? sig : (() => {
+  let seen = false
+  return sig.fmap(v => (seen ||= v !== 0) ? v : d)
+})()
+// Turn the LC knobs (endless encoders) to their defaults once per page load, so they move on from there
+if (useDefaults && globalThis.knobDefaultsSent !== '008') {
+  for (const out of WebMidi.outputs.filter(o => o.name.includes(LC_PORT) && !o.name.includes('DAW')))
+    for (const [cc, v] of Object.entries(KNOB_DEFAULTS)) out.send([0xBF, Number(cc), Math.round(v * 127)])
+  globalThis.knobDefaultsSent = '008'
+}
 const lcMemo = {}
-const lcCc = c => lcMemo[c] ??= !lcInputs.length ? off()
-  : lcInputs.slice(1).reduce((v, cc) => lastMoved(v, cc(c)), lcInputs[0](c))
+const lcCc = c => lcMemo[c] ??= withDefault(!lcInputs.length ? off()
+  : lcInputs.slice(1).reduce((v, cc) => lastMoved(v, cc(c)), lcInputs[0](c)), KNOB_DEFAULTS[c])
 // Column 8 (global) is read from both its Mode 1 and Mode 2 CCs, last moved wins: it works on both pages even on a
 // controller whose column 8 sends CC + 48 in Mode 2. Jojo on the plain CCs (Mode 1), Jonas on CC + 48 (Mode 2).
 const alone    = true
@@ -466,7 +488,7 @@ const stemJ1_kick = beatOnly(gate(kick.btn2.fmap(v => v <= 0.5), strip(dryBus(
 // ============================================================
 // JOJO 2 RUMBLE — the kick's sound low-passed into a dark reverb, on the 3rd and 4th 16th of every beat (own orbit)
 // ============================================================
-// @ctl 16:2.k1 Brightness | 0 = warm rumble ↔ more of the kick's body in the tail (lpf 250–1800 Hz).
+// @ctl 16:2.k1 Brightness | 0 = warm rumble ↔ more of the kick's body in the tail (lpf 100–500 Hz).
 // @ctl 16:2.k2 Space | short rumble ↔ a long dark cloud (reverb never fully off: the reverb is the sound).
 // @ctl 16:2.k3 Motion | still ↔ the filter breathes and the rumble echoes in 16ths.
 // @ctl 16:2.fader Level | rumble under the kick, same pitch (C).
@@ -490,8 +512,8 @@ const rumbleRiser = gate(held(rumble.btn2), s("pink*16")
 
 const stemJ2_rumble = strip(stack(
   beatOnly(bus(pick(rumbleVar, RUMBLES)
-    .lpf(toned(expRange(rumble.bright, 250, 1800)).fmap(f => m => w => f * (1 - 0.6 * m * w)).appLeft(rumbleMove).appLeft(sine.slow(2)))
-    .mul(gain(0.67)).delay(rumbleMove.mul(0.4)), 3, rumble.space.fmap(s => 0.5 + 0.5 * s))),
+    .lpf(toned(expRange(rumble.bright, 100, 500)).fmap(f => m => w => f * (1 - 0.6 * m * w)).appLeft(rumbleMove).appLeft(sine.slow(2)))
+    .mul(gain(0.67)).delay(rumbleMove.mul(0.4)), 3, rumble.space.fmap(s => 0.35 + 0.45 * s))),
   bus(rumbleRiser, 2, pure(0.3))
 ), {
   level: rumble.level.range(0, 0.68),   // was 1; mix: rumble −8 dB under the kick
@@ -528,7 +550,7 @@ const stemJ3_sub = beatOnly(strip(dryBus(stack(
 // ============================================================
 // Round 8 (the off-beat square was far too boring): 2-bar lines in the gaps around the kick, mostly the root with the
 // octave, the minor 3rd, the ♭7 and the ♭6 below for darkness; accented notes open the filter further.
-// @ctl 16:4.k1 Brightness | dark and dull ↔ biting (lpf 200–2000 Hz, the note envelope opens above it).
+// @ctl 16:4.k1 Brightness | dark ↔ biting (lpf 350–2500 Hz, the note envelope opens above it).
 // @ctl 16:4.k2 Space | dry ↔ a little room (reverb).
 // @ctl 16:4.k3 Groove | the line as written ↔ quiet ghost 16ths roll in the gaps.
 // @ctl 16:4.fader Level | dark rolling bass, follows Jonas' chords.
@@ -545,17 +567,30 @@ const BASS_LINES = [
 ].map(([main, extra]) => [onRoot(n(main)), onRoot(n(extra))])
 // Accents per 16th (fixed, so the line grooves the same way every bar): the 3rd 16th of each beat is loudest and
 // opens the filter furthest
-const bassSound = pat => pat.scale(scaleIn(2)).add(note(bassOct)).s("sawtooth").superimpose(x => x.add(note(0.1)))
+const bassTone = pat => pat.scale(scaleIn(2)).add(note(bassOct)).s("sawtooth")
   .velocity("[0.7 0.8 1 0.75]*4")
   .attack(0.003).decay(0.16).sustain(0.15).release(0.06)
   .lpq(7).lpenv("[1.8 2.2 3.2 2]*4").lpattack(0.002).lpdecay(0.11).lpsustain(0).shape(0.35)
+const bassSound = pat => bassTone(pat).superimpose(x => x.add(note(0.1)))
+// Space version: a wide top layer. The same line high-passed, one copy on the left, one on the right that comes
+// BASS_TOP_MS later (Haas): detuned copies stayed alike on short notes and gave no width. Below BASS_TOP_HZ only the
+// mono core plays, so the delay never thins the low end in mono. (No low-pass split: strip() sets the one low-pass per
+// event.)
+const BASS_TOP_HZ   = 200
+const BASS_TOP_GAIN = 1.5
+const BASS_TOP_MS   = 12
+const bassTop = pat => stack(
+  bassTone(pat).pan(0),
+  bassTone(pat).pan(1).late(BASS_TOP_MS / 1000 * bpm / 240)
+).hpf(BASS_TOP_HZ)
 
 const stemJ4_bass = beatOnly(strip(dryBus(stack(
-  bassSound(pick(bassVar, BASS_LINES.map(l => l[0]))).gain(0.3),
+  bassTone(pick(bassVar, BASS_LINES.map(l => l[0]))).gain(0.3),
+  bassTop(pick(bassVar, BASS_LINES.map(l => l[0]))).gain(0.3 * BASS_TOP_GAIN),
   gate(above(bassCol.char, 0), bassSound(pick(bassVar, BASS_LINES.map(l => l[1]))).gain(bassCol.char.mul(0.16)))
 ), 1, bassCol.space), {
-  lpf: expRange(bassCol.bright, 200, 2000).mul(sine.slow(16).range(0.8, 1.25)),
-  level: bassCol.level.range(0, 0.5),   // round 8: new sound, level matched to the old bassline (LUFS)
+  lpf: expRange(bassCol.bright, 350, 2500).mul(sine.slow(16).range(0.8, 1.25)),
+  level: bassCol.level.range(0, 0.6),   // round 8: 0.5 (LUFS-matched); space version: 0.6 with the wide top (K5)
 }))
 
 // ============================================================
@@ -630,7 +665,7 @@ const stemJ6_hats = strip(dryBus(stack(
   gate(above(hatDens, 0), drum("hh*16").degradeBy(0.4).gain(ramp(hatDens, 0, 0.5).mul(0.12))),
   gate(above(hatDens, 0.5), drum("hh*32").degradeBy(0.8).gain(ramp(hatDens, 0.5, 1).mul(0.18))),
   gate(held(hats.btn2), drum("oh*8").decay(0.4).sustain(0).release(0.1).gain("[0.26 0.4]*4"))
-).mul(gain(3.2)).hpf(1800).pan(0.56), 1, hats.space), {
+).mul(gain(3.2)).hpf(1800).pan(0.62), 1, hats.space), {
   lpf: expRange(hats.bright, 9000, 18000),
   level: hats.level.range(0, 0.11),   // was 1, 0.47, 0.3; round 8: open hats ≈ 12 dB louder, set to +3 dB over the old hats
 })
@@ -689,7 +724,7 @@ const stemJ8_ride = strip(dryBus(pick(rideVar, RIDES)
 // JONAS 1 PAD — dark minor-9 chords on the progression, slow attack
 // ============================================================
 // @ctl 2:1.k1 Brightness | muffled ↔ open and airy (lpf 250–6000 Hz).
-// @ctl 2:1.k2 Space | dry and close ↔ far away in a big room (reverb).
+// @ctl 2:1.k2 Space | a little room ↔ far away in a big room (reverb). Starts at 50 % until turned.
 // @ctl 2:1.k3 Swell | 0 = held chords. Up = the chord is re-struck on every half bar and breathes in and out.
 // @ctl 2:1.fader Level | dark pad.
 // @ctl 2:1.b1 Change | next of 8 chord progressions, for all.
@@ -698,16 +733,16 @@ const padSwell = pad.char
 const padChord = chordOn([0, 2, 4, 6, 8]).scale(scaleIn(3))
 const padStill = stack(
   padChord.s("sawtooth").superimpose(x => x.add(note(0.1))).attack(0.9).sustain(0.8).release(2).gain(0.035)
-    .pan(sine.slow(5).range(0.3, 0.7)),
-  padChord.s("triangle").attack(0.6).sustain(0.8).release(2).gain(0.07)
+    .pan(sine.slow(5).range(0.15, 0.85)),
+  padChord.s("triangle").attack(0.6).sustain(0.8).release(2).gain(0.07).pan(sine.slow(5).range(0.85, 0.15))
 )
 const padBreath = padChord.struct("x*2").s("sawtooth,triangle")
-  .attack(0.4).decay(0.5).sustain(0.15).release(0.8).gain(0.05).pan(sine.slow(5).range(0.3, 0.7))
+  .attack(0.4).decay(0.5).sustain(0.15).release(0.8).gain(0.05).pan(sine.slow(5).range(0.15, 0.85))
 
 const stemN1_pad = strip(dryBus(stack(
   gate(above(fadeMain(padSwell), 0), padStill.mul(gain(fadeMain(padSwell)))),
   gate(above(fadeExtra(padSwell), 0), padBreath.mul(gain(fadeExtra(padSwell))))
-), 2, pad.space), {
+).hpf(400), 2, pad.space.fmap(s => 0.3 + 0.7 * s)), {
   lpf: expRange(pad.bright, 250, 6000),
   level: pad.level.range(0, 1),
 })
@@ -719,7 +754,7 @@ const stemN1_pad = strip(dryBus(stack(
 // pad in column 1 (two of them without the 3rd), three detuned saws, the cutoff drifts over 16 bars. Pump: every
 // quarter swells in after the kick, as if a compressor ducked it.
 // @ctl 2:2.k1 Brightness | dark and muffled ↔ open and wide (lpf 300–4000 Hz, drifting slowly).
-// @ctl 2:2.k2 Space | close ↔ far away in a big room (reverb).
+// @ctl 2:2.k2 Space | a little room ↔ far away in a big room (reverb). Starts at 75 % until turned.
 // @ctl 2:2.k3 Pump | 0 = long held chords ↔ the kick pumps the pad on every beat, deeper and deeper.
 // @ctl 2:2.fader Level | dark techno pad on the progression.
 // @ctl 2:2.b1 Change | minor 7 → fourths → fifths → minor 9 without the 3rd.
@@ -730,8 +765,9 @@ const tpadPump = tpad.char
 // Scale degrees above the chord root
 const TPAD_SHAPES = [[0, 2, 4, 6], [0, 3, 6, 9], [0, 4, 7, 11], [0, 4, 6, 8]]
 const tpadChord = pick(tpadVar, TPAD_SHAPES.map(shape => chordOn(shape).scale(scaleIn(3))))
-const tpadSaws = pat => stack(pat, pat.add(note(0.12)), pat.add(note(-0.11))).s('sawtooth').gain(0.028)
-  .pan(sine.slow(7).range(0.3, 0.7))
+// Space version: each saw has its own fixed place (middle, left, right) instead of all three moving together
+const tpadSaws = pat => stack(pat.pan(0.5), pat.add(note(0.12)).pan(0.1), pat.add(note(-0.11)).pan(0.9))
+  .s('sawtooth').gain(0.028)
 const tpadHeld   = tpadSaws(tpadChord.struct("x")).attack(0.5).sustain(1).release(1.5)
 const tpadPumped = tpadSaws(tpadChord.struct("x*4")).attack(tpadPump.fmap(p => 0.06 + 0.14 * p)).sustain(1)
   .release(0.04).clip(1)
@@ -739,7 +775,7 @@ const tpadPumped = tpadSaws(tpadChord.struct("x*4")).attack(tpadPump.fmap(p => 0
 const stemN2_tpad = strip(throwEcho(dryBus(stack(
   gate(above(fadeMain(tpadPump), 0), tpadHeld.mul(gain(fadeMain(tpadPump)))),
   gate(above(fadeExtra(tpadPump), 0), tpadPumped.mul(gain(fadeExtra(tpadPump))))
-), 2, tpad.space), tpad.btn2), {
+).hpf(350), 2, tpad.space.fmap(s => 0.3 + 0.7 * s)), tpad.btn2), {
   lpf: expRange(tpad.bright, 300, 4000).mul(sine.slow(16).range(0.7, 1.4)),
   level: tpad.level.range(0, 0.8),   // round 8: new sound, as loud as the old chord pulse (LUFS)
 })
@@ -831,7 +867,7 @@ const stemN4_stab = strip(throwEcho(dryBus(stack(
   stabNotes.add(note(-12)).s('square').gain(0.12)
 ).attack(0.002).decay(0.17).sustain(0).release(0.08)
   .lpq(8).lpenv(3).lpattack(0.002).lpdecay(0.08).lpsustain(0).shape(0.25)
-  .gain(0.3), 2, lead.space.fmap(s => 0.25 + 0.75 * s)), lead.btn2), {
+  .gain(0.3).hpf(400), 2, lead.space.fmap(s => 0.25 + 0.75 * s)), lead.btn2), {   // space version: out of the bass lane
   lpf: expRange(lead.bright, 400, 4000).mul(sine.slow(12).range(0.75, 1.35)),
   level: lead.level.range(0, 0.62),   // round 8: new sound, level matched to the old lead (LUFS)
 })
@@ -902,9 +938,9 @@ const CLAVE_RHYTHMS = [
 const gaps = r => r.split(' ').map(c => c === 'x' ? '~' : 'x').join(' ')
 // Plain strings (single quotes) parsed here with mini(): double quotes would already be patterns, not text
 const claves = r => note("[c7 c7 g6 c7]*4").struct(mini(r)).s('sine').fm(0.4).fmh(1)
-  .attack(0.001).decay(0.035).sustain(0).release(0.02).gain(0.32).pan(0.62)
+  .attack(0.001).decay(0.035).sustain(0).release(0.02).gain(0.32).pan(0.7)
 const shaker = s("white*16").attack(0.008).decay(0.035).sustain(0).release(0.02).hpf(7000)
-  .gain("[0.16 0.09 0.13 0.09]*4").pan(0.4)
+  .gain("[0.16 0.09 0.13 0.09]*4").pan(0.3)
 const metal = (hits, g) => note('f5').struct(hits).s('sine').fm(5).fmh(1.414)
   .attack(0.001).decay(0.04).sustain(0).release(0.03).gain(g).pan(perlin.slow(2).range(0.3, 0.7))
 const zap = hits => note('c5').struct(hits).s('sine').penv(-24).pdecay(0.05).attack(0.001).decay(0.06).sustain(0).release(0.03)
@@ -953,7 +989,7 @@ const breath = pick(fxVar, FX_BREATHS).fmap(v => b => b > 0.5 ? 1 : Math.pow(v, 
 const fxColour = perlin.slow(11).range(0.6, 1.7)   // the bandpass wanders, independent of the breath
 const fxNoise = s("pink*16").degradeBy(0.5).attack(0.08).sustain(0.8).release(rand.range(0.12, 0.4))
   .bpf(breath.fmap(b => c => 400 * Math.pow(6, b) * c).appLeft(fxColour)).bpq(0.8)
-  .gain(breath.fmap(b => r => (1 + 6 * b) * r).appLeft(rand.range(0.5, 1))).pan(rand.range(0.25, 0.75))
+  .gain(breath.fmap(b => r => (1 + 6 * b) * r).appLeft(rand.range(0.5, 1))).pan(rand.range(0.1, 0.9))
 const ramp01  = x => Math.min(1, Math.max(0, x))
 const fxChord = chordOn([0, 4, 7]).scale(scaleIn(4))
 const fxPulse = stack(
@@ -1128,12 +1164,12 @@ showStatus()
 // @lk k3 Attack | quick (0.15 s) ↔ slow fade-in (2 s).
 // @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
 // @lk k5 Detune | narrow ↔ wide, wobbly supersaw.
-// @lk k6 Reverb | some room ↔ far away.
+// @lk k6 Reverb | some room ↔ far away. Starts at 40 % until turned.
 // @lk k7 Echo | dry ↔ long dub echo.
 // @lk k8 Shot Dark | drum pads: open ↔ dark (lpf 18 kHz → 800 Hz).
 const LK_PAD_CHAN = 10
 const LK_PAD_NOTE_1 = 36
-const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
+const lkKnob = n => lkCc ? withDefault(lkCc(LK_KNOB_1 + n - 1), LK_DEFAULTS[n]) : off()
 const lkKeysLevel = lkCc ? lkCc(1) : off()
 const isPadHit = v => v.midichan === LK_PAD_CHAN
 
@@ -1176,7 +1212,7 @@ const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(4).range(0.25, 2))) : silence
 
 const lkPad = lkNotes.filterValues(v => !isPadHit(v))
   .s('supersaw').unison(7).detune(lkKnob(5).range(0.08, 0.6)).spread(0.8)
-  .hpf(140)
+  .hpf(220)
   .lpf(toned(expRange(lkKnob(1), 600, 9000)))
   .lpq(lkKnob(2).range(0, 12))
   .attack(lkKnob(3).range(0.15, 2)).decay(0.4).sustain(0.75).release(1.6)

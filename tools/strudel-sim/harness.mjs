@@ -10,13 +10,17 @@ const AsyncFunction = (async () => {}).constructor
 
 // vals: { cc: value 0..1 }, mutable while running. expr: return this expression (e.g. a stem name)
 // instead of the master, which is the last top-level `stack(` in the file.
+// A Launchkey (port name contains 'Launchkey') reads its own CCs from vals.lk<cc> (its knobs share CC numbers with the
+// LC); its keys play vals.keys (mini-notation of notes, e.g. '<[f3,ab3,c4] [db3,f3,ab3]>'), else nothing.
 export async function load(file, vals, expr) {
   const src = fs.readFileSync(file, 'utf8')
   const master = [...src.matchAll(/^stack\(/gm)].pop()
   if (!master) throw new Error(`${file}: no top-level stack( (master) found`)
   const body = src.slice(0, master.index) + (expr ? `return ${expr}` : 'return ' + src.slice(master.index))
+  const isLaunchkey = name => typeof name === 'string' && name.includes('Launchkey')
   const env = {
-    midin: async () => n => core.ref(() => vals[n] ?? 0),
+    midin: async name => n => core.ref(() => (isLaunchkey(name) ? vals['lk' + n] : vals[n]) ?? 0),
+    midikeys: async () => () => vals.keys ? core.note(vals.keys) : core.silence,
     slider: v => core.pure(v),
     setcpm: () => {},
     setcps: () => {},
