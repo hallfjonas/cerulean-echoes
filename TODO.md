@@ -1,13 +1,7 @@
 
 ## Action Items
 ### Jonas
-+ Improve groove track
-    + more techno; less cringe [replace 7 fx breath durch Klang-Stäbe oder -Hölzer, schneller groove]
-    + more spacial distribution; segment the space
-    + densitiy (missing kicks and crash and a lot of other stuff, maybe voice?; maybe draw a build up trajectory in terms of lows/mids/highs)
-+ Bessere Keys
-+ Bessere Samples
-
++ Next steps:
 + Adopt new UI layout from Johannes? NOT PUSHED YET
     + BLOCKS: Fix UI layout in strudel
     + Extend all strudel tracks by LK and align layouts
