@@ -263,11 +263,12 @@ const statusUi = !hasPage ? null : globalThis.houseStatus ??= (() => {
   return { text, box }
 })()
 
-// LC view: a big, normal window (second screen, full screen) that draws the controller page in use: each control's
-// name from the @ctl tags in the editor, its value, and what the buttons have chosen. One controller: the page follows
-// the CCs that move (columns 1-7: plain = Mode 1 Jojo, CC + 48 = Mode 2 Jonas; column 8 is on both). Two controllers:
-// the page of the controller moved last. Values come from Web MIDI directly; a control not moved since loading shows –
-// (Strudel reads it as 0). Kept on globalThis like the status box; side, pageOf and draw are set anew on every evaluation.
+// LC view: a big, normal window (second screen, full screen) that draws both controller pages side by side, Jojo
+// (Mode 1) left, Jonas (Mode 2) right: each control's name from the @ctl tags in the editor, its value, and what the buttons
+// have chosen. The page in use gets a frame in its colour: two controllers = the one moved last; one controller = the
+// page whose CCs move (columns 1-7: plain = Mode 1 Jojo, CC + 48 = Mode 2 Jonas; column 8 is on both). Values come
+// from Web MIDI directly; a control not moved since loading shows – (Strudel reads it as 0). Kept on globalThis like
+// the status box; side, pageOf and draw are set anew on every evaluation.
 const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   const v = { win: null, cc: { jojo: {}, jonas: {} }, page: 'jojo', timer: null,
     side: () => 'jonas', pageOf: side => side, draw: () => {}, css: '' }
@@ -374,7 +375,7 @@ const pick = (latch, pats) => latch.pat.fmap(i => pats[i]).innerJoin()
 // ============================================================
 // @ctl g.k1 Fog | 0 = clear, up = every filter pulled down to ~6 %: muffled, as if from outside the club.
 // @ctl g.k2 Room | 0 = each sound's own room (row 2), up = everything drowns in reverb.
-// @ctl g.k3 Tension | build-up: echo grows, filters open, from the middle a snare roll (clap fader), no further roll build-up above 80 %. 0 = release.
+// @ctl g.k3 Tension | build-up: echo grows, filters open (not hats, clap, shaker), from the middle a snare roll (clap fader), no further roll build-up above 80 %. 0 = release.
 // @ctl g.fader Master Level | volume of everything, both controllers. 0 = silence.
 // @ctl g.b1 Chapter | Vamp (Am9) ↔ Wechsel (col. 1 chords).
 // @ctl g.b2 Break / Drop | 1st: kick, pump, sub, bass out (clap, hats, percussion stay). 2nd: all back on the one.
@@ -404,7 +405,7 @@ const breakKeep = pat => pat
 
 const audible = level => and(above(level, 0), above(globalLevel, 0))
 // lpf × fog/tension, kept between 80 Hz and 18 kHz (fog never makes a stem silent)
-const toned  = lpf => lpf.fmap(f => g => Math.min(18000, Math.max(80, f * g))).appLeft(globalTone)
+const toned  = (lpf, tone = globalTone) => lpf.fmap(f => g => Math.min(18000, Math.max(80, f * g))).appLeft(tone)
 // Reverb send: the stem's space knob (0..0.9), raised by the global Room up to 0.95
 const roomOf = space => space.fmap(s => g => { const r = 0.9 * s; return r + (0.95 - r) * g }).appLeft(globalRoom)
 // Change: read the stem's randomness 1024 cycles further per step (keeps bar alignment, new random values).
@@ -430,9 +431,10 @@ const bus = (pat, orbit, space, echo = 0) => pat
 // Reverb only, no echo (kick, sub and bass would smear)
 const dryBus = (pat, orbit, space) => pat.room(roomOf(space)).roomsize(BUSES[orbit].hall).orbit(orbit)
 
-// Channel strip: lpf × fog/tension (if given), level × master as postgain, gated while the fader or master is 0
-const strip = (stem, { lpf, level }) => {
-  const pat = lpf === undefined ? stem : stem.lpf(toned(lpf))
+// Channel strip: lpf × fog/tension (if given), level × master as postgain, gated while the fader or master is 0.
+// high: hats, clap, shaker: Fog darkens them, but Tension does not open their filter (it made them far too loud).
+const strip = (stem, { lpf, level, high = false }) => {
+  const pat = lpf === undefined ? stem : stem.lpf(toned(lpf, high ? globalFog : globalTone))
   return gate(audible(level), pat.postgain(level.mul(globalLevel)))
 }
 const drum = (names, bank = 'RolandTR909') => s(names).bank(bank)
@@ -716,6 +718,7 @@ const stemJ5_clap = breakKeep(strip(bus(stack(
     .gain(tensionRoll.fmap(t => 0.1 + 0.35 * t)))
 ).mul(gain(0.8)).hpf(300).pan(0.48), 1, clap.space, 0.2), {
   lpf: expRange(clap.bright, 3500, 14000),
+  high: true,
   level: clap.level.range(0, 1),
 }))
 
@@ -751,6 +754,7 @@ const stemJ6_hats = breakKeep(strip(bus(stack(
   gate(held(hats.btn2), drum("oh*8").gain(0.3).decay(0.22).sustain(0))
 ).mul(gain(0.9)).pan(0.56), 1, hats.space, 0.2), {
   lpf: expRange(hats.bright, 4000, 16000),
+  high: true,
   level: hats.level.range(0, 1),
 }))
 
@@ -802,6 +806,7 @@ const stemJ8_shake = breakKeep(strip(bus(pick(shakeVar, SHAKERS)
   .swingBy(shake.char.mul(0.6), 8)   // 0.6 = the off-16th lands on the last triplet
   .pan(0.62), 1, shake.space, 0.25), {
   lpf: expRange(shake.bright, 4500, 16000),
+  high: true,
   level: shake.level.range(0, 1),
 }))
 
@@ -1371,12 +1376,16 @@ if (lcView) {
   }
   const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
   const choice = (page, n) => {
-    if (isGlobal(page, n)) return pending(...lcChapter())
+    if (isGlobal(page, n)) return lcChapter()
     const r = STATUS[page][n - 1]
-    if (!r) return ''
+    if (!r) return ['', '']
     const show = i => !r.names ? (i + 1) + ' / ' + r.n : typeof r.names === 'function' ? r.names(i) : r.names[i]
-    return pending(show(r.latch.now), show(r.latch.pending))
+    return [show(r.latch.now), show(r.latch.pending)]
   }
+  // Button 1 in two lines like button 2: its name and the choice; while a change waits for the bar line, the current
+  // choice small on top and the next one below (so the button keeps its size)
+  const b1Lines = (name, now, next) => next !== now ? '<span>' + esc(now) + '</span><b class=next>→ ' + esc(next) + '</b>'
+    : '<span>' + esc(name) + '</span><b>' + esc(now) + '</b>'
   const cell = (page, n, row) => {
     if (COLVIEW[page + ':' + n] && !isGlobal(page, n)) return COLVIEW[page + ':' + n](row, { esc, pending })
     const val = valueOf(page, n, row)
@@ -1386,7 +1395,7 @@ if (lcView) {
     const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
     if (row === 'fader') return '<div class="cell fader"' + title + '><div class=bar ' + v + '><i></i></div>' +
       '<b>' + num + '</b><span>' + esc(name) + '</span></div>'
-    if (row === 'b1') return '<div class="cell btn"' + title + '><span>' + esc(name) + '</span><b>' + choice(page, n) + '</b></div>'
+    if (row === 'b1') return '<div class="cell btn"' + title + '>' + b1Lines(name, ...choice(page, n)) + '</div>'
     if (row === 'b2') {
       const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
       const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
@@ -1401,20 +1410,24 @@ if (lcView) {
     '<span class=bars>' + marks(CYCLE, beatNow.bar % CYCLE) + '</span><span class=beats>' + marks(4, beatNow.beat) + '</span>' +
     (chordAt(beatNow.bar) ? '<span class=chord>' + esc(chordAt(beatNow.bar)) + '</span>' : '')
   lcView.css = [
-    'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+    ':root{--acc:#ddd}html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(10px,.8vw,18px)/1.25 system-ui,sans-serif}',
+    '.pages{flex:1;display:flex;gap:1vw;min-height:0}',
+    '.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:.4vh;min-height:0;padding:.6vh .8vw;border:2px solid #222;border-radius:8px}',
+    '.page.live{border-color:var(--acc)}.page h2{margin:0;font-size:1.15em;color:var(--acc)}',
     '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
     '.head{display:flex;gap:2.5vw;align-items:baseline;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:var(--acc)}',
     '.head .k{opacity:.6;margin-right:.4em}.next{color:var(--acc)}',
-    '.grid{flex:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) auto auto;gap:.8vh .8vw}',
-    '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.g{color:var(--acc)}',
+    '.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:2.9em repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 3.3em 3.3em;gap:.8vh .5vw}',
+    '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}.col.g{color:var(--acc)}',
     '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
     '.cell span{opacity:.7;font-size:.85em;overflow-wrap:anywhere}.cell b{font-variant-numeric:tabular-nums}',
-    '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+    '.dial{width:min(3vw,6.5vh);aspect-ratio:1;border-radius:50%;',
     'background:conic-gradient(from -135deg,var(--acc) 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
     '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
-    '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+    '.bar{position:relative;width:1vw;min-width:12px;flex:1;min-height:30px;background:#333;border-radius:4px;overflow:hidden}',
     '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:var(--acc)}',
-    '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start}.btn.on{background:var(--acc);color:#111}',
+    '.btn{background:#222;border-radius:6px;padding:.4em .3em;justify-content:flex-start;overflow:hidden;box-sizing:border-box}',
+    '.btn b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.btn .next{display:block;overflow:hidden;text-overflow:ellipsis}.btn.on{background:var(--acc);color:#111}',
     '.btn.on span{opacity:.8}.btn b{font-size:1.05em}',
     '.beats{margin-left:.6em}.beats i{display:inline-block;width:.75em;height:.75em;border-radius:50%;background:#333;margin-left:.3em}',
     '.beats i:first-child{outline:2px solid #555}.beats i.on{background:var(--acc)}',
@@ -1422,24 +1435,27 @@ if (lcView) {
     '.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}',
     '.pat{font:.75em monospace;letter-spacing:.05em;opacity:.85;overflow-wrap:anywhere}',
   ].join('\n')
+  // One page as a block: its title, the column names and the six rows. The page moved last gets a frame in its colour.
+  // The pages stand side by side like the two controllers on the table; swap the order here if Jonas stands left.
+  const PAGE_ORDER = ['jojo', 'jonas']
+  const cols = [1, 2, 3, 4, 5, 6, 7, 8]
+  const pageHtml = page => '<section class="page' + (page === lcView.page ? ' live' : '') + '" style="--acc:' +
+    (page === 'jojo' ? '#f0a040' : '#50c8e8') + '"><h2>' +
+    esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h2><div class=grid>' +
+    cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
+      esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
+    ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div></section>'
   lcView.draw = () => {
     const doc = lcView.win.document
     const root = doc.getElementById('lc')
     if (!root) return
-    const page = lcView.page
-    doc.documentElement.style.setProperty('--acc', page === 'jojo' ? '#f0a040' : '#50c8e8')
-    const cols = [1, 2, 3, 4, 5, 6, 7, 8]
-    root.innerHTML = '<div class=head><h1>' + esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h1>' +
+    root.innerHTML = '<div class=head>' +
       '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
       lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
       '<div><span class=k>Takt</span>' + beatHtml() + '</div>' +
       '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
       (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
-      (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div>' +
-      '<div class=grid>' +
-      cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
-        esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
-      ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div>'
+      (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' + PAGE_ORDER.map(pageHtml).join('') + '</div>'
   }
   // Another track's status box may be the one on the page now: the link moves into it
   if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)

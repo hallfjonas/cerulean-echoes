@@ -89,3 +89,12 @@
 - Toms insgesamt nicht mehr zu leise.
 - Knopf überall „Komplexität“ (Überbegriff), für einfache Bedienung gleiche Beschriftung.
 - → in 007 übernommen (Jonas 2 Eno-Bogen, 3 Marimba, 4 Toms).
+
+## Techno-Akkorde 1 — techno-akkorde-1.strudel (2026-11-09), for 008 Jonas 2
+- Players not convinced by the chord pulse (008 round 7); before that the dub chords were rejected (boring, cheap attack).
+- Research: tracks/008-groove-techno/recherche-chords-lead.md (Attack Magazine). New engine tools/stem-lab/engine-techno
+  (`// @engine techno`: F dorian, 140 BPM, 008's progressions, techno context: kick, hat, clap, bass, 008 pad).
+- Columns: 1 chord pulse as in 008 (reference), 2 dub chuff (noise + slow filter attack + feedback echo), 3 Basic Channel
+  (crushed, moving bandpass), 4 parallel m7 (UR Timeline), 5 pad chopped by 5/16 echo + drive, 6 one hit + long echo,
+  7 minor triad stab (Mills principle). Checked in Node (notes, events). Levels estimated, not measured. Not heard.
+- Feedback: open.
