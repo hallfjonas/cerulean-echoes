@@ -50,7 +50,7 @@ offen ist.
 **F** Vollbild · **V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus. Die Leiste oben blendet sich nach 3 s
 ohne Maus aus.
 
-Alte Dual-Tracks über ihre `-single.strudel`-Version tappen.
+Alte Dual-Versionen über ihre Single-Version in `old/` tappen (z. B. `tracks/009-house/old/009-house-single.strudel`).
 
 ## Fortschritt
 
