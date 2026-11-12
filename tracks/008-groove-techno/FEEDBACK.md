@@ -1,11 +1,18 @@
 
-## GENERAL
+## ROUND 9 — reverts two round-8 asks
+- Global button 1 is the chapter switch again (dark → tense → warm, starts dark); the drop fill is gone. A harsher
+  drop and build-up did not work out yet; it comes back later, with a fresh start.
+- Room knob → Thin (the mirror of Fog: every high-pass pushed up); Tension now also raises the reverb.
+- Tension's snare roll keeps playing in the break.
+
+## ROUND 8
+### GENERAL
 - change chapter to F Dunkel fixed
 - replace that button with drop fill (idea would be to first turn off beat; then, before bringing it back, you fill the beat; this should be a 'button down' feature: plan with a 16 beat build up; cycle by cycle; at the end of the 16th beat)
 - too much melody; not enough techno
 - I think needs more fast percussion eleemnts (Klanghözer, shakers, bongos, ride, dark electronic mid&high-frequency stuff)
 
-## BAD
+### BAD
 - Bassline --> waaaay too boring; more interesting dark techno line
 - Hi-Hat --> should be open and much more crisp (much higher brightness by default)
 - Chord pulse --> should be replaced by LKs; replace with nice techno pads
@@ -13,7 +20,7 @@
 - Pings --> too boring; full remake --> think dark techno
 - FX / Breath --> breathing is a good theme; just softer
 
-## GOOD (Change nothing unless specifically addressed)
+### GOOD (Change nothing unless specifically addressed)
 - Answer
 - Sub
 - Kicktop button -> instead of cycling through patterns, double-time (so instead of 4/4 -> 8/4 while pressed)
