@@ -33,3 +33,14 @@
 - Columns and sounds as round 3. Button 1 = 18 lines: the liked ones (disco syncope 3, beat 4 open 3, Voyager 3, dead-note
   funk 3, Alright) + 5 new ones in their style (syncope around the 1 + dead notes, short + beat 4 open + pickup, plucking +
   syncope, Alright short, dead notes around the 1). Not heard.
+
+## Low-End Width 1 — low-end-width.strudel (2026-11-11), for 008 (space plan)
+- Question: may 008's low end be wide, or must it stay mono? Columns 1-3 = 008's kick (Punch 0.5), sub ("Pumpe") and
+  bassline ("rollend", lpf floor 350 Hz as in the space plan), chords 1–6, no reverb. Per column: width, method
+  (detune / Haas / auto-pan), amount, crossover (mono below 40–300 Hz). Column 8: mono check (all pans to the middle,
+  copies kept) and bypass (all mono, reference).
+- Node (transpile ok; offline render, 8 bars, below 120 Hz, mono sum vs. stereo; full width each):
+  sub detune 12 ct −0.2 dB, 25 ct −0.5 dB (side/mid 0.13: little width, the short notes restart in step);
+  sub Haas 10 ms −8.9 dB, worst beat −13.6 dB (side/mid 6.8: nearly cancels); sub auto-pan −1.3 dB;
+  sub detune 25 ct with crossover 300 Hz 0 dB; bassline detune 12 ct −0.1 dB, with crossover 0 dB;
+  kick Haas 10 ms −3.6 dB. Not heard. Feedback: open.

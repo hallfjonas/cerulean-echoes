@@ -1,15 +1,14 @@
 
 ## Action Items
 ### Jonas
-+ Letzte Wiese sample
-+ Improve groove track
-    + less cringe more techno; more groove; more trippy space sounds
-    + densitiy (missing kicks and crash and a lot of other stuff, maybe voice?; maybe draw a build up trajectory in terms of lows/mids/highs)
-+ Have fun
-+ Bessere Samples
-+ Bessere Keys
++ Next steps:
+    + Adopt new UI layout from Johannes? NOT PUSHED YET
+    + Adopt Jonas new strudel-streamlined single file architecture
+    + Add MK and make all LCs optional. Each LC has same 2-mode single midi setup.
+    + Add MK knob states to the global single page midi UI
+    + Merge Techno updates. improved sound distribution and space
+    + Animation ist wird noch nicht durch dis knobs manipuliert... (z.B.: brightness bass)
 
-+ Adopt new UI layout from Johannes? NOT PUSHED YET
     + BLOCKS: Fix UI layout in strudel
     + Extend all strudel tracks by LK and align layouts
 

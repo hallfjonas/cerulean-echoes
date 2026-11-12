@@ -1,0 +1,194 @@
+// ============================================================
+// LOW-END WIDTH LAB: 008's kick, sub and bassline, each from mono to very wide, with a mono check
+// ============================================================
+// Question behind this board: how wide may the low end of 008 be? A wide sub feels big on headphones, but club
+// systems play the lows in mono (left + right summed). This board makes each of the three low sounds wide in three
+// ways and lets you hear at once what is left when the mix is summed to mono.
+// Sounds as in tracks/008-groove-techno/008-groove-techno.strudel (round 9): kick at Punch 0.5, sub "Pumpe", bassline
+// "rollend" with the filter floor of the space plan (350 Hz). Chords 1–6 (F, then D♭), 140 BPM, no reverb.
+//
+// Launch Control XL 3 in Custom Mode 16 (channel 16). Columns 1-3: fader = level, knob 1 = width, knob 2 = the
+// method's amount, knob 3 = crossover (below it the sound stays mono), button 1 = method, button 2 = solo.
+// Column 8: fader = master, button 1 = mono check, button 2 = bypass (everything mono, for A/B).
+// @layout Low-End Width Lab (lab/bass)
+// @note Kick, sub and bassline of 008, each from mono to very wide. Turn up width (knob 1) on one sound, then press mono check (column 8, button 1): does the sound keep its power?
+// @note Button 1 of a column switches the method: detune → Haas delay → auto-pan. Knob 3 keeps everything below the crossover mono: the safe way to be wide.
+// @note The status box at the bottom right shows every value with units.
+// @guide Three ways to make a sound wide | Detune: two copies, left a little lower, right a little higher; they beat against each other. Haas: the right copy comes a few milliseconds later. Auto-pan: one copy that wanders from left to right.
+// @guide What mono does | A club system adds left and right. A Haas copy then hollows out some frequencies (comb filter): on the sub at 10 ms almost half a wave late, so it nearly cancels. Detuned copies swell and fade in a slow pulse, but 008's sub notes are short and restart in step, so detune costs little there (and gives little width). Auto-pan changes the level a little.
+// @guide What to listen for | Headphones first: which width do you like? Then mono check: is the sub still there on every note, and still as loud? A phone speaker is a good second test.
+// @guide Crossover | Knob 3 splits the sound: below the crossover one mono copy, above it the wide copies. The sub (a sine at 35–44 Hz) has almost nothing above 100 Hz, so with the crossover up only its triangle overtones go wide.
+// @mode 16 Mode 16 — Low-End Width Lab
+// @col 16:1 1 Kick
+// @col 16:2 2 Sub
+// @col 16:3 3 Bassline
+// @col 16:8 8 Master + mono check
+// @ctl 16:1.k1 Width | 0 = mono in the middle ↔ 1 = copies hard left and right.
+// @ctl 16:1.k2 Amount | detune 0–25 cents, Haas 0–20 ms, or auto-pan 0.25–4 sweeps per bar.
+// @ctl 16:1.k3 Crossover | 0 = whole sound wide; up = mono below 40–300 Hz, wide above.
+// @ctl 16:1.fader Level | 008's kick: sine on C2 + 909, on every beat.
+// @ctl 16:1.b1 Method | detune → Haas → auto-pan.
+// @ctl 16:1.b2 Solo | only the kick; press again = all.
+// @ctl 16:2.k1 Width | 0 = mono in the middle ↔ 1 = copies hard left and right.
+// @ctl 16:2.k2 Amount | detune 0–25 cents, Haas 0–20 ms, or auto-pan 0.25–4 sweeps per bar.
+// @ctl 16:2.k3 Crossover | 0 = whole sound wide; up = mono below 40–300 Hz, wide above.
+// @ctl 16:2.fader Level | 008's sub: pumping sine + triangle on F1 / D♭1, a 16th after each kick.
+// @ctl 16:2.b1 Method | detune → Haas → auto-pan.
+// @ctl 16:2.b2 Solo | only the sub; press again = all.
+// @ctl 16:3.k1 Width | 0 = mono in the middle ↔ 1 = copies hard left and right.
+// @ctl 16:3.k2 Amount | detune 0–25 cents, Haas 0–20 ms, or auto-pan 0.25–4 sweeps per bar.
+// @ctl 16:3.k3 Crossover | 0 = whole sound wide; up = mono below 40–300 Hz, wide above.
+// @ctl 16:3.fader Level | 008's rolling bassline on F2, detuned saws through a snapping filter.
+// @ctl 16:3.b1 Method | detune → Haas → auto-pan.
+// @ctl 16:3.b2 Solo | only the bassline; press again = all.
+// @ctl 16:8.fader Master | volume of the whole board.
+// @ctl 16:8.b1 Mono check | on: everything in the middle, as a club system sums it (copies stay, so you hear what cancels).
+// @ctl 16:8.b2 Bypass | on: no width at all, one mono copy each: the reference.
+
+const BPM = 140
+const cps = BPM / 240
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const lin = (lo, hi) => v => lo + (hi - lo) * v
+const hz  = x => x < 1000 ? Math.round(x) + ' Hz' : (x / 1000).toFixed(1) + ' kHz'
+
+// Chords 1–6 as in 008's pad progression 2: two bars per chord, F F D♭ D♭ (scale degrees 0 0 -2 -2)
+const PROG = [0, 0, 0, 0, -2, -2, -2, -2]
+const MINOR = [0, 2, 3, 5, 7, 8, 10]
+const semis = deg => Math.floor(deg / 7) * 12 + MINOR[((deg % 7) + 7) % 7]
+const F1 = 29, C2 = 36, F2 = 41
+const BASS_BARS = ['~ 0 0 7 ~ 0 0 0 ~ 0 0 7 ~ 0 2 0', '~ 0 0 7 ~ 0 0 0 ~ 0 -1 0 ~ 4 2 -1'].map(b => b.split(' '))
+
+// Each part: events(step, bar) → the layers of one hit (dur in 16ths). Values as in 008.
+const PARTS = [
+  { name: 'Kick', max: 0.8,
+    events: step => step % 4 !== 0 ? [] : [
+      { s: 'sine', note: C2, gain: 0.8, attack: 0.004, decay: 0.4, sustain: 0, release: 0.05, penv: 24, pdecay: 0.05,
+        cutoff: 2500, dur: 4 },
+      { s: 'bd', bank: 'RolandTR909', gain: 0.24, cutoff: 2500, dur: 4 }] },
+  { name: 'Sub', max: 0.65,
+    events: (step, bar) => {
+      if (step % 4 !== 1) return []
+      const note = F1 + semis(PROG[bar % 8]), env = { attack: 0.015, sustain: 1, release: 0.04, dur: 3 }
+      return [{ s: 'sine', note, gain: 0.9, ...env }, { s: 'triangle', note, gain: 0.18, ...env }]
+    } },
+  { name: 'Bassline', max: 0.7,
+    events: (step, bar) => {
+      const token = BASS_BARS[bar % 2][step]
+      if (token === '~') return []
+      const note = F2 + semis(Number(token) + PROG[bar % 8])
+      const tone = { s: 'sawtooth', gain: 0.3, velocity: [0.7, 0.8, 1, 0.75][step % 4], attack: 0.003, decay: 0.16,
+        sustain: 0.15, release: 0.06, cutoff: 350, resonance: 7, lpenv: [1.8, 2.2, 3.2, 2][step % 4], lpattack: 0.002,
+        lpdecay: 0.11, lpsustain: 0, shape: 0.35, dur: 1 }
+      return [{ ...tone, note }, { ...tone, note: note + 0.1 }]
+    } },
+]
+const METHODS = ['Detune', 'Haas', 'Auto-Pan']
+const KNOBS = [
+  ['Breite', 0, lin(0, 1), x => x.toFixed(2)],
+  ['Menge', 0.5, null, null],
+  ['Crossover', 0, exp(40, 300), hz],
+]
+const AMOUNT = [
+  [lin(0, 25), x => x.toFixed(0) + ' ct'],
+  [lin(0, 20), x => x.toFixed(1) + ' ms'],
+  [exp(0.25, 4), x => x.toFixed(2) + '/Takt'],
+]
+
+const S = globalThis.lowEndLab ??= { val: {}, method: PARTS.map(() => 0), solo: -1, mono: false, bypass: false }
+PARTS.forEach((p, i) => {
+  S.val[5 + i] ??= 0.8
+  KNOBS.forEach(([, start], r) => { S.val[13 + 8 * r + i] ??= start })
+})
+S.val[12] ??= 0.8
+const width     = i => S.bypass ? 0 : S.val[13 + i]
+const amount    = i => AMOUNT[S.method[i]][0](S.val[21 + i])
+const crossover = i => S.val[29 + i] < 0.02 ? 0 : KNOBS[2][2](S.val[29 + i])
+
+// One hit of part i → its events with width: copies with pan (and pitch or a small delay), the part below the
+// crossover as one mono copy. shift = a delay in cycles (Haas).
+const widen = (i, layers, step, bar) => {
+  const w = width(i)
+  if (w < 0.005) return layers
+  const xo = crossover(i), left = 0.5 - w / 2, right = 0.5 + w / 2, amt = amount(i)
+  const low  = xo ? layers.map(v => ({ ...v, cutoff: Math.min(v.cutoff ?? 20000, xo), lpenv: 0 })) : []
+  const high = xo ? layers.map(v => ({ ...v, hcutoff: Math.max(v.hcutoff ?? 0, xo) })) : layers
+  const detune = (v, cents) => v.note !== undefined ? { ...v, note: v.note + cents / 100 }
+    : { ...v, speed: (v.speed ?? 1) * Math.pow(2, cents / 1200) }
+  const copy = (v, pan, extra = {}) => ({ ...v, pan, gain: (v.gain ?? 1) * 0.71, ...extra })
+  const wide = [
+    v => [copy(detune(v, -amt / 2), left), copy(detune(v, amt / 2), right)],
+    v => [copy(v, left), copy(v, right, { shift: amt / 1000 * cps })],
+    v => [{ ...v, pan: 0.5 + (w / 2) * Math.sin(2 * Math.PI * amt * (bar + step / 16)) }],
+  ][S.method[i]]
+  return [...low, ...high.flatMap(wide)]
+}
+
+const hasPage = typeof document !== 'undefined'
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== 'low-end-width') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = 'low-end-width'
+  }
+}
+let statusBox = hasPage ? document.getElementById('board-status') : null
+if (hasPage && !statusBox) {
+  statusBox = document.createElement('pre')
+  statusBox.id = 'board-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;margin:0;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);color:#eee;font:13px/1.5 monospace;border-radius:6px;pointer-events:none'
+  document.body.appendChild(statusBox)
+}
+const showStatus = () => {
+  if (!statusBox) return
+  statusBox.textContent = [
+    (S.mono ? 'MONO-CHECK AN' : 'Stereo') + ' · ' + (S.bypass ? 'BYPASS (alles mono)' : 'Breite aktiv') + ' · Master ' +
+      Math.round(S.val[12] * 100) + ' · ' + BPM + ' BPM',
+    ...PARTS.map((p, i) => (i + 1) + (S.solo === i ? ' SOLO ' : S.solo >= 0 ? '  --  ' : '      ') + p.name.padEnd(9) +
+      ('Pegel ' + Math.round(S.val[5 + i] * 100)).padEnd(10) + ('Breite ' + width(i).toFixed(2)).padEnd(13) +
+      (METHODS[S.method[i]] + ' ' + AMOUNT[S.method[i]][1](amount(i))).padEnd(20) +
+      'mono unter ' + (crossover(i) ? hz(crossover(i)) : '–')),
+  ].join('\n')
+}
+const onMidi = e => {
+  const [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if (cc >= 5 && cc <= 36) S.val[cc] = value / 127
+  else if (value === 0) return
+  else if (cc >= 37 && cc < 37 + PARTS.length) S.method[cc - 37] = (S.method[cc - 37] + 1) % METHODS.length
+  else if (cc >= 45 && cc < 45 + PARTS.length) S.solo = S.solo === cc - 45 ? -1 : cc - 45
+  else if (cc === 44) S.mono = !S.mono
+  else if (cc === 52) S.bypass = !S.bypass
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; each step asks fn for its events; an event may carry dur (in 16ths, default 4) and shift (cycles)
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  for (let k = Math.ceil(b0 * 16 - 1e-9); k < e0 * 16 - 1e-9; k++)
+    for (const { dur = 4, shift = 0, ...v } of fn(((k % 16) + 16) % 16, Math.floor(k / 16)) ?? []) {
+      const whole = new TimeSpan(k / 16 + shift, (k + dur) / 16 + shift)
+      out.push(new Hap(whole, whole, v, {}))
+    }
+  return out
+})
+
+const board = grid((step, bar) => PARTS.flatMap((p, i) => {
+  const level = S.val[5 + i]
+  if (level <= 0 || S.val[12] <= 0 || (S.solo >= 0 && S.solo !== i)) return []
+  return widen(i, p.events(step, bar), step, bar).map(v => ({ orbit: 1, ...v, pan: S.mono ? 0.5 : v.pan ?? 0.5,
+    postgain: level * p.max * S.val[12] }))
+}))
+setcps(cps)
+
+stack(board.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0))

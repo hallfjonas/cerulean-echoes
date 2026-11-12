@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trajectory Player</title>
+<style>
+  :root { --bg: #0a1a26; --fg: #eef4f2; --dim: #7fa3b2; --line: #2c4e63 }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px system-ui, sans-serif; overflow: hidden }
+  #view { position: fixed; inset: 0; display: block }
+  header { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 10px 16px;
+    align-items: center; padding: 10px 16px; background: rgba(4, 6, 13, 0.8); z-index: 1; transition: opacity 0.6s }
+  body.idle header { opacity: 0; pointer-events: none }
+  body.idle { cursor: none }
+  button, select { background: #163449; color: var(--fg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 6px 10px; font: inherit; cursor: pointer }
+  label { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: 13px }
+  input[type=range] { width: 140px; accent-color: #4fb3e0 }
+  output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em }
+  #status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px }
+</style>
+</head>
+<body>
+<!-- Plays a tapped track (make-tapped.mjs) right here and shows it: no strudel.cc needed. Every control the track
+     reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
+     last per number); a control not moved yet reads 0. Two homotopy controls:
+     "Hart ↔ Weich" sets the character of the visuals (render.mjs setCharacter).
+     "Roh ↔ Glatt" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
+     (smoothing.mjs); the sound is not affected.
+     Axes, labels and beat rings can be switched off. The track's status box (bottom right) hides while its LC view
+     is open in another window. -->
+<canvas id="view"></canvas>
+<header>
+  <select id="track"></select>
+  <button id="play">Play</button>
+  <button id="stop">Stop</button>
+  <label title="0 = hart, scharf, wild · 1 = weich, verschmiert, träge">Hart
+    <input id="character" type="range" min="0" max="1" step="0.01" value="0.5"> Weich <output id="characterValue">0.50</output></label>
+  <label title="0 = rohe Signale · 1 = gleitender Mittelwert über 2^53 Zeilen (max_int): eingefroren">Roh
+    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0"> Glatt <output id="smoothingValue">roh</output></label>
+  <label title="Taste A"><input id="axes" type="checkbox" checked> Achsen</label>
+  <label title="Taste L"><input id="labels" type="checkbox" checked> Beschriftung</label>
+  <label title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
+  <span id="status">lädt Strudel …</span>
+</header>
+<script type="module">
+import { initStrudel, evaluate, samples, hush, signal } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
+import { createRenderer } from './render.mjs'
+import { createStrudelSource } from './strudel-source.mjs'
+import { createSmoother, describeWindow } from './smoothing.mjs'
+
+const $ = id => document.getElementById(id)
+const renderer = createRenderer($('view'))
+const smoother = createSmoother(renderer.push)
+let label = 'lädt Strudel …', visuals = '', midiInputs = 0
+createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
+
+const human = new Map()
+globalThis.midin = async () => c => signal(() => human.get(c) ?? 0)
+
+navigator.requestMIDIAccess?.().then(access => {
+  const listen = () => {
+    midiInputs = 0
+    for (const input of access.inputs.values()) {
+      if (/DAW/.test(input.name)) continue
+      midiInputs++
+      input.onmidimessage = ({ data: [status, cc, value] }) => { if ((status & 0xf0) === 0xb0) human.set(cc, value / 127) }
+    }
+  }
+  listen()
+  access.onstatechange = listen
+}).catch(() => {})
+
+const ready = initStrudel({
+  prebake: () => Promise.all([
+    samples('github:tidalcycles/dirt-samples'),
+    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json'),
+    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/vcsl.json'),
+    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/piano.json'),
+  ]),
+})
+ready.then(() => { label = 'bereit' })
+fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f, f))))
+
+$('play').onclick = async () => {
+  await ready
+  label = 'lädt Track …'
+  const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
+  try {
+    await evaluate(code)
+    label = 'spielt: ' + $('track').value.replace(/-tapped\.strudel$/, '')
+  } catch (error) {
+    label = 'Fehler: ' + error.message
+  }
+}
+$('stop').onclick = () => { hush(); label = 'gestoppt' }
+
+const slider = (id, apply, show = v => v.toFixed(2)) => {
+  const update = () => { apply(Number($(id).value)); $(id + 'Value').textContent = show(Number($(id).value)) }
+  $(id).oninput = update
+  update()
+}
+slider('character', v => renderer.setCharacter(v))
+slider('smoothing', v => { smoother.setAmount(v); renderer.setSmoothing(v) }, describeWindow)
+
+const checkbox = (id, apply) => {
+  $(id).onchange = () => apply($(id).checked)
+  apply($(id).checked)
+}
+checkbox('axes', renderer.setAxes)
+checkbox('labels', renderer.setLabels)
+checkbox('rings', renderer.setRings)
+
+const hideStatusBoxWhileLcViewOpen = () => {
+  const view = globalThis.lcxlView, box = view?.link?.parentElement
+  if (box && box !== document.body) box.hidden = !!view.win && !view.win.closed
+}
+
+const showStatus = () => {
+  hideStatusBoxWhileLcViewOpen()
+  $('status').textContent = `${label} · MIDI: ${midiInputs} Eingänge${visuals ? ' · ' + visuals : ''}`
+  requestAnimationFrame(showStatus)
+}
+showStatus()
+
+const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
+addEventListener('keydown', event => {
+  if (['SELECT', 'INPUT'].includes(event.target.tagName)) return
+  if (event.key === 'f') toggleFullscreen()
+  if (event.key === 'v') renderer.toggleLook()
+  if (event.key === 'a') $('axes').click()
+  if (event.key === 'l') $('labels').click()
+  if (event.key === 'b') $('rings').click()
+  if (event.key === 'w') renderer.toggleWiden()
+})
+let idleTimer
+const wake = () => {
+  document.body.classList.remove('idle')
+  clearTimeout(idleTimer)
+  idleTimer = setTimeout(() => document.body.classList.add('idle'), 3000)
+}
+addEventListener('mousemove', wake)
+wake()
+</script>
+</body>
+</html>
