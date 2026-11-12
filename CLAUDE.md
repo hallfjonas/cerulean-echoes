@@ -4,6 +4,13 @@ Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control 
 Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/geraete.md`).
 Talk to the user in German; code comments stay in English. Explain audio basics plainly.
 
+## Labels
+Everything the player reads is English and short: `@ctl` texts, control and option names, the live view (`▣ LC big`), the status box.
+One name per job in every track: row 1 Brightness, row 2 Space, fader Level, button 1 Pattern (Chords on a harmony column),
+global column Fog / Thin / Tension / Master / Chapter / Break. Row 3 and button 2 are named for what they do (Length, Complexity,
+Octave, Echo throw, Lift). A `@ctl` text is one short line (about 50 characters): what the control does, no ranges or history.
+No pattern strings (x..x) in the live view. Chat with the user stays German.
+
 ## Layout
 - `tracks/NNN/` — one folder per track number: the track (`NNN.strudel`, variants as `NNN-<name>.strudel`), its
   layout sheets, custom modes (`.syx`) and feedback notes; superseded variants in `tracks/NNN/old/`

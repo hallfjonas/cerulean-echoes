@@ -1,0 +1,464 @@
+// ============================================================
+// TECHNO-PADS 1: one pad column for track 008 instead of Pad (Jonas 1) + Techno-Pad (Jonas 2)
+// ============================================================
+// Wish (2026-11-12): put pad and techno pad together in one column; button 1 = the chords (progressions with real
+// key changes, "not just the basic stuff"), button 2 = the chord colour (7, 9, fourths, fifths); fuller than now.
+// Here button 1 and 2 of EVERY candidate column act on the one shared harmony (as the pad's button 1 does in 008),
+// so all columns can be compared on the same chords and the context bass follows. Both switch at the next chord.
+//
+// ADAPTED ENGINE: a copy of tools/stem-lab/engine-techno.strudel-part with chords as roots in semitones (any root, not
+// only the F scale), the colour button and both buttons on every column. NO `@engine` marker: do not run sync.mjs.
+//
+// Progressions (button 1), transposed to F, 2 bars per chord (sources: Attack Magazine "Passing Notes"):
+//   1 008 jetzt   Fm – D♭ – B♭m – Cm: the track's 1–6–4–5 (reference, all in F minor)
+//   2 Parallel    Fm – E♭m – Cm – Cm: one minor shape moved down (Attack "Parallel chords": Dm9 > Cm9 > Am9; "parallel
+//                 chords almost always contain key changes"; E♭m is outside F minor)
+//   3 Kerri 1     Fm – Gm – Bm – E♭m: Kerri Chandler "Bar a Thym" (G#m7 > A#m7 > Dm7 > F#m7; the third chord shares no
+//                 note with the key) (Attack "Parallel chords")
+//   4 Kerri 2     Fm – Fm – Gm – G♭7: "Harder Gets Higher" (G#m7 > A#m7 > A7: the borrowed A7 slides down a semitone
+//                 back to the start) (Attack "Kerri Chandler chords")
+//   5 Terje       Fm – E♭m – B – E: Todd Terje "Preben Goes to Acapulco" (Dm7 > Cm7 > A♭maj7 > D♭maj7 > Dm7: the key
+//                 moves four times; A♭maj7 is the pivot, D♭maj7 steps up a semitone back home) (Attack "Todd Terje")
+//   6 Kerri 3     Fm – Fm – D♭m – D♭m: "The Sound Is Yours" (D#m7(11) > Bm(13): a minor chord a major third down)
+//   7 Ausreißer   Fm – Fm – Fm – B: Motor City Drum Ensemble "Raw Cuts #3" (a Cmaj7 loop, F#maj7 as a borrowed fill
+//                 every 4 bars; here on F minor, the fill a tritone away) (Attack "Parallel chords")
+//   8 Stehend     Fm – B♭m – Fm – B♭m: Kerri "The Way It Goes" (D#m7 > G#m7) (Attack "Kerri Chandler chords")
+// Colours (button 2): 7 (minor 7 / major 7 / dominant 7), 9 (+ the 9th), Quarten (stacked fourths on the root),
+// Quinten (stacked fifths: root, 5th, 9th). Which colour fits which chord quality = my translation.
+//
+// Columns (sound candidates), all with row 3 = Pump (0 = held, up = the kick pumps the chord on every beat):
+//   1 Pad (jetzt)    008's pad: two detuned saws + triangle, slow attack (reference)
+//   2 Techno (jetzt) 008's techno pad: three saws left / middle / right (reference)
+//   3 Beide          1 + 2 played together: the literal "put them together"
+//   4 Tief           Attack "Theory of techno pads": "triad chords can sound thin" → low octave doubling of the root
+//                    and the 3rd an octave up, saws + triangle
+//   5 Superchor      supersaw (Strudel's detuned unison) + a soft sine root an octave down; like the Launchkey pad
+//   6 Kalt           Attack "Cold pads" (Ableton Analog): detuned sine pair with slowly growing vibrato, a square through
+//                    a slowly moving band-pass, a little noise colour, auto-pan
+//   7 Gedreht        Kerri Chandler voicing (Attack): "third inversion" = the top tone an octave down under the root;
+//                    warm sine + triangle + a quiet saw
+//   8 Echo-Pad       Attack "Cold pads": "a delay with feedback is a better alternative to reverb": a swelling chord
+//                    every 2 bars, its saws left / middle / right into a long dotted-8th feedback echo
+// No high-pass on any pad (feedback 2026-11-12).
+// Strudel parameters, gains and the transfer of the recipes = my guess. Levels estimated, not measured. Not heard.
+//
+// @layout Techno-Pads 1 (lab/harmonie, 008: one pad column, chords + colour)
+// @note Columns 1–8 = pad sounds. Button 1 on ANY column = next chord progression, button 2 on ANY column = next colour (7, 9, fourths, fifths). Both switch at the next chord and act on all columns and the bass.
+// @note Columns 1 and 2 = Pad and Techno-Pad as they are in 008 (reference). Context in Mode 2: drums, bass.
+// @guide What to listen for | Which column sounds fullest at all knobs 0 without covering the bass? Which progression still pulls after 32 bars?
+// @guide Live | Row 3 (Pump) turns a held chord into a pumping one. Button 2 changes the colour of the chord for everyone.
+// @mode 16 Mode 16 — Pad candidates
+// @col 16:1 1 Pad (jetzt)
+// @col 16:2 2 Techno (jetzt)
+// @col 16:3 3 Beide
+// @col 16:4 4 Tief
+// @col 16:5 5 Superchor
+// @col 16:6 6 Kalt
+// @col 16:7 7 Gedreht
+// @col 16:8 8 Echo-Pad
+// @row 16:k1 Row 1 \ Brightness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Pump
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Chords
+// @row 16:b2 Button 2 \ Colour
+// @ctl 16:1-8.k1 Brightness | dark ↔ open (low-pass, range per column).
+// @ctl 16:1-8.k2 Space | a little room ↔ far away (reverb; column 8 also more echo).
+// @ctl 16:1-8.k3 Pump | 0 = held chords ↔ the kick pumps the chord on every beat.
+// @ctl 16:1-8.fader Level | 0 = off.
+// @ctl 16:1-8.b1 Chords | next progression (8), for all columns and the bass, at the next chord.
+// @ctl 16:1-8.b2 Colour | 7 → 9 → fourths → fifths, for all columns, at the next chord.
+// @mode 2 Mode 2 — Context
+// @col 2:5 5 Harmony
+// @col 2:6 6 Drums
+// @col 2:7 7 Bass
+// @ctl 2:5.b1 Chords | next progression (same as button 1 above).
+// @ctl 2:5.b2 Colour | next colour (same as button 2 above).
+// @ctl 2:6.fader Drums | sine kick, off-beat hat, short clap (as 008).
+// @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %.
+// @ctl 2:6.b2 Drums out | everything but the drums while held.
+// @ctl 2:7.fader Bass | off-beat square bass on the chord root.
+
+const BOARD = { id: 'techno-pads-1', title: 'Techno-Pads 1' }
+const bpm = 140
+
+// Chords: [root in semitones from F, quality m / M / d (dominant 7)], 4 chords × 2 bars
+const PROGRESSIONS = [
+  ['Fm D♭ B♭m Cm', [[0, 'm'], [-4, 'M'], [5, 'm'], [7, 'm']]],
+  ['Fm E♭m Cm', [[0, 'm'], [-2, 'm'], [-5, 'm'], [-5, 'm']]],
+  ['Fm Gm Bm E♭m', [[0, 'm'], [2, 'm'], [6, 'm'], [-2, 'm']]],
+  ['Fm Gm G♭7', [[0, 'm'], [0, 'm'], [2, 'm'], [1, 'd']]],
+  ['Fm E♭m B E', [[0, 'm'], [-2, 'm'], [6, 'M'], [-1, 'M']]],
+  ['Fm D♭m', [[0, 'm'], [0, 'm'], [-4, 'm'], [-4, 'm']]],
+  ['Fm … B', [[0, 'm'], [0, 'm'], [0, 'm'], [6, 'M']]],
+  ['Fm B♭m', [[0, 'm'], [5, 'm'], [0, 'm'], [5, 'm']]],
+]
+// Colour = semitones above the root per quality
+const COLOURS = [
+  ['7', { m: [0, 3, 7, 10], M: [0, 4, 7, 11], d: [0, 4, 7, 10] }],
+  ['9', { m: [0, 3, 7, 10, 14], M: [0, 4, 7, 11, 14], d: [0, 4, 7, 10, 14] }],
+  ['Quarten', { m: [0, 5, 10, 15], M: [0, 5, 10, 15], d: [0, 5, 10, 15] }],
+  ['Quinten', { m: [0, 7, 14], M: [0, 7, 14], d: [0, 7, 14] }],
+]
+
+const makeCols = h => {
+  // Row 3 = Pump on every column: 0..0.5 brings the pumped layer in, 0.5..1 fades the held layer out (as 008)
+  const pump = (i, held, pumped) => {
+    const k = h.knob(29 + i)
+    // a layer whose gain is 0 is not computed at all (gate per beat)
+    const only = (cond, p) => k.segment(4).fmap(v => cond(v) ? p : silence).innerJoin()
+    return stack(only(v => v < 1, held.mul(gain(k.fmap(v => Math.min(1, Math.max(0, (1 - v) / 0.5)))))),
+      only(v => v > 0, pumped.mul(gain(k.fmap(v => Math.min(1, v / 0.5))))))
+  }
+  const ch = h.voiced(k => k)                                         // the chord as it is
+  const quarters = p => p.struct(mini('x*4'))                               // pumped: one hit per beat, held until the next
+
+  // 1 008's pad
+  const padHeld = p => stack(
+    p.s('sawtooth').superimpose(x => x.add(note(0.1))).attack(0.9).sustain(0.8).release(2).gain(0.035)
+      .pan(sine.slow(5).range(0.15, 0.85)),
+    p.s('triangle').attack(0.6).sustain(0.8).release(2).gain(0.07).pan(sine.slow(5).range(0.85, 0.15)))
+  const padPump = p => stack(p.s('sawtooth').superimpose(x => x.add(note(0.1))).gain(0.035),
+    p.s('triangle').gain(0.07)).attack(0.08).sustain(1).release(0.05).clip(1)
+  // 2 008's techno pad: three saws at fixed places
+  const saws3 = p => stack(p.pan(0.5), p.add(note(0.12)).pan(0.1), p.add(note(-0.11)).pan(0.9)).s('sawtooth').gain(0.028)
+  const tpHeld = p => saws3(p).attack(0.5).sustain(1).release(1.5)
+  const tpPump = p => saws3(p).attack(0.1).sustain(1).release(0.04).clip(1)
+  // 4 low doubling: root an octave down (triangle), the 3rd an octave up (quiet)
+  const low = h.voiced(k => [k[0] - 12])
+  const top = h.voiced(k => [k[1] + 12])
+  const deep = (p, lowP, topP) => stack(
+    p.s('sawtooth').superimpose(x => x.add(note(0.09))).gain(0.03).pan(sine.slow(7).range(0.25, 0.75)),
+    p.s('triangle').gain(0.06),
+    lowP.s('triangle').gain(0.09),
+    topP.s('sawtooth').gain(0.012).pan(0.65))
+  // 5 supersaw + sine root an octave down
+  const choir = (p, lowP) => stack(p.s('supersaw').unison(5).detune(0.22).spread(0.8).gain(0.11), lowP.s('sine').gain(0.12))
+  // 6 cold: detuned sines with a slow vibrato, a square through a moving band-pass, a little noise
+  const cold = p => stack(
+    stack(p.s('sine').pan(0.3), p.add(note(0.08)).s('sine').pan(0.7)).vib(0.25).vibmod(0.12).gain(0.09),
+    p.s('square').bpf(sine.slow(8).range(500, 1600)).bpq(2).gain(0.03).pan(sine.slow(6).range(0.2, 0.8)),
+    s('pink').struct(mini('x')).hpf(3500).gain(0.02).pan(sine.slow(9).range(0.1, 0.9)))
+  // 7 turned: top tone an octave down under the root; sine + triangle + a quiet saw
+  const turned = h.voiced(k => [k[k.length - 1] - 12, ...k.slice(0, -1)])
+  const warm = p => stack(p.s('sine').gain(0.07), p.s('triangle').gain(0.05), p.s('sawtooth').gain(0.012))
+  // 8 echo pad: a swelling chord every 2 bars into a long feedback echo, saws left / middle / right
+  const echoHit = p => saws3(p.struct(mini('<x ~>'))).mul(gain(1.3)).attack(0.25).decay(1.2).sustain(0.25).release(0.8)
+    .delay(0.45).delaytime(0.75 * 60 / bpm).delayfeedback(0.68)
+
+  const col = (i, name, range, held, pumped, extra = {}) => ({ name, range, space: 'bus', hall: 4, k3: 'own', b2: 'own',
+    k3name: 'Pump', pats: [[name, pump(i, held, pumped)]], ...extra })
+  return [
+    col(0, 'Pad (jetzt)', [250, 6000], padHeld(ch), padPump(quarters(ch))),
+    col(1, 'Techno (jetzt)', [300, 4000], tpHeld(ch), tpPump(quarters(ch))),
+    col(2, 'Beide', [300, 5000], stack(padHeld(ch), tpHeld(ch)).mul(gain(0.8)),
+      stack(padPump(quarters(ch)), tpPump(quarters(ch))).mul(gain(0.8))),
+    col(3, 'Tief', [300, 5000], deep(ch, low, top).attack(0.7).sustain(0.85).release(2),
+      deep(quarters(ch), quarters(low), quarters(top)).attack(0.08).sustain(1).release(0.05).clip(1)),
+    col(4, 'Superchor', [300, 6000], choir(ch, low).attack(0.8).sustain(0.85).release(2),
+      choir(quarters(ch), quarters(low)).attack(0.08).sustain(1).release(0.05).clip(1)),
+    col(5, 'Kalt', [400, 7000], cold(ch).attack(1).sustain(0.85).release(2.5),
+      cold(quarters(ch)).attack(0.1).sustain(1).release(0.06).clip(1)),
+    col(6, 'Gedreht', [300, 5000], warm(turned).attack(0.4).sustain(0.85).release(1.5),
+      warm(quarters(turned)).attack(0.05).sustain(1).release(0.05).clip(1)),
+    col(7, 'Echo-Pad', [300, 5000], echoHit(ch), echoHit(ch).mul(gain(0.7)).stack(tpPump(quarters(ch)).mul(gain(0.6)))),
+  ]
+}
+
+// ENGINE goes below (adapted copy of engine-techno; do NOT run sync.mjs on this file)
+
+// ============================================================
+// ENGINE TECHNO (ADAPTED for techno-pads-1: chords in semitones, colour button; do not sync) — engine 2 for track 008 (groove techno, F dorian, 140 BPM): 008's chord progressions, a techno
+// context (sine kick on C, off-beat hat, short clap, off-beat square bass, 008's pad). Only the part above differs.
+// Source: tools/stem-lab/engine-techno.strudel-part, copied in by sync.mjs (boards marked `// @engine techno`)
+// ============================================================
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const md = (k, n) => ((k % n) + n) % n
+const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x))
+const hash = (a, b, c) => {
+  let h = Math.imul(a + 0x9e3779b9 | 0, 0x85ebca6b) ^ Math.imul(b + 0x632be59b | 0, 0xc2b2ae35) ^ Math.imul(c + 0x27d4eb2f | 0, 0x165667b1)
+  h ^= h >>> 15; h = Math.imul(h, 0x2c1b3c6d); h ^= h >>> 12; h = Math.imul(h, 0x297a2d39); h ^= h >>> 15
+  return (h >>> 0) / 4294967296
+}
+
+// Harmony (adapted): PROGRESSIONS and COLOURS come from the board. A chord = [root in semitones from F, quality];
+// 2 bars per chord, 4 chords = 8 bars. Button 1 (any column) = next progression, button 2 = next colour, both at the
+// next chord (latch over 2 bars).
+const HARMONIES = PROGRESSIONS
+const NAMES = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B']
+const CHORD_CACHE = {}
+// The chord: keys from the colour's semitones on a root between B2 and A♯3, bass on F2 … E3
+const CH = ([semi, q], col) => CHORD_CACHE[semi + q + col] ??= (() => {
+  const r = md(semi, 12), base = 53 + r - (r > 5 ? 12 : 0)
+  return { key: semi + q + col, name: NAMES[md(5 + semi, 12)] + (q === 'm' ? 'm' : q === 'd' ? '7' : ''),
+    bass: 41 + r, keys: COLOURS[col][1][q].map(x => base + x) }
+})()
+const PATS = {}
+// The chord through a voicing function (keys → midi notes), as a pattern with one event per 2 bars (the chord's span)
+const voiced = fn => signal(t => Math.floor(t)).segment(16).fmap(bar => {
+  const c = chordOf(bar), ks = fn(c.keys)
+  return PATS[c.key + '|' + ks] ??= note(stack(...ks)).slow(2)
+}).innerJoin()
+const knobSig = cc => signal(() => S.val[cc] ?? 0)
+const heldSig = cc => signal(() => S.held[cc] ? 1 : 0)
+const H = { voiced, knob: knobSig, held: heldSig }
+const COLS = makeCols(H)
+
+// State survives re-evaluation. Mode 16: fader 5-12, knobs 13-36, buttons 37-52. Mode 2 = + 48.
+const S = globalThis[BOARD.id] ??= { val: {}, held: {}, pend: {}, at: {}, seed: {} }
+COLS.forEach((c, i) => { S.val[5 + i] ??= i === 0 ? 0.8 : 0; S.val[13 + i] ??= 0.6; S.val[21 + i] ??= 0; S.val[29 + i] ??= 0.3 })
+S.val[58] ??= 0.6; S.val[66] ??= 0; S.val[59] ??= 0.5; S.val[60] ??= 0   // drums, swing (straight), bass, pad
+const swingPct = () => 0.5 + 0.2 * S.val[66]
+const drumsLevel = () => S.held[98] ? 0 : S.val[58]
+// A column's pattern list: [name, pattern]
+const patsOf = i => COLS[i].pats
+// A choice made now takes over at the next bar (len 4: at the next 4-bar phrase); fixed once a bar is first asked
+const latch = (key, bar, len = 1) => {
+  const b = Math.floor(bar / len), m = S.at[key] ??= {}
+  if (!(b in m)) { m[b] = S.pend[key] ?? 0; for (const x in m) if (+x < b - 8) delete m[x] }
+  return m[b]
+}
+const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== BOARD.id) {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = BOARD.id
+  }
+}
+
+// Status box (bottom right) with the dashboard link; other boards' boxes are removed
+let statusBox = null, statusText = null
+if (hasPage) {
+  for (const id of ['board-status', 'keys-lab-status', 'stem-lab-status']) document.getElementById(id)?.remove()
+  statusBox = document.createElement('div')
+  statusBox.id = 'stem-lab-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  statusText = document.createElement('pre')
+  statusText.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  statusBox.append(statusText)
+  document.body.appendChild(statusBox)
+}
+const beatNow = { bar: null, beat: null }
+const pct = v => Math.round((v ?? 0) * 100)
+const harmNow = () => latchNow('harm')
+const colNow = () => latchNow('col')
+
+// DASHBOARD — a big window with every control of Mode 16 and the Mode 2 context on top. The link opens a tab named
+// stem-lab-view; strudel.cc replaces window.open, so the handle comes from the native open of a hidden iframe.
+const view = !hasPage ? null : globalThis.stemLabView ??= { win: null }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const VIEW_CSS = [
+  'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+  '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+  '.head{display:flex;gap:2.5vw;align-items:center;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:#50c8e8}',
+  '.k{opacity:.6;margin-right:.4em}.next,.acc{color:#50c8e8}',
+  '.grid{flex:1;display:grid;grid-template-columns:repeat(' + COLS.length + ',1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 4.6em 3em;gap:.8vh .8vw}',
+  '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.live{color:#50c8e8;border-color:#50c8e8}',
+  '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+  '.cell span,.cell b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cell span{opacity:.7;font-size:.85em}.cell b{font-variant-numeric:tabular-nums}',
+  '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+  'background:conic-gradient(from -135deg,#50c8e8 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+  '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+  '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+  '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:#50c8e8}',
+  '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start;overflow:hidden}.btn.on{background:#50c8e8;color:#111}',
+  '.pat{font:.7em monospace;letter-spacing:.03em;opacity:.85;overflow-wrap:anywhere}',
+  '.beats i,.bars i{display:inline-block;background:#333;margin-left:.3em}.beats i{width:.75em;height:.75em;border-radius:50%}',
+  '.bars i{width:1.1em;height:.55em;border-radius:2px}.beats i.on,.bars i.on{background:#50c8e8}',
+].join('\n')
+const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+const drawView = () => {
+  if (!view?.win || view.win.closed) return
+  const root = view.win.document.getElementById('lc')
+  if (!root) return
+  const h = harmNow(), hp = S.pend.harm ?? 0, chords = HARMONIES[h][1]
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const bar = beatNow.bar
+  const where = bar === null ? '–' : '<span class=bars>' + marks(8, md(bar, 8)) + '</span><span class=beats>' +
+    marks(4, beatNow.beat) + '</span> <b class=acc>' + esc(chordOf(bar).name) + '</b>'
+  const knob = (v, name) => '<div class="cell knob"><div class=dial style="--v:' + (v ?? 0) + '"></div><b>' + pct(v) +
+    '</b><span>' + esc(name) + '</span></div>'
+  const cells = COLS.map((c, i) => {
+    const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
+    return {
+      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
+        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+      b1: '<div class="cell btn"><span>Akkorde</span><b>' + pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><span>Farbe</span><b>' + pending(COLOURS[colNow()][0], COLOURS[S.pend.col ?? 0][0]) + '</b></div>',
+    }
+  })
+  root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
+    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Farbe</span>' + pending(COLOURS[colNow()][0], COLOURS[S.pend.col ?? 0][0]) + '</div>' +
+    '<div><span class=k>Takt</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
+    '</div><div><span class=k>Pad</span>' + pct(S.val[60]) + '</div></div>' +
+    '<div class=grid>' +
+    COLS.map((c, i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 ? ' live' : '') + '">' + (i + 1) + ' ' + esc(c.name) + '</div>').join('') +
+    ['k1', 'k2', 'k3', 'fader', 'b1', 'b2'].map(r => cells.map(c => c[r]).join('')).join('') + '</div>'
+}
+if (view) {
+  for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
+  view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
+  const link = document.createElement('a')
+  link.textContent = '▣ LC groß'
+  link.href = 'about:blank'
+  link.target = 'stem-lab-view'
+  link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
+    'background:#ddd;border-radius:3px;text-decoration:none;cursor:pointer'
+  link.onclick = () => setTimeout(() => {
+    try {
+      const w = view.opener.contentWindow.open('', 'stem-lab-view')
+      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      view.win = w
+      w.document.title = BOARD.title
+      w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+      w.document.body.innerHTML = '<div id=lc></div>'
+      drawView()
+    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+  }, 100)
+  statusBox.append(link)
+  if (view.win && !view.win.closed) {
+    view.win.document.title = BOARD.title
+    view.win.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+    if (!view.win.document.getElementById('lc')) view.win.document.body.innerHTML = '<div id=lc></div>'
+  }
+}
+const showStatus = () => {
+  if (statusText) {
+    const h = harmNow(), hp = S.pend.harm ?? 0
+    statusText.textContent = [
+      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : '') +
+        ' · Farbe ' + COLOURS[colNow()][0] + ((S.pend.col ?? 0) !== colNow() ? ' → ' + COLOURS[S.pend.col ?? 0][0] : ''),
+      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+        ' · Pad ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
+      '',
+      ...COLS.map((c, i) => {
+        const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+          pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
+      }),
+    ].join('\n')
+  }
+  drawView()
+}
+const onMidi = e => {
+  const [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if ((cc >= 45 && cc <= 52) || (cc >= 93 && cc <= 100)) {
+    if (value > 63 && !S.held[cc]) {
+      ;(S.since ??= {})[cc] = performance.now()   // when it was pressed (for ramps)
+      // button 2 of a candidate column or Mode 2 column 5: next colour
+      if ((cc >= 45 && cc <= 44 + COLS.length) || cc === 93) S.pend.col = ((S.pend.col ?? 0) + 1) % COLOURS.length
+    }
+    S.held[cc] = value > 63
+  }
+  else if (value === 0) return
+  else if ((cc >= 37 && cc <= 36 + COLS.length) || cc === 89) S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length
+  else if (false) {
+    const i = cc - 37
+    if (!COLS[i]) return
+    S.pend[i] = ((S.pend[i] ?? 0) + 1) % patsOf(i).length
+  }
+  else if (cc === 89) S.pend.harm = ((S.pend.harm ?? 0) + 1) % HARMONIES.length
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; fn(step, bar, k) returns events with dur in 16ths; swing moves the odd 16ths late
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const late = k => md(k, 2) === 1 ? 2 * (swingPct() - 0.5) : 0
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 1; k++) {
+    const t0 = (k + late(k)) / 16
+    if (t0 < b0 - 1 / 16 || t0 >= e0 + 1 / 16) continue
+    for (const { dur = 1, ...v } of fn(md(k, 16), Math.floor(k / 16), k) ?? []) {
+      if (t0 < b0 - 1e-9 || t0 >= e0 - 1e-9) continue
+      out.push(new Hap(new TimeSpan(t0, t0 + dur / 16), new TimeSpan(t0, Math.min(t0 + dur / 16, e0)), v, {}))
+    }
+  }
+  return out
+})
+const chordName = bar => HARMONIES[latch('harm', bar, 2)][1][md(Math.floor(bar / 2), 4)]
+const chordOf = bar => CH(chordName(bar), latch('col', bar, 2))
+
+// A column: the pattern picked by button 1 (taking over at the next bar), swung like the drums, then the channel
+// strip per event from the knobs: Brightness = low-pass over the column's range (brighter also ±2 dB louder), Space =
+// a 1/8 echo first, the room from 0.35 on, Length = note length ×0.5 … ×4 (clip), Level = fader, button 2 held = echo
+// throw (dotted 8th, long tail). A voice may carry `bright` (a factor on its cutoff, e.g. for accents); a voice's own
+// low-pass (e.g. a recipe's lpf) is kept when it is lower than the Brightness knob's.
+const column = i => {
+  const c = COLS[i], built = c.pats.map(([, p]) => p)
+  // adapted: a column whose fader is 0 is not computed at all (checked every beat)
+  const sel = signal(t => (S.val[5 + i] ?? 0) > 0 ? latch(i, Math.floor(t)) : -1).segment(4)
+  return sel.fmap(p => p < 0 ? silence : built[p]).innerJoin()
+    .swingBy(signal(() => 2 * (swingPct() - 0.5)), 8)
+    .filterValues(() => (S.val[5 + i] ?? 0) > 0)
+    .fmap(({ bright = 1, ...v }) => {
+      const level = S.val[5 + i] ?? 0, br = S.val[13 + i] ?? 0.6, sp = S.val[21 + i] ?? 0, ln = S.val[29 + i] ?? 0.3
+      const [clo, chi] = c.range ?? [300, 8000]
+      let room, ef
+      if (c.space === 'bus') {
+        // as the tracks' bus(): the voice's own echo amount × 2 × space, space never below the column's floor (a
+        // little room even at 0), dotted-8th echo with a long tail; room 0.9 × space
+        const s2 = (c.floor ?? 0.3) + (1 - (c.floor ?? 0.3)) * sp
+        room = 0.9 * s2
+        ef = { delay: Math.min(0.9, (v.delay ?? 0) * 2 * s2), delaytime: v.delaytime ?? 0.75 * 60 / bpm, delayfeedback: v.delayfeedback ?? 0.55 }
+      } else {
+        room = 0.8 * Math.max(0, (sp - 0.35) / 0.65)
+        const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+        ef = ev > 0 ? { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev } : {}
+      }
+      const fx = c.b2 !== 'own' && S.held[45 + i] ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62 } : {}
+      const clip = c.k3 === 'own' ? {} : { clip: (v.clip ?? 1) * (c.len ?? 1) * exp(0.5, 4)(ln) }
+      return { release: 0.1, ...v, cutoff: Math.min(18000, v.cutoff ?? 18000, exp(clo, chi)(br) * bright), room, roomsize: c.hall ?? 2,
+        ...clip, postgain: level * Math.pow(10, 4 * (br - 0.5) / 20) * (c.gain ?? 1), ...ef, ...fx, orbit: 3 }
+    })
+}
+
+// Context as in track 008: sine kick on C2 with a little 909, off-beat 909 hat, short clap on 2 and 4, the off-beat
+// square bass on the root (F2 …), 008's pad (minor-9 chord, saw + triangle, slow attack) on every chord change
+const context = grid((step, bar) => {
+  const out = [], l = drumsLevel(), bl = S.val[59], kl = S.val[60], ch = chordOf(bar)
+  if (l > 0) {
+    if (step % 4 === 0) out.push(
+      { s: 'sine', note: 36, attack: 0.004, decay: 0.4, sustain: 0, release: 0.05, penv: 24, pdecay: 0.05, gain: 0.8, postgain: l },
+      { s: 'bd', bank: 'RolandTR909', gain: 0.24, postgain: l })
+    if (step % 4 === 2) out.push({ s: 'hh', bank: 'RolandTR909', gain: 0.32, postgain: l })
+    if (step === 4 || step === 12) out.push({ s: 'cp', bank: 'RolandTR909', attack: 0.001, decay: 0.05, sustain: 0,
+      release: 0.03, gain: 0.55, cutoff: 6000, postgain: l })
+  }
+  if (bl > 0 && step % 4 === 2) out.push({ s: 'square', note: ch.bass, gain: 0.22, decay: 0.14, sustain: 0.1,
+    release: 0.05, cutoff: 700, shape: 0.3, postgain: bl })
+  if (kl > 0 && step === 0 && md(bar, 2) === 0) for (const n of ch.keys) out.push(
+    { s: 'sawtooth', note: n, attack: 0.9, sustain: 0.8, release: 2, gain: 0.035, cutoff: 1400, postgain: kl, dur: 31 },
+    { s: 'triangle', note: n, attack: 0.6, sustain: 0.8, release: 2, gain: 0.07, cutoff: 1400, postgain: kl, dur: 31 })
+  return out.map(v => ({ ...v, orbit: 1 }))
+})
+
+const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
+  const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), b = Math.floor((pos - bar) * 4 + 1e-9)
+  setTimeout(() => { beatNow.bar = bar; beatNow.beat = b; showStatus() }, Math.max(0, (t - now) * 1000))
+}, true)
+setcpm(bpm / 4)
+
+// A board may define MASTER(pattern) (e.g. a filter on everything, FX lab); it gets columns + context
+const master = typeof MASTER === 'function' ? MASTER : (p => p)
+stack(master(stack(...COLS.map((_, i) => column(i)), context)))
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
+  .stack(beatTick)   // silent, after the safety net: moves the dashboard and the status box with the beat
