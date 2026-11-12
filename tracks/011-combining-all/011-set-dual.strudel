@@ -441,7 +441,7 @@ const SET = {
 }
 
 // ============================================================
-// TRACK 007 — Ambient (from tracks/007-ambient-soundscape/007-ambient-dual.strudel)
+// TRACK 007 — Ambient (from tracks/007-ambient-soundscape/old/007-ambient-dual.strudel)
 // ============================================================
 // @007 layout Track 007 — ambient moods (two controllers)
 // @007 note Dreamy ambient on D, about 70 BPM. Jojo plays the foundation (heartbeat, drone, bass and soft clicks), Jonas the colour (pad, bowed loops, marimba and toms, choir, sparkles) and the global column 8.
@@ -1355,7 +1355,7 @@ return { taps, showStatus, STATUS, lcChapter, lcHead, stems: { J1: stemJ1_pulse,
 })()
 
 // ============================================================
-// TRACK 010 — Ambient House (from tracks/010-ambient-house/010-ambient-house-dual.strudel)
+// TRACK 010 — Ambient House (from tracks/010-ambient-house/old/010-ambient-house-dual.strudel)
 // ============================================================
 // @010 layout Track 010 — ambient house (two controllers)
 // @010 note Ambient house in D minor, 120 BPM, a sunrise mood. Jojo plays the foundation (kick, bass, drums, congas), Jonas the colour (pad, chords, melodies, birds) and the global column 8.
@@ -2097,7 +2097,7 @@ return { taps, showStatus, STATUS, lcChapter, lcHead, stems: { J1: stemJ1_kick, 
 })()
 
 // ============================================================
-// TRACK 009 — Cool House (from tracks/009-house/009-house-dual.strudel)
+// TRACK 009 — Cool House (from tracks/009-house/old/009-house-dual.strudel)
 // ============================================================
 // @009 layout Track 009 — house (two controllers)
 // @009 note Happy, jazzy, dry house in A minor, 124 BPM. Jojo plays the rhythm (kick, bass, drums, percussion), Jonas the harmony with the chord progressions (column 1), the keys (column 2), the vibraphone (column 3), the flute (column 4; 5-7 empty for now) and the global column 8.
