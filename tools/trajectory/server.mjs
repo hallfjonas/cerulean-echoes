@@ -51,7 +51,8 @@ http.createServer((request, response) => {
   response.writeHead(200, { ...CORS, 'Content-Type': TYPES[path.extname(file)] ?? 'application/octet-stream',
     'Cache-Control': 'no-store' })
   fs.createReadStream(file).pipe(response)
-}).listen(port, () => console.log(`trajectory: http://localhost:${port}  (events from strudel.cc → /events)`))
+}).listen(port, '127.0.0.1',
+  () => console.log(`trajectory: http://localhost:${port}  (events from strudel.cc → /events)`))
 
 setInterval(() => {
   if (received) console.log(`${received} event batches relayed to ${clients.size} page(s) in the last 10 s`)

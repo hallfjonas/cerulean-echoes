@@ -34,7 +34,7 @@
 // Harmony: Jonas' pad button 1 picks the chord progression; Jojo's sub and bassline follow its root.
 // Space version (008-space-plan.html, 008-space-implementation.md): the bassline owns 125–350 Hz (pads, techno pad,
 //   stab and keys pad high-passed, rumble filter lower), comes forward (filter floor 350 Hz, louder) and gets a wide
-//   top layer above 300 Hz while its core stays mono; pads, percussion and FX reach further left and right.
+//   top layer above 200 Hz while its core stays mono; pads, percussion and FX reach further left and right.
 //   Merged into this file from 008-groove-techno-space.strudel; the version before is in git history (bc37698).
 // ============================================================
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
