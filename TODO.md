@@ -1,13 +1,12 @@
 
 ## Action Items
 ### Jonas
-+ Letzte Wiese sample
 + Improve groove track
-    + less cringe more techno; more groove; more trippy space sounds
+    + more techno; less cringe [replace 7 fx breath durch Klang-Stäbe oder -Hölzer, schneller groove]
+    + more spacial distribution; segment the space
     + densitiy (missing kicks and crash and a lot of other stuff, maybe voice?; maybe draw a build up trajectory in terms of lows/mids/highs)
-+ Have fun
-+ Bessere Samples
 + Bessere Keys
++ Bessere Samples
 
 + Adopt new UI layout from Johannes? NOT PUSHED YET
     + BLOCKS: Fix UI layout in strudel

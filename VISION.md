@@ -5,8 +5,9 @@
 ### MUSIC-ARCHITECTUR
 - See fucking music architect visuals
 
-### GAMIFICATION (WARNING ANNOYING TECH BUSINESS DIRECTION)
-You should be able to turn this into a 1 vs 1 player game (ACHTUNG DIE KURVE... YOU SHOULD BE ABLTE TO PLAY ACHTUNG THE SOUND FEATURE).
+### BUSINESS VISION (WARNING: ANNOYING)
+- You should be able to turn this into a virtual reality (drift through space and view the sound sources. float, view, feel)
+- You should be able to turn this into a 1 vs 1 player game (ACHTUNG DIE KURVE... YOU SHOULD BE ABLTE TO PLAY ACHTUNG THE SOUND FEATURE).
 
 ### Drop Funktionalität
 ### Variante 1: Verhalten rotieren (wie bei anderen Instrumenten)
