@@ -20,10 +20,27 @@ const src = fs.readFileSync(file, 'utf8')
 const master = [...src.matchAll(/^stack\(/gm)].pop()
 if (!master) throw new Error(`${file}: no top-level stack( (master) found`)
 
+// Readable stem names from the track's own tags: stemJn = Jojo's column n, stemNn = Jonas' column n (the @col name),
+// Jojo's column 8 = the label of its pattern button, stemLK = the Launchkey; anything else its variable suffix.
+// Tag prefixes as in the tracks' LC view: single file 16 (Mode 1) / 2 (Mode 2), dual file B16 (Jojo) / 16 (Jonas)
+const columns = {}
+for (const m of src.matchAll(/^\/\/ @col (\S+) \d+ (.+)$/gm)) columns[m[1]] = m[2].trim()
+const isSingleFile = /^\/\/ @(?:ctl|col) 2:/m.test(src)
+const page = { J: isSingleFile ? '16' : 'B16', N: isSingleFile ? '2' : '16' }
+const col8 = src.match(/^const (\w+)\s*= colJojo\(8\)/m)?.[1]
+const col8Label = col8 && src.match(new RegExp(`change\\(${col8}\\.btn, '\\w+', '([^']+)'`))?.[1]
+const capitalise = s => s.charAt(0).toUpperCase() + s.slice(1)
+const readable = stem => {
+  if (stem === 'stemLK') return 'Launchkey'
+  const [, who, n] = stem.match(/^stem([JN])(\d)_/) ?? []
+  if (who === 'J' && n === '8' && col8Label) return col8Label
+  return columns[`${page[who]}:${n}`] ?? capitalise(stem.replace(/^stem([JN]\d_)?/, ''))
+}
+
 const stems = []
 const masterCode = src.slice(master.index).replace(/^(\s+)(stem\w+)(\s*,?)(\s*(\/\/.*)?)$/gm, (_, indent, stem, comma, rest) => {
-  stems.push(stem)
-  return `${indent}${stem}.tag('${stem}')${comma}${rest}`
+  stems.push(readable(stem))
+  return `${indent}${stem}.tag('${readable(stem).replace(/'/g, "\\'")}')${comma}${rest}`
 })
 if (!stems.length) throw new Error(`${file}: no stem variables (stem…) in the master stack`)
 

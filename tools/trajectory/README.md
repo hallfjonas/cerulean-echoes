@@ -45,8 +45,9 @@ offen ist.
   Signale, die das Bild sieht: 0 = roh, 0.06 ≈ 302 ms, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 Tage, 1 = 2^53
   (max_int), eingefroren. Nur fürs Bild; der Ton bleibt roh.
 
-**Schalter und Tasten** (Startwerte: Achsen und Beschriftung aus, Beat-Ringe an): **A** Achsen · **L** Beschriftung
-(Stem-Namen, Achsenwörter) · **B** Beat-Ringe (die Kreise von der Kick) – alle drei auch als Häkchen in der Leiste.
+**Schalter und Tasten** (Startwerte: Achsen und Beschriftung aus, Beat-Ringe und LC-Rahmen an): **A** Achsen ·
+**L** Beschriftung (Stem-Namen, Achsenwörter) · **B** Beat-Ringe (die Kreise von der Kick) · **H** LC-Rahmen (der
+Rahmen um die zuletzt benutzte Controller-Seite in der LC-Ansicht) – alle vier auch als Häkchen in der Leiste.
 **F** Vollbild · **V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus. Die Leiste oben blendet sich nach 3 s
 ohne Maus aus.
 
@@ -90,7 +91,7 @@ Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher d
 | `render.mjs` | Bild. „deck“ (Standard, wie Folie 6 des Decks): leuchtende Kometen mit Schweifen, Ringe von der Kick, Achsen. „ocean“: Stems als Flüssigkeitsschichten, Zeit in die Tiefe, schwebende Kamera. „clean“: Kometen, Ringe |
 | `smoothing.mjs` | Regler Roh ↔ Glatt: gleitender Mittelwert, Fenster wächst exponentiell bis 2^53 Zeilen |
 | `strudel-source.mjs` | Strudel-Events → Zeilen, jedes Event erscheint, wenn es klingt (`delay`) |
-| `make-tapped.mjs` | Kopie eines Tracks: jeder Stem bekommt seinen Namen als `.tag()`, Master sendet per `.onTrigger` (Klang unverändert) |
+| `make-tapped.mjs` | Kopie eines Tracks: jeder Stem bekommt seinen lesbaren Namen aus dem Track (`@col`-Spaltenname, Spalte 8 von Jojo: Name ihres Pattern-Knopfs, `stemLK` = Launchkey) als `.tag()`, Master sendet per `.onTrigger` (Klang unverändert) |
 | `server.mjs` | statische Dateien + Relay POST `/events` → SSE `/stream`; CORS- und Private-Network-Header für strudel.cc |
 | `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI (`midin` pro Port, `midikeys` für Launchkey-Tasten und -Pads), Regler Hart ↔ Weich, Roh ↔ Glatt; ohne `gm_*`-Klänge (siehe Grenzen) |
 | `index.html` | die Seite: Quellen, Kanalwahl, Aufnahme, Tasten |
@@ -121,9 +122,9 @@ ist `registerSoundfonts()` auskommentiert. Ein Event mit `gm_*` bleibt still, oh
 | Track | stumm im Player |
 |---|---|
 | 008 | nichts |
-| 007 | Marimba, Toms, Glockenspiel, Chor, Vibrafon, Agogo (auch Launchkey-Pads) |
+| 007 | Launchkey-Pads: Glockenspiel, Marimba, Chor, „ooh“, Agogo, Tom, Vibrafon (Marimba, Toms und Glitter von Jonas spielen VCSL-Aufnahmen) |
 | 009, 009-riffs | Vibrafon, Marimba u. a.; Launchkey: Orgel-, Bläser-Stab, „ooh“ |
-| 010 | Glockenspiel, Marimba, Vibrafon, Agogo; Launchkey: das Pad (`gm_pad_warm`) und mehrere Pads |
+| 010 | Launchkey-Pads: Marimba, Glockenspiel, Agogo, Vibrafon, „ooh“ (Glockenspiel von Jonas: VCSL; Tasten: Synth-Pad wie 007) |
 
 Für den vollen Klang dieser Tracks: den getappten Track in strudel.cc einfügen und spielen; die Controller sind
 dort dieselben.

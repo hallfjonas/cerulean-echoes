@@ -20,6 +20,7 @@ sd.setAudioContext(ctx)
 await sd.initAudio({})
 sd.registerSynthSounds()
 await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json')
+await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/vcsl.json')
 for (const h of pat.queryArc(0, CYC)) if (h.hasOnset()) {
   const b = h.whole.begin.valueOf()
   await sd.superdough(h.value, b / cps + 0.05, h.duration / cps, cps, b)

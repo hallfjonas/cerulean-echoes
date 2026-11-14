@@ -21,9 +21,9 @@ asks: a lab column with Length on row 3 and Shift on button 2 keeps them.
    shifted controls) in one state object updated by a signal pushed to `taps` (queried every tick via `stateTaps`).
    Use the track's `change()` for button 1 (bar latch + status box) and `strip()` for level and master gating.
 4. **Labels 1:1 too**: the board's dashboard is part of the column. Register the column in the track's `COLVIEW`
-   (`'page:column'` → `(row, { esc, pending }) => html`) with the board's cell code: its German labels (Hell, Raum,
-   Länge, Pegel …), the values from the column's state (not raw CCs, when shift routes them), the rhythm name plus its
-   x/./- string under button 1, the shift view. Copy the board's `@ctl` texts for the layout sheet; only shorten a
+   (`'page:column'` → `(row, { esc, pending }) => html`) with the board's cell code: its labels (English, short: Brightness, Space,
+   Length, Level …; see CLAUDE.md "Labels"), the values from the column's state (not raw CCs, when shift routes them), the pattern name under button 1 (no x/./- string),
+   the shift view. Copy the board's `@ctl` texts for the layout sheet; only shorten a
    button text that would overflow.
 5. **Keep what the lab decided**: voicing, rhythms, touch, swing, brightness ranges, per-sound gains, effects
    (the lab's own space mapping), start values for controls that have not been moved. Track-wide things stay on top:

@@ -98,3 +98,22 @@
   (crushed, moving bandpass), 4 parallel m7 (UR Timeline), 5 pad chopped by 5/16 echo + drive, 6 one hit + long echo,
   7 minor triad stab (Mills principle). Checked in Node (notes, events). Levels estimated, not measured. Not heard.
 - Feedback: open.
+
+## Techno-Pads 1 — techno-pads-1.strudel (2026-11-12), for 008: Pad + Techno-Pad in one column
+- Wish: one pad column; button 1 = chord progressions with real key changes ("not just the basic stuff"), button 2 =
+  colour (7, 9, fourths, fifths); fuller than now (the space version's fixed hpf 400/350 had thinned both pads; in
+  008 the hpf now moves with Brightness, 60/80–400 Hz).
+- Adapted engine copy (no `@engine`, do not sync): chords as roots in semitones; button 1 / 2 on any column switch the
+  shared progression / colour at the next chord; muted columns and pump layers are not computed.
+- Progressions (Attack Magazine "Passing Notes": Parallel chords, Kerri Chandler chords, Todd Terje): 008 jetzt,
+  Parallel (Fm–E♭m–Cm), Kerri 1 (Fm–Gm–Bm–E♭m), Kerri 2 (… Gm–G♭7), Terje (Fm–E♭m–B–E), Kerri 3 (Fm–D♭m),
+  Ausreißer (Fm … B), Stehend (Fm–B♭m).
+- Columns: 1 Pad (jetzt), 2 Techno (jetzt), 3 Beide, 4 Tief (low octave doubling, Attack "Theory of techno pads"),
+  5 Superchor (supersaw + sine root below), 6 Kalt (Attack "Cold pads"), 7 Gedreht (Kerri's third inversion),
+  8 Echo-Pad (feedback echo instead of reverb, Attack "Cold pads"). Row 3 = Pump everywhere.
+- Checked in Node: chords/colours right, transpiles; cost 4.3 ms/tick with 2 columns on, 20 ms with all 8 (compare
+  one or two at a time). Levels estimated, not measured. Not heard.
+- Feedback: open.
+- Feedback techno-pads-1 (Nutzer, 2026-11-12): kein Hochpass auf Pads (raus, auch in 008). Der Beat im Hintergrund
+  (Kontext der Techno-Engine) ist viel zu schwach. Es sollen einfach gute Pads sein; am Ende ist einer von beiden
+  (Pad oder Techno-Pad) in Ordnung. Folgen-Namen jetzt die Akkorde selbst (harmonie-2: keine Künstlernamen).
