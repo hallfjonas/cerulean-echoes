@@ -5,7 +5,8 @@
 // Before: old/007-ambient-dual.strudel + its generated -single version.
 // Sound from old/007-ambient-moods-dual.strudel, controls rearranged after midi-layouts/templates/dual-lc.strudel.
 // Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, shaker, wood/drops, crackle.
-// Jonas (colour): pad, Eno bowed, marimba, toms (Takada style, from lab/harmonie/midori-5), choir, glitter, shimmer + the global column 8.
+// Jonas (colour): pad, Eno bowed + shimmer, marimba, toms (Takada style, from lab/harmonie/midori-5), choir, glitter, voice
+// (a spoken recording on a loop) + the global column 8.
 // Chapter (global button 1): D lydian (floating) → D dorian (melancholic) → D whole tone (strange), at the next bar.
 // Feedback 1 (feedback.md): sea/wind quieter, drone and bass fader ranges cut to the old 40 % (they were too heavy
 //   in the lows with the kick). Previous version: old/007-ambient-dual-before-feedback1.strudel.
@@ -42,12 +43,12 @@
 // @row 16:b2 Button 2 \ Moment
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Pad
-// @col 2:2 2 Eno Bowed
+// @col 2:2 2 Eno / Shimmer
 // @col 2:3 3 Marimba
 // @col 2:4 4 Toms
 // @col 2:5 5 Choir
 // @col 2:6 6 Glitter
-// @col 2:7 7 Shimmer
+// @col 2:7 7 Voice
 // @col 2:8 8 Global
 // @row 2:k1 Row 1 \ Brightness
 // @row 2:k2 Row 2 \ Space
@@ -148,9 +149,11 @@ const cycleButton = (button, n, onChange = () => {}) => {
 // at(t) is asked with bar starts in real time (outside any reseed shift); it remembers the previous value for
 // queries that still reach back into the old bar. pat = the value per bar.
 const barLatch = () => {
-  const l = { pending: 0, now: 0, prev: 0, bar: -Infinity }
+  const l = { pending: 0, now: 0, prev: 0, bar: -Infinity, wall: -Infinity }
   l.at = t => {
-    const bar = Math.floor(Number(t))
+    const bar = Math.floor(Number(t)), wall = Date.now()
+    if (wall - l.wall > 1000) l.bar = -Infinity   // not asked for a second: the track was stopped, its bars start again
+    l.wall = wall
     if (bar > l.bar) {
       if (l.pending !== l.now) { l.prev = l.now; l.now = l.pending; showStatus() }
       else l.prev = l.now
@@ -372,7 +375,7 @@ const reseed = (latch, pat) => pat.early(latch.pat.fmap(v => v * 1024))
 
 // Effect buses. Each orbit has one reverb and one delay, and every reverb costs a lot of CPU (its length is
 // the room size in seconds), so the stems share two orbits; stems on one orbit share room size and echo time/feedback.
-// Orbit 1 = pulse, drone, bass, crackle, sea/wind, music box, whale, choir (dotted-quarter echo).
+// Orbit 1 = pulse, drone, bass, crackle, sea/wind, music box, whale, choir, voice (dotted-quarter echo).
 // Orbit 2 = rim, shaker, wood, pad, chords, glitter, shimmer (dotted-8th echo).
 const BUSES = {
   1: { hall: 6.5, time: beat * 1.5, feedback: 0.5 },
@@ -599,8 +602,8 @@ const SHAKER = (() => {
 const stemJ6_shaker = beatOnly(strip(echoThrow(bus(shakerVar.pat.fmap(i => SHAKER[i]).innerJoin(), 2, labSpace(shakerCol.space)),
   shakerCol.btn2), {
   lpf: expRange(shakerCol.bright, 1500, 16000),
-  // the lab: level × 1, brighter also up to ±2 dB
-  level: shakerCol.level.range(0, 1).mul(shakerCol.bright.fmap(b => Math.pow(10, 4 * (b - 0.5) / 20))),
+  // the lab: level × 1, brighter also up to ±2 dB; mix: −5 dB (user 2026-11-14: shaker too loud)
+  level: shakerCol.level.range(0, 0.56).mul(shakerCol.bright.fmap(b => Math.pow(10, 4 * (b - 0.5) / 20))),
 }))
 
 // ============================================================
@@ -696,10 +699,10 @@ const stemN1_pad = strip(bus(wobble(stack(
 // marimba (VCSL soft xylophone) −25…−18, toms (VCSL low tom) −24…−22.
 // @ctl 2:2.k1 Brightness | dull ↔ bright.
 // @ctl 2:2.k2 Space | dry ↔ echo + room.
-// @ctl 2:2.k3 Complexity | 2 loops ↔ 6 loops drifting against each other.
-// @ctl 2:2.fader Level | bowed vibraphone loops (Eno, Music for Airports).
-// @ctl 2:2.b1 Pattern | note set: calm (fifths) → lydian (G♯, C♯) → low and slower.
-// @ctl 2:2.b2 Echo throw | held: long dotted-8th echo.
+// @ctl 2:2.k3 Complexity | more loops; the shimmer adds a bell chord.
+// @ctl 2:2.fader Level | bowed loops (low) and shimmer swells (high).
+// @ctl 2:2.b1 Pattern | note set: calm → lydian → low; shimmer pace too.
+// @ctl 2:2.b2 Layer | Eno → Shimmer → both, at the next bar.
 // @ctl 2:3.k1 Brightness | dull ↔ bright.
 // @ctl 2:3.k2 Space | dry ↔ echo + room.
 // @ctl 2:3.k3 Complexity | one figure ↔ all layers.
@@ -945,7 +948,13 @@ const newJonas = (col, c, label, long = false) => {
     level: col.level.range(0, c.gain ?? 1).mul(col.bright.fmap(b => Math.pow(10, 4 * (b - 0.5) / 20))),
   }).fmap(({ bright, ...v }) => bright ? { ...v, cutoff: Math.min(18000, v.cutoff * bright) } : v)
 }
-const stemN2_bowed   = newJonas(bowed, NEW_JONAS[0], 'Bogen', true)
+// Eno / Shimmer (column 2): button 2 switches the layer at the next bar, so it no longer throws the echo
+const enoShimmer = barLatch()
+cycleButton(bowed.btn2, 3, s => { enoShimmer.pending = s; showStatus() })
+const ENO_SHIMMER = ['Eno', 'Shimmer', 'Eno + Shimmer']
+const stemN2_eno = gate(enoShimmer.pat.fmap(m => m !== 1), newJonas({ ...bowed, btn2: off() }, NEW_JONAS[0], 'Bogen', true))
+Object.defineProperty(STATUS.jonas[STATUS.jonas.length - 1], 'label', { get: () => ENO_SHIMMER[enoShimmer.now] +
+  (enoShimmer.pending !== enoShimmer.now ? ' → ' + ENO_SHIMMER[enoShimmer.pending] : '') })
 const stemN3_marimba = newJonas(marimba, NEW_JONAS[1], 'Marimba')
 const stemN4_toms    = newJonas(toms, NEW_JONAS[2], 'Toms')
 
@@ -1022,38 +1031,75 @@ const stemN6_glitter = strip(bus(stack(
 })
 
 // ============================================================
-// JONAS 7 SHIMMER — high tones that swell in slowly and hang in the air
+// JONAS 2 (second layer) SHIMMER — high tones that swell in slowly and hang in the air, above the bowed loops
 // ============================================================
-// @ctl 2:7.k1 Brightness | dull ↔ bright.
-// @ctl 2:7.k2 Space | dry ↔ echo + room.
-// @ctl 2:7.k3 Complexity | subtle (one tone) ↔ wild (a bell-like chord with long echoes).
-// @ctl 2:7.fader Level | shimmer swells.
-// @ctl 2:7.b1 Pattern | a new tone every 2 bars → every 4 bars → every bar.
-// @ctl 2:7.b2 Rise | while held, a cloud of tones climbs an octave and grows denser over 2 bars.
-const fx       = colJonas(7)
-const fxVar    = change(fx.btn, 'jonas', 'Shimmer', 3, ['2 bars', '4 bars', '1 bar'])
-const fxAmount = fx.char
-const fxRise   = heldRamp(fx.btn2, 2)
-const FX_NOTES = [2, 4, 1].map(len => n(irand(7).segment(1).slow(len)))   // scale degree, a new one every len bars
-const fxNotes  = reseed(fxVar, fxVar.pat.fmap(i => FX_NOTES[i]).innerJoin())
+// Read from column 2 (button 2 = layer Eno / Shimmer / both). Its pace follows button 1's note set: calm = a new tone
+// every 2 bars, lydian = every bar, low = every 4 bars.
+const fxLatch  = barLatch()
+cycleButton(bowed.btn, 3, s => { fxLatch.pending = s })
+const fxAmount = bowed.char
+const FX_NOTES = [2, 1, 4].map(len => n(irand(7).segment(1).slow(len)))   // scale degree, a new one every len bars
+const fxNotes  = reseed(fxLatch, fxLatch.pat.fmap(i => FX_NOTES[i]).innerJoin())
 
-const stemN7_shimmer = strip(bus(stack(
+const stemN2_shimmer = gate(enoShimmer.pat.fmap(m => m !== 0), strip(bus(stack(
   wobble(fxNotes.scale(scaleIn(5)).s("triangle")
     .attack(2.5).sustain(0.7).release(4).gain(0.18).pan(sine.slow(9).range(0.2, 0.8))),
   gate(above(fxAmount, 0), wobble(stack(fxNotes.add(n(2)), fxNotes.add(n(4))).scale(scaleIn(5)).s("sine")
     .fm(fxAmount.mul(2)).fmh(2).attack(1.5).sustain(0.6).release(4)
     .gain(fxAmount.mul(0.14)).pan(sine.slow(7)).delay(0.6))),
-  // Rise: random tones around the current note that climb an octave and thicken from a few to most 16ths over 2 bars;
-  // loose timing (nudge), own level and length per tone, so it swells like a cloud, not a machine
-  gate(held(fx.btn2), n(irand(5).segment(16)).add(fxNotes).add(n(fxRise.fmap(r => Math.floor(7 * r))))   // 16th grid first: add keeps the left structure
-    .degradeBy(fxRise.fmap(r => 0.85 - 0.6 * r))
-    .scale(scaleIn(5)).s("triangle").nudge(rand.range(0, 0.04))
-    .attack(0.02).decay(rand.range(0.2, 0.7)).sustain(0).release(0.4)
-    .gain(fxRise.fmap(r => 0.08 + 0.3 * r)).mul(gain(rand.range(0.5, 1)))
-    .pan(rand).delay(0.6))
-), 2, fx.space), {
-  lpf: expRange(fx.bright, 1500, 14000),
-  level: fx.level.range(0, 1.86),   // was 1; mix: shimmer −10 dB
+), 2, bowed.space), {
+  lpf: expRange(bowed.bright, 1500, 14000),
+  level: bowed.level.range(0, 1.86),   // mix: shimmer −10 dB
+}))
+const stemN2_bowed = stack(stemN2_eno, stemN2_shimmer)
+
+// ============================================================
+// JONAS 7 VOICE — David's spoken recording (samples/voice/david.mp3, 9:13 min, −20 LUFS) on an endless loop
+// ============================================================
+// The recording runs with the clock like a radio left on: the place in it follows the track's time, so the fader
+// brings it in where it is now. Played a beat at a time (a beat-long slice, each starting where the last one ended),
+// so the effect follows the knob within a beat. Row 3 = distortion: a radio from the start (band-pass, hiss,
+// crackle) that gets thinner and rougher up to half way; past half it breaks: distortion, then bitcrush, then fewer
+// samples. Button 2 held stutters the start of each beat.
+// @ctl 2:7.k1 Brightness | dull ↔ bright.
+// @ctl 2:7.k2 Space | dry ↔ echo + room.
+// @ctl 2:7.k3 Distortion | radio → rougher → past half: crushed, broken.
+// @ctl 2:7.fader Level | the spoken voice, looping.
+// @ctl 2:7.b2 Stutter | held: each beat's start repeats in 16ths.
+if (typeof samples === 'function') await samples({ david: 'voice/david.mp3' },
+  'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/')
+const voice     = colJonas(7)
+const DAVID_SEC = 552.9
+// Where in the recording (0..1) the beat at cycle t starts
+const voiceAt = t => ((Math.floor(4 * Number(t) + 1e-9) * beat) % DAVID_SEC) / DAVID_SEC
+const voiceSlices = (perBeat, len) => s('david').segment(4 * perBeat)
+  .fmap(v => t => ({ ...v, begin: voiceAt(t), end: voiceAt(t) + len * beat / DAVID_SEC })).appLeft(signal(t => t))
+const voicePlain   = voiceSlices(1, 1)
+const voiceStutter = voiceSlices(4, 0.25)
+// The effect per event from row 3 (a): r = the radio part (0 → 1 up to half way), c = the break past half (0 → 1).
+// The radio is a band-pass (the strip's low-pass stays free for Brightness).
+const VOICE_EDGE = 0.5
+const voiceRadio = a => Math.min(1, a / VOICE_EDGE)
+const voiceBreak = a => Math.max(0, (a - VOICE_EDGE) / (1 - VOICE_EDGE))
+const voiceFxOf = a => {
+  const r = voiceRadio(a), c = voiceBreak(a)
+  return { hcutoff: 350 + 250 * r, bandf: 1600, bandq: 0.8 + 1.7 * r, shape: 0.15 + 0.25 * r, gain: 1 - 0.45 * c,
+    ...(c > 0 ? { distort: 0.5 + 4.5 * c } : {}),
+    ...(c > 0.35 ? { crush: 10 - 7 * (c - 0.35) / 0.65 } : {}),
+    ...(c > 0.7 ? { coarse: Math.round(1 + 7 * (c - 0.7) / 0.3) } : {}) }
+}
+const voiceFxd = pat => pat.fmap(v => a => ({ ...v, ...voiceFxOf(a) })).appLeft(voice.char)
+// The radio's hiss and crackle under the voice, louder with the radio part
+const voiceHiss = stack(
+  s('pink').segment(4).hpf(1200).lpf(5000).gain(voice.char.fmap(a => 0.015 + 0.045 * voiceRadio(a))),
+  s('crackle').segment(4).density(0.03).gain(voice.char.fmap(a => 0.1 + 0.2 * voiceRadio(a)))).attack(0.01).release(0.05)
+const stemN7_voice = strip(bus(stack(
+  gate(held(voice.btn2).fmap(h => !h), voiceFxd(voicePlain)),
+  gate(held(voice.btn2), voiceFxd(voiceStutter)),
+  voiceHiss,
+), 1, voice.space, 0.15), {
+  lpf: expRange(voice.bright, 1500, 16000),
+  level: voice.level.range(0, 1),
 })
 
 // Stateful controls (button counters, bar latches, risers) only see a change when they are queried.
@@ -1262,12 +1308,19 @@ const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
 const lkKeysLevel = lkCc ? lkCc(1) : off()
 const isPadHit = v => v.midichan === LK_PAD_CHAN
 
-// The scheduler empties midikeys' note queue on its first query: every layer reads one shared query of it
+// The scheduler empties midikeys' note queue on its first query: every layer reads one shared query of it.
+// Keys and pads pressed while the track was stopped wait in that queue: after a pause of more than a second (or on
+// the first query) they are read and dropped, so they do not all sound at once when the track starts.
 const shareQuery = pat => {
-  let span = null, haps = []
+  let span = null, haps = [], wall = -Infinity
   return new Pattern(state => {
     const key = state.span.begin + ':' + state.span.end
-    if (key !== span) { span = key; haps = pat.query(state) }
+    if (key !== span) {
+      const now = Date.now()
+      span = key; haps = pat.query(state)
+      if (now - wall > 1000) haps = []
+      wall = now
+    }
     return haps
   })
 }
@@ -1276,22 +1329,23 @@ const OWN_SAMPLES = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoe
 if (typeof samples === 'function') await samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a' }, OWN_SAMPLES)
 
 // Pads 1 and 5 = the spoken voice samples, as in 008; pitched shots carry their note as a MIDI number
+// gain: each hit levelled to about −15 LUFS-M, dry (tools/strudel-sim/pad-levels.mjs); gm_* and synth shots unmeasured
 const LK_SHOTS = [
   { s: 'brace' },
   { s: 'gm_glockenspiel', note: 86, room: 0.7 },
   { s: 'gm_marimba', note: 50, room: 0.5 },
-  { s: 'vibraphone_bowed', note: 62, room: 0.7 },
-  { s: 'lw' },
+  { s: 'vibraphone_bowed', note: 62, room: 0.7, gain: 6.5 },
+  { s: 'lw', gain: 0.56 },
   { s: 'gm_choir_aahs', note: 62, attack: 0.3, release: 2, room: 0.8 },
   { s: 'gm_voice_oohs', note: 69, attack: 0.2, release: 2, room: 0.8 },
   { s: 'gm_agogo', note: 74, room: 0.6 },
   { s: 'gm_melodic_tom', note: 50, room: 0.6 },
-  { s: 'wind', speed: 0.5, room: 0.8 },
-  { s: 'space', speed: 0.5, room: 0.9 },
-  { s: 'metal', speed: 0.4, room: 0.7 },
+  { s: 'wind', speed: 0.5, room: 0.8, gain: 1.36 },
+  { s: 'space', speed: 0.5, room: 0.9, gain: 0.65 },
+  { s: 'metal', speed: 0.4, room: 0.7, gain: 1.76 },
   { s: 'pink', attack: 1.5, decay: 0.5, sustain: 0, release: 1.5, cutoff: 1500, gain: 0.3, room: 0.8 },
   { s: 'sine', note: 98, attack: 0.005, decay: 1.5, sustain: 0, release: 1, gain: 0.3, room: 0.9 },
-  { s: 'rolandtr909_cr', speed: -0.5, room: 0.7 },
+  { s: 'rolandtr909_cr', speed: -0.5, room: 0.7, gain: 0.54 },
   { s: 'gm_vibraphone', note: 81, room: 0.7 },
 ]
 const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
@@ -1349,7 +1403,7 @@ stack(
   stemN4_toms,
   stemN5_choir,
   stemN6_glitter,
-  stemN7_shimmer,
+  stemN7_voice,
   stemLK,
   stateTaps
 )
