@@ -18,10 +18,10 @@ all at once: `npm run syx`.
 // @mode 16 Mode 16 — Stems             a page per mode, in this order
 // @mode 2 Mode 2 — Melodien (CC + 48)
 // @col 16:1 1 Kick                     column heading
-// @row 16:k1 Reihe 1 \ HPF             row label (" \ " = line break)
-// @ctl 16:1.k1 HPF | 20–2000 Hz. Ganz offen: nur noch der Klick.
-// @ctl 2:1-7.k1 Wobble | …             range: text on column 1, "wie <heading>" on the others
-// @ctl g.fader Master Level | …        global column 8, on every page, CC n / n + 48
+// @row 16:k1 Row 1 \ HPF             row label (" \ " = line break)
+// @ctl 16:1.k1 HPF | thick ↔ only the click.
+// @ctl 2:1-7.k1 Wobble | …             range: text on column 1, "as <heading>" on the others
+// @ctl g.fader Master | …        global column 8, on every page, CC n / n + 48
 ```
 Rows: `k1 k2 k3` (knob rows), `fader`, `b1 b2` (button rows). Mode 16: fader 5-12, knobs 13-36, buttons 37-52; Mode 2 = +48.
 

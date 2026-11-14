@@ -50,3 +50,14 @@
 - Harter Anschlag: der Lauf landet auf der Eins mit dem vollen Echo-Stab-Akkord (Violinen, Bratschen, Celli) + Pizzicato-Klick.
 - Spalten: Echo-Stab, Lauf hoch, langer Lauf, Stab + Schweller, 16tel-Figur. Reihe 3: unisono → + Oktave → + Terzen
   unter den Läufen → + Celli zwei Oktaven tiefer.
+
+## techno-strings-1 (gebaut 2026-11-12, für 008, Hintergrund) — NICHT gehört
+- Wunsch: ikonische Hintergrund-Streicher; Moll, dessen Quinte einen Halbton steigt und ihn zu Dur macht (Fm → D♭/F),
+  oder andere sparsame Bewegungen.
+- Spalten = Bewegungen auf offenem Fm (F4 C5 F5 A♭5): Fm→D♭ (Leittonwechsel), Fm→F, Fm→A♭, Linie hoch (Bond-Klischee
+  5–♯5–6), Linie runter (m, m(maj7), m7, m6), Fm→E (Slide), Fm→C, Kette Fm→D♭→B♭m. Quellen: Wikipedia „Contrast chord“,
+  Kopp „Chromatic Transformations“ (UCI), thejazzpianosite.com „Line clichés“, Attack „Strings of Life“ (Stabs) und
+  „Analogue string synthesis“. Fm→C und die Kette = meine Wahl.
+- Taste 1 = Langsam (6 Takte Grund, 2 bewegt) / Pendel (jeder Takt) / Stabs; Reihe 3 = JX-10 (harmonie-5) ↔ Analog-Strings.
+- Engine techno (Kontext-Beat schwach, Nutzer-Feedback zu techno-pads-1; Engine nicht geändert, gemeinsamer Code).
+- Node: Noten je Takt geprüft, transpiliert. Pegel geschätzt.

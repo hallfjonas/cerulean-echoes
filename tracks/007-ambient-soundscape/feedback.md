@@ -26,4 +26,9 @@
 ## Feedback 3 (user, 2026-11-09)
 - Toms (Jonas 4) louder: gain 2.5 → 4 (+4 dB) in 007-ambient-dual.strudel; single and set 011 rebuilt.
 - Ticks (Jojo 6) never used → replace. Candidates in lab/drums/ambient-perkussion-1.strudel (real recordings): kalimba,
-  shaker, slit drum · birds, pebbles, fire · gong, tubular bells. Waiting for the pick.
+  shaker, slit drum · birds, pebbles, fire · gong, tubular bells.
+- 2026-11-12: user picked the shaker → Jojo 6 = shaker (lab column 2, 1:1) in 007-ambient.strudel; previous
+  old/007-ambient-before-shaker.strudel. Level = the lab's (not rendered: Node cannot decode the VCSL shaker WAVs).
+
+## 2026-11-12 — labels English, short, unified (NOT checked on hardware)
+- User: language, unification, simplification everywhere. All @ctl texts one short line, German LC-view/status/option names translated, button 1 = Pattern, global column as in 009. Transpile and layout sheets regenerated; no sound change.

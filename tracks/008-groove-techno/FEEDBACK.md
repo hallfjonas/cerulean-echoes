@@ -70,3 +70,16 @@ Round 1 changes (beyond the plan values, found by measuring):
   K2 drops to 8 % and K3 to 6 competitors because the LK pad at full mod wheel is the loudest stem (−14 LUFS) and
   sits on F3 in the lane (lane −20 dB, the bassline −30 dB). No knob lowers that: only code (keys pad hpf 220 → 350 Hz
   like the techno pad, and/or less gain). Without the LK pad K2 stays at about 41 %.
+
+## PADS + STRINGS (2026-11-12)
+- No high-pass on the pads (the space version's fixed 400/350 Hz made them thin).
+- Jonas 1 = Pads: pad + techno pad together (lab/harmonie/techno-pads-1 "Beide"); button 1 = progression (as before),
+  button 2 = colour 7 / 9 / fourths / fifths (freeze is gone), row 3 = Pump. Level range 1.2 (≈ both pads before).
+- Jonas 2 = Strings: lab/streicher/techno-strings-1 moves 1, 3, 4, 5, 8 (graded good), timing "Langsam"; row 3 = JX-10
+  ↔ analogue strings; button 2 = echo throw. Static on F (no progression, no chapter); level range 0.5 (≈ −30 LUFS).
+- Bass 3-3-2 monotone (root only). Before: old/008-groove-techno-before-strings.strudel. Not heard.
+- Strings +3 dB (level range 0.7). Percussion: pure-sine pillow bongos again (004–006), no FM; Brightness = lpf
+  700–5000 Hz; level range 0.85 (same loudness as the FM bongos, measured).
+
+## 2026-11-12 — labels English, short, unified (NOT checked on hardware)
+- User: language, unification, simplification everywhere. All @ctl texts one short line, German LC-view/status/option names translated, button 1 = Pattern, global column as in 009. Transpile and layout sheets regenerated; no sound change.

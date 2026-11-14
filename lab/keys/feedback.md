@@ -278,3 +278,27 @@
 - Node: switches at the phrase, bass and pad follow (Kerri, Am F G, Chicago, Checkmate, Am9 D9 with keys on D9), transpile
   ok, ~0.8 ms/tick. Pad −27.6 LUFS at fader 1 offline (track: −27). Not heard.
 - Known: pulling the leading riff to 0 leaves the keys silent until the phrase (the monotone keys come in then).
+
+## Round 24 — talk (user, 2026-11-12)
+- Not heard yet. Questions: is “everything follows the riff” usual? Answer from the research: records share ONE chord
+  sequence; under a keys riff the bass either follows its roots (Keep Me Inside, Good Life) or holds a pedal (Mommy
+  What's a Record); the live “who leads” switch is ours. Monotone keys: the progression keeps running (unchanged).
+- User wants the options side by side in one lab → round 25.
+
+## Round 25 — house-keys-lab-25.strudel (2026-11-12)
+- Round 24 + one switch, Mode 2 column 7 button 1 (CC 91), at the next 4-bar phrase: what bass and pad do while a RIFF
+  leads: 1 follow (= round 24) → 2 pedal (bass A, pad holds Am9 in the track's voicing) → 3 bass follows, no pad →
+  4 pedal A, no pad. Progression leading (monotone keys): unchanged. Status box and LC view show “Unter Riff”.
+- Node: Kerri video in all four (bass 33/38/43 ↔ 33 only; pad riff chords / Am9 every phrase / none), Checkmate on the
+  pedal, progression unchanged; transpile ok, ~3 ms/tick. Not heard.
+
+## Round 26 — house-keys-lab-26.strudel (2026-11-12) — NOT heard
+- User: round 25 mixed rhythms and chord sequences (column 2 monotone keys with 8 rhythms, Kerri video with its rhythm + the 8). Wanted: one riff per
+  column, rhythm and chords fixed; the button under the slider tries the options for bass and harmony.
+- Built: six columns (Kerri video, Checkmate, Turn Off The Lights, Atmosphere, Chicago Spread, Retro disco), each with its one rhythm. Button 1 per
+  column = Folgen / Orgelpunkt A + Am9 / Bass folgt ohne Fläche / Orgelpunkt ohne Fläche (kept per column, takes over at the next 4-bar phrase).
+  Sources of the options as in round 25 (Attack Magazine, Kerri Chandler). All faders at 0: the progression leads.
+- Out: column 2 monotone keys, the 8 rhythms of 009, the global “Unter Riff” switch (Mode 2 column 7 button 1). Round 25 is in old/.
+- Checked: syntax / transpile only. Open: do four options per riff suffice; riff 7 (empty column) for a new riff?
+- Round 26, same day: bass and pad were barely audible. Bass: an octave and a bit up (F2–E3, as the track) plus a quiet saw, gain ×2.7;
+  pad HARM_LEVEL ×2. Both by ear, not measured (the offline renderer does not run lab boards).

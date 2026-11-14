@@ -105,3 +105,27 @@
   prüfen (cheap/knacksig behoben?).
 - single, syx, Layouts (Cloud), Set 011 neu gebaut; check-set: 009 nur Abweichungen im allerersten Moment, sonst identisch.
 - Hinweis: 009-house-riffs-dual.strudel (+ single, syx, Layouts, 22:24) stammt aus einer anderen Sitzung; nicht angefasst.
+
+## 2026-11-12 — keys riffs from lab round 26 (NOT heard)
+- User: Kerri-Video "Folgen" sounded odd (its Dm9/Gm9 chords were my invention, the video riff is Am9 only → not taken over; the Kerri rhythm stays as "Kerri-Riff" on Am9); Checkmate "Folgen" sounded good; wants the non-monotone riffs in the track.
+- Keys button 1: 8 rhythms (Am9) + 4 riffs with their own chords: Checkmate, Atmosphere, Chicago Spread, Retro disco (16 bars). While a riff is selected and the keys fader is up, bass, sub, harmony, vibraphone, flute follow the riff's chords (chord of the bar's first 16th); Jonas 1's progression is overridden meanwhile.
+- Not taken over: Turn Off The Lights (changes chord mid-bar; the bar-wise bass cannot follow), the lab's Orgelpunkt/no-pad options.
+- Added chords Gm and Em/G (keys riffs only). Checked with the Node harness (notes per bar) and transpile check only.
+
+## 2026-11-12 — brass with chance (NOT heard)
+- User: the brass play the same every bar. Now every short figure (1–2 bars) rests for a repetition with 30 % (every 4th repetition always plays) and every hit but the downbeat is left out with 25 % (`BRASS_REST`, `BRASS_DROP`; hash of the repetition number, so it differs every time but is stable per query). The 4-bar "rare" figures and swells keep their own sparseness. Checked in the Node harness: in 24 bars 7 are silent, the others differ in hit count.
+
+## 2026-11-12 — Break keeps the percussion (NOT heard)
+- User: "Beat aus" should not hide all percussion, only the low parts. Now only kick, noise pump, sub and bass pause in the break; clap, hats, congas and tambourine keep playing (their `beatOnly` removed). Checked by transpile only.
+
+## 2026-11-12 — overlay rhythms out of the keys
+- User: the overlaid riffs (Kette + versetzt, Kette + Paare) out. Button 1 now has 6 rhythms + 4 riffs. Transpile check only.
+
+## 2026-11-12 — Retro disco riff out of the keys
+- User: the last riff (Retro disco) out. Button 1 now has 6 rhythms + 3 riffs (Checkmate, Atmosphere, Chicago). Transpile check only.
+
+## 2026-11-12 — Kerri-Video and Turn Off riffs in the keys (NOT heard)
+- User: Kerri-Video was not odd in the lab, I had set it up wrong; both riffs in. The track now knows the chord per 16th under a riff (chordAtK): bass, sub, pad, vibraphone, flute, brass, strings, guitar change chords inside the bar with the riff (Kerri: Am9 6 / Dm9 8 / Gm9 2 16ths; Turn Off). New chords Dm9, Gm9, Bm. Retro disco stays out. Node harness: keys, pad change at the right 16ths.
+
+## 2026-11-12 — labels unified (English, shorter) (NOT heard)
+- User: simplify and unify all labels, shorten when in doubt; language agreed: everything English (sheets, LC view, status box, option names). All @ctl texts rewritten short (button 1 = "Pattern", "Chords" on harmony, "Chapter" global; knob 2 "Space"; fader "Level"); German labels in the LC view/status box/option names translated; Wechsel -> Progression in the chapter name; the rhythm string under the keys button in the LC view removed. Backup before: scratchpad 009-before-labels.strudel. Checked: transpile, harness (events play), layout sheet.

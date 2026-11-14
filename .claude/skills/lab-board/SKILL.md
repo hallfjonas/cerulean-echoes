@@ -37,6 +37,7 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
   randomness only for melodies. Row-3 knobs that add variation over time are liked; never glide/pitch bend; rolls =
   one slow swell. Same effect on the same control in every column (echo on Space), no per-pattern special effects.
 - Single quotes for plain text in Strudel (double quotes are mini-notation); labels without theory terms.
+- Labels (control names, `@ctl`, option names, the live view, the status box): English and short, as in CLAUDE.md "Labels".
 
 ## Rounds
 - Current round in the folder, older rounds in `old/` (move the .strudel and its layout pdf), the result of each round

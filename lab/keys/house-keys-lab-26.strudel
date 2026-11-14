@@ -1,0 +1,688 @@
+// ============================================================
+// HOUSE KEYS LAB 26: one riff per column (rhythm and chords fixed); button 1 = how bass and harmony behave under it
+// ============================================================
+// Round 26 for 009 (user, 2026-11-12: round 25 mixed rhythms and chord sequences; "one riff per column, rhythm and
+// chords fixed, and the button under the slider tries the options"). The mixed-in monotone column and the 8 rhythms
+// of 009 are out. Six columns, six riffs, each with its own rhythm and chords (nothing to change on them):
+//   1 Kerri video  2 Checkmate  3 Turn Off The Lights  4 Atmosphere  5 Chicago Spread  6 Retro disco (16 bars)
+// BUTTON 1 of every column = what bass and harmony pad do WHILE THAT RIFF LEADS (a column's choice is kept; it takes
+// over at the next 4-bar phrase):
+//   1 Folgen               bass on the riff's roots, pad holds the riff's chords
+//   2 Orgelpunkt           bass stays on A, pad holds Am9 (a pedal under the riff, as Kerri Chandler “Mommy What's a
+//                          Record”: chords moving over a held bass note; Attack Magazine, Kerri Chandler chords part 2)
+//   3 Bass folgt, ohne     bass on the riff's roots, pad silent: the riff alone carries the chords (bass on the roots as
+//     Fläche               Kerri Chandler “Keep Me Inside”, Inner City “Good Life”; Attack Magazine)
+//   4 Orgelpunkt, ohne     bass on A, pad silent
+//     Fläche
+// Who leads: the column whose fader was raised from 0 last takes over at the next 4-bar phrase and starts from its own
+// first bar; only the leading riff sounds. All faders at 0 → the progression leads (Mode 2 column 1 button 1 picks one
+// of 10 of track 009) and bass and pad play it. Everything else as round 25 (sounds, knobs, drums, pad). Not heard.
+//
+// Launch Control XL 3: keys in Custom Mode 16 (channel 16), harmony, drums and bass in Mode 2 (CC + 48).
+// @layout House Keys Lab 26 (lab/keys, round 26 for 009: six riffs, button 1 = what bass and harmony do under the riff)
+// @note Round 26: one riff per column, rhythm and chords fixed. Button 1 under the fader = bass and harmony under it: follow → pedal A + Am9 → bass follows, no pad → pedal A, no pad.
+// @note The column whose fader you raise from 0 leads at the next 4-bar phrase (bass and harmony pad follow its chords). All faders at 0: the progression (Mode 2, column 1, button 1) leads.
+// @guide What to listen for | For each riff: which of the four options is best? Does the pedal on A make it stronger or flatter? Does the riff carry the chords alone (no pad)?
+// @guide Try | Drums, bass (Mode 2 column 7) and pad (Mode 2 fader 1) up, raise one riff, press its button 1 and listen at the next phrase. Then the next riff.
+// @mode 16 Mode 16 — Riffs
+// @col 16:1 1 Kerri video
+// @col 16:2 2 Checkmate
+// @col 16:3 3 Turn Off The Lights
+// @col 16:4 4 Atmosphere
+// @col 16:5 5 Chicago spread
+// @col 16:6 6 Retro disco (16)
+// @row 16:k1 Row 1 \ Brightness
+// @row 16:k2 Row 2 \ Space
+// @row 16:k3 Row 3 \ Length
+// @row 16:fader Fader \ Level
+// @row 16:b1 Button 1 \ Under the riff
+// @row 16:b2 Button 2 \ Sound
+// @ctl 16:1-6.k1 Brightness | dull ↔ bright over the sound's own range; brighter also plays a little harder.
+// @ctl 16:1-6.k2 Space | 0 = dry; a 1/8 echo first, then the room.
+// @ctl 16:1-6.k3 Length | 0 = short stab ↔ hits ring four times longer.
+// @ctl 16:1-6.fader Level | raised from 0: this riff leads at the next phrase (its chords go to bass and pad).
+// @ctl 16:1-6.b1 Under the riff | follow → pedal A + Am9 → bass follows, no pad → pedal A, no pad (next phrase).
+// @ctl 16:1-6.b2 Sound | held: knobs = sound mix (piano → Rhodes, B3 → M1, vibes → marimba); fader = overtones.
+// @mode 2 Mode 2 — Harmony, drums, bass
+// @col 2:1 1 Harmony
+// @col 2:6 6 Drums
+// @col 2:7 7 Bass
+// @ctl 2:1.k1 Brightness | dull ↔ bright (low-pass 400–6000 Hz).
+// @ctl 2:1.k2 Space | echo and room.
+// @ctl 2:1.k3 Strings ↔ B3 | strings → both → B3 alone.
+// @ctl 2:1.fader Level | held chords of the leader (riff or progression), as track 009's Jonas 1.
+// @ctl 2:1.b1 Progression | next of 10 (track 009); the progression leads again from the next phrase.
+// @ctl 2:6.fader Drums | 909 kick, off-beat hat, clap, shaker.
+// @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %; 55–58 % = house.
+// @ctl 2:6.b2 Drums out | keys and bass alone while held.
+// @ctl 2:7.fader Bass | off-beat bass on the root of the leader's chord.
+
+const exp = (lo, hi) => v => lo * Math.pow(hi / lo, v)
+const bpm = 124
+
+// Patterns: [name, loop, (unused: old bar 4 / bar 8 variations)]. The loop can be any length (16 = one bar, 32 = two
+// bars) and repeats unchanged. x = chord, g = ghost chord, t = top note, u = chord tone
+// above the top, d = note below the top, - = the hit before is held one more 16th, . = rest.
+// X = accented hit (louder, and brighter in column()); overlays: O = both rhythms hit (a little louder), a / b = only one
+const VEL = { x: 0.8, X: 1, g: 0.3, t: 0.7, u: 0.7, d: 0.65, O: 1, a: 0.8, b: 0.8 }
+// Two rhythms played at once, as one loop: O where both hit, a / b where only the first / second does
+const overlay = (a, b) => [...a].map((c, i) => c === 'x' ? (b[i] === 'x' ? 'O' : 'a') : b[i] === 'x' ? 'b' : '.').join('')
+// Pedal chords for a pattern with its own chord sequence (none here: the Kerri riff's chords are on the harmony board)
+const PEDAL = {
+  // Kerri's shape (♭7 9 ♭3 5, no root), registers as in the video: Gm9 a whole step under Am9, Dm9 a fifth under it
+  A: { root: 9, pcs: [7, 11, 0, 4], notes: [55, 59, 60, 64] },
+  G: { root: 7, pcs: [5, 9, 10, 2], notes: [53, 57, 58, 62] },
+  D: { root: 2, pcs: [0, 4, 5, 9], notes: [48, 52, 53, 57] },
+  // round 21: the other riff chords, voiced around G3–E4 like the keys (as the track's harmony column / lab CH)
+  F: { root: 5, pcs: [5, 9, 0, 4], notes: [53, 57, 60, 64] },    // Fmaj7 F3 A3 C4 E4
+  g: { root: 7, pcs: [7, 9, 11, 2], notes: [55, 57, 59, 62] },   // Gadd9 G3 A3 B3 D4
+  E: { root: 4, pcs: [7, 11, 2, 4], notes: [55, 59, 62, 64] },   // Em7 G3 B3 D4 E4
+  d: { root: 2, pcs: [6, 9, 0, 4], notes: [54, 57, 60, 64] },    // D9 F♯3 A3 C4 E4 (as track 009)
+  e: { root: 4, pcs: [2, 6, 7, 11], notes: [50, 54, 55, 59] },   // Em9 in Kerri's shape D3 F♯3 G3 B3 (parallel to Am9)
+}
+// round 23: voicings per riff (letters → { root, pcs, notes }), F♯3–G♯4 where possible (the samples' range)
+const V = (root, notes) => ({ root, pcs: [...new Set(notes.map(n => n % 12))], notes })
+// riff chords: one letter per 16th, built from bars of 16
+const bars = (...bs) => { for (const x of bs) if (x.length !== 16) throw new Error('riff bar is not 16 steps: ' + x); return bs.join('') }
+const RIFFS = [
+  // [name, chords per 16th, voicings, own rhythms (null = the 8 of 009)]
+  ['Kerri-Video', 'AAAAAADDDDDDDDGG', PEDAL, [['Kerri-Video', 'x..x..x..x..x.x.']]],   // round 26: its own rhythm only
+  // Checkmate: Am triad A3 C4 E4, Gm first inversion B♭3 D4 G4; the change on the last 16th of each bar
+  ['Checkmate', bars('AAAAAAAAAAAAAAAG', 'GGGGGGGGGGGGGGGA'),
+    { A: V(9, [57, 60, 64]), G: V(7, [58, 62, 67]) },
+    [['Checkmate', bars('..x..x..x.x..x.x', '..x..x..x.x..x.x')]]],
+  // Turn Off The Lights: triads Am A3 C4 E4, Dm A3 D4 F4, Em B3 E4 G4 | Bm in two voicings (B3 D4 F♯4 / F♯3 B3 D4)
+  ['Turn Off The Lights', bars('AAAAAADDDDDDEEEE', 'bbbbbvvvvvvvbbbA'),
+    { A: V(9, [57, 60, 64]), D: V(2, [57, 62, 65]), E: V(4, [59, 64, 67]), b: V(11, [59, 62, 66]), v: V(11, [54, 59, 62]) },
+    [['Turn Off', bars('x..x..x..x..x.x.', '..x..x..x...x..x')]]],
+  // Atmosphere: Am7 in Kerri's shape G3 A3 C4 E4, the fill stab Am7(11) G3 A3 D4 E4 | Em over G (bass G): G3 B3 E4
+  ['Atmosphere', bars('MMMMMMMMMMfMMMMM', 'qqqqqqqqqqqqqqqq'),
+    { M: V(9, [55, 57, 60, 64]), f: V(9, [55, 57, 62, 64]), q: V(7, [55, 59, 64]) },
+    [['Atmosphere', bars('..x...x...x...x.', '..x...x...x..x..')]]],
+  // Chicago spread: Am9 G3 B3 C4 E4 | Cmaj9 G3 B3 D4 E4 | Fmaj7 A3 C4 E4 F4 | D9 F♯3 A3 C4 E4
+  ['Chicago Spread', bars('AAAAAAAAAAAAAACC', 'CCCCCCCCCCCCCCCC', 'FFFFFFFFFFFFFFDD', 'DDDDDDDDDDDDDDDD'),
+    { A: V(9, [55, 59, 60, 64]), C: V(0, [55, 59, 62, 64]), F: V(5, [57, 60, 64, 65]), D: V(2, [54, 57, 60, 64]) },
+    [['Chicago', bars('x...x...x-.x..x.', '..x..x.....x....', 'x...x...x-.x..x.', '..x..x.....x....')]]],
+  // Retro disco: bars 1–8 Am7 (3) Fmaj7 (3) G (2) on the beats; bars 9–16 the same in other voicings, off the beats,
+  // G climbing through its inversions in bars 15–16 (the lift into the loop)
+  ['Retro-Disco 16T', bars(...Array(3).fill('MMMMMMMMMMMMMMMM'), ...Array(3).fill('FFFFFFFFFFFFFFFF'), ...Array(2).fill('GGGGGGGGGGGGGGGG'),
+      ...Array(3).fill('mmmmmmmmmmmmmmmm'), ...Array(3).fill('ffffffffffffffff'), 'gggggggggggggggg', 'gggghhhhhhhhiiii'),
+    { M: V(9, [55, 57, 60, 64]), F: V(5, [57, 60, 64, 65]), G: V(7, [55, 59, 62]),
+      m: V(9, [60, 64, 67]), f: V(5, [53, 57, 60, 64]), g: V(7, [55, 59, 62]), h: V(7, [59, 62, 67]), i: V(7, [62, 67, 71]) },
+    [['Retro-Disco', bars(...Array(8).fill('x--.x--.x--.x-x.'), ...Array(8).fill('..x..x..x..x.x..'))]]],
+]
+// round 24: the riffs' chord names (status, dashboard; the pad holds one name as one chord, so Atmosphere's fill stab and
+// Turn Off's second Bm voicing do not restrike it)
+const RIFF_NAMES = {
+  'Kerri-Video': { A: 'Am9', D: 'Dm9', G: 'Gm9' },
+  'Checkmate': { A: 'Am', G: 'Gm' },
+  'Turn Off The Lights': { A: 'Am', D: 'Dm', E: 'Em', b: 'Bm', v: 'Bm' },
+  'Atmosphere': { M: 'Am7', f: 'Am7', q: 'Em/G' },
+  'Chicago Spread': { A: 'Am9', C: 'Cmaj9', F: 'Fmaj7', D: 'D9' },
+  'Retro-Disco 16T': { M: 'Am7', F: 'Fmaj7', G: 'G', m: 'Am7', f: 'Fmaj7', g: 'G', h: 'G', i: 'G' },
+}
+// Columns: [name, patterns, (unused), (unused), touch, sources, job of button 1 in sound mode, chords per 16th, voicings]
+// The rhythms on button 1, the same on every column (change them while the keys are off)
+const PATS = [
+    ['Kette',            '.x..x..x.x..x..x', '.x..x..x.x..x.x.', '.x..x..x.x.x.x.x'],
+    ['versetzte Kette',  '...x..x..x.x..x.', '...x..x..x.x.x..', '...x..x..x.x.x.x'],
+    ['Paare',            '.x.x..x..x.x..x.'],
+    ['3-3-2',            'x..x..x...x..x..'],
+    ['Kerri-Synkope',    '..x..x...x.x..x.'],
+    // The Kerri video's riff rhythm, all on Am9 and as short as every other pattern (Length knob = how long)
+    ['Kerri-Riff auf A', 'x..x..x..x..x.x.'],
+    // Overlays: liked in round 6 when two columns played different patterns at once (the hits differ, more organic)
+    // 8th element = the reference rhythm: the overlay is levelled to its energy (as loud as the chain alone)
+    ['Kette + versetzt', overlay('.x..x..x.x..x..x', '...x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x'],
+    ['Kette + Paare',    overlay('.x..x..x.x..x..x', '.x.x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x']]
+// Touch schemes: touch(k, pat, pos) = how hard the hit at 16th k is played, 0 soft … 0.5 as written … 1
+// hard (gain 0.6 – 1.4, brightness ×0.5 – ×2); vel / cut = other gain / brightness per symbol. Fixed per position:
+// the loop stays constant.
+const md = (k, n) => ((k % n) + n) % n
+const isHit = c => c !== '.' && c !== '-'
+const hitsBefore = (pat, pos) => [...pat.slice(0, pos)].filter(isHit).length
+// 16ths from this hit to the next one (around the loop)
+const gapAfter = (pat, pos) => { for (let d = 1; d < pat.length; d++) if (isHit(pat[(pos + d) % pat.length])) return d; return pat.length }
+// 16ths since the hit before (around the loop)
+const gapBefore = (pat, pos) => { for (let d = 1; d < pat.length; d++) if (isHit(pat[md(pos - d, pat.length)])) return d; return pat.length }
+// Accent before gaps at strength s (0 = flat): each hit deviates from the pattern's average by how long the rest after it
+// is, so the slider spreads the hits around the middle; full = about 6 dB between the hardest and the softest hit
+// (the round-9/10 accent was only 1-2 dB)
+const clamp01 = x => Math.max(0, Math.min(1, x))
+const gapT = (pat, pos) => Math.min(0.9, 0.2 + 0.2 * gapAfter(pat, pos))
+const meanCache = {}
+const gapMean = pat => meanCache[pat] ??= (() => { let t = 0, n = 0
+  for (let p = 0; p < pat.length; p++) if (isHit(pat[p])) { t += gapT(pat, p); n++ }
+  return n ? t / n : 0.5 })()
+const accent = (k, pat, pos, s) => clamp01(0.5 + (gapT(pat, pos) - gapMean(pat)) * 4 * s)
+// The touch decided in round 11, the same on every column: accent before gaps at ACCENT with brighter accents
+// (bright 4 = brightness ×0.25 … ×4 over the touch range) and, in the overlays, the second rhythm b SECOND softer
+// (0.8 = as loud as the first) and darker. vel / cut = gain / brightness per symbol.
+const ACCENT = 0.25, SECOND = 0.45
+const TOUCH = { touch: accent, bright: 4, vel: () => ({ ...VEL, b: 0.8 * (1 - SECOND) }), cut: () => ({ b: 1 - 0.8 * SECOND }) }
+// Columns: [name, patterns, (unused), (unused), touch, source]
+// Columns: [name, patterns, (unused), (unused), touch, sources, job of button 1 in sound mode]
+// Columns: [name, patterns, (unused), (unused), touch, sources, job of button 1 in sound mode, riff]
+const PATS_K = [['Kerri-Video', 'x..x..x..x..x.x.'], ...PATS.filter(([n]) => n !== 'Kerri-Riff auf A')]
+const COLS = RIFFS.map(([name, seq, voic, pats]) => [name, pats, null, null, TOUCH, ['steinway', 'rhodes'], null, seq, voic])
+// Brightness range per sound [lowest, highest cutoff]: highest = twice the frequency below which 99.9 % of the sound's
+// energy lies (measured, first 0.3 s of C4 / B3; GM Rhodes from its soundfont zone). Organs and mallets: estimated
+// from their partials (B3: sines up to the twelfth, M1: a square), not measured.
+const RANGE = { gmrhodes: [250, 4100], piano: [250, 3700], rhodes: [250, 2000], steinway: [250, 8100],
+  b3: [250, 2000], m1: [250, 5000], vibes: [250, 4000], marimba: [250, 3000] }
+// Organ voices from round 14, an octave above the chords
+const M1K = 0.42   // −7.5 dB: the built M1 measured 7.5 dB louder than the B3 (round 14)
+// Hammond B3 with a slow Leslie: drawbars 16' + 5 1/3' + 8' (“888”), each tonewheel a sine; the Leslie as a slow
+// vibrato plus two copies a few cents apart, left and right
+const B3 = n => [0, 19, 12].flatMap((d, j) => [-0.04, 0.04].map((dt, side) => ({ s: 'sine', note: n + d + dt,
+  gain: [0.12, 0.07, 0.1][j], attack: 0.004, vib: 0.8, vibmod: 0.08, pan: side ? 0.7 : 0.3 })))
+// M1 Organ 2 (90s house): hollow square tone + octave, a fast percussive “tock” on the twelfth
+const M1 = n => [
+  { s: 'square', note: n + 12, gain: 0.22 * M1K, attack: 0.002, decay: 0.25, sustain: 0.7 },
+  { s: 'sine', note: n + 24, gain: 0.18 * M1K, attack: 0.002, decay: 0.25, sustain: 0.7 },
+  { s: 'sine', note: n + 31, gain: 0.25 * M1K, attack: 0.001, decay: 0.08, sustain: 0 }]
+const scaled = (vs, k) => vs.map(v => ({ ...v, gain: v.gain * k }))
+// The sources: note → voices, each as loud as the grand (round 14: LOUD, Kette, Am9; round 16 / 19: Steinway,
+// Rhodes Mark I and the grand re-levelled for their ranges, −18.8 LUFS at Brightness 0.6; GM sounds not measurable
+// offline, from round 14). Gains relative to the grand's voice gain 0.6.
+const SRC = {
+  gmrhodes: n => [{ s: 'gm_epiano1', note: n, gain: 0.75 * 1.01 }],
+  piano: n => [{ s: 'piano', note: n, gain: 0.6 * 0.933, hcutoff: 120 }],
+  steinway: n => [{ s: 'stein', note: n, gain: 0.6 * 0.49 / 0.955 * 0.99 }],
+  rhodes: n => [{ s: 'jrh', note: n, gain: 0.6 * 0.292 / 0.955 * 0.902 }],
+  b3: n => scaled(B3(n), 1.82 * 0.85),   // −1.4 dB: louder with its own brightness range (measured)
+  m1: n => scaled(M1(n), 1.85),
+  vibes: n => [{ s: 'gm_vibraphone', note: n - 12, gain: 0.65 * 0.91 }],
+  marimba: n => [{ s: 'gm_marimba', note: n, gain: 0.7 * 1.38 }],
+}
+// The sound mix (shift + knobs, as round 14): a knob in three thirds: 0 silent → A fades in → A blends into B → B
+// fades out; equal-power blend, so two sounds together stay as loud as one. Returns [level A, level B].
+const sweep = v => v < 1 / 3 ? [3 * v, 0] : v > 2 / 3 ? [3 - 3 * v, 1] : [1, 3 * v - 1]
+const xfade = c => [Math.cos(c * Math.PI / 2), Math.sin(c * Math.PI / 2)].map(x => x < 1e-6 ? 0 : x)
+// the two organs share partials: mid-blend measured +1.3 dB louder (round 14), taken out
+const pairLevels = (v, dip = 0) => { const [lvl, c] = sweep(v), [a, b] = xfade(c), d = Math.pow(10, -dip * Math.sin(Math.PI * c) / 20)
+  return [lvl * a * d, lvl * b * d] }
+const MIXNAMES = [['Klavier', 'Rhodes'], ['B3', 'M1'], ['Vibra', 'Marimba']]
+const layersOf = i => { const m = S.mix[i], [pno, rho] = COLS[i][5]
+  // piano and Rhodes blended dip 1.3 dB mid-way (measured, Steinway + Mark I): lifted
+  return [[pno, pairLevels(m[0], -1.3)[0]], [rho, pairLevels(m[0], -1.3)[1]], ['b3', pairLevels(m[1], 1.3)[0]], ['m1', pairLevels(m[1], 1.3)[1]],
+    ['vibes', pairLevels(m[2])[0]], ['marimba', pairLevels(m[2])[1]]].filter(([, l]) => l > 0) }
+// Level every column, pattern and strength to the same energy (sum of squared hit gains over the loop, like LUFS):
+// a touch column to equal hits, an overlay to its reference rhythm (8th element). Cached per column, pattern, strength.
+const touchGain = (dyn, k, pat, pos, s, st) => (dyn?.vel ? dyn.vel(st) : VEL)[s] * (dyn ? 0.6 + 0.8 * dyn.touch(k, pat, pos, st) : 1)
+const normCache = {}
+const norm = (i, e, st) => normCache[i + '|' + e[1] + '|' + st.toFixed(2)] ??= (() => {
+  const pat = e[1], ref = e[7] ?? pat
+  let w = 0, d = 0   // over two bars (a pattern may be two bars long)
+  for (let p = 0; p < 32; p++) { const r = ref[p % ref.length], q = pat[p % pat.length]
+    if (VEL[r]) w += VEL[r] ** 2
+    if (VEL[q]) d += touchGain(COLS[i][4], p, pat, p % pat.length, q, st) ** 2 }
+  return d > 0 ? Math.sqrt(w / d) : 1
+})()
+
+// Samples: Steinway (VCSL vl3, from our repo: the browser refuses VCSL's own files) and the Rhodes Mark I (jRhodes3d,
+// file 3, the middle strike). Only the notes around the chord (G3 B3 C4 E4).
+const JRH = 'https://raw.githubusercontent.com/sfzinstruments/jlearman.jRhodes3d/master/jRhodes3d-mono/'
+const OWN = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/johannes/samples/vcsl-keys/'
+const notesMap = (keys, file) => Object.fromEntries(keys.map(k => [k.toLowerCase(), file(k)]))
+const SAMPLE_MAP = {
+  stein: notesMap(['F#3', 'G#3', 'A#3', 'C4', 'D4', 'E4'], k => OWN + 'JHPiano_Sus_Close_' + k.replace('#', '%23') + '_vl3_rr1.flac'),
+  jrh: notesMap(['G3', 'B3', 'D4', 'F4'], k => JRH + { G3: 'A_055__G3', B3: 'A_059__B3', D4: 'A_062__D4', F4: 'A_065__F4' }[k] + '_3.flac'),
+}
+if (typeof samples === 'function') await samples(SAMPLE_MAP)
+
+// State survives re-evaluation. Mode 16: fader 5-12, knobs 13-36, buttons 37-52. Mode 2 = + 48.
+const S = globalThis.houseKeysLab26 ??= { val: {}, held: {}, pend: {}, at: {} }
+S.val[5] ??= 0.8
+for (let i = 0; i < 8; i++) S.val[13 + i] ??= 0.6
+S.mix ??= []
+for (let i = 0; i < 8; i++) S.mix[i] ??= [0.5, 0, 0]
+// button 1 in sound mode: held (echo, stutter: while held; since = when the stutter started) and push (on at start)
+S.job ??= { held: {}, push: {}, since: {} }
+for (let i = 0; i < 8; i++) S.job.push[i] ??= true   // sound mix per column: piano and Rhodes half each, no organ, no mallets
+for (let i = 0; i < 8; i++) S.val['rec' + i] ??= 0.5   // how strongly the overtones follow the accent (shift + fader; half = round 11)
+S.val[58] ??= 0.6; S.val[66] ??= 0.3; S.val[59] ??= 0.6   // drums, swing, bass
+S.val[53] ??= 0; S.val[61] ??= 0.6; S.val[69] ??= 0; S.val[77] ??= 0.3   // harmony pad: level, brightness, space, strings ↔ B3 (track start values)
+S.pend.lead ??= { kind: 'riff', i: 0 }   // column 1 starts up, so the Kerri video leads first
+const swingPct = () => 0.5 + 0.2 * S.val[66], bassLevel = () => S.val[59]
+const drumsLevel = () => S.held[98] ? 0 : S.val[58]
+// A choice made now takes over at the next bar (len 4: at the next 4-bar phrase); fixed once a bar is first asked
+const latch = (key, bar, len = 1) => {
+  const b = Math.floor(bar / len), m = S.at[key] ??= {}
+  if (!(b in m)) { m[b] = S.pend[key] ?? 0; for (const x in m) if (+x < b - 8) delete m[x] }
+  return m[b]
+}
+const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
+// CHORD CLOCK (round 24): track 009's chords and its 10 progressions (copied from 009-house-dual.strudel), and the
+// leader: a riff column or the progression. Bass, harmony pad and keys all read the clock.
+// Every chord: bass = the bass note as MIDI (A1 = 33); voicings of the pad as the track's harmony column (HARM_VOICING).
+const midi = name => {
+  const m = name.match(/^([a-g])(#|b)?(\d)$/)
+  return 12 * (+m[3] + 1) + { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0)
+}
+const pc = m => (m % 12 + 12) % 12
+const chord = (name, bassName) => ({ name, bass: midi(bassName) })
+const CHORDS = [chord('Am9', 'a1'), chord('D9', 'd2'), chord('Am7', 'a1'), chord('Cmaj7', 'c2'), chord('Em7', 'e1'),
+  chord('Fmaj7', 'f1'), chord('Fadd9', 'f1'), chord('Gadd9', 'g1'), chord('G11', 'g1'), chord('Dm7', 'd2')]
+const CID = Object.fromEntries(CHORDS.map((c, i) => [c.name, i]))
+const x2 = bs => [...bs, ...bs]
+const PROGS = [
+  ['Am9 D9',     x2(['Am9', 'Am9', 'D9', 'D9'])],                                          // track 009 as it was
+  ['Am7 C Em7',  x2(['Am7', 'Am7', 'Cmaj7', 'Em7'])],                                      // MAW, To Be In Love
+  ['Am F G',     x2(['Am9', 'Am9', 'Fmaj7', 'Gadd9'])],                                    // Mr Fingers, Can You Feel It
+  ['F G Am',     x2(['Fadd9', 'G11', 'Am9', 'Am9'])],                                      // CeCe Peniston, Finally
+  ['Em7 Fmaj7',  ['Em7', 'Fmaj7', 'Em7', 'Fmaj7', 'Em7', 'Fmaj7', 'Em7', 'Am7']],          // Stardust
+  ['Fmaj7 G',    x2(['Fmaj7', 'Fmaj7', 'Gadd9', 'Gadd9'])],                                // Daft Punk, One More Time
+  ['F Am C Dm',  ['Fmaj7', 'Fmaj7', 'Am7', 'Am7', 'Cmaj7', 'Cmaj7', 'Dm7', 'Dm7']],        // Livin' Joy, Dreamer
+  ['Am7 Dm7',    x2(['Am7', 'Am7', 'Dm7', 'Dm7'])],                                        // Black Box
+  ['C F Am Em',  x2(['Cmaj7', 'Fadd9', 'Am7', 'Em7'])],                                    // Basement Jaxx, Romeo
+  ['F Em Am',    x2(['Fmaj7', 'Em7', 'Am7', 'Am7'])],                                      // Joey Negro
+].map(([name, bs]) => ({ name, ids: bs.map(b => CID[b]) }))
+// The track's harmony voicings: the pitch classes, four notes from E3 (52) up
+const HARM_VOICING = { Am9: [55, 59, 60, 64], D9: [54, 57, 60, 64], Am7: [55, 57, 60, 64], Cmaj7: [55, 59, 60, 64],
+  Em7: [55, 59, 62, 64], Fmaj7: [53, 57, 60, 64], Fadd9: [53, 55, 57, 60], Gadd9: [55, 57, 59, 62], G11: [53, 55, 60, 62],
+  Dm7: [53, 57, 60, 62] }
+const HARM_POOL = {}
+const harmNotes = name => HARM_POOL[name] ??= (() => {
+  const pcs = HARM_VOICING[name].map(pc), o = []
+  for (let m = 52; m <= 76; m++) if (pcs.includes(pc(m))) o.push(m)
+  return o.slice(0, 4)
+})()
+// The monotone keys (column 2): Am9 in Kerri's shape; D9 only under the progression “Am9 D9” (as track 009)
+const KEYS_AM9 = PEDAL.A, KEYS_D9 = PEDAL.d
+const isRiff = i => !!COLS[i]?.[7]
+const sameLead = (a, b) => a.kind === b.kind && (a.kind === 'riff' ? a.i === b.i : a.prog === b.prog)
+// The leader per 4-bar phrase, fixed when the phrase is first asked; a new leader starts from its first bar (since)
+const leadAt = bar => {
+  const b = Math.floor(bar / 4), m = S.at.lead ??= {}
+  if (!(b in m)) {
+    const p = S.pend.lead ?? { kind: 'prog' }
+    const want = p.kind === 'riff' ? { kind: 'riff', i: p.i } : { kind: 'prog', prog: S.pend.prog ?? 0 }
+    const ks = Object.keys(m).map(Number).filter(x => x < b), prev = ks.length ? m[Math.max(...ks)] : null
+    m[b] = prev && sameLead(prev, want) ? prev : { ...want, since: 4 * b }
+    for (const x in m) if (+x < b - 8) delete m[x]
+  }
+  return m[b]
+}
+const leadNow = () => { const m = S.at.lead ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : null }
+const leadPend = () => { const p = S.pend.lead ?? { kind: 'prog' }; return p.kind === 'riff' ? p : { kind: 'prog', prog: S.pend.prog ?? 0 } }
+const leadName = L => !L ? '–' : L.kind === 'riff' ? (L.i + 1) + ' ' + COLS[L.i][0] : 'Folge ' + PROGS[L.prog].name
+// The chord at 16th k: the leading riff's (its letter, from its first 16th on) or the progression's (one per bar)
+const clockAt = k => {
+  const L = leadAt(Math.floor(k / 16))
+  if (L.kind === 'riff') {
+    const seq = COLS[L.i][7], s = seq[md(k - 16 * L.since, seq.length)], v = COLS[L.i][8][s], name = RIFF_NAMES[COLS[L.i][0]][s]
+    return { key: 'r' + L.i + name, name, root: v.root, pad: v.notes, riff: true }
+  }
+  const c = CHORDS[PROGS[L.prog].ids[md(Math.floor(k / 16) - L.since, 8)]]
+  return { key: 'p' + c.name, name: c.name, root: pc(c.bass), pad: harmNotes(c.name) }
+}
+// With the push: a progression changes two 16ths early (as the track); a riff's changes are already in its letters,
+// only its first chord comes two 16ths early when it takes the lead
+const pushAt = k => {
+  const L2 = leadAt(Math.floor((k + 2) / 16))
+  return L2.kind === 'prog' || L2 !== leadAt(Math.floor(k / 16)) ? clockAt(k + 2) : clockAt(k)
+}
+// Round 25: what bass and pad do while a riff leads (Mode 2 column 7 button 1), fixed per 4-bar phrase like the leader
+const UNDER = [
+  { name: 'Folgen', bass: 'riff', pad: 'riff' },
+  { name: 'Orgelpunkt A', bass: 'A', pad: 'Am9' },
+  { name: 'Bass folgt, ohne Fläche', bass: 'riff', pad: 'off' },
+  { name: 'Orgelpunkt, ohne Fläche', bass: 'A', pad: 'off' },
+]
+// round 26: each riff column has its own choice (S.pend['under' + i]); the leading riff's counts
+const underOf = (i, k) => UNDER[latch('under' + i, Math.floor(k / 16), 4)]
+const underAt = k => { const L = leadAt(Math.floor(k / 16)); return L.kind === 'riff' ? underOf(L.i, k) : UNDER[0] }
+// The bass root and the pad chord at 16th k (with the push), after the switch
+const bassRootAt = k => { const c = pushAt(k); return c.riff && underAt(k + 2).bass === 'A' ? 9 : c.root }
+const padAt = k => {
+  const c = pushAt(k)
+  if (!c.riff) return c
+  const p = underAt(k + 2).pad
+  return p === 'riff' ? c : p === 'Am9' ? { key: 'pedal', name: 'Am9', pad: harmNotes('Am9') } : { key: 'off', pad: [] }
+}
+const keysAt = bar => {
+  const L = leadAt(bar)
+  if (L.kind !== 'prog' || L.prog !== 0) return KEYS_AM9
+  return CHORDS[PROGS[0].ids[md(bar - L.since, 8)]].name === 'D9' ? KEYS_D9 : KEYS_AM9
+}
+// A keys column sounds only while it leads (riff) or while the progression leads (monotone column)
+const leads = i => { const L = leadNow(); return !!L && (isRiff(i) ? L.kind === 'riff' && L.i === i : L.kind === 'prog') }
+// A fader raised from 0 makes its column the leader at the next phrase; the leading riff pulled to 0 gives it back
+const leadOnFader = (i, was, now) => {
+  if (was <= 0 && now > 0) S.pend.lead = isRiff(i) ? { kind: 'riff', i } : { kind: 'prog' }
+  else if (was > 0 && now <= 0 && isRiff(i) && S.pend.lead?.kind === 'riff' && S.pend.lead.i === i) S.pend.lead = { kind: 'prog' }
+}
+
+const hasPage = typeof document !== 'undefined' && !!document.createElement
+const isLCXL = port => /LCXL|Launch Control/i.test(port.name) && !/DAW/i.test(port.name)
+const access = hasPage && navigator.requestMIDIAccess ? await navigator.requestMIDIAccess() : null
+if (access && globalThis.knobsSyncedFor !== 'house-keys-lab-26') {
+  const out = [...access.outputs.values()].find(isLCXL)
+  if (out) {
+    for (let cc = 13; cc <= 36; cc++) out.send([0xBF, cc, Math.round((S.val[cc] ?? 0) * 127)])
+    globalThis.knobsSyncedFor = 'house-keys-lab-26'
+  }
+}
+
+// Status box (bottom right) with the dashboard link; other boards' boxes are removed
+let statusBox = null, statusText = null
+if (hasPage) {
+  for (const id of ['board-status', 'keys-lab-status']) document.getElementById(id)?.remove()
+  statusBox = document.createElement('div')
+  statusBox.id = 'keys-lab-status'
+  statusBox.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:1000;padding:8px 12px;' +
+    'background:rgba(0,0,0,.75);border-radius:6px'
+  statusText = document.createElement('pre')
+  statusText.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
+  statusBox.append(statusText)
+  document.body.appendChild(statusBox)
+}
+const beatNow = { bar: null, beat: null }
+const pct = v => Math.round((v ?? 0) * 100)
+
+// DASHBOARD — a big window: Mode 16 grid (every control, value, pattern) and the Mode 2 sound mix + globals on top.
+// The link opens a tab named keys-lab-view (never stopped by the pop-up blocker); strudel.cc replaces window.open,
+// so the handle on that tab comes from the native open of a hidden iframe.
+const view = !hasPage ? null : globalThis.keysLabView ??= { win: null }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const VIEW_CSS = [
+  'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+  '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+  '.head{display:flex;gap:2.5vw;align-items:center;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:#50c8e8}',
+  '.k{opacity:.6;margin-right:.4em}.next,.acc{color:#50c8e8}',
+  '.mix{display:flex;gap:1.5vw;align-items:center}.mix div{display:flex;align-items:center;gap:.4em}',
+  '.mix i{display:inline-block;width:5vw;height:.7em;background:#333;border-radius:3px;overflow:hidden}',
+  '.mix i b{display:block;height:100%;width:calc(var(--v)*100%);background:#50c8e8}',
+  '.grid{flex:1;display:grid;grid-template-columns:repeat(' + COLS.length + ',1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 4.2em 4.2em;gap:.8vh .8vw}',
+  '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.live{color:#50c8e8;border-color:#50c8e8}',
+  '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+  '.cell span,.cell b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cell span{opacity:.7;font-size:.85em}.cell b{font-variant-numeric:tabular-nums}.btn{overflow:hidden}',
+  '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+  'background:conic-gradient(from -135deg,#50c8e8 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+  '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+  '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+  '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:#50c8e8}',
+  '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start}.btn.on{background:#50c8e8;color:#111}',
+  '.pat{font:.75em monospace;letter-spacing:.05em;opacity:.85;overflow-wrap:anywhere}',
+  '.beats i,.bars i{display:inline-block;background:#333;margin-left:.3em}.beats i{width:.75em;height:.75em;border-radius:50%}',
+  '.bars i{width:1.1em;height:.55em;border-radius:2px}.beats i.on,.bars i.on{background:#50c8e8}',
+].join('\n')
+// Round 25: the switch now (→ next), as text or html
+const underText = (html, i) => { const n = UNDER[latchNow('under' + i)].name, p = UNDER[S.pend['under' + i] ?? 0].name
+  return html ? pending(n, p) : n + (p !== n ? ' → ' + p + ' (nächste Phrase)' : '') }
+const underLead = html => { const L = leadNow(); return L?.kind === 'riff' ? underText(html, L.i) : html ? '–' : '–' }
+const pending = (now, next) =>esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+// While a column's shift is on, its cells show what the controls do then: the fader sets how far the accent moves
+// through the recordings (sources with only one: nothing), everything else does nothing
+const SHIFT_FADER = Object.fromEntries(COLS.map((c, i) => [i, ['rec' + i, 'Obertöne']]))
+const mixText = (i, r) => { const [a, b] = MIXNAMES[r], v = S.mix[i][r]
+  return v <= 0 ? 'aus' : v < 1 / 3 ? a + ' ' + pct(3 * v) : v > 2 / 3 ? b + ' ' + pct(3 - 3 * v) : a + ' → ' + b + ' ' + pct(3 * v - 1) }
+const catchHint = () => ''
+const drawView = () => {
+  if (!view?.win || view.win.closed) return
+  const root = view.win.document.getElementById('lc')
+  if (!root) return
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const bar = beatNow.bar
+  const where = bar === null ? '–' : '<span class=bars>' + marks(4, ((bar % 4) + 4) % 4) + '</span><span class=beats>' +
+    marks(4, beatNow.beat) + '</span> <b class=acc>' + esc((S.at.lead ?? {})[Math.floor(bar / 4)] ? clockAt(16 * bar).name : '') + '</b>'
+  const knob = (v, name, txt) => '<div class="cell knob"><div class=dial style="--v:' + (v ?? 0) + '"></div><b>' + (txt ?? pct(v)) +
+    '</b><span>' + esc(name) + '</span></div>'
+  const off = name => '<div class="cell" style="opacity:.25"><span>' + esc(name) + '</span></div>'
+  const cells = COLS.map(([, pats], i) => {
+    const now = latchNow(i), next = S.pend[i] ?? 0
+    if (S.held[45 + i]) {
+      const hp = S.pend.harm ?? 0, f = SHIFT_FADER[i]
+      return {
+        k1: knob(S.mix[i][0], 'Klavier → Rhodes', mixText(i, 0)), k2: knob(S.mix[i][1], 'B3 → M1', mixText(i, 1)),
+        k3: knob(S.mix[i][2], 'Vibra → Marimba', mixText(i, 2)),
+        fader: !f ? off('—') : '<div class="cell fader"><div class=bar style="--v:' + (S.val[f[0]] ?? 0) + '"><i></i></div><b>' +
+          pct(S.val[f[0]]) + '</b><span>' + f[1] + catchHint(f[0]) + '</span></div>',
+        b1: !COLS[i][6] ? off('—') : COLS[i][6] === 'push'
+          ? '<div class="cell btn' + (S.job.push[i] ? ' on' : '') + '"><b>Push ' + (S.job.push[i] ? 'an' : 'aus') + '</b></div>'
+          : '<div class="cell btn' + (S.job.held[i] ? ' on' : '') + '"><b>' + (COLS[i][6] === 'echo' ? 'Echo-Wurf' : 'Stotter') + '</b></div>',
+        b2: '<div class="cell btn on"><b>Klang an</b></div>',
+      }
+    }
+    return {
+      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], 'Länge'),
+      fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
+        pct(S.val[5 + i]) + '</b><span>Pegel' + catchHint(5 + i) + '</span></div>',
+      b1: '<div class="cell btn"><span>Unter dem Riff</span><b>' + underText(true, i) + '</b></div>',
+      b2: '<div class="cell btn"><b>Klang</b></div>',
+    }
+  })
+  root.innerHTML = '<div class=head><h1>House Keys Lab 26</h1>' +
+    '<div><span class=k>Führt</span>' + pending(leadName(leadNow()), leadName(leadPend())) + '</div>' +
+    '<div><span class=k>Takt</span>' + where + '</div>' +
+    '<div><span class=k>Unter Riff</span>' + underLead(true) + '</div></div>' +
+    '<div class="head mix">' + ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? '<b class=acc>KLANG</b>' : '') +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(bassLevel()) + '</div>' +
+    '<div><span class=k>Fläche</span>' + pct(S.val[53]) + ' · ' + ((S.val[77] ?? 0) <= 0.001 ? 'Strings' : (S.val[77] ?? 0) >= 0.999 ? 'B3' : 'beide ' + pct(S.val[77])) + '</div></div>' +
+    '<div class=grid>' +
+    COLS.map(([name], i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 && leads(i) ? ' live' : '') + '">' + (i + 1) + ' ' + esc(name) + '</div>').join('') +
+    ['k1', 'k2', 'k3', 'fader', 'b1', 'b2'].map(r => cells.map(c => c[r]).join('')).join('') + '</div>'
+}
+if (view) {
+  for (const old of document.querySelectorAll('a')) if (old.target === 'keys-lab-view') old.remove()
+  view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
+  const link = document.createElement('a')
+  link.textContent = '▣ LC groß'
+  link.href = 'about:blank'
+  link.target = 'keys-lab-view'
+  link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
+    'background:#ddd;border-radius:3px;text-decoration:none;cursor:pointer'
+  link.onclick = () => setTimeout(() => {
+    try {
+      const w = view.opener.contentWindow.open('', 'keys-lab-view')
+      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      view.win = w
+      w.document.title = 'House Keys Lab 26'
+      w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+      w.document.body.innerHTML = '<div id=lc></div>'
+      drawView()
+    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+  }, 100)
+  statusBox.append(link)
+  if (view.win && !view.win.closed) {
+    view.win.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
+    if (!view.win.document.getElementById('lc')) view.win.document.body.innerHTML = '<div id=lc></div>'
+  }
+}
+
+const showStatus = () => {
+  if (statusText) {
+    const ln = leadName(leadNow()), lp = leadName(leadPend())
+    statusText.textContent = [
+      'Führt ' + ln + (lp !== ln ? ' → ' + lp + ' (nächste Phrase)' : '') + ' · Fläche ' + pct(S.val[53]),
+      'Unter Riff ' + underLead(false),
+      ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? 'KLANG · ' : '') + 'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(bassLevel()) + ' · ' + bpm + ' BPM',
+      '',
+      ...COLS.map(([name, pats], i) => {
+        const now = latchNow(i), next = S.pend[i] ?? 0
+        return (leads(i) && (S.val[5 + i] ?? 0) > 0 ? '♪' : ' ') + (i + 1) + ' ' + name.padEnd(19) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+          underText(false, i)
+      }),
+    ].join('\n')
+  }
+  drawView()
+}
+// Shift per column (button 2 switches it on / off): its fader sets how far the accent moves through the recordings
+const onMidi = e => {
+  let [status, cc, value] = e.data
+  if ((status & 0xf0) !== 0xb0) return
+  if (cc >= 45 && cc <= 52) {
+    const i = cc - 45, L = S.latched ??= []
+    if (value > 63) { L[i] = !L[i]; S.held[cc] = L[i] }   // every press switches shift on or off; release does nothing
+    if (!S.held[cc]) S.held[cc + 48] = false
+    showStatus()
+    return
+  }
+  const col = cc >= 5 && cc <= 12 ? cc - 5 : cc >= 13 && cc <= 36 ? (cc - 13) % 8 : cc >= 37 && cc <= 44 ? cc - 37 : -1
+  // shift + the column's three knobs = its sound mix
+  if (col >= 0 && col < COLS.length && S.held[45 + col] && cc >= 13 && cc <= 36) { S.mix[col][Math.floor((cc - 13) / 8)] = value / 127; showStatus(); return }
+  // sound mode + button 1 = the column's job
+  if (col >= 0 && col < COLS.length && S.held[45 + col] && cc >= 37 && cc <= 44) {
+    const job = COLS[col][6]
+    if (job === 'push') { if (value > 63) S.job.push[col] = !S.job.push[col] }
+    else if (job) { S.job.held[col] = value > 63; if (value > 63) S.job.since[col] = performance.now() }
+    showStatus(); return
+  }
+  if (col >= 0 && S.held[45 + col]) {
+    const sf = cc >= 5 && cc <= 12 ? SHIFT_FADER[cc - 5] : null
+    if (sf) { S.val[sf[0]] = value / 127; showStatus(); return }   // shift fader: recordings
+    return   // shift: everything else does nothing
+  }
+  if (cc >= 5 && cc <= 11 && COLS[cc - 5]) leadOnFader(cc - 5, S.val[cc] ?? 0, value / 127)
+  if ((cc >= 5 && cc <= 36) || (cc >= 53 && cc <= 84)) S.val[cc] = value / 127
+  else if ((cc >= 45 && cc <= 52) || (cc >= 93 && cc <= 100)) S.held[cc] = value > 63
+  else if (value === 0) return
+  else if (cc >= 37 && cc <= 44) { if (!COLS[cc - 37]) return; const key = 'under' + (cc - 37); S.pend[key] = ((S.pend[key] ?? 0) + 1) % UNDER.length }   // round 26: button 1 = under the riff
+  else if (cc === 85) { S.pend.prog = ((S.pend.prog ?? 0) + 1) % PROGS.length; S.pend.lead = { kind: 'prog' } }   // Mode 2 col. 1 button 1
+  else return
+  showStatus()
+}
+if (access) for (const input of access.inputs.values()) {
+  if (!isLCXL(input)) continue
+  if (globalThis.boardListener) input.removeEventListener('midimessage', globalThis.boardListener)
+  input.addEventListener('midimessage', onMidi)
+}
+globalThis.boardListener = onMidi
+showStatus()
+
+// 16 steps per bar; fn(step, bar, k) returns events with dur in 16ths; swing moves the odd 16ths late
+const grid = fn => new Pattern(state => {
+  const b0 = state.span.begin.valueOf(), e0 = state.span.end.valueOf(), out = []
+  const late = k => ((k % 2) + 2) % 2 === 1 ? 2 * (swingPct() - 0.5) : 0
+  for (let k = Math.floor(b0 * 16) - 1; k < e0 * 16 + 1; k++) {
+    const t0 = (k + late(k)) / 16
+    if (t0 < b0 - 1 / 16 || t0 >= e0 + 1 / 16) continue   // only hits that swing could move into this window
+    for (const { dur = 1, jit = 0, ...v } of fn(((k % 16) + 16) % 16, Math.floor(k / 16), k) ?? []) {
+      const t = t0 + jit
+      if (t < b0 - 1e-9 || t >= e0 - 1e-9) continue
+      out.push(new Hap(new TimeSpan(t, t + dur / 16), new TimeSpan(t, Math.min(t + dur / 16, e0)), v, {}))
+    }
+  }
+  return out
+})
+
+const column = i => grid((step, bar, k) => {
+  if (step === 0) latch(i, bar)   // latch every bar, also while silent
+  const level = S.val[5 + i] ?? 0
+  if (level <= 0) return
+  // round 24: only the leading keys sound; a riff starts from its first 16th when it takes the lead
+  const L = leadAt(bar)
+  if (isRiff(i) ? !(L.kind === 'riff' && L.i === i) : L.kind !== 'prog') return
+  const ph = isRiff(i) ? k - 16 * L.since : k
+  // The loop repeats unchanged (any length, read from the step number)
+  const job = COLS[i][6], stutter = job === 'stutter' && S.job.held[i]
+  // Stutter: while held, every 16th plays the chord (the pattern's symbols are read as x)
+  const pat = stutter ? 'x'.repeat(16) : COLS[i][1][latch(i, bar)][1], len = pat.length
+  const pos = md(ph, len)
+  const sym = pat[pos]
+  if (sym === '.' || sym === '-') return
+  let ties = 0
+  while (pos + ties + 1 < len && pat[pos + ties + 1] === '-') ties++
+  const entry = COLS[i][1][latch(i, bar)], seq = COLS[i][7] ?? entry[4]
+  // Push (Kerri Chandler): hits on the last two 16ths of a bar already play the next bar's chord
+  const kk = ph
+  const push = job === 'push' ? S.job.push[i] : true
+  const { pcs, notes } = seq ? COLS[i][8][seq[((kk % seq.length) + seq.length) % seq.length]] : keysAt(push && step >= 14 ? bar + 1 : bar), top = notes[notes.length - 1]
+  const above = top + Math.min(...pcs.map(p => ((p - top) % 12 + 12) % 12).filter(d => d > 0))
+  const play0 = { x: notes, X: notes, O: notes, a: notes, b: notes, g: notes, t: [top], u: [above], d: [notes[notes.length - 2]] }[sym]
+  const play = play0
+  const lenF = exp(1, 4)(S.val[29 + i] ?? 0), lengths = entry[5], mod = entry[6] ?? {}
+  const hit = [...pat.slice(0, pos)].filter(c => c !== '.' && c !== '-').length   // which hit of the loop this is
+  const dur = (lengths ? lengths[hit] * lenF : sym === 'g' ? Math.min(1, lenF) : (1 + ties) * lenF)
+  // Brightness: low-pass 250 Hz – 12 kHz with a little resonance; brighter also plays a little harder (±2 dB, a
+  // softer attack at the dark end). Space: the echo comes first (1/8, full at half the knob), the room from 0.35
+  // own range per sound; the top third raises the resonance from 4 to 12: a presence peak on the upper overtones
+  const br = S.val[13 + i] ?? 0.6
+  const res = 4 + 8 * Math.max(0, (br - 2 / 3) * 3)
+  const tGain = Math.pow(10, 4 * (br - 0.5) / 20), tAtk = br < 0.3 ? 0.02 * (1 - br / 0.3) : 0
+  const sp = S.val[21 + i] ?? 0, room = 0.8 * Math.max(0, (sp - 0.35) / 0.65)
+  const ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0, ef = ev > 0 ? { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev } : {}
+  // Touch (round 11): gain per hit by the accent, levelled to equal hits. Overtones: the filter per hit opens with the
+  // accent; e = shift + fader = how strongly (0 = every hit equally bright, 0.5 = round 11: ×0.25 … ×4 over the touch
+  // range, 1 = twice that). X = brighter accent, b (overlays) darker
+  const dyn = COLS[i][4], st = ACCENT, hitT = dyn.touch(k, pat, pos, st), vt = dyn.vel(st), e = S.val['rec' + i] ?? 0.5
+  // Stutter: plain 16ths a little softer (the energy of 16 hits instead of 6), brighter the longer it is held (×1 … ×3 over 2 s)
+  const stHeld = stutter ? Math.min(1, (performance.now() - (S.job.since[i] ?? 0)) / 2000) : 0
+  const hitGain = stutter ? 0.6 : (0.6 + 0.8 * hitT) * norm(i, entry, st)
+  const hitCut = stutter ? 1 + 2 * stHeld : Math.pow(2, 2 * e * dyn.bright * (hitT - 0.5)) * (sym === 'X' ? 1.4 : 1) * (dyn.cut(st)[sym] ?? 1)
+  // Echo throw: while held, a long dotted-8th echo on every hit, on its own bus (orbit 3), so the tail keeps going
+  const thrown = job === 'echo' && S.job.held[i]
+  const fx = thrown ? { delay: 0.65, delaytime: 0.75 * 60 / bpm, delayfeedback: 0.62, orbit: 3 } : job === 'echo' ? { orbit: 3 } : {}
+  const lay = layersOf(i)
+  if (!lay.length) return
+  return lay.flatMap(([src, l]) => { const [clo, chi] = RANGE[src], c = exp(clo, chi)(br)
+    return play.flatMap(n => SRC[src](n)).map(v => ({ release: 0.15, ...v, dur, gain: v.gain * 0.955 * vt[sym],
+      cutoff: Math.min(18000, Math.max(150, c * hitCut)), resonance: res, attack: Math.max(v.attack ?? 0, tAtk), room,
+      roomsize: 2, orbit: 2, postgain: level * l * hitGain * tGain, ...mod, ...ef, ...fx })) })
+})
+
+// Context: a dry house loop (909 kick, off-beat open hat, clap on 2 and 4, quiet shaker) and the bass on the root
+const context = grid((step, bar, k) => {
+  const out = [], l = drumsLevel(), bl = bassLevel()
+  if (step === 0) leadAt(bar)   // latches the leader every bar
+  if (l > 0) {
+    if (step % 4 === 0) out.push({ s: 'bd', bank: 'RolandTR909', gain: 0.6, decay: 0.25, sustain: 0, postgain: l })
+    if (step % 4 === 2) out.push({ s: 'oh', bank: 'RolandTR909', gain: 0.3, decay: 0.12, sustain: 0, postgain: l })
+    if (step === 4 || step === 12) out.push({ s: 'cp', bank: 'RolandTR909', gain: 0.5, postgain: l })
+    out.push({ s: 'sh', bank: 'RolandTR727', n: 1, gain: step % 2 ? 0.3 : 0.18, postgain: l })
+  }
+  if (step === 0) COLS.forEach((_, i) => latch('under' + i, bar, 4))   // latches every column's switch every bar
+  const root = bassRootAt(k)   // round 24: the bass follows the chord clock; round 25: or stays on A under a riff
+  // round 26: too quiet (user, 2026-11-12). A1–E2 (55–82 Hz) barely sounds on small speakers: now F2–E3 like the track's
+  // bass (41 + …), a triangle plus a quiet saw for overtones, gain ×2.7 (+8.6 dB). Levels by ear, not measured.
+  if (bl > 0 && step % 4 === 2) { const note = 41 + ((root - 5) % 12 + 12) % 12
+    out.push({ s: 'triangle', note, gain: 1.2, decay: 0.15, sustain: 0.3, release: 0.05, cutoff: 1200, postgain: bl, dur: 1.5 },
+      { s: 'sawtooth', note, gain: 0.25, decay: 0.15, sustain: 0.3, release: 0.05, cutoff: 700, postgain: bl, dur: 1.5 }) }
+  return out.map(v => ({ ...v, orbit: 1 }))
+})
+
+// HARMONY PAD (round 24): track 009's Jonas 1 (JX-10 strings ↔ B3, held chords, its channel strip) on Mode 2 column 1,
+// playing the chord clock: one strike per chord as long as it lasts, struck again at every 4-bar phrase (with the push).
+// Only deviation from the track: no random velocity (perlin 0.85–1 there; its mean 0.925 here) and no swing on it.
+const HARM_LEVEL = 1.85   // round 26: ×2 (+6 dB) against the track's 0.925: the pad was barely audible (user, 2026-11-12; by ear)
+// The strike at every phrase: two 16ths early under a progression (its push); under a riff on the phrase, but not on
+// its first one (its first chord was already struck two 16ths early)
+const phraseStrike = k => {
+  const L = leadAt(Math.floor((k + 2) / 16))
+  return L.kind === 'prog' ? md(k + 2, 64) === 0 : md(k, 64) === 0 && leadAt(Math.floor((k - 1) / 16)) === L
+}
+const padCol = grid((step, bar, k) => {
+  const level = S.val[53] ?? 0
+  if (level <= 0) return
+  const c = padAt(k)   // round 25: the riff's chord, Am9 as a pedal, or nothing (key 'off')
+  if (c.key === 'off') return
+  if (!phraseStrike(k) && padAt(k - 1).key === c.key) return   // no new chord here
+  let e = 1   // how long it lasts: to the next chord or the next phrase (never asks past the next phrase's leader)
+  while (e < 64 && !phraseStrike(k + e) && padAt(k + e).key === c.key) e++
+  const x = S.val[77] ?? 0.3, br = S.val[61] ?? 0.6, sp = S.val[69] ?? 0
+  const a = x < 0.999 ? Math.cos(x * Math.PI / 2) : 0, b = x > 0.001 ? Math.sin(x * Math.PI / 2) : 0
+  const room = 0.8 * Math.max(0, (sp - 0.35) / 0.65), ev = sp > 0 ? Math.min(1, 0.4 + 1.2 * sp) : 0
+  const ef = ev > 0 ? { delay: 0.6 * ev, delaytime: 30 / bpm, delayfeedback: 0.15 + 0.35 * ev } : {}
+  const cutoff = Math.min(18000, 400 * Math.pow(15, br)), tGain = Math.pow(10, 4 * (br - 0.5) / 20)
+  const out = []
+  for (const m of c.pad) {
+    if (a > 0) out.push(
+      { s: 'supersaw', note: m, unison: 2, detune: 0.08, spread: 0.6, gain: 0.5 * 0.24 * a, attack: 0.35, decay: 0.1, sustain: 1, release: 0.8 },
+      { s: 'supersaw', note: m + 0.1, unison: 2, detune: 0.05, spread: 0.9, gain: 0.3 * 0.24 * a, attack: 0.35, decay: 0.1, sustain: 1, release: 0.8 })
+    if (b > 0) for (const [d, g] of [[0, 0.14], [12, 0.11]]) for (const [dt, pan] of [[-0.04, 0.3], [0.04, 0.7]])
+      out.push({ s: 'sine', note: m + d + dt, gain: g * 0.47 * b, pan, vib: 0.8, vibmod: 0.08, attack: 0.06, sustain: 1, release: 0.25 })
+  }
+  return out.map(v => ({ ...v, dur: e, cutoff, room, roomsize: 2, ...ef, orbit: 3, postgain: level * HARM_LEVEL * tGain }))
+})
+
+const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
+  const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), b = Math.floor((pos - bar) * 4 + 1e-9)
+  setTimeout(() => { beatNow.bar = bar; beatNow.beat = b; showStatus() }, Math.max(0, (t - now) * 1000))
+}, true)
+setcpm(bpm / 4)
+
+stack(...COLS.map((_, i) => column(i)), padCol, context)
+  .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway
+  .stack(beatTick)   // silent, after the safety net: moves the dashboard and the status box with the beat

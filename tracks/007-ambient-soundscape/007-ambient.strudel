@@ -4,7 +4,7 @@
 // layout (Mode 1 + Mode 2), a Launchkey MK4 25 adds keys (soft glass pad) and drum pads (ambient one-shots).
 // Before: old/007-ambient-dual.strudel + its generated -single version.
 // Sound from old/007-ambient-moods-dual.strudel, controls rearranged after midi-layouts/templates/dual-lc.strudel.
-// Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, clock ticks, wood/drops, crackle.
+// Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, shaker, wood/drops, crackle.
 // Jonas (colour): pad, Eno bowed, marimba, toms (Takada style, from lab/harmonie/midori-5), choir, glitter, shimmer + the global column 8.
 // Chapter (global button 1): D lydian (floating) → D dorian (melancholic) → D whole tone (strange), at the next bar.
 // Feedback 1 (feedback.md): sea/wind quieter, drone and bass fader ranges cut to the old 40 % (they were too heavy
@@ -32,7 +32,7 @@
 // @col 16:3 3 Drone
 // @col 16:4 4 Bass
 // @col 16:5 5 Rim
-// @col 16:6 6 Ticks
+// @col 16:6 6 Shaker
 // @col 16:7 7 Wood / Drops
 // @row 16:k1 Row 1 \ Brightness
 // @row 16:k2 Row 2 \ Space
@@ -57,7 +57,7 @@
 // @row 2:b2 Button 2 \ Moment
 // @guide Playing together | Jojo builds the floor: drone and bass first, then the heartbeat, then the small clicks. Jonas colours it: pad and bowed loops, marimba and toms for movement, then choir and the sparkles on top.
 // @guide Playing together | Jonas' column 8 acts on everything: Fog and Tension darken or open all filters, Room drowns everything in reverb, Chapter changes the key colour for both players at the next bar.
-// @guide Playing together | Break: one press takes out the beat (pulse, bass, rim, ticks, wood) at the next bar; drone, crackle, sea and all of Jonas' sounds keep floating. The second press brings the beat back on the one.
+// @guide Playing together | Break: one press takes out the beat (pulse, bass, rim, shaker, wood) at the next bar; drone, crackle, sea and all of Jonas' sounds keep floating. The second press brings the beat back on the one.
 // @guide Every position sounds good | No filter closes completely, and space 0 is dry but never silent. Row 2 at about the middle gives each sound the room it had in the original track.
 // @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
 // @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
@@ -181,13 +181,13 @@ const heldRamp = (button, cycles) => {
 // Drone chords per mood (absolute notes, so each mood needs its own; the other stems use scale degrees).
 // Whole tone has no fifth (D E F♯ G♯ A♯ C): its drones use tritones and major thirds instead.
 const MOODS = [
-  { scale: 'lydian', name: 'schwebend',   // D E F♯ G♯ A B C♯
+  { scale: 'lydian', name: 'Floating',   // D E F♯ G♯ A B C♯
     drones: ["[d1,a1]", "[d1,a1,e2]", "[g0,d1,a1]", "[d1,a1,c#2]", "[a0,e1,b1]", "[d1,g#1,a1]", "[e1,b1,f#2]", "[d1,d2,a2]"],
     names: ['D–A', 'D–A–E', 'G–D–A', 'D–A–C♯', 'A–E–B', 'D–G♯–A', 'E–B–F♯', 'D–D–A'] },
-  { scale: 'dorian', name: 'melancholisch',   // D E F G A B C
+  { scale: 'dorian', name: 'Melancholic',   // D E F G A B C
     drones: ["[d1,a1]", "[d1,a1,e2]", "[g0,d1,a1]", "[d1,a1,c2]", "[a0,e1,b1]", "[d1,f1,a1]", "[e1,b1,g2]", "[d1,d2,a2]"],
     names: ['D–A', 'D–A–E', 'G–D–A', 'D–A–C', 'A–E–B', 'D–F–A', 'E–B–G', 'D–D–A'] },
-  { scale: 'whole tone', name: 'seltsam',   // D E F♯ G♯ A♯ C
+  { scale: 'whole tone', name: 'Strange',   // D E F♯ G♯ A♯ C
     drones: ["[d1,g#1]", "[d1,a#1,e2]", "[c1,f#1,d2]", "[d1,c2]", "[e1,a#1,d2]", "[d1,f#1,a#1]", "[g#0,d1,a#1]", "[d1,d2,g#2]"],
     names: ['D–G♯', 'D–A♯–E', 'C–F♯–D', 'D–C', 'E–A♯–D', 'D–F♯–A♯', 'G♯–D–A♯', 'D–D–G♯'] },
 ]
@@ -228,7 +228,7 @@ const statusUi = !hasPage ? null : globalThis.ambientStatus ??= (() => {
 // the status box; side, pageOf and draw are set anew on every evaluation.
 const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   const v = { win: null, cc: { jojo: {}, jonas: {} }, page: 'jojo', timer: null,
-    side: () => 'jonas', pageOf: side => side, draw: () => {}, css: '' }
+    side: () => 'jonas', pageOf: side => side, draw: () => {}, css: '', keys: new Set(), pads: new Set(), base: 48 }
   v.update = () => {
     if (!v.win || v.win.closed || v.timer) return
     v.timer = setTimeout(() => { v.timer = null; if (v.win && !v.win.closed) v.draw() }, 40)
@@ -237,6 +237,14 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   const onMsg = (name, e) => {
     if (!v.side(name)) return
     const [status, cc, val] = e.data
+    // Launchkey keys and pads: held notes light up (channel 10 = drum pads)
+    if (v.side(name) === 'lk' && ((status & 0xf0) === 0x90 || (status & 0xf0) === 0x80)) {
+      const on = (status & 0xf0) === 0x90 && val > 0
+      const set = (status & 0x0f) === 9 ? v.pads : v.keys
+      if (on) { set.add(cc); if (set === v.keys && (cc < v.base || cc > v.base + 24)) v.base = 12 * Math.floor(cc / 12) } else set.delete(cc)
+      v.update()
+      return
+    }
     if ((status & 0xf0) !== 0xb0) {
       if (status === 0xf8 || status === 0xfe || v.side(name) === 'lk') return   // clock, active sensing, keys and pads
       v.other = [...e.data].map(b => b.toString(16).padStart(2, '0')).join(' ').toUpperCase()
@@ -272,7 +280,7 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   opener.style.display = 'none'
   document.body.append(opener)
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'lcxl-view'
   link.style.cssText = 'display:inline-block;margin:6px 0 0 6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -280,14 +288,14 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   link.onclick = () => setTimeout(() => {
     try {
       const w = opener.contentWindow.open('', 'lcxl-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       v.win = w
       w.document.title = 'LC XL 3'
       w.document.head.innerHTML = '<style>' + v.css + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       v.draw()
-      link.textContent = '▣ LC groß'
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+      link.textContent = '▣ LC big'
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   if (statusUi.box) statusUi.box.append(link)
   else { link.style.cssText += ';position:fixed;right:12px;bottom:4px;z-index:1001'; document.body.append(link) }
@@ -301,13 +309,13 @@ const showStatus = () => {
   if (!statusUi) return
   const dots = v => [...Array(8).keys()].map(k => k === v ? '●' : '○').join('')
   const show = (r, v) => !r.names ? String(v + 1) : typeof r.names === 'function' ? r.names(v) : r.names[v]
-  const line = (r, i) => !r ? (i + 1) + ' —' : (i + 1) + ' ' + r.label.padEnd(10) + ' ' + (r.n === 8 ? dots(r.latch.now) + ' ' : '') +
+  const line = (r, i) => !r ? (i + 1) + ' —' : (i + 1) + ' ' + r.label.padEnd(12) + ' ' + (r.n === 8 ? dots(r.latch.now) + ' ' : '') +
     show(r, r.latch.now) + (r.latch.pending !== r.latch.now ? ' → ' + show(r, r.latch.pending) : '')
-  const soon = l => l.pending !== l.now ? ' (nächster Takt)' : ''
+  const soon = l => l.pending !== l.now ? ' (next bar)' : ''
   statusUi.text.textContent = [
     'Kapitel     D ' + MOODS[moodLatch.now].name +
       (moodLatch.pending !== moodLatch.now ? ' → ' + MOODS[moodLatch.pending].name : '') + soon(moodLatch),
-    'Break       ' + (breakLatch.now ? 'Beat aus' : 'Beat an') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'aus' : 'an') : '') + soon(breakLatch),
+    'Break       ' + (breakLatch.now ? 'Beat off' : 'Beat on') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'off' : 'on') : '') + soon(breakLatch),
     '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
     '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line),
   ].join('\n')
@@ -324,12 +332,12 @@ const change = (button, who, label, n = 8, names) => {
 // ============================================================
 // GLOBAL (Jonas, column 8) — acts on both controllers
 // ============================================================
-// @ctl g.k1 Fog | 0 = clear, up = every filter pulled down to ~6 %: distant, under water.
+// @ctl g.k1 Fog | clear ↔ muffled (all low-passes down).
 // @ctl g.k2 Room | 0 = each sound's own room (row 2), up = everything drowns in reverb.
-// @ctl g.k3 Tension | 0–0.5: echo grows on all melodic stems, filters open. 0.5–1: + slow tape wobble on the long sounds. Back to 0 = release.
-// @ctl g.fader Master Level | volume of everything, both controllers. 0 = silence.
+// @ctl g.k3 Tension | build-up: echo, reverb, open filters; the end adds a snare roll.
+// @ctl g.fader Master | volume of everything.
 // @ctl g.b1 Chapter | mood: floating → melancholic → strange, at the next bar.
-// @ctl g.b2 Break / Drop | 1st: beat out. 2nd: all back on the one.
+// @ctl g.b2 Break | 1st: low end out. 2nd: all back on the one.
 const glob          = colJonas(8)
 const globalFog     = glob.bright.fmap(f => Math.pow(0.06, f))
 const globalRoom    = glob.space
@@ -365,7 +373,7 @@ const reseed = (latch, pat) => pat.early(latch.pat.fmap(v => v * 1024))
 // Effect buses. Each orbit has one reverb and one delay, and every reverb costs a lot of CPU (its length is
 // the room size in seconds), so the stems share two orbits; stems on one orbit share room size and echo time/feedback.
 // Orbit 1 = pulse, drone, bass, crackle, sea/wind, music box, whale, choir (dotted-quarter echo).
-// Orbit 2 = rim, ticks, wood, pad, chords, glitter, shimmer (dotted-8th echo).
+// Orbit 2 = rim, shaker, wood, pad, chords, glitter, shimmer (dotted-8th echo).
 const BUSES = {
   1: { hall: 6.5, time: beat * 1.5, feedback: 0.5 },
   2: { hall: 6, time: beat * 0.75, feedback: 0.6 },
@@ -393,14 +401,14 @@ const strip = (stem, { lpf, level }) => {
 //   soft   = a plain sine (no click, no noise) that fades in over 15 ms and glides 4 semitones down into D
 //   medium = synth bass drum (triangle + pitch drop + short noise click + light saturation), 8-semitone drop
 //   firm   = the same with a 12-semitone drop: more punch and click
-// @ctl 16:1.k1 Brightness | dull thump ↔ clicky attack (lpf 180–1500 Hz).
-// @ctl 16:1.k2 Space | dry and close ↔ far away in a big room (reverb).
-// @ctl 16:1.k3 Drive | three steps: soft sine thump → synth kick → firm kick with more click.
+// @ctl 16:1.k1 Brightness | dull ↔ bright.
+// @ctl 16:1.k2 Space | dry ↔ room.
+// @ctl 16:1.k3 Punch | three steps: soft sine thump → synth kick → firm kick with more click.
 // @ctl 16:1.fader Level | 0 = gone. A heartbeat thump on D.
-// @ctl 16:1.b1 Change | heartbeat → quarters → half notes.
+// @ctl 16:1.b1 Pattern | heartbeat → quarters → half notes.
 // @ctl 16:1.b2 Drop out | pulse pauses while held.
 const pulse       = colJojo(1)
-const pulseRhythm = change(pulse.btn, 'jojo', 'Puls', 3, ['Herzschlag', 'Viertel', 'Halbe'])
+const pulseRhythm = change(pulse.btn, 'jojo', 'Pulse', 3, ['Heartbeat', 'Quarters', 'Halves'])
 const pulseDrive  = pulse.char.fmap(d => d < 1 / 3 ? 0 : d < 2 / 3 ? 1 : 2)
 const PULSE_GAINS = ["[1 0.55 ~ ~]*4", "0.9*4", "1 ~ 1 ~"]   // heartbeat, quarters, half notes
 const PULSE_SOUNDS = [
@@ -419,14 +427,14 @@ const stemJ1_pulse = beatOnly(gate(pulse.btn2.fmap(v => v <= 0.5), strip(dryBus(
 // ============================================================
 // JOJO 2 SEA / WIND — noise: rolling waves ↔ whistling gusts
 // ============================================================
-// @ctl 16:2.k1 Brightness | 0 = soft rumble ↔ airy hiss (lpf 700–12000 Hz, moves with the waves).
-// @ctl 16:2.k2 Space | dry ↔ far away (reverb).
+// @ctl 16:2.k1 Brightness | dull ↔ bright.
+// @ctl 16:2.k2 Space | dry ↔ room.
 // @ctl 16:2.k3 Sea ↔ Wind | 0 = brown-noise waves rolling in, 0.5 = both, 1 = only whistling wind gusts.
 // @ctl 16:2.fader Level | sea and wind. Keeps playing in the break.
-// @ctl 16:2.b1 Change | next of 3 random wave / gust patterns.
+// @ctl 16:2.b1 Pattern | next of 3 random wave / gust patterns.
 // @ctl 16:2.b2 Riser | a noise sweep rises over 2 bars while held.
 const wind     = colJojo(2)
-const windVar  = change(wind.btn, 'jojo', 'Meer/Wind', 3)
+const windVar  = change(wind.btn, 'jojo', 'Sea / Wind', 3)
 const windMix  = wind.char
 const windLpf  = toned(expRange(wind.bright, 700, 12000))
 const windRise = heldRamp(wind.btn2, 2)
@@ -462,11 +470,11 @@ const stemJ2_wind = strip(bus(stack(
 // ============================================================
 // JOJO 3 DRONE — low fifths that breathe in and out once per bar
 // ============================================================
-// @ctl 16:3.k1 Brightness | pure and dark ↔ open, the overtones come through (lpf 120–4000 Hz).
-// @ctl 16:3.k2 Space | dry ↔ far away (reverb).
-// @ctl 16:3.k3 Beating | 0 = pure sines. Up = a detuned saw copy fades in, the two beat against each other (slow “wah-wah”).
+// @ctl 16:3.k1 Brightness | dull ↔ bright.
+// @ctl 16:3.k2 Space | dry ↔ room.
+// @ctl 16:3.k3 Beating | pure sines ↔ detuned saw beating.
 // @ctl 16:3.fader Level | slow drone chords on D.
-// @ctl 16:3.b1 Change | 3 drone chords per chapter: D–A → D–A–E → G–D–A.
+// @ctl 16:3.b1 Pattern | 3 drone chords per chapter: D–A → D–A–E → G–D–A.
 const drone      = colJojo(3)
 const droneVar   = change(drone.btn, 'jojo', 'Drone', 3, i => MOODS[moodLatch.now].names[i])
 const droneBeat  = drone.char
@@ -489,11 +497,11 @@ const stemJ3_drone = strip(bus(wobble(stack(
 // ============================================================
 // JOJO 4 BASS — a soft sub bass on the mood's scale, mostly the root. No echo, no wobble (both smear the low end).
 // ============================================================
-// @ctl 16:4.k1 Brightness | round and dark ↔ the saw's buzz comes through (lpf 80–2000 Hz).
-// @ctl 16:4.k2 Space | dry ↔ far away (reverb).
+// @ctl 16:4.k1 Brightness | dull ↔ bright.
+// @ctl 16:4.k2 Space | dry ↔ room.
 // @ctl 16:4.k3 Groove | 0 = a soft swell every bar. Up to 0.5 a 3-3-2 pulse fades in, at 1 only the pulse.
 // @ctl 16:4.fader Level | slow bass swells.
-// @ctl 16:4.b1 Change | next of 3 bass lines (a note every 2 bars).
+// @ctl 16:4.b1 Pattern | next of 3 bass lines (a note every 2 bars).
 // @ctl 16:4.b2 Octave | one octave up while held.
 const bassCol  = colJojo(4)
 const bassVar  = change(bassCol.btn, 'jojo', 'Bass', 3)
@@ -526,11 +534,11 @@ const stemJ4_bass = beatOnly(strip(dryBus(stack(
 // ============================================================
 // JOJO 5 RIM — a soft rim click on the backbeat: a short triangle blip + a breath of noise
 // ============================================================
-// @ctl 16:5.k1 Brightness | soft and far ↔ sharp crack (lpf 1.2–12 kHz).
-// @ctl 16:5.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 16:5.k3 Ghost notes | plain ↔ extra quiet clicks in between.
+// @ctl 16:5.k1 Brightness | dull ↔ bright.
+// @ctl 16:5.k2 Space | dry ↔ room.
+// @ctl 16:5.k3 Complexity | plain ↔ extra quiet clicks in between.
 // @ctl 16:5.fader Level | soft rim click on 2 and 4.
-// @ctl 16:5.b1 Change | backbeat → late ghost → offset click.
+// @ctl 16:5.b1 Pattern | backbeat → late ghost → offset click.
 // @ctl 16:5.b2 Roll | 16th roll, growing over the bar, while held.
 const rim      = colJojo(5)
 const rimVar   = change(rim.btn, 'jojo', 'Rim', 3)
@@ -554,39 +562,58 @@ const stemJ5_rim = beatOnly(strip(bus(rimSound.pan(0.45), 2, rim.space, 0.25), {
 }))
 
 // ============================================================
-// JOJO 6 TICKS — a clock: tick-tock on 8ths, FM sine (metallic), tick left, tock right
+// JOJO 6 SHAKER — a small shaker (+ a cabasa on 4), real recordings (VCSL). From lab/drums/ambient-perkussion-1.strudel,
+// column 2, 1:1 (user 2026-11-12: instead of the clock ticks, never used). Previous: old/007-ambient-before-shaker.strudel.
+// Deviations as for Jonas 2–4: Fog / Tension on the filter, global Room, Tension echo, orbit 2 (dotted-8th echo,
+// feedback 0.6 instead of the lab's 0.55); pauses in the break like the other beat stems.
 // ============================================================
-// @ctl 16:6.k1 Brightness | soft tick ↔ crisp and sharp (lpf 3–16 kHz).
-// @ctl 16:6.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 16:6.k3 Density | 8ths ↔ + 16ths ↔ + little flutters.
-// @ctl 16:6.fader Level | clock ticks.
-// @ctl 16:6.b1 Change | next of 3 random accent / 16th patterns.
-// @ctl 16:6.b2 Open | ticks ring long while held.
-const ticks    = colJojo(6)
-const tickVar  = change(ticks.btn, 'jojo', 'Ticken', 3)
-const tickDens = ticks.char
-const tickOpen = ticks.btn2.fmap(v => v > 0.5 ? 0.35 : 0.035)   // decay in seconds
+// @ctl 16:6.k1 Brightness | dull ↔ bright.
+// @ctl 16:6.k2 Space | dry ↔ room.
+// @ctl 16:6.k3 Complexity | 0 = the figure ↔ + quiet 16ths, from the middle a cabasa on 4.
+// @ctl 16:6.fader Level | shaker.
+// @ctl 16:6.b1 Pattern | 8ths → 16ths → rocking 3-3-2.
+// @ctl 16:6.b2 Echo throw | held: long dotted-8th echo.
+// The lab's space (floor 0.25: a little room and echo at 0) and echo throw on button 2; also used by Jonas 2–4
+const labSpace  = space => space.fmap(s => 0.25 + 0.75 * s)
+const echoThrow = (pat, button) => pat.fmap(v => b => b > 0.5 ? { ...v, delay: Math.max(v.delay ?? 0, 0.65) } : v).appLeft(button)
+const shakerCol = colJojo(6)
+const SHAKER_NAMES = ['8ths', '16ths', 'Rocking 3-3-2']
+const shakerVar = change(shakerCol.btn, 'jojo', 'Shaker', 3, SHAKER_NAMES)
+// The lab's code (makeCols, column 2): k3 = row 3, more() = a layer that thins out (share lo at 0, all at 1)
+const SHAKER = (() => {
+  const k3 = shakerCol.char
+  const more = (pat, lo = 0) => gate(k3.fmap(k => k > 0.02), pat.degradeBy(k3.fmap(k => 1 - (lo + (1 - lo) * k))))
+  const steps = (list, len = 16) => mini('{' + list + '}%' + len)
+  // VCSL shaker, small: 0–3 double down/up, 4–7 high fast, 8–11 low fast
+  const shk = (ns, vel, len = 16) => n(steps(ns, len)).s('shaker_small').velocity(steps(vel, len)).mul(gain(rand.range(0.8, 1))).gain(4)
+  const ghost = n(steps('4 5 6 7')).s('shaker_small').velocity(0.45).gain(4).pan(0.6)
+  const cabasa = s('cabasa').n('<0 1>').struct('~ ~ ~ x').gain(2.5).pan(0.35)
+  const opt = core => stack(core, more(ghost, 0.15), gate(k3.fmap(k => k > 0.5), cabasa)).delay(0.1)
+  return [
+    opt(shk('0 2', '1 0.6', 8)),
+    opt(shk('0 6 2 6', '0.9 0.4 0.7 0.45')),
+    opt(shk('0 ~ 6 2 ~ 6 0 ~ 1 ~ 6 3 ~ 6 1 ~', '1 0 0.4 0.75 0 0.4 0.9 0 1 0 0.4 0.75 0 0.4 0.9 0')),
+  ]
+})()
 
-const stemJ6_ticks = beatOnly(strip(bus(reseed(tickVar, stack(
-  note("[d7 a6]*4").degradeBy(0.1).gain(rand.range(0.15, 0.3)).pan("[0.35 0.65]*4"),
-  gate(above(tickDens, 0), note("[~ e7]*8").degradeBy(0.3).gain(ramp(tickDens, 0, 0.5).mul(0.2)).pan(rand.range(0.3, 0.7))),
-  gate(above(tickDens, 0.6), note("a7*32").degradeBy(0.8).gain(ramp(tickDens, 0.6, 1).mul(0.12)).pan(rand))
-)).s("sine").fm(2.5).fmh(2.7).decay(tickOpen).sustain(0), 2, ticks.space, 0.3), {
-  lpf: expRange(ticks.bright, 3000, 16000),
-  level: ticks.level.range(0, 5.7),   // was 1; mix: ticks −15 dB (were inaudible at brightness 0)
+const stemJ6_shaker = beatOnly(strip(echoThrow(bus(shakerVar.pat.fmap(i => SHAKER[i]).innerJoin(), 2, labSpace(shakerCol.space)),
+  shakerCol.btn2), {
+  lpf: expRange(shakerCol.bright, 1500, 16000),
+  // the lab: level × 1, brighter also up to ±2 dB
+  level: shakerCol.level.range(0, 1).mul(shakerCol.bright.fmap(b => Math.pow(10, 4 * (b - 0.5) / 20))),
 }))
 
 // ============================================================
 // JOJO 7 WOOD / DROPS — random clicks on a 16th grid; some glide up into their note like water drops
 // ============================================================
-// @ctl 16:7.k1 Brightness | woody (pure sine blip) ↔ metallic (FM).
-// @ctl 16:7.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 16:7.k3 Density | a click now and then ↔ a busy pattern.
+// @ctl 16:7.k1 Brightness | dull ↔ bright.
+// @ctl 16:7.k2 Space | dry ↔ room.
+// @ctl 16:7.k3 Complexity | a click now and then ↔ a busy pattern.
 // @ctl 16:7.fader Level | wood clicks and drops.
-// @ctl 16:7.b1 Change | next of 3 random patterns.
+// @ctl 16:7.b1 Pattern | next of 3 random patterns.
 // @ctl 16:7.b2 Fill | almost every 16th plays while held.
 const wood     = colJojo(7)
-const woodVar  = change(wood.btn, 'jojo', 'Holz', 3)
+const woodVar  = change(wood.btn, 'jojo', 'Wood / Drops', 3)
 const woodKeep = wood.char.fmap(d => f => f > 0.5 ? 0.85 : 0.06 + 0.5 * d).appLeft(wood.btn2)   // share of 16ths
 
 const stemJ7_wood = beatOnly(strip(bus(reseed(woodVar,
@@ -604,7 +631,7 @@ const stemJ7_wood = beatOnly(strip(bus(reseed(woodVar,
 // JOJO 8 CRACKLE — vinyl dust: very short noise clicks on a 32nd grid
 // ============================================================
 const dust     = colJojo(8)
-const dustVar  = change(dust.btn, 'jojo', 'Knistern', 3)
+const dustVar  = change(dust.btn, 'jojo', 'Crackle', 3)
 const dustKeep = dust.char.fmap(d => dbl => Math.min(0.9, (0.04 + 0.4 * d) * (dbl > 0.5 ? 2 : 1))).appLeft(dust.btn2)
 
 const stemJ8_dust = strip(bus(reseed(dustVar,
@@ -619,11 +646,11 @@ const stemJ8_dust = strip(bus(reseed(dustVar,
 // ============================================================
 // JONAS 1 PAD — slow random chords from the mood's scale
 // ============================================================
-// @ctl 2:1.k1 Brightness | muffled ↔ open and airy (lpf 300–8000 Hz).
-// @ctl 2:1.k2 Space | dry and close ↔ far away in a big room (reverb + echo).
-// @ctl 2:1.k3 Swell | 0 = still, held chords. Up = the chord is re-struck every half bar and breathes in and out.
+// @ctl 2:1.k1 Brightness | dull ↔ bright.
+// @ctl 2:1.k2 Space | dry ↔ echo + room.
+// @ctl 2:1.k3 Swell | still chords ↔ re-struck and breathing.
 // @ctl 2:1.fader Level | long floating chords.
-// @ctl 2:1.b1 Change | 3 chord progressions: calm → circling → open.
+// @ctl 2:1.b1 Pattern | 3 chord progressions: calm → circling → open.
 // @ctl 2:1.b2 Freeze | holds the current chord while held.
 const pad      = colJonas(1)
 const padVar   = change(pad.btn, 'jonas', 'Pad', 3, ['I–IV', 'I–iii–IV–ii', 'I–vi–IV–vii'])
@@ -667,23 +694,23 @@ const stemN1_pad = strip(bus(wobble(stack(
 // Tension wobble on the bowed loops; orbit 2 (dotted-8th echo as in the lab, feedback 0.6 instead of 0.55).
 // Levels from the lab (bowed ×1, marimba ×1.6, toms ×2.5 at full fader); GM sounds cannot be rendered offline, so they
 // are not measured against the other stems yet.
-// @ctl 2:2.k1 Brightness | soft ↔ bright (lpf 800–12000 Hz).
-// @ctl 2:2.k2 Space | room and dotted-8th echo (a little at 0).
+// @ctl 2:2.k1 Brightness | dull ↔ bright.
+// @ctl 2:2.k2 Space | dry ↔ echo + room.
 // @ctl 2:2.k3 Complexity | 2 loops ↔ 6 loops drifting against each other.
 // @ctl 2:2.fader Level | bowed vibraphone loops (Eno, Music for Airports).
-// @ctl 2:2.b1 Change | note set: calm (fifths) → lydian (G♯, C♯) → low and slower.
+// @ctl 2:2.b1 Pattern | note set: calm (fifths) → lydian (G♯, C♯) → low and slower.
 // @ctl 2:2.b2 Echo throw | held: long dotted-8th echo.
-// @ctl 2:3.k1 Brightness | soft mallet ↔ bright (lpf 600–6000 Hz).
-// @ctl 2:3.k2 Space | room and dotted-8th echo (a little at 0).
-// @ctl 2:3.k3 Complexity | 0 = one figure ↔ all layers (Euclid: also denser; build-up: up to 7, louder and brighter).
+// @ctl 2:3.k1 Brightness | dull ↔ bright.
+// @ctl 2:3.k2 Space | dry ↔ echo + room.
+// @ctl 2:3.k3 Complexity | one figure ↔ all layers.
 // @ctl 2:3.fader Level | marimba figures laid over each other (Takada).
-// @ctl 2:3.b1 Change | cycles → canon → cells → Euclid → build-up.
+// @ctl 2:3.b1 Pattern | cycles → canon → cells → Euclid → build-up.
 // @ctl 2:3.b2 Echo throw | held: long dotted-8th echo.
-// @ctl 2:4.k1 Brightness | soft ↔ bright (lpf 600–6000 Hz).
-// @ctl 2:4.k2 Space | room and dotted-8th echo (a little at 0).
+// @ctl 2:4.k1 Brightness | dull ↔ bright.
+// @ctl 2:4.k2 Space | dry ↔ echo + room.
 // @ctl 2:4.k3 Complexity | 0 = the figure alone ↔ fuller: rests fill up, canon voices, a drifting copy.
 // @ctl 2:4.fader Level | tom figures.
-// @ctl 2:4.b1 Change | cycles → canon → Euclid → build-up → crossing → Clapping.
+// @ctl 2:4.b1 Pattern | cycles → canon → Euclid → build-up → crossing → Clapping.
 // @ctl 2:4.b2 Echo throw | held: long dotted-8th echo.
 // The lab's column code (lab/harmonie/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
 // its knob reads (h.knob / h.at) and the drift offsets' name. Returns the three columns { name, pats, range, gain, tom }.
@@ -725,9 +752,9 @@ const makeNewJonas = (h, scaleIn) => {
   // 1a Cycles: [figure, octave, pan]
   const C5 = ['4 ~ 7 ~ 9', 1, 0.3], C7 = ['0 ~ ~ 2 ~ 4 ~', 0, 0.7], ANCHOR = ['0 ~ ~ ~ ~ ~ ~ ~ 4 ~ ~ ~ ~ ~ ~ ~', 0, 0.5]
   const CYCLES = [
-    ['Zyklen 5·7', [C5, C7]],
-    ['Zyklen 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
-    ['Zyklen 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
+    ['Cycles 5·7', [C5, C7]],
+    ['Cycles 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
+    ['Cycles 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
   ].map(([n, ls]) => [n, ls.map(s => layer(...s))])
   // 1b Canon: one figure, voices [late by 16ths, octave, pan]
   const VOICES = [[0, 1, 0.3], [3, 1, 0.7], [5, 0, 0.5], [11, 2, 0.6]]
@@ -735,15 +762,15 @@ const makeNewJonas = (h, scaleIn) => {
   const CANON = [['Kanon einfach', '0 4 ~ 7 4 ~ 2 ~'], ['Kanon mittel', '4 ~ 2 4 ~ 7 ~ ~'], ['Kanon lang', '7 ~ 6 4 ~ 2 4 ~ 9 ~ 7 ~']]
     .map(([n, f]) => [n, canon(f)])
   // 1c Similar cells: one cell, padded to slightly different lengths, each layer a little moved in pitch and place
-  const CELLS = [['Zellen 2 Töne', '0 ~ 4', [4, 5, 6, 7]], ['Zellen 4 Töne', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Zellen 6 Töne', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
+  const CELLS = [['Cells 2 notes', '0 ~ 4', [4, 5, 6, 7]], ['Cells 4 notes', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Cells 6 notes', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
   const SIM = [[0, 1, 0.3], [2, 1, 0.7], [-3, 1, 0.5], [4, 0, 0.45]]   // [shift, octave, pan] per layer
   const similar = CELLS.map(([n, cell, lens]) => [n, lens.map((L, v) => layer(pad(shift(cell, SIM[v][0]), L), SIM[v][1], SIM[v][2]))])
   // 2 Euclid: [hits, length, notes, octave, pan]
   const eu = list => list.map(([k, L, ns, oct, pan, rot = 0]) => layer(euclid(k, L, ns, rot), oct, pan))
   const EUCLID = [
-    ['Locker', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
-    ['Mittel', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
-    ['Dicht', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
+    ['Loose', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
+    ['Medium', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
+    ['Dense', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
       [4, 9, [0, 4, -3, 2], 0, 0.5]])],
   ]
   // 3 Build-up: layer v enters at bar v × every of a 64-bar round and stays to its end; row 3 (intensity) caps how many
@@ -762,7 +789,7 @@ const makeNewJonas = (h, scaleIn) => {
   const L1 = '4 ~ 7 ~ 2 ~ 4 ~', L2 = '~ 9 ~ 6 ~ 7 ~ 4', L2s = '~ 9 ~ 6 ~ 7 ~', L3 = '0 ~ ~ 2 ~ ~ 4 ~ ~'
   const BELL = [
     ['verzahnt', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
-    ['Linie 2 rutscht', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['Line 2 slips', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
     ['alle rutschen', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(L3, 0, 0.5)]],
   ]
   // 5 Railway crossing: each crossing = a two-tone bell in 8ths, [high, low, octave, pan]; crossing v runs at speed
@@ -772,7 +799,7 @@ const makeNewJonas = (h, scaleIn) => {
   const crossing = spread => CROSSINGS.map(([a, b, oct, pan], v) => layer(a + ' ' + b, oct, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
   // the same, all crossings on the same two tones (A–F♯), only their speed differs (row 3 on the toms)
   const crossingSame = spread => CROSSINGS.map(([, , , pan], v) => layer('4 2', 1, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
-  const CROSS = [['weit', crossing(0.045)], ['weiter', crossing(0.07)], ['sehr weit', crossing(0.1)]]
+  const CROSS = [['Wide', crossing(0.045)], ['weiter', crossing(0.07)], ['sehr weit', crossing(0.1)]]
   // 6 Clapping Music (Reich 1972): 12 pulses per bar (8th triplets), x x x . x x . x . x x .; voice 2 one pulse ahead
   // after every `every` bars, back in unison after 12 moves; the hits play the notes in turn
   const CLAP = 'x x x ~ x x ~ x ~ x x ~'
@@ -787,7 +814,7 @@ const makeNewJonas = (h, scaleIn) => {
   const agogo12 = note(mini('{' + toks(BELL12).map(x => x === '~' ? x : 77).join(' ') + '}%12')).s('gm_agogo').gain(0.22).pan(0.5)
   const v4 = layer(bellFig([9, 11, 9, 7, 6, 4, 7]), 2, 0.55, 0.35, 12).early(moving(3, 12, 1 / 12))
   const CLAPPING = [
-    ['Reich (2 Stimmen)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
+    ['Reich (2 voices)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
     ['3 Stimmen', [v1, v2, v3]],
     ['3 Stimmen + Glocke', [stack(v1, agogo12), v2, v3, v4]],
   ]
@@ -824,11 +851,11 @@ const makeNewJonas = (h, scaleIn) => {
   const eucKnob = cc => stack(...[0, 1, 2, 3].map(v => gate(h.knob(cc).fmap(k => v < 1 + Math.round(3 * k)),
     h.knob(cc).fmap(k => Math.min(2, Math.floor(3 * k))).fmap(d => EUCLID[d][1][v]).innerJoin()))).delay(0.12)
   const MARIMBA = [
-    ['Zyklen', layers(1, ZYKLEN)],
-    ['Kanon', layers(1, CANON[2][1])],
-    ['Zellen', layers(1, similar[1][1])],
-    ['Euklid', eucKnob(30)],
-    ['Aufbau', layers(1, BUILDUP[1][1])],
+    ['Cycles', layers(1, ZYKLEN)],
+    ['Canon', layers(1, CANON[2][1])],
+    ['Cells', layers(1, similar[1][1])],
+    ['Euclid', eucKnob(30)],
+    ['Build-up', layers(1, BUILDUP[1][1])],
   ]
 
   // Toms (row 3 = cc 31), one figure each (several different tom layers = mush):
@@ -877,20 +904,20 @@ const makeNewJonas = (h, scaleIn) => {
   const tomClap = stack(v1, gate(h.knob(31).fmap(k => k > 0.02),
     h.knob(31).fmap(k => Math.min(2, Math.floor(3 * k))).fmap(r => clapRates[r]).innerJoin()))
   const TOMS = [
-    ['Zyklen', dense(C5[0], 1, 0.4)],
-    ['Kanon', tomCanon],
-    ['Euklid', dense(euclid(3, 8, [4, 7, 2]), 1, 0.4)],
-    ['Aufbau', tomBuild],
-    ['Bahnübergang', tomShift('crossing', layer('4 2', 1, 0.35, 0.45, 8))],
+    ['Cycles', dense(C5[0], 1, 0.4)],
+    ['Canon', tomCanon],
+    ['Euclid', dense(euclid(3, 8, [4, 7, 2]), 1, 0.4)],
+    ['Build-up', tomBuild],
+    ['Crossing', tomShift('crossing', layer('4 2', 1, 0.35, 0.45, 8))],
     ['Clapping Music', tomClap],
   ].map(([n, p]) => [n, p.delay(0.12)])
 
   const col = (name, k3name, pats, extra = {}) => ({ name, space: 'bus', floor: 0.25, hall: 6, k3: 'own', k3name,
     range: [600, 6000], gain: 1, pats, ...extra })
   return [
-    col('Eno-Bogen', 'Komplexität', eno(0, bowedVib), { range: [800, 12000] }),
-    col('Marimba', 'Komplexität', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
-    col('Toms', 'Komplexität', TOMS, { tom: true, gain: 4 }),    // +12 dB (user: toms louder still; 2026-11-09: louder again, was 2.5)
+    col('Eno bowed', 'Complexity', eno(0, bowedVib), { range: [800, 12000] }),
+    col('Marimba', 'Complexity', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
+    col('Toms', 'Complexity', TOMS, { tom: true, gain: 4 }),    // +12 dB (user: toms louder still; 2026-11-09: louder again, was 2.5)
   ]
 }
 
@@ -906,8 +933,6 @@ const NEW_JONAS = makeNewJonas({ knob: cc => LAB_K3[cc], at: (cc, t) => knobVal(
 // One column: the lab's options on button 1 (latched to the next bar), toms converted (GM melodic tom an octave lower,
 // accents softened), the lab's space (floor 0.25: a little room and echo at 0) on orbit 2, echo throw on button 2,
 // brightness = low-pass over the lab's range (×bright per note, for build-up) and ±2 dB, level × the lab's gain
-const labSpace  = space => space.fmap(s => 0.25 + 0.75 * s)
-const echoThrow = (pat, button) => pat.fmap(v => b => b > 0.5 ? { ...v, delay: Math.max(v.delay ?? 0, 0.65) } : v).appLeft(button)
 const newJonas = (col, c, label, long = false) => {
   const latch = change(col.btn, 'jonas', label, c.pats.length, c.pats.map(([name]) => name))
   const built = c.pats.map(([, p]) => p)
@@ -928,14 +953,14 @@ const stemN4_toms    = newJonas(toms, NEW_JONAS[2], 'Toms')
 // ============================================================
 // JONAS 5 CHOIR — the answer: breathy “aah/ooh” voices on half notes
 // ============================================================
-// @ctl 2:5.k1 Brightness | hushed ↔ clear (lpf 500–10000 Hz).
-// @ctl 2:5.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 2:5.k3 Voices | 0 = one voice, 0.5 = + a third above, 1 = + a fifth: three-part harmony.
+// @ctl 2:5.k1 Brightness | dull ↔ bright.
+// @ctl 2:5.k2 Space | dry ↔ echo + room.
+// @ctl 2:5.k3 Complexity | 0 = one voice, 0.5 = + a third above, 1 = + a fifth: three-part harmony.
 // @ctl 2:5.fader Level | choir voices.
-// @ctl 2:5.b1 Change | middle → low → high register (new melody each time).
+// @ctl 2:5.b1 Pattern | middle → low → high register (new melody each time).
 // @ctl 2:5.b2 Full choir | all three voices while held.
 const choir       = colJonas(5)
-const choirVar    = change(choir.btn, 'jonas', 'Chor', 3, ['mittel', 'tief', 'hoch'])
+const choirVar    = change(choir.btn, 'jonas', 'Choir', 3, ['Middle', 'Low', 'High'])
 const choirScale  = choirVar.pat.fmap(i => [scaleIn(4), scaleIn(3), scaleIn(5)][i]).innerJoin()
 const choirVoices = choir.char.fmap(c => b => b > 0.5 ? 1 : c).appLeft(choir.btn2)
 
@@ -962,14 +987,14 @@ const stemN5_choir = strip(bus(wobble(stack(
 // JONAS 6 GLITTER — a real glockenspiel (General MIDI soundfont) struck at random on a 16th grid: metal bars that ring
 // out, random notes of the mood's scale (without the 4th and 7th degree, the sharpest ones), long echoes
 // ============================================================
-// @ctl 2:6.k1 Brightness | soft mallets ↔ bright metal (lpf 3–16 kHz).
-// @ctl 2:6.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 2:6.k3 Density | a drop now and then (~1 per bar) ↔ a sparkling rain (~70 % of the 16ths).
+// @ctl 2:6.k1 Brightness | dull ↔ bright.
+// @ctl 2:6.k2 Space | dry ↔ echo + room.
+// @ctl 2:6.k3 Complexity | a drop now and then (~1 per bar) ↔ a sparkling rain (~70 % of the 16ths).
 // @ctl 2:6.fader Level | random glockenspiel notes.
-// @ctl 2:6.b1 Change | high → very high → middle register.
-// @ctl 2:6.b2 Run | runs up and down the scale, denser and louder the longer it is held (full after 2 bars).
+// @ctl 2:6.b1 Pattern | high → very high → middle register.
+// @ctl 2:6.b2 Run | scale runs, denser while held.
 const glit     = colJonas(6)
-const glitVar  = change(glit.btn, 'jonas', 'Glitzer', 3, ['hoch', 'sehr hoch', 'mittel'])
+const glitVar  = change(glit.btn, 'jonas', 'Glitter', 3, ['High', 'Very high', 'Middle'])
 const glitKeep = glit.char.fmap(d => 0.06 + 0.64 * d)   // share of 16ths
 const glitScale = glitVar.pat.fmap(i => [scaleIn(5), scaleIn(6), scaleIn(4)][i]).innerJoin()
 const GLIT_TONES = [0, 1, 2, 4, 5, 7, 8, 9, 11]   // scale degrees over 1.5 octaves, without the 4th and 7th
@@ -999,14 +1024,14 @@ const stemN6_glitter = strip(bus(stack(
 // ============================================================
 // JONAS 7 SHIMMER — high tones that swell in slowly and hang in the air
 // ============================================================
-// @ctl 2:7.k1 Brightness | dark whoosh ↔ bright shimmer (lpf 1.5–14 kHz).
-// @ctl 2:7.k2 Space | dry ↔ far away (reverb + echo).
-// @ctl 2:7.k3 Amount | subtle (one tone) ↔ wild (a bell-like chord with long echoes).
+// @ctl 2:7.k1 Brightness | dull ↔ bright.
+// @ctl 2:7.k2 Space | dry ↔ echo + room.
+// @ctl 2:7.k3 Complexity | subtle (one tone) ↔ wild (a bell-like chord with long echoes).
 // @ctl 2:7.fader Level | shimmer swells.
-// @ctl 2:7.b1 Change | a new tone every 2 bars → every 4 bars → every bar.
+// @ctl 2:7.b1 Pattern | a new tone every 2 bars → every 4 bars → every bar.
 // @ctl 2:7.b2 Rise | while held, a cloud of tones climbs an octave and grows denser over 2 bars.
 const fx       = colJonas(7)
-const fxVar    = change(fx.btn, 'jonas', 'Schimmer', 3, ['2 Takte', '4 Takte', '1 Takt'])
+const fxVar    = change(fx.btn, 'jonas', 'Shimmer', 3, ['2 bars', '4 bars', '1 bar'])
 const fxAmount = fx.char
 const fxRise   = heldRamp(fx.btn2, 2)
 const FX_NOTES = [2, 4, 1].map(len => n(irand(7).segment(1).slow(len)))   // scale degree, a new one every len bars
@@ -1077,7 +1102,12 @@ if (lcView) {
   // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page; the Launchkey keeps it too
   lcView.pageOf = (side, cc) => side === 'lk' ? lcView.page
     : !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
+  // Column 8 knobs and fader: the value the sound really uses (glob, last moved of Mode 1 / Mode 2), not the last raw
+  // CC the view saw, so a global knob left on can never hide behind a stale or missing number
+  const GLOBAL_USED = { k1: glob.bright, k2: glob.space, k3: glob.char, fader: glob.level }
+  const used = pat => { try { return pat.queryArc(0, 0.01)[0]?.value } catch (e) { return undefined } }
   const valueOf = (page, n, row) => {
+    if (isGlobal(page, n) && GLOBAL_USED[row]) return used(GLOBAL_USED[row])
     const base = CC_ROW[row] + n
     const t = lcView.cc[alone ? 'jonas' : page]
     return alone && page === 'jonas' && n < 8 ? t[base + 48] : t[base] ?? (n === 8 ? t[base + 48] : undefined)
@@ -1105,8 +1135,8 @@ if (lcView) {
     if (row === 'b1') return '<div class="cell btn"' + title + '>' + b1Lines(name, ...choice(page, n)) + '</div>'
     if (row === 'b2') {
       const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
-      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
-        : on ? 'gedrückt' : ''
+      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on')
+        : on ? 'held' : ''
       return '<div class="cell btn' + (on ? ' on' : '') + '"' + title + '><span>' + esc(name) + '</span><b>' + what + '</b></div>'
     }
     return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
@@ -1124,8 +1154,16 @@ if (lcView) {
     return '<div class="cell ' + (key === 'level' ? 'fader' : 'knob') + '"' + title + '>' + mark + '<b>' + num + '</b><span>' +
       esc(name) + '</span></div>'
   }
-  const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkrow>' +
-    LK_CTLS.map(lkCell).join('') + '</div></div>'
+  // The 25 keys (the window moves to the octave played) and the 16 pads (2 rows of 8, notes 36-43 below, 44-51 above)
+  lcView.keys ??= new Set(); lcView.pads ??= new Set(); lcView.base ??= 48
+  const BLACK = [1, 3, 6, 8, 10]
+  const lkPlay = () => '<div class=lkplay><div class=lkkeys>' + [...Array(25).keys()].map(i => {
+    const m = lcView.base + i
+    return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lcView.keys.has(m) ? ' on' : '') + '"></i>'
+  }).join('') + '</div><div class=lkpads>' + [44, 36].flatMap(b => [...Array(8).keys()].map(i =>
+    '<i class="' + (lcView.pads.has(b + i) ? 'on' : '') + '"></i>')).join('') + '</div></div>'
+  const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkbody><div class=lkmain><div class=lkrow>' +
+    LK_CTLS.slice(1).map(lkCell).join('') + '</div>' + lkPlay() + '</div>' + lkCell(LK_CTLS[0]) + '</div></div>'
   // Bar in the cycle (bars) and beat in the bar (dots, the one ringed), then the bar's chord
   const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
   const beatHtml = () => beatNow.bar === null ? '–' : (beatNow.bar % CYCLE + 1) + ' / ' + CYCLE +
@@ -1155,7 +1193,12 @@ if (lcView) {
     '.beats i:first-child{outline:2px solid #555}.beats i.on{background:var(--acc)}',
     '.bars{margin-left:.6em}.bars i{display:inline-block;width:1.1em;height:.55em;border-radius:2px;background:#333;margin-left:.15em}',
     '.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}',
-    '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(9,1fr);gap:.8vw;height:14vh}',
+    '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(8,1fr);gap:.8vw;height:14vh}',
+    '.lkbody{display:flex;gap:1vw}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5vh}.lkbody>.fader{flex:none;width:5vw;justify-content:flex-start}',
+    '.lkplay{display:flex;gap:2vw;height:7vh}.lkkeys{flex:3;display:grid;grid-template-columns:repeat(25,1fr);gap:2px}',
+    '.lkkeys i{border-radius:3px;background:#333}.lkkeys i.blk{background:#1c1c1c;border:1px solid #444}.lkkeys i.on{background:#50c8e8}',
+    '.lkpads{flex:2;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:1fr 1fr;gap:4px}',
+    '.lkpads i{border-radius:4px;background:#2a2a2a}.lkpads i.on{background:#f0a040}',
   ].join('\n')
   // One page as a block: its title, the column names and the six rows. The page moved last gets a frame in its colour.
   // The pages stand side by side like the two controllers on the table; swap the order here if Jonas stands left.
@@ -1172,13 +1215,22 @@ if (lcView) {
     const root = doc.getElementById('lc')
     if (!root) return
     root.innerHTML = '<div class=head>' +
-      '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
+      '<div><span class=k>Chapter</span>' + pending(...lcChapter()) + '</div>' +
       lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
-      '<div><span class=k>Takt</span>' + beatHtml() + '</div>' +
-      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
+      '<div><span class=k>Bar</span>' + beatHtml() + '</div>' +
+      // Global knobs that are not at 0 (Fog, Thin, Tension …) stand in the head line, in the accent colour
+      ['k1', 'k2', 'k3'].map(r => [(TAGS['g.' + r] ?? r).split(' | ')[0], used(GLOBAL_USED[r]) ?? 0]).filter(([, v]) => v > 0.01)
+        .map(([k, v]) => '<div class=next><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
+      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
       (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
       (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' +
       PAGE_ORDER.map(pageHtml).join('') + '</div>' + lkHtml()
+    // Keys level bar as tall as the LC level faders (the LC grid sets their height)
+    const ref = root.querySelector('.page .fader .bar'), lkBar = root.querySelector('.lkbody>.fader .bar')
+    // The bar itself in the middle of the Launchkey block (number and name hang below it)
+    const lkBody = root.querySelector('.lkbody')
+    if (ref && lkBar) Object.assign(lkBar.style, { flex: 'none', height: ref.offsetHeight + 'px',
+      marginTop: Math.max(0, (lkBody.clientHeight - ref.offsetHeight) / 2) + 'px' })
   }
   // Another track's status box may be the one on the page now: the link moves into it
   if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)
@@ -1195,14 +1247,14 @@ showStatus()
 // knobs 1-7. Same knobs in every track; only the sounds differ.
 // Names for the LC view (its Launchkey row); not read by the layout sheet tools.
 // @lk level Keys Level | mod wheel: volume of the keys pad (× master). 0 = keys silent, pads still play.
-// @lk k1 Cutoff | dark ↔ open (lpf 400–6000 Hz, × fog/tension).
+// @lk k1 Brightness | dark ↔ open (lpf 400–6000 Hz, × fog/tension).
 // @lk k2 Resonance | flat ↔ whistling filter peak.
 // @lk k3 Attack | slow fade-in (0.4 s) ↔ very slow swell (4 s).
 // @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
 // @lk k5 Detune | one clean voice ↔ wide and wobbly (two detuned voices around it).
-// @lk k6 Reverb | big room ↔ far away (it is ambient: never dry).
+// @lk k6 Space | much reverb ↔ far away (it is ambient: never dry).
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Shot Dark | drum pads: open ↔ dark (lpf 18 kHz → 800 Hz).
+// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog (lpf 18 kHz → 800 Hz).
 const LK_PAD_CHAN = 10
 const LK_PAD_NOTE_1 = 36
 const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
@@ -1287,7 +1339,7 @@ stack(
   stemJ3_drone,
   stemJ4_bass,
   stemJ5_rim,
-  stemJ6_ticks,
+  stemJ6_shaker,
   stemJ7_wood,
   stemJ8_dust,
   stemN1_pad,
