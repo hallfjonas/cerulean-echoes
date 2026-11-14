@@ -20,7 +20,8 @@ Dann in Chrome **http://localhost:8766/player.html** öffnen (nicht `http://loca
 Der Player spielt einen Track direkt auf localhost (kein strudel.cc nötig) und zeigt die Visualisierung gleich
 dahinter: jeder Stem mit Namen, Tempo aus Strudels Uhr.
 
-1. Track tappen (einmal pro Track und nach jeder Änderung am Track; landet in `trajectory/tapped/` und in der
+1. Track tappen (einmal pro Track; danach baut der Layout-Hook bzw. `npm run watch` die Kopie nach jeder Änderung
+   am Track neu; landet in `trajectory/tapped/` und in der
    Zwischenablage):
 
    ```bash

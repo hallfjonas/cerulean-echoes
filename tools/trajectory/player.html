@@ -19,6 +19,9 @@
   output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em }
   #status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px }
 </style>
+<script type="importmap">
+{ "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
+</script>
 </head>
 <body>
 <!-- Plays a tapped track (make-tapped.mjs) right here and shows it: no strudel.cc needed. Every control the track
@@ -49,6 +52,7 @@ import { initStrudel, evaluate, samples, hush, signal, reify, Pattern, Hap, Time
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
 import { createSmoother, describeWindow } from './smoothing.mjs'
+import { BANKS, SOUNDFONTS } from './banks.mjs'
 
 const $ = id => document.getElementById(id)
 const renderer = createRenderer($('view'))
@@ -111,12 +115,11 @@ globalThis.midikeys = async name => {
   })
 }
 
+// The banks from banks.mjs and the gm_* soundfonts, as strudel.cc has them
 const ready = initStrudel({
   prebake: () => Promise.all([
-    samples('github:tidalcycles/dirt-samples'),
-    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json'),
-    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/vcsl.json'),
-    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/piano.json'),
+    ...BANKS.map(url => samples(url)),
+    import(SOUNDFONTS + 'fontloader.mjs').then(({ registerSoundfonts }) => registerSoundfonts()),
   ]),
 })
 ready.then(() => { label = 'bereit' })

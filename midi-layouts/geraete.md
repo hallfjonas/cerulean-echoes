@@ -38,7 +38,7 @@ benutzt). Fehlt das Gerät, bleibt sein Teil stumm.
 | Tasten | Noten, Kanal 1 | Pad je Track: 007 Glas-Pad, 008 dunkles Techno-Pad, 009 Rhodes Mark I, 010 warmes Pad |
 | Mod-Wheel | CC 1 | Lautstärke der Tasten (× Master-Fader); auf 0 stumm |
 | Drehknöpfe 1–8 | CC 21–28, Kanal 1 | 1 Cutoff, 2 Resonanz, 3 Attack, 4 Notenlänge, 5 Detune, 6 Hall, 7 Echo, 8 One-Shots dunkler |
-| Drum-Pads (Drum-Mode) | Noten 36–51, Kanal 10 | 16 One-Shots je Track (Pad 1 und 5 = die zwei Stimm-Samples); 008: dunkel (909, 808, Modular, Metal, Space, Wind), 007: Glocken, Chor, Wind, Rauschen, 009: House-Kit (909, 727, Orgel-, Bläser-Stab), 010: Congas, Marimba, Shaker |
+| Drum-Pads (Drum-Mode) | Noten 36–51, Kanal 10 | 16 One-Shots je Track (linke Hälfte, Pads 1–8 = die Stimm-Samples, eigene Farbe in der LC-Ansicht; Wine, Evening, Creatures, No end, Places laufen einmal durch, neue Schläge während sie spielen zählen nicht); 008: dunkel (909, 808, Modular, Metal, Space, Wind), 007: Glocken, Chor, Wind, Rauschen, 009: House-Kit (909, 727, Orgel-, Bläser-Stab), 010: Congas, Marimba, Shaker |
 
 - Die Tasten haben kein Note-off: Strudel spielt jede Note mit fester Länge (Knopf 4), Halten verlängert nichts.
 - Kanal 10 für die Pads ist angenommen, nicht nachgemessen. Spielen die Pads stattdessen den Pad-Klang, senden sie auf

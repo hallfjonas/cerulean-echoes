@@ -75,6 +75,17 @@ Strudel computes every event of every layer even when it is silent; dense tracks
 - Keep the safety net at the end of the master: `.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)`.
 - Prove a restructuring is inaudible with `/strudel-optimize` (compares old and new event by event).
 
+## Sounds that load (samples/sounds.json)
+Every sound a track plays must load in a browser, on strudel.cc and in the player (`tools/trajectory/player.html`
+loads the same banks as strudel.cc, `banks.mjs`, plus the gm_* soundfonts). `samples/sounds.json` is the list:
+`ok` (whitelist, where it loads from) and `broken` (blacklist, why).
+- After adding or changing a sound: `cd tools && node strudel-sim/check-sounds.mjs <track>` (plays the track in the
+  simulator with every control and pad, fetches each sound's file, updates the list). The hook compares every edited
+  track with the list offline and reports broken or unchecked sounds.
+- A broken bank sound (e.g. a VCSL file whose path has a comma: raw.githubusercontent then sends a header Chrome
+  refuses) is copied into `samples/mirror/` with `node strudel-sim/mirror-sound.mjs <sound>`; every track loads
+  `samples/mirror/mirror.json`, so the copy plays under the same name once pushed to main.
+
 ## Layout sheets
 Each tagged track has a generated `<track>-layout.pdf` (Typst). The source of truth is the `// @ctl` comments in
 the track; a hook regenerates the PDF after every edit. See `/lcxl-layout`.

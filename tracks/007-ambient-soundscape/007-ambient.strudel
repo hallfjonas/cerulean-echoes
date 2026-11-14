@@ -240,11 +240,13 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   const onMsg = (name, e) => {
     if (!v.side(name)) return
     const [status, cc, val] = e.data
-    // Launchkey keys and pads: held notes light up (channel 10 = drum pads)
+    // Launchkey keys and pads: held notes light up (channel 10 = drum pads); a pad also stays lit for 250 ms after its
+    // hit, since a quick tap sends its note-off before the view draws
     if (v.side(name) === 'lk' && ((status & 0xf0) === 0x90 || (status & 0xf0) === 0x80)) {
       const on = (status & 0xf0) === 0x90 && val > 0
       const set = (status & 0x0f) === 9 ? v.pads : v.keys
       if (on) { set.add(cc); if (set === v.keys && (cc < v.base || cc > v.base + 24)) v.base = 12 * Math.floor(cc / 12) } else set.delete(cc)
+      if (on && set === v.pads) { (v.padAt ??= {})[cc] = performance.now(); setTimeout(v.update, 300) }
       v.update()
       return
     }
@@ -1209,11 +1211,13 @@ if (lcView) {
   // Keys in the current chapter's scale on D (pitch class 2) light up softly
   const SCALE_STEPS = { lydian: [0, 2, 4, 6, 7, 9, 11], dorian: [0, 2, 3, 5, 7, 9, 10], 'whole tone': [0, 2, 4, 6, 8, 10] }
   const inKey = m => SCALE_STEPS[MOODS[moodLatch.now].scale].includes(((m - 2) % 12 + 12) % 12)
+  const padLit = n => lcView.pads.has(n) || performance.now() - (lcView.padAt?.[n] ?? -1e4) < 250
   const lkPlay = () => '<div class=lkplay><div class=lkkeys>' + [...Array(25).keys()].map(i => {
     const m = lcView.base + i
     return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (inKey(m) ? ' in' : '') + (lcView.keys.has(m) ? ' on' : '') + '"></i>'
   }).join('') + '</div><div class=lkpads>' + [40, 36].flatMap(b => [0, 1, 2, 3, 8, 9, 10, 11].map(i =>
-    '<i class="' + (lcView.pads.has(b + i) ? 'on' : '') + '">' + esc(lcView.padNames?.[b + i - 36] ?? '') + '</i>')).join('') + '</div></div>'
+    '<i class="' + (lcView.padVoice?.[b + i - 36] ? 'voice' : '') + (padLit(b + i) ? ' on' : '') + '">' +
+    esc(lcView.padNames?.[b + i - 36] ?? '') + '</i>')).join('') + '</div></div>'
   const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkbody><div class=lkmain><div class=lkrow>' +
     LK_CTLS.slice(1).map(lkCell).join('') + '</div>' + lkPlay() + '</div>' + lkCell(LK_CTLS[0]) + '</div></div>'
   // Bar in the cycle (bars) and beat in the bar (dots, the one ringed), then the bar's chord
@@ -1248,11 +1252,14 @@ if (lcView) {
     '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(8,1fr);gap:.8vw;height:14vh}',
     '.lkbody{display:flex;gap:1vw}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5vh}.lkbody>.fader{flex:none;width:5vw;justify-content:flex-start}',
     '.lkplay{display:flex;gap:2vw;height:7vh}.lkkeys{flex:3;display:grid;grid-template-columns:repeat(25,1fr);gap:2px}',
-    '.lkkeys i{border-radius:3px;background:#333}.lkkeys i.blk{background:#1c1c1c;border:1px solid #444}',
-    '.lkkeys i.in{background:#6a6a6a}.lkkeys i.blk.in{background:#4a4a4a;border-color:#888}.lkkeys i.on,.lkkeys i.blk.on{background:#50c8e8}',
+    // Keys: green = in the track's scale now, red = off key; pressed = bright
+    '.lkkeys i{border-radius:3px;background:#5a2a2a}.lkkeys i.blk{background:#3a1a1a;border:1px solid #6a3434}',
+    '.lkkeys i.in{background:#2f6a3c}.lkkeys i.blk.in{background:#1f4a2a;border-color:#3f8a50}',
+    '.lkkeys i.on{background:#ff5050}.lkkeys i.in.on{background:#6ff08a}',
     '.lkpads{flex:2;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:1fr 1fr;gap:4px}',
     '.lkpads i{border-radius:4px;background:#2a2a2a;display:flex;align-items:center;justify-content:center;text-align:center;',
     'font:normal .75em/1.1 system-ui,sans-serif;color:#bbb;overflow:hidden;padding:0 2px}.lkpads i.on{background:#f0a040;color:#111}',
+    '.lkpads i.voice{background:#3b2d52;color:#dccbf7}.lkpads i.voice.on{background:#b48cf0;color:#111}',
   ].join('\n')
   // One page as a block: its title, the column names and the six rows. The page moved last gets a frame in its colour.
   // The pages stand side by side like the two controllers on the table; swap the order here if Jonas stands left.
@@ -1333,30 +1340,44 @@ const shareQuery = pat => {
 }
 
 const OWN_SAMPLES = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/'
-if (typeof samples === 'function') await samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a' }, OWN_SAMPLES)
+// Bank sounds browsers cannot load from their bank (samples/sounds.json), copied into this repository under the same
+// names (tools/strudel-sim/mirror-sound.mjs)
+if (typeof samples === 'function') await samples(OWN_SAMPLES + 'mirror/mirror.json')
+// The spoken voice samples (own recordings); their pads have their own colour in the LC view
+const VOICE_SAMPLES = { brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a',
+  paper: 'voice/A%20piece%20of%20paper.mp3', wine: 'voice/Plaenterwald%20Wine%20and%20cheese.mp3',
+  evening: 'voice/The%20Evening%20progresses.mp3', creatures: 'voice/The%20creatures%20have%20begun%20illumination.mp3',
+  noend: 'voice/The%20evening%20does%20not%20end.mp3', places: 'voice/There%20are%20places%20on%20earth.mp3' }
+if (typeof samples === 'function') await samples(VOICE_SAMPLES, OWN_SAMPLES)
 
-// Pads 1 and 5 = the spoken voice samples, as in 008; pitched shots carry their note as a MIDI number
+// Left half (pads 1-4 bottom, 5-8 top) = the spoken voice samples, right half = the other one-shots;
+// pitched shots carry their note as a MIDI number. once = the sample's length in seconds: while it plays, new hits
+// on that pad are ignored (it runs once, however often the pad is struck)
 // gain: each hit levelled to about −15 LUFS-M, dry (tools/strudel-sim/pad-levels.mjs); gm_* and synth shots unmeasured
 const LK_SHOTS = [
-  { name: 'Voice Brace', s: 'brace' },
+  { name: 'Brace', s: 'brace' },
+  { name: 'Paper', s: 'paper', gain: 1.14 },
+  { name: 'Wine', s: 'wine', gain: 0.98, once: 5.33 },
+  { name: 'Evening', s: 'evening', gain: 1.04, once: 9.25 },
+  { name: 'Wiese', s: 'lw', gain: 0.56 },
+  { name: 'Creatures', s: 'creatures', once: 4.52 },
+  { name: 'No end', s: 'noend', gain: 0.76, once: 10.19 },
+  { name: 'Places', s: 'places', gain: 0.94, once: 15.07 },
   { name: 'Glockenspiel', s: 'gm_glockenspiel', note: 86, room: 0.7 },
-  { name: 'Marimba', s: 'gm_marimba', note: 50, room: 0.5 },
   { name: 'Bowed vibe', s: 'vibraphone_bowed', note: 62, room: 0.7, gain: 6.5 },
-  { name: 'Voice Wiese', s: 'lw', gain: 0.56 },
   { name: 'Choir aah', s: 'gm_choir_aahs', note: 62, attack: 0.3, release: 2, room: 0.8 },
   { name: 'Voice ooh', s: 'gm_voice_oohs', note: 69, attack: 0.2, release: 2, room: 0.8 },
-  { name: 'Agogo', s: 'gm_agogo', note: 74, room: 0.6 },
-  { name: 'Tom', s: 'gm_melodic_tom', note: 50, room: 0.6 },
   { name: 'Wind', s: 'wind', speed: 0.5, room: 0.8, gain: 1.36 },
   { name: 'Space', s: 'space', speed: 0.5, room: 0.9, gain: 0.65 },
-  { name: 'Metal', s: 'metal', speed: 0.4, room: 0.7, gain: 1.76 },
-  { name: 'Noise swell', s: 'pink', attack: 1.5, decay: 0.5, sustain: 0, release: 1.5, cutoff: 1500, gain: 0.3, room: 0.8 },
-  { name: 'High ping', s: 'sine', note: 98, attack: 0.005, decay: 1.5, sustain: 0, release: 1, gain: 0.3, room: 0.9 },
+  { name: 'Noise swell', s: 'pink', attack: 0.4, decay: 1.6, sustain: 0, release: 1.5, cutoff: 1500, gain: 4.4, room: 0.8 },
   { name: 'Crash reverse', s: 'rolandtr909_cr', speed: -0.5, room: 0.7, gain: 0.54 },
-  { name: 'Vibraphone', s: 'gm_vibraphone', note: 81, room: 0.7 },
 ]
 const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
-if (lcView) { lcView.padNames = LK_SHOTS.map(shot => shot.name); lcView.update() }
+if (lcView) {
+  lcView.padNames = LK_SHOTS.map(shot => shot.name)
+  lcView.padVoice = LK_SHOTS.map(shot => shot.s in VOICE_SAMPLES)
+  lcView.update()
+}
 
 const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(4).range(0.25, 2))) : silence
 const lkKeyNotes = lkNotes.filterValues(v => !isPadHit(v))
@@ -1379,6 +1400,18 @@ const lkPad = stack(
   .postgain(lkKeysLevel.range(0, 2).mul(globalLevel))   // +6 dB (user 2026-11-14: keys too quiet)
 
 const lkShotTone = expRange(lkKnob(8), 18000, 800)
+// A shot with `once` ignores new hits until it has played out. A hit already let through passes again when queried
+// twice (its start is remembered); a start more than 4 cycles before the run (track restarted) starts afresh.
+const lkOnceRuns = {}
+const lkOnce = hap => {
+  const { once, s } = hap.value
+  if (!once) return true
+  const t = hap.whole.begin.valueOf(), run = lkOnceRuns[s]
+  if (run?.hits.includes(t)) return true
+  if (run && t > run.start - 4 && t < run.until) return false
+  lkOnceRuns[s] = { start: t, until: t + once * bpm / 240, hits: [t, ...(run?.hits ?? [])].slice(0, 8) }
+  return true
+}
 const lkShots = lkNotes.filterValues(isPadHit)
   .fmap(({ note, ...v }) => tone => room => {
     const { name, ...shot } = shotOf(note)
@@ -1387,6 +1420,8 @@ const lkShots = lkNotes.filterValues(isPadHit)
   })
   .appLeft(lkShotTone.fmap(t => g => Math.min(18000, Math.max(80, t * g))).appLeft(globalTone))
   .appLeft(globalRoom)
+  .filterHaps(lkOnce)
+  .fmap(({ once, ...v }) => v)
   .roomsize(BUSES[1].hall).delaytime(BUSES[1].time).delayfeedback(BUSES[1].feedback)
   .orbit(1)
   .postgain(globalLevel)
