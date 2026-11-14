@@ -35,16 +35,16 @@
   <button id="play">Play</button>
   <button id="stop">Stop</button>
   <label title="0 = hart, scharf, wild · 1 = weich, verschmiert, träge">Hart
-    <input id="character" type="range" min="0" max="1" step="0.01" value="0.5"> Weich <output id="characterValue">0.50</output></label>
+    <input id="character" type="range" min="0" max="1" step="0.01" value="0"> Weich <output id="characterValue">0.00</output></label>
   <label title="0 = rohe Signale · 1 = gleitender Mittelwert über 2^53 Zeilen (max_int): eingefroren">Roh
-    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0"> Glatt <output id="smoothingValue">roh</output></label>
-  <label title="Taste A"><input id="axes" type="checkbox" checked> Achsen</label>
-  <label title="Taste L"><input id="labels" type="checkbox" checked> Beschriftung</label>
+    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0.06"> Glatt <output id="smoothingValue">302 ms</output></label>
+  <label title="Taste A"><input id="axes" type="checkbox"> Achsen</label>
+  <label title="Taste L"><input id="labels" type="checkbox"> Beschriftung</label>
   <label title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
   <span id="status">lädt Strudel …</span>
 </header>
 <script type="module">
-import { initStrudel, evaluate, samples, hush, signal } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
+import { initStrudel, evaluate, samples, hush, signal, reify, Pattern, Hap, TimeSpan } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
 import { createSmoother, describeWindow } from './smoothing.mjs'
@@ -55,21 +55,60 @@ const smoother = createSmoother(renderer.push)
 let label = 'lädt Strudel …', visuals = '', midiInputs = 0
 createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
 
-const human = new Map()
-globalThis.midin = async () => c => signal(() => human.get(c) ?? 0)
-
-navigator.requestMIDIAccess?.().then(access => {
-  const listen = () => {
-    midiInputs = 0
-    for (const input of access.inputs.values()) {
-      if (/DAW/.test(input.name)) continue
-      midiInputs++
-      input.onmidimessage = ({ data: [status, cc, value] }) => { if ((status & 0xf0) === 0xb0) human.set(cc, value / 127) }
+// Web MIDI per input, as in strudel.cc: each input keeps the last value of every CC (with the time it came) and the
+// keys pressed since the last query. DAW ports are left out.
+let midiAccess = null
+const ports = new Map()
+const listen = () => {
+  midiInputs = 0
+  for (const input of midiAccess.inputs.values()) {
+    if (/DAW/.test(input.name)) continue
+    midiInputs++
+    const port = ports.get(input.name) ?? { cc: new Map(), keys: [] }
+    ports.set(input.name, port)
+    input.onmidimessage = ({ data: [status, a, b] }) => {
+      const kind = status & 0xf0
+      if (kind === 0xb0) port.cc.set(a, { value: b / 127, time: performance.now() })
+      else if (kind === 0x90 && b > 0) port.keys.push({ note: a, velocity: b / 127, midichan: (status & 0x0f) + 1 })
     }
   }
-  listen()
-  access.onstatechange = listen
-}).catch(() => {})
+}
+const midiReady = (navigator.requestMIDIAccess?.() ?? Promise.reject())
+  .then(access => { midiAccess = access; listen(); access.onstatechange = listen })
+  .catch(() => {})
+// The one-file tracks find their Launch Controls by port name through WebMidi.inputs
+globalThis.WebMidi = {
+  get inputs() { return midiAccess ? [...midiAccess.inputs.values()] : [] },
+  get outputs() { return midiAccess ? [...midiAccess.outputs.values()] : [] },
+}
+// Inputs whose name contains `name`; without a name every input but the Launchkey (its knobs send the same CC
+// numbers as the Launch Controls' second knob row)
+const matching = name => [...ports].filter(([n]) => name ? n.includes(name) : !n.includes('Launchkey')).map(([, p]) => p)
+// midin(name): one input (an error if it is missing, so a track can fall back), per CC the input moved last wins
+globalThis.midin = async name => {
+  if (name && !matching(name).length) throw new Error('MIDI input not found: ' + name)
+  return cc => signal(() => {
+    let last = null
+    for (const port of matching(name)) {
+      const v = port.cc.get(cc)
+      if (v && (!last || v.time > last.time)) last = v
+    }
+    return last?.value ?? 0
+  })
+}
+// midikeys(name)(length): every key pressed since the last query as a note of `length` cycles from the start of
+// that query (no note-off, as in strudel.cc). Each query empties the queue, so a track reads it through one query.
+globalThis.midikeys = async name => {
+  if (!matching(name).length) throw new Error('MIDI input not found: ' + name)
+  return length => new Pattern(state => {
+    const keys = matching(name).flatMap(port => port.keys.splice(0))
+    if (!keys.length) return []
+    const begin = state.span.begin
+    const cycles = reify(length).query(state.setSpan(new TimeSpan(begin, begin.add(1 / 64))))[0]?.value ?? 0.5
+    const whole = new TimeSpan(begin, begin.add(cycles))
+    return keys.map(key => new Hap(whole, state.span.intersection(whole), key))
+  })
+}
 
 const ready = initStrudel({
   prebake: () => Promise.all([
@@ -83,7 +122,7 @@ ready.then(() => { label = 'bereit' })
 fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f, f))))
 
 $('play').onclick = async () => {
-  await ready
+  await Promise.all([ready, midiReady])
   label = 'lädt Track …'
   const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
   try {
