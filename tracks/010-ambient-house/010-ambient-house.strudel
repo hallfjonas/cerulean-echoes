@@ -814,7 +814,7 @@ const stemN5_ans = strip(bus(stack(
 })
 
 // ============================================================
-// JONAS 6 GLOCKENSPIEL — a real glockenspiel (General MIDI soundfont) on chord tones, high up, struck as by hand:
+// JONAS 6 GLOCKENSPIEL — a real glockenspiel (VCSL recordings) on chord tones, high up, struck as by hand:
 // loose velocities, a few notes per bar, each bar ringing out; long echoes
 // ============================================================
 // @ctl 2:6.k1 Brightness | dull ↔ bright.
@@ -830,7 +830,7 @@ const bellRise = heldRamp(bells.btn2, 2)                // 0 → 1 over 2 bars w
 const BELL_TONES = [0, 2, 4, 6, 7, 9, 11]
 const bellNote = steps => n(irand(7).segment(steps).fmap(i => BELL_TONES[i]))
 // Every bar keeps ringing after the next is struck (a metal bar, no damper)
-const glock = pat => pat.s("gm_glockenspiel").release(1.2)
+const glock = pat => pat.s('glockenspiel').release(1.2)
 // A player's sweep: up and down the chord tones in 32nds, two octaves (scale degrees above the root)
 const BELL_RUN = n("[0 2 4 6 7 9 11 13 14 13 11 9 7 6 4 2]*2")
 
@@ -847,7 +847,7 @@ const stemN6_bells = strip(bus(onRoot(stack(
     .pan(sine.fast(2).range(0.3, 0.7)).delay(0.4))
 )).scale(scaleIn(5)), 2, bells.space), {
   lpf: expRange(bells.bright, 3000, 16000),
-  level: bells.level.range(0, 1),
+  level: bells.level.range(0, 4),   // VCSL glockenspiel (quieter than GM): ×4 puts it −12 dB under the pad
 })
 
 // ============================================================
@@ -981,13 +981,14 @@ if (lcView) {
     return '<div class="cell ' + (key === 'level' ? 'fader' : 'knob') + '"' + title + '>' + mark + '<b>' + num + '</b><span>' +
       esc(name) + '</span></div>'
   }
-  // The 25 keys (the window moves to the octave played) and the 16 pads (2 rows of 8, notes 36-43 below, 44-51 above)
+  // The 25 keys (the window moves to the octave played) and the 16 pads in the Launchkey's
+  // default layout (C1 = 36 bottom left: 36-39 bottom left, 40-43 top left, 44-47 bottom right, 48-51 top right)
   lcView.keys ??= new Set(); lcView.pads ??= new Set(); lcView.base ??= 48
   const BLACK = [1, 3, 6, 8, 10]
   const lkPlay = () => '<div class=lkplay><div class=lkkeys>' + [...Array(25).keys()].map(i => {
     const m = lcView.base + i
     return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lcView.keys.has(m) ? ' on' : '') + '"></i>'
-  }).join('') + '</div><div class=lkpads>' + [44, 36].flatMap(b => [...Array(8).keys()].map(i =>
+  }).join('') + '</div><div class=lkpads>' + [40, 36].flatMap(b => [0, 1, 2, 3, 8, 9, 10, 11].map(i =>
     '<i class="' + (lcView.pads.has(b + i) ? 'on' : '') + '"></i>')).join('') + '</div></div>'
   const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkbody><div class=lkmain><div class=lkrow>' +
     LK_CTLS.slice(1).map(lkCell).join('') + '</div>' + lkPlay() + '</div>' + lkCell(LK_CTLS[0]) + '</div></div>'
@@ -1127,12 +1128,13 @@ const lkKeyNotes = lkNotes.filterValues(v => !isPadHit(v))
 // Detune: two extra voices a little sharp and flat (semitones)
 const lkDetune = lkKnob(5).range(0.04, 0.3)
 
-// Warm pad (General MIDI soundfont) with two detuned copies, on Jonas' orbit
+// Warm synth pad (as in 007): a soft triangle with two detuned saws, on Jonas' orbit
 const lkPad = stack(
-  lkKeyNotes.s('gm_pad_warm').gain(0.6),
-  lkKeyNotes.add(note(lkDetune)).s('gm_pad_warm').gain(0.25),
-  lkKeyNotes.add(note(lkDetune.mul(-1))).s('gm_pad_warm').gain(0.25),
+  lkKeyNotes.s('triangle').gain(0.45),
+  lkKeyNotes.add(note(lkDetune)).s('sawtooth').gain(0.12),
+  lkKeyNotes.add(note(lkDetune.mul(-1))).s('sawtooth').gain(0.12),
 )
+  .decay(0.6).sustain(0.8)
   .lpf(toned(expRange(lkKnob(1), 500, 8000)))
   .lpq(lkKnob(2).range(0, 12))
   .attack(lkKnob(3).range(0.1, 2)).release(2)

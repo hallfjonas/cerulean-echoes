@@ -692,8 +692,8 @@ const stemN1_pad = strip(bus(wobble(stack(
 // Deviations (track-wide, as for every stem): the figures' scale degrees follow the chapter (scaleIn: lydian → dorian
 // → whole tone) instead of the lab's fixed D lydian; Fog / Tension on the filters, global Room, Tension echo; the
 // Tension wobble on the bowed loops; orbit 2 (dotted-8th echo as in the lab, feedback 0.6 instead of 0.55).
-// Levels from the lab (bowed ×1, marimba ×1.6, toms ×2.5 at full fader); GM sounds cannot be rendered offline, so they
-// are not measured against the other stems yet.
+// Levels measured offline (tools/strudel-sim/render.mjs, brightness 0.5, fader 1): bowed −24…−18 LUFS over row 3,
+// marimba (VCSL soft xylophone) −25…−18, toms (VCSL low tom) −24…−22.
 // @ctl 2:2.k1 Brightness | dull ↔ bright.
 // @ctl 2:2.k2 Space | dry ↔ echo + room.
 // @ctl 2:2.k3 Complexity | 2 loops ↔ 6 loops drifting against each other.
@@ -730,7 +730,7 @@ const makeNewJonas = (h, scaleIn) => {
   const layer = (fig, oct = 1, pan = 0.5, g = 0.5, steps = 16) => {
     const t = toks(fig)
     return n(mini('{' + t.join(' ') + '}%' + steps)).scale(scaleIn(3 + oct))
-      .velocity(mini('{' + accOf(t).join(' ') + '}%' + steps)).s('gm_marimba').gain(g).pan(pan)
+      .velocity(mini('{' + accOf(t).join(' ') + '}%' + steps)).s('xylophone_soft_ff').gain(g).pan(pan)
   }
   // Layers on row 3 of column i: layer 1 always, the others one by one as the knob goes up
   const layers = (i, ls) => stack(...ls.map((l, v) => v === 0 ? l
@@ -785,7 +785,7 @@ const makeNewJonas = (h, scaleIn) => {
   const BUILDUP = BUILD_RAW.map(([n, ls]) => [n, ls.map(swell)])
   // 4 Bell pulse: an agogo bell on the quarters with line 1; line 2 fills the gaps of line 1 (interlocked), or runs a
   // step shorter and slides; line 3 (row 3) slides too
-  const bell = note(mini('{77 ~ ~ ~}%16')).s('gm_agogo').gain(0.25).pan(0.5)
+  const bell = note(mini('{36 ~ ~ ~}%16')).s('agogo').n(1).gain(0.25).pan(0.5)
   const L1 = '4 ~ 7 ~ 2 ~ 4 ~', L2 = '~ 9 ~ 6 ~ 7 ~ 4', L2s = '~ 9 ~ 6 ~ 7 ~', L3 = '0 ~ ~ 2 ~ ~ 4 ~ ~'
   const BELL = [
     ['verzahnt', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
@@ -811,7 +811,7 @@ const makeNewJonas = (h, scaleIn) => {
   const v1 = layer(clapFig([0, 4, 7, 4, 2, 4, 7, 9]), 1, 0.3, 0.5, 12)
   const v2 = layer(clapFig([7, 9, 11, 9, 7, 4, 7, 6]), 1, 0.7, 0.5, 12).early(moving(4, 12, 1 / 12))
   const v3 = layer(clapFig([0, -3, 2, 0, 4, 2]), 0, 0.5, 0.45, 12).late(moving(6, 12, 1 / 12))
-  const agogo12 = note(mini('{' + toks(BELL12).map(x => x === '~' ? x : 77).join(' ') + '}%12')).s('gm_agogo').gain(0.22).pan(0.5)
+  const agogo12 = note(mini('{' + toks(BELL12).map(x => x === '~' ? x : 36).join(' ') + '}%12')).s('agogo').n(1).gain(0.22).pan(0.5)
   const v4 = layer(bellFig([9, 11, 9, 7, 6, 4, 7]), 2, 0.55, 0.35, 12).early(moving(3, 12, 1 / 12))
   const CLAPPING = [
     ['Reich (2 voices)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
@@ -881,7 +881,7 @@ const makeNewJonas = (h, scaleIn) => {
   const denseLayer = (fig, oct, pan, g = 0.5, steps = 16) => [0, 1, 2, 3, 4].map(level => {
     const [f, v] = denseFig(fig, level)
     return n(mini('{' + f + '}%' + steps)).scale(scaleIn(3 + oct)).velocity(mini('{' + v + '}%' + steps))
-      .s('gm_marimba').gain(g).pan(pan)
+      .s('xylophone_soft_ff').gain(g).pan(pan)
   })
   const dense = (fig, oct = 1, pan = 0.4, g = 0.5, steps = 16) => {
     const lv = denseLayer(fig, oct, pan, g, steps)
@@ -916,8 +916,8 @@ const makeNewJonas = (h, scaleIn) => {
     range: [600, 6000], gain: 1, pats, ...extra })
   return [
     col('Eno bowed', 'Complexity', eno(0, bowedVib), { range: [800, 12000] }),
-    col('Marimba', 'Complexity', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
-    col('Toms', 'Complexity', TOMS, { tom: true, gain: 4 }),    // +12 dB (user: toms louder still; 2026-11-09: louder again, was 2.5)
+    col('Marimba', 'Complexity', MARIMBA, { gain: 1.3 }),            // VCSL soft xylophone: −18 LUFS like the bowed loops, peak < 1
+    col('Toms', 'Complexity', TOMS, { tom: true, gain: 14 }),   // VCSL low tom is quiet: ×14 puts it at −24 LUFS, with the marimba
   ]
 }
 
@@ -930,14 +930,14 @@ const LAB_K3 = { 29: bowed.char, 30: marimba.char, 31: toms.char }
 const knobVal = (pat, t) => pat.queryArc(t, t + 1e-4)[0]?.value ?? 0
 const NEW_JONAS = makeNewJonas({ knob: cc => LAB_K3[cc], at: (cc, t) => knobVal(LAB_K3[cc], t) }, scaleIn)
 
-// One column: the lab's options on button 1 (latched to the next bar), toms converted (GM melodic tom an octave lower,
-// accents softened), the lab's space (floor 0.25: a little room and echo at 0) on orbit 2, echo throw on button 2,
+// One column: the lab's options on button 1 (latched to the next bar), toms converted (VCSL low tom with mallet: unpitched
+// recordings play as recorded at C2, so the figures' main octave around D4 lands there; accents softened), the lab's space (floor 0.25: a little room and echo at 0) on orbit 2, echo throw on button 2,
 // brightness = low-pass over the lab's range (×bright per note, for build-up) and ±2 dB, level × the lab's gain
 const newJonas = (col, c, label, long = false) => {
   const latch = change(col.btn, 'jonas', label, c.pats.length, c.pats.map(([name]) => name))
   const built = c.pats.map(([, p]) => p)
   let pat = latch.pat.fmap(i => built[i]).innerJoin()
-  if (c.tom) pat = pat.fmap(v => v.s === 'gm_marimba' ? { ...v, s: 'gm_melodic_tom', note: (typeof v.note === 'string' ? noteToMidi(v.note) : v.note) - 12,
+  if (c.tom) pat = pat.fmap(v => v.s === 'xylophone_soft_ff' ? { ...v, s: 'tom2_mallet', note: (typeof v.note === 'string' ? noteToMidi(v.note) : v.note) - 26,
     velocity: 0.6 + 0.4 * ((v.velocity ?? 0.6) - 0.6) } : v)
   if (long) pat = wobble(pat)
   return strip(echoThrow(bus(pat, 2, labSpace(col.space)), col.btn2), {
@@ -984,7 +984,7 @@ const stemN5_choir = strip(bus(wobble(stack(
 })
 
 // ============================================================
-// JONAS 6 GLITTER — a real glockenspiel (General MIDI soundfont) struck at random on a 16th grid: metal bars that ring
+// JONAS 6 GLITTER — a real glockenspiel (VCSL recordings) struck at random on a 16th grid: metal bars that ring
 // out, random notes of the mood's scale (without the 4th and 7th degree, the sharpest ones), long echoes
 // ============================================================
 // @ctl 2:6.k1 Brightness | dull ↔ bright.
@@ -1001,7 +1001,7 @@ const GLIT_TONES = [0, 1, 2, 4, 5, 7, 8, 9, 11]   // scale degrees over 1.5 octa
 const glitTone  = k => irand(GLIT_TONES.length).segment(k).fmap(i => GLIT_TONES[i])
 const glitRise  = heldRamp(glit.btn2, 2)                 // 0 → 1 over 2 bars while held
 // Every bar keeps ringing after the next is struck (a metal bar, no damper)
-const glock = pat => pat.s("gm_glockenspiel").release(1.2)
+const glock = pat => pat.s('glockenspiel').release(1.2)
 // A player's sweep: up and down GLIT_TONES in 32nds
 const GLIT_RUN = n("[0 1 2 4 5 7 8 9 11 9 8 7 5 4 2 1]*2")
 
@@ -1018,7 +1018,7 @@ const stemN6_glitter = strip(bus(stack(
     .pan(sine.fast(2).range(0.3, 0.7)).delay(0.4))
 ).scale(glitScale), 2, glit.space), {
   lpf: expRange(glit.bright, 3000, 16000),
-  level: glit.level.range(0, 0.6),   // was 1; mix: glockenspiel −12 dB under the pad
+  level: glit.level.range(0, 2.4),   // VCSL glockenspiel (quieter than GM): ×4 keeps it −12 dB under the pad
 })
 
 // ============================================================
@@ -1154,13 +1154,14 @@ if (lcView) {
     return '<div class="cell ' + (key === 'level' ? 'fader' : 'knob') + '"' + title + '>' + mark + '<b>' + num + '</b><span>' +
       esc(name) + '</span></div>'
   }
-  // The 25 keys (the window moves to the octave played) and the 16 pads (2 rows of 8, notes 36-43 below, 44-51 above)
+  // The 25 keys (the window moves to the octave played) and the 16 pads in the Launchkey's
+  // default layout (C1 = 36 bottom left: 36-39 bottom left, 40-43 top left, 44-47 bottom right, 48-51 top right)
   lcView.keys ??= new Set(); lcView.pads ??= new Set(); lcView.base ??= 48
   const BLACK = [1, 3, 6, 8, 10]
   const lkPlay = () => '<div class=lkplay><div class=lkkeys>' + [...Array(25).keys()].map(i => {
     const m = lcView.base + i
     return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lcView.keys.has(m) ? ' on' : '') + '"></i>'
-  }).join('') + '</div><div class=lkpads>' + [44, 36].flatMap(b => [...Array(8).keys()].map(i =>
+  }).join('') + '</div><div class=lkpads>' + [40, 36].flatMap(b => [0, 1, 2, 3, 8, 9, 10, 11].map(i =>
     '<i class="' + (lcView.pads.has(b + i) ? 'on' : '') + '"></i>')).join('') + '</div></div>'
   const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkbody><div class=lkmain><div class=lkrow>' +
     LK_CTLS.slice(1).map(lkCell).join('') + '</div>' + lkPlay() + '</div>' + lkCell(LK_CTLS[0]) + '</div></div>'

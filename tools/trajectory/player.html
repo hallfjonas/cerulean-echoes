@@ -27,7 +27,7 @@
      "Hart ↔ Weich" sets the character of the visuals (render.mjs setCharacter).
      "Roh ↔ Glatt" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
-     Axes, labels and beat rings can be switched off. The track's status box (bottom right) hides while its LC view
+     Axes, labels, beat rings and the LC view's frame around the page moved last can be switched off. The track's status box (bottom right) hides while its LC view
      is open in another window. -->
 <canvas id="view"></canvas>
 <header>
@@ -41,6 +41,7 @@
   <label title="Taste A"><input id="axes" type="checkbox"> Achsen</label>
   <label title="Taste L"><input id="labels" type="checkbox"> Beschriftung</label>
   <label title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
+  <label title="Taste H: Rahmen um die zuletzt benutzte Controller-Seite in der LC-Ansicht"><input id="lcFrame" type="checkbox" checked> LC-Rahmen</label>
   <span id="status">lädt Strudel …</span>
 </header>
 <script type="module">
@@ -119,12 +120,14 @@ const ready = initStrudel({
   ]),
 })
 ready.then(() => { label = 'bereit' })
-fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f, f))))
+fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f.replace(/-tapped\.strudel$/, ''), f))))
 
 $('play').onclick = async () => {
   await Promise.all([ready, midiReady])
   label = 'lädt Track …'
   const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
+  // The track's LC view reads the control names from strudel.cc's editor text; here the track itself stands in
+  globalThis.strudelMirror = { code }
   try {
     await evaluate(code)
     label = 'spielt: ' + $('track').value.replace(/-tapped\.strudel$/, '')
@@ -155,8 +158,18 @@ const hideStatusBoxWhileLcViewOpen = () => {
   if (box && box !== document.body) box.hidden = !!view.win && !view.win.closed
 }
 
+const NO_FRAME_CSS = '.page.live{border-color:#222 !important}'
+const applyLcFrame = () => {
+  const view = globalThis.lcxlView, doc = view?.win && !view.win.closed ? view.win.document : null
+  if (!doc) return
+  const style = doc.getElementById('noFrame')
+  if ($('lcFrame').checked) style?.remove()
+  else if (!style) doc.head.append(Object.assign(doc.createElement('style'), { id: 'noFrame', textContent: NO_FRAME_CSS }))
+}
+
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
+  applyLcFrame()
   $('status').textContent = `${label} · MIDI: ${midiInputs} Eingänge${visuals ? ' · ' + visuals : ''}`
   requestAnimationFrame(showStatus)
 }
@@ -170,6 +183,7 @@ addEventListener('keydown', event => {
   if (event.key === 'a') $('axes').click()
   if (event.key === 'l') $('labels').click()
   if (event.key === 'b') $('rings').click()
+  if (event.key === 'h') $('lcFrame').click()
   if (event.key === 'w') renderer.toggleWiden()
 })
 let idleTimer
