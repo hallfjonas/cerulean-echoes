@@ -13,7 +13,8 @@ const out = console.log
 console.log = () => {}
 
 const sr = 48000, SEC = Number(process.env.SEC ?? 4)
-const OWN = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/'
+// OWN=<url> measures this repository's samples from elsewhere (e.g. a local server before they are pushed)
+const OWN = process.env.OWN ?? 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/'
 const kweight = x => {
   const stages = [[[1.53512485958697, -2.69169618940638, 1.19839281085285], [1, -1.69065929318241, 0.73248077421585]],
                   [[1, -2, 1], [1, -1.99004745483398, 0.99007225036621]]]
@@ -44,9 +45,9 @@ await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main
 await sd.samples('github:tidalcycles/dirt-samples')
 await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/vcsl.json')
 await sd.samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a',
-  paper: 'voice/A%20piece%20of%20paper.mp3', wine: 'voice/Plaenterwald%20Wine%20and%20cheese.mp3',
+  paper: 'voice/Piece%20of%20Paper.mp3', wine: 'voice/Plaenterwald%20Wine%20and%20cheese.mp3',
   evening: 'voice/The%20Evening%20progresses.mp3', creatures: 'voice/The%20creatures%20have%20begun%20illumination.mp3',
-  noend: 'voice/The%20evening%20does%20not%20end.mp3', places: 'voice/There%20are%20places%20on%20earth.mp3' }, OWN)
+  noend: 'voice/The%20evening%20does%20not%20end.mp3', vast: 'voice/in%20the%20vast.mp3' }, OWN)
 for (const [k, j] of jobs.entries()) if (!/^gm_/.test(j.shot.s))
   await sd.superdough({ ...j.shot, room: 0, delay: 0, orbit: 1 }, k * SEC + 0.05, Number(process.env.DUR ?? 0.5), 1, 0).catch(e => { j.err = e.message })
 const buf = await ctx.startRendering()

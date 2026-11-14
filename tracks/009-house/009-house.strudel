@@ -1961,9 +1961,9 @@ const OWN_SAMPLES = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoe
 if (typeof samples === 'function') await samples(OWN_SAMPLES + 'mirror/mirror.json')
 // The spoken voice samples (own recordings); their pads have their own colour in the LC view
 const VOICE_SAMPLES = { brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a',
-  paper: 'voice/A%20piece%20of%20paper.mp3', wine: 'voice/Plaenterwald%20Wine%20and%20cheese.mp3',
+  paper: 'voice/Piece%20of%20Paper.mp3', wine: 'voice/Plaenterwald%20Wine%20and%20cheese.mp3',
   evening: 'voice/The%20Evening%20progresses.mp3', creatures: 'voice/The%20creatures%20have%20begun%20illumination.mp3',
-  noend: 'voice/The%20evening%20does%20not%20end.mp3', places: 'voice/There%20are%20places%20on%20earth.mp3' }
+  noend: 'voice/The%20evening%20does%20not%20end.mp3', vast: 'voice/in%20the%20vast.mp3' }
 if (typeof samples === 'function') await samples(VOICE_SAMPLES, OWN_SAMPLES)
 
 // Left half (pads 1-4 bottom, 5-8 top) = the spoken voice samples, right half = the other one-shots;
@@ -1972,13 +1972,13 @@ if (typeof samples === 'function') await samples(VOICE_SAMPLES, OWN_SAMPLES)
 // gain: each hit levelled to about −15 LUFS-M, dry (tools/strudel-sim/pad-levels.mjs); gm_* and synth shots unmeasured
 const LK_SHOTS = [
   { name: 'Brace', s: 'brace' },
-  { name: 'Paper', s: 'paper', gain: 1.14 },
+  { name: 'Paper', s: 'paper', gain: 0.99 },
   { name: 'Wine', s: 'wine', gain: 0.98, once: 5.33 },
   { name: 'Evening', s: 'evening', gain: 1.04, once: 9.25 },
   { name: 'Wiese', s: 'lw', gain: 0.56 },
   { name: 'Creatures', s: 'creatures', once: 4.52 },
   { name: 'No end', s: 'noend', gain: 0.76, once: 10.19 },
-  { name: 'Places', s: 'places', gain: 0.94, once: 15.07 },
+  { name: 'Vast', s: 'vast', once: 14.6 },
   { name: 'Clap', s: 'rolandtr909_cp', gain: 1.2 },
   { name: 'Open hat', s: 'rolandtr909_oh', speed: 0.95, gain: 1.14 },
   { name: 'Rim echo', s: 'rolandtr909_rim', delay: 0.3, gain: 1.19 },
