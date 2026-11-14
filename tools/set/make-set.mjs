@@ -21,9 +21,9 @@ const OUT = path.join(ROOT, 'tracks/011-combining-all/011-set-dual.strudel')
 // grid = BPM of the clock on its plateau; slow = how many clock bars make one bar of the track; phrase = chapter
 // latch length in the set (orig = in the track); orbit0 = added to the track's orbits; transpose in semitones
 const TRACKS = [
-  { id: '007', name: 'Ambient',       file: 'tracks/007-ambient-soundscape/007-ambient-dual.strudel',       grid: 140, slow: 2, phrase: 4, orig: 1, orbit0: 0, transpose: 0 },
-  { id: '010', name: 'Ambient House', file: 'tracks/010-ambient-house/010-ambient-house-dual.strudel', grid: 120, slow: 1, phrase: 8, orig: 4, orbit0: 3, transpose: 0 },
-  { id: '009', name: 'Cool House',    file: 'tracks/009-house/009-house-dual.strudel',    grid: 122, slow: 1, phrase: 8, orig: 4, orbit0: 0, transpose: 0 },
+  { id: '007', name: 'Ambient',       file: 'tracks/007-ambient-soundscape/old/007-ambient-dual.strudel',       grid: 140, slow: 2, phrase: 4, orig: 1, orbit0: 0, transpose: 0 },
+  { id: '010', name: 'Ambient House', file: 'tracks/010-ambient-house/old/010-ambient-house-dual.strudel', grid: 120, slow: 1, phrase: 8, orig: 4, orbit0: 3, transpose: 0 },
+  { id: '009', name: 'Cool House',    file: 'tracks/009-house/old/009-house-dual.strudel',    grid: 122, slow: 1, phrase: 8, orig: 4, orbit0: 0, transpose: 0 },
   { id: '008', name: 'Groove Techno', file: 'tracks/008-groove-techno/old/008-groove-techno-multi.strudel', grid: 140, slow: 1, phrase: 4, orig: 1, orbit0: 3, transpose: 4,
     text: [[/'F ' \+ MOODS/g, "'A ' + MOODS"], [/'Kapitel {5}F '/g, "'Kapitel     A '"]] },
 ]

@@ -19,7 +19,7 @@ digitally, without a cable or extra software.
 | 3/4 | Loopback = Strudel, stereo, clean |
 
 1. Focusrite Control 2: enable Loopback.
-2. GarageBand: Open or copy tempate /Users/jonas.hall/Documents/GitHub/cerulean-echoes/recordings/2026-11-14-beats-und-basteln/001.band
+2. GarageBand: open the template `recordings/2026-11-14-beats-und-basteln/001.band` (copy it for a new session).
 3. Track A: input 1 (mono, mic). Track B: input 3+4 (stereo, Strudel). Arm both, record.
 4. Close other apps or mute system sounds: Loopback records everything the Mac plays.
 

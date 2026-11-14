@@ -2,4 +2,7 @@
 .*
 ableton
 node_modules/
+!.claude/
+.claude/*
+!.claude/skills/
 tools/trajectory/tapped/

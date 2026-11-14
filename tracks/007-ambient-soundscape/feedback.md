@@ -22,3 +22,8 @@
 - Choir stays (good shimmer, sits higher; the drone is much lower).
 - 2026-11-08: Jonas 2–4 = Eno-Bogen, Marimba, Toms (Takada) aus lab/harmonie/midori-5.strudel übernommen; Version davor
   old/007-ambient-dual-before-midori.strudel. Abweichung: Tonleiter folgt dem Kapitel. Pegel der GM-Klänge noch nicht gemessen.
+
+## Feedback 3 (user, 2026-11-09)
+- Toms (Jonas 4) louder: gain 2.5 → 4 (+4 dB) in 007-ambient-dual.strudel; single and set 011 rebuilt.
+- Ticks (Jojo 6) never used → replace. Candidates in lab/drums/ambient-perkussion-1.strudel (real recordings): kalimba,
+  shaker, slit drum · birds, pebbles, fire · gong, tubular bells. Waiting for the pick.

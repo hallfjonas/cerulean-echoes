@@ -1,6 +1,8 @@
 // ============================================================
-// GENERATED from 007-ambient-dual.strudel by tools/lcxl-layout/make-single.mjs — edit the dual file, not this one.
-// TRACK 007 — dreamy ambient / soundscape on D, ~70 BPM, three switchable moods, in the two-controller layout
+// TRACK 007 — dreamy ambient / soundscape on D, ~70 BPM, three switchable moods
+// One file for any number of controllers, all optional: every Launch Control XL 3 that is connected gets the full
+// layout (Mode 1 + Mode 2), a Launchkey MK4 25 adds keys (soft glass pad) and drum pads (ambient one-shots).
+// Before: old/007-ambient-dual.strudel + its generated -single version.
 // Sound from old/007-ambient-moods-dual.strudel, controls rearranged after midi-layouts/templates/dual-lc.strudel.
 // Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, clock ticks, wood/drops, crackle.
 // Jonas (colour): pad, Eno bowed, marimba, toms (Takada style, from lab/harmonie/midori-5), choir, glitter, shimmer + the global column 8.
@@ -10,20 +12,19 @@
 // Feedback 2: chords, music box and whale out (Jonas 2–4 free). Previous: old/007-ambient-dual-before-feedback2.strudel.
 // Jonas 2–4 = Eno bowed, marimba, toms from lab/harmonie/midori-5.strudel. Previous: old/007-ambient-dual-before-midori.strudel.
 // ============================================================
-// Two Launch Control XL 3, both in Custom Mode 16 (same CCs), told apart by their MIDI input.
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
 // button row 1 = change (next pattern, at the next bar), button row 2 = a moment (while held).
 // Change: each press steps to the next of 3 variations, at the next bar. Jonas' variations differ audibly (progression,
 // rhythm, tune, register, speed); where they are random, the randomness is also read from a different point in time.
 // Re-evaluating starts again at 0.
-// One controller only (Jojo's missing, or the -single version): Mode 1 = Jojo (same CCs as Mode 16), Mode 2 = Jonas
-// (CC + 48). Jojo's column 8 (crackle) stays off; column 8 is the global column on both pages.
-// @layout Track 007 — ambient moods (one controller)
+// Every Launch Control XL 3: Mode 1 = Jojo (same CCs as Mode 16), Mode 2 = Jonas (CC + 48). Jojo's column 8 (crackle)
+// stays off; column 8 is the global column on both pages. With two of them, the control moved last wins.
+// @layout Track 007 — ambient moods
 // @globalcc same
 // @note Dreamy ambient on D, about 70 BPM. Jojo plays the foundation (heartbeat, drone, bass and soft clicks), Jonas the colour (pad, bowed loops, marimba and toms, choir, sparkles) and the global column 8.
 // @note Every row means the same everywhere: row 1 = brightness, row 2 = space, row 3 = character, fader = level, button 1 = next pattern (at the next bar, 3 per stem), button 2 = a moment while held.
 // @note Start with all faders down. Nothing sounds until Jonas' master fader (column 8) is up.
-// @note One controller: Mode 1 = Jojo (foundation, columns 1–7; Jojo's column 8 (Crackle) stays off; Mode 1 sends the same CCs as Mode 16), Mode 2 = Jonas (colour). Column 8 is global on both pages.
+// @note Every Launch Control XL 3 gets this full layout: Mode 1 = Jojo (foundation, columns 1–7; Jojo's column 8 (Crackle) stays off; Mode 1 sends the same CCs as Mode 16), Mode 2 = Jonas (colour). Column 8 is global on both pages. Two controllers: the control moved last wins.
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
 // @col 16:8 8 Global
 // @col 16:1 1 Pulse
@@ -61,17 +62,28 @@
 // @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
 // @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
 // @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
-const JOJO  = 'LCXL3 Jojo MIDI Out'
-const JONAS = 'LCXL3 Jonas MIDI Out'
-// Jonas' controller by its macOS name; if that name is missing (other computer, other USB port), the first MIDI input
-let ccJonas
-try { ccJonas = await midin(JONAS) } catch (e) { console.warn('Jonas not found: using the first MIDI input'); ccJonas = await midin() }
-// Single version (written by tools/lcxl-layout/make-single.mjs with SINGLE = true): don't look for Jojo's controller
-const SINGLE = true
-let ccJojo = null
-if (!SINGLE) {
-  try { ccJojo = await midin(JOJO) } catch (e) { console.warn('Jojo not found: one controller, Mode 1 = Jojo, Mode 2 = Jonas (CC + 48)') }
-}
+// @guide Playing together | Both Launch Controls have the full layout and steer the same sounds: whoever moves a control last sets its value, a button press counts from either. Agree who plays which page.
+// Every Launch Control XL 3 that is connected (by the port name, whatever it is renamed to; not its DAW port).
+// Without Web MIDI (the Node tools) one plain midin() stands in.
+const LC_PORT = 'LCXL3'
+if (globalThis.enableWebMidi) await enableWebMidi()
+const lcPorts = globalThis.WebMidi
+  ? WebMidi.inputs.map(i => i.name).filter(n => n.includes(LC_PORT) && !n.includes('DAW'))
+  : null
+const lcInputs = []
+if (lcPorts) for (const name of lcPorts) lcInputs.push(await midin(name))
+else lcInputs.push(await midin())
+if (!lcInputs.length) console.warn('No Launch Control XL 3 found')
+
+// Launchkey MK4 25: keys + drum pads via midikeys, knobs and mod wheel via midin; silent if missing
+const LK_NAME   = 'Launchkey MK4 25'
+const LK_KNOB_1 = 21
+let lkCc = null
+let lkKeys = null
+try {
+  lkCc   = await midin(LK_NAME)
+  lkKeys = await midikeys(LK_NAME)
+} catch (e) { console.warn('Launchkey not found: ' + e.message) }
 
 const ramp = (sig, from, to) => sig.fmap(v => Math.min(1, Math.max(0, (v - from) / (to - from))))
 // Row-3 crossfade: 0..0.5 brings the extra layer in, 0.5..1 fades the main layer out
@@ -87,12 +99,15 @@ setcpm(bpm / 4)
 // Mapping of column n (1-8): brightness, space, character (knob rows 1-3), fader, button rows 1-2
 const colMap = (read, n) => ({ bright: read(12 + n), space: read(20 + n), char: read(28 + n), level: read(4 + n), btn: read(36 + n), btn2: read(44 + n) })
 const off = () => signal(() => 0)
-// Column 8 (global) is read from both its Mode 16 and Mode 2 CCs, last moved wins: it works on both pages even on a
-// controller whose column 8 sends CC + 48 in Mode 2
-// One controller: Jojo on the plain CCs (Mode 1), Jonas on CC + 48 (Mode 2)
-const alone    = !ccJojo
-const colJonas = n => colMap(n === 8 ? c => lastMoved(ccJonas(c), ccJonas(c + 48)) : alone ? c => ccJonas(c + 48) : ccJonas, n)
-const colJojo  = n => !alone ? colMap(ccJojo, n) : n === 8 ? colMap(off, n) : colMap(ccJonas, n)
+// One CC across all Launch Controls: the one moved last wins. Made once per CC (lastMoved is stateful).
+const lcMemo = {}
+const lcCc = c => lcMemo[c] ??= !lcInputs.length ? off()
+  : lcInputs.slice(1).reduce((v, cc) => lastMoved(v, cc(c)), lcInputs[0](c))
+// Column 8 (global) is read from both its Mode 1 and Mode 2 CCs, last moved wins: it works on both pages even on a
+// controller whose column 8 sends CC + 48 in Mode 2. Jojo on the plain CCs (Mode 1), Jonas on CC + 48 (Mode 2).
+const alone    = true
+const colJonas = n => colMap(n === 8 ? c => lastMoved(lcCc(c), lcCc(c + 48)) : c => lcCc(c + 48), n)
+const colJojo  = n => n === 8 ? colMap(off, n) : colMap(lcCc, n)
 
 const gate  = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
 const above = (sig, x) => sig.fmap(v => v > x)
@@ -205,11 +220,12 @@ const statusUi = !hasPage ? null : globalThis.ambientStatus ??= (() => {
   return { text, box }
 })()
 
-// LC view: a big, normal window (second screen, full screen) that draws the controller page in use: each control's
-// name from the @ctl tags in the editor, its value, and what the buttons have chosen. One controller: the page follows
-// the CCs that move (columns 1-7: plain = Mode 1 Jojo, CC + 48 = Mode 2 Jonas; column 8 is on both). Two controllers:
-// the page of the controller moved last. Values come from Web MIDI directly; a control not moved since loading shows –
-// (Strudel reads it as 0). Kept on globalThis like the status box; side, pageOf and draw are set anew on every evaluation.
+// LC view: a big, normal window (second screen, full screen) that draws both controller pages side by side, Jojo
+// (Mode 1) left, Jonas (Mode 2) right: each control's name from the @ctl tags in the editor, its value, and what the buttons
+// have chosen. The page in use gets a frame in its colour: two controllers = the one moved last; one controller = the
+// page whose CCs move (columns 1-7: plain = Mode 1 Jojo, CC + 48 = Mode 2 Jonas; column 8 is on both). Values come
+// from Web MIDI directly; a control not moved since loading shows – (Strudel reads it as 0). Kept on globalThis like
+// the status box; side, pageOf and draw are set anew on every evaluation.
 const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   const v = { win: null, cc: { jojo: {}, jonas: {} }, page: 'jojo', timer: null,
     side: () => 'jonas', pageOf: side => side, draw: () => {}, css: '' }
@@ -219,15 +235,17 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   }
   // Everything that is not a CC (a mode switch may send SysEx or a program change) is shown in the view as hex
   const onMsg = (name, e) => {
+    if (!v.side(name)) return
     const [status, cc, val] = e.data
     if ((status & 0xf0) !== 0xb0) {
-      if (status === 0xf8 || status === 0xfe) return   // clock, active sensing
+      if (status === 0xf8 || status === 0xfe || v.side(name) === 'lk') return   // clock, active sensing, keys and pads
       v.other = [...e.data].map(b => b.toString(16).padStart(2, '0')).join(' ').toUpperCase()
       v.update()
       return
     }
     const side = v.side(name)
-    v.cc[side][cc] = val / 127
+    const values = v.cc[side] ??= {}
+    values[cc] = val / 127
     v.page = v.pageOf(side, cc)
     v.update()
   }
@@ -872,7 +890,7 @@ const makeNewJonas = (h, scaleIn) => {
   return [
     col('Eno-Bogen', 'Komplexität', eno(0, bowedVib), { range: [800, 12000] }),
     col('Marimba', 'Komplexität', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
-    col('Toms', 'Komplexität', TOMS, { tom: true, gain: 2.5 }),  // +8 dB (user: toms louder still)
+    col('Toms', 'Komplexität', TOMS, { tom: true, gain: 4 }),    // +12 dB (user: toms louder still; 2026-11-09: louder again, was 2.5)
   ]
 }
 
@@ -1039,6 +1057,7 @@ if (lcView) {
   const code = globalThis.strudelMirror?.code ?? ''
   const TAGS = {}
   for (const m of code.matchAll(/^\/\/ @(?:mode|col|ctl) (\S+) (.*)$/gm)) TAGS[m[1]] = m[2]
+  for (const m of code.matchAll(/^\/\/ @lk (\S+) (.*)$/gm)) TAGS['lk.' + m[1]] = m[2]
   // Tag prefix of a page: dual file B16 (Jojo) / 16 (Jonas), single file 16 (Mode 1) / 2 (Mode 2)
   const isSingleFile = /^\/\/ @ctl 2:/m.test(code)
   const prefix = page => page === 'jojo' ? (isSingleFile ? '16' : 'B16') : (isSingleFile ? '2' : '16')
@@ -1053,9 +1072,11 @@ if (lcView) {
     return /^Mode \d/.test(m[1]) ? m[1] + ' — ' + what : what
   }
 
-  lcView.side = name => !alone && /jojo/i.test(name ?? '') ? 'jojo' : 'jonas'
-  // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page
-  lcView.pageOf = (side, cc) => !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
+  lcView.side = name => name?.includes(LC_PORT) ? 'jonas'
+    : name?.includes(LK_NAME) && !name.includes('DAW') ? 'lk' : null
+  // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page; the Launchkey keeps it too
+  lcView.pageOf = (side, cc) => side === 'lk' ? lcView.page
+    : !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
   const valueOf = (page, n, row) => {
     const base = CC_ROW[row] + n
     const t = lcView.cc[alone ? 'jonas' : page]
@@ -1063,12 +1084,16 @@ if (lcView) {
   }
   const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
   const choice = (page, n) => {
-    if (isGlobal(page, n)) return pending(...lcChapter())
+    if (isGlobal(page, n)) return lcChapter()
     const r = STATUS[page][n - 1]
-    if (!r) return ''
+    if (!r) return ['', '']
     const show = i => !r.names ? (i + 1) + ' / ' + r.n : typeof r.names === 'function' ? r.names(i) : r.names[i]
-    return pending(show(r.latch.now), show(r.latch.pending))
+    return [show(r.latch.now), show(r.latch.pending)]
   }
+  // Button 1 in two lines like button 2: its name and the choice; while a change waits for the bar line, the current
+  // choice small on top and the next one below (so the button keeps its size)
+  const b1Lines = (name, now, next) => next !== now ? '<span>' + esc(now) + '</span><b class=next>→ ' + esc(next) + '</b>'
+    : '<span>' + esc(name) + '</span><b>' + esc(now) + '</b>'
   const cell = (page, n, row) => {
     const val = valueOf(page, n, row)
     const [name, desc] = (TAGS[isGlobal(page, n) ? 'g.' + row : prefix(page) + ':' + n + '.' + row] ?? '').split(' | ')
@@ -1077,7 +1102,7 @@ if (lcView) {
     const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
     if (row === 'fader') return '<div class="cell fader"' + title + '><div class=bar ' + v + '><i></i></div>' +
       '<b>' + num + '</b><span>' + esc(name) + '</span></div>'
-    if (row === 'b1') return '<div class="cell btn"' + title + '><span>' + esc(name) + '</span><b>' + choice(page, n) + '</b></div>'
+    if (row === 'b1') return '<div class="cell btn"' + title + '>' + b1Lines(name, ...choice(page, n)) + '</div>'
     if (row === 'b2') {
       const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
       const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
@@ -1086,50 +1111,74 @@ if (lcView) {
     }
     return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
   }
+  // Launchkey row: mod wheel (keys level) and knobs 1-8, names from the @lk tags; shown while a Launchkey is connected
+  lcView.cc.lk ??= {}
+  const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, LK_KNOB_1 + n - 1])]
+  const lkCell = ([key, cc]) => {
+    const val = lcView.cc.lk[cc]
+    const [name, desc] = (TAGS['lk.' + key] ?? key).split(' | ')
+    const num = val === undefined ? '–' : Math.round(val * 100)
+    const v = 'style="--v:' + (val ?? 0) + '"'
+    const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
+    const mark = key === 'level' ? '<div class=bar ' + v + '><i></i></div>' : '<div class=dial ' + v + '></div>'
+    return '<div class="cell ' + (key === 'level' ? 'fader' : 'knob') + '"' + title + '>' + mark + '<b>' + num + '</b><span>' +
+      esc(name) + '</span></div>'
+  }
+  const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkrow>' +
+    LK_CTLS.map(lkCell).join('') + '</div></div>'
   // Bar in the cycle (bars) and beat in the bar (dots, the one ringed), then the bar's chord
   const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
   const beatHtml = () => beatNow.bar === null ? '–' : (beatNow.bar % CYCLE + 1) + ' / ' + CYCLE +
     '<span class=bars>' + marks(CYCLE, beatNow.bar % CYCLE) + '</span><span class=beats>' + marks(4, beatNow.beat) + '</span>' +
     (chordAt(beatNow.bar) ? '<span class=chord>' + esc(chordAt(beatNow.bar)) + '</span>' : '')
   lcView.css = [
-    'html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(12px,1.25vw,24px)/1.3 system-ui,sans-serif}',
+    ':root{--acc:#ddd}html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(10px,.8vw,18px)/1.25 system-ui,sans-serif}',
+    '.pages{flex:1;display:flex;gap:1vw;min-height:0}',
+    '.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:.4vh;min-height:0;padding:.6vh .8vw;border:2px solid #222;border-radius:8px}',
+    '.page.live{border-color:var(--acc)}.page h2{margin:0;font-size:1.15em;color:var(--acc)}',
     '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
     '.head{display:flex;gap:2.5vw;align-items:baseline;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:var(--acc)}',
     '.head .k{opacity:.6;margin-right:.4em}.next{color:var(--acc)}',
-    '.grid{flex:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:auto repeat(3,minmax(0,1fr)) minmax(0,1.4fr) auto auto;gap:.8vh .8vw}',
-    '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333}.col.g{color:var(--acc)}',
+    '.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:2.9em repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 3.3em 3.3em;gap:.8vh .5vw}',
+    '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}.col.g{color:var(--acc)}',
     '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
     '.cell span{opacity:.7;font-size:.85em;overflow-wrap:anywhere}.cell b{font-variant-numeric:tabular-nums}',
-    '.dial{width:min(5vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+    '.dial{width:min(3vw,6.5vh);aspect-ratio:1;border-radius:50%;',
     'background:conic-gradient(from -135deg,var(--acc) 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
     '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
-    '.bar{position:relative;width:1.4vw;min-width:14px;flex:1;min-height:40px;background:#333;border-radius:4px;overflow:hidden}',
+    '.bar{position:relative;width:1vw;min-width:12px;flex:1;min-height:30px;background:#333;border-radius:4px;overflow:hidden}',
     '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:var(--acc)}',
-    '.btn{background:#222;border-radius:6px;padding:.5em .3em;justify-content:flex-start}.btn.on{background:var(--acc);color:#111}',
+    '.btn{background:#222;border-radius:6px;padding:.4em .3em;justify-content:flex-start;overflow:hidden;box-sizing:border-box}',
+    '.btn b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.btn .next{display:block;overflow:hidden;text-overflow:ellipsis}.btn.on{background:var(--acc);color:#111}',
     '.btn.on span{opacity:.8}.btn b{font-size:1.05em}',
     '.beats{margin-left:.6em}.beats i{display:inline-block;width:.75em;height:.75em;border-radius:50%;background:#333;margin-left:.3em}',
     '.beats i:first-child{outline:2px solid #555}.beats i.on{background:var(--acc)}',
     '.bars{margin-left:.6em}.bars i{display:inline-block;width:1.1em;height:.55em;border-radius:2px;background:#333;margin-left:.15em}',
     '.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}',
+    '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(9,1fr);gap:.8vw;height:14vh}',
   ].join('\n')
+  // One page as a block: its title, the column names and the six rows. The page moved last gets a frame in its colour.
+  // The pages stand side by side like the two controllers on the table; swap the order here if Jonas stands left.
+  const PAGE_ORDER = ['jojo', 'jonas']
+  const cols = [1, 2, 3, 4, 5, 6, 7, 8]
+  const pageHtml = page => '<section class="page' + (page === lcView.page ? ' live' : '') + '" style="--acc:' +
+    (page === 'jojo' ? '#f0a040' : '#50c8e8') + '"><h2>' +
+    esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h2><div class=grid>' +
+    cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
+      esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
+    ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div></section>'
   lcView.draw = () => {
     const doc = lcView.win.document
     const root = doc.getElementById('lc')
     if (!root) return
-    const page = lcView.page
-    doc.documentElement.style.setProperty('--acc', page === 'jojo' ? '#f0a040' : '#50c8e8')
-    const cols = [1, 2, 3, 4, 5, 6, 7, 8]
-    root.innerHTML = '<div class=head><h1>' + esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h1>' +
+    root.innerHTML = '<div class=head>' +
       '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
       lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
       '<div><span class=k>Takt</span>' + beatHtml() + '</div>' +
       '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
       (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
-      (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div>' +
-      '<div class=grid>' +
-      cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
-        esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
-      ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div>'
+      (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' +
+      PAGE_ORDER.map(pageHtml).join('') + '</div>' + lkHtml()
   }
   // Another track's status box may be the one on the page now: the link moves into it
   if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)
@@ -1137,6 +1186,97 @@ if (lcView) {
 }
 showStatus()
 
+
+// ============================================================
+// LAUNCHKEY MK4 25 — keys play a soft glass pad, the 16 drum pads play ambient one-shots (bells, voices, wind)
+// ============================================================
+// Mod wheel (CC 1) = keys level (× master). Knob 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune,
+// 6 reverb, 7 echo, 8 one-shot darkness (0 = open). Drum pads (Drum mode, channel 10, notes 36-51) ignore the keys'
+// knobs 1-7. Same knobs in every track; only the sounds differ.
+// Names for the LC view (its Launchkey row); not read by the layout sheet tools.
+// @lk level Keys Level | mod wheel: volume of the keys pad (× master). 0 = keys silent, pads still play.
+// @lk k1 Cutoff | dark ↔ open (lpf 400–6000 Hz, × fog/tension).
+// @lk k2 Resonance | flat ↔ whistling filter peak.
+// @lk k3 Attack | slow fade-in (0.4 s) ↔ very slow swell (4 s).
+// @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
+// @lk k5 Detune | one clean voice ↔ wide and wobbly (two detuned voices around it).
+// @lk k6 Reverb | big room ↔ far away (it is ambient: never dry).
+// @lk k7 Echo | dry ↔ long echo.
+// @lk k8 Shot Dark | drum pads: open ↔ dark (lpf 18 kHz → 800 Hz).
+const LK_PAD_CHAN = 10
+const LK_PAD_NOTE_1 = 36
+const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
+const lkKeysLevel = lkCc ? lkCc(1) : off()
+const isPadHit = v => v.midichan === LK_PAD_CHAN
+
+// The scheduler empties midikeys' note queue on its first query: every layer reads one shared query of it
+const shareQuery = pat => {
+  let span = null, haps = []
+  return new Pattern(state => {
+    const key = state.span.begin + ':' + state.span.end
+    if (key !== span) { span = key; haps = pat.query(state) }
+    return haps
+  })
+}
+
+const OWN_SAMPLES = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/'
+if (typeof samples === 'function') await samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a' }, OWN_SAMPLES)
+
+// Pads 1 and 5 = the spoken voice samples, as in 008; pitched shots carry their note as a MIDI number
+const LK_SHOTS = [
+  { s: 'brace' },
+  { s: 'gm_glockenspiel', note: 86, room: 0.7 },
+  { s: 'gm_marimba', note: 50, room: 0.5 },
+  { s: 'vibraphone_bowed', note: 62, room: 0.7 },
+  { s: 'lw' },
+  { s: 'gm_choir_aahs', note: 62, attack: 0.3, release: 2, room: 0.8 },
+  { s: 'gm_voice_oohs', note: 69, attack: 0.2, release: 2, room: 0.8 },
+  { s: 'gm_agogo', note: 74, room: 0.6 },
+  { s: 'gm_melodic_tom', note: 50, room: 0.6 },
+  { s: 'wind', speed: 0.5, room: 0.8 },
+  { s: 'space', speed: 0.5, room: 0.9 },
+  { s: 'metal', speed: 0.4, room: 0.7 },
+  { s: 'pink', attack: 1.5, decay: 0.5, sustain: 0, release: 1.5, cutoff: 1500, gain: 0.3, room: 0.8 },
+  { s: 'sine', note: 98, attack: 0.005, decay: 1.5, sustain: 0, release: 1, gain: 0.3, room: 0.9 },
+  { s: 'rolandtr909_cr', speed: -0.5, room: 0.7 },
+  { s: 'gm_vibraphone', note: 81, room: 0.7 },
+]
+const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
+
+const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(4).range(0.25, 2))) : silence
+const lkKeyNotes = lkNotes.filterValues(v => !isPadHit(v))
+// Detune: two extra voices a little sharp and flat (semitones)
+const lkDetune = lkKnob(5).range(0.04, 0.3)
+
+// Glass pad: a triangle with two quiet detuned saws, slow envelope, a lot of room
+const lkPad = stack(
+  lkKeyNotes.s('triangle').gain(0.45),
+  lkKeyNotes.add(note(lkDetune)).s('sawtooth').gain(0.12),
+  lkKeyNotes.add(note(lkDetune.mul(-1))).s('sawtooth').gain(0.12),
+)
+  .decay(0.6).sustain(0.8)
+  .lpf(toned(expRange(lkKnob(1), 400, 6000)))
+  .lpq(lkKnob(2).range(0, 12))
+  .attack(lkKnob(3).range(0.4, 4)).release(3)
+  .room(roomOf(lkKnob(6).range(0.5, 1))).roomsize(BUSES[2].hall)
+  .delay(lkKnob(7).range(0, 0.6)).delaytime(BUSES[2].time).delayfeedback(BUSES[2].feedback)
+  .orbit(2)
+  .postgain(lkKeysLevel.mul(globalLevel))
+
+const lkShotTone = expRange(lkKnob(8), 18000, 800)
+const lkShots = lkNotes.filterValues(isPadHit)
+  .fmap(({ note, ...v }) => tone => room => {
+    const shot = shotOf(note)
+    const base = shot.room ?? 0.3
+    return { ...v, ...shot, room: base + (0.95 - base) * room, cutoff: Math.min(shot.cutoff ?? 18000, tone) }
+  })
+  .appLeft(lkShotTone.fmap(t => g => Math.min(18000, Math.max(80, t * g))).appLeft(globalTone))
+  .appLeft(globalRoom)
+  .roomsize(BUSES[1].hall).delaytime(BUSES[1].time).delayfeedback(BUSES[1].feedback)
+  .orbit(1)
+  .postgain(globalLevel)
+
+const stemLK = stack(lkPad, lkShots)
 
 // ============================================================
 // MASTER AUDIO MATRIX
@@ -1157,6 +1297,7 @@ stack(
   stemN5_choir,
   stemN6_glitter,
   stemN7_shimmer,
+  stemLK,
   stateTaps
 )
   .filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)   // safety net: drop anything that is silent anyway

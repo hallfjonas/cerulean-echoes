@@ -27,3 +27,11 @@
 ## melodie-4 (Nutzer, 2026-11-08 nachts)
 - Bläser-Melodien gefallen noch nicht: eher purer klassischer Jazz. Nicht vergessen: klassischer House / Happy House.
 - Flöten ganz gut, der Verspielt-Knopf ist super; aber zu leise. Die höhere (Spalte 6) ist besser → wird eine Spalte im Track.
+
+## Techno-Lead 1 — techno-lead-1.strudel (2026-11-09), for 008 Jonas 4
+- Players find the 008 lead uninspired. Research: tracks/008-groove-techno/recherche-chords-lead.md (motif, not tune).
+- Engine: tools/stem-lab/engine-techno (`// @engine techno`, 008 context).
+- Columns: 1 lead as in 008 (reference), 2 one-note square triplet stab (Hood), 3 3/5/7-step riff against the bar,
+  4 tame acid without glide (as acid 2), 5 bandpass answer in bar 2, 6 metal loop (FM bell instead of a gong sample).
+  Checked in Node. Levels estimated, not measured. Not heard. Open: vocal-fragment stab (needs a sample).
+- Feedback: open.
