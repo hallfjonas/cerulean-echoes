@@ -1232,21 +1232,21 @@ showStatus()
 
 
 // ============================================================
-// LAUNCHKEY MK4 25 — keys play a dark techno pad, the 16 drum pads play dark one-shots
+// LAUNCHKEY MK4 25 — keys play a dark dub-techno chord stab, the 16 drum pads play dark one-shots
 // ============================================================
-// Mod wheel (CC 1) = keys level (× master). Knob 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune,
-// 6 reverb, 7 echo, 8 one-shot darkness (0 = open). Drum pads (Drum mode, channel 10, notes 36-51) ignore the keys'
-// knobs 1-7.
+// Mod wheel (CC 1) = keys level (× master). Every knob moves the stab: 1 low-pass, 2 resonance + filter snap,
+// 3 attack, 4 length (note, filter decay, tail), 5 detune, 6 reverb, 7 dub echo (amount + repeats), 8 one-shot
+// darkness (0 = open). Drum pads (Drum mode, channel 10, notes 36-51) ignore the keys' knobs 1-7.
 // Names for the LC view (its Launchkey row); not read by the layout sheet tools.
-// @lk level Keys Level | mod wheel: volume of the keys pad (× master). 0 = keys silent, pads still play.
-// @lk k1 Brightness | dark ↔ open (lpf 600–9000 Hz, × fog/tension).
-// @lk k2 Resonance | flat ↔ whistling filter peak.
-// @lk k3 Attack | quick (0.15 s) ↔ slow fade-in (2 s).
-// @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
-// @lk k5 Detune | narrow ↔ wide, wobbly supersaw.
-// @lk k6 Space | a little reverb ↔ far away. Starts at 40 % until turned.
-// @lk k7 Echo | dry ↔ long dub echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog (lpf 18 kHz → 800 Hz).
+// @lk level Keys Level | mod wheel: volume of the chord stab (× master).
+// @lk k1 Brightness | dark ↔ open.
+// @lk k2 Resonance | round ↔ acid: filter peak, snap on every key.
+// @lk k3 Attack | hard stab ↔ slow swell.
+// @lk k4 Length | short stab ↔ long chord with a tail.
+// @lk k5 Detune | tight ↔ saws drift apart, wide and sour.
+// @lk k6 Space | a little reverb ↔ far away. 40 % until turned.
+// @lk k7 Echo | dry ↔ dub echo that keeps repeating.
+// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 const LK_PAD_CHAN = 10
 const LK_PAD_NOTE_1 = 36
 const lkKnob = n => lkCc ? withDefault(lkCc(LK_KNOB_1 + n - 1), LK_DEFAULTS[n]) : off()
@@ -1288,17 +1288,26 @@ const LK_SHOTS = [
 ]
 const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
 
-const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(4).range(0.25, 2))) : silence
+const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(4).fmap(v => 0.0625 * Math.pow(32, v)))) : silence
+const lkKeyNotes = lkNotes.filterValues(v => !isPadHit(v))
+const lkDetune = lkKnob(5).fmap(v => 0.03 + 0.47 * v)
 
-const lkPad = lkNotes.filterValues(v => !isPadHit(v))
-  .s('supersaw').unison(7).detune(lkKnob(5).range(0.08, 0.6)).spread(0.8)
-  .hpf(220)
-  .lpf(toned(expRange(lkKnob(1), 600, 9000)))
-  .lpq(lkKnob(2).range(0, 12))
-  .attack(lkKnob(3).range(0.15, 2)).decay(0.4).sustain(0.75).release(1.6)
-  .gain(0.7)
+// Two saws and a square, detuned against each other, through a resonant low-pass whose envelope snaps open on every
+// key (more snap with more resonance) and closes again within the note's length
+const lkPad = stack(
+  lkKeyNotes.s('sawtooth').gain(0.3),
+  lkKeyNotes.add(note(lkDetune)).s('sawtooth').gain(0.22).pan(0.2),
+  lkKeyNotes.add(note(lkDetune.mul(-1))).s('square').gain(0.14).pan(0.8),
+)
+  .hpf(180)
+  .lpf(toned(expRange(lkKnob(1), 400, 6000)))
+  .lpq(lkKnob(2).range(1, 18)).lpenv(lkKnob(2).range(0.5, 4)).lpattack(0.005).lpsustain(0)
+  .lpdecay(lkKnob(4).fmap(v => 0.08 * Math.pow(8, v)))
+  .attack(lkKnob(3).fmap(v => 0.003 * Math.pow(500, v))).decay(0.3).sustain(0.6)
+  .release(lkKnob(4).fmap(v => 0.12 * Math.pow(12, v)))
+  .gain(0.8)
   .room(roomOf(lkKnob(6).range(0.39, 1))).roomsize(BUSES[2].hall)
-  .delay(lkKnob(7).range(0, 0.6)).delaytime(BUSES[2].time).delayfeedback(BUSES[2].feedback)
+  .delay(lkKnob(7).range(0, 0.65)).delaytime(BUSES[2].time).delayfeedback(lkKnob(7).range(0.3, 0.72))
   .orbit(2)
   .postgain(lkKeysLevel.mul(globalLevel))
 

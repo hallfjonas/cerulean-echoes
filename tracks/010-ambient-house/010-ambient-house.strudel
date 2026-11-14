@@ -1068,21 +1068,21 @@ showStatus()
 
 
 // ============================================================
-// LAUNCHKEY MK4 25 — keys play a warm sunrise pad, the 16 drum pads play organic one-shots (congas, mallets, shakers)
+// LAUNCHKEY MK4 25 — keys play Steinway + Rhodes as Jonas' keys (column 2), the 16 drum pads play one-shots
 // ============================================================
-// Mod wheel (CC 1) = keys level (× master). Knob 1 brightness, 2 resonance, 3 attack, 4 length, 5 detune,
-// 6 space (reverb), 7 echo, 8 pad fog (one-shot darkness, 0 = open). Drum pads (Drum mode, channel 10, notes 36-51) ignore the keys'
-// knobs 1-7. Same knobs in every track; only the sounds differ.
+// Mod wheel (CC 1) = keys level (× master). Knob 1 brightness, 2 resonance, 3 attack, 4 length, 5 detune (Rhodes
+// chorus), 6 space, 7 echo, 8 pad fog (one-shot darkness, 0 = open). Drum pads (Drum mode, channel 10, notes 36-51)
+// ignore the keys' knobs 1-7. Same knobs and keys sound in 009 and 010; only the pads differ.
 // Names for the LC view (its Launchkey row); not read by the layout sheet tools.
-// @lk level Keys Level | mod wheel: volume of the keys pad (× master). 0 = keys silent, pads still play.
-// @lk k1 Brightness | dark ↔ open (lpf 500–8000 Hz, × fog/tension).
-// @lk k2 Resonance | flat ↔ whistling filter peak.
-// @lk k3 Attack | soft (0.1 s) ↔ slow fade-in (2 s).
-// @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
-// @lk k5 Detune | one clean voice ↔ wide and wobbly (two detuned voices around it).
-// @lk k6 Space | a little reverb ↔ far away. Starts at about a third.
+// @lk level Keys Level | mod wheel: volume of piano + Rhodes (× master).
+// @lk k1 Brightness | dull ↔ bright; harder keys brighter.
+// @lk k2 Resonance | flat ↔ filter peak.
+// @lk k3 Attack | hammer ↔ soft swell.
+// @lk k4 Length | short notes ↔ long.
+// @lk k5 Detune | clean ↔ wide Rhodes chorus.
+// @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog (lpf 18 kHz → 800 Hz).
+// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 const LK_PAD_CHAN = 10
 const LK_PAD_NOTE_1 = 36
 const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
@@ -1099,6 +1099,14 @@ const shareQuery = pat => {
   })
 }
 
+// Keys (as Jonas' keys in 009): Steinway B (VCSL vl3, trimmed copies in our repo) and the Rhodes Mark I (jRhodes3d)
+const JRH = 'https://raw.githubusercontent.com/sfzinstruments/jlearman.jRhodes3d/master/jRhodes3d-mono/'
+const OWN = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/johannes/samples/vcsl-keys/'
+const notesMap = (keys, file) => Object.fromEntries(keys.map(k => [k.toLowerCase(), file(k)]))
+if (typeof samples === 'function') await samples({
+  stein: notesMap(['F#3', 'G#3', 'A#3', 'C4', 'D4', 'E4'], k => OWN + 'JHPiano_Sus_Close_' + k.replace('#', '%23') + '_vl3_rr1.flac'),
+  jrh: notesMap(['G3', 'B3', 'D4', 'F4'], k => JRH + { G3: 'A_055__G3', B3: 'A_059__B3', D4: 'A_062__D4', F4: 'A_065__F4' }[k] + '_3.flac'),
+})
 const OWN_SAMPLES = 'https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/'
 if (typeof samples === 'function') await samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a' }, OWN_SAMPLES)
 
@@ -1125,20 +1133,23 @@ const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
 
 const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(4).range(0.25, 2))) : silence
 const lkKeyNotes = lkNotes.filterValues(v => !isPadHit(v))
-// Detune: two extra voices a little sharp and flat (semitones)
+// The sound mix of Jonas' keys at its start (piano → Rhodes half way: both, equally loud), each sound over its own
+// brightness range; a harder key opens the filter up to an octave further, a soft one closes it
+const lkBright = (notes, lo, hi) => notes.fmap(v => b => g => ({ ...v,
+  cutoff: Math.min(18000, Math.max(80, lo * Math.pow(hi / lo, b) * Math.pow(2, 2 * ((v.velocity ?? 0.75) - 0.5)) * g)) }))
+  .appLeft(lkKnob(1)).appLeft(globalTone)
+// Detune: two Rhodes copies a little sharp and flat, left and right; silent at 0
 const lkDetune = lkKnob(5).range(0.04, 0.3)
-
-// Warm synth pad (as in 007): a soft triangle with two detuned saws, on Jonas' orbit
+const lkChorus = lkKnob(5).fmap(v => 0.12 * Math.min(1, 4 * v))
 const lkPad = stack(
-  lkKeyNotes.s('triangle').gain(0.45),
-  lkKeyNotes.add(note(lkDetune)).s('sawtooth').gain(0.12),
-  lkKeyNotes.add(note(lkDetune.mul(-1))).s('sawtooth').gain(0.12),
+  lkBright(lkKeyNotes, 250, 8100).s('stein').gain(0.5),
+  lkBright(lkKeyNotes, 250, 2000).s('jrh').gain(0.27),
+  lkBright(lkKeyNotes.add(note(lkDetune)), 250, 2000).s('jrh').gain(lkChorus).pan(0.25),
+  lkBright(lkKeyNotes.add(note(lkDetune.mul(-1))), 250, 2000).s('jrh').gain(lkChorus).pan(0.75),
 )
-  .decay(0.6).sustain(0.8)
-  .lpf(toned(expRange(lkKnob(1), 500, 8000)))
   .lpq(lkKnob(2).range(0, 12))
-  .attack(lkKnob(3).range(0.1, 2)).release(2)
-  .room(roomOf(lkKnob(6).range(0.35, 1))).roomsize(BUSES[2].hall)
+  .attack(lkKnob(3).range(0.005, 0.5)).release(0.5)
+  .room(roomOf(lkKnob(6).range(0.1, 0.8))).roomsize(BUSES[2].hall)
   .delay(lkKnob(7).range(0, 0.6)).delaytime(BUSES[2].time).delayfeedback(BUSES[2].feedback)
   .orbit(2)
   .postgain(lkKeysLevel.mul(globalLevel))
