@@ -223,8 +223,8 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +

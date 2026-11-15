@@ -13,7 +13,7 @@
 // add them as one more stage in STAGES if you need them.
 //
 // PITCH: the note comes from the basslines (note names: 'a1' = A in octave 1, 'c#2' = C sharp in octave 2).
-// Octave switch: column 6, button row 1 (±0, +1, +2 octaves). Going down needs a negative entry in OCTAVES (e.g. ['-1 Okt.', -12]).
+// Octave switch: column 6, button row 1 (±0, +1, +2 octaves). Going down needs a negative entry in OCTAVES (e.g. ['-1 oct.', -12]).
 // Transpose in code: .trans(n) moves by n semitones. Pitch envelope (column 6, fader) = each note starts higher and slides down;
 // vibrato (column 6, knobs) = slow pitch wobble.
 //
@@ -82,11 +82,11 @@ const BASSLINES = [
 
 // Choices for button row 1, per column. trim = rough loudness match (bright waveforms are louder at the same gain).
 const WAVES    = [['sine', 1], ['triangle', 0.9], ['sawtooth', 0.5], ['square', 0.45], ['pulse', 0.45], ['supersaw', 0.35]]
-const LENGTHS  = [['kurz ¼', 0.25], ['halb ½', 0.5], ['voll', 1], ['lang ×2', 2]]   // clip: note length relative to its step
+const LENGTHS  = [['short ¼', 0.25], ['half ½', 0.5], ['full', 1], ['long ×2', 2]]   // clip: note length relative to its step
 const FTYPES   = ['12db', '24db', 'ladder']
-const FDIRS    = [['auf', 1], ['ab', -1]]
+const FDIRS    = [['up', 1], ['down', -1]]
 const RATIOS   = [1, 2, 3, 0.5, 1.414]                                               // fmh: modulator frequency / note frequency
-const OCTAVES  = [['±0', 0], ['+1 Okt.', 12], ['+2 Okt.', 24]]
+const OCTAVES  = [['±0', 0], ['+1 oct.', 12], ['+2 oct.', 24]]
 const DTYPES   = ['scurve', 'soft', 'hard', 'cubic', 'diode', 'asym', 'fold', 'sinefold', 'chebyshev']
 const DTIMES   = [['1/8', 0.5], ['3/16', 0.75], ['1/4', 1], ['1/16', 0.25]]          // delay time in beats
 
@@ -100,13 +100,13 @@ const num = d => x => x.toFixed(d)
 const CTL = {
   // 1 source
   // @ctl 16:1.fader Level | 0–1, overall volume.
-  level:     [5,  'Lautst.',    0.7,  lin(0, 1),        num(2)],
+  level:     [5,  'Level',      0.7,  lin(0, 1),        num(2)],
   // @ctl 16:1.k1 Pulse width | Only for pulse: 0.5 = square (hollow) … 0.05 = thin, nasal.
-  pw:        [13, 'Pulsbr.',    0,    lin(0.5, 0.05),   num(2)],
+  pw:        [13, 'Pulse w.',   0,    lin(0.5, 0.05),   num(2)],
   // @ctl 16:1.k2 Detune | Only for supersaw: how far the 5 sawtooths are detuned. 0 = one saw, more = wide, shimmering.
   detune:    [21, 'Detune',     0.3,  lin(0, 1),        num(2)],
   // @ctl 16:1.k3 Noise | 0–1, mix in noise (sine/triangle/sawtooth/square): air, bite.
-  noise:     [29, 'Rauschen',   0,    lin(0, 1),        num(2)],
+  noise:     [29, 'Noise',      0,    lin(0, 1),        num(2)],
   // 2 volume envelope (ADSR): how the volume of each note moves over time
   // @ctl 16:2.k1 Attack | 1 ms–1 s: how long the note takes to fade in. Short = click, long = soft, swelling.
   attack:    [14, 'A',          0,    exp(0.001, 1),    sec],
@@ -127,45 +127,45 @@ const CTL = {
   hpq:       [31, 'HPF-Res',    0,    lin(0, 20),       num(1)],
   // 4 filter envelope: moves the lowpass cutoff with every note
   // @ctl 16:4.fader Env amount | 0–6 octaves: how far the filter sweeps up (or down) from the cutoff on each note. Needs column 3 on.
-  fenv:      [8,  'Menge',      0.5,  lin(0, 6),        x => x.toFixed(1) + ' Okt.'],
-  // @ctl 16:4.k1 Filter attack | 1 ms–1 s: how fast the filter opens. Long = „wah“.
+  fenv:      [8,  'Amount',     0.5,  lin(0, 6),        x => x.toFixed(1) + ' oct.'],
+  // @ctl 16:4.k1 Filter attack | 1 ms–1 s: how fast the filter opens. Long = “wah”.
   fattack:   [16, 'A',          0,    exp(0.001, 1),    sec],
-  // @ctl 16:4.k2 Filter decay | 10 ms–2 s: how fast it closes again. Short = „blubb“, squelch.
+  // @ctl 16:4.k2 Filter decay | 10 ms–2 s: how fast it closes again. Short = “bloop”, squelch.
   fdecay:    [24, 'D',          0.4,  exp(0.01, 2),     sec],
   // @ctl 16:4.k3 Filter sustain | 0–1: how far open it stays while the note sounds.
   fsustain:  [32, 'S',          0,    lin(0, 1),        num(2)],
   // 5 FM: a second, inaudible oscillator wobbles the pitch of the first so fast that new overtones appear
   // @ctl 16:5.fader FM amount | 0–8: 0 = none, a little = warmer, a lot = metallic, bell-like, growl.
-  fm:        [9,  'Stärke',     0.25, lin(0, 8),        num(1)],
+  fm:        [9,  'Amount',     0.25, lin(0, 8),        num(1)],
   // @ctl 16:5.k1 FM decay | 10 ms–2 s: how fast the FM overtones fade (with FM sustain below 1).
   fmdecay:   [17, 'D',          0.45, exp(0.01, 2),     sec],
   // @ctl 16:5.k2 FM sustain | 0–1: 1 = FM stays for the whole note, 0 = only a strike (like e-piano, bell).
   fmsustain: [25, 'S',          1,    lin(0, 1),        num(2)],
   // @ctl 16:5.k3 Detune | 0–5 % off the ratio: crooked, inharmonic, beating.
-  fmdetune:  [33, 'Verst.',     0,    lin(0, 0.05),     x => (x * 100).toFixed(1) + ' %'],
+  fmdetune:  [33, 'Detune',     0,    lin(0, 0.05),     x => (x * 100).toFixed(1) + ' %'],
   // 6 pitch: pitch envelope (a drop at the start of each note) and vibrato (slow wobble)
-  // @ctl 16:6.fader Pitch env | 0–24 semitones: each note starts this much higher and falls down. High + short = „zap“, kick-like.
-  penv:      [10, 'P-Env',      0.5,  lin(0, 24),       x => x.toFixed(1) + ' HT'],
+  // @ctl 16:6.fader Pitch env | 0–24 semitones: each note starts this much higher and falls down. High + short = “zap”, kick-like.
+  penv:      [10, 'P-Env',      0.5,  lin(0, 24),       x => x.toFixed(1) + ' st'],
   // @ctl 16:6.k1 Pitch decay | 10 ms–1 s: how fast the pitch falls.
   pdecay:    [18, 'P-Dec',      0.4,  exp(0.01, 1),     sec],
   // @ctl 16:6.k2 Vibrato rate | 0–12 Hz: how fast the pitch wobbles.
   vib:       [26, 'Vib',        0.4,  lin(0, 12),       x => x.toFixed(1) + ' Hz'],
   // @ctl 16:6.k3 Vibrato depth | 0–2 semitones: how far it wobbles.
-  vibmod:    [34, 'Tiefe',      0.25, lin(0, 2),        x => x.toFixed(2) + ' HT'],
+  vibmod:    [34, 'Depth',      0.25, lin(0, 2),        x => x.toFixed(2) + ' st'],
   // 7 drive: distortion adds overtones by bending the waveform
   // @ctl 16:7.fader Drive | 0–6: how much distortion. The type (button 1) sets the character.
   drive:     [11, 'Drive',      0.3,  lin(0, 6),        num(1)],
   // @ctl 16:7.k1 Level after | 0.1–1: distortion makes it louder; use this to bring it back down.
-  distvol:   [19, 'Pegel',      0.5,  lin(0.1, 1),      num(2)],
+  distvol:   [19, 'Level',      0.5,  lin(0.1, 1),      num(2)],
   // @ctl 16:7.k2 Bitcrush | 16–2 bit: coarser volume steps, rough, digital, 8-bit.
   crush:     [27, 'Bits',       0,    lin(16, 2),       x => x.toFixed(1)],
   // @ctl 16:7.k3 Coarse | 1–32: lower sample rate, metallic aliasing, telephone/Game Boy.
   coarse:    [35, 'Coarse',     0,    v => 1 + Math.round(31 * v), x => String(x)],
   // 8 space: reverb (room) and echo (delay)
   // @ctl 16:8.fader Reverb | 0–1: amount of reverb. Use sparingly on bass, otherwise it turns to mush.
-  room:      [12, 'Hall',       0.3,  lin(0, 1),        num(2)],
+  room:      [12, 'Reverb',     0.3,  lin(0, 1),        num(2)],
   // @ctl 16:8.k1 Room size | 0.5–8: small room … cathedral.
-  roomsize:  [20, 'Größe',      0.3,  exp(0.5, 8),      num(1)],
+  roomsize:  [20, 'Size',       0.3,  exp(0.5, 8),      num(1)],
   // @ctl 16:8.k2 Delay | 0–0.8: volume of the echoes.
   delay:     [28, 'Delay',      0.3,  lin(0, 0.8),      num(2)],
   // @ctl 16:8.k3 Feedback | 0–0.9: how many echoes (high = endless).
@@ -197,14 +197,14 @@ if (globalThis.knobsSyncedFor !== 'synth') {
 
 // Status box at the bottom right: every column with its choice, on/off and the live values.
 const COLUMNS = [
-  ['Quelle',     () => WAVES[S.sel[0]][0] + '  Line ' + (S.line + 1), ['level', 'pw', 'detune', 'noise']],
-  ['Hüllkurve',  () => 'Länge ' + LENGTHS[S.sel[1]][0],               ['attack', 'decay', 'sustain', 'release']],
+  ['Source',     () => WAVES[S.sel[0]][0] + '  Line ' + (S.line + 1), ['level', 'pw', 'detune', 'noise']],
+  ['Envelope',   () => 'Length ' + LENGTHS[S.sel[1]][0],               ['attack', 'decay', 'sustain', 'release']],
   ['Filter',     () => FTYPES[S.sel[2]],                              ['cutoff', 'lpq', 'hpf', 'hpq']],
   ['Filter-Env', () => FDIRS[S.sel[3]][0],                            ['fenv', 'fattack', 'fdecay', 'fsustain']],
-  ['FM',         () => 'Verh. ' + RATIOS[S.sel[4]],                   ['fm', 'fmdecay', 'fmsustain', 'fmdetune']],
-  ['Tonhöhe',    () => OCTAVES[S.sel[5]][0],                          ['penv', 'pdecay', 'vib', 'vibmod']],
-  ['Verzerrung', () => DTYPES[S.sel[6]],                              ['drive', 'distvol', 'crush', 'coarse']],
-  ['Raum',       () => 'Delay ' + DTIMES[S.sel[7]][0],                ['room', 'roomsize', 'delay', 'feedback']],
+  ['FM',         () => 'Ratio ' + RATIOS[S.sel[4]],                   ['fm', 'fmdecay', 'fmsustain', 'fmdetune']],
+  ['Pitch',      () => OCTAVES[S.sel[5]][0],                          ['penv', 'pdecay', 'vib', 'vibmod']],
+  ['Drive',      () => DTYPES[S.sel[6]],                              ['drive', 'distvol', 'crush', 'coarse']],
+  ['Space',      () => 'Delay ' + DTIMES[S.sel[7]][0],                ['room', 'roomsize', 'delay', 'feedback']],
 ]
 let statusBox = document.getElementById('board-status')
 if (!statusBox) {
@@ -216,7 +216,7 @@ if (!statusBox) {
 }
 const showStatus = () => {
   statusBox.textContent = COLUMNS.map(([name, choice, names], i) =>
-    (i + 1) + ' ' + name.padEnd(11) + (i === 0 ? '   ' : S.on[i] ? 'AN ' : 'aus') + ' ' + choice().padEnd(19) +
+    (i + 1) + ' ' + name.padEnd(11) + (i === 0 ? '   ' : S.on[i] ? 'ON ' : 'off') + ' ' + choice().padEnd(19) +
     names.map(n => (CTL[n][1] + ' ' + CTL[n][4](get(n))).padEnd(15)).join('')
   ).join('\n')
 }

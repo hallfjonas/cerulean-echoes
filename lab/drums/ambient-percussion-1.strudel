@@ -1,6 +1,6 @@
 // ============================================================
-// AMBIENT PERKUSSION 1: candidates for track 007, Jojo 6 (instead of the clock ticks, user 2026-11-09: “Ticks verwende
-// ich nie, da muss was anderes her”)
+// AMBIENT PERCUSSION 1: candidates for track 007, Jojo 6 (instead of the clock ticks, user 2026-11-09: “I never use the
+// ticks, something else is needed”)
 // ============================================================
 // Three directions the user picked, 2–3 candidates each, all real recordings (no synth sounds):
 //   organic percussion: 1 kalimba (mbira, Kenya), 2 shaker (+ cabasa), 3 slit drum (log drum, high/low tongue)
@@ -16,7 +16,7 @@
 // lab/harmony/midori-5.strudel. Do NOT run stem-lab/sync.mjs on it.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), context in Mode 2.
-// @layout Ambient Perkussion 1 (lab/drums, 007: Jojo 6 instead of the ticks)
+// @layout Ambient Percussion 1 (lab/drums, 007: Jojo 6 instead of the ticks)
 // @note Candidates for Jojo 6 in track 007, over 007's context (Mode 2: heartbeat, drone, pad). Real recordings only. Pick by ear: which 1–2 go on?
 // @guide What to listen for | Does it sit under the pad and the heartbeat without ticking like a clock? Organic percussion (1–3), field recordings (4–6) or gongs/bells (7–8)?
 // @mode 16 Mode 16 — Candidates
@@ -69,7 +69,7 @@
 // Dirt-Samples (birds, pebbles, fire); VCSL is part of strudel.cc's own samples
 if (typeof samples === 'function') await samples('github:tidalcycles/dirt-samples')
 
-const BOARD = { id: 'perc1', title: 'Ambient Perkussion 1' }
+const BOARD = { id: 'perc1', title: 'Ambient Percussion 1' }
 const bpm = 70
 
 const makeCols = h => {
@@ -89,10 +89,10 @@ const makeCols = h => {
   const kalimba = (fig, oct = 3, len = 12, pan = 0.5) => deg(fig, oct, len).s('kalimba').gain(1.1).pan(pan).delay(0.15)
   const KAL_HIGH = kalimba('7 ~ ~ 9 ~ ~ 11 ~ ~ 9 ~ ~ 7 ~ ~ ~ ~ ~', 3, 12, 0.65).degradeBy(0.3).mul(gain(0.6))
   const KALIMBA = [
-    ['Ruhig', stack(kalimba('0 ~ 4 ~ 2 ~ 4 ~ 0 ~ 4 ~', 3, 12, 0.4), more(0, KAL_HIGH, 0.2))],
-    ['Verzahnt', stack(kalimba('0 ~ 4 ~ 2 ~ 4 ~ 0 ~ 4 ~', 3, 12, 0.35),
+    ['Calm', stack(kalimba('0 ~ 4 ~ 2 ~ 4 ~ 0 ~ 4 ~', 3, 12, 0.4), more(0, KAL_HIGH, 0.2))],
+    ['Interlocked', stack(kalimba('0 ~ 4 ~ 2 ~ 4 ~ 0 ~ 4 ~', 3, 12, 0.35),
       kalimba('~ 7 ~ 9 ~ 7 ~ 11 ~ 9 ~ 7', 3, 12, 0.65).mul(gain(0.8)), more(0, KAL_HIGH, 0.2))],
-    ['Kreisend', stack(kalimba('0 4 2 7 4', 3, 8, 0.45), kalimba('0 ~ ~ ~ ~ ~ ~ ~', 2, 8, 0.5).mul(gain(0.8)),
+    ['Circling', stack(kalimba('0 4 2 7 4', 3, 8, 0.45), kalimba('0 ~ ~ ~ ~ ~ ~ ~', 2, 8, 0.5).mul(gain(0.8)),
       more(0, KAL_HIGH, 0.2))],
   ]
 
@@ -102,18 +102,18 @@ const makeCols = h => {
   const CABASA = s('cabasa').n('<0 1>').struct('~ ~ ~ x').gain(2.5).pan(0.35)
   const shakerOpt = core => stack(core, more(1, SHK_GHOST, 0.15), gate(k3(1).fmap(k => k > 0.5), CABASA)).delay(0.1)
   const SHAKER = [
-    ['Achtel', shakerOpt(shk('0 2', '1 0.6', 8))],
-    ['Sechzehntel', shakerOpt(shk('0 6 2 6', '0.9 0.4 0.7 0.45'))],
-    ['Wiegen 3-3-2', shakerOpt(shk('0 ~ 6 2 ~ 6 0 ~ 1 ~ 6 3 ~ 6 1 ~', '1 0 0.4 0.75 0 0.4 0.9 0 1 0 0.4 0.75 0 0.4 0.9 0'))],
+    ['Eighths', shakerOpt(shk('0 2', '1 0.6', 8))],
+    ['Sixteenths', shakerOpt(shk('0 6 2 6', '0.9 0.4 0.7 0.45'))],
+    ['Rocking 3-3-2', shakerOpt(shk('0 ~ 6 2 ~ 6 0 ~ 1 ~ 6 3 ~ 6 1 ~', '1 0 0.4 0.75 0 0.4 0.9 0 1 0 0.4 0.75 0 0.4 0.9 0'))],
   ]
 
   // 3 Slit drum (VCSL log drum: 0–2 high tongue soft → hard, 3–5 low tongue soft → hard)
   const slit = (ns, pan = 0.5) => n(steps(ns)).s('slitdrum').gain(2.5).pan(pan).delay(0.15)
   const SLIT_GHOST = s('slitdrum').n(0).struct('x*16').gain(2.5).pan(0.6)
   const SLIT = [
-    ['Ruf', stack(slit('5 ~ ~ 2 ~ ~ 4 ~ ~ ~ 1 ~ ~ ~ ~ ~', 0.45), more(2, SLIT_GHOST, 0.1))],
-    ['Antwort', stack(slit('5 ~ ~ 2 ~ ~ 4 ~ ~ ~ 1 ~ ~ ~ ~ ~ 4 ~ ~ ~ 2 ~ 1 ~ 5 ~ ~ 2 ~ ~ ~ ~', 0.45), more(2, SLIT_GHOST, 0.1))],
-    ['Gehen', stack(slit('5 ~ 1 ~ 4 ~ 1 ~ 5 ~ 1 ~ 4 ~ 0 2', 0.45), more(2, SLIT_GHOST, 0.1))],
+    ['Call', stack(slit('5 ~ ~ 2 ~ ~ 4 ~ ~ ~ 1 ~ ~ ~ ~ ~', 0.45), more(2, SLIT_GHOST, 0.1))],
+    ['Answer', stack(slit('5 ~ ~ 2 ~ ~ 4 ~ ~ ~ 1 ~ ~ ~ ~ ~ 4 ~ ~ ~ 2 ~ 1 ~ 5 ~ ~ 2 ~ ~ ~ ~', 0.45), more(2, SLIT_GHOST, 0.1))],
+    ['Walking', stack(slit('5 ~ 1 ~ 4 ~ 1 ~ 5 ~ 1 ~ 4 ~ 0 2', 0.45), more(2, SLIT_GHOST, 0.1))],
   ]
 
   // 4 Birds (Dirt-Samples birds: 10 calls of 1–4 s). Loops of odd length on the 16th grid, so the calls wander against
@@ -121,9 +121,9 @@ const makeCols = h => {
   const bird = (len, pan, at = 0) => s('birds').struct(steps(['x', ...Array(len - 1).fill('~')].join(' ')))
     .n(irand(10)).late(at / 16).gain(0.35).pan(pan).delay(0.2)
   const BIRDS = [
-    ['Einzeln', stack(bird(23, 0.5), more(3, bird(9, 0.3, 4), 0.1), more(3, bird(7, 0.7, 2), 0, 0.5))],
-    ['Ruf + Antwort', stack(bird(11, 0.2), bird(13, 0.8, 6), more(3, bird(5, 0.5, 3), 0.1))],
-    ['Morgenchor', stack(bird(5, 0.3), bird(7, 0.7, 2), bird(9, 0.5, 5), more(3, bird(3, 0.6, 1), 0.1))],
+    ['Single', stack(bird(23, 0.5), more(3, bird(9, 0.3, 4), 0.1), more(3, bird(7, 0.7, 2), 0, 0.5))],
+    ['Call + answer', stack(bird(11, 0.2), bird(13, 0.8, 6), more(3, bird(5, 0.5, 3), 0.1))],
+    ['Dawn chorus', stack(bird(5, 0.3), bird(7, 0.7, 2), bird(9, 0.5, 5), more(3, bird(3, 0.6, 1), 0.1))],
   ]
 
   // 5 Pebbles (Dirt-Samples, Freesound 90788 kmoon “pebbles scrape drag foot”, 22.4 s): short cuts of it as strokes
@@ -133,9 +133,9 @@ const makeCols = h => {
   const trickle = s('pebbles').struct('x*16').fmap(v => b => ({ ...v, begin: b, end: b + 0.005 })).appLeft(rand.range(0, 0.95))
     .gain(0.25).pan(rand.range(0.3, 0.7))
   const PEBBLES = [
-    ['Schritte', stack(peb('0.12 0.31 0.52 0.74', 0.02, 4, 0.45), more(4, trickle, 0.1))],
-    ['Rieseln', stack(peb('0.2 ~ 0.4 0.43 ~ 0.6 ~ 0.66 0.2 ~ 0.41 ~ 0.6 0.62 ~ 0.7', 0.006), more(4, trickle, 0.1))],
-    ['Schieben', stack(peb('0.1 ~ 0.55 ~', 0.06, 4, 0.5).attack(0.08), more(4, trickle, 0.1))],
+    ['Steps', stack(peb('0.12 0.31 0.52 0.74', 0.02, 4, 0.45), more(4, trickle, 0.1))],
+    ['Trickle', stack(peb('0.2 ~ 0.4 0.43 ~ 0.6 ~ 0.66 0.2 ~ 0.41 ~ 0.6 0.62 ~ 0.7', 0.006), more(4, trickle, 0.1))],
+    ['Push', stack(peb('0.1 ~ 0.55 ~', 0.06, 4, 0.5).attack(0.08), more(4, trickle, 0.1))],
   ]
 
   // 6 Fire (Dirt-Samples fire, 9.4 s crackle): cuts of the recording
@@ -144,39 +144,39 @@ const makeCols = h => {
   const pops = s('fire').struct('x*16').fmap(v => b => ({ ...v, begin: b, end: b + 0.012 })).appLeft(rand.range(0, 0.98))
     .gain(0.35).pan(rand.range(0.2, 0.8))
   const FIRE = [
-    ['Glut', stack(fire('0.1 0.55', 0.12, 2).attack(0.3).release(0.4), more(5, pops, 0.08))],
-    ['Knistern', stack(more(5, pops, 0.35), fire('0.3', 0.2, 1).attack(0.5).mul(gain(0.5)))],
-    ['Schleife', stack(fire('0.12 ~ 0.47 0.33 ~ 0.81 0.05 ~', 0.015, 8), more(5, pops, 0.08))],
+    ['Embers', stack(fire('0.1 0.55', 0.12, 2).attack(0.3).release(0.4), more(5, pops, 0.08))],
+    ['Crackle', stack(more(5, pops, 0.35), fire('0.3', 0.2, 1).attack(0.5).mul(gain(0.5)))],
+    ['Loop', stack(fire('0.12 ~ 0.47 0.33 ~ 0.81 0.05 ~', 0.015, 8), more(5, pops, 0.08))],
   ]
 
   // 7 Gong (VCSL gong2: 0 full, 1 loudest, 2–4 light, 5 scrape; gong: 5 = soft hit). Row 3 = depth (playback speed 1 → 0.5)
   const depth = p => p.speed(k3(6).fmap(k => Math.pow(0.5, k)))
   const GONG = [
-    ['Alle 2 Takte', depth(n('<2 ~ 3 ~>').s('gong2').gain(0.8).delay(0.2))],
-    ['Ruf', depth(n('<[2 ~ ~ ~] [~ ~ 3 ~] ~ [~ ~ ~ 4]>').s('gong2').gain(0.8).delay(0.2))],
-    ['Tief + hell', depth(stack(n('<5 ~ ~ ~>').s('gong').gain(3), n('<~ [~ ~ 3 ~]>').s('gong2').gain(0.6).pan(0.65)).delay(0.2))],
+    ['Every 2 bars', depth(n('<2 ~ 3 ~>').s('gong2').gain(0.8).delay(0.2))],
+    ['Call', depth(n('<[2 ~ ~ ~] [~ ~ 3 ~] ~ [~ ~ ~ 4]>').s('gong2').gain(0.8).delay(0.2))],
+    ['Low + high', depth(stack(n('<5 ~ ~ ~>').s('gong').gain(3), n('<~ [~ ~ 3 ~]>').s('gong2').gain(0.6).pan(0.65)).delay(0.2))],
   ]
 
   // 8 Tubular bells (VCSL, soft strokes C3–E4), scale degrees of the progression's mode
   const bell = (fig, oct = 3, len = 4, pan = 0.5) => deg(fig, oct, len).s('tubularbells').gain(3).pan(pan).delay(0.2)
   const BELL_HIGH = bell('~ 4 ~ ~ ~ 7 ~ ~', 4, 8, 0.65).mul(gain(0.6))
   const BELLS = [
-    ['Grundton', stack(bell('0 ~ ~ ~ ~ ~ ~ ~ 4 ~ ~ ~ ~ ~ ~ ~', 3, 2), more(7, BELL_HIGH, 0.15))],
-    ['Ruf', stack(bell('0 ~ ~ ~ ~ ~ 4 ~ ~ ~ 2 ~ ~ ~ ~ ~', 3, 8), more(7, BELL_HIGH, 0.15))],
-    ['Läuten', stack(bell('0 4 2 ~ 4 0 ~ ~', 3, 4), more(7, BELL_HIGH, 0.15))],
+    ['Root', stack(bell('0 ~ ~ ~ ~ ~ ~ ~ 4 ~ ~ ~ ~ ~ ~ ~', 3, 2), more(7, BELL_HIGH, 0.15))],
+    ['Call', stack(bell('0 ~ ~ ~ ~ ~ 4 ~ ~ ~ 2 ~ ~ ~ ~ ~', 3, 8), more(7, BELL_HIGH, 0.15))],
+    ['Ringing', stack(bell('0 4 2 ~ 4 0 ~ ~', 3, 4), more(7, BELL_HIGH, 0.15))],
   ]
 
   const col = (name, k3name, pats, extra = {}) => ({ name, space: 'bus', floor: 0.25, hall: 6, k3: 'own', k3name,
     range: [600, 12000], gain: 1, pats, ...extra })
   return [
-    col('Kalimba', 'Dichte', KALIMBA, { range: [800, 12000] }),
-    col('Shaker', 'Dichte', SHAKER, { range: [1500, 16000] }),
-    col('Schlitztrommel', 'Dichte', SLIT, { range: [500, 8000] }),
-    col('Vögel', 'Dichte', BIRDS, { range: [1500, 16000] }),
-    col('Kiesel', 'Dichte', PEBBLES, { range: [1000, 16000] }),
-    col('Feuer', 'Dichte', FIRE, { range: [800, 16000] }),
-    col('Gong', 'Tiefe', GONG, { range: [400, 12000] }),
-    col('Röhrenglocken', 'Dichte', BELLS, { range: [600, 12000] }),
+    col('Kalimba', 'Density', KALIMBA, { range: [800, 12000] }),
+    col('Shaker', 'Density', SHAKER, { range: [1500, 16000] }),
+    col('Slit drum', 'Density', SLIT, { range: [500, 8000] }),
+    col('Birds', 'Density', BIRDS, { range: [1500, 16000] }),
+    col('Pebbles', 'Density', PEBBLES, { range: [1000, 16000] }),
+    col('Fire', 'Density', FIRE, { range: [800, 16000] }),
+    col('Gong', 'Depth', GONG, { range: [400, 12000] }),
+    col('Tubular bells', 'Density', BELLS, { range: [600, 12000] }),
   ]
 }
 
@@ -206,9 +206,9 @@ const CH = {
 }
 // The pad's three progressions in 007 (one chord per 2 bars): [name, bars, push, scale]
 const HARMONIES = [
-  ['Ruhig: I–IV', ['Dmaj7', 'Dmaj7', 'Dmaj7', 'Dmaj7', 'G♯ø7', 'G♯ø7', 'G♯ø7', 'G♯ø7'], 0, 'lydian'],
-  ['Kreisend: I–iii–IV–ii', ['Dmaj7', 'Dmaj7', 'F♯m7', 'F♯m7', 'G♯ø7', 'G♯ø7', 'E7', 'E7'], 0, 'lydian'],
-  ['Offen: I–vi–IV–vii', ['Dmaj7', 'Dmaj7', 'Bm7', 'Bm7', 'G♯ø7', 'G♯ø7', 'C♯m7', 'C♯m7'], 0, 'lydian'],
+  ['Calm: I–IV', ['Dmaj7', 'Dmaj7', 'Dmaj7', 'Dmaj7', 'G♯ø7', 'G♯ø7', 'G♯ø7', 'G♯ø7'], 0, 'lydian'],
+  ['Circling: I–iii–IV–ii', ['Dmaj7', 'Dmaj7', 'F♯m7', 'F♯m7', 'G♯ø7', 'G♯ø7', 'E7', 'E7'], 0, 'lydian'],
+  ['Open: I–vi–IV–vii', ['Dmaj7', 'Dmaj7', 'Bm7', 'Bm7', 'G♯ø7', 'G♯ø7', 'C♯m7', 'C♯m7'], 0, 'lydian'],
 ]
 // each progression as 128 chord names, one per 16th
 const H128 = HARMONIES.map(([, bars]) => bars.flatMap(b => typeof b === 'string' ? Array(16).fill(b)
@@ -357,19 +357,19 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
       b2: c.b2 === 'tom' ? '<div class="cell btn' + (S.tog?.[45 + i] ? ' on' : '') + '"><b>' + ['Marimba', 'Toms', 'Marimba + Toms'][S.tog?.[45 + i] ?? 0] + '</b></div>'
-        : '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        : '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Puls</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Puls</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Drone</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Pad</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -380,7 +380,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -388,13 +388,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -407,13 +407,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Puls ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Drone ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Puls ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Drone ' + pct(S.val[59]) +
         ' · Pad ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

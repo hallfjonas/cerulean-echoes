@@ -21,11 +21,11 @@ const words = [
   'dann', 'jetzt', 'hier', 'ganz', 'immer', 'sehr', 'mehr', 'weil', 'dass', 'sich', 'nach', 'vom', 'beim', 'ohne',
   'gegen', 'unter', 'zwischen', 'damit', 'aber', 'wieder', 'soll', 'muss', 'kann', 'gut', 'neu', 'neue', 'alle',
   'jede', 'jeder', 'jedes', 'klingt', 'Klang', 'Spur', 'Regler', 'Knopf', 'Tasten', 'leise', 'laut', 'hell', 'dunkel',
-  'Akkord', 'Akkorde', 'Hall', 'langsam', 'schnell', 'Takt', 'Takte', 'Stimme', 'Ebene', 'zeigt', 'spielt',
+  'Akkord', 'Akkorde', 'Zufall', 'Wurf', 'Dichte', 'Umfang', 'langsam', 'schnell', 'Takt', 'Takte', 'Stimme', 'Ebene', 'zeigt', 'spielt',
   'harmonie', 'melodie', 'einwurf', 'einwuerfe', 'blaeser', 'gitarre', 'streicher', 'geraete', 'recherche',
   'uebergabe', 'hoerliste', 'groß', 'gross',
 ]
-const wordRe = new RegExp(`\\b(${words.join('|')})\\b`, 'g')
+const wordRe = new RegExp(`\\b(${words.join('|')})\\b`, 'gi')
 const umlautRe = /[äöüÄÖÜß]/g
 
 const allowFile = join(root, 'tools/lang-scan-allow.txt')

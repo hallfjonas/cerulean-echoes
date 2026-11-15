@@ -1,5 +1,5 @@
 // ============================================================
-// DISCO-BLÄSER 3: the liked figures + four groovier ones; complexity knob, solo ↔ ensemble, organic lift (009 Jonas 5–7)
+// DISCO BRASS 3: the liked figures + four groovier ones; complexity knob, solo ↔ ensemble, organic lift (009 Jonas 5–7)
 // ============================================================
 // @engine 3
 // Round 2 feedback (feedback.md, school grades): off-beat 4 (boring), push 2–3, 3-3-2 2, riff 4, held push 4, cascade 4,
@@ -17,7 +17,7 @@
 // sustain), solo trumpet; VSCO 2 CE (CC0) trombone falls. Pitches checked file by file. Not heard; levels from RMS.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass, keys and the progression in Mode 2.
-// @layout Disco-Bläser 3 (lab/brass, 009 Jonas 5–7: liked figures + groovier ones, complexity, solo ↔ ensemble, lift)
+// @layout Disco Brass 3 (lab/brass, 009 Jonas 5–7: liked figures + groovier ones, complexity, solo ↔ ensemble, lift)
 // @note Kept from round 2: push, 3-3-2, swell + fall, shout. New: double push, 3-3-2 over two bars, hits on the "a", swell into a push.
 // @note Row 3 = complexity (more groove notes). Button 1 = solo ↔ ensemble. Button 2 held = organic lift.
 // @guide What to listen for | Which figures groove? Does row 3 add groove without getting busy? Is the lift organic?
@@ -56,7 +56,7 @@
 // @ctl 2:7.fader Bass | off-beat bass on the chord root.
 // @ctl 2:8.fader Keys | the keys of 009, following the progression.
 
-const BOARD = { id: 'blaeser3', title: 'Disco-Bläser 3' }
+const BOARD = { id: 'brass3', title: 'Disco Brass 3' }
 const bpm = 124
 const BAR = 240 / bpm   // seconds per bar
 
@@ -107,13 +107,13 @@ const makeCols = h => {
   const N = (p, len, lv = 0, kind = 'hit') => ({ p, len, lv, kind })
   const FIG = [
     ['Push', 32, [N(14, 1), N(16, 3), N(30, 1), N(0, 3), N(13, 1, 1), N(29, 1, 1), N(22, 1, 2), N(8, 1, 2)]],
-    ['3-3-2 + Antwort', 32, [N(0, 1), N(3, 1), N(6, 2), N(24, 1), N(27, 3), N(10, 1, 1), N(23, 1, 1), N(31, 1, 2), N(14, 1, 2)]],
+    ['3-3-2 + answer', 32, [N(0, 1), N(3, 1), N(6, 2), N(24, 1), N(27, 3), N(10, 1, 1), N(23, 1, 1), N(31, 1, 2), N(14, 1, 2)]],
     ['Shout', 16, [N(0, 1), N(3, 1), N(6, 1), N(10, 2), N(12, 1), N(14, 1, 1), N(15, 1, 2), N(8, 1, 2)]],
-    ['Schweller + Fall', 64, [N(0, 14, 0, 'swell'), N(14, 2, 0, 'fall'), N(46, 1), N(48, 3), N(45, 1, 1), N(62, 1, 1), N(54, 1, 2)]],
-    ['Doppel-Push', 32, [N(13, 1), N(14, 1), N(16, 2), N(29, 1), N(30, 1), N(0, 2), N(6, 1, 1), N(22, 1, 1), N(23, 1, 2), N(10, 1, 2)]],
-    ['3-3-2 lang', 32, [N(0, 1), N(3, 1), N(6, 1), N(16, 1), N(19, 1), N(22, 2), N(28, 1, 1), N(30, 1, 1), N(12, 1, 2), N(27, 1, 2)]],
-    ['Auf der a', 16, [N(3, 1), N(7, 1), N(11, 1), N(14, 2), N(15, 1, 1), N(0, 1, 1), N(9, 1, 2)]],
-    ['Schweller + Push', 32, [N(24, 6, 0, 'swell'), N(30, 1), N(0, 2), N(3, 1, 1), N(6, 1, 1), N(10, 1, 2), N(14, 1, 2)]],
+    ['Swell + fall', 64, [N(0, 14, 0, 'swell'), N(14, 2, 0, 'fall'), N(46, 1), N(48, 3), N(45, 1, 1), N(62, 1, 1), N(54, 1, 2)]],
+    ['Double push', 32, [N(13, 1), N(14, 1), N(16, 2), N(29, 1), N(30, 1), N(0, 2), N(6, 1, 1), N(22, 1, 1), N(23, 1, 2), N(10, 1, 2)]],
+    ['3-3-2 long', 32, [N(0, 1), N(3, 1), N(6, 1), N(16, 1), N(19, 1), N(22, 2), N(28, 1, 1), N(30, 1, 1), N(12, 1, 2), N(27, 1, 2)]],
+    ['On the a', 16, [N(3, 1), N(7, 1), N(11, 1), N(14, 2), N(15, 1, 1), N(0, 1, 1), N(9, 1, 2)]],
+    ['Swell + push', 32, [N(24, 6, 0, 'swell'), N(30, 1), N(0, 2), N(3, 1, 1), N(6, 1, 1), N(10, 1, 2), N(14, 1, 2)]],
   ]
   // ensemble = round 2's warm full section; solo = one trumpet (the SSO solo trumpet, short)
   const ENS = { lead: [['sso_tp', 0.45, 0, 0.45], ['sso_hn', 0.45, 6, 0.55]], dbl: [['sso_tp', 0.32, 9, 0.6]],
@@ -151,7 +151,7 @@ const makeCols = h => {
     }
     return out
   })
-  return FIG.map(([name, L, notes], c) => ({ name, k3: 'own', k3name: 'Komplexität', b2: 'own', space: 'bus', floor: 0.3,
+  return FIG.map(([name, L, notes], c) => ({ name, k3: 'own', k3name: 'Complexity', b2: 'own', space: 'bus', floor: 0.3,
     hall: 2.5, range: [900, 8000], gain: 0.9, pats: [['Ensemble', play(c, L, notes, false)], ['Solo', play(c, L, notes, true)]] }))
 }
 
@@ -370,9 +370,9 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
         pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
         typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
@@ -380,14 +380,14 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -398,7 +398,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -406,13 +406,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -425,13 +425,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

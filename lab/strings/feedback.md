@@ -1,63 +1,63 @@
-# Streicher — Feedback
+# Strings — feedback
 
-## disco-strings-1 (gebaut 2026-11-08, für 009 Jonas 5–7) — NICHT gehört
-- Auftrag (Nutzer): Disco-Streicher, warm und organisch, an House angelehnt. Die echte VSCO-Section war als GEHALTENE
-  Harmonie raus (lab/harmony); hier spielen Streicher Rhythmus: Stabs, Läufe, fallende Figuren — keine Fläche.
-- Figuren (Taste 1): Echo-Stab alle 2 Takte ([Purple Disco Machine „In My Arms“, Attack Magazine](https://www.attackmagazine.com/technique/deconstructed/purple-disco-machine-in-your-arms/)),
-  Offbeat-Stabs („sharp stabs“ wie Le Freak), Lauf hoch in den Stab, fallende Figur auf jedem Schlag
+## disco-strings-1 (built 2026-11-08, for 009 Jonas 5–7) — NOT heard
+- Brief (user): disco strings, warm and organic, leaning on house. The real VSCO section was out as HELD
+  harmony (lab/harmony); here strings play rhythm: stabs, runs, falling figures — no pad.
+- Figures (button 1): echo stab every 2 bars ([Purple Disco Machine “In My Arms”, Attack Magazine](https://www.attackmagazine.com/technique/deconstructed/purple-disco-machine-in-your-arms/)),
+  offbeat stabs (“sharp stabs” as in Le Freak), run up into the stab, falling figure on every beat
   ([VI-Control: idioms of funk/disco strings](https://vi-control.net/community/threads/what-are-the-idioms-and-techniques-behind-funk-disco-strings.150009/)).
-  Töne MEINE, auf den Akkorden der Folge (Oberstimme = Akkordton nahe E5, Läufe in der Tonleiter der Folge).
-- Reihe 3 = Aufbau: Violinen unisono → + Oktave → + Akkord darunter (Bratschen, Celli auf dem Grundton) → + Scoop in die Stabs.
-- Klänge: [Sonatina Symphonic Orchestra](https://github.com/peastman/sso) (CC Sampling Plus 1.0) 1./2. Violinen, Bratschen,
-  Celli staccato; [VSCO 2 CE](https://github.com/sgossner/VSCO-2-CE) (CC0) Violinen-/Bratschen-Section spiccato.
-  Tonhöhen Datei für Datei geprüft: SSO-Namen = Klang; die SSO-rr2-Dateien klingen einen Halbton höher (nicht benutzt);
-  VSCO klingt eine Oktave über dem Dateinamen.
-- Spalten: 1 SSO-Violinen, 2 VSCO-Violinen, 3 beide (große Section), 4 dunkel (Linie eine Oktave tiefer auf Bratschen).
-- Geprüft: Node (Noten je 16tel, ≤ 3 ms/Tick), alle Samples laden im Browser. Pegel aus dem RMS der Dateien, nicht gerendert.
-- Feedback (Nutzer, 2026-11-08 abends): noch etwas langweilig; „Beide“ oder „Dunkel“ besser. Offbeat langweilig,
-  Fallend viel zu stressig, Lauf + Stab ok — Lauf OHNE Stab viel besser, Echo-Stab ganz gut. Wie die Bläser: 8 Spalten,
-  ein Klang, verschiedene Figuren. Frage: an die globalen Akkorde anpassen? → Sie folgen schon der Folge (hier Mode 2
-  Spalte 5; im Track automatisch der Folge von Jonas 1).
+  Notes MINE, on the chords of the progression (top voice = chord tone near E5, runs in the progression's scale).
+- Row 3 = build-up: violins unison → + octave → + chord below (violas, celli on the root) → + scoop into the stabs.
+- Sounds: [Sonatina Symphonic Orchestra](https://github.com/peastman/sso) (CC Sampling Plus 1.0) 1st/2nd violins, violas,
+  celli staccato; [VSCO 2 CE](https://github.com/sgossner/VSCO-2-CE) (CC0) violin / viola section spiccato.
+  Pitches checked file by file: SSO names = sound; the SSO rr2 files sound a semitone higher (not used);
+  VSCO sounds an octave above the file name.
+- Columns: 1 SSO violins, 2 VSCO violins, 3 both (big section), 4 dark (line an octave lower on violas).
+- Checked: Node (notes per 16th, ≤ 3 ms/tick), all samples load in the browser. Levels from the files' RMS, not rendered.
+- Feedback (user, 2026-11-08 evening): still a bit boring; “Both” or “Dark” better. Offbeat boring,
+  falling far too stressful, run + stab ok — run WITHOUT stab much better, echo stab quite good. Like the brass: 8 columns,
+  one sound, different figures. Question: adapt to the global chords? → They already follow the progression (here Mode 2
+  column 5; in the track automatically the progression of Jonas 1).
 
-## disco-strings-2 (gebaut 2026-11-08 abends) — NICHT gehört
-- Ein Klang überall = „Beide“ (SSO + VSCO); Taste 1 = normal ↔ eine Oktave tiefer („Dunkel“).
-- 8 Figuren: Echo-Stab, Lauf hoch (landet eine 16tel vor der Eins, kein Stab), langer Lauf (8 Töne, alle 4 Takte),
-  Lauf runter nach der Kick, Lauf + Echo auf dem letzten Ton, hoch und runter, Schweller (ein Akkord über 2 Takte,
-  Purple Disco Machine), Pizzicato zwischen den Kicks ([Andrés „New For U“, Mixmag](https://mixmag.net/feature/20-best-house-music-samples-funk-soul-disco-kerri-chandler-larry-heard-chic)).
-  Töne MEINE: Läufe in der Tonleiter der Folge auf die Oberstimme des nächsten Akkords.
-- Reihe 3 = Aufbau: unisono → + Oktave → + Terzen unter den Läufen / Akkord unter Stab und Schweller → + Scoop.
-- Neu: SSO-Sustain (Violinen, Bratschen) und -Pizzicato; Tonhöhen geprüft. Node ok, ≤ 4 ms/Tick im Mittel.
-- Feedback disco-strings-2 (Nutzer, Schulnoten): Echo-Stab 2; Lauf hoch 3 (die Eins oben wie beim Echo-Stab betonen);
-  langer Lauf 2–3 (oben betonen); Lauf runter 4−; Lauf + Echo 4; hoch und runter 4; Schweller 2–3; Pizzicato 4−.
-  Alle 4er raus, neue Versionen; nochmal nachlesen, was gute Streicher sind. Taste 1 (Oktave) macht keinen Spaß →
-  Solo ↔ Ensemble; Taste 2 → Einwürfe oder Steigerung (immer organisch).
+## disco-strings-2 (built 2026-11-08 evening) — NOT heard
+- One sound everywhere = “Both” (SSO + VSCO); button 1 = normal ↔ an octave lower (“Dark”).
+- 8 figures: echo stab, run up (lands a 16th before the one, no stab), long run (8 notes, every 4 bars),
+  run down after the kick, run + echo on the last note, up and down, swell (one chord over 2 bars,
+  Purple Disco Machine), pizzicato between the kicks ([Andrés “New For U”, Mixmag](https://mixmag.net/feature/20-best-house-music-samples-funk-soul-disco-kerri-chandler-larry-heard-chic)).
+  Notes MINE: runs in the progression's scale onto the top voice of the next chord.
+- Row 3 = build-up: unison → + octave → + thirds under the runs / chord under stab and swell → + scoop.
+- New: SSO sustain (violins, violas) and pizzicato; pitches checked. Node ok, ≤ 4 ms/tick on average.
+- Feedback disco-strings-2 (user, school grades, 1 = best): echo stab 2; run up 3 (accent the one on top as in the echo
+  stab); long run 2–3 (accent on top); run down 4−; run + echo 4; up and down 4; swell 2–3; pizzicato 4−.
+  All 4s out, new versions; read up again on what good strings are. Button 1 (octave) is no fun →
+  solo ↔ ensemble; button 2 → stabs or lift (always organic).
 
-## disco-strings-3 (gebaut 2026-11-08 nachts) — NICHT gehört
-- Behalten: Echo-Stab, Lauf hoch und langer Lauf (landen jetzt AUF der Eins mit betontem Stab + Echo), Schweller.
-- Neu: hohe Gegenstimme in Oktaven, wenige lange Töne ([Sound On Sound, Arranging Strings 4](https://www.soundonsound.com/techniques/arranging-strings-part-4): Descant),
-  Echo-Stab + Schweller (Purple Disco Machine), Tremolo-Aufbau in die nächste 8-Takt-Phrase, 16tel-Figur in Takt 4
-  (SOS: einfache 16tel-Phrasen, Oktavlauf über zwei Schläge). Töne MEINE.
-- Taste 1 = Ensemble ↔ Solo (SSO-Solovioline), Taste 2 gehalten = Steigerung (Oktave und Stimmen kommen über 2 Takte dazu,
-  heller, +3 dB; zurück über 1 Takt). Reihe 3 = Aufbau wie Runde 2. Neu: SSO-Tremolo, Solovioline (Tonhöhen geprüft).
-- Feedback disco-strings-3 (Nutzer): Läufe brauchen fast einen „Beat“ — harter Anschlag oben (nicht das Echo ist
-  entscheidend; der Echo-Stab ist viel härter). Klang insgesamt cheap und knacksig — muss besser werden. Schweller,
-  Gegenstimme, Tremolo (nichts zu hören) raus. Stab + Schweller ganz gut, 16tel-Figur ganz cool.
+## disco-strings-3 (built 2026-11-08 night) — NOT heard
+- Kept: echo stab, run up and long run (now land ON the one with an accented stab + echo), swell.
+- New: high countermelody in octaves, few long notes ([Sound On Sound, Arranging Strings 4](https://www.soundonsound.com/techniques/arranging-strings-part-4): descant),
+  echo stab + swell (Purple Disco Machine), tremolo build into the next 8-bar phrase, 16th figure in bar 4
+  (SOS: simple 16th phrases, octave run over two beats). Notes MINE.
+- Button 1 = ensemble ↔ solo (SSO solo violin), button 2 held = lift (octave and voices join over 2 bars,
+  brighter, +3 dB; back over 1 bar). Row 3 = build-up as round 2. New: SSO tremolo, solo violin (pitches checked).
+- Feedback disco-strings-3 (user): runs almost need a “beat” — a hard attack on top (the echo is not what
+  matters; the echo stab is much harder). Sound overall cheap and crackly — must get better. Swell,
+  countermelody, tremolo (nothing to hear) out. Stab + swell quite good, 16th figure quite cool.
 
-## disco-strings-4 (gebaut 2026-11-08 nachts) — NICHT gehört
-- Vermutete Ursachen für „cheap/knacksig“ und Änderungen: (1) drei Violin-Sections spielten denselben Ton 0–10 ms versetzt
-  = Kammfilter (dünn, phasig) → jetzt eine Section pro Ton, abwechselnd; die zweite nur in der Oktave; (2) jede Note wurde
-  nach ihrer 16tel abgeschnitten (clip) → Staccato klingt jetzt aus wie aufgenommen; (3) Scoop (Pitch-Hüllkurve) raus.
-- Harter Anschlag: der Lauf landet auf der Eins mit dem vollen Echo-Stab-Akkord (Violinen, Bratschen, Celli) + Pizzicato-Klick.
-- Spalten: Echo-Stab, Lauf hoch, langer Lauf, Stab + Schweller, 16tel-Figur. Reihe 3: unisono → + Oktave → + Terzen
-  unter den Läufen → + Celli zwei Oktaven tiefer.
+## disco-strings-4 (built 2026-11-08 night) — NOT heard
+- Suspected causes of “cheap / crackly” and changes: (1) three violin sections played the same note 0–10 ms apart
+  = comb filter (thin, phasey) → now one section per note, alternating; the second only in the octave; (2) every note was
+  cut after its 16th (clip) → staccato now rings out as recorded; (3) scoop (pitch envelope) out.
+- Hard attack: the run lands on the one with the full echo-stab chord (violins, violas, celli) + pizzicato click.
+- Columns: echo stab, run up, long run, stab + swell, 16th figure. Row 3: unison → + octave → + thirds
+  under the runs → + celli two octaves lower.
 
-## techno-strings-1 (gebaut 2026-11-12, für 008, Hintergrund) — NICHT gehört
-- Wunsch: ikonische Hintergrund-Streicher; Moll, dessen Quinte einen Halbton steigt und ihn zu Dur macht (Fm → D♭/F),
-  oder andere sparsame Bewegungen.
-- Spalten = Bewegungen auf offenem Fm (F4 C5 F5 A♭5): Fm→D♭ (Leittonwechsel), Fm→F, Fm→A♭, Linie hoch (Bond-Klischee
-  5–♯5–6), Linie runter (m, m(maj7), m7, m6), Fm→E (Slide), Fm→C, Kette Fm→D♭→B♭m. Quellen: Wikipedia „Contrast chord“,
-  Kopp „Chromatic Transformations“ (UCI), thejazzpianosite.com „Line clichés“, Attack „Strings of Life“ (Stabs) und
-  „Analogue string synthesis“. Fm→C und die Kette = meine Wahl.
-- Taste 1 = Langsam (6 Takte Grund, 2 bewegt) / Pendel (jeder Takt) / Stabs; Reihe 3 = JX-10 (harmony-5) ↔ Analog-Strings.
-- Engine techno (Kontext-Beat schwach, Nutzer-Feedback zu techno-pads-1; Engine nicht geändert, gemeinsamer Code).
-- Node: Noten je Takt geprüft, transpiliert. Pegel geschätzt.
+## techno-strings-1 (built 2026-11-12, for 008, background) — NOT heard
+- Wish: iconic background strings; minor, whose fifth rises a semitone and turns it major (Fm → D♭/F),
+  or other sparse moves.
+- Columns = moves on an open Fm (F4 C5 F5 A♭5): Fm→D♭ (leading-tone exchange), Fm→F, Fm→A♭, line up (Bond cliché
+  5–♯5–6), line down (m, m(maj7), m7, m6), Fm→E (slide), Fm→C, chain Fm→D♭→B♭m. Sources: Wikipedia “Contrast chord”,
+  Kopp “Chromatic Transformations” (UCI), thejazzpianosite.com “Line clichés”, Attack “Strings of Life” (stabs) and
+  “Analogue string synthesis”. Fm→C and the chain = my choice.
+- Button 1 = slow (6 bars home, 2 moved) / pendulum (every bar) / stabs; row 3 = JX-10 (harmony-5) ↔ analogue strings.
+- Engine techno (context beat weak, user feedback on techno-pads-1; engine not changed, shared code).
+- Node: notes per bar checked, transpiled. Levels estimated.

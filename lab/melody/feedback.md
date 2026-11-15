@@ -1,34 +1,34 @@
 # stabs — Feedback
 
-## answers-lab-1 (Nutzer, 2026-11-08)
-- Antworten (Spalten 1+2, Rhodes) langweilig und eintönig: taktweise wird schnell langweilig → spannendere Patterns,
-  längere Zyklen.
-- Dub Brass deutlich besser, aber auch schnell eintönig. M1-Orgel und Trompeten richtig langweilig.
+## answers-lab-1 (user, 2026-11-08)
+- Answers (columns 1+2, Rhodes) boring and monotonous: bar by bar quickly gets boring → more exciting patterns,
+  longer cycles.
+- Dub brass clearly better, but also quickly monotonous. M1 organ and trumpets really boring.
 
-## melody-1 (Nutzer, 2026-11-08)
-- Trompeten: alle drei richtig schlechter Klang, überhaupt nicht warm; echte Aufnahmen haben viel mehr Dynamik und
-  weniger mechanische Spielweise → keine Einzelton-Multisamples für Bläser, echte Phrasen nötig.
-- Vibraphon: ziemlich nice. Braucht einen Komplexitäts-Knopf wie im Techno-Track (008 Pings/Density): Länge und Raum
-  zusammenlegen (beides verschmiert / macht weicher), Reihe 3 = von basic zu komplexer. Klingt schon gut.
-- Marimba verliert gegen Vibraphon → raus.
+## melody-1 (user, 2026-11-08)
+- Trumpets: all three a really bad sound, not warm at all; real recordings have much more dynamics and
+  a less mechanical way of playing → no single-note multisamples for brass, real phrases needed.
+- Vibraphone: pretty nice. Needs a complexity knob as in the techno track (008 Pings/Density): merge length and space
+  (both smear / make it softer), row 3 = from basic to more complex. Already sounds good.
+- Marimba loses against the vibraphone → out.
 
-## melody-3 (Nutzer, 2026-11-08)
-- Trompeten und Sax klingen gut. Aber zu sparsam, zu lange Pausen: so sind es eher kleine Einwürfe als Melodien.
-  Bei wenig (niedrige Stellung) ist das ok, aber es muss sich etwas aufbauen.
+## melody-3 (user, 2026-11-08)
+- Trumpets and sax sound good. But too sparse, too long rests: this way they are rather small stabs than melodies.
+  With little (low setting) that is ok, but something has to build up.
 
-## melody-4 (gebaut 2026-11-08, nicht gehört)
-- Spalten 1–4 = die Phrasen aus Runde 3, eine Spalte pro Instrument (Trompete: alle 14, Sax, Trompete ↔ Sax als Ruf/Antwort,
-  Flöten-Phrasen), ruhig → lebhaft sortiert. Reihe 3 = Aufbau in 4 Stufen, je ein fester 8-Takt-Plan: 1 Phrase auf Takt 1 →
-  Ruf + Antwort (Takt 5) → alle 2 Takte → direkt hintereinander (halber Takt Abstand, lebhaftere Hälfte). Taste 1 = Startphrase.
-- Spalten 5–6 = Flöten-Melodie aus echten Flötentönen (aus den juskiddink-Phrasen geschnitten, per Abspielgeschwindigkeit
-  auf die Tonhöhe), Motive auf den Akkordtönen (folgen allen Folgen), A A B A; Reihe 3 = Verspielt (Zusatztöne, Triller).
-  Spalte 6 ab G4 (bis +5 Halbtöne hochgerechnet). Motive meine. In Node geprüft; Pegel NICHT gemessen.
+## melody-4 (built 2026-11-08, not heard)
+- Columns 1–4 = the phrases from round 3, one column per instrument (trumpet: all 14, sax, trumpet ↔ sax as call / answer,
+  flute phrases), sorted calm → lively. Row 3 = build-up in 4 steps, each a fixed 8-bar plan: 1 phrase on bar 1 →
+  call + answer (bar 5) → every 2 bars → straight one after another (half a bar apart, livelier half). Button 1 = start phrase.
+- Columns 5–6 = flute melody from real flute notes (cut from the juskiddink phrases, brought to pitch by playback
+  speed), motifs on the chord tones (follow all progressions), A A B A; row 3 = Playful (extra notes, trills).
+  Column 6 from G4 (up to +5 semitones transposed). Motifs mine. Checked in Node; levels NOT measured.
 
-## melody-4 (Nutzer, 2026-11-08 nachts)
-- Bläser-Melodien gefallen noch nicht: eher purer klassischer Jazz. Nicht vergessen: klassischer House / Happy House.
-- Flöten ganz gut, der Verspielt-Knopf ist super; aber zu leise. Die höhere (Spalte 6) ist besser → wird eine Spalte im Track.
+## melody-4 (user, 2026-11-08 night)
+- Brass melodies not liked yet: rather pure classic jazz. Do not forget: classic house / happy house.
+- Flutes quite good, the Playful knob is great; but too quiet. The higher one (column 6) is better → becomes a column in the track.
 
-## Techno-Lead 1 — techno-lead-1.strudel (2026-11-09), for 008 Jonas 4
+## Techno Lead 1 — techno-lead-1.strudel (2026-11-09), for 008 Jonas 4
 - Players find the 008 lead uninspired. Research: tracks/008-groove-techno/research-chords-lead.md (motif, not tune).
 - Engine: tools/stem-lab/engine-techno (`// @engine techno`, 008 context).
 - Columns: 1 lead as in 008 (reference), 2 one-note square triplet stab (Hood), 3 3/5/7-step riff against the bar,

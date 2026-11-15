@@ -7,8 +7,8 @@
   up across it (−4.2 dB measured). Columns: Acid Tracks, swing acid, acid bass, acid melody, squelch stabs, 8-bar build.
 - Checked in Node (notes per bar, progression 19), ~3 ms/tick per column. Offline: every column −21 LUFS (first line,
   Cutoff 0.6, Acid 0.3) = keys of 009; Acid 1 → −21.8. Not heard. Feedback: open.
-- Feedback (Nutzer, 2026-11-08 nachts): Effekt zu krass, der Ton klingt schon kratzig; überall zu viel Acid und
-  Craziness. Swing-Acid klingt schon ganz gut, Squelch auch ganz gut.
+- Feedback (user, 2026-11-08 night): effect far too strong, the tone already sounds scratchy; too much acid and
+  craziness everywhere. Swing acid already sounds quite good, squelch quite good too.
 
 ## Acid 2 — acid-2.strudel (2026-11-08 night)
 - Tamer: no drive, 12 dB low-pass instead of ladder, env 0.5–2.5 oct., res 2–9, accent ×1.3, cutoff 150–1800 Hz. Only the

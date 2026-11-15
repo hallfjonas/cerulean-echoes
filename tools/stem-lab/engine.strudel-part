@@ -28,7 +28,7 @@ const melodyOf = (c, lo, hi) => inRange(c.penta, lo, hi)
 //   . rest · - the note before is held one more 16th · x stab (the column's chord notes) · X accented stab
 //   1-9 melody note: the n-th note of the chord's pentatonic from the column's lowest note up (1 = lowest)
 //   o soft ghost (the pentatonic note under the last note played)
-// Zufall entries: a riff rolled from the column's rhythm cells (one cell per beat) and a melodic contour that lands
+// Random entries: a riff rolled from the column's rhythm cells (one cell per beat) and a melodic contour that lands
 // on a chord tone on every beat. It is rolled when button 1 reaches the entry and then loops unchanged.
 const VEL = { x: 0.8, X: 1, o: 0.45 }
 const rollRiff = (cells, seed, bars = 2) => {
@@ -52,8 +52,8 @@ COLS.forEach((c, i) => { S.val[5 + i] ??= i === 0 ? 0.8 : 0; S.val[13 + i] ??= 0
 S.val[58] ??= 0.6; S.val[66] ??= 0.3; S.val[59] ??= 0.6; S.val[60] ??= 0.5   // drums, swing, bass, keys
 const swingPct = () => 0.5 + 0.2 * S.val[66]
 const drumsLevel = () => S.held[98] ? 0 : S.val[58]
-// A column's pattern list: the written ones, then Zufall 1 and 2 (rolled riffs) if it has rhythm cells
-const patsOf = i => [...COLS[i].pats, ...(COLS[i].cells ? [['Zufall 1'], ['Zufall 2']] : [])]
+// A column's pattern list: the written ones, then Random 1 and 2 (rolled riffs) if it has rhythm cells
+const patsOf = i => [...COLS[i].pats, ...(COLS[i].cells ? [['Random 1'], ['Random 2']] : [])]
 // A choice made now takes over at the next bar (len 4: at the next 4-bar phrase); fixed once a bar is first asked
 const latch = (key, bar, len = 1) => {
   const b = Math.floor(bar / len), m = S.at[key] ??= {}
@@ -61,7 +61,7 @@ const latch = (key, bar, len = 1) => {
   return m[b]
 }
 const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
-// The loop a column plays: the written string, or the riff rolled for the Zufall slot (cached per seed)
+// The loop a column plays: the written string, or the riff rolled for the Random slot (cached per seed)
 const ROLLED = {}
 const loopOf = (i, p) => { const e = patsOf(i)[p]
   if (e[1]) return e[1]
@@ -138,7 +138,7 @@ const drawView = () => {
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
         pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b><div class=pat>' + esc(loopOf(i, now)) + '</div></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>Echo-Wurf</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>Echo throw</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
@@ -205,7 +205,7 @@ const onMidi = e => {
     const i = cc - 37
     if (!COLS[i]) return
     const p = ((S.pend[i] ?? 0) + 1) % patsOf(i).length
-    // arriving at a Zufall slot rolls a new riff for it
+    // arriving at a Random slot rolls a new riff for it
     if (!patsOf(i)[p][1]) S.seed[i + ':' + p] = Math.floor(Math.random() * 1e6)
     S.pend[i] = p
   }

@@ -1,5 +1,5 @@
 // ============================================================
-// GITARREN-KLÄNGE 1: eight guitar sounds, the same plucked lines on every column (009 Jonas 5–7)
+// GUITAR SOUNDS 1: eight guitar sounds, the same plucked lines on every column (009 Jonas 5–7)
 // ============================================================
 // @engine 3
 // User (2026-11-08): the guitar sound is not good yet — show different sounds on a separate lab, next to the line board
@@ -9,7 +9,7 @@
 // treatment after it, the way a house producer would treat a sampled guitar (Stardust: phaser + overdrive on the
 // "Fate" guitar; disco: wah, palm mute; house: echo).
 //   1 Clean, high string (as disco-guitar-2/3)         5 Phaser (the Stardust sound), lower strings
-//   2 Lower strings (same notes on the G / B string:     6 Palm-muted: short, dark, a soft attack ("dumpf gezupft")
+//   2 Lower strings (same notes on the G / B string:     6 Palm-muted: short, dark, a soft attack ("dull plucked")
 //     thicker, warmer)                                   7 Auto-wah: a resonant filter that opens with every pluck
 //   3 Jazz: lower strings, dark, long                    8 Dub echo: dotted-8th echo and room
 //   4 Amp crunch: a little overdrive, the top rolled off
@@ -18,7 +18,7 @@
 // in this repo first (only as .7z on GitHub releases) — next round if none of these is good enough.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass, keys and the progression in Mode 2.
-// @layout Gitarren-Klänge 1 (lab/guitar, 009 Jonas 5–7: eight guitar sounds, same lines)
+// @layout Guitar Sounds 1 (lab/guitar, 009 Jonas 5–7: eight guitar sounds, same lines)
 // @note Same lines on every column (button 1: Stardust, repeated note, e & a 4); only the sound changes.
 // @note All from a real Stratocaster recorded note by note (nyanshell.strat, MIT): which string, and the treatment after it.
 // @guide What to listen for | Which sound is warm and "house"? Which is closest to the guitars of the reference records?
@@ -57,7 +57,7 @@
 // @ctl 2:7.fader Bass | off-beat bass on the chord root.
 // @ctl 2:8.fader Keys | the keys of 009, following the progression.
 
-const BOARD = { id: 'gitklang1', title: 'Gitarren-Klänge 1' }
+const BOARD = { id: 'guitarSounds1', title: 'Guitar Sounds 1' }
 const bpm = 124
 const BAR = 240 / bpm   // seconds per bar
 
@@ -95,7 +95,7 @@ const makeCols = h => {
   const N = (p, len, what, acc = 1) => ({ p, len, what, acc })
   const LINES = [
     ['Stardust', [N(2, 2, ['top']), N(6, 1, ['ch', 0]), N(8, 2, ['oct']), N(11, 1, ['strum']), N(15, 1, ['strum'])]],
-    ['Wiederholter Ton', [N(0, 2, ['top'], 1.1), N(3, 2, ['top']), N(6, 2, ['top']), N(10, 1, ['top'], 0.8)]],
+    ['Repeated note', [N(0, 2, ['top'], 1.1), N(3, 2, ['top']), N(6, 2, ['top']), N(10, 1, ['top'], 0.8)]],
     ['e & a 4', [N(9, 1, ['ch', 2]), N(10, 1, ['ch', 1]), N(11, 1, ['ch', 0]), N(12, 3, ['top'], 1.1)]],
   ]
   const pitchOf = (what, name) => {
@@ -117,17 +117,17 @@ const makeCols = h => {
     return out
   })
   const SOUNDS = [
-    ['Clean hoch', { str: 'hi', gain: 5, len: [0.5, 1.6], range: [800, 7000] }],
-    ['Tiefe Saiten', { str: 'lo', gain: 4.5, len: [0.5, 1.6], range: [800, 7000] }],
+    ['Clean high', { str: 'hi', gain: 5, len: [0.5, 1.6], range: [800, 7000] }],
+    ['Lower strings', { str: 'lo', gain: 4.5, len: [0.5, 1.6], range: [800, 7000] }],
     ['Jazz', { str: 'lo', gain: 5.5, len: [0.8, 2.5], release: 0.25, range: [500, 2500], fx: { bright: 0.8 } }],
     ['Crunch', { str: 'hi', gain: 2.6, len: [0.5, 1.4], range: [1200, 6000], fx: { shape: 0.45 } }],
     ['Phaser', { str: 'lo', gain: 4.5, len: [0.6, 1.8], range: [900, 8000],
       fx: { phaserrate: 0.35, phaserdepth: 0.8, phasercenter: 1000, phasersweep: 1200 } }],
-    ['Gedämpft', { str: 'lo', gain: 6, len: [0.35, 0.8], attack: 0.005, release: 0.04, range: [400, 2000] }],
+    ['Palm-muted', { str: 'lo', gain: 6, len: [0.35, 0.8], attack: 0.005, release: 0.04, range: [400, 2000] }],
     ['Auto-Wah', { str: 'hi', gain: 4, len: [0.6, 1.6], range: [500, 2500], fx: { lpq: 7, lpenv: 3, lpattack: 0.01, lpdecay: 0.14, lpsustain: 0.1 } }],
-    ['Dub-Echo', { str: 'hi', gain: 4.5, len: [0.5, 1.4], range: [800, 6000], fx: { delay: 0.45 } }],
+    ['Dub echo', { str: 'hi', gain: 4.5, len: [0.5, 1.4], range: [800, 6000], fx: { delay: 0.45 } }],
   ]
-  return SOUNDS.map(([name, snd], c) => ({ name, k3: 'own', k3name: 'Länge', space: name === 'Dub-Echo' ? 'bus' : undefined,
+  return SOUNDS.map(([name, snd], c) => ({ name, k3: 'own', k3name: 'Length', space: name === 'Dub echo' ? 'bus' : undefined,
     floor: 0.35, range: snd.range, gain: 1, pats: LINES.map(([ln, notes]) => [ln, play(c, notes, snd)]) }))
 }
 
@@ -346,9 +346,9 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
         pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
         typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
@@ -356,14 +356,14 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -374,7 +374,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -382,13 +382,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -401,13 +401,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

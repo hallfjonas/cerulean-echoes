@@ -2,8 +2,8 @@
 // HOUSE BASS 4: columns = SOUNDS, button 1 = the same 18 lines in every column (the liked ones + 5 new in their style)
 // ============================================================
 // @engine 3
-// Round 4 (2026-11-08 night). User on the lines (bass-2/3): Voyager „Zupfen“ all good; Instant Crush not so good; disco
-// syncope all good, especially „um die 1“, also „kurz“; Alright quite good; beat 4 open good, especially the short one;
+// Round 4 (2026-11-08 night). User on the lines (bass-2/3): Voyager “plucking” all good; Instant Crush not so good; disco
+// syncope all good, especially “around the 1”, also “short”; Alright quite good; beat 4 open good, especially the short one;
 // Something About Us not so; dead-note funk quite good. So: Instant Crush, Something About Us, Get Lucky and the other
 // octave lines out; the liked ones first (disco syncope, beat 4 open, Voyager, dead notes, Alright), then 5 new lines
 // that combine what was liked: syncope around the 1 with dead notes, short + beat 4 open with a pickup, plucking +
@@ -137,35 +137,35 @@ const makeCols = h => {
     .attack(0.004).decay(0.3).sustain(0.7).release(0.1)
 
   const LINES = [
-    ['1 Disco-Synkope: Um die 1', ['.R.5..7.O..R.5.F', '.R.5..7.O.7.5.3A']],
-    ['2 Disco-Synkope: Um die 1, kurz', ['.r.5..7.o..r.5.F', '.r..5.r..o.7.r5A']],
-    ['3 Disco-Synkope: Pentatonik-Lauf', ['.R.3.4.5..7.O.7.', '.R.5.7.O.7.5.4.A']],
-    ['4 Beat 4 frei: Beat 4 frei, kurz', ['r.ro.r5.r7.o....', 'r.ro.r5.o7.5....']],
-    ['5 Beat 4 frei: Beat 4 frei', ['R-.O..R5.R7.....', 'R-.O..R5.O.7....']],
-    ['6 Beat 4 frei: + Auftakt', ['R-.O..R5.R7.....', 'R-.O..R5.O.7..5A']],
-    ['7 Voyager: Zupfen → lang', ['R.R.O.R.RgROg7R5', 'R-------....O.7A']],
-    ['8 Voyager: Zupfen 2T', ['r.r.o.r.rgro.7r5', 'r.r.5.r.rgro7-5A']],
-    ['9 Voyager: Zupfen spät', ['..r.o.r.rgro.7rA', 'R-----..r.o.7.5.']],
-    ['10 Dead-Note-Funk: Dead Notes', ['RgRgO.RgRg5.RgO7', 'RgRgO.RgRg5.R.7A']],
-    ['11 Dead-Note-Funk: Atempause', ['R.RgO.R..g5.RgO7', 'R.RgO.Rg.g5.R7.A']],
-    ['12 Dead-Note-Funk: Gerutscht', ['RgR.O~7.RgR.5~7A', 'RgR.O~7.Rg5.7~OA']],
-    ['13 Oktav-Funk: Alright', ['R.O.R.O.R.O.R.O.', 'R.3.R.3.R.5.O.7A']],
-    ['14 Neu: Um die 1 + Dead', ['.R.5g.7.O.gR.5.F', '.R.5g.7.O.7g5.3A']],
-    ['15 Neu: Kurz, Beat 4 frei + Auftakt', ['r.ro.r5.r7.o..5A', 'r.ro.r5.o7.5..5A']],
-    ['16 Neu: Zupfen + Synkope', ['r.r.o.r..r.5..7.', '.r.5..7.o.ro.7rA']],
-    ['17 Neu: Alright kurz', ['r.o.r.o.r.o.r.o.', 'r.3.r.3.r.5.o.7A']],
-    ['18 Neu: Dead Notes um die 1', ['gRg5..7.OgRg5..F', 'gRg5..7.Og7g5.3A']],
+    ['1 Disco syncope: around the 1', ['.R.5..7.O..R.5.F', '.R.5..7.O.7.5.3A']],
+    ['2 Disco syncope: around the 1, short', ['.r.5..7.o..r.5.F', '.r..5.r..o.7.r5A']],
+    ['3 Disco syncope: pentatonic run', ['.R.3.4.5..7.O.7.', '.R.5.7.O.7.5.4.A']],
+    ['4 Beat 4 open: beat 4 open, short', ['r.ro.r5.r7.o....', 'r.ro.r5.o7.5....']],
+    ['5 Beat 4 open: beat 4 open', ['R-.O..R5.R7.....', 'R-.O..R5.O.7....']],
+    ['6 Beat 4 open: + pickup', ['R-.O..R5.R7.....', 'R-.O..R5.O.7..5A']],
+    ['7 Voyager: plucking → long', ['R.R.O.R.RgROg7R5', 'R-------....O.7A']],
+    ['8 Voyager: plucking 2 bars', ['r.r.o.r.rgro.7r5', 'r.r.5.r.rgro7-5A']],
+    ['9 Voyager: plucking late', ['..r.o.r.rgro.7rA', 'R-----..r.o.7.5.']],
+    ['10 Dead-note funk: dead notes', ['RgRgO.RgRg5.RgO7', 'RgRgO.RgRg5.R.7A']],
+    ['11 Dead-note funk: breather', ['R.RgO.R..g5.RgO7', 'R.RgO.Rg.g5.R7.A']],
+    ['12 Dead-note funk: slid', ['RgR.O~7.RgR.5~7A', 'RgR.O~7.Rg5.7~OA']],
+    ['13 Octave funk: Alright', ['R.O.R.O.R.O.R.O.', 'R.3.R.3.R.5.O.7A']],
+    ['14 New: around the 1 + dead', ['.R.5g.7.O.gR.5.F', '.R.5g.7.O.7g5.3A']],
+    ['15 New: short, beat 4 open + pickup', ['r.ro.r5.r7.o..5A', 'r.ro.r5.o7.5..5A']],
+    ['16 New: plucking + syncope', ['r.r.o.r..r.5..7.', '.r.5..7.o.ro.7rA']],
+    ['17 New: Alright short', ['r.o.r.o.r.o.r.o.', 'r.3.r.3.r.5.o.7A']],
+    ['18 New: dead notes around the 1', ['gRg5..7.OgRg5..F', 'gRg5..7.Og7g5.3A']],
   ]
-  const col = (i, name, sound, range, gain) => ({ name, range, gain, b2: 'own', b2name: 'Oktave',
+  const col = (i, name, sound, range, gain) => ({ name, range, gain, b2: 'own', b2name: 'Octave',
     pats: LINES.map(([n, bars]) => [n, oct(i)(sound(linePat(bars)))]) })
   return [
     col(0, 'FM (Daft Punk)', fmb, [400, 5000], 0.77),
     col(1, 'Juno', juno, [200, 4000], 1.13),
-    col(2, 'M1-Orgel', m1, [300, 3000], 0.71),
+    col(2, 'M1 organ', m1, [300, 3000], 0.71),
     col(3, 'Disco', disco, [300, 5000], 1),
-    col(4, 'Rund', round, [300, 3000], 0.74),
+    col(4, 'Round', round, [300, 3000], 0.74),
     col(5, 'Warm', warm, [250, 3500], 0.69),
-    col(6, 'Jojo 4 jetzt', jojo, [700, 5000], 0.85),
+    col(6, 'Jojo 4 now', jojo, [700, 5000], 0.85),
     col(7, 'Deep Sub', deep, [150, 1500], 0.33),
   ]
 }
@@ -385,9 +385,9 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
         pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
         typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
@@ -395,14 +395,14 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -413,7 +413,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -421,13 +421,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -440,13 +440,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

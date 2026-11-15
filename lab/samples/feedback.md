@@ -1,13 +1,13 @@
-# samples — Feedback
+# samples — feedback
 
-## sample-lab-1 (Nutzer, 2026-11-08)
-- Bläser-Stabs: furchtbar, quäkig, nicht organisch, nicht als Bläser erkennbar → raus.
-- Sax (Alto): zu gefühlsdudelig/cheesy, nicht warm genug. Tenor etwas besser, aber nur ein Ton? (prüfen: Startpunkt/Länge)
-- Trompete: zu schnelle, unruhige Töne (Oldschool-Jazz), nur 1 Takt wiederholt → mehr Klarheit und Melodie.
-- Gitarre: könnte nice sein, aber zu messy und nicht im Takt.
-- Flöte: prinzipiell gut, Samples noch nicht. Triller (427560) besser als Oktaven → Einwurf, viel seltener;
-  für die Launchkey-Pads: nur Triller, ohne den Tonhöhen-Drop am Ende.
-- Stimme: erstes (Humming 439504) still; zweites (janie_joelle yeah yeah yeah 529175) gefällt → Pads.
-  Scat (184280) still.
-- Rhodes/Orgel: funktioniert gar nicht, verstaubter Jazz.
-- Vinyl: nicht spannend.
+## sample-lab-1 (user, 2026-11-08)
+- Horn stabs: awful, squawky, not organic, not recognisable as brass → out.
+- Sax (alto): too schmaltzy / cheesy, not warm enough. Tenor a bit better, but only one note? (check: start point / length)
+- Trumpet: too fast, restless notes (old-school jazz), only 1 bar repeated → more clarity and melody.
+- Guitar: could be nice, but too messy and not in time.
+- Flute: good in principle, the samples not yet. Trill (427560) better than octaves → stab, much rarer;
+  for the Launchkey pads: only the trill, without the pitch drop at the end.
+- Voice: the first (Humming 439504) silent; the second (janie_joelle yeah yeah yeah 529175) liked → pads.
+  Scat (184280) silent.
+- Rhodes / organ: does not work at all, dusty jazz.
+- Vinyl: not exciting.

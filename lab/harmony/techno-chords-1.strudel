@@ -1,5 +1,5 @@
 // ============================================================
-// TECHNO-AKKORDE 1: chord candidates for track 008 column Jonas 2 (now: chord pulse)
+// TECHNO CHORDS 1: chord candidates for track 008 column Jonas 2 (now: chord pulse)
 // ============================================================
 // @engine techno
 // The players are not convinced by the chord pulse (round 7), and before it the dub chords were boring with a cheap
@@ -13,29 +13,29 @@
 //                 syncopation, dotted-8th echo; row 3 = bandpass centre. (Source uses a sampled chord: synth here.)
 //   4 Parallel    Attack "Theory of techno: parallel chord stabs" (UR – Timeline): one fixed minor-7 shape in
 //                 semitones moved by the root, short 16th hits off the downbeat, a 2-bar pattern with muted hits.
-//   5 Pad gehackt Attack "Basic Channel style", step 4: the held chord chopped into rhythm by a 5/16 echo with drive;
+//   5 Pad chopped Attack "Basic Channel style", step 4: the held chord chopped into rhythm by a 5/16 echo with drive;
 //                 row 3 = drive.
-//   6 Ein Schlag  Chain-Reaction idea after the same sources: one chord hit, the echo with long feedback is the
+//   6 One hit     Chain-Reaction idea after the same sources: one chord hit, the echo with long feedback is the
 //                 rhythm, the filter breathes over 16 bars; row 3 = feedback. (Combination = my guess.)
-//   7 Dreiklang   Attack "Jeff Mills – The Bells part 2": three saws tuned to a minor triad (one key = chord), very
+//   7 Triad       Attack "Jeff Mills – The Bells part 2": three saws tuned to a minor triad (one key = chord), very
 //                 short, slow warble, a little drive. Not the bell riff of the pings: a chord stab in the middle.
 // Note values and Strudel parameters are my translation of the recipes (guess), not from the sources. Levels set by
 // ear-free estimate, not measured. Not heard.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass, pad and the progression in Mode 2.
-// @layout Techno-Akkorde 1 (lab/harmony, 008 Jonas 2: chord candidates after research)
+// @layout Techno Chords 1 (lab/harmony, 008 Jonas 2: chord candidates after research)
 // @note Column 1 = the chord pulse as it is in 008 (reference). Columns 2–7 = one researched recipe each (see the file head).
 // @note Context in Mode 2: drums, bass and pad of 008, the progression on column 5 button 1.
 // @guide What to listen for | At all knobs 0: which one sits with kick and pad without pulling attention? Which still sounds good after 32 bars?
 // @guide Live | Turn row 3 slowly: on 2 and 6 it is the echo tail, on 3 the band, on 5 the drive. Button 2 = echo throw.
 // @mode 16 Mode 16 — Candidates
-// @col 16:1 1 Puls (jetzt)
+// @col 16:1 1 Pulse (now)
 // @col 16:2 2 Dub-Chuff
 // @col 16:3 3 Basic Ch.
 // @col 16:4 4 Parallel
-// @col 16:5 5 Pad gehackt
-// @col 16:6 6 Ein Schlag
-// @col 16:7 7 Dreiklang
+// @col 16:5 5 Pad chopped
+// @col 16:6 6 One hit
+// @col 16:7 7 Triad
 // @row 16:k1 Row 1 \ Brightness
 // @row 16:k2 Row 2 \ Space
 // @row 16:k3 Row 3 \ Character
@@ -66,7 +66,7 @@
 // @ctl 2:7.fader Bass | off-beat square bass on the chord root.
 // @ctl 2:8.fader Pad | 008's pad, minor-9 chords.
 
-const BOARD = { id: 'techno-chords-1', title: 'Techno-Akkorde 1' }
+const BOARD = { id: 'techno-chords-1', title: 'Techno Chords 1' }
 const bpm = 140
 
 const makeCols = h => {
@@ -121,34 +121,34 @@ const makeCols = h => {
     .vib(0.3).vibmod(0.08).shape(0.2).gain(0.05)
 
   return [
-    { name: 'Puls (jetzt)', range: [300, 5000], space: 'bus', pats: [
-      ['2 Schläge', pulse(hits(m9, '..x.......x.....'))],
-      ['4 Schläge', pulse(hits(m9, '..x...x...x...x.'))],
-      ['Viertel', pulse(hits(m9, 'x.....x.....x...'))]] },
+    { name: 'Pulse (now)', range: [300, 5000], space: 'bus', pats: [
+      ['2 hits', pulse(hits(m9, '..x.......x.....'))],
+      ['4 hits', pulse(hits(m9, '..x...x...x...x.'))],
+      ['Quarters', pulse(hits(m9, 'x.....x.....x...'))]] },
     { name: 'Dub-Chuff', range: [400, 4000], space: 'bus', k3: 'own', k3name: 'Echo', pats: [
-      ['Und 2 + 4', chuff('......x.......x.')],
-      ['Ein Schlag', chuff('..x.............')],
-      ['Synkope', chuff('...x......x.....')]] },
+      ['And 2 + 4', chuff('......x.......x.')],
+      ['One hit', chuff('..x.............')],
+      ['Syncopation', chuff('...x......x.....')]] },
     { name: 'Basic Ch.', range: [800, 8000], space: 'bus', k3: 'own', k3name: 'Band', gain: 1.4, pats: [
       ['3/16', basic('x..x..x..x..x...')],
       ['Offbeat', basic('..x...x...x...x.')],
-      ['Synkope', basic('...x..x...x..x..')]] },
+      ['Syncopation', basic('...x..x...x..x..')]] },
     { name: 'Parallel', range: [500, 6000], space: 'bus', pats: [
       ['Timeline', par('..x..x...x..x...', '..x..x.......x..')],
-      ['Ruf', par('.x..x.....x..x..', '.x..x...........')],
-      ['Sechzehntel', par('..xx..x...x..x..', '..xx......x.....')]] },
-    { name: 'Pad gehackt', range: [300, 5000], space: 'bus', k3: 'own', k3name: 'Drive', pats: [
-      ['Eins', chop('x...............')],
-      ['Eins + 7', chop('x.....x.........')],
-      ['Und', chop('..x.......x.....')]] },
-    { name: 'Ein Schlag', range: [400, 5000], space: 'bus', k3: 'own', k3name: 'Echo', pats: [
-      ['Und 1', one('..x.............')],
-      ['2 Takte', one('..x.............', '................')],
-      ['Und 2', one('......x.........')]] },
-    { name: 'Dreiklang', range: [600, 7000], space: 'bus', pats: [
+      ['Call', par('.x..x.....x..x..', '.x..x...........')],
+      ['Sixteenths', par('..xx..x...x..x..', '..xx......x.....')]] },
+    { name: 'Pad chopped', range: [300, 5000], space: 'bus', k3: 'own', k3name: 'Drive', pats: [
+      ['One', chop('x...............')],
+      ['One + 7', chop('x.....x.........')],
+      ['And', chop('..x.......x.....')]] },
+    { name: 'One hit', range: [400, 5000], space: 'bus', k3: 'own', k3name: 'Echo', pats: [
+      ['And 1', one('..x.............')],
+      ['2 bars', one('..x.............', '................')],
+      ['And 2', one('......x.........')]] },
+    { name: 'Triad', range: [600, 7000], space: 'bus', pats: [
       ['Offbeat', triad('..x...x...x...x.')],
-      ['Triolen', triad('x.x..x.x..x.')],
-      ['Ruf', triad('.x..x...x..x....')]] },
+      ['Triplets', triad('x.x..x.x..x.')],
+      ['Call', triad('.x..x...x..x....')]] },
   ]
 }
 
@@ -281,17 +281,17 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Pad</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -302,7 +302,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -310,13 +310,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -329,13 +329,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Pad ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
       }),
     ].join('\n')

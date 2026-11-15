@@ -7,13 +7,12 @@
 //   1 Kerri video  2 Checkmate  3 Turn Off The Lights  4 Atmosphere  5 Chicago Spread  6 Retro disco (16 bars)
 // BUTTON 1 of every column = what bass and harmony pad do WHILE THAT RIFF LEADS (a column's choice is kept; it takes
 // over at the next 4-bar phrase):
-//   1 Folgen               bass on the riff's roots, pad holds the riff's chords
-//   2 Orgelpunkt           bass stays on A, pad holds Am9 (a pedal under the riff, as Kerri Chandler “Mommy What's a
+//   1 Follow               bass on the riff's roots, pad holds the riff's chords
+//   2 Pedal A              bass stays on A, pad holds Am9 (a pedal under the riff, as Kerri Chandler “Mommy What's a
 //                          Record”: chords moving over a held bass note; Attack Magazine, Kerri Chandler chords part 2)
-//   3 Bass folgt, ohne     bass on the riff's roots, pad silent: the riff alone carries the chords (bass on the roots as
-//     Fläche               Kerri Chandler “Keep Me Inside”, Inner City “Good Life”; Attack Magazine)
-//   4 Orgelpunkt, ohne     bass on A, pad silent
-//     Fläche
+//   3 Bass follows, no     bass on the riff's roots, pad silent: the riff alone carries the chords (bass on the roots as
+//     pad                  Kerri Chandler “Keep Me Inside”, Inner City “Good Life”; Attack Magazine)
+//   4 Pedal, no pad        bass on A, pad silent
 // Who leads: the column whose fader was raised from 0 last takes over at the next 4-bar phrase and starts from its own
 // first bar; only the leading riff sounds. All faders at 0 → the progression leads (Mode 2 column 1 button 1 picks one
 // of 10 of track 009) and bass and pad play it. Everything else as round 25 (sounds, knobs, drums, pad). Not heard.
@@ -105,11 +104,11 @@ const RIFFS = [
     [['Chicago', bars('x...x...x-.x..x.', '..x..x.....x....', 'x...x...x-.x..x.', '..x..x.....x....')]]],
   // Retro disco: bars 1–8 Am7 (3) Fmaj7 (3) G (2) on the beats; bars 9–16 the same in other voicings, off the beats,
   // G climbing through its inversions in bars 15–16 (the lift into the loop)
-  ['Retro-Disco 16T', bars(...Array(3).fill('MMMMMMMMMMMMMMMM'), ...Array(3).fill('FFFFFFFFFFFFFFFF'), ...Array(2).fill('GGGGGGGGGGGGGGGG'),
+  ['Retro disco 16 bars', bars(...Array(3).fill('MMMMMMMMMMMMMMMM'), ...Array(3).fill('FFFFFFFFFFFFFFFF'), ...Array(2).fill('GGGGGGGGGGGGGGGG'),
       ...Array(3).fill('mmmmmmmmmmmmmmmm'), ...Array(3).fill('ffffffffffffffff'), 'gggggggggggggggg', 'gggghhhhhhhhiiii'),
     { M: V(9, [55, 57, 60, 64]), F: V(5, [57, 60, 64, 65]), G: V(7, [55, 59, 62]),
       m: V(9, [60, 64, 67]), f: V(5, [53, 57, 60, 64]), g: V(7, [55, 59, 62]), h: V(7, [59, 62, 67]), i: V(7, [62, 67, 71]) },
-    [['Retro-Disco', bars(...Array(8).fill('x--.x--.x--.x-x.'), ...Array(8).fill('..x..x..x..x.x..'))]]],
+    [['Retro disco', bars(...Array(8).fill('x--.x--.x--.x-x.'), ...Array(8).fill('..x..x..x..x.x..'))]]],
 ]
 // round 24: the riffs' chord names (status, dashboard; the pad holds one name as one chord, so Atmosphere's fill stab and
 // Turn Off's second Bm voicing do not restrike it)
@@ -119,22 +118,22 @@ const RIFF_NAMES = {
   'Turn Off The Lights': { A: 'Am', D: 'Dm', E: 'Em', b: 'Bm', v: 'Bm' },
   'Atmosphere': { M: 'Am7', f: 'Am7', q: 'Em/G' },
   'Chicago Spread': { A: 'Am9', C: 'Cmaj9', F: 'Fmaj7', D: 'D9' },
-  'Retro-Disco 16T': { M: 'Am7', F: 'Fmaj7', G: 'G', m: 'Am7', f: 'Fmaj7', g: 'G', h: 'G', i: 'G' },
+  'Retro disco 16 bars': { M: 'Am7', F: 'Fmaj7', G: 'G', m: 'Am7', f: 'Fmaj7', g: 'G', h: 'G', i: 'G' },
 }
 // Columns: [name, patterns, (unused), (unused), touch, sources, job of button 1 in sound mode, chords per 16th, voicings]
 // The rhythms on button 1, the same on every column (change them while the keys are off)
 const PATS = [
-    ['Kette',            '.x..x..x.x..x..x', '.x..x..x.x..x.x.', '.x..x..x.x.x.x.x'],
-    ['versetzte Kette',  '...x..x..x.x..x.', '...x..x..x.x.x..', '...x..x..x.x.x.x'],
-    ['Paare',            '.x.x..x..x.x..x.'],
+    ['Chain',            '.x..x..x.x..x..x', '.x..x..x.x..x.x.', '.x..x..x.x.x.x.x'],
+    ['shifted chain',    '...x..x..x.x..x.', '...x..x..x.x.x..', '...x..x..x.x.x.x'],
+    ['Pairs',            '.x.x..x..x.x..x.'],
     ['3-3-2',            'x..x..x...x..x..'],
-    ['Kerri-Synkope',    '..x..x...x.x..x.'],
+    ['Kerri syncopation','..x..x...x.x..x.'],
     // The Kerri video's riff rhythm, all on Am9 and as short as every other pattern (Length knob = how long)
-    ['Kerri-Riff auf A', 'x..x..x..x..x.x.'],
+    ['Kerri riff on A', 'x..x..x..x..x.x.'],
     // Overlays: liked in round 6 when two columns played different patterns at once (the hits differ, more organic)
     // 8th element = the reference rhythm: the overlay is levelled to its energy (as loud as the chain alone)
-    ['Kette + versetzt', overlay('.x..x..x.x..x..x', '...x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x'],
-    ['Kette + Paare',    overlay('.x..x..x.x..x..x', '.x.x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x']]
+    ['Chain + shifted', overlay('.x..x..x.x..x..x', '...x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x'],
+    ['Chain + pairs',    overlay('.x..x..x.x..x..x', '.x.x..x..x.x..x.'), '', '', null, null, null, '.x..x..x.x..x..x']]
 // Touch schemes: touch(k, pat, pos) = how hard the hit at 16th k is played, 0 soft … 0.5 as written … 1
 // hard (gain 0.6 – 1.4, brightness ×0.5 – ×2); vel / cut = other gain / brightness per symbol. Fixed per position:
 // the loop stays constant.
@@ -163,7 +162,7 @@ const TOUCH = { touch: accent, bright: 4, vel: () => ({ ...VEL, b: 0.8 * (1 - SE
 // Columns: [name, patterns, (unused), (unused), touch, source]
 // Columns: [name, patterns, (unused), (unused), touch, sources, job of button 1 in sound mode]
 // Columns: [name, patterns, (unused), (unused), touch, sources, job of button 1 in sound mode, riff]
-const PATS_K = [['Kerri-Video', 'x..x..x..x..x.x.'], ...PATS.filter(([n]) => n !== 'Kerri-Riff auf A')]
+const PATS_K = [['Kerri-Video', 'x..x..x..x..x.x.'], ...PATS.filter(([n]) => n !== 'Kerri riff on A')]
 const COLS = RIFFS.map(([name, seq, voic, pats]) => [name, pats, null, null, TOUCH, ['steinway', 'rhodes'], null, seq, voic])
 // Brightness range per sound [lowest, highest cutoff]: highest = twice the frequency below which 99.9 % of the sound's
 // energy lies (measured, first 0.3 s of C4 / B3; GM Rhodes from its soundfont zone). Organs and mallets: estimated
@@ -202,7 +201,7 @@ const xfade = c => [Math.cos(c * Math.PI / 2), Math.sin(c * Math.PI / 2)].map(x 
 // the two organs share partials: mid-blend measured +1.3 dB louder (round 14), taken out
 const pairLevels = (v, dip = 0) => { const [lvl, c] = sweep(v), [a, b] = xfade(c), d = Math.pow(10, -dip * Math.sin(Math.PI * c) / 20)
   return [lvl * a * d, lvl * b * d] }
-const MIXNAMES = [['Klavier', 'Rhodes'], ['B3', 'M1'], ['Vibra', 'Marimba']]
+const MIXNAMES = [['Piano', 'Rhodes'], ['B3', 'M1'], ['Vibra', 'Marimba']]
 const layersOf = i => { const m = S.mix[i], [pno, rho] = COLS[i][5]
   // piano and Rhodes blended dip 1.3 dB mid-way (measured, Steinway + Mark I): lifted
   return [[pno, pairLevels(m[0], -1.3)[0]], [rho, pairLevels(m[0], -1.3)[1]], ['b3', pairLevels(m[1], 1.3)[0]], ['m1', pairLevels(m[1], 1.3)[1]],
@@ -306,7 +305,7 @@ const leadAt = bar => {
 }
 const leadNow = () => { const m = S.at.lead ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : null }
 const leadPend = () => { const p = S.pend.lead ?? { kind: 'prog' }; return p.kind === 'riff' ? p : { kind: 'prog', prog: S.pend.prog ?? 0 } }
-const leadName = L => !L ? '–' : L.kind === 'riff' ? (L.i + 1) + ' ' + COLS[L.i][0] : 'Folge ' + PROGS[L.prog].name
+const leadName = L => !L ? '–' : L.kind === 'riff' ? (L.i + 1) + ' ' + COLS[L.i][0] : 'Progression ' + PROGS[L.prog].name
 // The chord at 16th k: the leading riff's (its letter, from its first 16th on) or the progression's (one per bar)
 const clockAt = k => {
   const L = leadAt(Math.floor(k / 16))
@@ -325,10 +324,10 @@ const pushAt = k => {
 }
 // Round 25: what bass and pad do while a riff leads (Mode 2 column 7 button 1), fixed per 4-bar phrase like the leader
 const UNDER = [
-  { name: 'Folgen', bass: 'riff', pad: 'riff' },
-  { name: 'Orgelpunkt A', bass: 'A', pad: 'Am9' },
-  { name: 'Bass folgt, ohne Fläche', bass: 'riff', pad: 'off' },
-  { name: 'Orgelpunkt, ohne Fläche', bass: 'A', pad: 'off' },
+  { name: 'Follow', bass: 'riff', pad: 'riff' },
+  { name: 'Pedal A', bass: 'A', pad: 'Am9' },
+  { name: 'Bass follows, no pad', bass: 'riff', pad: 'off' },
+  { name: 'Pedal, no pad', bass: 'A', pad: 'off' },
 ]
 // round 26: each riff column has its own choice (S.pend['under' + i]); the leading riff's counts
 const underOf = (i, k) => UNDER[latch('under' + i, Math.floor(k / 16), 4)]
@@ -410,14 +409,14 @@ const VIEW_CSS = [
 ].join('\n')
 // Round 25: the switch now (→ next), as text or html
 const underText = (html, i) => { const n = UNDER[latchNow('under' + i)].name, p = UNDER[S.pend['under' + i] ?? 0].name
-  return html ? pending(n, p) : n + (p !== n ? ' → ' + p + ' (nächste Phrase)' : '') }
+  return html ? pending(n, p) : n + (p !== n ? ' → ' + p + ' (next phrase)' : '') }
 const underLead = html => { const L = leadNow(); return L?.kind === 'riff' ? underText(html, L.i) : html ? '–' : '–' }
 const pending = (now, next) =>esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
 // While a column's shift is on, its cells show what the controls do then: the fader sets how far the accent moves
 // through the recordings (sources with only one: nothing), everything else does nothing
-const SHIFT_FADER = Object.fromEntries(COLS.map((c, i) => [i, ['rec' + i, 'Obertöne']]))
+const SHIFT_FADER = Object.fromEntries(COLS.map((c, i) => [i, ['rec' + i, 'Overtones']]))
 const mixText = (i, r) => { const [a, b] = MIXNAMES[r], v = S.mix[i][r]
-  return v <= 0 ? 'aus' : v < 1 / 3 ? a + ' ' + pct(3 * v) : v > 2 / 3 ? b + ' ' + pct(3 - 3 * v) : a + ' → ' + b + ' ' + pct(3 * v - 1) }
+  return v <= 0 ? 'off' : v < 1 / 3 ? a + ' ' + pct(3 * v) : v > 2 / 3 ? b + ' ' + pct(3 - 3 * v) : a + ' → ' + b + ' ' + pct(3 * v - 1) }
 const catchHint = () => ''
 const drawView = () => {
   if (!view?.win || view.win.closed) return
@@ -435,32 +434,32 @@ const drawView = () => {
     if (S.held[45 + i]) {
       const hp = S.pend.harm ?? 0, f = SHIFT_FADER[i]
       return {
-        k1: knob(S.mix[i][0], 'Klavier → Rhodes', mixText(i, 0)), k2: knob(S.mix[i][1], 'B3 → M1', mixText(i, 1)),
+        k1: knob(S.mix[i][0], 'Piano → Rhodes', mixText(i, 0)), k2: knob(S.mix[i][1], 'B3 → M1', mixText(i, 1)),
         k3: knob(S.mix[i][2], 'Vibra → Marimba', mixText(i, 2)),
         fader: !f ? off('—') : '<div class="cell fader"><div class=bar style="--v:' + (S.val[f[0]] ?? 0) + '"><i></i></div><b>' +
           pct(S.val[f[0]]) + '</b><span>' + f[1] + catchHint(f[0]) + '</span></div>',
         b1: !COLS[i][6] ? off('—') : COLS[i][6] === 'push'
-          ? '<div class="cell btn' + (S.job.push[i] ? ' on' : '') + '"><b>Push ' + (S.job.push[i] ? 'an' : 'aus') + '</b></div>'
-          : '<div class="cell btn' + (S.job.held[i] ? ' on' : '') + '"><b>' + (COLS[i][6] === 'echo' ? 'Echo-Wurf' : 'Stotter') + '</b></div>',
-        b2: '<div class="cell btn on"><b>Klang an</b></div>',
+          ? '<div class="cell btn' + (S.job.push[i] ? ' on' : '') + '"><b>Push ' + (S.job.push[i] ? 'on' : 'off') + '</b></div>'
+          : '<div class="cell btn' + (S.job.held[i] ? ' on' : '') + '"><b>' + (COLS[i][6] === 'echo' ? 'Echo throw' : 'Stutter') + '</b></div>',
+        b2: '<div class="cell btn on"><b>Sound on</b></div>',
       }
     }
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], 'Space'), k3: knob(S.val[29 + i], 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel' + catchHint(5 + i) + '</span></div>',
-      b1: '<div class="cell btn"><span>Unter dem Riff</span><b>' + underText(true, i) + '</b></div>',
-      b2: '<div class="cell btn"><b>Klang</b></div>',
+        pct(S.val[5 + i]) + '</b><span>Level' + catchHint(5 + i) + '</span></div>',
+      b1: '<div class="cell btn"><span>Under the riff</span><b>' + underText(true, i) + '</b></div>',
+      b2: '<div class="cell btn"><b>Sound</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>House Keys Lab 26</h1>' +
-    '<div><span class=k>Führt</span>' + pending(leadName(leadNow()), leadName(leadPend())) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Unter Riff</span>' + underLead(true) + '</div></div>' +
-    '<div class="head mix">' + ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? '<b class=acc>KLANG</b>' : '') +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Leads</span>' + pending(leadName(leadNow()), leadName(leadPend())) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Under riff</span>' + underLead(true) + '</div></div>' +
+    '<div class="head mix">' + ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? '<b class=acc>SOUND</b>' : '') +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(bassLevel()) + '</div>' +
-    '<div><span class=k>Fläche</span>' + pct(S.val[53]) + ' · ' + ((S.val[77] ?? 0) <= 0.001 ? 'Strings' : (S.val[77] ?? 0) >= 0.999 ? 'B3' : 'beide ' + pct(S.val[77])) + '</div></div>' +
+    '<div><span class=k>Pad</span>' + pct(S.val[53]) + ' · ' + ((S.val[77] ?? 0) <= 0.001 ? 'Strings' : (S.val[77] ?? 0) >= 0.999 ? 'B3' : 'both ' + pct(S.val[77])) + '</div></div>' +
     '<div class=grid>' +
     COLS.map(([name], i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 && leads(i) ? ' live' : '') + '">' + (i + 1) + ' ' + esc(name) + '</div>').join('') +
     ['k1', 'k2', 'k3', 'fader', 'b1', 'b2'].map(r => cells.map(c => c[r]).join('')).join('') + '</div>'
@@ -469,7 +468,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'keys-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -477,13 +476,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'keys-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = 'House Keys Lab 26'
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -496,13 +495,13 @@ const showStatus = () => {
   if (statusText) {
     const ln = leadName(leadNow()), lp = leadName(leadPend())
     statusText.textContent = [
-      'Führt ' + ln + (lp !== ln ? ' → ' + lp + ' (nächste Phrase)' : '') + ' · Fläche ' + pct(S.val[53]),
-      'Unter Riff ' + underLead(false),
-      ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? 'KLANG · ' : '') + 'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(bassLevel()) + ' · ' + bpm + ' BPM',
+      'Leads ' + ln + (lp !== ln ? ' → ' + lp + ' (next phrase)' : '') + ' · Pad ' + pct(S.val[53]),
+      'Under riff ' + underLead(false),
+      ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? 'SOUND · ' : '') + 'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(bassLevel()) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map(([name, pats], i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0
-        return (leads(i) && (S.val[5 + i] ?? 0) > 0 ? '♪' : ' ') + (i + 1) + ' ' + name.padEnd(19) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (leads(i) && (S.val[5 + i] ?? 0) > 0 ? '♪' : ' ') + (i + 1) + ' ' + name.padEnd(19) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           underText(false, i)
       }),
     ].join('\n')

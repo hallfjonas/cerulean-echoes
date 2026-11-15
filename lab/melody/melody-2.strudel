@@ -1,19 +1,19 @@
 // ============================================================
-// MELODIE 2: the vibraphone of round 1 with a Complexity knob (round 2; trumpets and marimba out, see feedback.md)
+// MELODY 2: the vibraphone of round 1 with a Complexity knob (round 2; trumpets and marimba out, see feedback.md)
 // ============================================================
 // @engine 3
 // Round 1 feedback: vibraphone “quite nice”; wanted a knob from basic to complex as in 008 (Pings: Density), and Length
 // and Space merged into one knob (both smear / soften). Trumpet multisamples: not warm, mechanical → real recorded
 // phrases next (not in this board yet). Marimba lost against the vibraphone.
 // Phrases (follow the chord, engine 3): Offbeat — chord tones on off-beat 16ths, bar 8 climbs; Tresillo — 3-3-2 on
-// root / fifth, diatonic per chord, every 4th bar different; Ruf-Echo — the Escravos call an octave lower in bars 7–8.
+// root / fifth, diatonic per chord, every 4th bar different; call echo — the Escravos call an octave lower in bars 7–8.
 // Complexity (row 3), as 008's Pings density: 0 = the core of the figure (2–3 notes per bar) → from 15 % the figure
 // as in round 1 (the default, 30 %) → from 45 % the gaps fill in at random with chord tones → from 75 % quick 16th /
 // 32nd doubles and neighbour notes. Soft (row 2) = the old Space plus longer notes (×1 … ×4 ring).
 // Sound: VCSL vibraphone (CC0, built into Strudel; files an octave above their names: played an octave lower).
 //
 // Launch Control XL 3: the candidate in Custom Mode 16 (channel 16), drums, bass, keys and the progression in Mode 2.
-// @layout Melodie 2 (lab/melody, 009: vibraphone with Soft and Complexity knobs)
+// @layout Melody 2 (lab/melody, 009: vibraphone with Soft and Complexity knobs)
 // @note Column 1: vibraphone phrases that follow the chord. Row 2 Soft = space + longer notes, row 3 Complexity = basic → written → fills → doubles.
 // @note Trumpet and marimba out (round 1); real recorded brass phrases come in their own column next.
 // @guide What to listen for | Does Complexity go from calm to busy without ever sounding wrong? Is Soft one useful knob?
@@ -44,7 +44,7 @@
 // @ctl 2:7.fader Bass | off-beat bass on the chord root.
 // @ctl 2:8.fader Keys | the keys of 009 (Steinway + Rhodes, chain rhythm), following the progression.
 
-const BOARD = { id: 'melodie2', title: 'Melodie 2' }
+const BOARD = { id: 'melody2', title: 'Melody 2' }
 const bpm = 124
 
 // The Escravos call (folk song part 1, A dorian), for the echo in bars 7–8; one entry per bar, 16 steps per bar
@@ -72,11 +72,11 @@ const makeCols = h => {
     '<[~@10 -1 ~ 2 ~@3]!3 [~@10 2 ~ [4 4] ~@3]>',
     '[~ 2 ~ ~ 1 ~ ~ 4 ~ 3 ~ 4 ~ 5 4 ~]').add(h.rootDeg())).scale(h.scale(3))   // dorian or aeolian, per progression
   const echo = busy(note(mini(seq([R, R, R, R, R, R, ...T1.map(b => lower(b, -2))]))))
-  const vibes = [['Offbeat', offbeat], ['Tresillo', tresillo], ['Ruf-Echo', echo]].map(([name, p]) => [name,
+  const vibes = [['Offbeat', offbeat], ['Tresillo', tresillo], ['Call echo', echo]].map(([name, p]) => [name,
     p.s('vibraphone').velocity(perlin.range(0.6, 1)).pan(sine.slow(3).range(0.4, 0.6))
       .clip(soft.fmap(s => 4 * Math.pow(4, s)))])          // Soft: ring ×4 … ×16 of a 16th (round 1: ~×3.7)
   return [
-    { name: 'Vibraphon', range: [600, 12000], gain: 0.5, k2name: 'Weich', k3: 'own', k3name: 'Komplex', pats: vibes },
+    { name: 'Vibraphone', range: [600, 12000], gain: 0.5, k2name: 'Soft', k3: 'own', k3name: 'Complexity', pats: vibes },
   ]
 }
 
@@ -284,9 +284,9 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
         pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
         typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
@@ -294,14 +294,14 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -312,7 +312,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -320,13 +320,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -339,13 +339,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

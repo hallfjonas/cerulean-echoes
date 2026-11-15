@@ -1,9 +1,9 @@
-# fx — Feedback
+# fx — feedback
 
-## fx-lab-1 (Nutzer, 2026-11-08)
-- FX hört man (fast) nicht, geben nicht viel her. Vinyl-Knistern nicht spannend.
-- Neue Richtung: „Einwürfe“ — seltene, ikonische, rhythmische Ereignisse, die nicht zur Rhythmusgruppe gehören
-  (kein Fundament). 2 Spalten, verschiedene Typen. Erst recherchieren.
+## fx-lab-1 (user, 2026-11-08)
+- FX can (almost) not be heard, they do not offer much. Vinyl crackle not exciting.
+- New direction: “stabs” — rare, iconic, rhythmic events that do not belong to the rhythm section
+  (no foundation). 2 columns, different types. Research first.
 
-## stab-1 (Nutzer, 2026-11-08)
-- Alle Einwürfe Quatsch (Rufe, Jubel, Flöten, Zither, Posaune, Cuíca). Wenn überhaupt: ikonischere Vocal-Samples.
+## stab-1 (user, 2026-11-08)
+- All stabs nonsense (shouts, crowd, flutes, zither, trombone, cuíca). If anything: more iconic vocal samples.

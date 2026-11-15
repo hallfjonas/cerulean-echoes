@@ -1,96 +1,101 @@
-# harmonie — Feedback
+# harmony — feedback
 
-## harmonie-1 (Nutzer, 2026-11-08)
-- Kommen in Frage: JX-10-Strings und Orgel. String-Machine und echte Section raus.
-- Akkordfolgen noch sehr basic: die jetzigen können bleiben, aber es braucht andere klassische House-Progressionen
-  (Recherche läuft, 2026-11-08).
-- M1-Orgel war schon verworfen (Nutzer 2026-11-08) → aus Harmonie 2 entfernt.
-- Akkordfolgen direkt auf die unteren Tasten (Mode 16 Reihe b2 = Folgen 1–8).
+## harmony-1 (user, 2026-11-08)
+- In the running: JX-10 strings and organ. String machine and real section out.
+- Chord progressions still very basic: the current ones can stay, but other classic house progressions are needed
+  (research running, 2026-11-08).
+- M1 organ was already rejected (user 2026-11-08) → removed from Harmony 2.
+- Chord progressions directly on the lower buttons (Mode 16 row b2 = progressions 1–8).
 
-## ambient-1 (Nutzer, 2026-11-07; Track 007, Ersatz für Chords und Wal)
-- Eno-Chor und Eno-Bogen klingen beide gut, aber vielleicht zu nah am Chor von 007.
-- Budd-Klavier: klingt etwas billig und langweilig → raus.
-- Streicher (tief + Schwellen): schön, aber zu getragen; davon gibt es in 007 schon viel.
-- Gas-Schleier: gefällt, gehört aber eher zur Rhythmusgruppe (Jojo).
-- Gewünscht: etwas Melodischeres als Option, das Orientierung gibt.
-- Der Teppich (Kontext: Drone + Pad + Puls) ist als Grundlage toll, aber etwas breiig.
+## ambient-1 (user, 2026-11-07; track 007, replacement for chords and whale)
+- Eno choir and Eno bowed both sound good, but maybe too close to the choir of 007.
+- Budd piano: sounds a bit cheap and boring → out.
+- Strings (low + swells): beautiful, but too solemn; 007 already has a lot of that.
+- Gas veil: liked, but belongs rather to the rhythm section (Jojo).
+- Wanted: something more melodic as an option, something that gives orientation.
+- The carpet (context: drone + pad + pulse) is great as a base, but a bit mushy.
 
-## harmonie-2 (Nutzer, 2026-11-08)
-- Akkordfolgen gehören auf die Taste unter dem Fader (Reihe b1, CC 37–44) — dort ist üblicherweise das Wechseln; Rhythmus-Wechsel auf die untere Reihe.
-- Mehr Klang-Optionen: Strings + B3 zusammen klingt gut; B3 braucht weicheren Anschlag.
-- Harmonie 3 (Akkordfolgen auf Taste 1, Charakter auf Reihe 3, Mischungen): „passt jetzt ganz gut“. Beschriftung = die Akkorde selbst, nicht Künstler.
-- Taste unter dem Fader = durch die Akkordfolgen schalten (wie „Wechsel“ überall), nicht direkt wählen.
+## harmony-2 (user, 2026-11-08)
+- Chord progressions belong on the button under the fader (row b1, CC 37–44) — that is where changing usually is; rhythm
+  changes on the lower row.
+- More sound options: strings + B3 together sounds good; B3 needs a softer attack.
+- Harmony 3 (progressions on button 1, character on row 3, blends): “fits quite well now”. Labels = the chords
+  themselves, not artists.
+- Button under the fader = step through the progressions (like “Change” everywhere), not choose directly.
 
-## harmonie-3 (Nutzer, 2026-11-08)
-- Vorschläge reduzieren: Orgel wie Strings raus, Strings + Orgel raus. Reihe 3: zwischen Strings, Strings + B3 und B3 durchfaden.
+## harmony-3 (user, 2026-11-08)
+- Fewer proposals: organ as strings out, strings + organ out. Row 3: fade between strings, strings + B3 and B3.
 
-## ambient-2 (Nutzer, 2026-11-08)
-- Gas-Schleier gefällt (bleibt für Jojo vorgemerkt).
-- Eno-Bogen ziemlich gut, fast besser als Chor und Akkorde; liegt aber nah am Chor. Chor bleibt trotzdem (Flirren,
-  höher; Drone viel tiefer).
-- Gewünscht: etwas Nicht-Breiiges. Richtung: Midori Takada („Catastrophe Σ“): sich verschiebende, überlagerte,
-  einfache Marimba-Rhythmen → ambient-3 (Takada 3:4, 5·7·12, Kanon, Additiv + Vibraphon-Motiv, Flöte, Eno-Bogen).
+## ambient-2 (user, 2026-11-08)
+- Gas veil liked (kept in mind for Jojo).
+- Eno bowed quite good, almost better than choir and chords; but close to the choir. Choir stays anyway (shimmer,
+  higher; drone much lower).
+- Wanted: something not mushy. Direction: Midori Takada (“Catastrophe Σ”): shifting, layered,
+  simple marimba rhythms → ambient-3 (Takada 3:4, 5·7·12, canon, additive + vibraphone motif, flute, Eno bowed).
 
-## ambient-3 (Nutzer, 2026-11-08)
-- Takada 3:4 zu simpel. 5·7·12 besser, darf abgefahrener sein → Taste 1 schaltet Optionen mit steigender Komplexität.
-- Bei Takada sind sich die einzelnen Rhythmen wohl ähnlicher.
-- Kanon gut. Additiv nichts → raus.
-- Vibraphon, Flöte, Eno-Bogen raus aus diesem Board (Flötenartiges gibt es schon; Vibraphon später evtl. eine Option).
-  Das Board bleibt bei Takada → midori-1 (7 Marimba-Spalten).
-- Erinnerung: eine Lab-Spalte ist später eine Track-Spalte (allein spielbar), keine Gruppe aus mehreren Spalten.
+## ambient-3 (user, 2026-11-08)
+- Takada 3:4 too simple. 5·7·12 better, may be wilder → button 1 steps through options of rising complexity.
+- In Takada the single rhythms are probably more alike.
+- Canon good. Additive nothing → out.
+- Vibraphone, flute, Eno bowed out of this board (there is already something flute-like; vibraphone maybe an option later).
+  The board stays with Takada → midori-1 (7 marimba columns).
+- Reminder: a lab column later becomes a track column (playable on its own), not a group of several columns.
 
-## midori-1 (Nutzer, 2026-11-08)
-- Klingt insgesamt ganz gut. Zyklen, Kanon, Ähnliche Zellen, Euklid bleiben; Phase, Polytempo, Akzente raus.
-- Vermutung: bei Takada beginnt ein Pattern allein, die anderen kommen dazu und überlagern sich; eher dasselbe
-  Pattern in etwas anderem Tempo als klare 5/7/12. Nachgelesen: das Marimba-Stück ist „Crossing“ (RA, Spectrum
-  Culture), „Catastrophe Σ“ = Kuhglocke/Toms, Harmonium-Drone, wird schneller. Wie „Crossing“ gebaut ist, steht nirgends.
-- Toms als Option: Taste 2 schaltet Marimba ↔ Toms → midori-2 (+ Aufbau, Drift, Glockenpuls).
+## midori-1 (user, 2026-11-08)
+- Sounds quite good overall. Cycles, canon, similar cells, Euclid stay; phase, polytempo, accents out.
+- Guess: in Takada one pattern starts alone, the others join and overlap; rather the same
+  pattern at a slightly different tempo than clear 5/7/12. Looked up: the marimba piece is “Crossing” (RA, Spectrum
+  Culture), “Catastrophe Σ” = cowbell / toms, harmonium drone, gets faster. How “Crossing” is built is written nowhere.
+- Toms as an option: button 2 switches marimba ↔ toms → midori-2 (+ build-up, drift, bell pulse).
 
-## midori-2 (Nutzer, 2026-11-08)
-- Aufbau schön, aber zu niedrige Decke an Komplexität/Intensität → Reihe 3 soll auch das Anschwellen steuern.
-- Drift: zu schnelle Töne → raus. Glockenpuls: das beste der neuen. Toms gefallen, aber es muss beides geben.
-- Zyklen, Kanon, Ähnliche Zellen zusammen auf Spalte 1.
-- Es fehlte eine Überlagerung, die einen Rhythmus verschiebt. Nachgelesen: „Crossing“ ist von japanischen
-  Bahnübergängen inspiriert (Vinyl Factory), Reichs „Clapping Music“ ist ein genannter Einfluss
-  → midori-3: Bahnübergang, Clapping Music; Taste 2 = Marimba → Toms → beides.
+## midori-2 (user, 2026-11-08)
+- Build-up nice, but too low a ceiling of complexity / intensity → row 3 should also control the swelling.
+- Drift: notes too fast → out. Bell pulse: the best of the new ones. Toms liked, but both must exist.
+- Cycles, canon, similar cells together on column 1.
+- Missing: a layering that shifts a rhythm. Looked up: “Crossing” is inspired by Japanese railway
+  crossings (Vinyl Factory), Reich's “Clapping Music” is a named influence
+  → midori-3: railway crossing, Clapping Music; button 2 = marimba → toms → both.
 
-## midori-3 (Nutzer, 2026-11-08)
-- Bahnübergang: muss bei „weit“ starten (das Nächste, was ok ist), eher noch weiter → midori-4: weit → weiter → sehr weit.
-- Clapping Music: gut vom Prinzip, aber zu wenig komplex → midori-4: 2 Stimmen → 3 Stimmen → 3 Stimmen + 12/8-Glockenpattern.
-- Mit Toms klingt das Driften auch cool.
-- Offene Frage: zwei Spalten (Marimba / Toms), um sie getrennt mischen zu können?
+## midori-3 (user, 2026-11-08)
+- Railway crossing: must start at “far” (the next thing that is ok), rather even farther → midori-4: far → farther → very far.
+- Clapping Music: good in principle, but not complex enough → midori-4: 2 voices → 3 voices → 3 voices + 12/8 bell pattern.
+- With toms the drifting sounds cool too.
+- Open question: two columns (marimba / toms), to mix them separately?
 
-## midori-4 (Nutzer, 2026-11-08)
-- Bahnübergang: verschiedene Tonhöhen pro Übergang — unsicher, ob gut (vielleicht doch). Offen: Variante mit gleicher Tonhöhe.
-- Clapping Music besser mit Toms, sonst etwas langweilig. Drift klingt mit Toms cool.
-- Plan für 007 (Jonas 2–4): 1 Eno-Bogen, 1 Marimba, 1 Toms (nicht 1:1; Zyklen eher für Toms; manches auf beiden).
-  Marimba: Zyklen, Kanon, Zellen, Euklid, Aufbau (Glockenpuls, Bahnübergang, Clapping raus).
-  Toms: Zyklen, Kanon, Zellen, Drift/Schnelligkeitsknopf, Euklid, Aufbau, Bahnübergang, Clapping; evtl. noch aussortieren.
-  → midori-5 (Toms: Reihe 3 = Verschiebung).
+## midori-4 (user, 2026-11-08)
+- Railway crossing: different pitches per crossing — unsure whether good (maybe after all). Open: variant with the same pitch.
+- Clapping Music better with toms, otherwise a bit boring. Drift sounds cool with toms.
+- Plan for 007 (Jonas 2–4): 1 Eno bowed, 1 marimba, 1 toms (not 1:1; cycles rather for toms; some on both).
+  Marimba: cycles, canon, cells, Euclid, build-up (bell pulse, railway crossing, Clapping out).
+  Toms: cycles, canon, cells, drift / speed knob, Euclid, build-up, railway crossing, Clapping; maybe sort out more.
+  → midori-5 (toms: row 3 = shift).
 
-- Toms: mehrere Schichten = Brei (bei Marimba gut) → Toms vorerst nur erste Schicht (midori-5).
-- Toms ohne Drift mit verschiedenen Spuren klingt schlecht → Reihe 3 blendet Kopien DERSELBEN Figur ein, die wegdriften (midori-5).
-- Eno-Bogen: sind die 3 Optionen unterschiedlich genug? (offen).
-- Eno-Bogen: Optionen neu = ruhig (Quinten) → lydisch (G♯, C♯) → tief und langsamer; alle unter dem Shimmer.
-- Verschiebung nur bei einfachen Rhythmen (Bahnübergang) sinnvoll, bei komplexen Gewusel → Toms Reihe 3: Bahnübergang = Verschiebung, sonst Dichte (Geisterschläge) (midori-5).
+- Toms: several layers = mush (good on marimba) → toms only the first layer for now (midori-5).
+- Toms without drift with different stems sounds bad → row 3 fades in copies of THE SAME figure that drift away (midori-5).
+- Eno bowed: are the 3 options different enough? (open).
+- Eno bowed: options now = calm (fifths) → lydian (G♯, C♯) → low and slower; all below the shimmer.
+- Shift only makes sense on simple rhythms (railway crossing), on complex ones a jumble → toms row 3: railway crossing =
+  shift, otherwise density (ghost strokes) (midori-5).
 
-## midori-5 (Nutzer, 2026-11-08 abends)
-- Viel zu viele Optionen pro Pattern-Familie — lieber mit dem Knopf steigern statt mit mehreren Optionen (hatte er schon gesagt).
-- Marimba raus: Kanon einfach + mittel, Zellen 2 + 6 Töne, Aufbau 2 + 8 Takte; Euklid nur einmal, Schichten-Knopf steuert auch die Dichte.
-- Toms: der Dichte-Knopf tat nichts (Geisterschläge unhörbar) → muss wirken. Raus: Kanon mittel + lang, alle Zellen,
-  Aufbau 2 + 8 Takte, Bahnübergang gleich, Clapping 2/3 Stimmen und mit Glocke; Euklid nur einmal mit Dichte;
-  nicht zu viele Stimmen (muddy).
-- Beides lauter, Toms noch lauter als Marimba.
-- → midori-5 (5b): Marimba 5 Optionen, Toms 6 Optionen mit echtem Dichte-Knopf; Version davor old/midori-5a.strudel.
+## midori-5 (user, 2026-11-08 evening)
+- Far too many options per pattern family — rather raise it with the knob than with several options (he had said so before).
+- Marimba out: canon simple + medium, cells 2 + 6 notes, build-up 2 + 8 bars; Euclid only once, the layers knob also
+  controls the density.
+- Toms: the density knob did nothing (ghost strokes inaudible) → must work. Out: canon medium + long, all cells,
+  build-up 2 + 8 bars, railway crossing same, Clapping 2/3 voices and with bell; Euclid only once with density;
+  not too many voices (muddy).
+- Both louder, toms even louder than marimba.
+- → midori-5 (5b): marimba 5 options, toms 6 options with a real density knob; version before old/midori-5a.strudel.
 
-## midori-5b (Nutzer, 2026-11-08 abends)
-- Toms: Kanon hat eine viel zu laute 1; Kanon-Komplexität (Pausen füllen) klingt weird → Komplexität = Kanon-Stimmen.
-- Aufbau (Toms): viel zu laute Töne, ungute Überlagerung → eine Figur, die sich selbst auffüllt. Betonungen auf Toms leiser (1 → 0.76).
-- Toms insgesamt nicht mehr zu leise.
-- Knopf überall „Komplexität“ (Überbegriff), für einfache Bedienung gleiche Beschriftung.
-- → in 007 übernommen (Jonas 2 Eno-Bogen, 3 Marimba, 4 Toms).
+## midori-5b (user, 2026-11-08 evening)
+- Toms: canon has a much too loud 1; canon complexity (filling rests) sounds weird → complexity = canon voices.
+- Build-up (toms): much too loud notes, unpleasant overlap → one figure that fills itself up. Accents on toms quieter
+  (1 → 0.76).
+- Toms overall no longer too quiet.
+- Knob “Complexity” everywhere (umbrella term), the same label for easy use.
+- → taken into 007 (Jonas 2 Eno bowed, 3 marimba, 4 toms).
 
-## Techno-Akkorde 1 — techno-chords-1.strudel (2026-11-09), for 008 Jonas 2
+## Techno Chords 1 — techno-chords-1.strudel (2026-11-09), for 008 Jonas 2
 - Players not convinced by the chord pulse (008 round 7); before that the dub chords were rejected (boring, cheap attack).
 - Research: tracks/008-groove-techno/research-chords-lead.md (Attack Magazine). New engine tools/stem-lab/engine-techno
   (`// @engine techno`: F dorian, 140 BPM, 008's progressions, techno context: kick, hat, clap, bass, 008 pad).
@@ -99,21 +104,21 @@
   7 minor triad stab (Mills principle). Checked in Node (notes, events). Levels estimated, not measured. Not heard.
 - Feedback: open.
 
-## Techno-Pads 1 — techno-pads-1.strudel (2026-11-12), for 008: Pad + Techno-Pad in one column
+## Techno Pads 1 — techno-pads-1.strudel (2026-11-12), for 008: Pad + Techno Pad in one column
 - Wish: one pad column; button 1 = chord progressions with real key changes ("not just the basic stuff"), button 2 =
   colour (7, 9, fourths, fifths); fuller than now (the space version's fixed hpf 400/350 had thinned both pads; in
   008 the hpf now moves with Brightness, 60/80–400 Hz).
 - Adapted engine copy (no `@engine`, do not sync): chords as roots in semitones; button 1 / 2 on any column switch the
   shared progression / colour at the next chord; muted columns and pump layers are not computed.
-- Progressions (Attack Magazine "Passing Notes": Parallel chords, Kerri Chandler chords, Todd Terje): 008 jetzt,
+- Progressions (Attack Magazine "Passing Notes": Parallel chords, Kerri Chandler chords, Todd Terje): 008 now,
   Parallel (Fm–E♭m–Cm), Kerri 1 (Fm–Gm–Bm–E♭m), Kerri 2 (… Gm–G♭7), Terje (Fm–E♭m–B–E), Kerri 3 (Fm–D♭m),
-  Ausreißer (Fm … B), Stehend (Fm–B♭m).
-- Columns: 1 Pad (jetzt), 2 Techno (jetzt), 3 Beide, 4 Tief (low octave doubling, Attack "Theory of techno pads"),
-  5 Superchor (supersaw + sine root below), 6 Kalt (Attack "Cold pads"), 7 Gedreht (Kerri's third inversion),
+  Outlier (Fm … B), Standing (Fm–B♭m).
+- Columns: 1 Pad (now), 2 Techno (now), 3 Both, 4 Low (low octave doubling, Attack "Theory of techno pads"),
+  5 Super choir (supersaw + sine root below), 6 Cold (Attack "Cold pads"), 7 Inverted (Kerri's third inversion),
   8 Echo-Pad (feedback echo instead of reverb, Attack "Cold pads"). Row 3 = Pump everywhere.
 - Checked in Node: chords/colours right, transpiles; cost 4.3 ms/tick with 2 columns on, 20 ms with all 8 (compare
   one or two at a time). Levels estimated, not measured. Not heard.
 - Feedback: open.
-- Feedback techno-pads-1 (Nutzer, 2026-11-12): kein Hochpass auf Pads (raus, auch in 008). Der Beat im Hintergrund
-  (Kontext der Techno-Engine) ist viel zu schwach. Es sollen einfach gute Pads sein; am Ende ist einer von beiden
-  (Pad oder Techno-Pad) in Ordnung. Folgen-Namen jetzt die Akkorde selbst (harmonie-2: keine Künstlernamen).
+- Feedback techno-pads-1 (user, 2026-11-12): no high-pass on pads (out, also in 008). The beat in the background
+  (context of the techno engine) is far too weak. They should simply be good pads; in the end one of the two
+  (Pad or Techno Pad) is fine. Progression names now the chords themselves (harmony-2: no artist names).

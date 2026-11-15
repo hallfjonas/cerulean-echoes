@@ -90,25 +90,25 @@ const makeCols = h => {
   // 1a Cycles: [figure, octave, pan]
   const C5 = ['4 ~ 7 ~ 9', 1, 0.3], C7 = ['0 ~ ~ 2 ~ 4 ~', 0, 0.7], ANCHOR = ['0 ~ ~ ~ ~ ~ ~ ~ 4 ~ ~ ~ ~ ~ ~ ~', 0, 0.5]
   const CYCLES = [
-    ['Zyklen 5·7', [C5, C7]],
-    ['Zyklen 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
-    ['Zyklen 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
+    ['Cycles 5·7', [C5, C7]],
+    ['Cycles 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
+    ['Cycles 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
   ].map(([n, ls]) => [n, ls.map(s => layer(...s))])
   // 1b Canon: one figure, voices [late by 16ths, octave, pan]
   const VOICES = [[0, 1, 0.3], [3, 1, 0.7], [5, 0, 0.5], [11, 2, 0.6]]
   const canon = fig => VOICES.map(([o, oct, pan]) => layer(fig, oct, pan, oct === 2 ? 0.35 : 0.5).late(o / 16))
-  const CANON = [['Kanon einfach', '0 4 ~ 7 4 ~ 2 ~'], ['Kanon mittel', '4 ~ 2 4 ~ 7 ~ ~'], ['Kanon lang', '7 ~ 6 4 ~ 2 4 ~ 9 ~ 7 ~']]
+  const CANON = [['Canon simple', '0 4 ~ 7 4 ~ 2 ~'], ['Canon medium', '4 ~ 2 4 ~ 7 ~ ~'], ['Canon long', '7 ~ 6 4 ~ 2 4 ~ 9 ~ 7 ~']]
     .map(([n, f]) => [n, canon(f)])
   // 1c Similar cells: one cell, padded to slightly different lengths, each layer a little moved in pitch and place
-  const CELLS = [['Zellen 2 Töne', '0 ~ 4', [4, 5, 6, 7]], ['Zellen 4 Töne', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Zellen 6 Töne', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
+  const CELLS = [['Cells 2 notes', '0 ~ 4', [4, 5, 6, 7]], ['Cells 4 notes', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Cells 6 notes', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
   const SIM = [[0, 1, 0.3], [2, 1, 0.7], [-3, 1, 0.5], [4, 0, 0.45]]   // [shift, octave, pan] per layer
   const similar = CELLS.map(([n, cell, lens]) => [n, lens.map((L, v) => layer(pad(shift(cell, SIM[v][0]), L), SIM[v][1], SIM[v][2]))])
   // 2 Euclid: [hits, length, notes, octave, pan]
   const eu = list => list.map(([k, L, ns, oct, pan, rot = 0]) => layer(euclid(k, L, ns, rot), oct, pan))
   const EUCLID = [
-    ['Locker', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
-    ['Mittel', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
-    ['Dicht', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
+    ['Sparse', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
+    ['Medium', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
+    ['Dense', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
       [4, 9, [0, 4, -3, 2], 0, 0.5]])],
   ]
   // 3 Build-up: layer v enters at bar v × every of a 64-bar round and stays to its end; row 3 (intensity) caps how many
@@ -119,16 +119,16 @@ const makeCols = h => {
   const swell = p => p.fmap(v => { const k = S.val[30] ?? 0.3; return { ...v, gain: v.gain * (0.7 + 0.7 * k), bright: 0.6 + 1.4 * k } })
   const entering = every => BUILD.map((s, v) => v === 0 ? layer(...s)
     : gate(signal(t => md(Math.floor(t + 1e-9), 64) >= v * every).segment(1), layer(...s)))
-  const BUILD_RAW = [['alle 8 Takte', entering(8)], ['alle 4 Takte', entering(4)], ['alle 2 Takte', entering(2)]]
+  const BUILD_RAW = [['every 8 bars', entering(8)], ['every 4 bars', entering(4)], ['every 2 bars', entering(2)]]
   const BUILDUP = BUILD_RAW.map(([n, ls]) => [n, ls.map(swell)])
   // 4 Bell pulse: an agogo bell on the quarters with line 1; line 2 fills the gaps of line 1 (interlocked), or runs a
   // step shorter and slides; line 3 (row 3) slides too
   const bell = note(mini('{77 ~ ~ ~}%16')).s('gm_agogo').gain(0.25).pan(0.5)
   const L1 = '4 ~ 7 ~ 2 ~ 4 ~', L2 = '~ 9 ~ 6 ~ 7 ~ 4', L2s = '~ 9 ~ 6 ~ 7 ~', L3 = '0 ~ ~ 2 ~ ~ 4 ~ ~'
   const BELL = [
-    ['verzahnt', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
-    ['Linie 2 rutscht', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
-    ['alle rutschen', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(L3, 0, 0.5)]],
+    ['interlocked', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['line 2 slides', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['all slide', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(L3, 0, 0.5)]],
   ]
   // 5 Railway crossing: each crossing = a two-tone bell in 8ths, [high, low, octave, pan]; crossing v runs at speed
   // 1 + spread × SPEEDS[v], so they fall out of step and come back (spread 0.01 = a 16th apart after ~6 bars)
@@ -137,7 +137,7 @@ const makeCols = h => {
   const crossing = spread => CROSSINGS.map(([a, b, oct, pan], v) => layer(a + ' ' + b, oct, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
   // the same, all crossings on the same two tones (A–F♯), only their speed differs (row 3 on the toms)
   const crossingSame = spread => CROSSINGS.map(([, , , pan], v) => layer('4 2', 1, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
-  const CROSS = [['weit', crossing(0.045)], ['weiter', crossing(0.07)], ['sehr weit', crossing(0.1)]]
+  const CROSS = [['far', crossing(0.045)], ['farther', crossing(0.07)], ['very far', crossing(0.1)]]
   // 6 Clapping Music (Reich 1972): 12 pulses per bar (8th triplets), x x x . x x . x . x x .; voice 2 one pulse ahead
   // after every `every` bars, back in unison after 12 moves; the hits play the notes in turn
   const CLAP = 'x x x ~ x x ~ x ~ x x ~'
@@ -152,9 +152,9 @@ const makeCols = h => {
   const agogo12 = note(mini('{' + toks(BELL12).map(x => x === '~' ? x : 77).join(' ') + '}%12')).s('gm_agogo').gain(0.22).pan(0.5)
   const v4 = layer(bellFig([9, 11, 9, 7, 6, 4, 7]), 2, 0.55, 0.35, 12).early(moving(3, 12, 1 / 12))
   const CLAPPING = [
-    ['Reich (2 Stimmen)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
-    ['3 Stimmen', [v1, v2, v3]],
-    ['3 Stimmen + Glocke', [stack(v1, agogo12), v2, v3, v4]],
+    ['Reich (2 voices)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
+    ['3 voices', [v1, v2, v3]],
+    ['3 voices + bell', [stack(v1, agogo12), v2, v3, v4]],
   ]
 
   // 1 Eno bowed (ambient rounds 1–2): single notes on loops of different lengths that drift apart
@@ -162,7 +162,7 @@ const makeCols = h => {
   // Note sets (user, 2026-11-08: the old open / middle / high were too alike; high sat in the shimmer's register):
   // [name, scale degrees (the first two always sound), loop stretch]. Calm = fifths only (D A E B), lydian = with G♯ and
   // C♯ first, low = down to A2 and slower. All below the shimmer (Jonas 7, from about D5).
-  const ENO_SETS = [['Ruhig', [0, 4, 8, 7, 11, 12], 1], ['Lydisch', [3, 6, 4, 8, 10, 13], 1], ['Tief', [0, -3, 4, 2, 7, 1], 1.5]]
+  const ENO_SETS = [['Calm', [0, 4, 8, 7, 11, 12], 1], ['Lydian', [3, 6, 4, 8, 10, 13], 1], ['Low', [0, -3, 4, 2, 7, 1], 1.5]]
   const eno = (i, sound) => ENO_SETS.map(([name, set, sl]) => [name, sound(stack(...set.map((d, v) =>
     gate(h.knob(29 + i).fmap(k => v < 2 + Math.round(4 * k)),
       note(deg(d)).struct(mini('x ~ ~')).slow(ENO_LOOPS[v] * sl).late(ENO_OFFS[v] * sl).pan(0.2 + 0.6 * ((v * 0.37) % 1))))))])
@@ -184,16 +184,16 @@ const makeCols = h => {
   // ---- Round 5 b (user, 2026-11-08 evening): fewer options, the knob does the rest -------------------------------
   // Marimba (row 3 = cc 30): cycles as ONE option (row 3 adds 5 → 7 → anchor → 12 → 11 → 13), canon long, cells
   // 4 notes, Euclid as ONE option (row 3 adds layers AND makes each denser: sparse → middle → dense), build-up every 4 bars.
-  const ZYKLEN = [C5, C7, ANCHOR, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55],
+  const CYCLE_LAYERS = [C5, C7, ANCHOR, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55],
     ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45]].map(s => layer(...s))
   const eucKnob = cc => stack(...[0, 1, 2, 3].map(v => gate(h.knob(cc).fmap(k => v < 1 + Math.round(3 * k)),
     h.knob(cc).fmap(k => Math.min(2, Math.floor(3 * k))).fmap(d => EUCLID[d][1][v]).innerJoin()))).delay(0.12)
   const MARIMBA = [
-    ['Zyklen', layers(1, ZYKLEN)],
-    ['Kanon', layers(1, CANON[2][1])],
-    ['Zellen', layers(1, similar[1][1])],
-    ['Euklid', eucKnob(30)],
-    ['Aufbau', layers(1, BUILDUP[1][1])],
+    ['Cycles', layers(1, CYCLE_LAYERS)],
+    ['Canon', layers(1, CANON[2][1])],
+    ['Cells', layers(1, similar[1][1])],
+    ['Euclid', eucKnob(30)],
+    ['Build-up', layers(1, BUILDUP[1][1])],
   ]
 
   // Toms (row 3 = cc 31), one figure each (several different tom layers = mush):
@@ -242,20 +242,20 @@ const makeCols = h => {
   const tomClap = stack(v1, gate(h.knob(31).fmap(k => k > 0.02),
     h.knob(31).fmap(k => Math.min(2, Math.floor(3 * k))).fmap(r => clapRates[r]).innerJoin()))
   const TOMS = [
-    ['Zyklen', dense(C5[0], 1, 0.4)],
-    ['Kanon', tomCanon],
-    ['Euklid', dense(euclid(3, 8, [4, 7, 2]), 1, 0.4)],
-    ['Aufbau', tomBuild],
-    ['Bahnübergang', tomShift('crossing', layer('4 2', 1, 0.35, 0.45, 8))],
+    ['Cycles', dense(C5[0], 1, 0.4)],
+    ['Canon', tomCanon],
+    ['Euclid', dense(euclid(3, 8, [4, 7, 2]), 1, 0.4)],
+    ['Build-up', tomBuild],
+    ['Railway crossing', tomShift('crossing', layer('4 2', 1, 0.35, 0.45, 8))],
     ['Clapping Music', tomClap],
   ].map(([n, p]) => [n, p.delay(0.12)])
 
   const col = (name, k3name, pats, extra = {}) => ({ name, space: 'bus', floor: 0.25, hall: 6, k3: 'own', k3name,
     range: [600, 6000], gain: 1, pats, ...extra })
   return [
-    col('Eno-Bogen', 'Komplexität', eno(0, bowedVib), { range: [800, 12000] }),
-    col('Marimba', 'Komplexität', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
-    col('Toms', 'Komplexität', TOMS, { tom: true, gain: 2.5 }),  // +8 dB (user: toms louder still)
+    col('Eno bowed', 'Complexity', eno(0, bowedVib), { range: [800, 12000] }),
+    col('Marimba', 'Complexity', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
+    col('Toms', 'Complexity', TOMS, { tom: true, gain: 2.5 }),  // +8 dB (user: toms louder still)
   ]
 }
 
@@ -286,9 +286,9 @@ const CH = {
 }
 // The pad's three progressions in 007 (one chord per 2 bars): [name, bars, push, scale]
 const HARMONIES = [
-  ['Ruhig: I–IV', ['Dmaj7', 'Dmaj7', 'Dmaj7', 'Dmaj7', 'G♯ø7', 'G♯ø7', 'G♯ø7', 'G♯ø7'], 0, 'lydian'],
-  ['Kreisend: I–iii–IV–ii', ['Dmaj7', 'Dmaj7', 'F♯m7', 'F♯m7', 'G♯ø7', 'G♯ø7', 'E7', 'E7'], 0, 'lydian'],
-  ['Offen: I–vi–IV–vii', ['Dmaj7', 'Dmaj7', 'Bm7', 'Bm7', 'G♯ø7', 'G♯ø7', 'C♯m7', 'C♯m7'], 0, 'lydian'],
+  ['Calm: I–IV', ['Dmaj7', 'Dmaj7', 'Dmaj7', 'Dmaj7', 'G♯ø7', 'G♯ø7', 'G♯ø7', 'G♯ø7'], 0, 'lydian'],
+  ['Circling: I–iii–IV–ii', ['Dmaj7', 'Dmaj7', 'F♯m7', 'F♯m7', 'G♯ø7', 'G♯ø7', 'E7', 'E7'], 0, 'lydian'],
+  ['Open: I–vi–IV–vii', ['Dmaj7', 'Dmaj7', 'Bm7', 'Bm7', 'G♯ø7', 'G♯ø7', 'C♯m7', 'C♯m7'], 0, 'lydian'],
 ]
 // each progression as 128 chord names, one per 16th
 const H128 = HARMONIES.map(([, bars]) => bars.flatMap(b => typeof b === 'string' ? Array(16).fill(b)
@@ -437,19 +437,19 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
       b2: c.b2 === 'tom' ? '<div class="cell btn' + (S.tog?.[45 + i] ? ' on' : '') + '"><b>' + ['Marimba', 'Toms', 'Marimba + Toms'][S.tog?.[45 + i] ?? 0] + '</b></div>'
-        : '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        : '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Puls</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Puls</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Drone</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Pad</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -460,7 +460,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -468,13 +468,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -487,13 +487,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Puls ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Drone ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Puls ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Drone ' + pct(S.val[59]) +
         ' · Pad ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

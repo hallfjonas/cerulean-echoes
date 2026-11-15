@@ -13,7 +13,7 @@
 // @layout House Harmony Lab (lab/keys, round 1 for 009: chord changes)
 // @note One progression per column, all with the same sound mix. Pull up one fader at a time; the bass follows the leftmost column that is up.
 // @note Sound: hold any column's button 2 and turn its knobs: 1 = piano → Rhodes, 2 = B3 → M1, 3 = vibraphone → marimba. Each knob: 0 silent, first third the first sound fades in, middle third blends into the second at equal loudness, last third the second fades out. Touch follows Brightness. In Mode 2: faders 1-4 = grand, Rhodes, organ, vibraphone layers; knob 3 above each changes its character; faders 6 and 7 = drums and bass.
-// @note “▣ LC groß” in the status box opens the dashboard: every control, its value, the pattern, the chord and the beat.
+// @note “▣ LC big” in the status box opens the dashboard: every control, its value, the pattern, the chord and the beat.
 // @guide The progressions | 1 Kerri riff: the riff from the video, Am9 – Dm9 – Gm9 inside one bar. 2 System: Am9 – Gm9 – Am9 – Dm9, Kerri's shape (the 7th at the bottom, the 9 instead of the root). 3 Happy: major 7ths. 4 Deep: Am9 – D9, a minor vamp. 5 Italo: plain triads, big and bright. 6 Am – F – C – G: plain triads, the classic pop-house loop.
 // @guide Constancy | Every progression is four bars and repeats unchanged. Change comes from you: filter, length, layers, another rhythm.
 // @mode 16 Mode 16 — Progressions
@@ -80,26 +80,26 @@ const PEDAL = {
 }
 // The rhythms on button 1, the same on every column (change them while the keys are off)
 const PATS = [
-    ['Kette',            '.x..x..x.x..x..x', '.x..x..x.x..x.x.', '.x..x..x.x.x.x.x'],
-    ['versetzte Kette',  '...x..x..x.x..x.', '...x..x..x.x.x..', '...x..x..x.x.x.x'],
-    ['Paare',            '.x.x..x..x.x..x.'],
+    ['Chain',            '.x..x..x.x..x..x', '.x..x..x.x..x.x.', '.x..x..x.x.x.x.x'],
+    ['shifted chain',    '...x..x..x.x..x.', '...x..x..x.x.x..', '...x..x..x.x.x.x'],
+    ['Pairs',            '.x.x..x..x.x..x.'],
     ['3-3-2',            'x..x..x...x..x..'],
-    ['Kerri-Synkope',    '..x..x...x.x..x.']]
+    ['Kerri syncopation','..x..x...x.x..x.']]
 // The Kerri Chandler video riff: its rhythm and its own chord per 16th; as short as every other pattern (PEDAL: A = Am9, D = Dm9, G = Gm9)
-const KERRI = [['Kerri wie im Video', 'x..x..x..x..x.x.', '', '', 'AAAAAADDDDDDDDGG']]
+const KERRI = [['Kerri as in the video', 'x..x..x..x..x.x.', '', '', 'AAAAAADDDDDDDDGG']]
 // Organ voices (the organ layer uses the B3 and the M1), an octave above the chords
 // cf = how far the column's brightness filter may open (1 = as far as the knob says, 0.4 = darker)
 const M1K = 0.42   // −7.5 dB: the built M1 measured 7.5 dB louder than the B3
 const ORGANS = [
   ['Drawbar',         0.45, n => [{ s: 'gm_drawbar_organ', note: n + 12, gain: 0.45, attack: 0.015 }]],
-  ['Sinus 8+4',       1, n => [{ s: 'sine', note: n + 12, gain: 0.22, attack: 0.008 }, { s: 'sine', note: n + 24, gain: 0.09, attack: 0.008 }]],
-  ['Sinus + Quinte',  1, n => [{ s: 'sine', note: n + 12, gain: 0.2, attack: 0.008 }, { s: 'sine', note: n + 24, gain: 0.08, attack: 0.008 },
+  ['Sine 8+4',        1, n => [{ s: 'sine', note: n + 12, gain: 0.22, attack: 0.008 }, { s: 'sine', note: n + 24, gain: 0.09, attack: 0.008 }]],
+  ['Sine + fifth',    1, n => [{ s: 'sine', note: n + 12, gain: 0.2, attack: 0.008 }, { s: 'sine', note: n + 24, gain: 0.08, attack: 0.008 },
     { s: 'sine', note: n + 31, gain: 0.06, attack: 0.008 }]],
-  ['Dreieck',         0.4, n => [{ s: 'triangle', note: n + 12, gain: 0.2, attack: 0.01 }]],
+  ['Triangle',        0.4, n => [{ s: 'triangle', note: n + 12, gain: 0.2, attack: 0.01 }]],
   // Built, not sampled. M1 Organ 2 (90s house): hollow square tone + octave, a fast percussive “tock” on the twelfth
   // that dies away, the body settles a bit lower
   // M1K = level matched to the B3, measured offline
-  ['M1 gebastelt',    0.8, n => [
+  ['M1 built',    0.8, n => [
     { s: 'square', note: n + 12, gain: 0.22 * M1K, attack: 0.002, decay: 0.25, sustain: 0.7 },
     { s: 'sine', note: n + 24, gain: 0.18 * M1K, attack: 0.002, decay: 0.25, sustain: 0.7 },
     { s: 'sine', note: n + 31, gain: 0.25 * M1K, attack: 0.001, decay: 0.08, sustain: 0 }]],
@@ -125,16 +125,16 @@ const LOUD = { piano: 1, rhodes: 1.01, b3: 1.82, m1: 1.85, vibra: 0.91, marimba:
 const organVoice = name => ORGANS.find(o => o[0] === name)
 const scaled = (vs, k, cf) => vs.map(v => ({ ...v, gain: v.gain * k, cf }))
 const LAYERS = [
-  ['Flügel', 'M1', (n, g, c) => [{ s: 'piano', note: n, gain: 0.6 * g * (1 - 0.4 * c), hcutoff: 120 + 200 * c, shape: 0.15 * c },
+  ['Grand piano', 'M1', (n, g, c) => [{ s: 'piano', note: n, gain: 0.6 * g * (1 - 0.4 * c), hcutoff: 120 + 200 * c, shape: 0.15 * c },
     ...(c > 0 ? [{ s: 'piano', note: n + 0.1, gain: 0.3 * c * g, hcutoff: 300, pan: 0.65 },
       { s: 'gm_epiano2', note: n + 12, gain: 0.18 * c * g, pan: 0.35 }] : [])].map(v => ({ ...v, gain: v.gain * LOUD.piano }))],
   ['Rhodes', 'Phaser', (n, g, c) => [{ s: 'gm_epiano1', note: n, gain: 0.75 * g * LOUD.rhodes,
     ...(c > 0 ? { phaserrate: 0.4, phaserdepth: 0.8 * c } : {}) }]],
   // The two organs liked in round 4 (B3, M1), each with its own brightness limit (cf). They share partials (sines on
   // the same pitches), which add up louder than two unrelated sounds: measured +1.3 dB mid-blend, taken out by the sin(πc) dip
-  ['Orgel', 'M1', (n, g, c) => { const [a, b] = xfade(c).map(x => x * Math.pow(10, -1.3 * Math.sin(Math.PI * c) / 20)), b3 = organVoice('B3 + Leslie'), m1 = organVoice('M1 gebastelt')
+  ['Organ', 'M1', (n, g, c) => { const [a, b] = xfade(c).map(x => x * Math.pow(10, -1.3 * Math.sin(Math.PI * c) / 20)), b3 = organVoice('B3 + Leslie'), m1 = organVoice('M1 built')
     return [...(a > 0 ? scaled(b3[2](n), a * g * LOUD.b3, b3[1]) : []), ...(b > 0 ? scaled(m1[2](n), b * g * LOUD.m1, m1[1]) : [])] }],
-  ['Vibraphon', 'Marimba', (n, g, c) => { const [a, b] = xfade(c)
+  ['Vibraphone', 'Marimba', (n, g, c) => { const [a, b] = xfade(c)
     return [...(a > 0 ? [{ s: 'gm_vibraphone', note: n - 12, gain: 0.65 * a * g * LOUD.vibra }] : []),
       ...(b > 0 ? [{ s: 'gm_marimba', note: n, gain: 0.7 * b * g * LOUD.marimba }] : [])] }],
 ]
@@ -262,7 +262,7 @@ const VIEW_CSS = [
 const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
 // While a column's shift is on, its cells show what the controls do then: the three knobs mix the sound, the fader
 // sets the liveliness (only columns that have it); everything else does nothing
-const MIX_NAMES = ['Piano → Rhodes', 'B3 → M1', 'Vibraphon → Marimba']
+const MIX_NAMES = ['Piano → Rhodes', 'B3 → M1', 'Vibraphone → Marimba']
 // What each mix knob makes sound, in the same words everywhere (knob cells, header, status box)
 const pair = (lvl, c, a, b) => { const [x, y] = xfade(c ?? 0); return a + ' ' + pct(lvl * x) + ' · ' + b + ' ' + pct(lvl * y) }
 const mixText = r => r === 0 ? 'Piano ' + pct(S.val[53]) + ' · Rhodes ' + pct(S.val[54])
@@ -299,20 +299,20 @@ const drawView = () => {
       }
     }
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], 'Space'), k3: knob(S.val[29 + i], 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel' + catchHint(5 + i) + '</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level' + catchHint(5 + i) + '</span></div>',
       b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b><div class=pat>' +
         esc(pats[now][1]) + '</div></div>',
       b2: '<div class="cell btn"><b>Shift</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>House Harmony Lab</h1>' +
-    '<div><span class=k>Akkord</span><b class=acc>' + esc(chordName()) + '</b></div>' +
-    '<div><span class=k>Takt</span>' + where + '</div></div>' +
+    '<div><span class=k>Chord</span><b class=acc>' + esc(chordName()) + '</b></div>' +
+    '<div><span class=k>Bar</span>' + where + '</div></div>' +
     '<div class="head mix">' + ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? '<b class=acc>SHIFT</b>' : '') +
     '<div>' + esc([0, 1, 2].map(mixText).join(' · ')) + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(bassLevel()) + '</div></div>' +
     '<div class=grid>' +
     COLS.map(([name], i) => '<div class="col' + ((S.val[5 + i] ?? 0) > 0 ? ' live' : '') + '">' + (i + 1) + ' ' + esc(name) + '</div>').join('') +
@@ -322,7 +322,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'keys-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -330,13 +330,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'keys-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = 'House Harmony Lab'
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -348,13 +348,13 @@ if (view) {
 const showStatus = () => {
   if (statusText) {
     statusText.textContent = [
-      'Akkord   ' + chordName(),
-      'Klang    ' + [0, 1, 2].map(mixText).join('  |  '),
-      ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? 'SHIFT · ' : '') + 'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(bassLevel()) + ' · ' + bpm + ' BPM',
+      'Chord    ' + chordName(),
+      'Sound    ' + [0, 1, 2].map(mixText).join('  |  '),
+      ([0, 1, 2, 3, 4, 5, 6, 7].some(i => S.held[45 + i]) ? 'SHIFT · ' : '') + 'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(bassLevel()) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map(([name, pats], i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0
-        return (i + 1) + ' ' + name.padEnd(19) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + name.padEnd(19) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
       }),
     ].join('\n')

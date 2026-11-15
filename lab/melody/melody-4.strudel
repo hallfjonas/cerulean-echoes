@@ -1,5 +1,5 @@
 // ============================================================
-// MELODIE 4: the wind phrases of round 3 with a BUILD-UP knob, plus a playful flute melody made of real flute notes
+// MELODY 4: the wind phrases of round 3 with a BUILD-UP knob, plus a playful flute melody made of real flute notes
 // ============================================================
 // @engine 3
 // Round 3 feedback (feedback.md): trumpet and sax sound good, but too sparse: long rests, more interjections than
@@ -21,7 +21,7 @@
 // sped up by up to 5 semitones, above F5 folded down an octave — does it still sound like a flute?). Motifs MINE. Not heard; levels NOT measured (samples cannot be rendered offline here): gains as round 3.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass, keys and the progression in Mode 2.
-// @layout Melodie 4 (lab/melody, 009 Jonas 4/5: wind phrases with build-up, flute melody from real flute notes)
+// @layout Melody 4 (lab/melody, 009 Jonas 4/5: wind phrases with build-up, flute melody from real flute notes)
 // @note Columns 1–4: recorded wind phrases; row 3 = build-up: 1 per 8 bars → call + answer → every 2 bars → back to back.
 // @note Columns 5–6: a playful flute melody from real flute notes on the chord tones; row 3 = playful (neighbour notes, trill).
 // @guide What to listen for | Does the build-up turn interjections into a melody? Which step carries a party? Flute: playful but simple enough?
@@ -60,7 +60,7 @@
 // @ctl 2:7.fader Bass | off-beat bass on the chord root.
 // @ctl 2:8.fader Keys | the keys of 009, following the progression.
 
-const BOARD = { id: 'melodie4', title: 'Melodie 4' }
+const BOARD = { id: 'melody4', title: 'Melody 4' }
 const bpm = 124
 const BAR = 240 / bpm   // seconds per bar
 
@@ -119,7 +119,7 @@ const makeCols = h => {
     const hit = planOf(pools, stageOf(c), start, mode)[md(k, 128)]
     return hit ? { s: 'm4_' + hit[0], n: hit[1], release: undefined, delay: 0.25 } : null   // plays to its end
   }).segment(16).filterValues(v => v !== null)
-  const horns = (name, c, pools, gain, range) => ({ name, k3: 'own', k3name: 'Aufbau', space: 'bus', floor: 0.2, range, gain,
+  const horns = (name, c, pools, gain, range) => ({ name, k3: 'own', k3name: 'Build-up', space: 'bus', floor: 0.2, range, gain,
     pats: PHRASES[pools[0]].map((p, j) => [(j + 1) + ': ' + p[2], phrasePat(c, pools, j)]) })
 
   // ---- columns 5–6: the flute melody from single flute notes ----
@@ -133,11 +133,11 @@ const makeCols = h => {
   }
   // motifs as indexes into the chord's tones from `lo` up (0 = the lowest chord tone ≥ lo); 8 bars A A B A (A A B C)
   const MOTIFS = [
-    ['Hüpfer', ['[~ ~ 2 ~ ~ 3 ~ 2 ~ ~ 1 ~ ~ 2 ~ ~]', '[~ ~ 2 ~ ~ 3 ~ 4 ~ ~ 3 ~ 2 ~ 1 ~]', '[~ ~ 2 ~ ~ 3 ~ 2 ~ ~ 1 ~ 0 ~ ~ ~]'],
+    ['Hops', ['[~ ~ 2 ~ ~ 3 ~ 2 ~ ~ 1 ~ ~ 2 ~ ~]', '[~ ~ 2 ~ ~ 3 ~ 4 ~ ~ 3 ~ 2 ~ 1 ~]', '[~ ~ 2 ~ ~ 3 ~ 2 ~ ~ 1 ~ 0 ~ ~ ~]'],
       '[~ ~ ~ 3 ~ ~ ~ ~ ~ 1 ~ ~ ~ ~ ~ ~]', '[~ ~ ~ ~ 2 ~@11]'],
-    ['Ruf-Antwort', ['[3@3 ~ 2 ~ 3@4 ~@6]', '[~ ~ 1 ~ 2 ~ ~ 1@3 ~ 0@3 ~@3]', '[3@3 ~ 4 ~ 3@3 2 ~ ~ ~@4]'],
+    ['Call-answer', ['[3@3 ~ 2 ~ 3@4 ~@6]', '[~ ~ 1 ~ 2 ~ ~ 1@3 ~ 0@3 ~@3]', '[3@3 ~ 4 ~ 3@3 2 ~ ~ ~@4]'],
       '[~@8 2 ~@4 3 ~ ~]', '[~ ~ ~ 2 ~@12]'],
-    ['Drehung', ['[2 ~ 3 2 ~ 1 ~ 2 ~ ~ ~ ~ ~ ~ ~ ~]', '[2 ~ 3 2 ~ 1 ~ 0@2 ~ 1 ~ 2@3 ~]', '[4 ~ 3 2 ~ 3 ~ 2 ~ ~ ~ ~ ~ ~ ~ ~]'],
+    ['Turn', ['[2 ~ 3 2 ~ 1 ~ 2 ~ ~ ~ ~ ~ ~ ~ ~]', '[2 ~ 3 2 ~ 1 ~ 0@2 ~ 1 ~ 2@3 ~]', '[4 ~ 3 2 ~ 3 ~ 2 ~ ~ ~ ~ ~ ~ ~ ~]'],
       '[~@8 ~ 1 ~ ~ ~ 3 ~ ~]', '[~@14 2 ~]'],
   ]
   const melody = (c, lo) => {
@@ -152,16 +152,16 @@ const makeCols = h => {
         .velocity(perlin.range(0.75, 1)).pan(0.55)]
     })
   }
-  const flute = (name, c, lo, gain) => ({ name, k3: 'own', k3name: 'Verspielt', space: 'bus', floor: 0.2, range: [900, 14000],
+  const flute = (name, c, lo, gain) => ({ name, k3: 'own', k3name: 'Playful', space: 'bus', floor: 0.2, range: [900, 14000],
     gain, pats: melody(c, lo) })
 
   return [
-    horns('Trompete', 0, ['tp'], 0.5, [700, 14000]),
-    horns('Tenorsax', 1, ['sax'], 0.56, [500, 12000]),
-    horns('Trompete ↔ Sax', 2, ['tp', 'sax'], 0.53, [600, 14000]),
-    horns('Flöte (Phrasen)', 3, ['fl'], 0.53, [900, 14000]),
-    flute('Flöte Melodie', 4, 64, 0.6),
-    flute('Flöte höher', 5, 67, 0.6),
+    horns('Trumpet', 0, ['tp'], 0.5, [700, 14000]),
+    horns('Tenor sax', 1, ['sax'], 0.56, [500, 12000]),
+    horns('Trumpet ↔ sax', 2, ['tp', 'sax'], 0.53, [600, 14000]),
+    horns('Flute phrases', 3, ['fl'], 0.53, [900, 14000]),
+    flute('Flute melody', 4, 64, 0.6),
+    flute('Flute higher', 5, 67, 0.6),
   ]
 }
 
@@ -380,9 +380,9 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
         pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
         typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
@@ -390,14 +390,14 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -408,7 +408,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -416,13 +416,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -435,13 +435,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')

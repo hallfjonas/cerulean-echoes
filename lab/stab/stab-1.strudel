@@ -1,17 +1,17 @@
 // ============================================================
-// EINWURF 1: interjections for track 009 — rare, iconic, recorded events (not the rhythm section)
+// STAB 1: interjections for track 009 — rare, iconic, recorded events (not the rhythm section)
 // ============================================================
 // @engine 3
 // Research: tracks/009-house/research-stabs.md. House runs in 8/16-bar phrases; ear candy is short, separate from
 // the drums and surprises the first time; vocal shouts / ad-libs (“Yeah! Woo!”) are the classic; an echo throw on the
 // last word. Placement (inferred, no fixed rule found): a pickup on the “and” of beat 4 into a new phrase (voices), or an
 // answer on beat 1 of the new phrase (instrument gestures); at most once per 8 bars, often once per 16.
-// Each column: row 3 “Wie oft” in four steps — only the button / once per 16 bars / once per 8 / once per 4 bars (the
-// last two skip a quarter of their chances); button 1 “Jetzt!” fires at the next pickup / next bar; button 2 = echo
+// Each column: row 3 “How often” in four steps — only the button / once per 16 bars / once per 8 / once per 4 bars (the
+// last two skip a quarter of their chances); button 1 “Now!” fires at the next pickup / next bar; button 2 = echo
 // throw. Every occurrence takes the next sample of the pool (variation, not repetition). All dry + a short dotted-8th
 // echo; row 2 = more space.
 // Sounds (Freesound previews, VSCO 2, VCSL; CC0 unless noted), levels evened by their measured mean level (rough):
-//   1 Rufe: Oh yeah! (250097), Yeah! (475444), men “Hey” (57204, 527740), Whoo! (161340), cheer (346898), oooh hoo
+//   1 Shouts: Oh yeah! (250097), Yeah! (475444), men “Hey” (57204, 527740), Whoo! (161340), cheer (346898), oooh hoo
 //     (343868), aw yeah (541382), “this is house” (152487)   2 “yeah yeah yeah” (529175, hugo_nl, CC BY 4.0)
 //   3 crowd cheer (32260)   4 flute trill (427560 first phrase, Maria_Mannone, CC BY 4.0; 590174 a tone up: G/A)
 //   5 flute run (328858, F major moved up a tone = A dorian's notes)   6 zither glissando up / down (VCSL Dan Tranh,
@@ -19,7 +19,7 @@
 //   (VSCO 2 old trombone)   8 cuíca (728161). Keys measured with an FFT; nothing heard.
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass, keys and the progression in Mode 2.
-// @layout Einwurf 1 (lab/stab, 009: rare recorded interjections on phrase points)
+// @layout Stab 1 (lab/stab, 009: rare recorded interjections on phrase points)
 // @note Columns 1–3 voices (pickup into the phrase), 4–8 instrument gestures (on the 1 of the phrase). Each occurrence takes the next sample.
 // @note Row 3 = how often: button only / every 16 / every 8 / every 4 bars. Button 1 = now (next pickup / next bar).
 // @guide What to listen for | Which interjections are a highlight and stay one after the third time? Too rare / too often?
@@ -58,7 +58,7 @@
 // @ctl 2:7.fader Bass | off-beat bass on the chord root.
 // @ctl 2:8.fader Keys | the keys of 009, following the progression.
 
-const BOARD = { id: 'einwurf1', title: 'Einwurf 1' }
+const BOARD = { id: 'stab1', title: 'Stab 1' }
 const bpm = 124
 
 const FS = 'https://cdn.freesound.org/previews/'
@@ -113,16 +113,16 @@ const makeCols = h => {
   // column gain (2026-11-08, technical check, not heard): measured offline at fader 1 the columns were −13.7 … −19.3 LUFS
   // (kick of 009 ≈ −14) and three peaked above 1 → each scaled to ≈ −19 LUFS, peaks ≤ 0.9 (crowd stays at −22: peaky)
   const GAIN = [0.6, 0.56, 0.72, 0.71, 0.54, 0.9, 0.65, 0.71]
-  const col = (name, i, range) => ({ name, gain: GAIN[i], k3: 'own', k3name: 'Wie oft', b1: 'fire', b1name: 'Jetzt!', fireAt: AT[i],
+  const col = (name, i, range) => ({ name, gain: GAIN[i], k3: 'own', k3name: 'How often', b1: 'fire', b1name: 'Now!', fireAt: AT[i],
     space: 'bus', floor: 0.3, range, pats: [['Pool', shots(i)]] })
   return [
-    col('Rufe', 0, [800, 14000]),
+    col('Shouts', 0, [800, 14000]),
     col('Yeah yeah yeah', 1, [800, 14000]),
-    col('Jubel', 2, [800, 14000]),
-    col('Flöten-Triller', 3, [1000, 14000]),
-    col('Flöten-Lauf', 4, [1000, 14000]),
-    col('Zither-Gliss', 5, [800, 14000]),
-    col('Posaunen-Fall', 6, [400, 8000]),
+    col('Crowd', 2, [800, 14000]),
+    col('Flute trill', 3, [1000, 14000]),
+    col('Flute run', 4, [1000, 14000]),
+    col('Zither gliss', 5, [800, 14000]),
+    col('Trombone fall', 6, [400, 8000]),
     col('Cuíca', 7, [600, 12000]),
   ]
 }
@@ -331,9 +331,9 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], c.k2name ?? 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], c.k2name ?? 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: typeof PROG_NEXT !== 'undefined' && PROG_NEXT.includes(37 + i) ? '<div class="cell btn"><b>' +
         pending(HARMONIES[harmNow()][0], HARMONIES[S.pend.harm ?? 0][0]) + '</b></div>' :
         typeof PROG_KEYS !== 'undefined' && PROG_KEYS.includes(37 + i) ? '<div class="cell btn' +
@@ -341,14 +341,14 @@ const drawView = () => {
         pending(HARMONIES[PROG_KEYS.indexOf(37 + i)][0], HARMONIES[PROG_KEYS.indexOf(37 + i)][0]) +
         ((S.pend.harm ?? 0) === PROG_KEYS.indexOf(37 + i) && harmNow() !== PROG_KEYS.indexOf(37 + i) ? '<span class=next> ←</span>' : '') + '</b></div>' :
         c.b1 === 'fire' ? '<div class="cell btn' + (S.fire?.[i] != null && S.fire[i] >= (beatNow.bar ?? 0) ? ' on' : '') +
-        '"><b>' + esc(c.b1name ?? 'Jetzt!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+        '"><b>' + esc(c.b1name ?? 'Now!') + '</b></div>' : '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -359,7 +359,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -367,13 +367,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -386,13 +386,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           (c.b1 === 'fire' ? '' : pats[now][0] + (next !== now ? ' → ' + pats[next][0] : ''))
       }),
     ].join('\n')
