@@ -1,9 +1,9 @@
 ---
 name: english-repo
-status: in-progress
+status: completed
 created: 2026-11-15T16:40:00Z
-updated: 2026-11-15T19:50:30Z
-progress: 0%
+updated: 2026-11-15T20:58:06Z
+progress: 100%
 prd: .claude/prds/english-repo.md
 github: (will be set on sync)
 ---
@@ -92,13 +92,13 @@ checks prove it.
   ~1–2 h (PDF and simulator runs, one heavy job at a time). Total ~1–1.5 days of agent time.
 
 ## Tasks Created
-- [ ] 001.md - Glossary, scan script, rename German paths (parallel: false)
-- [ ] 002.md - Translate rules, docs and skills (parallel: true)
-- [ ] 003.md - Translate live tracks and their notes (parallel: true)
-- [ ] 004.md - Translate set 011 sources and frame (parallel: true)
-- [ ] 005.md - Translate lab boards and handbooks (parallel: true)
-- [ ] 006.md - Translate tools, snippets and sample notes (parallel: true)
-- [ ] 007.md - Regenerate and verify (parallel: false)
+- [x] 001.md - Glossary, scan script, rename German paths (parallel: false)
+- [x] 002.md - Translate rules, docs and skills (parallel: true)
+- [x] 003.md - Translate live tracks and their notes (parallel: true)
+- [x] 004.md - Translate set 011 sources and frame (parallel: true)
+- [x] 005.md - Translate lab boards and handbooks (parallel: true)
+- [x] 006.md - Translate tools, snippets and sample notes (parallel: true)
+- [x] 007.md - Regenerate and verify (parallel: false)
 
 Total tasks: 7
 Parallel tasks: 5
