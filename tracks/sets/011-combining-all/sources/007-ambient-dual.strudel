@@ -21,7 +21,7 @@
 // @note Dreamy ambient on D, about 70 BPM. Jojo plays the foundation (heartbeat, drone, bass and soft clicks), Jonas the colour (pad, bowed loops, marimba and toms, choir, sparkles) and the global column 8.
 // @note Every row means the same everywhere: row 1 = brightness, row 2 = space, row 3 = character, fader = level, button 1 = next pattern (at the next bar, 3 per stem), button 2 = a moment while held.
 // @note Start with all faders down. Nothing sounds until Jonas' master fader (column 8) is up.
-// @note The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
+// @note The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “as window” opens it as a small window that stays on top (Chrome/Edge).
 // @mode B16 Jojo — Foundation (beat + bass)
 // @col B16:1 1 Pulse
 // @col B16:2 2 Sea / Wind
@@ -161,13 +161,13 @@ const heldRamp = (button, cycles) => {
 // Drone chords per mood (absolute notes, so each mood needs its own; the other stems use scale degrees).
 // Whole tone has no fifth (D E F♯ G♯ A♯ C): its drones use tritones and major thirds instead.
 const MOODS = [
-  { scale: 'lydian', name: 'schwebend',   // D E F♯ G♯ A B C♯
+  { scale: 'lydian', name: 'Floating',   // D E F♯ G♯ A B C♯
     drones: ["[d1,a1]", "[d1,a1,e2]", "[g0,d1,a1]", "[d1,a1,c#2]", "[a0,e1,b1]", "[d1,g#1,a1]", "[e1,b1,f#2]", "[d1,d2,a2]"],
     names: ['D–A', 'D–A–E', 'G–D–A', 'D–A–C♯', 'A–E–B', 'D–G♯–A', 'E–B–F♯', 'D–D–A'] },
-  { scale: 'dorian', name: 'melancholisch',   // D E F G A B C
+  { scale: 'dorian', name: 'Melancholic',   // D E F G A B C
     drones: ["[d1,a1]", "[d1,a1,e2]", "[g0,d1,a1]", "[d1,a1,c2]", "[a0,e1,b1]", "[d1,f1,a1]", "[e1,b1,g2]", "[d1,d2,a2]"],
     names: ['D–A', 'D–A–E', 'G–D–A', 'D–A–C', 'A–E–B', 'D–F–A', 'E–B–G', 'D–D–A'] },
-  { scale: 'whole tone', name: 'seltsam',   // D E F♯ G♯ A♯ C
+  { scale: 'whole tone', name: 'Strange',   // D E F♯ G♯ A♯ C
     drones: ["[d1,g#1]", "[d1,a#1,e2]", "[c1,f#1,d2]", "[d1,c2]", "[e1,a#1,d2]", "[d1,f#1,a#1]", "[g#0,d1,a#1]", "[d1,d2,g#2]"],
     names: ['D–G♯', 'D–A♯–E', 'C–F♯–D', 'D–C', 'E–A♯–D', 'D–F♯–A♯', 'G♯–D–A♯', 'D–D–G♯'] },
 ]
@@ -185,10 +185,10 @@ const statusUi = !hasPage ? null : globalThis.ambientStatus ??= (() => {
   const text = document.createElement('pre')
   text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
   const pop = document.createElement('button')
-  pop.textContent = '⧉ als Fenster'
+  pop.textContent = '⧉ as window'
   pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
   pop.onclick = async () => {
-    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    if (!window.documentPictureInPicture) { pop.textContent = 'Chrome/Edge only'; return }
     const pip = await documentPictureInPicture.requestWindow({ width: 380, height: 470 })
     pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
     pip.document.body.append(text)
@@ -250,7 +250,7 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   opener.style.display = 'none'
   document.body.append(opener)
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'lcxl-view'
   link.style.cssText = 'display:inline-block;margin:6px 0 0 6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -258,14 +258,14 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   link.onclick = () => setTimeout(() => {
     try {
       const w = opener.contentWindow.open('', 'lcxl-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       v.win = w
       w.document.title = 'LC XL 3'
       w.document.head.innerHTML = '<style>' + v.css + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       v.draw()
-      link.textContent = '▣ LC groß'
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+      link.textContent = '▣ LC big'
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   if (statusUi.box) statusUi.box.append(link)
   else { link.style.cssText += ';position:fixed;right:12px;bottom:4px;z-index:1001'; document.body.append(link) }
@@ -281,11 +281,11 @@ const showStatus = () => {
   const show = (r, v) => !r.names ? String(v + 1) : typeof r.names === 'function' ? r.names(v) : r.names[v]
   const line = (r, i) => !r ? (i + 1) + ' —' : (i + 1) + ' ' + r.label.padEnd(10) + ' ' + (r.n === 8 ? dots(r.latch.now) + ' ' : '') +
     show(r, r.latch.now) + (r.latch.pending !== r.latch.now ? ' → ' + show(r, r.latch.pending) : '')
-  const soon = l => l.pending !== l.now ? ' (nächster Takt)' : ''
+  const soon = l => l.pending !== l.now ? ' (next bar)' : ''
   statusUi.text.textContent = [
-    'Kapitel     D ' + MOODS[moodLatch.now].name +
+    'Chapter     D ' + MOODS[moodLatch.now].name +
       (moodLatch.pending !== moodLatch.now ? ' → ' + MOODS[moodLatch.pending].name : '') + soon(moodLatch),
-    'Break       ' + (breakLatch.now ? 'Beat aus' : 'Beat an') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'aus' : 'an') : '') + soon(breakLatch),
+    'Break       ' + (breakLatch.now ? 'Beat off' : 'Beat on') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'off' : 'on') : '') + soon(breakLatch),
     '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
     '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line),
   ].join('\n')
@@ -378,7 +378,7 @@ const strip = (stem, { lpf, level }) => {
 // @ctl B16:1.b1 Change | heartbeat → quarters → half notes.
 // @ctl B16:1.b2 Drop out | pulse pauses while held.
 const pulse       = colJojo(1)
-const pulseRhythm = change(pulse.btn, 'jojo', 'Puls', 3, ['Herzschlag', 'Viertel', 'Halbe'])
+const pulseRhythm = change(pulse.btn, 'jojo', 'Pulse', 3, ['Heartbeat', 'Quarters', 'Halves'])
 const pulseDrive  = pulse.char.fmap(d => d < 1 / 3 ? 0 : d < 2 / 3 ? 1 : 2)
 const PULSE_GAINS = ["[1 0.55 ~ ~]*4", "0.9*4", "1 ~ 1 ~"]   // heartbeat, quarters, half notes
 const PULSE_SOUNDS = [
@@ -404,7 +404,7 @@ const stemJ1_pulse = beatOnly(gate(pulse.btn2.fmap(v => v <= 0.5), strip(dryBus(
 // @ctl B16:2.b1 Change | next of 3 random wave / gust patterns.
 // @ctl B16:2.b2 Riser | a noise sweep rises over 2 bars while held.
 const wind     = colJojo(2)
-const windVar  = change(wind.btn, 'jojo', 'Meer/Wind', 3)
+const windVar  = change(wind.btn, 'jojo', 'Sea / Wind', 3)
 const windMix  = wind.char
 const windLpf  = toned(expRange(wind.bright, 700, 12000))
 const windRise = heldRamp(wind.btn2, 2)
@@ -541,7 +541,7 @@ const stemJ5_rim = beatOnly(strip(bus(rimSound.pan(0.45), 2, rim.space, 0.25), {
 // @ctl B16:6.b1 Change | next of 3 random accent / 16th patterns.
 // @ctl B16:6.b2 Open | ticks ring long while held.
 const ticks    = colJojo(6)
-const tickVar  = change(ticks.btn, 'jojo', 'Ticken', 3)
+const tickVar  = change(ticks.btn, 'jojo', 'Ticks', 3)
 const tickDens = ticks.char
 const tickOpen = ticks.btn2.fmap(v => v > 0.5 ? 0.35 : 0.035)   // decay in seconds
 
@@ -564,7 +564,7 @@ const stemJ6_ticks = beatOnly(strip(bus(reseed(tickVar, stack(
 // @ctl B16:7.b1 Change | next of 3 random patterns.
 // @ctl B16:7.b2 Fill | almost every 16th plays while held.
 const wood     = colJojo(7)
-const woodVar  = change(wood.btn, 'jojo', 'Holz', 3)
+const woodVar  = change(wood.btn, 'jojo', 'Wood', 3)
 const woodKeep = wood.char.fmap(d => f => f > 0.5 ? 0.85 : 0.06 + 0.5 * d).appLeft(wood.btn2)   // share of 16ths
 
 const stemJ7_wood = beatOnly(strip(bus(reseed(woodVar,
@@ -588,7 +588,7 @@ const stemJ7_wood = beatOnly(strip(bus(reseed(woodVar,
 // @ctl B16:8.b1 Change | next of 3 random crackle patterns.
 // @ctl B16:8.b2 Double | twice as much crackle while held.
 const dust     = colJojo(8)
-const dustVar  = change(dust.btn, 'jojo', 'Knistern', 3)
+const dustVar  = change(dust.btn, 'jojo', 'Crackle', 3)
 const dustKeep = dust.char.fmap(d => dbl => Math.min(0.9, (0.04 + 0.4 * d) * (dbl > 0.5 ? 2 : 1))).appLeft(dust.btn2)
 
 const stemJ8_dust = strip(bus(reseed(dustVar,
@@ -709,25 +709,25 @@ const makeNewJonas = (h, scaleIn) => {
   // 1a Cycles: [figure, octave, pan]
   const C5 = ['4 ~ 7 ~ 9', 1, 0.3], C7 = ['0 ~ ~ 2 ~ 4 ~', 0, 0.7], ANCHOR = ['0 ~ ~ ~ ~ ~ ~ ~ 4 ~ ~ ~ ~ ~ ~ ~', 0, 0.5]
   const CYCLES = [
-    ['Zyklen 5·7', [C5, C7]],
-    ['Zyklen 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
-    ['Zyklen 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
+    ['Cycles 5·7', [C5, C7]],
+    ['Cycles 5·7·12', [C5, C7, ['7 ~ 4 ~ 2 ~ 4 ~ 6 ~ 4 ~', 1, 0.5], ANCHOR]],
+    ['Cycles 5·7·11·13', [C5, C7, ['9 ~ 7 ~ 4 ~ ~ 6 ~ 4 ~', 1, 0.55], ['2 ~ 4 ~ ~ 7 ~ ~ 11 ~ 9 ~ ~', 1, 0.45], ANCHOR]],
   ].map(([n, ls]) => [n, ls.map(s => layer(...s))])
   // 1b Canon: one figure, voices [late by 16ths, octave, pan]
   const VOICES = [[0, 1, 0.3], [3, 1, 0.7], [5, 0, 0.5], [11, 2, 0.6]]
   const canon = fig => VOICES.map(([o, oct, pan]) => layer(fig, oct, pan, oct === 2 ? 0.35 : 0.5).late(o / 16))
-  const CANON = [['Kanon einfach', '0 4 ~ 7 4 ~ 2 ~'], ['Kanon mittel', '4 ~ 2 4 ~ 7 ~ ~'], ['Kanon lang', '7 ~ 6 4 ~ 2 4 ~ 9 ~ 7 ~']]
+  const CANON = [['Canon simple', '0 4 ~ 7 4 ~ 2 ~'], ['Canon medium', '4 ~ 2 4 ~ 7 ~ ~'], ['Canon long', '7 ~ 6 4 ~ 2 4 ~ 9 ~ 7 ~']]
     .map(([n, f]) => [n, canon(f)])
   // 1c Similar cells: one cell, padded to slightly different lengths, each layer a little moved in pitch and place
-  const CELLS = [['Zellen 2 Töne', '0 ~ 4', [4, 5, 6, 7]], ['Zellen 4 Töne', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Zellen 6 Töne', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
+  const CELLS = [['Cells 2 notes', '0 ~ 4', [4, 5, 6, 7]], ['Cells 4 notes', '0 ~ 4 7 ~ 9', [7, 8, 9, 10]], ['Cells 6 notes', '0 4 ~ 7 9 ~ 11 ~ 7', [10, 11, 12, 13]]]
   const SIM = [[0, 1, 0.3], [2, 1, 0.7], [-3, 1, 0.5], [4, 0, 0.45]]   // [shift, octave, pan] per layer
   const similar = CELLS.map(([n, cell, lens]) => [n, lens.map((L, v) => layer(pad(shift(cell, SIM[v][0]), L), SIM[v][1], SIM[v][2]))])
   // 2 Euclid: [hits, length, notes, octave, pan]
   const eu = list => list.map(([k, L, ns, oct, pan, rot = 0]) => layer(euclid(k, L, ns, rot), oct, pan))
   const EUCLID = [
-    ['Locker', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
-    ['Mittel', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
-    ['Dicht', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
+    ['Loose', eu([[3, 8, [4, 7, 2], 1, 0.3], [2, 5, [9, 6], 1, 0.7], [3, 11, [0, 4, 2], 0, 0.5], [2, 13, [11, 9], 1, 0.5]])],
+    ['Medium', eu([[3, 8, [4, 7, 2], 1, 0.3], [5, 13, [0, 2, 4, 2, 7], 1, 0.7], [4, 11, [9, 7, 6, 4], 1, 0.5], [3, 16, [0, -3, 2], 0, 0.5]])],
+    ['Dense', eu([[5, 8, [4, 7, 9, 7, 2], 1, 0.3], [7, 13, [0, 2, 4, 7, 4, 2, 6], 1, 0.7], [7, 16, [9, 7, 4, 6, 11, 9, 7], 1, 0.5, 3],
       [4, 9, [0, 4, -3, 2], 0, 0.5]])],
   ]
   // 3 Build-up: layer v enters at bar v × every of a 64-bar round and stays to its end; row 3 (intensity) caps how many
@@ -738,16 +738,16 @@ const makeNewJonas = (h, scaleIn) => {
   const swell = p => p.fmap(v => k => ({ ...v, gain: v.gain * (0.7 + 0.7 * k), bright: 0.6 + 1.4 * k })).appLeft(h.knob(30))
   const entering = every => BUILD.map((s, v) => v === 0 ? layer(...s)
     : gate(signal(t => md(Math.floor(t + 1e-9), 64) >= v * every).segment(1), layer(...s)))
-  const BUILD_RAW = [['alle 8 Takte', entering(8)], ['alle 4 Takte', entering(4)], ['alle 2 Takte', entering(2)]]
+  const BUILD_RAW = [['every 8 bars', entering(8)], ['every 4 bars', entering(4)], ['every 2 bars', entering(2)]]
   const BUILDUP = BUILD_RAW.map(([n, ls]) => [n, ls.map(swell)])
   // 4 Bell pulse: an agogo bell on the quarters with line 1; line 2 fills the gaps of line 1 (interlocked), or runs a
   // step shorter and slides; line 3 (row 3) slides too
   const bell = note(mini('{77 ~ ~ ~}%16')).s('gm_agogo').gain(0.25).pan(0.5)
   const L1 = '4 ~ 7 ~ 2 ~ 4 ~', L2 = '~ 9 ~ 6 ~ 7 ~ 4', L2s = '~ 9 ~ 6 ~ 7 ~', L3 = '0 ~ ~ 2 ~ ~ 4 ~ ~'
   const BELL = [
-    ['verzahnt', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
-    ['Linie 2 rutscht', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
-    ['alle rutschen', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(L3, 0, 0.5)]],
+    ['Interlocked', [stack(bell, layer(L1, 1, 0.3)), layer(L2, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['Line 2 slips', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(pad('0 ~ ~ 2', 8), 0, 0.5)]],
+    ['All slip', [stack(bell, layer(L1, 1, 0.3)), layer(L2s, 1, 0.7), layer(L3, 0, 0.5)]],
   ]
   // 5 Railway crossing: each crossing = a two-tone bell in 8ths, [high, low, octave, pan]; crossing v runs at speed
   // 1 + spread × SPEEDS[v], so they fall out of step and come back (spread 0.01 = a 16th apart after ~6 bars)
@@ -756,7 +756,7 @@ const makeNewJonas = (h, scaleIn) => {
   const crossing = spread => CROSSINGS.map(([a, b, oct, pan], v) => layer(a + ' ' + b, oct, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
   // the same, all crossings on the same two tones (A–F♯), only their speed differs (row 3 on the toms)
   const crossingSame = spread => CROSSINGS.map(([, , , pan], v) => layer('4 2', 1, pan, 0.45, 8).fast(1 + spread * SPEEDS[v]))
-  const CROSS = [['weit', crossing(0.045)], ['weiter', crossing(0.07)], ['sehr weit', crossing(0.1)]]
+  const CROSS = [['Wide', crossing(0.045)], ['Wider', crossing(0.07)], ['Very wide', crossing(0.1)]]
   // 6 Clapping Music (Reich 1972): 12 pulses per bar (8th triplets), x x x . x x . x . x x .; voice 2 one pulse ahead
   // after every `every` bars, back in unison after 12 moves; the hits play the notes in turn
   const CLAP = 'x x x ~ x x ~ x ~ x x ~'
@@ -771,9 +771,9 @@ const makeNewJonas = (h, scaleIn) => {
   const agogo12 = note(mini('{' + toks(BELL12).map(x => x === '~' ? x : 77).join(' ') + '}%12')).s('gm_agogo').gain(0.22).pan(0.5)
   const v4 = layer(bellFig([9, 11, 9, 7, 6, 4, 7]), 2, 0.55, 0.35, 12).early(moving(3, 12, 1 / 12))
   const CLAPPING = [
-    ['Reich (2 Stimmen)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
-    ['3 Stimmen', [v1, v2, v3]],
-    ['3 Stimmen + Glocke', [stack(v1, agogo12), v2, v3, v4]],
+    ['Reich (2 voices)', [v1, v2, layer('0 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~', 0, 0.5, 0.45, 12)]],
+    ['3 voices', [v1, v2, v3]],
+    ['3 voices + bell', [stack(v1, agogo12), v2, v3, v4]],
   ]
 
   // 1 Eno bowed (ambient rounds 1–2): single notes on loops of different lengths that drift apart
@@ -781,7 +781,7 @@ const makeNewJonas = (h, scaleIn) => {
   // Note sets (user, 2026-11-08: the old open / middle / high were too alike; high sat in the shimmer's register):
   // [name, scale degrees (the first two always sound), loop stretch]. Calm = fifths only (D A E B), lydian = with G♯ and
   // C♯ first, low = down to A2 and slower. All below the shimmer (Jonas 7, from about D5).
-  const ENO_SETS = [['Ruhig', [0, 4, 8, 7, 11, 12], 1], ['Lydisch', [3, 6, 4, 8, 10, 13], 1], ['Tief', [0, -3, 4, 2, 7, 1], 1.5]]
+  const ENO_SETS = [['Calm', [0, 4, 8, 7, 11, 12], 1], ['Lydian', [3, 6, 4, 8, 10, 13], 1], ['Low', [0, -3, 4, 2, 7, 1], 1.5]]
   const eno = (i, sound) => ENO_SETS.map(([name, set, sl]) => [name, sound(stack(...set.map((d, v) =>
     gate(h.knob(29 + i).fmap(k => v < 2 + Math.round(4 * k)),
       n(d).struct(mini('x ~ ~')).slow(ENO_LOOPS[v] * sl).late(ENO_OFFS[v] * sl).pan(0.2 + 0.6 * ((v * 0.37) % 1)).scale(scaleIn(3))))))])
@@ -808,11 +808,11 @@ const makeNewJonas = (h, scaleIn) => {
   const eucKnob = cc => stack(...[0, 1, 2, 3].map(v => gate(h.knob(cc).fmap(k => v < 1 + Math.round(3 * k)),
     h.knob(cc).fmap(k => Math.min(2, Math.floor(3 * k))).fmap(d => EUCLID[d][1][v]).innerJoin()))).delay(0.12)
   const MARIMBA = [
-    ['Zyklen', layers(1, ZYKLEN)],
-    ['Kanon', layers(1, CANON[2][1])],
-    ['Zellen', layers(1, similar[1][1])],
-    ['Euklid', eucKnob(30)],
-    ['Aufbau', layers(1, BUILDUP[1][1])],
+    ['Cycles', layers(1, ZYKLEN)],
+    ['Canon', layers(1, CANON[2][1])],
+    ['Cells', layers(1, similar[1][1])],
+    ['Euclid', eucKnob(30)],
+    ['Build-up', layers(1, BUILDUP[1][1])],
   ]
 
   // Toms (row 3 = cc 31), one figure each (several different tom layers = mush):
@@ -861,20 +861,20 @@ const makeNewJonas = (h, scaleIn) => {
   const tomClap = stack(v1, gate(h.knob(31).fmap(k => k > 0.02),
     h.knob(31).fmap(k => Math.min(2, Math.floor(3 * k))).fmap(r => clapRates[r]).innerJoin()))
   const TOMS = [
-    ['Zyklen', dense(C5[0], 1, 0.4)],
-    ['Kanon', tomCanon],
-    ['Euklid', dense(euclid(3, 8, [4, 7, 2]), 1, 0.4)],
-    ['Aufbau', tomBuild],
-    ['Bahnübergang', tomShift('crossing', layer('4 2', 1, 0.35, 0.45, 8))],
+    ['Cycles', dense(C5[0], 1, 0.4)],
+    ['Canon', tomCanon],
+    ['Euclid', dense(euclid(3, 8, [4, 7, 2]), 1, 0.4)],
+    ['Build-up', tomBuild],
+    ['Railway crossing', tomShift('crossing', layer('4 2', 1, 0.35, 0.45, 8))],
     ['Clapping Music', tomClap],
   ].map(([n, p]) => [n, p.delay(0.12)])
 
   const col = (name, k3name, pats, extra = {}) => ({ name, space: 'bus', floor: 0.25, hall: 6, k3: 'own', k3name,
     range: [600, 6000], gain: 1, pats, ...extra })
   return [
-    col('Eno-Bogen', 'Komplexität', eno(0, bowedVib), { range: [800, 12000] }),
-    col('Marimba', 'Komplexität', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
-    col('Toms', 'Komplexität', TOMS, { tom: true, gain: 4 }),    // +12 dB (user: toms louder still; 2026-11-09: louder again, was 2.5)
+    col('Eno bowed', 'Complexity', eno(0, bowedVib), { range: [800, 12000] }),
+    col('Marimba', 'Complexity', MARIMBA, { gain: 1.6 }),            // +4 dB (user: louder)
+    col('Toms', 'Complexity', TOMS, { tom: true, gain: 4 }),    // +12 dB (user: toms louder still; 2026-11-09: louder again, was 2.5)
   ]
 }
 
@@ -904,7 +904,7 @@ const newJonas = (col, c, label, long = false) => {
     level: col.level.range(0, c.gain ?? 1).mul(col.bright.fmap(b => Math.pow(10, 4 * (b - 0.5) / 20))),
   }).fmap(({ bright, ...v }) => bright ? { ...v, cutoff: Math.min(18000, v.cutoff * bright) } : v)
 }
-const stemN2_bowed   = newJonas(bowed, NEW_JONAS[0], 'Bogen', true)
+const stemN2_bowed   = newJonas(bowed, NEW_JONAS[0], 'Bowed', true)
 const stemN3_marimba = newJonas(marimba, NEW_JONAS[1], 'Marimba')
 const stemN4_toms    = newJonas(toms, NEW_JONAS[2], 'Toms')
 
@@ -919,7 +919,7 @@ const stemN4_toms    = newJonas(toms, NEW_JONAS[2], 'Toms')
 // @ctl 16:5.b1 Change | middle → low → high register (new melody each time).
 // @ctl 16:5.b2 Full choir | all three voices while held.
 const choir       = colJonas(5)
-const choirVar    = change(choir.btn, 'jonas', 'Chor', 3, ['mittel', 'tief', 'hoch'])
+const choirVar    = change(choir.btn, 'jonas', 'Choir', 3, ['Middle', 'Low', 'High'])
 const choirScale  = choirVar.pat.fmap(i => [scaleIn(4), scaleIn(3), scaleIn(5)][i]).innerJoin()
 const choirVoices = choir.char.fmap(c => b => b > 0.5 ? 1 : c).appLeft(choir.btn2)
 
@@ -953,7 +953,7 @@ const stemN5_choir = strip(bus(wobble(stack(
 // @ctl 16:6.b1 Change | high → very high → middle register.
 // @ctl 16:6.b2 Run | runs up and down the scale, denser and louder the longer it is held (full after 2 bars).
 const glit     = colJonas(6)
-const glitVar  = change(glit.btn, 'jonas', 'Glitzer', 3, ['hoch', 'sehr hoch', 'mittel'])
+const glitVar  = change(glit.btn, 'jonas', 'Glitter', 3, ['High', 'Very high', 'Middle'])
 const glitKeep = glit.char.fmap(d => 0.06 + 0.64 * d)   // share of 16ths
 const glitScale = glitVar.pat.fmap(i => [scaleIn(5), scaleIn(6), scaleIn(4)][i]).innerJoin()
 const GLIT_TONES = [0, 1, 2, 4, 5, 7, 8, 9, 11]   // scale degrees over 1.5 octaves, without the 4th and 7th
@@ -990,7 +990,7 @@ const stemN6_glitter = strip(bus(stack(
 // @ctl 16:7.b1 Change | a new tone every 2 bars → every 4 bars → every bar.
 // @ctl 16:7.b2 Rise | while held, a cloud of tones climbs an octave and grows denser over 2 bars.
 const fx       = colJonas(7)
-const fxVar    = change(fx.btn, 'jonas', 'Schimmer', 3, ['2 Takte', '4 Takte', '1 Takt'])
+const fxVar    = change(fx.btn, 'jonas', 'Shimmer', 3, ['2 bars', '4 bars', '1 bar'])
 const fxAmount = fx.char
 const fxRise   = heldRamp(fx.btn2, 2)
 const FX_NOTES = [2, 4, 1].map(len => n(irand(7).segment(1).slow(len)))   // scale degree, a new one every len bars
@@ -1086,8 +1086,8 @@ if (lcView) {
     if (row === 'b1') return '<div class="cell btn"' + title + '>' + b1Lines(name, ...choice(page, n)) + '</div>'
     if (row === 'b2') {
       const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
-      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
-        : on ? 'gedrückt' : ''
+      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on')
+        : on ? 'held' : ''
       return '<div class="cell btn' + (on ? ' on' : '') + '"' + title + '><span>' + esc(name) + '</span><b>' + what + '</b></div>'
     }
     return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
@@ -1137,11 +1137,11 @@ if (lcView) {
     const root = doc.getElementById('lc')
     if (!root) return
     root.innerHTML = '<div class=head>' +
-      '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
+      '<div><span class=k>Chapter</span>' + pending(...lcChapter()) + '</div>' +
       lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
-      '<div><span class=k>Takt</span>' + beatHtml() + '</div>' +
-      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
-      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      '<div><span class=k>Bar</span>' + beatHtml() + '</div>' +
+      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
+      (code ? '' : '<div class=next>Names missing: editor not found</div>') +
       (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' + PAGE_ORDER.map(pageHtml).join('') + '</div>'
   }
   // Another track's status box may be the one on the page now: the link moves into it

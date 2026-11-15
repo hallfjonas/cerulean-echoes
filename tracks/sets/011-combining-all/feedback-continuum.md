@@ -1,25 +1,24 @@
-- rumble sollte eher auf 3 4, 2 4 , 3, 4 und so eingestellt werden können (16.)
-- sub sollte keine töne ändern, ist teil der bass / rumble fraktion
-- perc toms klingen cheap digital 
-- hats zu leise 
-- grund als besfchriftung nicht descriptiv; zb bei hats: 8tel oder bei kick 4/4 etc
-- kick ist keine 4/4, sondern hat einen zweiten schlag; das ist doch mist! 
-- jojo und jonas als namen haben im single track nichts zu suchen: das ist rhythmus und melody oder denk dir was deskriptives aus 
-- wie kann man die bpm verändern? 
-- house chords sollten mehr house piano sein; nutze bitte klasssiche gute samples für die sachen! sollte ikonischere einwürfe haben, nicht nur trembling chord progressions, das ist schnell langweilig
-- glide gefällt mir nicht so als effekt, das ist bisschen verschenkt
-- sollte irgendwo mehr acid optionen geben 
-- voices ist bisschen lost (im house teil zumindest)
-- ambient bells machen vielleicht im house und tehcno teil dann nicht mehr so viel sinn
-- air wardavor im ambient teil viel toller! das muss wieder so werden! 
-- ah, sub und bass sind viel besser im techno part! perc / tom bleibt furchtbar; und eigentlich zu melodisch 
-- beim drop sollten eigentlich die heads nicht aussetzen 
-- pads auf techno komplett lost; da geht nichts so sphärisches
-- chords auf techno auch lost; 
-- arp besser bei tehcno; dafür bei anderen bsischen lost
-- lead bei allen eher lame; vbielleciht bisschen randomness? 
-- voices bei techno eher los und unfassbar leise 
-- bass könnte mehr optionen haben 
+- rumble should rather be settable to 3 4, 2 4, 3, 4 and so on (16ths)
+- sub should not change notes, it is part of the bass / rumble group
+- perc toms sound cheap and digital
+- hats too quiet
+- "Basic" as a label is not descriptive; e.g. for hats: 8ths, or for the kick 4/4 etc.
+- the kick is not 4/4, it has a second hit; that is rubbish!
+- Jojo and Jonas as names have no place in the single track: that is rhythm and melody, or think of something descriptive
+- how can the BPM be changed?
+- house chords should be more house piano; please use classic good samples for these! It should have more iconic stabs, not only trembling chord progressions, that gets boring fast
+- I don't like glide much as an effect, it is a bit wasted
+- there should be more acid options somewhere
+- voices are a bit lost (in the house part at least)
+- ambient bells maybe don't make much sense in the house and techno part
+- air was much better before in the ambient part! It has to be like that again!
+- ah, sub and bass are much better in the techno part! perc / tom stays awful; and actually too melodic
+- at the drop the hats should actually not drop out
+- pads completely lost in techno; nothing that spherical works there
+- chords also lost in techno;
+- arp better in techno; but a bit lost in the others
+- lead rather lame everywhere; maybe a little randomness?
+- voices rather lost in techno and incredibly quiet
+- bass could have more options
 
-- vielleicht macht das doch keinen sinn insgesamt? oder nur für die rhytmusgruppe das kontinuirliche? 
-
+- maybe the whole thing makes no sense after all? Or only the continuous part for the rhythm group?

@@ -39,7 +39,7 @@
 // @note Groove techno on F minor, 140 BPM. Jojo plays the foundation (kick, bass, drums), Jonas the colour (pads, stab, percussion) and the global column 8.
 // @note Every row means the same everywhere: row 1 = brightness, row 2 = space, row 3 = character, fader = level, button 1 = next pattern (at the next bar), button 2 = a moment while held.
 // @note Start with all faders down. Nothing sounds until Jonas' master fader (column 8) is up. Jonas' pad button 1 changes the chords, and Jojo's sub and bassline follow.
-// @note The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
+// @note The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “as window” opens it as a small window that stays on top (Chrome/Edge).
 // @mode B16 Jojo — Foundation (beat + bass)
 // @col B16:1 1 Kick
 // @col B16:2 2 Rumble
@@ -195,7 +195,7 @@ const freeze = (button, pat) => {
 // MOODS — round 8: one chapter only, F minor (dark); global button 1 is the drop fill now
 // ============================================================
 const MOODS = [
-  { scale: 'minor',    name: 'dunkel' },     // F G A♭ B♭ C D♭ E♭
+  { scale: 'minor',    name: 'Dark' },     // F G A♭ B♭ C D♭ E♭
 ]
 
 // Status box at the bottom right: chapter, break, and which pattern each stem plays.
@@ -210,10 +210,10 @@ const statusUi = !hasPage ? null : globalThis.technoStatus ??= (() => {
   const text = document.createElement('pre')
   text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
   const pop = document.createElement('button')
-  pop.textContent = '⧉ als Fenster'
+  pop.textContent = '⧉ as window'
   pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
   pop.onclick = async () => {
-    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    if (!window.documentPictureInPicture) { pop.textContent = 'Chrome/Edge only'; return }
     const pip = await documentPictureInPicture.requestWindow({ width: 380, height: 470 })
     pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
     pip.document.body.append(text)
@@ -274,7 +274,7 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   opener.style.display = 'none'
   document.body.append(opener)
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'lcxl-view'
   link.style.cssText = 'display:inline-block;margin:6px 0 0 6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -282,14 +282,14 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   link.onclick = () => setTimeout(() => {
     try {
       const w = opener.contentWindow.open('', 'lcxl-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       v.win = w
       w.document.title = 'LC XL 3'
       w.document.head.innerHTML = '<style>' + v.css + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       v.draw()
-      link.textContent = '▣ LC groß'
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+      link.textContent = '▣ LC big'
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   if (statusUi.box) statusUi.box.append(link)
   else { link.style.cssText += ';position:fixed;right:12px;bottom:4px;z-index:1001'; document.body.append(link) }
@@ -305,11 +305,11 @@ const showStatus = () => {
   const show = (r, v) => !r.names ? String(v + 1) : r.names[v]
   const line = (r, i) => (i + 1) + ' ' + r.label.padEnd(10) + ' ' + (r.n === 8 ? dots(r.latch.now) + ' ' : '') +
     show(r, r.latch.now) + (r.latch.pending !== r.latch.now ? ' → ' + show(r, r.latch.pending) : '')
-  const soon = l => l.pending !== l.now ? ' (nächster Takt)' : ''
+  const soon = l => l.pending !== l.now ? ' (next bar)' : ''
   statusUi.text.textContent = [
-    'Kapitel     F ' + MOODS[moodLatch.now].name +
+    'Chapter     F ' + MOODS[moodLatch.now].name +
       (moodLatch.pending !== moodLatch.now ? ' → ' + MOODS[moodLatch.pending].name : '') + soon(moodLatch),
-    'Break       ' + (breakLatch.now ? 'Beat aus' : 'Beat an') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'aus' : 'an') : '') + soon(breakLatch),
+    'Break       ' + (breakLatch.now ? 'Beat off' : 'Beat on') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'off' : 'on') : '') + soon(breakLatch),
     '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
     '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line),
   ].join('\n')
@@ -442,7 +442,7 @@ const onRoot  = pat => pat.add(n(harmRoot))
 // @ctl B16:1.b2 Drop out | kick pauses while held.
 const kick     = colJojo(1)
 // Round 8: button 1 no longer steps through patterns; a fixed row keeps the status box and LC view in column order
-STATUS.jojo.push({ label: 'Kick', latch: { now: 0, pending: 0 }, n: 1, names: ['4/4 (halten: 8/4)'] })
+STATUS.jojo.push({ label: 'Kick', latch: { now: 0, pending: 0 }, n: 1, names: ['4/4 (held: 8/4)'] })
 const kickPunch = kick.char
 // Value at punch 0 / 0.5 / 1, straight lines in between
 const punch3 = (soft, round, hard) => kickPunch.fmap(p => p < 0.5 ? soft + (round - soft) * 2 * p : round + (hard - round) * (2 * p - 1))
@@ -504,7 +504,7 @@ const stemJ2_rumble = strip(stack(
 // @ctl B16:3.b1 Change | pump → fifth on beat 4 → syncopated.
 // @ctl B16:3.b2 Slide | every note bends up into its pitch while held.
 const sub      = colJojo(3)
-const subVar   = change(sub.btn, 'jojo', 'Sub', 3, ['Pumpe', 'Quinte', 'Synkope'])
+const subVar   = change(sub.btn, 'jojo', 'Sub', 3, ['Pump', 'Fifth', 'Syncopated'])
 const subClip  = sub.char.fmap(c => 1 - 0.65 * c)   // share of the note length that sounds
 const subSlide = sub.btn2.fmap(v => v > 0.5 ? -5 : 0)
 const SUBS = ["[~ 0@3]*4", "[~ 0@3] [~ 0@3] [~ 0@3] [~ 4@3]", "[~ 0@3] [~ 0@3] [~ 0@3] [~ 0 ~ 0]"]
@@ -531,7 +531,7 @@ const stemJ3_sub = beatOnly(strip(dryBus(stack(
 // @ctl B16:4.b1 Change | rolling → acid → stomp.
 // @ctl B16:4.b2 Octave | one octave up while held.
 const bassCol = colJojo(4)
-const bassVar = change(bassCol.btn, 'jojo', 'Bass', 3, ['rollend', 'Acid', 'Stampf'])
+const bassVar = change(bassCol.btn, 'jojo', 'Bass', 3, ['Rolling', 'Acid', 'Stomp'])
 const bassOct = bassCol.btn2.fmap(v => v > 0.5 ? 12 : 0)
 // [main line (2 bars, 16ths), ghost 16ths], scale degrees above the chord root (7 = octave, -2 = ♭6 below)
 const BASS_LINES = [
@@ -566,7 +566,7 @@ const stemJ4_bass = beatOnly(strip(dryBus(stack(
 // @ctl B16:5.b1 Change | short clap → with pickup → full drop clap (tail + double).
 // @ctl B16:5.b2 Swell | snare swell over 4 bars while held.
 const clap      = colJojo(5)
-const clapVar   = change(clap.btn, 'jojo', 'Clap', 3, ['einfach', 'Vorschlag', 'Drop'])
+const clapVar   = change(clap.btn, 'jojo', 'Clap', 3, ['Simple', 'Pickup', 'Drop'])
 const clapGhost = clap.char
 // Feedback round 3: the roll restarted every bar (cheap, symmetric). Now one slow swell from the moment of the press
 // (after Attack Magazine, "10 snare rolls for the drop": velocity ramp with a little randomisation, pitch rising;
@@ -609,7 +609,7 @@ const stemJ5_clap = beatOnly(strip(dryBus(stack(
 // @ctl B16:6.b1 Change | open off-beat → + closed 16ths → driving.
 // @ctl B16:6.b2 Long | the open hats ring longer, on every 8th, while held.
 const hats    = colJojo(6)
-const hatVar  = change(hats.btn, 'jojo', 'Hats', 3, ['offen', 'offen + 16tel', 'treibend'])
+const hatVar  = change(hats.btn, 'jojo', 'Hats', 3, ['Open', 'Open + 16ths', 'Driving'])
 const hatDens = hats.char
 const openHat = drum("[~ oh]*4").decay(0.18).sustain(0).release(0.05)
 const HATS = [
@@ -639,7 +639,7 @@ const stemJ6_hats = strip(dryBus(stack(
 // @ctl B16:7.b1 Change | pillow → gallop → 3-3-2.
 // @ctl B16:7.b2 Fill | a bongo run down over the bar while held.
 const perc     = colJojo(7)
-const percVar  = change(perc.btn, 'jojo', 'Perkussion', 3, ['Kissen', 'Galopp', '3-3-2'])
+const percVar  = change(perc.btn, 'jojo', 'Percussion', 3, ['Pillow', 'Gallop', '3-3-2'])
 const percDens = perc.char
 // Round 8: knob 0 = the old 65 %, the knob travels the rest of the old range
 const percBright = perc.bright.fmap(b => 0.65 + 0.35 * b)
@@ -673,7 +673,7 @@ const stemJ7_perc = strip(dryBus(stack(
 // @ctl B16:8.b1 Change | off-beat → 8ths → 16ths.
 // @ctl B16:8.b2 Double | double time while held.
 const ride    = colJojo(8)
-const rideVar = change(ride.btn, 'jojo', 'Ride', 3, ['Offbeat', 'Achtel', 'Sechzehntel'])
+const rideVar = change(ride.btn, 'jojo', 'Ride', 3, ['Off-beat', '8ths', '16ths'])
 const RIDES = ["[~ 0.35]*4", "[0.3 0.2]*4", "[0.3 0.12 0.2 0.12]*4"].map(g => drum("rd").struct(g).gain(g))
 
 const stemJ8_ride = strip(dryBus(pick(rideVar, RIDES)
@@ -724,7 +724,7 @@ const stemN1_pad = strip(dryBus(stack(
 // @ctl 16:2.b1 Change | minor 7 → fourths → fifths → minor 9 without the 3rd.
 // @ctl 16:2.b2 Echo throw | long echo on the pad while held.
 const tpad     = colJonas(2)
-const tpadVar  = change(tpad.btn, 'jonas', 'Techno-Pad', 4, ['Moll 7', 'Quarten', 'Quinten', 'Moll 9 ohne 3'])
+const tpadVar  = change(tpad.btn, 'jonas', 'Techno-Pad', 4, ['Minor 7', 'Fourths', 'Fifths', 'Minor 9 no 3rd'])
 const tpadPump = tpad.char
 // Scale degrees above the chord root
 const TPAD_SHAPES = [[0, 2, 4, 6], [0, 3, 6, 9], [0, 4, 7, 11], [0, 4, 6, 8]]
@@ -755,7 +755,7 @@ const stemN2_tpad = strip(throwEcho(dryBus(stack(
 // @ctl 16:3.b1 Change | next of 8 loops (3, 5 or 7 steps).
 // @ctl 16:3.b2 Octave | one octave up while held.
 const seqCol   = colJonas(3)
-const seqVar   = change(seqCol.btn, 'jonas', 'Sequenz')
+const seqVar   = change(seqCol.btn, 'jonas', 'Sequence')
 const seqRange = seqCol.char
 // Complexity (round 7), one flow: the loop fills in and gets its passing notes as in the first version, and each loop
 // has 8 extra notes that join one by one as the knob turns, always in the same order (each has its own threshold,
@@ -845,7 +845,7 @@ const stemN4_stab = strip(throwEcho(dryBus(stack(
 // @ctl 16:5.b1 Change | next of 8 phrase rhythms (new notes too).
 // @ctl 16:5.b2 Answer | random extra answers while held.
 const ans       = colJonas(5)
-const ansVar    = change(ans.btn, 'jonas', 'Antwort')
+const ansVar    = change(ans.btn, 'jonas', 'Answer')
 const ANS_RHYTHMS = ["~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ x ~ x ~", "~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ x ~ ~ x ~", "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x x x ~",
   "~ ~ ~ ~ ~ ~ ~ ~ ~ x ~ x ~ x ~ x", "~ ~ ~ ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~", "~ ~ ~ ~ ~ ~ ~ ~ x ~ x ~ ~ ~ ~ ~",
   "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ x x ~ x ~ ~", "~ ~ ~ ~ x ~ ~ ~ ~ ~ x ~ ~ ~ x x"]
@@ -943,7 +943,7 @@ const stemN6_perc = strip(dryBus(stack(
 // @ctl 16:7.b1 Change | one breath per 2 → 4 → 8 → 1 bar(s).
 // @ctl 16:7.b2 Open | the breath opens fully while held.
 const fx       = colJonas(7)
-const fxVar    = change(fx.btn, 'jonas', 'Atem', 4, ['2 Takte', '4 Takte', '8 Takte', '1 Takt'])
+const fxVar    = change(fx.btn, 'jonas', 'Breath', 4, ['2 bars', '4 bars', '8 bars', '1 bar'])
 const fxAmount = fx.char
 // Breath shape (sine) × a depth that changes slowly from breath to breath (0.3–1)
 const FX_BREATHS = [2, 4, 8, 1].map(len => sine.slow(len).mul(perlin.slow(2 * len).range(0.3, 1)))
@@ -1060,8 +1060,8 @@ if (lcView) {
     if (row === 'b1') return '<div class="cell btn"' + title + '><span>' + esc(name) + '</span><b>' + choice(page, n) + '</b></div>'
     if (row === 'b2') {
       const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
-      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
-        : on ? 'gedrückt' : ''
+      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on')
+        : on ? 'held' : ''
       return '<div class="cell btn' + (on ? ' on' : '') + '"' + title + '><span>' + esc(name) + '</span><b>' + what + '</b></div>'
     }
     return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
@@ -1100,11 +1100,11 @@ if (lcView) {
     doc.documentElement.style.setProperty('--acc', page === 'jojo' ? '#f0a040' : '#50c8e8')
     const cols = [1, 2, 3, 4, 5, 6, 7, 8]
     root.innerHTML = '<div class=head><h1>' + esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h1>' +
-      '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
+      '<div><span class=k>Chapter</span>' + pending(...lcChapter()) + '</div>' +
       lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
-      '<div><span class=k>Takt</span>' + beatHtml() + '</div>' +
-      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
-      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      '<div><span class=k>Bar</span>' + beatHtml() + '</div>' +
+      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
+      (code ? '' : '<div class=next>Names missing: editor not found</div>') +
       (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div>' +
       '<div class=grid>' +
       cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
