@@ -1,10 +1,10 @@
 // ============================================================
 // MALLETS LAB 1: vibraphone / marimba for track 009, Jonas column 5 (colourful, percussive, jazzy melodies)
 // ============================================================
-// Round 1. Research (stems-ideen.md, “Recherche”): Roy Ayers' vibraphone runs through jazzy house (he worked with
+// Round 1. Research (stem-ideas.md, “Recherche”): Roy Ayers' vibraphone runs through jazzy house (he worked with
 // Masters at Work and Kerri Chandler); deep house likes close, slightly dissonant melodies. No source for mallet
 // rhythms: the figures are my guess (a broken chord, thirds, a 3-against-4 ostinato).
-// Open question from stems-ideen.md: the keys' sound mode already has vibes → marimba (GM); column 4 = that sound
+// Open question from stem-ideas.md: the keys' sound mode already has vibes → marimba (GM); column 4 = that sound
 // as a reference, so the comparison shows whether a sampled mallet stem is worth its own column.
 //   1 Vibraphone, hard mallets: VCSL (CC0), a broken Am9 in 16ths with rests
 //   2 Vibraphone, soft mallets: VCSL (CC0), two-note thirds

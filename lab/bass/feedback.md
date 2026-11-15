@@ -1,7 +1,7 @@
 # Bass lab — feedback
 
 ## House Bass 1 — house-bass-1.strudel (2026-11-08), for 009 Jojo 4
-- Research: tracks/009-house/recherche-bass.md. Eight columns = style + sound, Engine 3 (follows all 21 progressions,
+- Research: tracks/009-house/research-bass.md. Eight columns = style + sound, Engine 3 (follows all 21 progressions,
   Kerri push 2 16ths): 1 M1 organ bass, 2 Juno, 3 disco octaves, 4 root rhythm, 5 Daft Punk (FM), 6 chord-tone themes
   (8-bar theme), 7 Jojo 4 as in the track (no ghost improviser), 8 deep sub ostinato. Three lines each (button 1),
   button 2 = octave up while held.

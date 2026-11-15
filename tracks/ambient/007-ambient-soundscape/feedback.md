@@ -17,15 +17,15 @@
 ## Feedback 2 (user, 2026-11-08)
 - Chords (Jonas 2), music box (Jonas 3: boring, not good) and whale (Jonas 4) out. Done in 007-ambient-dual.strudel
   (columns 2–4 free, stems kept as silence for the set); previous version old/007-ambient-dual-before-feedback2.strudel.
-- Successors are tried in lab/harmonie/ambient-3.strudel: Takada-style shifting marimba layers, a melodic voice on top,
+- Successors are tried in lab/harmony/ambient-3.strudel: Takada-style shifting marimba layers, a melodic voice on top,
   Eno bowed (liked, maybe better than the choir and instead of the chords).
 - Choir stays (good shimmer, sits higher; the drone is much lower).
-- 2026-11-08: Jonas 2–4 = Eno-Bogen, Marimba, Toms (Takada) aus lab/harmonie/midori-5.strudel übernommen; Version davor
+- 2026-11-08: Jonas 2–4 = Eno-Bogen, Marimba, Toms (Takada) aus lab/harmony/midori-5.strudel übernommen; Version davor
   old/007-ambient-dual-before-midori.strudel. Abweichung: Tonleiter folgt dem Kapitel. Pegel der GM-Klänge noch nicht gemessen.
 
 ## Feedback 3 (user, 2026-11-09)
 - Toms (Jonas 4) louder: gain 2.5 → 4 (+4 dB) in 007-ambient-dual.strudel; single and set 011 rebuilt.
-- Ticks (Jojo 6) never used → replace. Candidates in lab/drums/ambient-perkussion-1.strudel (real recordings): kalimba,
+- Ticks (Jojo 6) never used → replace. Candidates in lab/drums/ambient-percussion-1.strudel (real recordings): kalimba,
   shaker, slit drum · birds, pebbles, fire · gong, tubular bells.
 - 2026-11-12: user picked the shaker → Jojo 6 = shaker (lab column 2, 1:1) in 007-ambient.strudel; previous
   old/007-ambient-before-shaker.strudel. Level = the lab's (not rendered: Node cannot decode the VCSL shaker WAVs).

@@ -2,7 +2,7 @@
 // SAMPLE LAB 1: listening board for track 009, Jonas column 4 — real recorded phrases, auditioned in the groove
 // ============================================================
 // Classic house takes its playful top from recorded material (stabs, licks, phrases), not from synth figures. I cannot
-// listen, so this board only plays the candidates of tracks/009-house/hoerliste.md in time over drums, bass and keys:
+// listen, so this board only plays the candidates of tracks/009-house/listening-list.md in time over drums, bass and keys:
 // you pick by ear, then the winners get cut to the key and the grid (chop / slice / splice) in a next round.
 // Every column = one category, button 1 = the next candidate in it, row 3 = which part of the file (start point).
 // Short hits (under 1.5 s) play as stabs in the keys' gaps; longer phrases start on every second bar and play for
@@ -12,7 +12,7 @@
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass and keys in Mode 2 (CC + 48).
 // @layout Sample Lab 1 (lab/samples, round 1 for 009 column 4: recorded phrases from the listening list)
-// @note Plays the candidates of hoerliste.md in time: one category per column, button 1 = next candidate, row 3 = start point in the file. Not fitted to key or tempo yet: pick by ear, fitting comes next.
+// @note Plays the candidates of listening-list.md in time: one category per column, button 1 = next candidate, row 3 = start point in the file. Not fitted to key or tempo yet: pick by ear, fitting comes next.
 // @note Mode 2: fader 6 = drums (knob 1 = swing, button 2 = drums out), fader 7 = bass, fader 8 = keys of 009; column 5 button 1 = harmony.
 // @guide What to listen for | Which recordings have the right feel (real, warm, groovy)? Note the column and name (dashboard) of each favourite.
 // @guide Not yet fitted | Phrases play at their own tempo and key; a clash is expected. The fit (cutting, pitch) comes after you pick.

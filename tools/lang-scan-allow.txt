@@ -1,0 +1,7 @@
+# Strings removed from a line before the German scan in tools/lang-scan.mjs (one per line, exact text).
+# Only external names: sample/bank names, own recordings, place and person names, quoted external titles.
+beats-basteln-workshop
+letzte_wiese
+Plaenterwald
+plaenterwald
+Plänterwald

@@ -1,4 +1,4 @@
-# horn-phrases — real recorded wind phrases for lab/melodie/melodie-3 (track 009, Jonas 4)
+# horn-phrases — real recorded wind phrases for lab/melody/melody-3 (track 009, Jonas 4)
 
 Cut from longer free improvisations at rests (or at the end of a long note), only calm ones kept (few, long notes:
 ≤ 3.2 notes/s, a note ≥ 0.5 s, ≥ half the time in notes ≥ 0.3 s, no scale runs, no notes outside A dorian / A aeolian),

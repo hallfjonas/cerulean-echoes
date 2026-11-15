@@ -1,10 +1,10 @@
 // ============================================================
 // ORGAN LAB 1: organ for track 009, Jonas column 6 (a second harmony colour for the drop)
 // ============================================================
-// Round 1. Research (stems-ideen.md, “Recherche”): the organ of Robin S “Show Me Love” is the Korg M1 preset
+// Round 1. Research (stem-ideas.md, “Recherche”): the organ of Robin S “Show Me Love” is the Korg M1 preset
 // “Organ 2”, first meant as a bass; Organ 2 is punchier than Organ 1. The B3 and M1 here are the ones built in the
 // keys lab round 14 (liked there; B3 = drawbars 888 with a slow Leslie, M1 = square + octave + a percussive tock).
-// Open question from stems-ideen.md: the keys' sound mode already has B3 → M1; this board shows whether an own organ
+// Open question from stem-ideas.md: the keys' sound mode already has B3 → M1; this board shows whether an own organ
 // column (other register, other rhythm) adds something.
 //   1 M1 stabs: off-beat chord stabs (the 90s house organ)
 //   2 B3 drop chords: held chords with a short re-strike, for the drop

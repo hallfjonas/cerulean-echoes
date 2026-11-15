@@ -2,12 +2,12 @@
 // TRACK 007 — dreamy ambient / soundscape on D, ~70 BPM, three switchable moods, in the two-controller layout
 // Sound from old/007-ambient-moods-dual.strudel, controls rearranged after midi-layouts/templates/dual-lc.strudel.
 // Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, clock ticks, wood/drops, crackle.
-// Jonas (colour): pad, Eno bowed, marimba, toms (Takada style, from lab/harmonie/midori-5), choir, glitter, shimmer + the global column 8.
+// Jonas (colour): pad, Eno bowed, marimba, toms (Takada style, from lab/harmony/midori-5), choir, glitter, shimmer + the global column 8.
 // Chapter (global button 1): D lydian (floating) → D dorian (melancholic) → D whole tone (strange), at the next bar.
 // Feedback 1 (feedback.md): sea/wind quieter, drone and bass fader ranges cut to the old 40 % (they were too heavy
 //   in the lows with the kick). Previous version: old/007-ambient-dual-before-feedback1.strudel.
 // Feedback 2: chords, music box and whale out (Jonas 2–4 free). Previous: old/007-ambient-dual-before-feedback2.strudel.
-// Jonas 2–4 = Eno bowed, marimba, toms from lab/harmonie/midori-5.strudel. Previous: old/007-ambient-dual-before-midori.strudel.
+// Jonas 2–4 = Eno bowed, marimba, toms from lab/harmony/midori-5.strudel. Previous: old/007-ambient-dual-before-midori.strudel.
 // ============================================================
 // Two Launch Control XL 3, both in Custom Mode 16 (same CCs), told apart by their MIDI input.
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
@@ -640,7 +640,7 @@ const stemN1_pad = strip(bus(wobble(stack(
 })
 
 // ============================================================
-// JONAS 2–4 — Eno bowed, marimba, toms (Takada style): from lab/harmonie/midori-5.strudel (feedback 2: instead of
+// JONAS 2–4 — Eno bowed, marimba, toms (Takada style): from lab/harmony/midori-5.strudel (feedback 2: instead of
 // chords, music box and whale)
 // ============================================================
 // Ported 1:1 from the lab board (its makeCols below, same figures, controls, levels, ranges); per column: row 1 =
@@ -669,7 +669,7 @@ const stemN1_pad = strip(bus(wobble(stack(
 // @ctl 16:4.fader Level | tom figures.
 // @ctl 16:4.b1 Change | cycles → canon → Euclid → build-up → crossing → Clapping.
 // @ctl 16:4.b2 Echo throw | held: long dotted-8th echo.
-// The lab's column code (lab/harmonie/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
+// The lab's column code (lab/harmony/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
 // its knob reads (h.knob / h.at) and the drift offsets' name. Returns the three columns { name, pats, range, gain, tom }.
 const makeNewJonas = (h, scaleIn) => {
   const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()

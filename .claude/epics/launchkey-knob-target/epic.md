@@ -25,7 +25,7 @@ Two improvements for the Launchkey MK4 25 in the one-file live tracks (007, 008,
   encoders send absolute (0-127) or relative values, is unknown. Today's code reads them as absolute
   (`lkCc(31..38)` as 0..1; 008/009/010 hold a start value per knob with `lkSticky` until it moves, 007 reads
   `lkKnob` directly without `lkSticky`). Task 1 measures with `snippets/midi-test.strudel`
-  and writes the result into `midi-layouts/geraete.md`. The takeover design follows from it:
+  and writes the result into `midi-layouts/devices.md`. The takeover design follows from it:
   - relative → one accumulator per knob and target; no jumps by design.
   - absolute → pickup per knob and target: the stored value holds until the knob passes it.
 - **One routing helper.** `lkKnob(n)` stays the single access point. It becomes `lkKnob(target, n)` (or two
@@ -66,7 +66,7 @@ Keyboard drawing is independent of the knob work and can run in parallel.
 
 ## Task Breakdown Preview
 
-1. Measure the Launchkey: button CCs and encoder mode in factory setting; note in `midi-layouts/geraete.md`.
+1. Measure the Launchkey: button CCs and encoder mode in factory setting; note in `midi-layouts/devices.md`.
 2. Knob target switch in 009 (toggle, per-target values, routing, `stateTaps`), proven with `/strudel-optimize`
    (Keys target, knobs untouched = identical). Depends on 1.
 3. LC view: target label and per-target knob row in 009. Depends on 2.
@@ -82,7 +82,7 @@ code) — run 3 and 4 one after another or merge carefully.
 - Physical access to the Launchkey for task 1 (the player measures, Claude reads the console).
 - Lab round for the Pads knob jobs (separate, after this epic).
 - Other epics: `drop-buildup` and `player-hub` also change the LC view; `english-repo` renames
-  `midi-layouts/geraete.md` and touches every track. Merge one at a time.
+  `midi-layouts/devices.md` and touches every track. Merge one at a time.
 
 ## Success Criteria (Technical)
 

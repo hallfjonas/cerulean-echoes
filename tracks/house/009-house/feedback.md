@@ -28,12 +28,12 @@
   .claude/skills/lab-to-track.
 
 ## Vibraphon → Jonas 3 (2026-11-07)
-- Aus lab/melodie/melodie-2 Spalte 1, 1:1 (Hell, Weich, Komplex, Pegel, Taste 1 Phrase, Taste 2 Echo-Wurf); 40 % lauter
+- Aus lab/melody/melody-2 Spalte 1, 1:1 (Hell, Weich, Komplex, Pegel, Taste 1 Phrase, Taste 2 Echo-Wurf); 40 % lauter
   als im Labor (Nutzer: 30–50 %). Akkorde vom Kapitel (Am9 / D9) statt der Labor-Progressionen; eigener Orbit 3.
 - Jonas 2 bleibt frei für die Harmonie (harmonie-4). Offen: Track auf die 16 Akkordfolgen umstellen.
 - Set 011 nicht neu gebaut: make-set scheitert seit dem Keys-Port an `await samples(…)` in 009 (nicht durch diese Änderung).
 
-## 2026-11-08 — Harmonie-Spalte + Akkordfolgen (aus lab/harmonie/harmonie-4, Spalte 2)
+## 2026-11-08 — Harmonie-Spalte + Akkordfolgen (aus lab/harmony/harmonie-4, Spalte 2)
 - Jonas 1 = Harmonie (JX-10-Strings ↔ B3 16'+8' auf Reihe 3, gehaltene Akkorde, Echo-Wurf), Taste 1 = nächste von
   10 Akkordfolgen (nächste 8-Takt-Phrase). Keys auf Jonas 2 verschoben (unverändert).
 - Chapter (Jonas 8): Vamp = alle Am9; Wechsel = die Folge von Jonas 1 (Start: Am9 D9 = wie bisher).
@@ -58,7 +58,7 @@
 - Acid: super, muss aber nicht sein.
 
 ## 2026-11-08 (Nacht) — Flöte → Jonas 4
-- Aus lab/melodie/melodie-4 Spalte 6 („Flöte höher“), 1:1 (Hell, Raum, Verspielt, Pegel, Taste 1 Motiv, Taste 2 Echo-Wurf),
+- Aus lab/melody/melody-4 Spalte 6 („Flöte höher“), 1:1 (Hell, Raum, Verspielt, Pegel, Taste 1 Motiv, Taste 2 Echo-Wurf),
   echte Flötentöne aus den juskiddink-Phrasen (begin/end/speed), Motive auf den Akkordtönen ab G4, Orbit 3 (mit Vibraphon).
 - Einzige Abweichung: Akkorde aus dem Track (Kapitel + Folge, Push 2/16). Pegel: Nutzer „zu leise“ → Gain 0,6 → 2,0;
   offline im Track bei Fader 1 −23,9 LUFS = Vibraphon (−23,8). Nicht gehört.
@@ -81,7 +81,7 @@
   Über A rau nur Checkmates Gm (kleine None A–B♭). Nächste Stufe, falls nötig: Harmonie fällt bei Riff automatisch auf Am9.
 - Node: transpile ok (dual + single), Riffs ab Takt 1 und Rückkehr zu monoton geprüft, ~1,2 ms/Tick für die Keys. Nicht gehört.
 
-## 2026-11-08 nachts — Bläser → Jonas 5 (aus lab/blaeser/disco-blaeser-3)
+## 2026-11-08 nachts — Bläser → Jonas 5 (aus lab/brass/disco-brass-3)
 - Nutzer: „Auf der a“ und „Schweller + Fall“ raus, die übrigen sechs Figuren so in den Track.
 - Jonas 5 = ganzer Satz (SSO Trompeten, Hörner, Posaunen), Reihe 3 Komplexität, Taste 2 gehalten = Steigerung wie im Lab.
   Einzige Abweichungen (eine Spalte hat nur zwei Tasten): Taste 1 = die sechs Figuren (im Lab: je eine Spalte; Taste 1 war
@@ -94,14 +94,14 @@
   (Reihenfolge, in der die Regler-Zustände beim ersten Abfragen gesetzt werden; jetzt auch je ein Bläser-Hit), sonst identisch.
 
 ## 2026-11-08 spät — Streicher → Jonas 6, Gitarre → Jonas 7 (aktueller Stand, NICHT gehört)
-- Nutzer: „den aktuellen Stand in den Track einfügen“. Jonas 6 = lab/streicher/disco-streicher-4 (alle fünf Figuren auf
-  Taste 1, Reihe 3 Aufbau, Taste 2 gehalten Steigerung), Jonas 7 = lab/gitarre/disco-gitarre-3 (alle acht Linien auf
+- Nutzer: „den aktuellen Stand in den Track einfügen“. Jonas 6 = lab/strings/disco-strings-4 (alle fünf Figuren auf
+  Taste 1, Reihe 3 Aufbau, Taste 2 gehalten Steigerung), Jonas 7 = lab/guitar/disco-guitar-3 (alle acht Linien auf
   Taste 1, Reihe 3 Komplexität in 4 Stufen, Taste 2 gehalten Steigerung mit Phaser, Klang „offen“, hohe Saite).
 - Abweichungen wie bei den Bläsern: Taste 1 = Figuren statt Ensemble/Solo bzw. offen/gedämpft (nur Ensemble / offen);
   Akkorde aus dem Track; Orbit 3, Raumgröße 2; Gitarre mit dem punktierten 1/8-Echo von Orbit 3 statt 1/8.
 - Pegel offline (Cloud): Streicher Lab-Gain 0,9 = −17,3 LUFS → 0,59 (−21 LUFS = Keys, Bläser); Gitarre 1 = −15,3 LUFS →
   0,38 (−23,8 LUFS = Vibraphon, Flöte); Bläser −21,3.
-- Offen: Gitarrenklang (lab/gitarre/gitarren-klaenge-1), Bläser-Komplexität (lab/blaeser/komplexitaet-1), Streicher-Klang
+- Offen: Gitarrenklang (lab/guitar/guitar-sounds-1), Bläser-Komplexität (lab/brass/complexity-1), Streicher-Klang
   prüfen (cheap/knacksig behoben?).
 - single, syx, Layouts (Cloud), Set 011 neu gebaut; check-set: 009 nur Abweichungen im allerersten Moment, sonst identisch.
 - Hinweis: 009-house-riffs-dual.strudel (+ single, syx, Layouts, 22:24) stammt aus einer anderen Sitzung; nicht angefasst.

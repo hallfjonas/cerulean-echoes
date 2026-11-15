@@ -1,7 +1,7 @@
 # Acid lab — feedback
 
 ## Acid 1 — acid-1.strudel (2026-11-08), for 009 Jonas 6
-- User: acid great in principle, not convinced for 009 yet (groove, not techno) — try it. Research: recherche-bass.md (Acid).
+- User: acid great in principle, not convinced for 009 yet (groove, not techno) — try it. Research: research-bass.md (Acid).
 - 303 voice (saw → ladder low-pass, envelope, a little drive), lines as note / accent / slide lanes, following all
   progressions with approach notes (as the bass board). Row 3 = Acid (env 1–5 oct., res 4–18, decay 0.1–0.3 s), level made
   up across it (−4.2 dB measured). Columns: Acid Tracks, swing acid, acid bass, acid melody, squelch stabs, 8-bar build.

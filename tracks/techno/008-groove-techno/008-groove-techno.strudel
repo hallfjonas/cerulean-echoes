@@ -757,7 +757,7 @@ const stemJ8_ride = strip(dryBus(pick(rideVar, RIDES)
 // ============================================================
 // JONAS 1 PAD — pad and techno pad in one column (2026-11-12): 008's pad (two detuned saws + triangle, slow
 // attack) and the techno pad (three saws left / middle / right) together, as column 3 "Beide" of
-// lab/harmonie/techno-pads-1; no high-pass (feedback). Button 2 = chord colour (7, 9, fourths, fifths).
+// lab/harmony/techno-pads-1; no high-pass (feedback). Button 2 = chord colour (7, 9, fourths, fifths).
 // ============================================================
 // @ctl 2:1.k1 Brightness | dull ↔ bright.
 // @ctl 2:1.k2 Space | dry ↔ echo + room.
@@ -794,7 +794,7 @@ const stemN1_pad = strip(dryBus(stack(
 // ============================================================
 // JONAS 2 STRINGS — background strings that hold an open F minor (F4 C5 F5 A♭5) and move one voice now and then
 // ============================================================
-// From lab/streicher/techno-strings-1 (graded good: 1, 3, 4, 5, 8), timing "Langsam": a note every 2 bars, 6 bars
+// From lab/strings/techno-strings-1 (graded good: 1, 3, 4, 5, 8), timing "Langsam": a note every 2 bars, 6 bars
 // at home, 2 moved (lines: one step every 2 bars). Sources in the lab file (Leittonwechsel, line clichés, Attack).
 // The strings stay on F; they do not follow the progression or the chapter (in "warm" the D♭ rubs against D).
 // @ctl 2:2.k1 Brightness | dull ↔ bright.
@@ -818,7 +818,7 @@ const strVar = change(strCol.btn, 'jonas', 'Strings', STR_MOVES.length, STR_MOVE
 // Plain strings (single quotes) parsed with mini(): every unit a new note ('!' repeats), 4 units = 8 bars
 const strVoice = steps => note(mini(steps.map(([m, u]) => m + (u > 1 ? '!' + u : '')).join(' '))).slow(8)
 const STR_NOTES = STR_MOVES.map(([, voices]) => stack(...voices.map(strVoice)))
-// JX-10 strings (lab/harmonie/harmonie-5): two saws ~4 cents apart + a layer 0.1 semitone up
+// JX-10 strings (lab/harmony/harmony-5): two saws ~4 cents apart + a layer 0.1 semitone up
 const strJx = p => stack(p.s('supersaw').unison(2).detune(0.08).spread(0.6).gain(0.5),
   p.add(note(0.1)).s('supersaw').unison(2).detune(0.05).spread(0.9).gain(0.3))
   .attack(0.35).decay(0.1).sustain(1).release(0.8).mul(gain(0.24))

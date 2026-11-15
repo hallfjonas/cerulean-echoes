@@ -1,0 +1,37 @@
+# stabs — Feedback
+
+## answers-lab-1 (Nutzer, 2026-11-08)
+- Antworten (Spalten 1+2, Rhodes) langweilig und eintönig: taktweise wird schnell langweilig → spannendere Patterns,
+  längere Zyklen.
+- Dub Brass deutlich besser, aber auch schnell eintönig. M1-Orgel und Trompeten richtig langweilig.
+
+## melody-1 (Nutzer, 2026-11-08)
+- Trompeten: alle drei richtig schlechter Klang, überhaupt nicht warm; echte Aufnahmen haben viel mehr Dynamik und
+  weniger mechanische Spielweise → keine Einzelton-Multisamples für Bläser, echte Phrasen nötig.
+- Vibraphon: ziemlich nice. Braucht einen Komplexitäts-Knopf wie im Techno-Track (008 Pings/Density): Länge und Raum
+  zusammenlegen (beides verschmiert / macht weicher), Reihe 3 = von basic zu komplexer. Klingt schon gut.
+- Marimba verliert gegen Vibraphon → raus.
+
+## melody-3 (Nutzer, 2026-11-08)
+- Trompeten und Sax klingen gut. Aber zu sparsam, zu lange Pausen: so sind es eher kleine Einwürfe als Melodien.
+  Bei wenig (niedrige Stellung) ist das ok, aber es muss sich etwas aufbauen.
+
+## melody-4 (gebaut 2026-11-08, nicht gehört)
+- Spalten 1–4 = die Phrasen aus Runde 3, eine Spalte pro Instrument (Trompete: alle 14, Sax, Trompete ↔ Sax als Ruf/Antwort,
+  Flöten-Phrasen), ruhig → lebhaft sortiert. Reihe 3 = Aufbau in 4 Stufen, je ein fester 8-Takt-Plan: 1 Phrase auf Takt 1 →
+  Ruf + Antwort (Takt 5) → alle 2 Takte → direkt hintereinander (halber Takt Abstand, lebhaftere Hälfte). Taste 1 = Startphrase.
+- Spalten 5–6 = Flöten-Melodie aus echten Flötentönen (aus den juskiddink-Phrasen geschnitten, per Abspielgeschwindigkeit
+  auf die Tonhöhe), Motive auf den Akkordtönen (folgen allen Folgen), A A B A; Reihe 3 = Verspielt (Zusatztöne, Triller).
+  Spalte 6 ab G4 (bis +5 Halbtöne hochgerechnet). Motive meine. In Node geprüft; Pegel NICHT gemessen.
+
+## melody-4 (Nutzer, 2026-11-08 nachts)
+- Bläser-Melodien gefallen noch nicht: eher purer klassischer Jazz. Nicht vergessen: klassischer House / Happy House.
+- Flöten ganz gut, der Verspielt-Knopf ist super; aber zu leise. Die höhere (Spalte 6) ist besser → wird eine Spalte im Track.
+
+## Techno-Lead 1 — techno-lead-1.strudel (2026-11-09), for 008 Jonas 4
+- Players find the 008 lead uninspired. Research: tracks/008-groove-techno/research-chords-lead.md (motif, not tune).
+- Engine: tools/stem-lab/engine-techno (`// @engine techno`, 008 context).
+- Columns: 1 lead as in 008 (reference), 2 one-note square triplet stab (Hood), 3 3/5/7-step riff against the bar,
+  4 tame acid without glide (as acid 2), 5 bandpass answer in bar 2, 6 metal loop (FM bell instead of a gong sample).
+  Checked in Node. Levels estimated, not measured. Not heard. Open: vocal-fragment stab (needs a sample).
+- Feedback: open.

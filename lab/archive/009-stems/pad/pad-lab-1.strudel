@@ -1,7 +1,7 @@
 // ============================================================
 // PAD LAB 1: pad / strings for track 009, Jonas column 7 (a surface for the break and the build-up)
 // ============================================================
-// Round 1. Research (stems-ideen.md, “Recherche”): a house pad stays quiet, “simply to fill out the spectrum”
+// Round 1. Research (stem-ideas.md, “Recherche”): a house pad stays quiet, “simply to fill out the spectrum”
 // (EDMProd). Juno pad (Aulart): two slightly detuned saws + a square sub, low-pass 12 dB, slow attack, chorus, a 25 %
 // delay. String machine (Attack Magazine): a pulse + a saw an octave higher, slightly sharp, low-pass with little
 // resonance. Built from Strudel's oscillators (no chorus / PWM there: the detuned copies stand in for them).

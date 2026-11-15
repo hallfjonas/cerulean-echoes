@@ -207,7 +207,7 @@ const CH = {
   G7sus2: { name: 'G7sus2', bass: 43, deg: 6, keys: [53, 55, 57, 62] },   // F G A D (Roger Sanchez)
   'Am/C': { name: 'Am/C', bass: 36, deg: 2, keys: [55, 57, 60, 64] },     // Am7 shape over C
 }
-// Progressions over 8 bars: [name = the chords, as on the buttons; bars, push, scale]; the record is in the comment. Sources: tracks/009-house/recherche-harmonie.md (round 1:
+// Progressions over 8 bars: [name = the chords, as on the buttons; bars, push, scale]; the record is in the comment. Sources: tracks/009-house/research-harmony.md (round 1:
 // Attack / MAW / Kerri; round 2: Hooktheory TheoryTabs of the records — chord order from there, BAR LENGTHS MINE).
 // A bar is a chord name or [[name, 16ths], …]; push = how many 16ths early the next chord comes in (Kerri Chandler's
 // push, 2 = an 8th); scale = the mode melodies use over it (dorian has F♯, aeolian F).
@@ -231,7 +231,7 @@ const HARMONIES = [
   ['Am9 D9 (4+4)', ['Am9', 'Am9', 'Am9', 'Am9', 'D9', 'D9', 'D9', 'D9'], 2, 'dorian'],
   ['Am9 D9 (3/8+5/8)', Array(8).fill([['Am9', 6], ['D9', 10]]), 0, 'dorian'],
   ['Am9', Array(8).fill('Am9'), 2, 'dorian'],
-  // 17–21 (2026-11-08): more classic house records from recherche-harmonie.md (Hooktheory / Attack), at the end so the
+  // 17–21 (2026-11-08): more classic house records from research-harmony.md (Hooktheory / Attack), at the end so the
   // numbers of 1–16 stay; chord order from the sources, BAR LENGTHS MINE. Mode 2 col. 5 button 2 (previous) reaches them fast
   ['C F', x2(['Cmaj7', 'Cmaj7', 'Fmaj7', 'Fmaj7']), 2, 'aeolian'],            // Frankie Knuckles, The Whistle Song (relative)
   ['F Em Am G', x2(['Fmaj7', 'Em7', 'Am7', 'G11']), 2, 'aeolian'],            // Daft Punk, Digital Love (G7sus4 = G11 shape)

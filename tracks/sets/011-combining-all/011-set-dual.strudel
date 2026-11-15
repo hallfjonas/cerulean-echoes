@@ -960,7 +960,7 @@ const stemN1_pad = strip(bus(wobble(stack(
 })
 
 // ============================================================
-// JONAS 2–4 — Eno bowed, marimba, toms (Takada style): from lab/harmonie/midori-5.strudel (feedback 2: instead of
+// JONAS 2–4 — Eno bowed, marimba, toms (Takada style): from lab/harmony/midori-5.strudel (feedback 2: instead of
 // chords, music box and whale)
 // ============================================================
 // Ported 1:1 from the lab board (its makeCols below, same figures, controls, levels, ranges); per column: row 1 =
@@ -989,7 +989,7 @@ const stemN1_pad = strip(bus(wobble(stack(
 // @007 ctl 16:4.fader Level | tom figures.
 // @007 ctl 16:4.b1 Change | cycles → canon → Euclid → build-up → crossing → Clapping.
 // @007 ctl 16:4.b2 Echo throw | held: long dotted-8th echo.
-// The lab's column code (lab/harmonie/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
+// The lab's column code (lab/harmony/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
 // its knob reads (h.knob / h.at) and the drift offsets' name. Returns the three columns { name, pats, range, gain, tom }.
 const makeNewJonas = (h, scaleIn) => {
   const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
@@ -2562,7 +2562,7 @@ const stemJ3_sub = lowEnd(strip(dryBus(stack(
 // ============================================================
 // JOJO 4 BASS — from the bass lab (lab/bass/house-bass-4.strudel): six of its lines on button 1 (the user's best
 // grades, different enough from each other), row 3 fades through three of its sounds: FM (Daft Punk) → M1 organ → warm
-// analog (user, 2026-11-08). Lines after what analyses describe of real records (tracks/009-house/recherche-bass.md),
+// analog (user, 2026-11-08). Lines after what analyses describe of real records (tracks/009-house/research-bass.md),
 // notes mine within those rules; every line follows the chord (Chapter + progression of Jonas 1, the change two 16ths
 // early) and walks into each change with an approach note (A = a semitone below the next note).
 // Deviations from the lab: row 3 = sound instead of length (length fixed at the lab's start value, ×0.93); the three
@@ -2777,7 +2777,7 @@ const valAt = (pat, t) => { const h = pat.queryArc(t, t + 1e-4)[0]; return h ? h
 const pct = v => Math.round((v ?? 0) * 100)
 
 // ============================================================
-// JONAS 1 HARMONY — 1:1 from the harmony lab (lab/harmonie/harmonie-4.strudel, column 2 “Liegend, B3 sanft”): the
+// JONAS 1 HARMONY — 1:1 from the harmony lab (lab/harmony/harmonie-4.strudel, column 2 “Liegend, B3 sanft”): the
 // same controls, sounds, voicing, levels and channel strip. Held chords, as long as each chord lasts (struck again
 // after 4 bars), the next chord two 16ths early (push, as the keys).
 // ============================================================
@@ -3046,7 +3046,7 @@ const keyStabs = new Pattern(state => {
 const stemN2_keys = strip(keyStabs, { level: signal(() => K.val[3]) })
 
 // ============================================================
-// JONAS 3 VIBRAPHONE — 1:1 from the melody lab (lab/melodie/melodie-2.strudel, column 1): the same controls, phrases,
+// JONAS 3 VIBRAPHONE — 1:1 from the melody lab (lab/melody/melody-2.strudel, column 1): the same controls, phrases,
 // Complexity layers, touch, swing and effects; 40 % louder than in the lab (user, 2026-11-07: 30–50 % louder).
 // ============================================================
 // Phrases follow the chord: Offbeat = chord tones on off-beat 16ths (bar 8 climbs); Tresillo = 3-3-2 on root / fifth
@@ -3151,7 +3151,7 @@ COLVIEW['jonas:3'] = (row, { esc, pending }) => {
 }
 
 // ============================================================
-// JONAS 4 FLUTE — 1:1 from the melody lab (lab/melodie/melodie-4.strudel, column 6 “Flöte höher”): the same controls,
+// JONAS 4 FLUTE — 1:1 from the melody lab (lab/melody/melody-4.strudel, column 6 “Flöte höher”): the same controls,
 // motifs, Playful layers, flute notes, swing and effects; louder than in the lab (user, 2026-11-08: too quiet).
 // ============================================================
 // Single notes cut from the recorded flute (juskiddink “Flute2”, Freesound, CC BY 4.0 — the lab's phrase files, see
@@ -3254,7 +3254,7 @@ COLVIEW['jonas:4'] = (row, { esc, pending }) => {
 }
 
 // ============================================================
-// JONAS 5 BRASS — from the brass lab (lab/blaeser/disco-blaeser-3.strudel): its six figures that stayed (user,
+// JONAS 5 BRASS — from the brass lab (lab/brass/disco-brass-3.strudel): its six figures that stayed (user,
 // 2026-11-08: “auf der a” and “Schweller + Fall” out), the ensemble sound, row 3 Complexity and the Lift on button 2.
 // ============================================================
 // Full section (Sonatina Symphonic Orchestra, CC Sampling Plus 1.0: trumpets, horns, trombones staccato + sustain), warm
@@ -3375,7 +3375,7 @@ COLVIEW['jonas:5'] = (row, { esc, pending }) => {
 }
 
 // ============================================================
-// JONAS 6 STRINGS — from the strings lab (lab/streicher/disco-streicher-4.strudel), all five figures, NOT HEARD yet
+// JONAS 6 STRINGS — from the strings lab (lab/strings/disco-strings-4.strudel), all five figures, NOT HEARD yet
 // (user, 2026-11-08: put the current state into the track).
 // ============================================================
 // Sonatina Symphonic Orchestra (CC Sampling Plus 1.0) + VSCO 2 CE (CC0) string sections: one section per note (they
@@ -3520,9 +3520,9 @@ const labView = (st, k3name, b1names, latch) => (row, { esc, pending }) => {
 COLVIEW['jonas:6'] = labView(SG, 'Aufbau', strFigs.map(f => f[0]), strVar)
 
 // ============================================================
-// JONAS 7 GUITAR — from the guitar lab (lab/gitarre/disco-gitarre-3.strudel), all eight lines, open sound, NOT HEARD
+// JONAS 7 GUITAR — from the guitar lab (lab/guitar/disco-guitar-3.strudel), all eight lines, open sound, NOT HEARD
 // yet (user, 2026-11-08: put the current state into the track; the guitar sound is still being compared on
-// lab/gitarre/gitarren-klaenge-1).
+// lab/guitar/guitar-sounds-1).
 // ============================================================
 // Plucked single notes of a real Stratocaster (nyanshell.strat, MIT: every note recorded, three takes), on the chord
 // tones. Row 3 = complexity in four steps (line → + dead notes → + slides and a variation in bars 4 and 8 → + 16th

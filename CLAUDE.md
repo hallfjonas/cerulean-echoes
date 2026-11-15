@@ -1,7 +1,7 @@
 # cerulean-echoes
 
 Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control XL 3s via `midin()` and a
-Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/geraete.md`).
+Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/devices.md`).
 Talk to the user in German; code comments stay in English. Explain audio basics plainly.
 
 ## Labels
@@ -18,7 +18,7 @@ No pattern strings (x..x) in the live view. Chat with the user stays German.
   keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
-  `harmonie/`, `melodie/`, `einwurf/`, `samples/`, `tools/`
+  `harmony/`, `melody/`, `stab/`, `brass/`, `guitar/`, `strings/`, `samples/`, `tools/`
   (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + German handbook PDF).
   A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
   column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in

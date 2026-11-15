@@ -5,13 +5,13 @@
 // Before: old/007-ambient-dual.strudel + its generated -single version.
 // Sound from old/007-ambient-moods-dual.strudel, controls rearranged after midi-layouts/templates/dual-lc.strudel.
 // Jojo (foundation): heartbeat pulse, sea/wind, drone, bass, rim clicks, shaker, wood/drops, crackle.
-// Jonas (colour): pad, Eno bowed + shimmer, marimba, toms (Takada style, from lab/harmonie/midori-5), choir, glitter, voice
+// Jonas (colour): pad, Eno bowed + shimmer, marimba, toms (Takada style, from lab/harmony/midori-5), choir, glitter, voice
 // (a spoken recording on a loop) + the global column 8.
 // Chapter (global button 1): D lydian (floating) → D dorian (melancholic) → D whole tone (strange), at the next bar.
 // Feedback 1 (feedback.md): sea/wind quieter, drone and bass fader ranges cut to the old 40 % (they were too heavy
 //   in the lows with the kick). Previous version: old/007-ambient-dual-before-feedback1.strudel.
 // Feedback 2: chords, music box and whale out (Jonas 2–4 free). Previous: old/007-ambient-dual-before-feedback2.strudel.
-// Jonas 2–4 = Eno bowed, marimba, toms from lab/harmonie/midori-5.strudel. Previous: old/007-ambient-dual-before-midori.strudel.
+// Jonas 2–4 = Eno bowed, marimba, toms from lab/harmony/midori-5.strudel. Previous: old/007-ambient-dual-before-midori.strudel.
 // ============================================================
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
 // button row 1 = change (next pattern, at the next bar), button row 2 = a moment (while held).
@@ -567,7 +567,7 @@ const stemJ5_rim = beatOnly(strip(bus(rimSound.pan(0.45), 2, rim.space, 0.25), {
 }))
 
 // ============================================================
-// JOJO 6 SHAKER — a small shaker (+ a cabasa on 4), real recordings (VCSL). From lab/drums/ambient-perkussion-1.strudel,
+// JOJO 6 SHAKER — a small shaker (+ a cabasa on 4), real recordings (VCSL). From lab/drums/ambient-percussion-1.strudel,
 // column 2, 1:1 (user 2026-11-12: instead of the clock ticks, never used). Previous: old/007-ambient-before-shaker.strudel.
 // Deviations as for Jonas 2–4: Fog / Tension on the filter, global Room, Tension echo, orbit 2 (dotted-8th echo,
 // feedback 0.6 instead of the lab's 0.55); pauses in the break like the other beat stems.
@@ -688,7 +688,7 @@ const stemN1_pad = strip(bus(wobble(stack(
 })
 
 // ============================================================
-// JONAS 2–4 — Eno bowed, marimba, toms (Takada style): from lab/harmonie/midori-5.strudel (feedback 2: instead of
+// JONAS 2–4 — Eno bowed, marimba, toms (Takada style): from lab/harmony/midori-5.strudel (feedback 2: instead of
 // chords, music box and whale)
 // ============================================================
 // Ported 1:1 from the lab board (its makeCols below, same figures, controls, levels, ranges); per column: row 1 =
@@ -717,7 +717,7 @@ const stemN1_pad = strip(bus(wobble(stack(
 // @ctl 2:4.fader Level | tom figures.
 // @ctl 2:4.b1 Pattern | cycles → canon → Euclid → build-up → crossing → Clapping.
 // @ctl 2:4.b2 Echo throw | held: long dotted-8th echo.
-// The lab's column code (lab/harmonie/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
+// The lab's column code (lab/harmony/midori-5.strudel, makeCols), unchanged except: degrees → scaleIn (chapter),
 // its knob reads (h.knob / h.at) and the drift offsets' name. Returns the three columns { name, pats, range, gain, tom }.
 const makeNewJonas = (h, scaleIn) => {
   const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
