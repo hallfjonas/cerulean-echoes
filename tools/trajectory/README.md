@@ -25,7 +25,7 @@ dahinter: jeder Stem mit Namen, Tempo aus Strudels Uhr.
    Zwischenablage):
 
    ```bash
-   cd tools && node trajectory/make-tapped.mjs ../tracks/008-groove-techno/008-groove-techno.strudel
+   cd tools && node trajectory/make-tapped.mjs ../tracks/techno/008-groove-techno/008-groove-techno.strudel
    ```
 
 2. Im Player oben den Track wählen (alle getappten Tracks stehen in der Liste), **Play**.
@@ -52,7 +52,7 @@ Rahmen um die zuletzt benutzte Controller-Seite in der LC-Ansicht) – alle vier
 **F** Vollbild · **V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus. Die Leiste oben blendet sich nach 3 s
 ohne Maus aus.
 
-Alte Dual-Versionen über ihre Single-Version in `old/` tappen (z. B. `tracks/009-house/old/009-house-single.strudel`).
+Alte Dual-Versionen über ihre Single-Version tappen (z. B. `tracks/sets/011-combining-all/011-set-single.strudel`).
 
 ## Fortschritt
 

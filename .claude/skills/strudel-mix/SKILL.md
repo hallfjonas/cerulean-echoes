@@ -8,7 +8,7 @@ description: Pre-mix a Strudel track automatically - render every stem solo offl
 ## Measure
 ```sh
 cd tools && npm install            # once
-node strudel-sim/measure.mjs ../tracks/NNN/<track>.strudel stem1_kick=5,29 stem4_hats=8,32 stem_melody1=53,77 stem_baseline1=69
+node strudel-sim/measure.mjs ../tracks/<genre>/NNN-<name>/<track>.strudel stem1_kick=5,29 stem4_hats=8,32 stem_melody1=53,77 stem_baseline1=69
 ```
 `stem=faderCC[,charCC]`: the stem variable, its fader CC, optionally a knob swept over 0 / 0.5 / 1 (density, softness …).
 Default base: global faders (CC 12, 60) = 1, Mode 16 lpf row (CC 21-28) = 1, everything else 0; override with

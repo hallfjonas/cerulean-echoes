@@ -1,20 +1,11 @@
 
 ## Action Items
 ### Jonas
-+ Next steps:
-    + Add MK functionalities to all tracks (piano or pad keys + sound samples + knobs for key sound modification)
-    + Make these tracks (with both LCs and LK) available for the trajectory tool
-
-
- + Future:
-    + Animation ist wird noch nicht durch dis knobs manipuliert... (z.B.: brightness bass)
-    + BLOCKS: Fix UI layout in strudel
-    + Extend all strudel tracks by LK and align layouts
-
-## Ideas
-+ translate everything to English in this repo
-
++ Improve Animation:
+    - not impacted by knobs, e.g, higher brightsness on hats should move them higher on y-axis
+    - if level fader is at 0, the dot should hide
+    - the dot should be larger and brighter depending on how loud it is
+    - colors should be used to describe some element of the music --> RGB could give three dimensions here...
 
 ### Johannes
-+ Tracks finalisieren (2x Launchcontrols (OHNE KEYS!))
-+ Lösung für wechsel der Tracks finden (möglichst seamless)
++ Switch to Supercollider to minimize latency

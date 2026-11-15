@@ -75,7 +75,7 @@ Jeder Stem wird einzeln offline mit superdough (Strudels Audio-Engine) gerendert
 (LUFS: Lautheit so, wie das Ohr sie ungefähr empfindet; dazu der Spitzenpegel). Daraus folgen neue Fader-Maxima.
 
 ```sh
-node strudel-sim/measure.mjs ../tracks/006-lean-mix.strudel stem1_kick=5,29 stem4_hats=8,32
+node strudel-sim/measure.mjs ../tracks/historic/006/006-lean-mix.strudel stem1_kick=5,29 stem4_hats=8,32
 ```
 
 *Zielwerte* (Faustregel Techno, relativ zur Kick bei Fader 1):
