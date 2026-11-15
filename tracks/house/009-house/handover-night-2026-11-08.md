@@ -1,46 +1,46 @@
-# Übergabe: Nachtschicht 2026-11-08 (Nutzer war weg, nichts gehört)
+# Handover: night shift 2026-11-08 (user was away, nothing listened to)
 
-Auftrag: `prompt-next-agent.md` (Punkte 1–5). Sprache mit dem Nutzer Deutsch, Code-Kommentare Englisch.
+Task: `prompt-next-agent.md` (points 1–5). Language with the user German, code comments English.
 
-## Stand
-1. ☑ **Vibraphon „Ruf-Echo“ (009, Jonas 3): F♯ → F in den aeolischen Folgen.** `vibModeFix` in
-   `009-house-dual.strudel` (vor `vibPhrases`): F♯-Noten der Phrase werden F, wenn `modeAt(bar) === 'aeolian'`.
-   Geprüft in Node: Vamp und „Am9 D9“ → g f♯ e d …, Folgen 3 und 6 → g f e d …. Single, Layout (unverändert, keine
-   @ctl-Änderung), .syx neu erzeugt; `npm run set` gebaut. check-set: bei 009 genau dieselben Abweichungen wie vor der
-   Änderung (per temporärem Zurücksetzen verglichen): „all 0.5/1“ nur Ereignisse bei t = 0; „ride A/B“ Abweichungen in
-   Takt 0–1 (nicht nur im allerersten Moment, wie feedback.md sagt, aber unverändert alt).
-2. ☑ **`lab/melody/melody-3.strudel`** (Engine 3) — echte Bläser-Phrasen. Spalte 1 Vibraphon (melody-2, unverändert),
-   2 Trompete A, 3 Trompete B, 4 Trompete C, 5 Tenorsax, 6 Flöte. 20 Phrasen in `samples/horn-phrases/` (Tabelle,
-   Quellen, Credits: README dort). Methode: lange Freesound-Improvisationen (emirdemirel-Serie, Trompete Hikmet
-   Altunbaşlıer, Sax Toprak Barut; Flöte juskiddink 65509; alle CC BY 4.0) → Tonhöhe (YIN), an Pausen bzw. am Ende
-   langer Töne geschnitten, nur ruhige behalten (≤ 3,2 Töne/s, ein Ton ≥ 0,5 s, keine Tonleiter-Läufe, keine Töne
-   außerhalb A-dorisch/aeolisch), per Varispeed nach A (−3 … +2 Halbtöne), auf −20 dBFS angeglichen. Skripte:
-   `tools/phrase-cut/`. Gegenprobe: alle 20 Dateien liegen in A (Analyse der fertigen Dateien).
-   Spielweise: Einsatz auf der 1 alle 16 / 8 / 4 Takte (Reihe 3, Start 8), Phrase spielt bis zum Ende, Taste 1 =
-   nächste Phrase (immer dieselbe Phrase wiederholt), Taste 2 Echo-Wurf. Phrasen mit F♯ spielen nur in Folgen mit F♯,
-   mit F nur in den Moll-Folgen; sonst die nächste passende der Spalte.
-   Geprüft: Transpiler ok; Node: Einsätze, „Wie oft“ und das F♯/F-Ausweichen richtig; Rechenzeit 3,2 ms/Tick (p95
-   5,4 ms); Pegel offline: jede Phrase ≈ −23,5 LUFS bei Fader 1 (±1 dB) = etwa Vibraphon im Track; Chromium: Dateien
-   dekodieren (lokal; nach dem Push von GitHub, siehe unten). Layout-PDF ohne Überlauf.
-3. ☑ **`lab/stab/stab-1.strudel` technisch geprüft:** Transpiler ok; Rechenzeit 3,0 ms/Tick (p95 4,6 ms); alle 26
-   Samples (Freesound, VCSL, VSCO) laden und dekodieren in Headless-Chrome. **Auffällig: viel zu laut** — bei Fader 1
-   −13,7 … −19,3 LUFS (Kick in 009 ≈ −14), Jubel / Posaune / Cuíca mit Spitzen > 1 (Übersteuerung). Angeglichen
-   per Spalten-Gain (`GAIN` in makeCols) auf ≈ −19 LUFS, Spitzen ≤ 0,9; Jubel bleibt bei −22 (sehr spitzes Signal).
-   Inhalt sonst unverändert.
-4. ☑ Morgen-Übersicht in `stem-ideas.md` (oben) und hier.
-5. ☑ Commit + Push auf `johannes` (bbe18e2); alle 20 Phrasen laden und dekodieren von raw.githubusercontent.com in Headless-Chrome.
+## Status
+1. ☑ **Vibraphone "call echo" (009, Jonas 3): F♯ → F in the aeolian progressions.** `vibModeFix` in
+   `009-house-dual.strudel` (before `vibPhrases`): F♯ notes of the phrase become F when `modeAt(bar) === 'aeolian'`.
+   Checked in Node: vamp and "Am9 D9" → g f♯ e d …, progressions 3 and 6 → g f e d …. Single, layout (unchanged, no
+   @ctl change), .syx regenerated; `npm run set` built. check-set: for 009 exactly the same deviations as before the
+   change (compared by temporarily reverting): "all 0.5/1" only events at t = 0; "ride A/B" deviations in
+   bars 0–1 (not only in the very first moment, as feedback.md says, but unchanged from before).
+2. ☑ **`lab/melody/melody-3.strudel`** (engine 3) — real brass phrases. Column 1 vibraphone (melody-2, unchanged),
+   2 trumpet A, 3 trumpet B, 4 trumpet C, 5 tenor sax, 6 flute. 20 phrases in `samples/horn-phrases/` (table,
+   sources, credits: README there). Method: long Freesound improvisations (emirdemirel series, trumpet Hikmet
+   Altunbaşlıer, sax Toprak Barut; flute juskiddink 65509; all CC BY 4.0) → pitch (YIN), cut at pauses or at the end
+   of long notes, only calm ones kept (≤ 3.2 notes/s, one note ≥ 0.5 s, no scale runs, no notes
+   outside A Dorian/aeolian), varispeed to A (−3 … +2 semitones), matched to −20 dBFS. Scripts:
+   `tools/phrase-cut/`. Cross-check: all 20 files are in A (analysis of the finished files).
+   Playing: entry on the 1 every 16 / 8 / 4 bars (row 3, start 8), the phrase plays to the end, button 1 =
+   next phrase (always the same phrase repeated), button 2 echo throw. Phrases with F♯ only play in progressions with F♯,
+   with F only in the minor progressions; otherwise the next fitting one of the column.
+   Checked: transpiler ok; Node: entries, "How often" and the F♯/F swap correct; compute time 3.2 ms/tick (p95
+   5.4 ms); level offline: each phrase ≈ −23.5 LUFS at fader 1 (±1 dB) = about the vibraphone in the track; Chromium: files
+   decode (locally; after the push from GitHub, see below). Layout PDF without overflow.
+3. ☑ **`lab/stab/stab-1.strudel` checked technically:** transpiler ok; compute time 3.0 ms/tick (p95 4.6 ms); all 26
+   samples (Freesound, VCSL, VSCO) load and decode in headless Chrome. **Notable: far too loud** — at fader 1
+   −13.7 … −19.3 LUFS (kick in 009 ≈ −14), cheer / trombone / cuíca with peaks > 1 (clipping). Matched
+   via column gain (`GAIN` in makeCols) to ≈ −19 LUFS, peaks ≤ 0.9; cheer stays at −22 (very peaky signal).
+   Content otherwise unchanged.
+4. ☑ Morning overview in `stem-ideas.md` (top) and here.
+5. ☑ Commit + push to `johannes` (bbe18e2); all 20 phrases load and decode from raw.githubusercontent.com in headless Chrome.
 
-## Entscheidungen (ohne Rückfrage, naheliegend)
-- Flöte als 6. Spalte dazu: echte, ruhige Aufnahme, schon in A-Moll; VCSL-Flöte (Multisample) war verworfen, die
-  Flöten-Triller (echt) gefielen → als Vergleich.
-- Sax: aus 6 Sax-Aufnahmen der Serie bestanden nur 3 Stellen den Ruhe-Filter (der Spieler spielt dicht) → nur 3.
-- Quellen-Previews (128 kb/s MP3) statt Originale (Login nötig). Leise Aufnahmen wurden bis +14 dB angehoben →
-  evtl. hörbares Rauschen (tpm-424905-0737/-0838, tpx-430268-0470).
-- Phrasen-Beschriftung = die ersten Töne (wie bei den Akkordfolgen „die Akkorde selbst“).
-- Pegel der Bläser = Vibraphon im Track (dort +40 % gegenüber Labor), also im Labor etwas lauter als Spalte 1.
+## Decisions (without asking, obvious)
+- Flute added as 6th column: real, calm recording, already in A minor; the VCSL flute (multisample) had been rejected, the
+  flute trills (real) were liked → as a comparison.
+- Sax: of 6 sax recordings in the series only 3 passages passed the calm filter (the player plays densely) → only 3.
+- Source previews (128 kb/s MP3) instead of originals (login required). Quiet recordings were raised by up to +14 dB →
+  possibly audible noise (tpm-424905-0737/-0838, tpx-430268-0470).
+- Phrase labels = the first notes (like the chord progressions: "the chords themselves").
+- Brass level = vibraphone in the track (there +40 % over the lab), so in the lab a bit louder than column 1.
 
-## Nicht prüfbar ohne Gehör
-- Klingen die Phrasen warm/lebendig oder nach „Übungsaufnahme“? Passen sie rhythmisch, obwohl sie frei (ohne Takt)
-  gespielt sind? Wirkt die Varispeed-Transposition (bis −3 Halbtöne = 19 % langsamer) natürlich?
-- Tonhöhen-Analyse kann bei Trompete Oktavfehler haben (Melodie-Spalte in der README); die Tonart-Tags F♯/F sind
-  vorsichtig gesetzt.
+## Not checkable without ears
+- Do the phrases sound warm/alive or like a "practice recording"? Do they fit rhythmically, although they are played
+  freely (without a bar grid)? Does the varispeed transposition (up to −3 semitones = 19 % slower) sound natural?
+- Pitch analysis can have octave errors on trumpet (melody column in the README); the key tags F♯/F are
+  set cautiously.

@@ -1,68 +1,68 @@
-# Prompt für den nächsten Agenten (Track 009, Stand 2026-11-08)
+# Prompt for the next agent (track 009, as of 2026-11-08)
 
-Kopiere den Block unten als ersten Auftrag in die neue Sitzung.
+Copy the block below as the first task into the new session.
 
 ---
 
-Du arbeitest im Repo `cerulean-echoes` (Strudel-Live-Tracks für zwei Novation Launch Control XL 3). Sprich Deutsch mit
-mir, Code-Kommentare bleiben Englisch. Lies zuerst `CLAUDE.md`, dann für den Track 009:
-`tracks/009-house/stem-ideas.md` (oben die Liste „✗ Verworfen“ – nichts davon wieder einbauen),
-`tracks/009-house/feedback.md`, `tracks/009-house/handover-harmony-in-009.md` (was zuletzt gebaut wurde) und die
+You are working in the repo `cerulean-echoes` (Strudel live tracks for two Novation Launch Control XL 3). Speak German with
+me, code comments stay English. First read `CLAUDE.md`, then for track 009:
+`tracks/009-house/stem-ideas.md` (at the top the list "✗ Rejected" – build none of it back in),
+`tracks/009-house/feedback.md`, `tracks/009-house/handover-harmony-in-009.md` (what was built last) and the
 `feedback.md` in `lab/harmony/`, `lab/melody/`, `lab/stab/`.
 
-**Ziel des Projekts:** eine niederschwellige MIDI-Belegung, mit der Leute ohne Vorkenntnisse bei einem Treffen
-gemeinsam spielen; alles muss leicht gut klingen. Track 009 = klassischer House (124 BPM, A-Moll). Jojo = Rhythmus
-(8 Spalten), Jonas = Farbe (Spalten 1–7) + globale Spalte 8.
+**Goal of the project:** a low-threshold MIDI mapping with which people without prior knowledge play together at a
+meetup; everything has to sound good easily. Track 009 = classic house (124 BPM, A minor). Jojo = rhythm
+(8 columns), Jonas = colour (columns 1–7) + global column 8.
 
-**Stand Jonas (Track 009):**
-- Spalte 1 Harmonie (JX-10 ↔ B3, gehaltene Akkorde) mit 10 Akkordfolgen auf Taste 1; Chapter (Spalte 8) Vamp = Am9,
-  Wechsel = gewählte Folge. Keys bleiben bewusst monoton auf Am9 (nur in „Am9 D9“ D9). Nutzer: „die drei
-  Harmonie-Sachen sind super“ (Harmonie-Spalte, Akkordfolgen, monotone Keys).
-- Spalte 2 Keys, Spalte 3 Vibraphon (aus `lab/melody/melody-2`), Spalten 4–7 leer.
+**Status Jonas (track 009):**
+- Column 1 harmony (JX-10 ↔ B3, held chords) with 10 chord progressions on button 1; Chapter (column 8) vamp = Am9,
+  change = chosen progression. The keys deliberately stay monotonous on Am9 (only in "Am9 D9" D9). User: "the three
+  harmony things are great" (harmony column, chord progressions, monotonous keys).
+- Column 2 keys, column 3 vibraphone (from `lab/melody/melody-2`), columns 4–7 empty.
 
-**Ich bin heute Abend weg und kann nichts anhören.** Arbeite selbstständig an dem, was ohne mein Gehör geht, und
-präsentiere mir morgen früh die Ergebnisse (kurz, auf Deutsch: was gebaut ist, was ich anhören soll, was offen ist).
-Keine Rückfragen nötig; wo du entscheiden musst, nimm die naheliegende Variante und schreib die Entscheidung auf.
-Den Track 009 nur für Punkt 1 ändern; alles andere als Lab-Board vorbereiten, nichts ungehört in Tracks übernehmen.
+**I am away tonight and cannot listen to anything.** Work on your own on what is possible without my ears, and
+present the results to me tomorrow morning (short, in German: what is built, what I should listen to, what is open).
+No questions needed; where you have to decide, take the obvious option and write the decision down.
+Change track 009 only for point 1; prepare everything else as a lab board, take nothing unheard into tracks.
 
-**Heute Abend (in dieser Reihenfolge):**
-1. **Vibraphon-Phrase „Ruf-Echo“** (Track 009, Jonas 3) enthält F♯; in den aeolischen Folgen (alle außer „Am9 D9“)
-   reibt das. F♯ → F, wenn `modeAt(bar) === 'aeolian'` (sonst unverändert). Danach die üblichen Track-Schritte
-   (siehe Arbeitsregeln) inkl. `npm run set`.
-2. **Zweite Melodie-Spalte (Jonas 4): echte Bläser-Phrasen als Lab vorbereiten.** Trompeten aus
-   Einzelton-Multisamples sind verworfen (nicht warm, mechanisch); im ersten Sample-Lab waren schnelle, unruhige
-   Jazz-Phrasen und 1-Takt-Loops schlecht. Plan: längere echte Aufnahmen (z. B. Freesound 424876 / 424894
-   emirdemirel „Improvisation on Dorian“ Trompete / Sax, CC BY; 77706–77717 sorohanro Trompeten-Phrasen, CC BY; weitere
-   nur mit Quelle und freier Lizenz) an Pausen in Phrasen schneiden, per Analyse (Tonhöhe, Tonanzahl pro Sekunde) nur
-   ruhige behalten (wenige, lange Töne), nach A (dorisch/aeolisch) transponieren, Credits notieren. Lab
-   `lab/melody/melody-3.strudel` (Engine 3): pro Spalte ein Instrument/Quelle, Taste 1 = nächste Phrase,
-   Einsatz auf Phrasenpunkten (alle 4 bzw. 8 Takte), Reihe 3 = wie oft; das Vibraphon aus melody-2 als Vergleich
-   drinlassen. Quellen/Hinweise: `tracks/009-house/research-melodies.md`. Lieber 10–20 gute Kandidaten als viele
-   mittelmäßige; alle in Headless-Chromium laden/dekodieren.
-3. **Einwurf-Lab prüfen:** `lab/stab/stab-1.strudel` ist gebaut, aber nie gehört. Nur technisch prüfen
-   (Transpiler, Rechenzeit, Samples laden in Chromium, Pegel grob angleichen) und Auffälliges notieren; nichts
-   inhaltlich umbauen.
-4. **Morgen-Übersicht** oben in `tracks/009-house/stem-ideas.md` („▶ Für morgen früh“) und im Übergabe-md:
-   was zum Anhören bereitliegt, mit Dateipfaden, worauf ich achten soll, was nicht geprüft werden konnte.
-5. Zum Schluss committen und auf Branch `johannes` pushen (Commit-Nachricht wie im Repo üblich).
+**Tonight (in this order):**
+1. **Vibraphone phrase "call echo"** (track 009, Jonas 3) contains F♯; in the aeolian progressions (all except "Am9 D9")
+   that clashes. F♯ → F when `modeAt(bar) === 'aeolian'` (otherwise unchanged). Then the usual track steps
+   (see working rules) incl. `npm run set`.
+2. **Second melody column (Jonas 4): prepare real brass phrases as a lab.** Trumpets from
+   single-note multisamples are rejected (not warm, mechanical); in the first sample lab fast, restless
+   jazz phrases and 1-bar loops were bad. Plan: cut longer real recordings (e.g. Freesound 424876 / 424894
+   emirdemirel "Improvisation on Dorian" trumpet / sax, CC BY; 77706–77717 sorohanro trumpet phrases, CC BY; others
+   only with source and free licence) into phrases at pauses, keep only calm ones by analysis (pitch, notes per
+   second) (few, long notes), transpose to A (Dorian/aeolian), note the credits. Lab
+   `lab/melody/melody-3.strudel` (engine 3): one instrument/source per column, button 1 = next phrase,
+   entry on phrase points (every 4 or 8 bars), row 3 = how often; leave the vibraphone from melody-2 in as a comparison.
+   Sources/hints: `tracks/009-house/research-melodies.md`. Rather 10–20 good candidates than many
+   mediocre ones; load/decode all in headless Chromium.
+3. **Check the stab lab:** `lab/stab/stab-1.strudel` is built but never listened to. Only check it technically
+   (transpiler, compute time, samples load in Chromium, roughly match levels) and note anything notable; rework
+   nothing in content.
+4. **Morning overview** at the top of `tracks/009-house/stem-ideas.md` ("▶ For tomorrow morning") and in the handover md:
+   what is ready to listen to, with file paths, what I should pay attention to, what could not be checked.
+5. Finally commit and push to branch `johannes` (commit message as usual in the repo).
 
-**Danach, mit mir abzustimmen (nicht heute):** Harmonie im Browser anhören und feinschleifen (nur in Node getestet:
-Pegel gegen Keys, Akkordwechsel, Rechenzeit); Gewinner aus melody-3 und stab-1 mit dem Skill `lab-to-track` in
-Jonas 4–6 übernehmen; Launchkey-Pads später (Sammlung in `samples/pads/`).
+**Afterwards, to be agreed with me (not today):** listen to the harmony in the browser and fine-tune (only tested in Node:
+level against keys, chord changes, compute time); take winners from melody-3 and stab-1 with the skill `lab-to-track` into
+Jonas 4–6; Launchkey pads later (collection in `samples/pads/`).
 
-**Arbeitsregeln (wichtig, wurden oft verletzt):**
-- Vor jedem Bauen die Verworfen-Liste und die feedback.md lesen; Abgelehntes sofort raus, pro Runde lieber mehr
-  Optionen/Komplexität als kleine Schritte.
-- Recherchieren mit Quellen, nichts erfinden; was unbelegt ist, so benennen.
-- Lab-Boards: `lab/<rolle>/<rolle>-N.strudel`, alte Runden in `old/`; Engine 3 via `node tools/stem-lab/sync.mjs`
-  (läuft automatisch die Transpiler-Prüfung).
-- Vor jeder Übergabe: `node tools/strudel-sim/transpile-check.mjs <dateien>` (fängt z. B. doppelte Anführungszeichen,
-  die Strudel als Mini-Notation liest), Rechenzeit pro Scheduler-Tick in Node messen (≲ 8 ms), neue Samples in
-  Headless-Chromium laden/dekodieren (Playwright-Chromium unter `~/Library/Caches/ms-playwright`).
-- Track-Änderungen: `make-single.mjs`, `gen-layout.mjs` (Layout-PNG auf Textüberlauf prüfen), `make-syx.mjs`, danach
-  `npm run set` in `tools/` (Set 011 wird aus den Tracks gebaut; check-set zeigt für 009 bekannte Start-Abweichungen,
-  siehe feedback.md).
-- Taste 1 unter dem Fader = Wechseln (Muster bzw. Akkordfolge), Taste 2 = Moment; Labels ohne Theorie-Begriffe.
-- Den Plan und Stand laufend in einer Übergabe-md im Track-Ordner dokumentieren (falls dir die Rechenzeit ausgeht,
-  muss ein anderer Agent dort weitermachen können).
-- Rechner: M2 Air, geteilt; nur ein schwerer Job gleichzeitig, keine Hintergrundprozesse zurücklassen.
+**Working rules (important, were often broken):**
+- Before every build read the rejected list and the feedback.md; take rejected things out immediately, per round rather more
+  options/complexity than small steps.
+- Research with sources, invent nothing; name what is undocumented as such.
+- Lab boards: `lab/<role>/<role>-N.strudel`, old rounds in `old/`; engine 3 via `node tools/stem-lab/sync.mjs`
+  (runs the transpiler check automatically).
+- Before every handover: `node tools/strudel-sim/transpile-check.mjs <files>` (catches e.g. double quotes,
+  which Strudel reads as mini-notation), measure compute time per scheduler tick in Node (≲ 8 ms), load/decode new samples in
+  headless Chromium (Playwright Chromium under `~/Library/Caches/ms-playwright`).
+- Track changes: `make-single.mjs`, `gen-layout.mjs` (check the layout PNG for text overflow), `make-syx.mjs`, then
+  `npm run set` in `tools/` (set 011 is built from the tracks; check-set shows known start deviations for 009,
+  see feedback.md).
+- Button 1 under the fader = switch (pattern or chord progression), button 2 = moment; labels without theory terms.
+- Document the plan and status continuously in a handover md in the track folder (if you run out of compute time,
+  another agent must be able to continue there).
+- Machine: M2 Air, shared; only one heavy job at a time, leave no background processes behind.

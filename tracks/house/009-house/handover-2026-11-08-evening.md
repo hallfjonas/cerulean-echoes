@@ -1,31 +1,31 @@
-# Übergabe 009 (Stand 2026-11-08, später Abend) — HIER WEITERMACHEN
+# Handover 009 (as of 2026-11-08, late evening) — CONTINUE HERE
 
-Sprache mit dem Nutzer: Deutsch, Code-Kommentare Englisch. Vorher lesen: `CLAUDE.md`, `stem-ideas.md` (Liste
-„✗ Verworfen“), `feedback.md` (009, unten die neuesten Einträge), `lab/keys/feedback.md`, `lab/melody/feedback.md`,
-`lab/harmony/feedback.md`, `lab/stab/feedback.md`. Vorherige Übergabe: `handover-night-2026-11-08.md`.
+Language with the user: German, code comments English. Read first: `CLAUDE.md`, `stem-ideas.md` (list
+"✗ Rejected"), `feedback.md` (009, newest entries at the bottom), `lab/keys/feedback.md`, `lab/melody/feedback.md`,
+`lab/harmony/feedback.md`, `lab/stab/feedback.md`. Previous handover: `handover-night-2026-11-08.md`.
 
-## Was diese Sitzung gemacht hat
-- Track 009: Vibraphon „Ruf-Echo“ F♯ → F in Moll-Folgen (gepusht, bbe18e2 / 9631f63).
-- `lab/melody/melody-3.strudel` + `samples/horn-phrases/` (20 echte Trompeten/Sax/Flöten-Phrasen, CC BY 4.0) +
-  `tools/phrase-cut/` (gepusht).
-- `lab/stab/stab-1.strudel` Pegel angeglichen (gepusht).
-- NICHT committet (bitte committen + pushen, Branch `johannes`):
-  - `lab/harmony/harmony-5.strudel` (+ PDF): harmonie-4 + Folgen 17–21 (C F Whistle Song, F Em Am G Digital Love,
-    Am G/F F Dm Modjo, F C G Am Another Chance, Em Am Keep Me Inside); harmonie-4 nach `old/` (git mv).
-    Neue Akkorde/Folgen in `tools/stem-lab/engine3.strudel-part` angehängt (CH: G7/F, G7sus2, Am/C; HARMONIES 17–21).
-    Andere Engine-3-Boards wurden NICHT neu gesynct (brauchen es nicht).
-  - `lab/keys/house-keys-lab-21.strudel` (+ PDF): 8 Spalten = 1-Takt-Akkord-Riffs mit dem Keys-Groove (RIFFS +
-    PEDAL, Bass folgt dem Riff der linkesten offenen Spalte); lab-20 nach `old/` (git mv).
-  - `docs/references.md`: Sarah-Wild-Set als Hauptreferenz; Feedback-Einträge in den feedback.md-Dateien.
+## What this session did
+- Track 009: vibraphone "call echo" F♯ → F in minor progressions (pushed, bbe18e2 / 9631f63).
+- `lab/melody/melody-3.strudel` + `samples/horn-phrases/` (20 real trumpet/sax/flute phrases, CC BY 4.0) +
+  `tools/phrase-cut/` (pushed).
+- `lab/stab/stab-1.strudel` levels matched (pushed).
+- NOT committed (please commit + push, branch `johannes`):
+  - `lab/harmony/harmony-5.strudel` (+ PDF): harmony-4 + progressions 17–21 (C F Whistle Song, F Em Am G Digital Love,
+    Am G/F F Dm Modjo, F C G Am Another Chance, Em Am Keep Me Inside); harmony-4 to `old/` (git mv).
+    New chords/progressions appended to `tools/stem-lab/engine3.strudel-part` (CH: G7/F, G7sus2, Am/C; HARMONIES 17–21).
+    Other engine-3 boards were NOT re-synced (they do not need it).
+  - `lab/keys/house-keys-lab-21.strudel` (+ PDF): 8 columns = 1-bar chord riffs with the keys groove (RIFFS +
+    PEDAL, the bass follows the riff of the leftmost open column); lab-20 to `old/` (git mv).
+  - `docs/references.md`: Sarah Wild set as the main reference; feedback entries in the feedback.md files.
 
-## Nutzer-Feedback dieser Runde (alles schon in den feedback.md eingetragen, außer den letzten zwei Punkten)
-- Einwürfe: ALLE Quatsch (verworfen, in stem-ideas.md). Wenn überhaupt: ikonischere Vocal-Samples.
-- Bläser (melody-3): Trompete/Sax klingen gut, aber zu sparsam, zu lange Pausen = Einwürfe statt Melodien; es muss
-  sich etwas aufbauen. Vorschlag (noch nicht gebaut): melody-4 mit Aufbau-Regler (Reihe 3: 1 Phrase/8 Takte →
-  Ruf + Antwort → Phrasen direkt hintereinander; oben auch lebhaftere Phrasen; Spalten pro Instrument zusammenlegen).
-- Akkordfolgen: klassischer House, KEIN Progressive House (vi IV V I …).
-- Hauptreferenz: Sarah Wild, Fusion 2025 (SoundCloud-Link in docs/references.md). Trackliste (1001tracklists, vom
-  Nutzer eingefügt; Seite blockt Bots — nicht umgehen): Pink Floyd – Is There Anybody Out There · Sarah Wild – Fly With
+## User feedback this round (all already entered in the feedback.md files, except the last two points)
+- Stabs: ALL nonsense (rejected, in stem-ideas.md). If at all: more iconic vocal samples.
+- Brass (melody-3): trumpet/sax sound good, but too sparse, too long pauses = stabs instead of melodies; something
+  has to build up. Proposal (not built yet): melody-4 with a build-up fader (row 3: 1 phrase/8 bars →
+  call + answer → phrases right after each other; at the top also livelier phrases; merge columns per instrument).
+- Chord progressions: classic house, NOT progressive house (vi IV V I …).
+- Main reference: Sarah Wild, Fusion 2025 (SoundCloud link in docs/references.md). Tracklist (1001tracklists, pasted by
+  the user; the site blocks bots — do not circumvent): Pink Floyd – Is There Anybody Out There · Sarah Wild – Fly With
   Me To The Moon · Maltitz – Yepiyano · Hot Since 82 & Tomaz vs. Filterheadz – Sunshine 2025 · Krystal Klear – Deathlagg ·
   Freddie Mercury – Living On My Own · Baron Von Trax – If I Only Knew · Arpeggio – The Fighter · Austher – Expectations ·
   Borai & Denham Audio – Make Me (Paul Sirrell Remix) · L.P. Rhythm ft. Gaskin – In The House · Val Verra – House Music
@@ -33,51 +33,51 @@ Sprache mit dem Nutzer: Deutsch, Code-Kommentare Englisch. Vorher lesen: `CLAUDE
   (Piano House Original) · Laroze – Pure Water · Sarah Wild – Drum Extase · Austher – Memory Code · Herr Krank & Deborah
   Aime La Bagarre – Eurogenic · Miguel De Bois – Is Everything Cool? · Demi Riquísimo & Clint – Love State · JOVE – Don't
   Let Me Go · Doctr ft. Daniella – Training (French Version) · Narciss & Gerd Janson – Chicco's Chips. Genre: House, Tech House.
-  → in docs/references.md nachtragen.
-- Was der Nutzer im Set hört und für 009 will:
-  1. Viel House-Piano: nicht nur monoton, auch 8-taktige Folgen, aber immer mit groovigem Rhythmus.
-  2. House-Basslines mit viel Groove (Jojo Spalte 4) — „braucht Arbeit, mehr Optionen und bessere“.
-  3. Höhere, verspielte Melodie Richtung Flöte, weniger komplex als das Vibraphon (Vibraphon bleibt).
-  Acid: super, muss aber nicht sein.
-- **Keys-21 (neueste Antwort):** von den Riffs nur „Am D“ (Spalte 6: Am9 3/8 + D9 5/8 in einem Takt) okay. Nutzer:
-  „bitte da nochmal den Kerri hinzufügen, weißt du, was ich mein?“ → UNKLAR, nachfragen. Vermutungen: (a) Am D mit dem
-  Kerri-Riff-Rhythmus `x..x..x..x..x.x.` bzw. Kerri-Push; (b) das Kerri-Video-Riff (Am Dm Gm) nur mit Am/D-Akkorden.
-  Außerdem: „und bitte doch sagen, die über 4 oder 8 Takte gehen“ → wohl: Riffs/Piano, die über 4 oder 8 Takte laufen
-  (passt zu Punkt 1: 8-Takt-Folgen mit Groove). Ebenfalls kurz bestätigen lassen.
+  → add to docs/references.md.
+- What the user hears in the set and wants for 009:
+  1. Lots of house piano: not only monotonous, also 8-bar progressions, but always with a groovy rhythm.
+  2. House basslines with lots of groove (Jojo column 4) — "needs work, more options and better ones".
+  3. A higher, playful melody towards flute, less complex than the vibraphone (the vibraphone stays).
+  Acid: great, but not a must.
+- **Keys-21 (latest answer):** of the riffs only "Am D" (column 6: Am9 3/8 + D9 5/8 in one bar) is okay. User:
+  "please add the Kerri there again, you know what I mean?" → UNCLEAR, ask. Guesses: (a) Am D with the
+  Kerri riff rhythm `x..x..x..x..x.x.` or the Kerri push; (b) the Kerri video riff (Am Dm Gm) with Am/D chords only.
+  Also: "and please do say, the ones over 4 or 8 bars" → probably: riffs/piano running over 4 or 8 bars
+  (fits point 1: 8-bar progressions with groove). Also get this confirmed briefly.
 
-## Harmonie-Check (Nutzerfrage „auf gute Modulation geachtet?“, 2026-11-08) — NICHTS geändert, Antwort offen
-Analyse der 21 Folgen in `harmony-5.strudel` / Engine 3 (Skript: Stimmen = `stabOf(CH[name], 52, 4)` je Wechsel):
-- Gut: Stimmführung eng — gemeinsame Töne bleiben, Sprünge meist 1–2, max. 4 Halbtöne. Wechsel zwischen den Folgen
-  am 8-Takt-Anfang (mit Push) bleibt in a-Moll/C-Dur, nur dorisch↔äolisch (F♯/F) — weich, keine echte Modulation.
-- Problem 1: Die in `CH` notierten Kerri-Griffe (Septime unten, ohne Grundton) klingen NICHT — `stabOf` sortiert neu ab
-  E3: fast immer E3 unten, Em7 in Grundstellung, Fmaj7 = E3 F3 A3 C4 (kleine Sekunde bei 165 Hz = matschig, v. a. mit
-  Supersaws); Fadd9 / G11 / G7sus2 enge Cluster um F3/G3.
-- Problem 2: Oberstimme fast immer C4/D4 — keine Linie oben (Attack: „highest and lowest notes … give context and melody“).
-- Problem 3: Folge 13 „Attack-Beispiel“: Takt 8 muss C♯m7 sein (Überraschungsakkord, so in research-harmony.md R4),
-  im Board steht D9. Modjo „Lady“: Bm7♭5/D fehlt.
-- Recherche (Attack Magazine: kerri-chandler-chords, …-part2, parallel-chords, passing-notes-deep-house-chords,
-  lessons-from-disco-chords/2; Soundfly open-voiced sevenths; NI voice-leading): KC-Stabs ohne Grundton/Quinte, Septime
-  unten, gemeinsame Töne halten + oben ergänzen, 1/16 früh zurück; Übergangsakkord geliehen (A7 zwischen A♯m und G♯m,
-  „Rain“ ii–V-Ketten); Parallelakkorde = gleicher Griff verschoben (Mommy What's a Record Cm7 → Gm7 → Am7) = sanftester
-  Tonartwechsel; Orgelpunkt-Bass darunter; Zwei-Akkord-Vamps tragen viel klassischen House.
-- Vorschläge an den Nutzer (Antwort abwarten): A) Griffe wie notiert spielen, Umkehrung pro Wechsel nach kürzesten
-  Wegen, unter G3 keine Sekunden (ändert ALLE Folgen → nur mit OK); B) Folge 13 auf C♯m7; C) neue Folgen anhängen:
-  „Mommy“ (Am7 → Em7 → F♯m7 parallel über E-Orgelpunkt) + eine Folge mit Übergangsakkord.
+## Harmony check (user question "did you pay attention to good modulation?", 2026-11-08) — NOTHING changed, answer open
+Analysis of the 21 progressions in `harmony-5.strudel` / engine 3 (script: voices = `stabOf(CH[name], 52, 4)` per change):
+- Good: voice leading is tight — shared notes stay, jumps mostly 1–2, max. 4 semitones. Changes between the progressions
+  at the 8-bar start (with push) stay in A minor/C major, only Dorian↔aeolian (F♯/F) — soft, no real modulation.
+- Problem 1: the Kerri voicings written in `CH` (seventh at the bottom, without root) do NOT sound — `stabOf` re-sorts from
+  E3: almost always E3 at the bottom, Em7 in root position, Fmaj7 = E3 F3 A3 C4 (minor second at 165 Hz = muddy, especially with
+  supersaws); Fadd9 / G11 / G7sus2 tight clusters around F3/G3.
+- Problem 2: top voice almost always C4/D4 — no line on top (Attack: "highest and lowest notes … give context and melody").
+- Problem 3: progression 13 "Attack example": bar 8 must be C♯m7 (surprise chord, as in research-harmony.md R4),
+  the board has D9. Modjo "Lady": Bm7♭5/D is missing.
+- Research (Attack Magazine: kerri-chandler-chords, …-part2, parallel-chords, passing-notes-deep-house-chords,
+  lessons-from-disco-chords/2; Soundfly open-voiced sevenths; NI voice-leading): KC stabs without root/fifth, seventh
+  at the bottom, hold shared notes + add on top, back 1/16 early; borrowed passing chord (A7 between A♯m and G♯m,
+  "Rain" ii–V chains); parallel chords = same voicing shifted (Mommy What's a Record Cm7 → Gm7 → Am7) = softest
+  key change; pedal-point bass underneath; two-chord vamps carry a lot of classic house.
+- Proposals to the user (await answer): A) play voicings as written, inversion per change by shortest
+  paths, no seconds below G3 (changes ALL progressions → only with OK); B) progression 13 to C♯m7; C) append new progressions:
+  "Mommy" (Am7 → Em7 → F♯m7 parallel over an E pedal point) + one progression with a passing chord.
 
-## Nächste Schritte (Vorschlag, mit Nutzer abstimmen)
-1. Kurz nachfragen: was „den Kerri hinzufügen“ meint; ob 4/8-Takt-Piano-Folgen gemeint sind.
-2. **Bass (Priorität laut Nutzer):** erst recherchieren (Quellen notieren in einer `research-bass.md`): wie klassische
-   House-/Piano-House-Basslines gebaut sind (Synkopen, Oktavsprünge, Ghost Notes, Slides, Klänge: M1-/Juno-/Organ-Bass,
-   Sub + Mitten), möglichst an Tracks aus der Trackliste (Beschreibungen, Analysen). Bestehendes prüfen: `lab/bass/`
-   (Ordner + feedback.md) und Jojo 4 in `009-house-dual.strudel` (3 Linien, Sinus + Oktave + Square, Ghost-Improviser).
-   Dann Bass-Lab mit vielen Kandidaten-Spalten (Engine 3, folgt den Akkordfolgen; Kontext: Drums, Keys).
-3. Keys-22: „Am D“ als Basis + Kerri-Variante(n) + Piano mit 4/8-Takt-Folgen im Keys-Groove (die 8 Rhythmen auf Taste 1).
-   Idee: Keys-Spalte im Track bekommt die Riffs über die freie Taste im Klang-Modus (Runde 20 offen) statt eigene Spalte.
-4. melody-4 (Bläser mit Aufbau) und eine Flöten-Melodie-Spalte (verspielt, einfache Motive, höher).
-5. Spaltenplan Jonas 4–7 (Entwurf): Piano/Folge · Flöte hoch · Bläser · offen (Vocal-Hook nur mit guten Samples).
+## Next steps (proposal, agree with the user)
+1. Ask briefly: what "add the Kerri" means; whether 4/8-bar piano progressions are meant.
+2. **Bass (priority according to the user):** research first (note sources in a `research-bass.md`): how classic
+   house/piano-house basslines are built (syncopation, octave jumps, ghost notes, slides, sounds: M1/Juno/organ bass,
+   sub + mids), ideally from tracks in the tracklist (descriptions, analyses). Check what exists: `lab/bass/`
+   (folder + feedback.md) and Jojo 4 in `009-house-dual.strudel` (3 lines, sine + octave + square, ghost improviser).
+   Then a bass lab with many candidate columns (engine 3, follows the chord progressions; context: drums, keys).
+3. Keys-22: "Am D" as the basis + Kerri variant(s) + piano with 4/8-bar progressions in the keys groove (the 8 rhythms on button 1).
+   Idea: the keys column in the track gets the riffs through the free button in sound mode (round 20 open) instead of its own column.
+4. melody-4 (brass with build-up) and a flute melody column (playful, simple motifs, higher).
+5. Column plan Jonas 4–7 (draft): piano/progression · high flute · brass · open (vocal hook only with good samples).
 
-## Arbeitsregeln (Kurzfassung)
-Labs nicht ungefragt umbauen; Verworfen-Liste beachten; recherchieren mit Quellen; vor Übergabe
-`node tools/strudel-sim/transpile-check.mjs`, Rechenzeit ≲ 8 ms/Tick, Samples in Headless-Chrome dekodieren
-(`tools/phrase-cut/chrome-decode.mjs`); Lab-Runden: neue Datei, alte nach `old/`; Track-Änderungen: make-single,
-gen-layout, make-syx, `npm run set`. M2 Air geteilt: ein schwerer Job, keine Hintergrundprozesse.
+## Working rules (short version)
+Do not rework labs unasked; respect the rejected list; research with sources; before the handover
+`node tools/strudel-sim/transpile-check.mjs`, compute time ≲ 8 ms/tick, decode samples in headless Chrome
+(`tools/phrase-cut/chrome-decode.mjs`); lab rounds: new file, old one to `old/`; track changes: make-single,
+gen-layout, make-syx, `npm run set`. M2 Air shared: one heavy job, no background processes.

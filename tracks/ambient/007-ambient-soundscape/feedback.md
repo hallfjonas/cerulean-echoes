@@ -20,8 +20,8 @@
 - Successors are tried in lab/harmony/ambient-3.strudel: Takada-style shifting marimba layers, a melodic voice on top,
   Eno bowed (liked, maybe better than the choir and instead of the chords).
 - Choir stays (good shimmer, sits higher; the drone is much lower).
-- 2026-11-08: Jonas 2–4 = Eno-Bogen, Marimba, Toms (Takada) aus lab/harmony/midori-5.strudel übernommen; Version davor
-  old/007-ambient-dual-before-midori.strudel. Abweichung: Tonleiter folgt dem Kapitel. Pegel der GM-Klänge noch nicht gemessen.
+- 2026-11-08: Jonas 2–4 = Eno bowed, marimba, toms (Takada) taken over from lab/harmony/midori-5.strudel; previous version
+  old/007-ambient-dual-before-midori.strudel. Difference: the scale follows the chapter. Level of the GM sounds not measured yet.
 
 ## Feedback 3 (user, 2026-11-09)
 - Toms (Jonas 4) louder: gain 2.5 → 4 (+4 dB) in 007-ambient-dual.strudel; single and set 011 rebuilt.

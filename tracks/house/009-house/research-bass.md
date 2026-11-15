@@ -1,49 +1,49 @@
-# Recherche Bass für 009 (2026-11-08)
+# Research bass for 009 (2026-11-08)
 
-Auftrag (Nutzer, Referenz Sarah Wild Fusion 2025): House-Basslines mit viel Groove, mehr und bessere Optionen als
-Jojo 4. Dazu: auf gute Übergänge zwischen den Akkorden achten („Modulation“).
-Zu den Tracks der Trackliste (Val Verra, L.P. Rhythm, Austher …) fand ich keine Bass-Analysen; die Regeln unten stammen
-aus Analysen klassischer House-/Disco-Platten. Rhythmen in 16teln: 0 = Takt-Eins, Kick auf 0 4 8 12, Offbeats 2 6 10 14.
+Task (user, reference Sarah Wild Fusion 2025): house basslines with lots of groove, more and better options than
+Jojo 4. Also: pay attention to good transitions between the chords ("modulation").
+For the tracks in the tracklist (Val Verra, L.P. Rhythm, Austher …) I found no bass analyses; the rules below come
+from analyses of classic house/disco records. Rhythms in 16ths: 0 = bar one, kick on 0 4 8 12, offbeats 2 6 10 14.
 
-## Rollen / Stile (mit Referenz-Platten)
-- **Offbeat-Bass** — zwischen den Kicks, gerade (ungeswingt), oft nur zwei Töne; Saw, Filter-Hüllkurve leicht nach unten,
-  etwas Release, punktiertes 1/8-Delay. Candi Staton „Hallelujah Anyway“ (Larse). [A1]
-- **Grundton-Rhythmus** — bleibt auf dem Grundton, die Bewegung kommt aus dem Rhythmus; wechselt manchmal früher, kleiner
-  Schnörkel am Taktende. Inner City „Good Life“ (folgt den Akkorden, sehr beschäftigt), Lane 8 „Be Mine“, Jamie Principle
-  „Your Love“ (Strophe Ostinato, Refrain Achtel auf dem Grundton). [A2]
-- **Ostinato** — wiederholtes Muster, das im Groove sitzt statt zu führen, Zusammenspiel mit der Kick; viel Sub, wenig
-  Tiefmitten. Housemaster Boyz „House Nation“, Ninetoes „Finder“, Carl Craig/Theo Parrish „Falling Up“. [A6]
-- **Bass als Lead** — Oktaven über mehrere Lagen, ein Oszillator, Juno mit Chorus oder M1-Orgel. Mr Fingers „Can You Feel
-  It“, Robin S „Show Me Love“, MK/Nightcrawlers „Push The Feeling On“, Phuture „Acid Tracks“. [A4]
-- **Disco-Oktaven** — Oktave im Wechsel; umgekehrt (hoch auf dem Schlag, tief dazwischen) = „tuckernd“ vorwärts:
-  Greg Diamond „Chains“, Aphrohead „Kazoo“. Jamiroquai „Alright“: Oktaven über reine Moll-Folge, Refrain Grundton–Terz. [L]
-- **Daft Punk** — „Something About Us“: Grundton mit der Kick, Oktaven füllen zwischen den Kicks, eine Note in manchen
-  Takten von der 7. auf die 8. 16tel verschoben; die Akkorde spielen ohne tiefen Grundton (sauberer). „Around the World“:
-  Akkordwechsel eine 16tel VOR der Eins (Push), Viertel-Disco-Puls, Grundton + kleine Septime, Slides am Phrasenende,
-  Dead Notes. „Da Funk“: einzelne gemutete 16tel = Atempause. [D]
+## Roles / styles (with reference records)
+- **Offbeat bass** — between the kicks, straight (unswung), often only two notes; saw, filter envelope slightly downward,
+  some release, dotted 1/8 delay. Candi Staton "Hallelujah Anyway" (Larse). [A1]
+- **Root rhythm** — stays on the root, the movement comes from the rhythm; sometimes changes early, small
+  flourish at the end of the bar. Inner City "Good Life" (follows the chords, very busy), Lane 8 "Be Mine", Jamie Principle
+  "Your Love" (verse ostinato, chorus 8ths on the root). [A2]
+- **Ostinato** — repeated pattern that sits in the groove instead of leading, interplay with the kick; lots of sub, few
+  low mids. Housemaster Boyz "House Nation", Ninetoes "Finder", Carl Craig/Theo Parrish "Falling Up". [A6]
+- **Bass as lead** — octaves across several registers, one oscillator, Juno with chorus or M1 organ. Mr Fingers "Can You Feel
+  It", Robin S "Show Me Love", MK/Nightcrawlers "Push The Feeling On", Phuture "Acid Tracks". [A4]
+- **Disco octaves** — alternating octave; reversed (high on the beat, low in between) = "chugging" forward:
+  Greg Diamond "Chains", Aphrohead "Kazoo". Jamiroquai "Alright": octaves over a pure minor progression, chorus root–third. [L]
+- **Daft Punk** — "Something About Us": root with the kick, octaves fill between the kicks, one note in some
+  bars moved from the 7th to the 8th 16th; the chords play without a low root (cleaner). "Around the World":
+  chord change one 16th BEFORE the one (push), quarter-note disco pulse, root + minor seventh, slides at the phrase end,
+  dead notes. "Da Funk": single muted 16ths = breathing space. [D]
 
-## Töne und Übergänge („Modulation“ im Bass)
-- Akkordtöne zwischen gehaltenen Grundtönen als 16tel-Füller; Oktavlagen mischen (Füller mal unter, mal über dem Grundton).
-  Sprünge über gemeinsame Intervalle: 1-5-9, 1-7-8, 1-3-7, 1-5-8. [A5]
-- Übergänge: chromatischer Abgang/Lauf in den nächsten Akkord (Cameo „Candy“: nur Akkordtöne, außer am Phrasenende ein
-  chromatischer Abstieg in den Anfangsakkord; Attack: chromatischer Triolen-Abstieg Takt 4). [L][A5]
-- Wechsel vorziehen (Kerri-/Daft-Punk-Push, 1–2 16tel früh) und „früher wechseln, vorher zurückhalten“ = Spannung. [A2][D]
-- Dead Notes: kurze gedämpfte 16tel vor/nach Füllern und gehaltenen Tönen, perkussiv. [A5][D]
-- In Themen schreiben: 8 Takte mit wechselnden Notenlängen (lang → kurz/zupfend → am längsten). [A5]
-- Beat 4 frei lassen, damit Clap/Snare durchkommt (52nd Street). Resonante Slides am Phrasenende (Advance). [L]
-- Bass zwischen die Kicks, gleicher Swing wie die Drums, Sidechain; Mono/Legato, nichts überlappt. [E]
+## Notes and transitions ("modulation" in the bass)
+- Chord tones between held roots as 16th fillers; mix octave registers (fillers sometimes below, sometimes above the root).
+  Jumps over common intervals: 1-5-9, 1-7-8, 1-3-7, 1-5-8. [A5]
+- Transitions: chromatic descent/run into the next chord (Cameo "Candy": only chord tones, except at the phrase end a
+  chromatic descent into the opening chord; Attack: chromatic triplet descent bar 4). [L][A5]
+- Anticipate the change (Kerri/Daft Punk push, 1–2 16ths early) and "change earlier, hold back before" = tension. [A2][D]
+- Dead notes: short muted 16ths before/after fillers and held notes, percussive. [A5][D]
+- Write in themes: 8 bars with changing note lengths (long → short/plucked → longest). [A5]
+- Leave beat 4 free so the clap/snare comes through (52nd Street). Resonant slides at the phrase end (Advance). [L]
+- Bass between the kicks, same swing as the drums, sidechain; mono/legato, nothing overlaps. [E]
 
-## Klänge
-- **M1 „Organ 2“** (Show Me Love, Break My Soul): Dreieck + Sinus 19 Halbtöne (Oktave + Quinte) höher, Höhen weg,
-  knackige Amp-Hüllkurve; mehr Biss: kurzer Pitch-Env oder Rauschen im Anschlag [M5]. Sinus-Sub eine Oktave drunter
-  (40–80 Hz), einfache Version der Linie [M90].
-- **Juno**: Saw + Puls mit etwas PWM, Filter mit kurzer Hüllkurve, Sub-Oszillator, Chorus [M5].
-- **Acid** (TB-303): Saw/Square, Resonanzfilter, Accent hebt Filter + Lautstärke, Oktavsprünge und Slides [M5]. → eigenes
-  Lab (Jonas 6).
-- **Deep House**: einfache tiefpassgefilterte Analog-Wellen, „subby“, kurze Hüllkurve, etwas Sättigung [E].
-- French/Disco: E-Bass oder FM (DX7-artig), komprimiert, Sinus-Sub drunter [M5].
+## Sounds
+- **M1 "Organ 2"** (Show Me Love, Break My Soul): triangle + sine 19 semitones (octave + fifth) higher, highs off,
+  snappy amp envelope; more bite: short pitch env or noise in the attack [M5]. Sine sub an octave below
+  (40–80 Hz), simple version of the line [M90].
+- **Juno**: saw + pulse with some PWM, filter with a short envelope, sub oscillator, chorus [M5].
+- **Acid** (TB-303): saw/square, resonant filter, accent raises filter + level, octave jumps and slides [M5]. → own
+  lab (Jonas 6).
+- **Deep house**: simple low-pass filtered analog waves, "subby", short envelope, some saturation [E].
+- French/disco: electric bass or FM (DX7-like), compressed, sine sub below [M5].
 
-## Quellen
+## Sources
 - [A1] Attack, Low End Theory 1 Offbeat: https://www.attackmagazine.com/technique/tutorials/low-end-theory-exploring-eight-common-bassline-styles/
 - [A2] … 2 Root Rhythm: https://attackmagazine.com/technique/tutorials/low-end-theory-exploring-eight-common-bassline-styles/2
 - [A4] … 4 Bass As Lead: https://attackmagazine.com/technique/tutorials/low-end-theory-exploring-eight-common-bassline-styles/4
@@ -57,25 +57,25 @@ aus Analysen klassischer House-/Disco-Platten. Rhythmen in 16teln: 0 = Takt-Eins
 - Acid: https://www.attackmagazine.com/technique/tutorials/how-to-make-an-acid-house-bassline/ ,
   https://musicradar.com/tutorials/music-production-tutorials/lets-go-back-to-the-mid-80s-where-dance-music-began-your-guide-to-creating-a-classic-house-track-from-scratch
 
-## Acid (für lab/acid/acid-1, Jonas 6)
-- Acid House = Experimentieren mit dem Klang: die Regler (Cutoff, Resonanz, Env-Mod, Decay) werden den ganzen Track über
-  live gedreht (Phuture „Acid Tracks“, Ron Hardy, Music Box); die Programmierung (Notenlängen, Slides) macht den 303-Klang
-  so sehr aus wie das Timbre (Mark Archer). Acid Techno der 90er: schneller, härter, „weniger Experiment“. [AC]
-- 303: Tonhöhe, Trigger und Accent getrennt eingegeben; Accent hebt Filter und Lautstärke; Oktavsprünge und Slides sind
-  der Kern [M5]. Saw dünner/aggressiver als Square; Distortion, Cutoff, Resonanz, Env-Mod hoch „nach Geschmack“, 129 BPM,
-  punktiertes 1/8-Delay mit Hochpass [AH]. Klassischer House-Aufbau: 16tel, aber nicht auf jeder Position [MR].
-- Referenzen: Phuture „Acid Tracks“, Armando, 808 State „Newbuild“, Gerald Simpson „Voodoo Ray“, Josh Wink „Higher State“.
+## Acid (for lab/acid/acid-1, Jonas 6)
+- Acid house = experimenting with the sound: the controls (cutoff, resonance, env mod, decay) are turned live
+  throughout the track (Phuture "Acid Tracks", Ron Hardy, Music Box); the programming (note lengths, slides) makes the 303 sound
+  as much as the timbre does (Mark Archer). Acid techno of the 90s: faster, harder, "less experiment". [AC]
+- 303: pitch, trigger and accent entered separately; accent raises filter and level; octave jumps and slides are
+  the core [M5]. Saw thinner/more aggressive than square; distortion, cutoff, resonance, env mod high "to taste", 129 BPM,
+  dotted 1/8 delay with high-pass [AH]. Classic house build: 16ths, but not on every position [MR].
+- References: Phuture "Acid Tracks", Armando, 808 State "Newbuild", Gerald Simpson "Voodoo Ray", Josh Wink "Higher State".
 - [AC] https://www.attackmagazine.com/features/long-read/you-just-have-move-your-feet-30-years-acid/
 - [AH] https://www.attackmagazine.com/technique/tutorials/how-to-make-an-acid-house-bassline/
 - [MR] https://musicradar.com/tutorials/music-production-tutorials/lets-go-back-to-the-mid-80s-where-dance-music-began-your-guide-to-creating-a-classic-house-track-from-scratch
 
-## Runde 2 (Bass 2): was Analysen über einzelne Platten sagen (Noten auf den 16teln dann von mir)
-- Notengenaue Transkriptionen sind frei nicht zu finden (Tabs hinter Paywall, Piano-Rolls nur als Bilder).
-- Daft Punk „Voyager“: Takt 1 erste Hälfte auf der 1. und 3. 16tel, zweite Hälfte auch 2. und 4.; kurze, zupfende Noten,
-  die in lange Grundtöne auflösen. „Instant Crush“: Füller auf Oktave + kleiner Septime mit Slides; Akkordwechsel 1/8 oder
-  1/16 vor der Eins; Notenlängen fast nie gleich. „Get Lucky“: Grundtöne in Oktaven, Takte mit kurzen Staccato-Noten
-  gegen Takte mit gehaltenen; Füller auf den letzten zwei 16teln vor der Eins; Bass bewegt sich um die Gitarre. [D2]
-- Tensnake „Coma Cat“ (aus Anthony and the Camp „What I Like“): nur Moll-Pentatonik, Noten auf der 16tel direkt vor bzw.
-  nach der Eins jedes Takts — „rhythmisches Markenzeichen von Funk- und Disco-Basslines“. [T]
+## Round 2 (bass 2): what analyses say about individual records (notes on the 16ths then by me)
+- Note-exact transcriptions are not freely available (tabs behind a paywall, piano rolls only as images).
+- Daft Punk "Voyager": bar 1 first half on the 1st and 3rd 16th, second half also 2nd and 4th; short, plucked notes
+  that resolve into long roots. "Instant Crush": fillers on octave + minor seventh with slides; chord change 1/8 or
+  1/16 before the one; note lengths almost never equal. "Get Lucky": roots in octaves, bars with short staccato notes
+  against bars with held ones; fillers on the last two 16ths before the one; the bass moves around the guitar. [D2]
+- Tensnake "Coma Cat" (from Anthony and the Camp "What I Like"): only minor pentatonic, notes on the 16th directly before or
+  after the one of each bar — "rhythmic trademark of funk and disco basslines". [T]
 - [D2] https://www.attackmagazine.com/technique/passing-notes/daft-punk-basslines-part-2/
 - [T] https://www.attackmagazine.com/technique/the-breakdown/tensnake-coma-cat/
