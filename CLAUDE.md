@@ -1,15 +1,15 @@
 # cerulean-echoes
 
 Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control XL 3s via `midin()` and a
-Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/geraete.md`).
-Talk to the user in German; code comments stay in English. Explain audio basics plainly.
+Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/devices.md`).
+Talk to the user in English; code comments are English too. Explain audio basics plainly.
 
 ## Labels
 Everything the player reads is English and short: `@ctl` texts, control and option names, the live view (`▣ LC big`), the status box.
 One name per job in every track: row 1 Brightness, row 2 Space, fader Level, button 1 Pattern (Chords on a harmony column),
 global column Fog / Thin / Tension / Master / Chapter / Break. Row 3 and button 2 are named for what they do (Length, Complexity,
 Octave, Echo throw, Lift). A `@ctl` text is one short line (about 50 characters): what the control does, no ranges or history.
-No pattern strings (x..x) in the live view. Chat with the user stays German.
+No pattern strings (x..x) in the live view.
 
 ## Layout
 - `tracks/<genre>/NNN-<name>/` — one folder per track, grouped by genre (`ambient`, `ambient-house`, `house`,
@@ -18,8 +18,8 @@ No pattern strings (x..x) in the live view. Chat with the user stays German.
   keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
-  `harmonie/`, `melodie/`, `einwurf/`, `samples/`, `tools/`
-  (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + German handbook PDF).
+  `harmony/`, `melody/`, `stab/`, `brass/`, `guitar/`, `strings/`, `samples/`, `tools/`
+  (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + English handbook PDF).
   A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
   column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in
   the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.

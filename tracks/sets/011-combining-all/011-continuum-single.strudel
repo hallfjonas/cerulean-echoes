@@ -201,10 +201,10 @@ const hits = (steps, plan, maxShift = 1) => {
 // Root in semitones above A, quality: maj (major third), min (minor third), sus (2nd instead of the third);
 // optional colour tone in semitones above the root (default 14 = the 9th; 10 = minor 7th where the 9th would clash)
 const CHAPTERS = [
-  { name: 'hell',          chords: [['A', 0, 'maj'], ['D', 5, 'maj'], ['F♯m', 9, 'min'], ['E', 7, 'maj']] },
-  { name: 'schwebend',     chords: [['Asus2', 0, 'sus'], ['G', 10, 'maj'], ['Dsus2', 5, 'sus'], ['Asus2', 0, 'sus']] },
-  { name: 'melancholisch', chords: [['Am', 0, 'min'], ['F', 8, 'maj'], ['C', 3, 'maj'], ['G', 10, 'maj']] },
-  { name: 'dunkel',        chords: [['Am', 0, 'min', 10], ['B♭', 1, 'maj'], ['Dm', 5, 'min'], ['Am', 0, 'min', 10]] },
+  { name: 'Bright',        chords: [['A', 0, 'maj'], ['D', 5, 'maj'], ['F♯m', 9, 'min'], ['E', 7, 'maj']] },
+  { name: 'Floating',      chords: [['Asus2', 0, 'sus'], ['G', 10, 'maj'], ['Dsus2', 5, 'sus'], ['Asus2', 0, 'sus']] },
+  { name: 'Melancholic',   chords: [['Am', 0, 'min'], ['F', 8, 'maj'], ['C', 3, 'maj'], ['G', 10, 'maj']] },
+  { name: 'Dark',          chords: [['Am', 0, 'min', 10], ['B♭', 1, 'maj'], ['Dm', 5, 'min'], ['Am', 0, 'min', 10]] },
 ]
 const THIRD = { maj: 4, min: 3, sus: 2 }
 const chapterLatch = barLatch(2)
@@ -238,10 +238,10 @@ const statusUi = !hasPage ? null : globalThis.houseStatus ??= (() => {
   const text = document.createElement('pre')
   text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
   const pop = document.createElement('button')
-  pop.textContent = '⧉ als Fenster'
+  pop.textContent = '⧉ as window'
   pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
   pop.onclick = async () => {
-    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    if (!window.documentPictureInPicture) { pop.textContent = 'Chrome/Edge only'; return }
     const pip = await documentPictureInPicture.requestWindow({ width: 380, height: 490 })
     pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
     pip.document.body.append(text)
@@ -293,7 +293,7 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   opener.style.display = 'none'
   document.body.append(opener)
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'lcxl-view'
   link.style.cssText = 'display:inline-block;margin:6px 0 0 6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -301,14 +301,14 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   link.onclick = () => setTimeout(() => {
     try {
       const w = opener.contentWindow.open('', 'lcxl-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       v.win = w
       w.document.title = 'LC XL 3'
       w.document.head.innerHTML = '<style>' + v.css + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       v.draw()
-      link.textContent = '▣ LC groß'
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+      link.textContent = '▣ LC big'
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   if (statusUi.box) statusUi.box.append(link)
   else { link.style.cssText += ';position:fixed;right:12px;bottom:4px;z-index:1001'; document.body.append(link) }
@@ -322,7 +322,7 @@ const setWhere = () => {
   return ZONES[Math.round(clamp01(p) * 3)] + ' · ' + Math.round(p * 100) + ' %' +
     (Math.abs(setState.pos - p) > 1e-3 ? ' → ' + Math.round(setState.pos * 100) + ' %' : '') + ' · ' + Math.round(bpmNow()) + ' BPM'
 }
-const fogKnob = () => setState.held ? 'Set-Position (Fog bleibt bei ' + Math.round(setState.fog * 100) + ')' : 'Fog'
+const fogKnob = () => setState.held ? 'Set position (Fog stays at ' + Math.round(setState.fog * 100) + ')' : 'Fog'
 
 // Rows of the status box, filled by change(): { label, latch, n, names } per player
 const STATUS = { jojo: [], jonas: [] }
@@ -334,12 +334,12 @@ const showStatus = () => {
   const ch = chapterLatch
   statusUi.text.textContent = [
     'Set         ' + setWhere(),
-    'Fog-Knopf   ' + fogKnob(),
-    'Kapitel     ' + CHAPTERS[ch.now].name +
-      (ch.pending !== ch.now ? ' → ' + CHAPTERS[ch.pending].name + ' (nächster Akkord)' : ''),
-    'Akkorde     ' + CHAPTERS[ch.now].chords.map(c => c[0]).join(' – '),
-    'Break       ' + (breakLatch.now ? 'Beat aus' : 'Beat an') +
-      (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'aus' : 'an') + ' (nächster Takt)' : ''),
+    'Fog knob    ' + fogKnob(),
+    'Chapter     ' + CHAPTERS[ch.now].name +
+      (ch.pending !== ch.now ? ' → ' + CHAPTERS[ch.pending].name + ' (next chord)' : ''),
+    'Chords      ' + CHAPTERS[ch.now].chords.map(c => c[0]).join(' – '),
+    'Break       ' + (breakLatch.now ? 'Beat off' : 'Beat on') +
+      (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'off' : 'on') + ' (next bar)' : ''),
     '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
     '', alone ? 'Mode 2 · Jonas' : 'Jonas', ...STATUS.jonas.map(line),
   ].join('\n')
@@ -486,7 +486,7 @@ const brightLpf = (b, lo, hi) => { const a = ZL(lo), z = ZL(hi); return a * Math
 // @ctl 16:1.b2 Drop | kick, rumble and sub pause while held.
 const kick     = colJojo(1)
 const kickK    = knobsOf(kick)
-const kickVar  = change(kick.btn, 'jojo', 'Kick', 3, ['Grund', 'Auftakt', 'Lücke'])
+const kickVar  = change(kick.btn, 'jojo', 'Kick', 3, ['Basic', 'Pickup', 'Gap'])
 const dropHeld = () => read(kick.btn2) > 0.5
 const KICK_W   = ['9.5. .... 9.5. ....', '9... 9... 9... 9...', '9... 9... 9... 9...', '9... 9... 9... 9...'].map(W)
 
@@ -522,7 +522,7 @@ const stemJ1_kick = gate(audible(kick.level), hits(16, (step, bar, t) => {
 // @ctl 16:2.b2 Riser | a noise sweep rises over 2 bars while held.
 const rumble    = colJojo(2)
 const rumbleK   = knobsOf(rumble)
-const rumbleVar = change(rumble.btn, 'jojo', 'Rumble', 3, ['Grund', 'dicht', 'Wellen'])
+const rumbleVar = change(rumble.btn, 'jojo', 'Rumble', 3, ['Basic', 'Dense', 'Waves'])
 let riseStart = null
 const PUMP = [[0, 0.55, 0.85, 1], [0.3, 0.8, 1, 0.6]]   // breath over one beat (after the kick): basic, denser
 
@@ -570,7 +570,7 @@ const stemJ2_rumble = gate(audible(rumble.level), hits(16, (step, bar, t, n) => 
 // @ctl 16:3.b2 Slide | every note bends up into its pitch while held.
 const sub    = colJojo(3)
 const subK   = knobsOf(sub)
-const subVar = change(sub.btn, 'jojo', 'Sub', 3, ['Grund', 'Offbeat', 'lang'])
+const subVar = change(sub.btn, 'jojo', 'Sub', 3, ['Basic', 'Off-beat', 'Long'])
 
 const stemJ3_sub = gate(audible(sub.level), hits(4, (beat, bar, t) => {
   if (!beatAt(t) || dropHeld()) return
@@ -602,7 +602,7 @@ const stemJ3_sub = gate(audible(sub.level), hits(4, (beat, bar, t) => {
 // @ctl 16:4.b2 Octave | one octave up while held.
 const bass    = colJojo(4)
 const bassK   = knobsOf(bass)
-const bassVar = change(bass.btn, 'jojo', 'Bass', 3, ['Grund', 'Offbeat', 'Melodie'])
+const bassVar = change(bass.btn, 'jojo', 'Bass', 3, ['Basic', 'Off-beat', 'Melodic'])
 const BASS = [
   ['r... .... .... ....', '.rr. .rr. .rr. .rf.', '..r. ..o. ..r. .fr.', '..r. ..r. ..r. ..r.'],
   ['r... .... f... ....', '..r. ..r. ..r. ..r.', '..r. ..r. ..r. ..ro', '..r. .rr. ..r. .rr.'],
@@ -640,7 +640,7 @@ const stemJ4_bass = gate(audible(bass.level), hits(16, (step, bar, t, n) => {
 // @ctl 16:5.b2 Roll | snare roll, growing over the bar, while held.
 const clap    = colJojo(5)
 const clapK   = knobsOf(clap)
-const clapVar = change(clap.btn, 'jojo', 'Clap', 3, ['Grund', 'Auftakt', 'Figur'])
+const clapVar = change(clap.btn, 'jojo', 'Clap', 3, ['Basic', 'Pickup', 'Figure'])
 const CLAP_W  = ['.... .... 7... ....', '.... 9... .... 9...', '.... 9... .... 9...', '.... 9... .... 9...'].map(W)
 const CLAP_EXTRA = [W('.... .... .... ...3'), W('...3 .... ..3. ....')]   // pickup, rim figure
 const GHOST_1 = W('.... .... ..9. ....'), GHOST_2 = W('.... ..9. .... ...6')
@@ -684,7 +684,7 @@ const stemJ5_clap = gate(audible(clap.level), hits(16, (step, bar, t, n) => {
 // @ctl 16:6.b2 Open | every hit rings long while held (shaker: a long “shhh”).
 const hats   = colJojo(6)
 const hatsK  = knobsOf(hats)
-const hatVar = change(hats.btn, 'jojo', 'Hats', 3, ['Grund', '+16tel', 'treibend'])
+const hatVar = change(hats.btn, 'jojo', 'Hats', 3, ['Basic', '+16ths', 'Driving'])
 const HATS = [
   ['3.2. 3.2. 3.2. 3.2.', '..9. ..9. ..9. ..9.', '..9. ..9. ..9. ..9.', '3.9. 3.9. 3.9. 3.9.'],
   ['3121 3121 3121 3121', '4293 4293 4293 4293', '4293 4293 4293 4293', '5395 5395 5395 5395'],
@@ -721,7 +721,7 @@ const stemJ6_hats = gate(audible(hats.level), hits(16, (step, bar, t, n) => {
 // @ctl 16:7.b2 Fill | a tom run down over the bar while held.
 const perc    = colJojo(7)
 const percK   = knobsOf(perc)
-const percVar = change(perc.btn, 'jojo', 'Perc', 3, ['Grund', 'belebt', 'sparsam'])
+const percVar = change(perc.btn, 'jojo', 'Perc', 3, ['Basic', 'Busy', 'Sparse'])
 const PERC = [
   ['3... ..2. .... .3..', '0..2 ..1. 0..2 .1..', '3..3 ..3. ..3. 3...', '0.21 ..1. 0.2. .1.2'],
   ['3..2 ..2. 3... .3.1', '0.22 ..1. 0.12 .1.2', '3..3 ..3. 2.3. 3.1.', '0221 .21. 0.21 .1.2'],
@@ -756,7 +756,7 @@ const stemJ7_perc = gate(audible(perc.level), hits(16, (step, bar, t, n) => {
 // ============================================================
 const ride    = colJojo(8)
 const rideK   = knobsOf(ride)
-const rideVar = change(ride.btn, 'jojo', 'Ride', 3, ['Grund', '8tel', '16tel'])
+const rideVar = change(ride.btn, 'jojo', 'Ride', 3, ['Basic', '8ths', '16ths'])
 const RIDE = [
   ['5... .... .... ....', '..3. ..3. ..3. ..3.', '..4. ..4. ..4. ..4.', '..5. ..5. ..5. ..5.'],
   ['5... .... 4... ....', '2.3. 2.3. 2.3. 2.3.', '3.4. 3.4. 3.4. 3.4.', '3.5. 3.5. 3.5. 3.5.'],
@@ -795,7 +795,7 @@ const breathOf = (t, bars) => 0.5 - 0.5 * Math.cos(2 * Math.PI * ((t / bars) % 1
 // @ctl 2:1.b1 Change | voicing: warm → open → wide.
 // @ctl 2:1.b2 Freeze | holds the current chord while held, for everybody.
 const padK   = knobsOf(pad)
-const padVar = change(pad.btn, 'jonas', 'Pad', 3, ['warm', 'offen', 'weit'])
+const padVar = change(pad.btn, 'jonas', 'Pad', 3, ['Warm', 'Open', 'Wide'])
 
 const stemN1_pad = gate(audible(pad.level), hits(1, (s0, bar, t) => {
   if (bar % 2 !== 0) return
@@ -825,7 +825,7 @@ const stemN1_pad = gate(audible(pad.level), hits(1, (s0, bar, t) => {
 // @ctl 2:2.b2 Stab | a chord on every off-beat while held.
 const chords    = colJonas(2)
 const chordsK   = knobsOf(chords)
-const chordsVar = change(chords.btn, 'jonas', 'Akkorde', 3, ['Grund', 'mehr', 'anders'])
+const chordsVar = change(chords.btn, 'jonas', 'Chords', 3, ['Basic', 'More', 'Other'])
 const CHORDS = [
   ['5... .... .... ....', '...7 ..7. .... ....', '..7. ..7. ..7. ..7.', '...7 .... ..7. ....'],
   ['5... .... 4... ....', '7..7 .... ..7. ....', '7..7 ..7. .7.. 7...', '..7. .... ..7. ..5.'],
@@ -860,7 +860,7 @@ const stemN2_chords = gate(audible(chords.level), hits(16, (step, bar, t) => {
 // @ctl 2:3.b2 Octave | one octave up while held.
 const arp    = colJonas(3)
 const arpK   = knobsOf(arp)
-const arpVar = change(arp.btn, 'jonas', 'Arp', 3, ['Grund', 'Form 2', 'Form 3'])
+const arpVar = change(arp.btn, 'jonas', 'Arp', 3, ['Basic', 'Shape 2', 'Shape 3'])
 const ARPS = [
   ['4... ..2. .... 3...', '0242 0242 0243 0242', '0.2. 4.2. .3.2 0...', '0240 2402 4024 0240'],
   ['2... 4... ..3. ....', '0124 0124 1243 4210', '4.3. 2.0. 4.3. 2...', '0.20 .20. 20.2 0.2.'],
@@ -896,7 +896,7 @@ const stemN3_arp = gate(audible(arp.level), hits(16, (step, bar, t, n) => {
 // @ctl 2:4.b2 Echo throw | long echo on the lead while held.
 const lead    = colJonas(4)
 const leadK   = knobsOf(lead)
-const leadVar = change(lead.btn, 'jonas', 'Lead', 3, ['Grund', 'Linie 2', 'Linie 3'])
+const leadVar = change(lead.btn, 'jonas', 'Lead', 3, ['Basic', 'Line 2', 'Line 3'])
 const LEADS = [
   ['4___ ____ .... ....', '4___ ..2_ 0___ ....', '0.04 .0.3 .02. 4.0.', '0__2 __4_ 3___ 2...'],
   ['.... 3___ ____ ....', '..4_ __3_ 2___ ....', '00.3 .0.4 0.2. .30.', '4___ 3_2_ 0___ ....'],
@@ -930,7 +930,7 @@ const stemN4_lead = gate(audible(lead.level), hits(16, (step, bar, t) => {
 // @ctl 2:5.b2 Choir | all three voices while held.
 const voice    = colJonas(5)
 const voiceK   = knobsOf(voice)
-const voiceVar = change(voice.btn, 'jonas', 'Stimme', 3, ['Grund', 'Phrase 2', 'Phrase 3'])
+const voiceVar = change(voice.btn, 'jonas', 'Voice', 3, ['Basic', 'Phrase 2', 'Phrase 3'])
 const VOICES = [
   ['0___ ____ ____ ____', '0___ ____ 2___ ____', '..0. ..2. ..0. ...4', '..0. ...0 ..2. ....'],
   ['2___ ____ ____ ____', '4___ ____ 3___ ____', '..4. ..2. .... ..0.', '...0 ..0. ...2 ....'],
@@ -964,7 +964,7 @@ const stemN5_voice = gate(audible(voice.level), hits(16, (step, bar, t, n) => {
 // @ctl 2:6.b2 Run | runs over the chord, filling in while held.
 const bells    = colJonas(6)
 const bellsK   = knobsOf(bells)
-const bellsVar = change(bells.btn, 'jonas', 'Glocken', 3)
+const bellsVar = change(bells.btn, 'jonas', 'Bells', 3)
 const BELL_RUN = [0, 1, 2, 3, 4, 5, 6, 4, 6, 5, 4, 3, 2, 1, 0, 1]
 let runStart = null
 
@@ -1000,7 +1000,7 @@ const stemN6_bells = gate(audible(bells.level), hits(32, (step, bar, t, n) => {
 // @ctl 2:7.b2 Rise | chord tones climb an octave while held.
 const air    = colJonas(7)
 const airK   = knobsOf(air)
-const airVar = change(air.btn, 'jonas', 'Luft', 3, ['2 Takte', '4 Takte', '1 Takt'])
+const airVar = change(air.btn, 'jonas', 'Air', 3, ['2 bars', '4 bars', '1 bar'])
 const AIR_TONES = ['9... .... 6... ....', '9.6. 9.6. 9.6. 9.6.', '9.6. 9.6. 9.6. 9.6.', '9.6. 9.6. 9.6. 9.6.'].map(W)
 let airRise = null
 
@@ -1045,7 +1045,7 @@ setcps(bpmNow() / 240)
 
 // What the LC view shows: the chapter on column 8 button 1, the set position and chord at the top
 const lcChapter = () => [CHAPTERS[chapterLatch.now].name, CHAPTERS[chapterLatch.pending].name]
-const lcHead    = () => [['Set', setWhere()], ['Fog-Knopf', fogKnob()], ['Akkorde', CHAPTERS[chapterLatch.now].chords.map(c => c[0]).join(' – ')]]
+const lcHead    = () => [['Set', setWhere()], ['Fog knob', fogKnob()], ['Chords', CHAPTERS[chapterLatch.now].chords.map(c => c[0]).join(' – ')]]
 
 if (lcView) {
   const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 16 / Mode 1)
@@ -1095,8 +1095,8 @@ if (lcView) {
       '>' + b1Lines(name, ...choice(page, n)) + '</div>'
     if (row === 'b2') {
       const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
-      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')
-        : on ? 'gedrückt' : ''
+      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on')
+        : on ? 'held' : ''
       return '<div class="cell btn' + (on ? ' on' : '') + '"' + title + '><span>' + esc(name) + '</span><b>' + what + '</b></div>'
     }
     return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
@@ -1137,10 +1137,10 @@ if (lcView) {
     const root = doc.getElementById('lc')
     if (!root) return
     root.innerHTML = '<div class=head>' +
-      '<div><span class=k>Kapitel</span>' + pending(...lcChapter()) + '</div>' +
+      '<div><span class=k>Chapter</span>' + pending(...lcChapter()) + '</div>' +
       lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
-      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>' +
-      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
+      (code ? '' : '<div class=next>Names missing: editor not found</div>') +
       (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' + PAGE_ORDER.map(pageHtml).join('') + '</div>'
   }
   if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)

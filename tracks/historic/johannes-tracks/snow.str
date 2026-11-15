@@ -3,11 +3,11 @@ setcps(0.87) // gentle, floating tempo
 scale("B:minor")
 
 register('acidenv', (x, pat) => pat
-  .lpf(100)       // Basisfrequenz des Filters
-  .lpenv(x * 9)   // Filterhüllkurve (Envelope) basierend auf Eingabe x
-  .lps(0.2)       // Sustain (Haltezeit)
-  .lpd(0.12)      // Decay (Abklingzeit)
-  .lpq(2)         // Q-Faktor (Resonanz) für spitze Filterkurven
+  .lpf(100)       // Base frequency of the filter
+  .lpenv(x * 9)   // Filter envelope based on input x
+  .lps(0.2)       // Sustain (hold level)
+  .lpd(0.12)      // Decay (fade time)
+  .lpq(2)         // Q factor (resonance) for peaked filter curves
 )   
 
 // const LPF = slider(200, 8000, 1000, 50)

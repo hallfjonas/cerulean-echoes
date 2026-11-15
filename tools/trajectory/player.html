@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,8 +27,8 @@
 <!-- Plays a tapped track (make-tapped.mjs) right here and shows it: no strudel.cc needed. Every control the track
      reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
      last per number); a control not moved yet reads 0. Two homotopy controls:
-     "Hart ↔ Weich" sets the character of the visuals (render.mjs setCharacter).
-     "Roh ↔ Glatt" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
+     "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
+     "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
      Axes, labels, beat rings and the LC view's frame around the page moved last can be switched off. The track's status box (bottom right) hides while its LC view
      is open in another window. -->
@@ -37,15 +37,15 @@
   <select id="track"></select>
   <button id="play">Play</button>
   <button id="stop">Stop</button>
-  <label title="0 = hart, scharf, wild · 1 = weich, verschmiert, träge">Hart
-    <input id="character" type="range" min="0" max="1" step="0.01" value="0"> Weich <output id="characterValue">0.00</output></label>
-  <label title="0 = rohe Signale · 1 = gleitender Mittelwert über 2^53 Zeilen (max_int): eingefroren">Roh
-    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0.06"> Glatt <output id="smoothingValue">302 ms</output></label>
-  <label title="Taste A"><input id="axes" type="checkbox"> Achsen</label>
-  <label title="Taste L"><input id="labels" type="checkbox"> Beschriftung</label>
-  <label title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
-  <label title="Taste H: Rahmen um die zuletzt benutzte Controller-Seite in der LC-Ansicht"><input id="lcFrame" type="checkbox" checked> LC-Rahmen</label>
-  <span id="status">lädt Strudel …</span>
+  <label title="0 = hard, sharp, wild · 1 = soft, smeared, sluggish">Hard
+    <input id="character" type="range" min="0" max="1" step="0.01" value="0"> Soft <output id="characterValue">0.00</output></label>
+  <label title="0 = raw signals · 1 = moving average over 2^53 lines (max_int): frozen">Raw
+    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0.06"> Smooth <output id="smoothingValue">302 ms</output></label>
+  <label title="Key A"><input id="axes" type="checkbox"> Axes</label>
+  <label title="Key L"><input id="labels" type="checkbox"> Labels</label>
+  <label title="Key B: rings from the kick on every beat"><input id="rings" type="checkbox" checked> Beat rings</label>
+  <label title="Key H: frame around the controller page used last in the LC view"><input id="lcFrame" type="checkbox" checked> LC frame</label>
+  <span id="status">loading Strudel …</span>
 </header>
 <script type="module">
 import { initStrudel, evaluate, samples, hush, signal, reify, Pattern, Hap, TimeSpan } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
@@ -57,7 +57,7 @@ import { BANKS, SOUNDFONTS } from './banks.mjs'
 const $ = id => document.getElementById(id)
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
-let label = 'lädt Strudel …', visuals = '', midiInputs = 0
+let label = 'loading Strudel …', visuals = '', midiInputs = 0
 createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
 
 // Web MIDI per input, as in strudel.cc: each input keeps the last value of every CC (with the time it came) and the
@@ -122,23 +122,23 @@ const ready = initStrudel({
     import(SOUNDFONTS + 'fontloader.mjs').then(({ registerSoundfonts }) => registerSoundfonts()),
   ]),
 })
-ready.then(() => { label = 'bereit' })
+ready.then(() => { label = 'ready' })
 fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f.replace(/-tapped\.strudel$/, ''), f))))
 
 $('play').onclick = async () => {
   await Promise.all([ready, midiReady])
-  label = 'lädt Track …'
+  label = 'loading track …'
   const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
   // The track's LC view reads the control names from strudel.cc's editor text; here the track itself stands in
   globalThis.strudelMirror = { code }
   try {
     await evaluate(code)
-    label = 'spielt: ' + $('track').value.replace(/-tapped\.strudel$/, '')
+    label = 'playing: ' + $('track').value.replace(/-tapped\.strudel$/, '')
   } catch (error) {
-    label = 'Fehler: ' + error.message
+    label = 'Error: ' + error.message
   }
 }
-$('stop').onclick = () => { hush(); label = 'gestoppt' }
+$('stop').onclick = () => { hush(); label = 'stopped' }
 
 const slider = (id, apply, show = v => v.toFixed(2)) => {
   const update = () => { apply(Number($(id).value)); $(id + 'Value').textContent = show(Number($(id).value)) }
@@ -173,7 +173,7 @@ const applyLcFrame = () => {
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
-  $('status').textContent = `${label} · MIDI: ${midiInputs} Eingänge${visuals ? ' · ' + visuals : ''}`
+  $('status').textContent = `${label} · MIDI: ${midiInputs} inputs${visuals ? ' · ' + visuals : ''}`
   requestAnimationFrame(showStatus)
 }
 showStatus()

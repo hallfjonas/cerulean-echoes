@@ -83,7 +83,7 @@
 // @guide Playing together | The pad's button 1 changes the chords for both players: Jojo's sub and bassline move with it. Pad button 2 changes the chord colour (7, 9, fourths, fifths).
 // @guide Playing together | Break: one press takes out kick, rumble, sub, bassline and clap at the next bar; hats, percussion, ride and all of Jonas' sounds keep going. Turn Tension up during the break (its snare roll keeps playing), press again: everything is back on the one. Then let Tension go.
 // @guide Every position sounds good | No filter closes completely. Sequence, answer and FX keep a little room even at space 0.
-// @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
+// @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “as window” opens it as a small window that stays on top (Chrome/Edge).
 // @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 (chapter, break, tension) for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
 // @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
 // @guide Playing together | Both Launch Controls have the full layout and steer the same sounds: whoever moves a control last sets its value, a button press counts from either. Agree who plays which page.
@@ -254,10 +254,10 @@ const statusUi = !hasPage ? null : globalThis.technoStatus ??= (() => {
   const text = document.createElement('pre')
   text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
   const pop = document.createElement('button')
-  pop.textContent = '⧉ als Fenster'
+  pop.textContent = '⧉ as window'
   pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
   pop.onclick = async () => {
-    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    if (!window.documentPictureInPicture) { pop.textContent = 'Chrome/Edge only'; return }
     const pip = await documentPictureInPicture.requestWindow({ width: 380, height: 470 })
     pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
     pip.document.body.append(text)
@@ -364,7 +364,7 @@ const showStatus = () => {
     show(r, r.latch.now) + (r.latch.pending !== r.latch.now ? ' → ' + show(r, r.latch.pending) : '')
   const soon = l => l.pending !== l.now ? ' (next bar)' : ''
   statusUi.text.textContent = [
-    'Kapitel     F ' + MOODS[moodLatch.now].name +
+    'Chapter     F ' + MOODS[moodLatch.now].name +
       (moodLatch.pending !== moodLatch.now ? ' → ' + MOODS[moodLatch.pending].name : '') + soon(moodLatch),
     'Break       ' + (breakLatch.now ? 'Beat off' : 'Beat on') + (breakLatch.pending !== breakLatch.now ? ' → ' + (breakLatch.pending ? 'off' : 'on') : '') + soon(breakLatch),
     '', alone ? 'Mode 1 · Jojo' : 'Jojo', ...STATUS.jojo.map(line),
@@ -757,7 +757,7 @@ const stemJ8_ride = strip(dryBus(pick(rideVar, RIDES)
 // ============================================================
 // JONAS 1 PAD — pad and techno pad in one column (2026-11-12): 008's pad (two detuned saws + triangle, slow
 // attack) and the techno pad (three saws left / middle / right) together, as column 3 "Beide" of
-// lab/harmonie/techno-pads-1; no high-pass (feedback). Button 2 = chord colour (7, 9, fourths, fifths).
+// lab/harmony/techno-pads-1; no high-pass (feedback). Button 2 = chord colour (7, 9, fourths, fifths).
 // ============================================================
 // @ctl 2:1.k1 Brightness | dull ↔ bright.
 // @ctl 2:1.k2 Space | dry ↔ echo + room.
@@ -767,7 +767,7 @@ const stemJ8_ride = strip(dryBus(pick(rideVar, RIDES)
 // @ctl 2:1.b2 Colour | 7 → 9 → fourths → fifths, at the next bar.
 const padPump = pad.char
 // Colour (button 2): chord shapes in scale degrees above the root, so they follow the chapter
-const PAD_COLOURS = [['7', [0, 2, 4, 6]], ['9', [0, 2, 4, 6, 8]], ['Quarten', [0, 3, 6, 9]], ['Quinten', [0, 4, 8]]]
+const PAD_COLOURS = [['7', [0, 2, 4, 6]], ['9', [0, 2, 4, 6, 8]], ['Fourths', [0, 3, 6, 9]], ['Fifths', [0, 4, 8]]]
 const colourLatch = barLatch()
 cycleButton(pad.btn2, PAD_COLOURS.length, s => { colourLatch.pending = s; showStatus() })
 const padChord = pick(colourLatch, PAD_COLOURS.map(([, shape]) => chordOn(shape).scale(scaleIn(3))))
@@ -794,7 +794,7 @@ const stemN1_pad = strip(dryBus(stack(
 // ============================================================
 // JONAS 2 STRINGS — background strings that hold an open F minor (F4 C5 F5 A♭5) and move one voice now and then
 // ============================================================
-// From lab/streicher/techno-strings-1 (graded good: 1, 3, 4, 5, 8), timing "Langsam": a note every 2 bars, 6 bars
+// From lab/strings/techno-strings-1 (graded good: 1, 3, 4, 5, 8), timing "Slow": a note every 2 bars, 6 bars
 // at home, 2 moved (lines: one step every 2 bars). Sources in the lab file (Leittonwechsel, line clichés, Attack).
 // The strings stay on F; they do not follow the progression or the chapter (in "warm" the D♭ rubs against D).
 // @ctl 2:2.k1 Brightness | dull ↔ bright.
@@ -818,7 +818,7 @@ const strVar = change(strCol.btn, 'jonas', 'Strings', STR_MOVES.length, STR_MOVE
 // Plain strings (single quotes) parsed with mini(): every unit a new note ('!' repeats), 4 units = 8 bars
 const strVoice = steps => note(mini(steps.map(([m, u]) => m + (u > 1 ? '!' + u : '')).join(' '))).slow(8)
 const STR_NOTES = STR_MOVES.map(([, voices]) => stack(...voices.map(strVoice)))
-// JX-10 strings (lab/harmonie/harmonie-5): two saws ~4 cents apart + a layer 0.1 semitone up
+// JX-10 strings (lab/harmony/harmony-5): two saws ~4 cents apart + a layer 0.1 semitone up
 const strJx = p => stack(p.s('supersaw').unison(2).detune(0.08).spread(0.6).gain(0.5),
   p.add(note(0.1)).s('supersaw').unison(2).detune(0.05).spread(0.9).gain(0.3))
   .attack(0.35).decay(0.1).sustain(1).release(0.8).mul(gain(0.24))
@@ -1073,7 +1073,7 @@ const stateTaps = stack(...taps).filterValues(() => false)
 
 // What the LC view shows for this track: the chapter (now, next) on column 8 button 1, and extra lines at the top
 const lcChapter = () => ['F ' + MOODS[moodLatch.now].name, 'F ' + MOODS[moodLatch.pending].name]
-const lcHead    = () => [['Farbe', PAD_COLOURS[colourLatch.now][0]]]
+const lcHead    = () => [['Colour', PAD_COLOURS[colourLatch.now][0]]]
 // Where the music is (LC view): the beat in the bar and the bar in the big cycle. A silent event per beat moves it at
 // the moment the beat sounds (onTrigger, as in the set). chordAt(bar) = the chord of that bar ('' = none shown)
 const CYCLE   = 8   // the progression: 4 chords × 2 bars
@@ -1246,7 +1246,7 @@ if (lcView) {
       ['k1', 'k2', 'k3'].map(r => [(TAGS['g.' + r] ?? r).split(' | ')[0], used(GLOBAL_USED[r]) ?? 0]).filter(([, v]) => v > 0.01)
         .map(([k, v]) => '<div class=next><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
       '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
-      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      (code ? '' : '<div class=next>Names missing: editor not found</div>') +
       (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' +
       PAGE_ORDER.map(pageHtml).join('') + '</div>' + lkHtml()
     // Keys level bar as tall as the LC level faders (the LC grid sets their height)

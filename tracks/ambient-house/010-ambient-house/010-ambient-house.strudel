@@ -8,7 +8,7 @@
 // Jojo (foundation): kick, atmo pump, sub, rolling bass, clap / rim, hats, congas, shaker / ride.
 // Jonas (colour): pad, deep chords (e-piano), pluck arp, lead, marimba answer, glockenspiel, birds + the global column 8.
 // Chapter (global button 1): the chord progression for everybody, at the next phrase (4 bars):
-//   Dämmerung i–VI–III–VII → Sonnenaufgang VI–VII–i–i → Schweben i–iv → Wärme III–VI–iv–i. Everything follows its root.
+//   Dusk i–VI–III–VII → Sunrise VI–VII–i–i → Floating i–iv → Warmth III–VI–iv–i. Everything follows its root.
 // Drop: when the break ends, everything comes back on the one.
 // ============================================================
 // Every column: knob row 1 = brightness, row 2 = space, row 3 = character, fader = level,
@@ -57,7 +57,7 @@
 // @guide Playing together | Chapter changes the chords for both players at the next 4-bar phrase: sub, bass and every melody follow. Pad button 2 (freeze) holds the chord for everybody.
 // @guide Build-up and drop | Jonas turns Tension up (echo, open filters, snare roll), presses Break at the top: the beat goes out, pad and birds float. Jojo holds the noise riser, Jonas presses Break again: back on the one. Then let Tension go.
 // @guide Every position sounds good | No filter closes completely. Arp, lead, marimba and birds keep a little reverb even at Space 0.
-// @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).
+// @guide Status box | The status box at the bottom right of the Strudel page shows chapter, break and each stem's pattern. Its button “as window” opens it as a small window that stays on top (Chrome/Edge).
 // @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
 // @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
 // @guide Playing together | Both Launch Controls have the full layout and steer the same sounds: whoever moves a control last sets its value, a button press counts from either. Agree who plays which page.
@@ -207,10 +207,10 @@ const statusUi = !hasPage ? null : globalThis.houseStatus ??= (() => {
   const text = document.createElement('pre')
   text.style.cssText = 'margin:0;color:#eee;font:13px/1.5 monospace'
   const pop = document.createElement('button')
-  pop.textContent = '⧉ als Fenster'
+  pop.textContent = '⧉ as window'
   pop.style.cssText = 'margin-top:6px;font:12px sans-serif;cursor:pointer'
   pop.onclick = async () => {
-    if (!window.documentPictureInPicture) { pop.textContent = 'geht nur in Chrome/Edge'; return }
+    if (!window.documentPictureInPicture) { pop.textContent = 'Chrome/Edge only'; return }
     const pip = await documentPictureInPicture.requestWindow({ width: 380, height: 490 })
     pip.document.body.style.cssText = 'margin:0;padding:8px 12px;background:#111'
     pip.document.body.append(text)
@@ -1067,7 +1067,7 @@ if (lcView) {
       ['k1', 'k2', 'k3'].map(r => [(TAGS['g.' + r] ?? r).split(' | ')[0], used(GLOBAL_USED[r]) ?? 0]).filter(([, v]) => v > 0.01)
         .map(([k, v]) => '<div class=next><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
       '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
-      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      (code ? '' : '<div class=next>Names missing: editor not found</div>') +
       (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' +
       PAGE_ORDER.map(pageHtml).join('') + '</div>' + lkHtml()
     // Keys level bar as tall as the LC level faders (the LC grid sets their height)

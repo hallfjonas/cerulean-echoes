@@ -55,8 +55,8 @@ export function createStrudelSource({ onLine, onStatus = () => {}, url = '/strea
   }
 
   const stream = new EventSource(url)
-  stream.onopen = () => onStatus('verbunden, warte auf Strudel …')
-  stream.onerror = () => onStatus('keine Verbindung zum Server (node trajectory/server.mjs)')
+  stream.onopen = () => onStatus('connected, waiting for Strudel …')
+  stream.onerror = () => onStatus('no connection to the server (node trajectory/server.mjs)')
   stream.onmessage = ({ data }) => {
     batches++
     for (const event of JSON.parse(data)) setTimeout(() => hit(event), Math.max(0, event.delay * 1000 - 5))
@@ -74,7 +74,7 @@ export function createStrudelSource({ onLine, onStatus = () => {}, url = '/strea
     const cycle = clock.cycle + (t - clock.time) * clock.cps
     onLine({ t: round(t), pulse: { bpm: round(clock.cps * 60 * beatsPerCycle), phase: round(frac(cycle * beatsPerCycle)),
       density: round(clamp(new Set(onsets.map(o => o.slot)).size / 16)), swing: 0 } })
-    onStatus(`Strudel · ${stems.size} Stems · ${batches} Pakete`)
+    onStatus(`Strudel · ${stems.size} Stems · ${batches} batches`)
   }, 1000 / fps)
 
   return { close: () => { clearInterval(timer); stream.close() } }
