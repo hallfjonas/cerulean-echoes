@@ -2,7 +2,7 @@
 name: player-hub
 status: backlog
 created: 2026-11-15T18:58:29Z
-updated: 2026-11-15T18:58:29Z
+updated: 2026-11-15T20:30:00Z
 progress: 0%
 prd: .claude/prds/player-hub.md
 github: (will be set on sync)
@@ -52,14 +52,15 @@ from the UI, smooth transitions between tracks, auto-perform).
 ### Backend Services
 - `server.mjs`: `/` → `player.html`; `/catalogue`; `/run/<id>` (POST, SSE output), `/run` (DELETE); existing
   `/events`, `/stream`; drop `/tapped/` once the player uses `/catalogue`.
-- `catalogue.mjs`: scans `tracks/*/NNN-<name>.strudel` (one-file live tracks: has `// @mode 16 Mode 1`) and
-  `lab/*/*.strudel` (not `old/`, not `archive/`); taps on demand.
+- `catalogue.mjs`: scans `tracks/<genre>/NNN-<name>/NNN-<name>.strudel` (one-file live tracks: has
+  `// @mode 16 Mode 1`) and `lab/**/*.strudel` at any depth (not `old/`, not `archive/`); taps on demand.
 - `tools.mjs`: whitelist: check-sounds, measure (loudness), layouts + syx, stem-lab sync, stem-lab check,
   set build (`npm run set`).
 
 ### Infrastructure
 - `.claude/launch.json` unchanged (already starts `server.mjs` on 8766); README, `CLAUDE.md` updated.
-- Removed: `index.html`, `analyse.mjs`, `analyse-file.mjs` (only after confirming nothing else imports them).
+- Removed: `index.html`, `analyse.mjs`, `analyse-file.mjs` (nothing imports them; `render.mjs` and
+  `strudel-source.mjs` mention `analyse.mjs` in comments, update those).
 
 ## Implementation Strategy
 
@@ -71,9 +72,12 @@ from the UI, smooth transitions between tracks, auto-perform).
 4. Future-ideas evaluation can run any time (doc only).
 5. Docs last.
 
-Risks: lab boards may not all have a top-level master `stack(` that `makeTapped` needs (fallback: tap only boards it
-accepts, list the rest greyed); spawning tools from a page on a shared machine (mitigated: whitelist, one job);
-open epics `launchkey-knob-target` and `drop-buildup` change the LC view the player opens, coordinate merges.
+Risks: lab boards may not all have a top-level master `stack(` that `makeTapped` needs (today `lab/bass/synth` and
+the two tutorials; fallback: tap only boards it accepts, list the rest greyed); spawning tools from a page on a
+shared machine (mitigated: whitelist, one job);
+open epics `launchkey-knob-target` and `drop-buildup` change the LC view the player opens, coordinate merges;
+`english-repo` translates `player.html` text and renames paths the catalogue scans, run it before or after, not in
+parallel.
 
 ## Future Ideas: first take (input for task 007)
 
@@ -106,7 +110,7 @@ open epics `launchkey-knob-target` and `drop-buildup` change the LC view the pla
 - Internal: `make-tapped.mjs`, `render.mjs`, `smoothing.mjs`, `strudel-source.mjs`, the CLI tools listed in the PRD,
   the layout hook.
 - External: `@strudel/web@1.2.6` (unpkg), Web MIDI in Chrome.
-- Other epics: `launchkey-knob-target`, `drop-buildup` (LC / live view).
+- Other epics: `launchkey-knob-target`, `drop-buildup` (LC / live view), `english-repo` (paths, player text).
 
 ## Success Criteria (Technical)
 
@@ -114,7 +118,7 @@ open epics `launchkey-knob-target` and `drop-buildup` change the LC view the pla
 - `strudel-sim/compare.mjs` (or an in-browser event dump) shows identical events for 008 before and after task 1.
 - No `@strudel` / unpkg import outside `engine-strudel.mjs` in the page code.
 - Top bar ≤ 6 controls; settings persist across reload; all 7 old keys + S work.
-- `/catalogue` lists all 5 live tracks without a manual tap; deleting a tapped copy and reloading recreates it.
+- `/catalogue` lists all 4 live tracks without a manual tap; deleting a tapped copy and reloading recreates it.
 - Each whitelisted tool runs from `tools.html` with the same output as its CLI; a second run while busy gets 409;
   an unknown id gets 404.
 - At least one lab board plays with controllers in the player.

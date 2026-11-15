@@ -2,7 +2,7 @@
 name: english-repo
 status: backlog
 created: 2026-11-15T16:40:00Z
-updated: 2026-11-15T16:40:00Z
+updated: 2026-11-15T20:30:00Z
 progress: 0%
 prd: .claude/prds/english-repo.md
 github: (will be set on sync)
@@ -29,9 +29,10 @@ checks prove it.
 
 ## Technical Approach
 ### Frontend Components
-- Strudel tracks and boards: translate comments, `@ctl` texts, live-view labels (`▣ LC groß` → `▣ LC big`, status box),
-  German identifiers. Covers live tracks, frozen set sources (`sets/011-combining-all/sources/`), `lab/` boards and `lab/archive/`, `johannes-tracks/`,
-  `snippets/`, `midi-layouts/templates/`.
+- Strudel tracks and boards: translate comments and German identifiers. Live-track labels are already English
+  (`@ctl` texts, `▣ LC big`, status box); only a few German comment lines remain there. Covers live tracks, frozen
+  set sources (`sets/011-combining-all/sources/`), `lab/` boards and `lab/archive/`, `snippets/`,
+  `midi-layouts/templates/`.
 - `tools/trajectory/player.html`, `docs/casio-gp310-midi.html`: translate visible text.
 
 ### Backend Services
@@ -40,14 +41,14 @@ checks prove it.
 - `tools/set/make-set.mjs` and `set-frame.strudel`: update paths to frozen sources, rebuild set.
 
 ### Infrastructure
-- `CLAUDE.md`, `VISION.md`, `TECH-STACK.md`, `TODO.md`, `cl.md`, `.claude/skills/*`: remove German-chat rule, translate,
+- `CLAUDE.md`, `VISION.md`, `TECH-STACK.md`, `TODO.md`, `.claude/skills/*`: remove German-chat rule, translate,
   update paths.
 - Project memory (`~/.claude/projects/.../memory/`): remove any German-language rule.
 - New `tools/lang-scan.mjs` (or shell script): scans tracked text files for umlauts/ß, a German stop-word list and old
   path names, with a whitelist file; exits non-zero on hits.
 
 ## Implementation Strategy
-1. Precondition: pending reorganisation committed to `main`; branch `epic/english-repo`.
+1. Branch `epic/english-repo` from a clean `main`.
 2. Foundation (serial): glossary + scan script + all renames with reference fixes. Verify `npm run set` and a
    simulator run still pass after renames.
 3. Translation (parallel, disjoint folders): tracks, lab boards, tools, docs/meta/skills.
@@ -57,28 +58,31 @@ checks prove it.
 1. **Glossary, scan script, rename German paths** — `git mv` all German paths, fix every reference, write
    `docs/glossary.md` and the scan script. Serial, blocks all others.
 2. **Translate rules, docs and skills** — `CLAUDE.md` (drop German-chat rule), `VISION.md`, `TECH-STACK.md`, `TODO.md`,
-   `cl.md`, `docs/`, `midi-layouts/`, `.claude/skills/`, project memory. Parallel.
-3. **Translate live tracks** — `tracks/**` current files (007, 008, 009, 009-riffs, 010, learnings), their notes and
-   feedback; prove each live track with `/strudel-optimize`. Parallel.
+   `docs/`, `midi-layouts/`, `.claude/skills/`, project memory. Parallel.
+3. **Translate live tracks** — `tracks/**` current files (007, 008, 009, 010, `historic/`), their notes and
+   feedback; prove each live track with `/strudel-optimize`. Small for the `.strudel` files (labels already
+   English), larger for German `feedback.md` notes. Parallel.
 4. **Translate set 011 sources** — `sets/011-combining-all/sources/` and `tools/set/set-frame.strudel`; rerun
-   `npm run set`. Parallel with 3 (disjoint files), conflicts only on set rebuild → run set last. (`old/` folders
-   were removed on 2026-11-15; history stays in git.)
-5. **Translate lab boards** — `lab/**` incl. `lab/archive/`, `lab/tutorials/*.typ` handbooks, board feedback, layout
+   `npm run set`. Parallel with 3 (disjoint files), conflicts only on set rebuild → run set last.
+5. **Translate lab boards** — `lab/**` incl. `lab/archive/` (delete the tracked `lab/*/old/` folders first, per the
+   no-`old/` rule; ask before deleting), `lab/tutorials/*.typ` handbooks, board feedback, layout
    `.typ` sheets. Parallel.
-6. **Translate tools, snippets, samples notes, johannes-tracks** — `tools/**` (non-generated), `snippets/`,
-   `samples/**/README.md`, `johannes-tracks/`. Parallel.
+6. **Translate tools, snippets, samples notes** — `tools/**` (non-generated, incl. `tools/trajectory/player.html`),
+   `snippets/`, `samples/**/README.md`. Parallel.
 7. **Regenerate and verify** — rebuild layout PDFs/`.syx`, single files, tutorial and skills PDFs, set; run
    `check-set.mjs`, `check-sounds.mjs`, `/strudel-optimize` on live tracks, scan = 0. Depends on 2–6.
 
 ## Dependencies
-- Clean `main` (current uncommitted reorganisation committed).
+- Clean `main`.
+- Other epics: `drop-buildup`, `launchkey-knob-target`, `player-hub` edit the same tracks, tools and paths. Run this
+  epic alone, before or after them, never in parallel.
 - Typst, Node tools installed (`npm install` in `tools/`).
 - Task 1 blocks 2–6; 2–6 block 7.
 
 ## Success Criteria (Technical)
 - Scan script exits 0 over all tracked text files (whitelist only for external names).
 - No German path segment in `git ls-files`.
-- `/strudel-optimize` equivalent for 007, 008, 009, 009-riffs, 010 (before vs after).
+- `/strudel-optimize` equivalent for 007, 008, 009, 010 (before vs after).
 - `npm run set` builds, `check-set.mjs` passes; `check-sounds.mjs` adds no broken sound.
 - All derived files regenerated from translated sources; no German in `.syx` control names.
 - No instruction to use German in `CLAUDE.md`, skills or memory.

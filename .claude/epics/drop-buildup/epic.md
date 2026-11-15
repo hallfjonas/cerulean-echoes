@@ -2,7 +2,7 @@
 name: drop-buildup
 status: backlog
 created: 2026-11-15T16:35:35Z
-updated: 2026-11-15T16:35:35Z
+updated: 2026-11-15T20:30:00Z
 progress: 0%
 prd: (none, written directly from the user's notes)
 github: (will be set on sync)
@@ -72,7 +72,8 @@ drop lands after it. The live view must show this countdown.
   second-press bar + buildBars (Variant 2), expose patterns `breakOn`, `buildPhase` (0 → 1 across the build-up) and
   `dropHit` (true on the first bar after the drop).
 - Build-up layers: swell (noise or pad through an opening filter, gain ramp on `buildPhase`), snare roll (reuse
-  Tension's roll, driven by `buildPhase`), crash on `dropHit`.
+  Tension's roll, driven by `buildPhase`), crash on `dropHit`. 007 has no `tensionRoll`: its roll layer is new
+  (a soft roll that fits the ambient track) or 007 gets swell + crash only.
 
 ### Front-ends
 - Variant 1: `cycleButton`-style press counter → recipe index; each press schedules a self-ending break.
@@ -115,7 +116,7 @@ judge.
 ## Dependencies
 
 - `barLatch`, `cycleButton`, `gate`, `stateTaps` helpers already in each one-file track.
-- Tension knob's snare roll (`tensionRoll`) in 008/009/010 as the base for the roll layer.
+- Tension knob's snare roll (`tensionRoll`) in 008/009/010 as the base for the roll layer; 007 has none.
 - Crash / noise samples that load on strudel.cc (`samples/sounds.json`), e.g. `rolandtr909_cr` already used in 008.
 - `tools/strudel-sim` (`/strudel-optimize`, `check-sounds.mjs`) for verification.
 - Layout hook (`lcxl-layout`) to regenerate PDFs and `.syx` after `@ctl` changes.
@@ -145,3 +146,8 @@ judge.
 - Lab round and decision: 1 session with both players.
 - Port to 008: 1 session; 009/010/007: 1 session each, parallelisable.
 - Total: about 6-8 sessions.
+
+## Order with other epics
+
+- `english-repo` renames `lab/` folders and touches every track: do not run in parallel; finish one first.
+- `launchkey-knob-target` and `player-hub` also change the live tracks / LC view: merge one at a time.

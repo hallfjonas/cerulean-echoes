@@ -55,7 +55,7 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
 3. Cost per scheduler tick in the Node harness (`strudel-sim/harness.mjs`), aim ≲ 8 ms; gate silent columns/layers.
 4. New samples: fetch/decode in headless Chrome, read levels (VCSL is not normalized), do not renormalize on my own.
 5. Layout sheet: the hook writes `<board>-layout.pdf` after each edit; look at the PNG, no text overflow.
-6. Live view: when in doubt give the board the big "▣ LC groß" window like the tracks (copy from harmonie-5).
+6. Live view: when in doubt give the board the big "▣ LC big" window like the tracks (copy from harmonie-5).
 7. Log the build in `feedback.md` (date, columns, sources, "not heard", open questions).
 
 ## Don'ts

@@ -21,7 +21,7 @@ Goal: only audible events get computed. The sound and every MIDI control must st
      (gain vs postgain, which filters it has); different control order is fine because each control writes its own key.
    - Crossfades: `fadeMain` > 0 iff knob < 1, `fadeExtra` > 0 iff knob > 0, `ramp(d, from, to)` > 0 iff d > from.
    - Only gate where the gain is exactly 0. Anything else (e.g. lpf 0 Hz) is "practically silent": list it.
-4. Stateful closures (`cycleButton`, `coupled`, `lastMoved`): create once per control outside gated code and add them
+4. Stateful closures (`cycleButton`, `lastMoved`): create once per control outside gated code and add them
    to a `stateTaps` stack in the master: `stack(...).filterValues(() => false)`.
 5. Safety net at the end of the master: `.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)`.
 

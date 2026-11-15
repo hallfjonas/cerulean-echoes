@@ -2,7 +2,7 @@
 name: workflow-review
 status: backlog
 created: 2026-11-15T16:46:39Z
-updated: 2026-11-15T16:46:39Z
+updated: 2026-11-15T20:30:00Z
 progress: 0%
 prd: .claude/prds/workflow-review.md
 github: (will be set on sync)
@@ -11,7 +11,7 @@ github: (will be set on sync)
 # Epic: workflow-review
 
 ## Overview
-Script-extract signals from the 27 cerulean-echoes sessions since 2026-11-10, have subagents read the condensed
+Script-extract signals from all cerulean-echoes sessions since 2026-11-10, have subagents read the condensed
 digests in batches, cluster recurring friction into themes, propose skill/agent/hook/rule changes in a ranked report,
 let the user pick, then build and try the picked ones.
 
@@ -50,7 +50,7 @@ let the user pick, then build and try the picked ones.
 Order with `english-repo`: build step after that epic's task 2, or write in English and rebase.
 
 ## Task Breakdown Preview
-1. **Session digest script** — `digest.mjs`, git-ignored output, run over all 27 sessions + subagents. Serial.
+1. **Session digest script** — `digest.mjs`, git-ignored output, run over all sessions + subagents. Serial.
 2. **Inventory current tooling** — summarise the 5 skills, hook, `CLAUDE.md` rules, memory: what each covers, when
    last used in sessions. Parallel with 1.
 3. **Batch analysis A/B (Nov 10–12)** and **4. Batch analysis C/D (Nov 13–15)** — subagents read digests, write
@@ -68,7 +68,7 @@ Order with `english-repo`: build step after that epic's task 2, or write in Engl
 - Epic `english-repo` (task 2) for ordering of skill/`CLAUDE.md` edits.
 
 ## Success Criteria (Technical)
-- Digest script processes 27/27 sessions and all subagent files without error; output git-ignored.
+- Digest script processes every session and subagent file without error; output git-ignored.
 - Report: ≥5 themes, each with frequency and ≥2 cited sessions; every proposal has type, benefit, effort.
 - Each approved item shipped, tried once, outcome recorded; rejected items listed with reason.
 - No new skill overlaps an existing one without stating why.

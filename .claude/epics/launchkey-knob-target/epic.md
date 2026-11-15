@@ -2,7 +2,7 @@
 name: launchkey-knob-target
 status: backlog
 created: 2026-11-15T16:46:30Z
-updated: 2026-11-15T16:46:30Z
+updated: 2026-11-15T20:30:00Z
 progress: 0%
 prd: .claude/prds/launchkey-knob-target.md
 github: (will be set on sync)
@@ -23,9 +23,10 @@ Two improvements for the Launchkey MK4 25 in the one-file live tracks (007, 008,
 
 - **Measure first.** Which Launchkey button sends a CC on the MIDI port in the factory setting, and whether the
   encoders send absolute (0-127) or relative values, is unknown. Today's code reads them as absolute
-  (`lkCc(31..38)` as 0..1, `lkSticky` treats an untouched knob as 0). Task 1 measures with `snippets/midi-test.strudel`
+  (`lkCc(31..38)` as 0..1; 008/009/010 hold a start value per knob with `lkSticky` until it moves, 007 reads
+  `lkKnob` directly without `lkSticky`). Task 1 measures with `snippets/midi-test.strudel`
   and writes the result into `midi-layouts/geraete.md`. The takeover design follows from it:
-  - relative → one accumulator per knob and target (as `coupled` for the LC's column 8); no jumps by design.
+  - relative → one accumulator per knob and target; no jumps by design.
   - absolute → pickup per knob and target: the stored value holds until the knob passes it.
 - **One routing helper.** `lkKnob(n)` stays the single access point. It becomes `lkKnob(target, n)` (or two
   helpers `lkKeyKnob` / `lkPadKnob`) built on one shared `lkTarget` state; every existing `lkKnob(n)` call becomes
@@ -60,7 +61,8 @@ Two improvements for the Launchkey MK4 25 in the one-file live tracks (007, 008,
 ## Implementation Strategy
 
 Build and prove in 009-house, then port the same code block to 007, 008, 010 (their Launchkey blocks are the same
-structure; 007's knob jobs differ). Keyboard drawing is independent of the knob work and can run in parallel.
+structure; 007's knob jobs differ and it has no `lkSticky`, so its start values need checking in the port).
+Keyboard drawing is independent of the knob work and can run in parallel.
 
 ## Task Breakdown Preview
 
@@ -79,6 +81,8 @@ code) — run 3 and 4 one after another or merge carefully.
 
 - Physical access to the Launchkey for task 1 (the player measures, Claude reads the console).
 - Lab round for the Pads knob jobs (separate, after this epic).
+- Other epics: `drop-buildup` and `player-hub` also change the LC view; `english-repo` renames
+  `midi-layouts/geraete.md` and touches every track. Merge one at a time.
 
 ## Success Criteria (Technical)
 

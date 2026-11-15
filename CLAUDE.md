@@ -36,7 +36,7 @@ No pattern strings (x..x) in the live view. Chat with the user stays German.
 
 ## Live tracks (007, 008, 009, 010): one file each
 The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-ambient`, `008-groove-techno`,
-`009-house`, `009-house-riffs`, `010-ambient-house`), every controller optional. Edit these files.
+`009-house`, `010-ambient-house`), every controller optional. Edit these files.
 - Rows and columns after `midi-layouts/templates/dual-lc.strudel`: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour
   on columns 1-7, column 8 global. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0
   must already sound good.
@@ -46,7 +46,7 @@ The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-am
   tools) one plain `midin()` stands in, so `/strudel-optimize` and `tools/strudel-sim` still work.
 - Launchkey MK4 25 (optional, its own stem `stemLK`): keys = a pad, drum pads (channel 10) = 16 one-shots, mod wheel
   CC 1 = keys level × master, knobs CC 31-38 = sound (same meaning in every track; the sounds fit each track).
-- The LC view (`▣ LC groß`) shows Mode 1 and Mode 2 side by side, the page moved last framed, and the Launchkey row. `midikeys` has no note-off (fixed note length) and its queue is
+- The LC view (`▣ LC big`) shows Mode 1 and Mode 2 side by side, the page moved last framed, and the Launchkey row. `midikeys` has no note-off (fixed note length) and its queue is
   emptied by the scheduler's first query: read it through `shareQuery` when more than one layer uses it.
 - The old dual/multi and generated single versions are in git history. `-dual`/`-single` files and
   `tools/lcxl-layout/make-single.mjs` (run by the hook after every edit of a dual file or the template; never edit a
@@ -64,7 +64,7 @@ The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-am
 ## Controller mapping (LC XL 3)
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.
 - Mode 2 = same layout, every CC + 48 (melodies). Column 8 is global in both modes:
-  fader via `lastMoved` (last moved wins), knobs via `coupled` (endless encoders, relative deltas).
+  fader and knobs read from both modes' CCs via `lastMoved` (last moved wins).
 - In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/historic/006/006-arp.strudel`).
 
 ## Writing efficient Strudel (CPU)
@@ -72,7 +72,7 @@ Strudel computes every event of every layer even when it is silent; dense tracks
 - Gate silent parts so they are not queried at all: `gate(cond, pat) = cond.fmap(on => on ? pat : silence).innerJoin()`.
   Gate stems on fader/global level > 0 (`strip()`), crossfade layers where `fadeMain`/`fadeExtra` reach 0,
   overtone layers on mode and density. Only gate where the gain is exactly 0, so the sound stays identical.
-- Stateful closures (`cycleButton`, `coupled`, `lastMoved`): create each once per control, never inside a gated
+- Stateful closures (`cycleButton`, `lastMoved`): create each once per control, never inside a gated
   pattern only; query them every tick via a `stateTaps` stack in the master (`.filterValues(() => false)`),
   otherwise button presses are lost while the stem is gated.
 - Keep the safety net at the end of the master: `.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)`.
