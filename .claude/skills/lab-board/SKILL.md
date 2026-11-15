@@ -1,6 +1,6 @@
 ---
 name: lab-board
-description: Create or run a new round of a lab board (lab/<instrument or role>/<name>-N.strudel) - candidate columns on the stem-lab engine, layout sheet, feedback.md, old/ rotation. Use when the user wants candidates for an instrument or track role ("build a board for X", "next round", "new lab for 008 chords").
+description: Create or run a new round of a lab board (lab/<instrument or role>/<name>-N.strudel) - candidate columns on the stem-lab engine, layout sheet, feedback.md, round rotation. Use when the user wants candidates for an instrument or track role ("build a board for X", "next round", "new lab for 008 chords").
 ---
 
 # Lab board: candidate columns, played on the LC XL 3
@@ -11,7 +11,7 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
 `<name>-N.strudel` without a redundant "-lab".
 
 ## Before building (order matters)
-1. Read the folder's `feedback.md` and, for house, the "✗ Verworfen" list in `tracks/009-house/stems-ideen.md`.
+1. Read the folder's `feedback.md` and, for house, the "✗ Verworfen" list in `tracks/house/009-house/stems-ideen.md`.
    Nothing rejected comes back. After new feedback, update the reject list FIRST.
 2. Find out which track/column the board serves and read that track's `feedback.md`.
 3. **Research before sound ideas**: how producers make this sound (Attack Magazine, MusicRadar, Sound on Sound,
@@ -40,7 +40,8 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
 - Labels (control names, `@ctl`, option names, the live view, the status box): English and short, as in CLAUDE.md "Labels".
 
 ## Rounds
-- Current round in the folder, older rounds in `old/` (move the .strudel and its layout pdf), the result of each round
+- Current round in the folder, older rounds deleted once committed (no `old/`, git history keeps them; delete the
+  .strudel and its layout pdf), the result of each round
   in the folder's `feedback.md`, rejected whole series in `lab/archive/`.
 - Per round: keep only columns graded good (≈2 or better), replace the rest with NEW proposals instead of tweaking
   weak ones; offer clearly more options/complexity per round. An explicit "remove X" applies to every board that has X

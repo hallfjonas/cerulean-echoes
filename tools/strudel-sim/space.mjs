@@ -1,5 +1,5 @@
 // Space meter: where each stem sits (low ↔ high, left ↔ right, near ↔ far) and the KPIs of the space plan
-// (tracks/008-groove-techno/008-space-plan.html).
+// (tracks/techno/008-groove-techno/008-space-plan.html).
 // usage: node space.mjs <track.strudel> stem=faderCC ... [--bass stem] [--kick stem] [--front a,b] [--back c,d]
 //          [--base '<json cc values>'] [--defaults] [--keys '<notes>'] [--out results.json] [--no-wet] [--no-mix]
 //   faderCC may be lk<cc> for a Launchkey control (e.g. stemLK=lk1, the mod wheel). --defaults adds the track's

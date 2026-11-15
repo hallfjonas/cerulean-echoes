@@ -8,9 +8,9 @@ description: Make a dense Strudel track cheaper to compute without changing its 
 Goal: only audible events get computed. The sound and every MIDI control must stay identical.
 
 ## Steps
-1. Write the result into a **new file** (`tracks/NNN/NNN-lean.strudel`); never touch the original.
+1. Write the result into a **new file** (`tracks/<genre>/NNN-<name>/NNN-lean.strudel`); never touch the original.
 2. Mapping as data: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` instead of scattered `cc(n)`.
-3. Gate what is silent, using the helpers from `tracks/006/old/006-lean.strudel`:
+3. Gate what is silent, using the helpers from `tracks/historic/006/006-lean-mix.strudel`:
    ```js
    const gate  = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
    const above = (sig, x) => sig.fmap(v => v > x)
@@ -28,7 +28,7 @@ Goal: only audible events get computed. The sound and every MIDI control must st
 ## Verify (required)
 ```sh
 cd tools && npm install            # once
-node strudel-sim/compare.mjs ../tracks/NNN/NNN.strudel ../tracks/NNN/NNN-lean.strudel [--ignore-cutoff0]
+node strudel-sim/compare.mjs ../tracks/NNN/NNN.strudel ../tracks/<genre>/NNN-<name>/NNN-lean.strudel [--ignore-cutoff0]
 ```
 Runs fixed positions (all 0 / 0.5 / 1, random snapshots) and two "rides" (all controls moving, buttons tapped)
 and prints events per cycle, query time per cycle, and `identical: true|false` for the audible events.

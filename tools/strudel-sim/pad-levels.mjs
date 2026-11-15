@@ -47,7 +47,8 @@ await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main
 await sd.samples({ brace: 'voice/brace.m4a', lw: 'voice/letzte_wiese.m4a',
   paper: 'voice/Piece%20of%20Paper.mp3', wine: 'voice/Plaenterwald%20Wine%20and%20cheese.mp3',
   evening: 'voice/The%20Evening%20progresses.mp3', creatures: 'voice/The%20creatures%20have%20begun%20illumination.mp3',
-  noend: 'voice/The%20evening%20does%20not%20end.mp3', vast: 'voice/in%20the%20vast.mp3' }, OWN)
+  noend: 'voice/The%20evening%20does%20not%20end.mp3', vast: 'voice/in%20the%20vast.mp3',
+  plaenterwald: 'voice/plaenterwald.mp3' }, OWN)
 for (const [k, j] of jobs.entries()) if (!/^gm_/.test(j.shot.s))
   await sd.superdough({ ...j.shot, room: 0, delay: 0, orbit: 1 }, k * SEC + 0.05, Number(process.env.DUR ?? 0.5), 1, 0).catch(e => { j.err = e.message })
 const buf = await ctx.startRendering()
