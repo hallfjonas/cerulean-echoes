@@ -1,159 +1,158 @@
-# Trajectory — Musik-Architektur sichtbar machen
+# Trajectory — making music architecture visible
 
-Stand: 2026-11-12 · Phase 1, Prototyp · nichts davon ist committet
+As of: 2026-11-12 · phase 1, prototype · none of this is committed
 
-Die Idee steht in [VISION.md](../../VISION.md) (Abschnitt MUSIC-ARCHITECTUR): Jede Stimme eines Tracks hat zu jedem
-Zeitpunkt einen Ort im Raum – links/rechts (Pan), tief/hoch (Frequenz) – und einen Platz im zeitlichen Dialog (Tempo,
-Rhythmus, Groove). Diese Bahn (Trajektorie) wird gemessen, als Datei gespeichert und live animiert. Phase 2 (später):
-Emotionen über Publikumsfeedback.
+The idea is in [VISION.md](../../VISION.md) (section MUSIC ARCHITECTURE): every voice of a track has, at every
+moment, a place in space – left/right (pan), low/high (frequency) – and a place in the dialogue over time (tempo,
+rhythm, groove). This path (trajectory) is measured, saved as a file and animated live. Phase 2 (later):
+emotions through audience feedback.
 
-Pitch-Deck (12 Folien, Bewertung + Plan): https://claude.ai/artifact/5gM7MWgHqHCLvk3BveX9AZ
+Pitch deck (12 slides, assessment + plan): https://claude.ai/artifact/5gM7MWgHqHCLvk3BveX9AZ
 
-## Start: der Player
+## Start: the player
 
 ```bash
 cd tools && node trajectory/server.mjs
 ```
 
-Dann in Chrome **http://localhost:8766/player.html** öffnen (nicht `http://localhost:8766`).
+Then open **http://localhost:8766/player.html** in Chrome (not `http://localhost:8766`).
 
-Der Player spielt einen Track direkt auf localhost (kein strudel.cc nötig) und zeigt die Visualisierung gleich
-dahinter: jeder Stem mit Namen, Tempo aus Strudels Uhr.
+The player plays a track right on localhost (no strudel.cc needed) and shows the visuals right behind it:
+every stem with its name, tempo from Strudel's clock.
 
-1. Track tappen (einmal pro Track; danach baut der Layout-Hook bzw. `npm run watch` die Kopie nach jeder Änderung
-   am Track neu; landet in `trajectory/tapped/` und in der
-   Zwischenablage):
+1. Tap the track (once per track; after that the layout hook or `npm run watch` rebuilds the copy after every change
+   to the track; it lands in `trajectory/tapped/` and on the clipboard):
 
    ```bash
    cd tools && node trajectory/make-tapped.mjs ../tracks/techno/008-groove-techno/008-groove-techno.strudel
    ```
 
-2. Im Player oben den Track wählen (alle getappten Tracks stehen in der Liste), **Play**.
-3. Controller spielen. Gespielt wird nur von Menschen: jeder Regler, den der Track über `midin()` liest, kommt von
-   den angeschlossenen Controllern (Web MIDI, jeder Port für sich wie in strudel.cc); ein noch nicht bewegter Regler
-   steht auf 0 (oder auf dem Startwert, den der Track ihm gibt). Der Launchkey spielt mit: Tasten und Drum-Pads
-   (`midikeys`), Mod-Rad und Knöpfe. Ohne Controller bleibt es still: zuerst den Master-Fader (Spalte 8) hoch.
+2. Choose the track at the top of the player (all tapped tracks are in the list), **Play**.
+3. Play the controllers. Only humans play: every control the track reads through `midin()` comes from the
+   connected controllers (Web MIDI, each port on its own as in strudel.cc); a control not moved yet reads 0 (or the
+   start value the track gives it). The Launchkey plays along: keys and drum pads (`midikeys`), mod wheel and knobs.
+   Without controllers it stays silent: first raise the master fader (column 8).
 
-Die Statusbox des Tracks (unten rechts) verschwindet, solange seine LC-Ansicht („▣ LC groß“) in einem anderen Fenster
-offen ist.
+The track's status box (bottom right) hides while its LC view ("▣ LC big") is open in another window.
 
-**Regler in der Leiste** (Startwerte: Hart, Glatt 302 ms):
+**Sliders in the bar** (start values: Hard, Smooth 302 ms):
 
-- **Hart ↔ Weich** (0…1): Charakter der Visuals. 0 = Sägezahn-Kämme, eckige Linien, jede vergangene Zeitscheibe
-  mit Kante, sofortige Reaktion, Kamera vom Beat gestoßen; 1 = runde Wellen, dicke weiche Kämme, Bewegungsschmiere,
-  träges Folgen, gleitende Kamera.
-- **Roh ↔ Glatt** (0…1): gleitender Mittelwert (exponentiell gewichtet) über N = 2^(53·Regler) Zeilen auf alle
-  Signale, die das Bild sieht: 0 = roh, 0.06 ≈ 302 ms, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 Tage, 1 = 2^53
-  (max_int), eingefroren. Nur fürs Bild; der Ton bleibt roh.
+- **Hard ↔ Soft** (0…1): character of the visuals. 0 = sawtooth crests, angular lines, every past time slice with
+  an edge, instant response, camera pushed by the beat; 1 = round waves, thick soft crests, motion smear, sluggish
+  following, gliding camera.
+- **Raw ↔ Smooth** (0…1): moving average (exponentially weighted) over N = 2^(53·slider) lines on all signals the
+  visuals see: 0 = raw, 0.06 ≈ 302 ms, 0.1 ≈ 1.3 s, 0.3 ≈ 34 min, 0.5 ≈ 37 days, 1 = 2^53 (max_int), frozen. Visuals
+  only; the sound stays raw.
 
-**Schalter und Tasten** (Startwerte: Achsen und Beschriftung aus, Beat-Ringe und LC-Rahmen an): **A** Achsen ·
-**L** Beschriftung (Stem-Namen, Achsenwörter) · **B** Beat-Ringe (die Kreise von der Kick) · **H** LC-Rahmen (der
-Rahmen um die zuletzt benutzte Controller-Seite in der LC-Ansicht) – alle vier auch als Häkchen in der Leiste.
-**F** Vollbild · **V** Look (deck / ocean / clean) · **W** Pan-Weite an/aus. Die Leiste oben blendet sich nach 3 s
-ohne Maus aus.
+**Switches and keys** (start values: axes and labels off, beat rings and LC frame on): **A** axes ·
+**L** labels (stem names, axis words) · **B** beat rings (the circles from the kick) · **H** LC frame (the frame
+around the controller page used last in the LC view) – all four also as checkboxes in the bar.
+**F** fullscreen · **V** look (deck / ocean / clean) · **W** pan width on/off. The bar at the top hides after 3 s
+without the mouse.
 
-Alte Dual-Versionen über ihre Single-Version tappen (z. B. `tracks/sets/011-combining-all/011-set-single.strudel`).
+Tap old dual versions through their single version (e.g. `tracks/sets/011-combining-all/011-set-single.strudel`).
 
-## Fortschritt
+## Progress
 
-| Tag | Inhalt | Status |
+| Day | Content | Status |
 |---|---|---|
-| 1 · Ton rein | Web-Audio-Analyse → JSONL | fertig; BPM exakt (Synth 126.0, 008: 139.9 bei 140) |
-| 2 · Bild raus | Renderer, Vollbild, Mono-Fix, Pegelanzeige | fertig, von Jonas mit 10/10 bewertet |
-| 3 · Strudel | getappter Track → Server → exakte Stems | fertig; 008 (11–16 Stems, 140.0 BPM), 009 House (15 Stems, 124.0 BPM) |
-| Nachbesserung | Kanal 3/4, Look „ocean“ (Flüssigkeit, 4D, weich) | gebaut, Hardware-Test steht aus |
-| Deck-Look | Standard-Look wie Folie 6 des Pitch-Decks (Kometen, Ringe, Achsen); ocean/clean über V | gebaut, mit simulierten Stems geprüft |
-| 4 · Festhalten | Wiedergabe, Video-Export, Demucs | zurückgestellt |
-| 5 · Probe | Beamer, Feinschliff, KPI-Anzeige | offen |
+| 1 · Sound in | Web Audio analysis → JSONL | done; BPM exact (synth 126.0, 008: 139.9 at 140) |
+| 2 · Picture out | renderer, fullscreen, mono fix, level meter | done, rated 10/10 by Jonas |
+| 3 · Strudel | tapped track → server → exact stems | done; 008 (11–16 stems, 140.0 BPM), 009 house (15 stems, 124.0 BPM) |
+| Follow-up | channel 3/4, look "ocean" (liquid, 4D, soft) | built, hardware test pending |
+| Deck look | default look like slide 6 of the pitch deck (comets, rings, axes); ocean/clean via V | built, checked with simulated stems |
+| 4 · Capture | playback, video export, Demucs | postponed |
+| 5 · Rehearsal | projector, polish, KPI display | open |
 
-## Wie es gebaut ist
+## How it is built
 
 ```
- Audio (Datei / Eingang) ──analyse.mjs──┐
-                                        ├─► Trajektorie (Zeilen) ─► render.mjs ─► Canvas
- strudel.cc / player.html ──server.mjs──┘   strudel-source.mjs                   └► Aufnahme (JSONL)
-        (getappter Track, make-tapped.mjs)
+ Audio (file / input) ──analyse.mjs──┐
+                                     ├─► trajectory (lines) ─► render.mjs ─► canvas
+ strudel.cc / player.html ──server.mjs──┘   strudel-source.mjs              └► recording (JSONL)
+        (tapped track, make-tapped.mjs)
 ```
 
-Beide Eingänge schreiben **dasselbe Format**, der Renderer weiß nicht, woher die Musik kommt:
+Both inputs write **the same format**; the renderer does not know where the music comes from:
 
 ```
 {"t":12.533,"stem":"bass","x":-0.12,"y":0.31,"z":0.20,"e":0.72,"on":1}
 {"t":12.533,"pulse":{"bpm":140,"phase":0.25,"density":0.6,"swing":0.04}}
 ```
 
-`x` Pan −1…1 · `y` Tonhöhe log 20 Hz–20 kHz → 0…1 · `z` Tiefe (Audio: L/R-Dekorrelation; Strudel: `room`) ·
-`e` Energie 0…1 · `on` Anschlag · `pulse` Tempo, Taktphase, Dichte (Anteil belegter 16tel im letzten Takt), Swing.
+`x` pan −1…1 · `y` pitch log 20 Hz–20 kHz → 0…1 · `z` depth (audio: L/R decorrelation; Strudel: `room`) ·
+`e` energy 0…1 · `on` onset · `pulse` tempo, bar phase, density (share of filled 16ths in the last bar), swing.
 
-| Datei | Aufgabe |
+| File | Job |
 |---|---|
-| `analyse.mjs` | Kern der Audio-Analyse (Browser + Node): FFT 2048 für Pegel/Pan/Onsets, 8192 für die Tonhöhe von Kick und Bass, Tempo per Autokorrelation |
-| `analyse-file.mjs` | CLI: Datei → JSONL + Zusammenfassung (Drift = Bewegung innerhalb von 8 Takten) |
-| `render.mjs` | Bild. „deck“ (Standard, wie Folie 6 des Decks): leuchtende Kometen mit Schweifen, Ringe von der Kick, Achsen. „ocean“: Stems als Flüssigkeitsschichten, Zeit in die Tiefe, schwebende Kamera. „clean“: Kometen, Ringe |
-| `smoothing.mjs` | Regler Roh ↔ Glatt: gleitender Mittelwert, Fenster wächst exponentiell bis 2^53 Zeilen |
-| `strudel-source.mjs` | Strudel-Events → Zeilen, jedes Event erscheint, wenn es klingt (`delay`) |
-| `make-tapped.mjs` | Kopie eines Tracks: jeder Stem bekommt seinen lesbaren Namen aus dem Track (`@col`-Spaltenname, Spalte 8 von Jojo: Name ihres Pattern-Knopfs, `stemLK` = Launchkey) als `.tag()`, Master sendet per `.onTrigger` (Klang unverändert) |
-| `server.mjs` | statische Dateien + Relay POST `/events` → SSE `/stream`; CORS- und Private-Network-Header für strudel.cc |
-| `player.html` | spielt einen getappten Track mit `@strudel/web` direkt auf localhost und zeigt ihn; Controller per Web MIDI (`midin` pro Port, `midikeys` für Launchkey-Tasten und -Pads), Regler Hart ↔ Weich, Roh ↔ Glatt; ohne `gm_*`-Klänge (siehe Grenzen) |
-| `index.html` | die Seite: Quellen, Kanalwahl, Aufnahme, Tasten |
+| `analyse.mjs` | core of the audio analysis (browser + Node): FFT 2048 for level/pan/onsets, 8192 for the pitch of kick and bass, tempo by autocorrelation |
+| `analyse-file.mjs` | CLI: file → JSONL + summary (drift = movement within 8 bars) |
+| `render.mjs` | picture. "deck" (default, like slide 6 of the deck): glowing comets with tails, rings from the kick, axes. "ocean": stems as liquid layers, time into depth, floating camera. "clean": comets, rings |
+| `smoothing.mjs` | slider Raw ↔ Smooth: moving average, window grows exponentially up to 2^53 lines |
+| `strudel-source.mjs` | Strudel events → lines, each event appears when it sounds (`delay`) |
+| `make-tapped.mjs` | copy of a track: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged) |
+| `server.mjs` | static files + relay POST `/events` → SSE `/stream`; CORS and private-network headers for strudel.cc |
+| `player.html` | plays a tapped track with `@strudel/web` right on localhost and shows it; controllers via Web MIDI (`midin` per port, `midikeys` for Launchkey keys and pads), sliders Hard ↔ Soft, Raw ↔ Smooth; without `gm_*` sounds (see limits) |
+| `index.html` | the page: sources, channel choice, recording, keys |
 
-## Was wir gelernt haben
+## What we learned
 
-- **Bänder sind keine Stems.** In der 008-Aufnahme landet der Sub-Anteil des Basses im Kick-Band; die Zusammenfassung
-  zeigt die Kick deshalb „bewegter“ als den Bass, obwohl sie innerhalb eines Abschnitts fest steht (60–120 s: 43 Hz).
-  Exakt wird es nur über Strudel (oder später Demucs).
-- **Mikrofon ≠ Musik.** Scarlett-Mikro kommt nur links an (→ wird jetzt als Mono behandelt), MacBook-Mikro ist mono.
-  Die Musik liegt auf dem Scarlett-Loopback 3/4.
-- **Der 008-Mix ist im Panorama mittig.** Darum streckt die Pan-Weite (×1 bis ×5, Taste W) auf den genutzten Bereich.
-- **Gefallen hat:** Tag 2 („10/10“). **Nicht gefallen:** scharfe Linien („Klingen“), blendendes Additiv-Licht.
-  Gewünscht: dichte Flüssigkeit mit Wellen obendrauf, weiches Licht, schräger Blick mit wanderndem Blickwinkel –
-  daraus wurde „ocean“. Danach: zurück zum Look von Folie 6 des Decks („deck“, jetzt Standard).
+- **Bands are not stems.** In the 008 recording the sub part of the bass lands in the kick band; the summary
+  therefore shows the kick "moving" more than the bass, although it stays fixed within a section (60–120 s: 43 Hz).
+  Only Strudel makes it exact (or Demucs later).
+- **Microphone ≠ music.** The Scarlett mic arrives on the left only (→ now treated as mono); the MacBook mic is mono.
+  The music is on the Scarlett loopback 3/4.
+- **The 008 mix sits in the middle of the stereo field.** That is why pan width (×1 to ×5, key W) stretches it to
+  the range in use.
+- **Liked:** day 2 ("10/10"). **Not liked:** sharp lines ("blades"), dazzling additive light.
+  Wanted: dense liquid with waves on top, soft light, angled view with a wandering viewpoint –
+  that became "ocean". After that: back to the look of slide 6 of the deck ("deck", now the default).
 
-## Grenzen des Players
+## Limits of the player
 
-`player.html` ist für Visualisierung und Proben gedacht, nicht als vollständiger Ersatz für strudel.cc.
+`player.html` is meant for visuals and rehearsals, not as a full replacement for strudel.cc.
 
-**Klingt im Player:** Strudels eingebaute Synths (`sine`, `sawtooth`, `supersaw`, …), Dirt-Samples, Drum-Machines
-(909, 808, 727, 707), VCSL, Piano und alle Samples, die ein Track selbst lädt (Stimmen, Rhodes, Steinway). Controller:
-jeder Launch Control XL 3 und der Launchkey (Tasten, Drum-Pads, Mod-Rad, Knöpfe).
+**Sounds in the player:** Strudel's built-in synths (`sine`, `sawtooth`, `supersaw`, …), dirt samples, drum
+machines (909, 808, 727, 707), VCSL, piano and all samples a track loads itself (voices, Rhodes, Steinway).
+Controllers: every Launch Control XL 3 and the Launchkey (keys, drum pads, mod wheel, knobs).
 
-**Klingt nicht:** General-MIDI-Klänge (`gm_*`). `@strudel/web` (1.2.6 wie 1.3.0) registriert sie nicht, im Bundle
-ist `registerSoundfonts()` auskommentiert. Ein Event mit `gm_*` bleibt still, ohne Fehlermeldung.
+**Silent:** General MIDI sounds (`gm_*`). `@strudel/web` (1.2.6 as well as 1.3.0) does not register them; in the
+bundle `registerSoundfonts()` is commented out. An event with `gm_*` stays silent, without an error.
 
-| Track | stumm im Player |
+| Track | silent in the player |
 |---|---|
-| 008 | nichts |
-| 007 | Launchkey-Pads: Glockenspiel, Marimba, Chor, „ooh“, Agogo, Tom, Vibrafon (Marimba, Toms und Glitter von Jonas spielen VCSL-Aufnahmen) |
-| 009, 009-riffs | Vibrafon, Marimba u. a.; Launchkey: Orgel-, Bläser-Stab, „ooh“ |
-| 010 | Launchkey-Pads: Marimba, Glockenspiel, Agogo, Vibrafon, „ooh“ (Glockenspiel von Jonas: VCSL; Tasten: Synth-Pad wie 007) |
+| 008 | nothing |
+| 007 | Launchkey pads: glockenspiel, marimba, choir, "ooh", agogo, tom, vibraphone (Jonas' marimba, toms and glitter play VCSL recordings) |
+| 009, 009-riffs | vibraphone, marimba and others; Launchkey: organ and brass stab, "ooh" |
+| 010 | Launchkey pads: marimba, glockenspiel, agogo, vibraphone, "ooh" (Jonas' glockenspiel: VCSL; keys: synth pad as in 007) |
 
-Für den vollen Klang dieser Tracks: den getappten Track in strudel.cc einfügen und spielen; die Controller sind
-dort dieselben.
+For the full sound of these tracks: paste the tapped track into strudel.cc and play; the controllers there are
+the same.
 
-**Versucht, gescheitert:** `@strudel/soundfonts@1.2.6` per Import-Map an dasselbe `@strudel/web`-Bundle hängen (die
-Exporte, die es braucht, sind alle da). Es importiert `sfumato@0.1.2`, und dessen `soundfont2@^0.4.0` liefert über
-esm.sh kein `DEFAULT_GENERATOR_VALUES`; auch mit `soundfont2@0.5.0` nicht. Das Modul lädt dann nicht, und die ganze
-Seite bleibt bei „lädt Strudel …“ stehen.
+**Tried, failed:** attaching `@strudel/soundfonts@1.2.6` to the same `@strudel/web` bundle via an import map (the
+exports it needs are all there). It imports `sfumato@0.1.2`, and its `soundfont2@^0.4.0` delivers no
+`DEFAULT_GENERATOR_VALUES` through esm.sh; not with `soundfont2@0.5.0` either. The module then does not load, and the
+whole page hangs at "loading Strudel …".
 
-**Mögliche nächste Schritte** (Empfehlung zuerst):
+**Possible next steps** (recommendation first):
 
-1. **`sfumato` durch einen leeren Platzhalter ersetzen** (ein paar Zeilen in der Import-Map): `sfumato` wird nur für
-   `.sf2`-Dateien gebraucht, die `gm_*`-Klänge kommen aus webaudiofont-Daten. Klein, aber erst im Browser beweisen.
-2. **Eigenes Bundle bauen** (`@strudel/web` + `@strudel/soundfonts` mit esbuild in `tools/`): eine Datei, eine
-   Klang-Registry, unabhängig von esm.sh. Sauberer, aber ein Build-Schritt mehr.
-3. **Auf strudel.cc bleiben** für Tracks mit `gm_*`; der Player nur für 008 und Proben.
+1. **Replace `sfumato` with an empty stub** (a few lines in the import map): `sfumato` is only needed for `.sf2`
+   files; the `gm_*` sounds come from webaudiofont data. Small, but prove it in the browser first.
+2. **Build our own bundle** (`@strudel/web` + `@strudel/soundfonts` with esbuild in `tools/`): one file, one sound
+   registry, independent of esm.sh. Cleaner, but one more build step.
+3. **Stay on strudel.cc** for tracks with `gm_*`; the player only for 008 and rehearsals.
 
-## Offen (nach Priorität)
+## Open (by priority)
 
-1. **Testen mit Hardware:** Liefert Chrome vom Scarlett 4 Kanäle? Die Statuszeile sagt es („misst 3/4“ oder
-   „Kanal 3/4 fehlt“). Falls es fehlt: Strudel-Weg nutzen oder ein virtuelles Gerät (BlackHole).
-2. **strudel.cc im eigenen Chrome** mit Controllern + getapptem Track (im Browser-Pane blockiert; in Chrome evtl.
-   Abfrage „lokales Netzwerk“ erlauben).
-3. **Ocean-Look:** Gefallen? Performance im Vollbild messen (nicht gemessen; „clean“ lag bei 1–3 ms pro Bild).
-4. **Aufräumen:** `tools/trajectory/tapped/` in `.gitignore`, dann committen.
-5. **Tag 5:** Beamer-Probe, KPI „Spatial Trajectory Harmony“ (Trennung × Anker × Bewegung) als Zahl im Bild,
-   Crowd-Tap-Knopf (Zeitstempel für Publikumsreaktionen = Startpunkt Phase 2).
-6. **Tag 4:** Wiedergabe von Aufnahmen, Video-Export, Demucs (schwer: PyTorch, lange Rechenzeit auf dem M2 Air).
+1. **Test with hardware:** does Chrome get 4 channels from the Scarlett? The status line says so ("measuring 3/4" or
+   "channel 3/4 missing"). If missing: use the Strudel path or a virtual device (BlackHole).
+2. **strudel.cc in your own Chrome** with controllers + tapped track (blocked in the browser pane; in Chrome maybe
+   allow the "local network" prompt).
+3. **Ocean look:** liked? Measure performance in fullscreen (not measured; "clean" was at 1–3 ms per frame).
+4. **Tidy up:** `tools/trajectory/tapped/` into `.gitignore`, then commit.
+5. **Day 5:** projector rehearsal, KPI "Spatial Trajectory Harmony" (separation × anchor × movement) as a number in
+   the picture, crowd tap button (timestamps for audience reactions = starting point of phase 2).
+6. **Day 4:** playback of recordings, video export, Demucs (heavy: PyTorch, long compute time on the M2 Air).
 
-Querverbindung zur Musik ([TODO.md](../../TODO.md)): „Raum segmentieren“ und „Build-up über Tiefen/Mitten/Höhen“ für
-008 lassen sich mit dem Strudel-Weg direkt sehen und messen.
+Link to the music ([TODO.md](../../TODO.md)): "segment the space" and "build-up across lows/mids/highs" for
+008 can be seen and measured directly with the Strudel path.

@@ -1,6 +1,6 @@
-# Referenzen: Tracks und Sets zum Anhören
+# References: tracks and sets to listen to
 
-Ein Link pro Zeile, Notiz optional (`— worauf hören`).
+One link per line, note optional (`— what to listen for`).
 
 ## Ambient
 

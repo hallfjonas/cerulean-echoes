@@ -12,11 +12,11 @@ export const windowLines = amount => 2 ** (MAX_BITS * Math.min(1, Math.max(0, am
 export function describeWindow(amount) {
   if (amount >= 1) return '∞ (max_int)'
   const seconds = windowLines(amount) / LINES_PER_SECOND
-  const units = [[365 * 86400, 'J'], [86400, 'd'], [3600, 'h'], [60, 'min'], [1, 's']]
-  if (seconds < 1) return amount === 0 ? 'roh' : `${Math.round(seconds * 1000)} ms`
+  const units = [[365 * 86400, 'y'], [86400, 'd'], [3600, 'h'], [60, 'min'], [1, 's']]
+  if (seconds < 1) return amount === 0 ? 'raw' : `${Math.round(seconds * 1000)} ms`
   const [size, unit] = units.find(([size]) => seconds >= size)
   const value = seconds / size
-  return `${value < 10 ? value.toFixed(1) : Math.round(value).toLocaleString('de')} ${unit}`
+  return `${value < 10 ? value.toFixed(1) : Math.round(value).toLocaleString('en')} ${unit}`
 }
 
 export function createSmoother(onLine) {

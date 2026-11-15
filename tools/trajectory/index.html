@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,26 +24,26 @@
 </head>
 <body>
 <header>
-  <label class="file">Datei …<input id="file" type="file" accept="audio/*"></label>
-  <select id="device"><option value="">Eingang wählen …</option></select>
-  <select id="pair" title="Welche zwei Kanäle des Eingangs: 3/4 = Loopback eines Scarlett (was der Rechner abspielt)">
-    <option value="0">Kanal 1/2</option><option value="2">Kanal 3/4</option>
+  <label class="file">File …<input id="file" type="file" accept="audio/*"></label>
+  <select id="device"><option value="">Choose input …</option></select>
+  <select id="pair" title="Which two channels of the input: 3/4 = loopback of a Scarlett (what the computer plays)">
+    <option value="0">Channel 1/2</option><option value="2">Channel 3/4</option>
   </select>
-  <button id="live">Live starten</button>
-  <button id="strudel" title="Events vom getappten Track in strudel.cc (node trajectory/server.mjs)">Strudel</button>
-  <div class="meter" title="Pegel links / rechts"><span id="meterL"></span><span id="meterR"></span></div>
-  <button id="record">Aufnehmen</button>
-  <button id="download" disabled>JSONL laden</button>
-  <button id="fullscreen" title="Taste F">Vollbild</button>
-  <label title="0 = hart, scharf, wild · 1 = weich, verschmiert, träge" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Hart
-    <input id="character" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px;accent-color:#4fb3e0"> Weich</label>
-  <label title="0 = rohe Signale · 1 = gleitender Mittelwert über 2^53 Zeilen (max_int); die Aufnahme bleibt roh" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Roh
-    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0" style="width:120px;accent-color:#4fb3e0"> Glatt
-    <output id="smoothingValue" style="color:#eef4f2;min-width:4em">roh</output></label>
-  <label class="switch" title="Taste A"><input id="axes" type="checkbox" checked> Achsen</label>
-  <label class="switch" title="Taste L"><input id="labels" type="checkbox" checked> Beschriftung</label>
-  <label class="switch" title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
-  <span id="status">bereit · F Vollbild · V Look · A Achsen · L Beschriftung · B Beat-Ringe · W Pan-Weite</span>
+  <button id="live">Start live</button>
+  <button id="strudel" title="Events from the tapped track in strudel.cc (node trajectory/server.mjs)">Strudel</button>
+  <div class="meter" title="Level left / right"><span id="meterL"></span><span id="meterR"></span></div>
+  <button id="record">Record</button>
+  <button id="download" disabled>Download JSONL</button>
+  <button id="fullscreen" title="Key F">Fullscreen</button>
+  <label title="0 = hard, sharp, wild · 1 = soft, smeared, sluggish" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Hard
+    <input id="character" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px;accent-color:#4fb3e0"> Soft</label>
+  <label title="0 = raw signals · 1 = moving average over 2^53 lines (max_int); the recording stays raw" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Raw
+    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0" style="width:120px;accent-color:#4fb3e0"> Smooth
+    <output id="smoothingValue" style="color:#eef4f2;min-width:4em">raw</output></label>
+  <label class="switch" title="Key A"><input id="axes" type="checkbox" checked> Axes</label>
+  <label class="switch" title="Key L"><input id="labels" type="checkbox" checked> Labels</label>
+  <label class="switch" title="Key B: rings from the kick on every beat"><input id="rings" type="checkbox" checked> Beat rings</label>
+  <span id="status">ready · F fullscreen · V look · A axes · L labels · B beat rings · W pan width</span>
 </header>
 <canvas id="view"></canvas>
 <script type="module">
@@ -64,7 +64,7 @@ const TAP = `registerProcessor('tap', class extends AudioWorkletProcessor {
 })`
 
 let context, source, stream, strudel, analyser, left, right, filled = 0, sinceHop = 0, samples = 0, firstChannel = 0
-let levelL = 0, levelR = 0, oneSided = false, recording = false, recorded = [], label = 'bereit'
+let levelL = 0, levelR = 0, oneSided = false, recording = false, recorded = [], label = 'ready'
 
 async function start(connect, { channels = 2, first = 0 } = {}) {
   stop()
@@ -121,7 +121,7 @@ function showStatus() {
   const width = level => `${Math.max(0, Math.min(100, (10 * Math.log10(level + 1e-12) + 60) / 60 * 100))}%`
   $('meterL').style.width = width(levelL)
   $('meterR').style.width = width(levelR)
-  $('status').textContent = label + (oneSided ? ' · einseitig → mono' : '') + (recording ? ` · ● ${recorded.length}` : '')
+  $('status').textContent = label + (oneSided ? ' · one-sided → mono' : '') + (recording ? ` · ● ${recorded.length}` : '')
   requestAnimationFrame(showStatus)
 }
 showStatus()
@@ -142,8 +142,8 @@ $('file').onchange = async ({ target }) => {
 async function listDevices() {
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput')
   const chosen = $('device').value
-  $('device').replaceChildren(new Option('Eingang wählen …', ''),
-    ...devices.map(d => new Option(d.label || `Eingang ${d.deviceId.slice(0, 6)}`, d.deviceId)))
+  $('device').replaceChildren(new Option('Choose input …', ''),
+    ...devices.map(d => new Option(d.label || `Input ${d.deviceId.slice(0, 6)}`, d.deviceId)))
   $('device').value = chosen
 }
 listDevices()
@@ -157,8 +157,8 @@ $('live').onclick = async () => {
   }, { channels: first + 2, first })
   await listDevices()
   const track = stream.getAudioTracks()[0], delivered = track?.getSettings().channelCount
-  label = `live: ${track?.label ?? 'Eingang'} · ${delivered ?? '?'} Kanäle vom Browser`
-    + (delivered && delivered < first + 2 ? ` – Kanal ${first + 1}/${first + 2} fehlt` : ` · misst ${first + 1}/${first + 2}`)
+  label = `live: ${track?.label ?? 'input'} · ${delivered ?? '?'} channels from the browser`
+    + (delivered && delivered < first + 2 ? ` – channel ${first + 1}/${first + 2} missing` : ` · measuring ${first + 1}/${first + 2}`)
 }
 
 $('strudel').onclick = () => {
@@ -170,7 +170,7 @@ $('record').onclick = () => {
   recording = !recording
   if (recording) recorded = []
   $('record').classList.toggle('on', recording)
-  $('record').textContent = recording ? 'Stopp' : 'Aufnehmen'
+  $('record').textContent = recording ? 'Stop' : 'Record'
   $('download').disabled = recording || !recorded.length
 }
 
