@@ -1,0 +1,27 @@
+// .lpenv(x * 9).lps(.2).lpd(.12)
+
+scale("dorian")
+
+register('acidenv', (x, pat) => pat
+  .lpf(100)       // Basisfrequenz des Filters
+  .lpenv(x * 9)   // Filterhüllkurve (Envelope) basierend auf Eingabe x
+  .lps(0.2)       // Sustain (Haltezeit)
+  .lpd(0.12)      // Decay (Abklingzeit)
+  .lpq(2)         // Q-Faktor (Resonanz) für spitze Filterkurven
+)   
+
+setcps(.53) // gentle, floating tempo
+
+$: n("<0 -4 0 -4>").scale("dorian").trans(0).sound("sawtooth").acidenv(.24).pianoroll().gain(rand.range(0.68, 0.78)).sustain(.5)
+$: n("<0 -4 0 -4>").scale("dorian").trans(12).sound("sawtooth").acidenv(.09).pianoroll().gain(rand.range(0.12, 0.18)).sustain(.5)
+$: n("<0 -4 0 -4>").scale("dorian").trans(19).sound("sawtooth").acidenv(.06).pianoroll().gain(rand.range(0.06, 0.1)).sustain(.5)
+
+$: sound("lt:2!4").bank("RolandTR808").shape(.1).sustain(1.8).acidenv(.2).gain(.8).lpf(200).delay(0.1, 0.5)
+$: sound("lt:2!4").bank("RolandTR808").shape(.1).sustain(.2).acidenv(2.).gain(.1).lpf(200).delay(0.1, 0.5)
+$: sound("bd:2!4").bank("RolandTR808").shape(.1).sustain(.8).acidenv(.1).gain(1.).lpf(200).delay(0.1, 0.5)
+
+$: sound("lt:2!4*2").bank("RolandTR808").shape(.1).sustain(.8).acidenv(.0).gain(.3).lpenv(8).lpf(100).delay(0.1, 0.5).lpenv(10)
+
+$: sound("lt:2!2").bank("RolandTR808").shape(.3).sustain(.8).acidenv(.1).gain(1.)
+
+$: sound("brown").gain(.1)
