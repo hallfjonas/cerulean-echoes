@@ -1,0 +1,392 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="v5 (real device sizes, LC per facing player)" id="p5">
+    <mxGraphModel background="#ffffff" dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=6;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="120.0" width="660.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="door swing / keep clear" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#999999;fontSize=10;fontColor=#999999;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="126.0" y="126.0" width="174.0" height="174.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Couch 200 × 100 cm&lt;br&gt;(seat 50, back 75)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;spacingTop=40;" vertex="1" parent="1">
+          <mxGeometry x="380.0" y="123.0" width="397.0" height="200.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="backrest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c3abd0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380.0" y="123.0" width="397.0" height="36.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="Schrank 50 × 155 × 220 cm (speakers on top)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="680.0" y="430.0" width="97.0" height="310.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="123.0" y="504.0" width="357.0" height="160.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" value="Table 180 × 80 cm – short end on the west wall,&lt;br&gt;raise to ~100 cm (players' heads are over it)" style="text;html=1;fontSize=11;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="123.0" y="456.0" width="225.0" height="40.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" value="" style="shape=triangle;html=1;fillColor=#4a90d9;strokeColor=#4a90d9;strokeWidth=1;opacity=30;rotation=335.15;" vertex="1" parent="1">
+          <mxGeometry x="331.4" y="314.2" width="400.0" height="461.9" as="geometry" />
+        </mxCell>
+        <mxCell id="c9" value="" style="shape=triangle;html=1;fillColor=#e67e22;strokeColor=#e67e22;strokeWidth=1;opacity=30;rotation=25.19;" vertex="1" parent="1">
+          <mxGeometry x="332.0" y="392.8" width="400.0" height="461.9" as="geometry" />
+        </mxCell>
+        <mxCell id="c10" value="LC XL3 #1 (P1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="375.0" y="506.0" width="50.0" height="47.8" as="geometry" />
+        </mxCell>
+        <mxCell id="c11" value="Launchkey&lt;br&gt;25 MK4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;align=left;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="429.8" y="537.9" width="50.2" height="92.2" as="geometry" />
+        </mxCell>
+        <mxCell id="c11k" value="keys" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="456.0" y="537.9" width="24.0" height="92.2" />
+        </mxCell>
+        <mxCell id="c12" value="LC XL3 #2 (P4)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="375.0" y="614.2" width="50.0" height="47.8" as="geometry" />
+        </mxCell>
+        <mxCell id="c13" value="MacBook" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="290.0" y="562.0" width="62.0" height="44.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c14" value="2i2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="300.0" y="516.0" width="40.0" height="32.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" value="Screen 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="230.0" y="524.0" width="40.0" height="120.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c16" value="Screen 2 (opt.)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;horizontal=0;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="170.0" y="524.0" width="40.0" height="120.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c17" value="A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=9;fontStyle=1;rotation=335.15;" vertex="1" parent="1">
+          <mxGeometry x="686.9" y="438.9" width="52.0" height="44.4" as="geometry" />
+        </mxCell>
+        <mxCell id="c18" value="B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=9;fontStyle=1;rotation=25.19;" vertex="1" parent="1">
+          <mxGeometry x="687.0" y="686.6" width="52.0" height="44.4" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" value="P1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;opacity=80;" vertex="1" parent="1">
+          <mxGeometry x="355.0" y="439.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="P2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;opacity=80;" vertex="1" parent="1">
+          <mxGeometry x="450.0" y="489.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" value="P3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;opacity=80;" vertex="1" parent="1">
+          <mxGeometry x="450.0" y="589.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" value="P4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;opacity=80;" vertex="1" parent="1">
+          <mxGeometry x="355.0" y="639.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c19" value="1.00 m (max)" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#c0392b;fontSize=10;fontColor=#c0392b;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="p1" target="p4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c20" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="0.0" width="826.0" height="117.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c21" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="863.0" width="826.0" height="237.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c22" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="117.0" width="117.0" height="746.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c23" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="783.0" y="117.0" width="43.0" height="746.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c24" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=6;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="120.0" width="660.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c25" value="v5 – real device sizes: P1/P4 (facing each other) each own a Launch Control XL3, P2/P3 share the Launchkey 25 MK4 at the table end (1 m = 200 px)" style="text;html=1;fontSize=16;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="20.0" width="1100.0" height="30.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c26" value="↑ N (north)" style="text;html=1;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="680.0" y="60.0" width="100.0" height="30.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c27" value="3.3 m (east–west)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="900.0" width="660.0" height="24.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c28" value="3.7 m (north–south)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;horizontal=0;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="70.0" y="120.0" width="30.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c29" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="124.0" y="113.0" width="176.0" height="14.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c30" value="Entrance (~90 cm)" style="text;html=1;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="88.0" width="180.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c31" value="" style="rounded=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="330.0" y="853.0" width="240.0" height="14.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c32" value="Window (centred, width assumed ~1.2 m)" style="text;html=1;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300.0" y="870.0" width="300.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c33" value="" style="rounded=0;html=1;fillColor=#4a90d9;strokeColor=#4a90d9;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="950.0" width="40.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c34" value="" style="rounded=0;html=1;fillColor=#e67e22;strokeColor=#e67e22;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="165.0" y="950.0" width="40.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c35" value="&lt;b&gt;Good-sound band&lt;/b&gt; of speaker A (blue) and B (orange): ±30° around each speaker's axis (LP-6 V2 listening window, flat response). The LP-6 is specified for 120° coverage, so up to ±60° is still usable but gets duller. &lt;b&gt;Darker overlap = stereo sweet zone.&lt;/b&gt; Speakers are toed-in towards the centre of the group." style="text;html=1;fontSize=11;align=left;verticalAlign=top;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="215.0" y="940.0" width="565.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c36" value="&lt;b&gt;v5 – feedback incorporated&lt;/b&gt;&lt;br&gt;&lt;br&gt;&#10;&lt;b&gt;Device sizes (top view, to scale):&lt;/b&gt; Launchkey 25 MK4 46.1 × 25.1 cm, Launch Control XL3 25.0 × 23.9 cm (heights 7.9 / 4.3 cm don't matter in plan view). Figures 45 cm Ø.&lt;br&gt;&lt;br&gt;&#10;&lt;b&gt;Who controls what:&lt;/b&gt;&lt;br&gt;&#10;• P1 (north) and P4 (south) face each other across the table and each have their own LC XL3 right in front of them, flush with the table edge.&lt;br&gt;&#10;• The LK lies across the east end of the table with its keys (white strip) facing east, towards P2 and P3, who stand side by side at the short end and share it.&lt;br&gt;&#10;• The 2i2 and the MacBook stay on the table towards the west; the screens are further west.&lt;br&gt;&lt;br&gt;&#10;&lt;table border=&quot;1&quot; cellpadding=&quot;4&quot; style=&quot;border-collapse:collapse;font-size:11px;&quot;&gt;&#10;&lt;tr&gt;&lt;th&gt;Metric&lt;/th&gt;&lt;th&gt;v4&lt;/th&gt;&lt;th&gt;v5&lt;/th&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;Max distance between players&lt;/td&gt;&lt;td&gt;1.30 m&lt;/td&gt;&lt;td&gt;&lt;b&gt;1.00 m&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;Avg distance between players&lt;/td&gt;&lt;td&gt;0.94 m&lt;/td&gt;&lt;td&gt;&lt;b&gt;0.72 m&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;P1 → own LC / P4 → own LC&lt;/td&gt;&lt;td&gt;–&lt;/td&gt;&lt;td&gt;0.11 m / 0.11 m&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;P2 → LK / P3 → LK&lt;/td&gt;&lt;td&gt;–&lt;/td&gt;&lt;td&gt;0.08 m / 0.08 m&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;P1/P4 → other LC&lt;/td&gt;&lt;td&gt;–&lt;/td&gt;&lt;td&gt;0.65 m&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;P1 / P4 → LK&lt;/td&gt;&lt;td&gt;–&lt;/td&gt;&lt;td&gt;0.31 m / 0.31 m&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;Speaker distance / spacing&lt;/td&gt;&lt;td&gt;1.4 m / 1.25 m&lt;/td&gt;&lt;td&gt;1.46 m / 1.24 m&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;Stereo angle at group centre&lt;/td&gt;&lt;td&gt;54°&lt;/td&gt;&lt;td&gt;50°&lt;/td&gt;&lt;/tr&gt;&#10;&lt;tr&gt;&lt;td&gt;Max off-axis angle of a player&lt;/td&gt;&lt;td&gt;28°&lt;/td&gt;&lt;td&gt;&lt;b&gt;21°&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&#10;&lt;/table&gt;&lt;br&gt;&#10;distances are from the player's centre to the nearest edge of the device.&lt;br&gt;&lt;br&gt;&#10;&lt;b&gt;Speakers:&lt;/b&gt; unchanged by this step, since the player positions did not move (A 335°, B 25°, toed-in to the group centre, already as far apart as the Schrank allows). Stereo angle ~50° (ideal ~60°), all players within ±21° of both axes. Tilt the LP-6 down ~24° (speakers ≈ 2.3 m high)." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#f9f9f9;strokeColor=#999999;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="830.0" y="120.0" width="440.0" height="740.0" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Your idea (v4, to scale)" id="p1">
+    <mxGraphModel background="#ffffff" dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=6;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="120.0" width="660.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="door swing / keep clear" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#999999;fontSize=10;fontColor=#999999;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="126.0" y="126.0" width="174.0" height="174.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Couch 200 × 100 cm&lt;br&gt;(seat 50, back 75)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;spacingTop=40;" vertex="1" parent="1">
+          <mxGeometry x="380.0" y="123.0" width="397.0" height="200.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="backrest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c3abd0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380.0" y="123.0" width="397.0" height="36.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="Schrank 50 × 155 × 220 cm (speakers on top)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="680.0" y="430.0" width="97.0" height="310.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="123.0" y="504.0" width="357.0" height="160.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" value="Table 180 × 80 cm – short end on the west wall,&lt;br&gt;raise to ~100 cm" style="text;html=1;fontSize=11;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="123.0" y="456.0" width="225.0" height="40.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" value="" style="shape=triangle;html=1;fillColor=#4a90d9;strokeColor=#4a90d9;strokeWidth=1;opacity=30;rotation=333.43;" vertex="1" parent="1">
+          <mxGeometry x="333.1" y="318.5" width="400.0" height="461.9" as="geometry" />
+        </mxCell>
+        <mxCell id="c9" value="" style="shape=triangle;html=1;fillColor=#e67e22;strokeColor=#e67e22;strokeWidth=1;opacity=30;rotation=26.93;" vertex="1" parent="1">
+          <mxGeometry x="333.7" y="388.5" width="400.0" height="461.9" as="geometry" />
+        </mxCell>
+        <mxCell id="c10" value="Launch Control XL3 #1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="360.0" y="504.0" width="120.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c11" value="Launchkey 25" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="375.0" y="564.0" width="90.0" height="40.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c12" value="Launch Control XL3 #2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="360.0" y="604.0" width="120.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c13" value="MacBook" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="290.0" y="562.0" width="62.0" height="44.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c14" value="2i2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="300.0" y="516.0" width="40.0" height="32.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" value="Screen 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="230.0" y="524.0" width="40.0" height="120.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c16" value="Screen 2 (opt.)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;horizontal=0;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="170.0" y="524.0" width="40.0" height="120.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c17" value="A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=9;fontStyle=1;rotation=333.43;" vertex="1" parent="1">
+          <mxGeometry x="686.0" y="437.8" width="52.0" height="44.4" as="geometry" />
+        </mxCell>
+        <mxCell id="c18" value="B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=9;fontStyle=1;rotation=26.93;" vertex="1" parent="1">
+          <mxGeometry x="686.0" y="687.8" width="52.0" height="44.4" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" value="P1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="355.0" y="409.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="P2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="485.0" y="484.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" value="P3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="485.0" y="594.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" value="P4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="355.0" y="669.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c19" value="1.30 m (max)" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#c0392b;fontSize=10;fontColor=#c0392b;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="p1" target="p4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c20" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="0.0" width="826.0" height="117.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c21" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="863.0" width="826.0" height="237.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c22" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="117.0" width="117.0" height="746.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c23" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="783.0" y="117.0" width="43.0" height="746.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c24" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=6;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="120.0" width="660.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c25" value="v4 – your sketch redrawn to scale: table on the west wall, ring of 4 around its east end (1 m = 200 px)" style="text;html=1;fontSize=16;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="20.0" width="1100.0" height="30.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c26" value="↑ N (north)" style="text;html=1;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="680.0" y="60.0" width="100.0" height="30.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c27" value="3.3 m (east–west)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="900.0" width="660.0" height="24.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c28" value="3.7 m (north–south)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;horizontal=0;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="70.0" y="120.0" width="30.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c29" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="124.0" y="113.0" width="176.0" height="14.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c30" value="Entrance (~90 cm)" style="text;html=1;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="88.0" width="180.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c31" value="" style="rounded=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="330.0" y="853.0" width="240.0" height="14.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c32" value="Window (centred, width assumed ~1.2 m)" style="text;html=1;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300.0" y="870.0" width="300.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c33" value="" style="rounded=0;html=1;fillColor=#4a90d9;strokeColor=#4a90d9;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="950.0" width="40.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c34" value="" style="rounded=0;html=1;fillColor=#e67e22;strokeColor=#e67e22;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="165.0" y="950.0" width="40.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c35" value="&lt;b&gt;Good-sound band&lt;/b&gt; of speaker A (blue) and B (orange): ±30° around each speaker's axis (LP-6 V2 listening window, flat response). The LP-6 is specified for 120° coverage, so up to ±60° is still usable but gets duller. &lt;b&gt;Darker overlap = stereo sweet zone.&lt;/b&gt; Speakers are toed-in towards the centre of the group." style="text;html=1;fontSize=11;align=left;verticalAlign=top;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="215.0" y="940.0" width="565.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c36" value="&lt;b&gt;Evaluation of your idea (v4)&lt;/b&gt;&lt;br&gt;&lt;br&gt; I read your sketch as rotated by 180° (couch bottom-left = north-east corner, Schrank on the east wall) and redrew it to scale. Controllers are assumed to sit together as one 60 × 80 cm block at the east end of the table.&lt;br&gt;&lt;br&gt; &lt;table border=&quot;1&quot; cellpadding=&quot;4&quot; style=&quot;border-collapse:collapse;font-size:11px;&quot;&gt; &lt;tr&gt;&lt;th&gt;Metric&lt;/th&gt;&lt;th&gt;Your idea&lt;/th&gt;&lt;th&gt;v3&lt;/th&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;Max distance between players&lt;/td&gt;&lt;td&gt;1.30 m&lt;/td&gt;&lt;td&gt;&lt;b&gt;1.01 m&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;Avg distance between players&lt;/td&gt;&lt;td&gt;0.94 m&lt;/td&gt;&lt;td&gt;&lt;b&gt;0.75 m&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;All 4 reach all 3 controllers (≤ 0.75 m)&lt;/td&gt;&lt;td&gt;yes*&lt;/td&gt;&lt;td&gt;yes&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;Speaker distance / spacing&lt;/td&gt;&lt;td&gt;1.4 m / 1.25 m&lt;/td&gt;&lt;td&gt;2.4 m / 0.9 m&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;Stereo angle at group centre (ideal ≈ 60°)&lt;/td&gt;&lt;td&gt;&lt;b&gt;54°&lt;/b&gt;&lt;/td&gt;&lt;td&gt;19°&lt;/td&gt;&lt;/tr&gt; &lt;tr&gt;&lt;td&gt;All players inside both ±30° bands&lt;/td&gt;&lt;td&gt;yes (max 28°)&lt;/td&gt;&lt;td&gt;yes (max 12°)&lt;/td&gt;&lt;/tr&gt; &lt;/table&gt; * only with the compact block at the east end. Spread along the 1.8 m table, the long-side players would not reach everything.&lt;br&gt;&lt;br&gt; &lt;b&gt;Pros:&lt;/b&gt; a natural ring with eye contact; the table end on the wall saves floor space and keeps the door lane free; speakers close by form a proper stereo triangle on the group; all four stand inside the good-sound band of both speakers.&lt;br&gt;&lt;br&gt; &lt;b&gt;Cons:&lt;/b&gt; players on opposite long sides can never be closer than 1.30 m (table depth + body), so the max distance is 29 % worse than v3; P1 and P4 are at the full 0.75 m stretch to the far XL3; only P1/P4 can reach the MacBook; P2/P3 have the speakers behind them and P1/P4 to the side, so nobody faces the speakers (stereo image shifts when they turn). P1 and P4 sit near the edge of the bands (28°), still well inside the 60° coverage.&lt;br&gt;&lt;br&gt; &lt;b&gt;Verdict:&lt;/b&gt; good if the stereo image and sociability matter; v3 wins if max/average distance is the top priority. Tilt the LP-6 down, they sit at ~2.3 m height." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#f9f9f9;strokeColor=#999999;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="830.0" y="120.0" width="440.0" height="740.0" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="v3 (previous) with speaker bands" id="p2">
+    <mxGraphModel background="#ffffff" dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=6;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="120.0" width="660.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="door swing / keep clear" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#999999;fontSize=10;fontColor=#999999;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="126.0" y="126.0" width="174.0" height="174.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Couch 200 × 100 cm&lt;br&gt;(seat 50, back 75)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;spacingTop=40;" vertex="1" parent="1">
+          <mxGeometry x="380.0" y="123.0" width="397.0" height="200.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="backrest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c3abd0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380.0" y="123.0" width="397.0" height="36.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="Schrank 50 × 155 × 220 cm (speakers on top)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="680.0" y="550.0" width="97.0" height="307.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="310.0" y="400.0" width="360.0" height="160.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" value="Table 180 × 80 cm – raise to ~100 cm" style="text;html=1;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="330.0" y="372.0" width="340.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" value="" style="shape=triangle;html=1;fillColor=#4a90d9;strokeColor=#4a90d9;strokeWidth=1;opacity=30;rotation=10.68;" vertex="1" parent="1">
+          <mxGeometry x="155.0" y="231.4" width="580.0" height="669.7" as="geometry" />
+        </mxCell>
+        <mxCell id="c9" value="" style="shape=triangle;html=1;fillColor=#e67e22;strokeColor=#e67e22;strokeWidth=1;opacity=30;rotation=29.49;" vertex="1" parent="1">
+          <mxGeometry x="187.6" y="322.4" width="580.0" height="669.7" as="geometry" />
+        </mxCell>
+        <mxCell id="c10" value="Launch Control XL3 #2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="310.0" y="400.0" width="120.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c11" value="Launchkey 25" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="325.0" y="460.0" width="90.0" height="40.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c12" value="Launch Control XL3 #1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="310.0" y="500.0" width="120.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c13" value="MacBook" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="440.0" y="458.0" width="62.0" height="44.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c14" value="2i2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="450.0" y="412.0" width="40.0" height="32.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" value="Screen 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="520.0" y="420.0" width="40.0" height="120.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c16" value="Screen 2 (opt.)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;horizontal=0;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="600.0" y="420.0" width="40.0" height="120.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c17" value="A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=9;fontStyle=1;rotation=10.68;" vertex="1" parent="1">
+          <mxGeometry x="704.0" y="597.8" width="52.0" height="44.4" as="geometry" />
+        </mxCell>
+        <mxCell id="c18" value="B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=9;fontStyle=1;rotation=29.49;" vertex="1" parent="1">
+          <mxGeometry x="704.0" y="777.8" width="52.0" height="44.4" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" value="P1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="130.2" y="450.8" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="P2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="215.0" y="380.6" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" value="P3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="188.6" y="544.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" value="P4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="296.6" y="565.0" width="90.0" height="90.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c19" value="1.01 m" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#c0392b;fontSize=10;fontColor=#c0392b;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="p1" target="p4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c20" value="1.01 m" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#c0392b;fontSize=10;fontColor=#c0392b;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="p2" target="p4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c21" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="0.0" width="826.0" height="117.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c22" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="863.0" width="826.0" height="237.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c23" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0.0" y="117.0" width="117.0" height="746.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c24" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="783.0" y="117.0" width="43.0" height="746.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c25" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=6;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="120.0" width="660.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c26" value="v3 (previous layout) – now with speaker bands (1 m = 200 px)" style="text;html=1;fontSize=16;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="20.0" width="1100.0" height="30.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c27" value="↑ N (north)" style="text;html=1;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="680.0" y="60.0" width="100.0" height="30.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c28" value="3.3 m (east–west)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="900.0" width="660.0" height="24.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c29" value="3.7 m (north–south)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;horizontal=0;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="70.0" y="120.0" width="30.0" height="740.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c30" value="" style="rounded=0;html=1;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="124.0" y="113.0" width="176.0" height="14.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c31" value="Entrance (~90 cm)" style="text;html=1;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="88.0" width="180.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c32" value="" style="rounded=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="330.0" y="853.0" width="240.0" height="14.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c33" value="Window (centred, width assumed ~1.2 m)" style="text;html=1;fontSize=11;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300.0" y="870.0" width="300.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c34" value="" style="rounded=0;html=1;fillColor=#4a90d9;strokeColor=#4a90d9;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="120.0" y="950.0" width="40.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c35" value="" style="rounded=0;html=1;fillColor=#e67e22;strokeColor=#e67e22;opacity=40;" vertex="1" parent="1">
+          <mxGeometry x="165.0" y="950.0" width="40.0" height="22.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c36" value="&lt;b&gt;Good-sound band&lt;/b&gt; of speaker A (blue) and B (orange): ±30° around each speaker's axis (LP-6 V2 listening window, flat response). The LP-6 is specified for 120° coverage, so up to ±60° is still usable but gets duller. &lt;b&gt;Darker overlap = stereo sweet zone.&lt;/b&gt; Speakers are toed-in towards the centre of the group." style="text;html=1;fontSize=11;align=left;verticalAlign=top;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="215.0" y="940.0" width="565.0" height="60.0" as="geometry" />
+        </mxCell>
+        <mxCell id="c37" value="&lt;b&gt;v3 for comparison&lt;/b&gt;&lt;br&gt;&lt;br&gt; Smallest max distance (1.01 m) and average (0.75 m), all reach all controllers.&lt;br&gt;&lt;br&gt; &lt;b&gt;Speakers:&lt;/b&gt; all four players are well inside both ±30° bands (max 12° off-axis), but the speakers are 2.4 m away and only 0.9 m apart, so the stereo angle is just 19° (ideal ≈ 60°). The stereo image will be narrow. Moving the speakers further apart is not possible on the Schrank (1.55 m long) without moving the group closer.&lt;br&gt;&lt;br&gt; Compare with page 1 (your idea), which gives a 54° stereo angle at the cost of a 1.30 m max distance." style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=10;fillColor=#f9f9f9;strokeColor=#999999;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="830.0" y="120.0" width="440.0" height="740.0" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
