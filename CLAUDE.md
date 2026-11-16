@@ -106,7 +106,7 @@ Tools (run in `tools/`):
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
 - Layout sheets / `.syx`: `npm run layouts`, `npm run syx`; on save: `npm run watch`
 - Trajectory: `node trajectory/server.mjs [port]` + `node trajectory/make-tapped.mjs <track>`
-- Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--only <id>]`
+- Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
 - Outline a long track before reading it: `npm run track-map -- <track>`, then `sed -n` ranges
 - Paths cited in docs, skills and epics exist? `npm run path-lint` (planned files in epics show up too)
 

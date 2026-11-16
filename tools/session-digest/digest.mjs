@@ -1,6 +1,7 @@
 // Turns Claude Code session transcripts (JSONL) of this project into compact Markdown digests for review.
 // Usage: node session-digest/digest.mjs [--since 2026-11-10] [--until 2026-11-15] [--only <session-id-prefix>]
-//   [--dir <transcript dir>]. A session belongs to the day it started; --until is inclusive.
+//   [--dir <transcript dir>]. Default: the project's transcript folder and those of its worktrees
+//   (.claude/worktrees/<name>). A session belongs to the day it started; --until is inclusive.
 // Writes tools/session-digest/out/<session>.md (git-ignored: it holds private chat content) and out/index.md.
 // Each digest lists user messages (flagged corrections), per turn the tool sequence, errors, hook output, skills and
 // subagents, handover notes, repeated tool sequences, edit reverts, and a short summary of every subagent transcript.
@@ -15,7 +16,11 @@ const since = option('--since', '2026-11-10')
 const until = option('--until', '9999-12-31')
 const only = option('--only', null)
 const projectSlug = '-Users-jonas-hall-Documents-GitHub-cerulean-echoes'
-const transcriptDir = option('--dir', path.join(os.homedir(), '.claude', 'projects', projectSlug))
+const projectsDir = path.join(os.homedir(), '.claude', 'projects')
+const transcriptDirs = args.includes('--dir')
+  ? [option('--dir')]
+  : fs.readdirSync(projectsDir).filter(name => name === projectSlug || name.startsWith(projectSlug + '--claude-worktrees-'))
+    .map(name => path.join(projectsDir, name))
 const outDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'out')
 
 const USER_TEXT_LIMIT = 1500
@@ -304,10 +309,10 @@ function digest(sessionFile) {
 
 if (!only) fs.rmSync(outDir, { recursive: true, force: true })
 fs.mkdirSync(outDir, { recursive: true })
-const sessionFiles = fs
-  .readdirSync(transcriptDir)
+const sessionFiles = transcriptDirs.flatMap(dir => fs
+  .readdirSync(dir)
   .filter(name => name.endsWith('.jsonl') && (!only || name.startsWith(only)))
-  .map(name => path.join(transcriptDir, name))
+  .map(name => path.join(dir, name)))
 const results = []
 for (const file of sessionFiles) {
   try {

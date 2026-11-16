@@ -44,14 +44,15 @@ If the user plays pads by position, confirm the pad when the note name and the p
 ## 4. Level
 `cd tools && OWN=<url> SEC=16 node strudel-sim/pad-levels.mjs <track>` measures each pad dry (loudest 400 ms, LUFS-M).
 It has its own copy of the voice map: add the new key there too. Set `gain` so the new shot sits at about
--15 LUFS-M like the others (the comment above `LK_SHOTS` says so). Before the push, serve `samples/` locally
-(`python3 -m http.server 8770 -d samples`) and pass `OWN=http://localhost:8770/`.
+-15 LUFS-M like the others (the comment above `LK_SHOTS` says so). Before the push, serve the repo root locally
+(the `static` entry in `.claude/launch.json`, or `python3 -m http.server 8770` in the repo root) and pass
+`OWN=http://localhost:8770/samples/`.
 
 ## 5. Check and report
 - `cd tools && node strudel-sim/check-sounds.mjs <track>` (online): updates `samples/sounds.json`; a file not on
   `origin/main` yet prints `warning: … plays only after push to main` (run `git fetch` first for a current answer).
 - The hook regenerates layout sheet and `.syx`; update the pad list in `midi-layouts/devices.md` if names changed.
-- Tell the user (German): which pad (note name and position), the file and its size, the level, and that it plays on
+- Tell the user: which pad (note name and position), the file and its size, the level, and that it plays on
   strudel.cc only after the file is pushed to `main` (commit + push / merge; not committed by you unless asked).
 - Test before merging: push the branch and point `OWN_SAMPLES` temporarily at
   `https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/<branch>/samples/` in a scratch copy pasted into
