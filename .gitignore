@@ -6,6 +6,7 @@ node_modules/
 .claude/*
 !.claude/skills/
 !.claude/epics/
+!.claude/prds/
 tools/trajectory/tapped/
 Scarlett*
 *.band

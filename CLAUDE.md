@@ -97,5 +97,11 @@ all buttons momentary): dual → `-jojo.syx` / `-jonas.syx` (slot 16 on each LC)
 `-single-mode2.syx` (slots 1 and 2), one-file track (has `// @mode 16 Mode 1`) → `-mode1.syx` / `-mode2.syx` (slots 1
 and 2 on every LC). Load them with Novation Components. Hand-written `*-layout.typ` files are older sheets; the lab boards keep theirs on purpose (they add pages the generator cannot make: sound descriptions, variant tables).
 
+## CCPM epics and PRDs
+Larger work is planned with [CCPM](/Users/jonas.hall/.claude/skills/ccpm/SKILL.md): a PRD (`.claude/prds/<name>.md`) is
+parsed into an epic (`.claude/epics/<name>/`) of numbered task files.
+- Track epics and PRDs locally, on the feature branch, while the work is open.
+- Once the epic is implemented and merged, remove its epic folder and PRD from main; git history keeps them.
+
 ## Machine
 M2 Air, 16 GB, shared with other agents: the global resource rules apply (one heavy job at a time, test small first).
