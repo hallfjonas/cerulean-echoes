@@ -1,14 +1,15 @@
-insgesamt noch viel zu tun! 
+still a lot to do overall!
 
-- kick so soft ? bitte geeignete synthies als ausgangswert verwenden 
-- piano katastrophe; einfach langweilige uninspirierte chord progreesions; überhaupt kein house piano style
-- strings ist mir nicht klar, ob ich das gut fine 
-- eigentlich die meisten anderen effekte müssen auch überarbeitet werden
-- ich will wirklich einen trockenen, aber happy house sound; richtig classy 
+- kick so soft? please use suitable synths as the starting point
+- piano a disaster; just boring, uninspired chord progressions; no house piano style at all
+- strings: not sure whether I like them
+- most of the other effects need reworking too
+- I really want a dry but happy house sound; really classy
 - 
 ## 009 cool v1 (2026-11-01)
-- Ride sitzt komisch weit links (Spalte 2) → v2: Ride + Riser auf Spalte 7, Rim + Toms auf Spalte 2
-- Piano-Samples müssen klavierähnlicher werden können → v2: Riff klingt so lang wie notiert, dann Dämpfer; Knopf 3 = Pedal
-- Chord progressions etwas langweilig, bitte ikonischer → v2: Dorisch, Abstieg, Seele, Kreis (Kapitel 1-4)
-- Acid, Riff und Stimme folgen alle der Akkordfolge → zu unisono → v2: feste Melodien in A-Moll, die nur bei Reibung einen Ton ausweichen
-- Die parallelen Progressionen (Klavier-Riff, Chord Memory) als Option behalten → Kapitel 5-8 und Riff-Muster 3-4
+- Ride sits oddly far left (column 2) → v2: ride + riser on column 7, rim + toms on column 2
+- Piano samples must be able to sound more like a piano → v2: riff sounds as long as written, then damper; knob 3 = pedal
+- Chord progressions a bit boring, please more iconic → v2: Dorian, descent, soul, circle (chapters 1-4)
+- Acid, riff and voice all follow the chord progression → too unison → v2: fixed melodies in A minor that only move a
+  note aside where it clashes
+- Keep the parallel progressions (piano riff, chord memory) as an option → chapters 5-8 and riff patterns 3-4

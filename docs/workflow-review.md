@@ -202,7 +202,7 @@ Built 2026-11-16, each item tried once on a real past case. Nothing rejected; pa
 | P6 | `.gitignore` tracks `.claude/settings.json`, `launch.json`, `prds/`, `.gitattributes` | — | Hooks and PRDs now reach every checkout |
 | P7 | `tools/strudel-sim/audibility.mjs` (`npm run audibility`); `render.mjs` loads banks, soundfonts and the track's own samples, keys render; `strudel-mix` skill rewritten | 010 ambient-house | Found: `stemJ8_shake` is always silent (`colJojo(8)` maps to `off()`); Marimba D and Glockenspiel pads LOW; Rim echo and Shaker pads clip; noise, hats, bells, birds LOW. Not fixed (sound changes need the user) |
 | P8 | Skill `add-sample`; `check-sounds.mjs` warns "plays only after push to main" | copy of 010 with an unpushed dummy sample | Warning in both modes, exit code unchanged. `pad-levels.mjs` keeps its own voice map (skill says so) |
-| P9 | `midi-layouts/geraete.md`: full Launchkey table (pad grid C1 = 36 … E1 = 40, knobs absolute, untested buttons marked); vocabulary line in `CLAUDE.md` | transcripts and tracks | Pad channel 10 confirmed in use, button CCs still unmeasured |
+| P9 | `midi-layouts/devices.md`: full Launchkey table (pad grid C1 = 36 … E1 = 40, knobs absolute, untested buttons marked); vocabulary line in `CLAUDE.md` | transcripts and tracks | Pad channel 10 confirmed in use, button CCs still unmeasured |
 | P10 | `tools/path-lint.mjs` (`npm run path-lint`) | whole repo | 62 hits, all planned files in epics/PRDs, example names, or deleted files the review quotes; `CLAUDE.md`, skills and devices doc clean. Not run as a commit hook (too noisy while epics name planned files) |
 | P11 | `// @shared` regions (10 regions) in 007–010, canonical copies in `tools/shared/`, `npm run shared [-- --check / --from]` | 007–010 | `--check` 38× same. `controls` and `lc-view-draw` unified; compare identical on 008–010; 007 `ride B` differs, but HEAD vs HEAD differs the same way (compare is nondeterministic there). Left unmarked: 009's view draw, 008's `columns` (knob defaults), the status boxes |
 | P12 | `tools/track-map.mjs` (`npm run track-map`) | 008 (1462 lines) | ~80-line outline with sections, tags, stems, master |
@@ -213,4 +213,4 @@ Built 2026-11-16, each item tried once on a real past case. Nothing rejected; pa
 | P17 | Memory: `one-file-any-controllers` fixed (`old/` → git history, set sources); new `machine-tools` | — | Trajectory visual reference not added (no source for it) |
 
 Follow-ups found during the build: 010 shaker stem silent and pad levels (P7); `measure.mjs` default `--base` (CC 21–28)
-is from the 006 layout; 008/009/010/011 load piano samples from the `johannes` branch; `lab/harmonie/old/` still exists.
+is from the 006 layout; 008/009/010/011 load piano samples from the `johannes` branch; `lab/harmony/old/` may still exist.

@@ -57,7 +57,7 @@ const stem1_kick = s("[bd bd bd bd]").bank("RolandTR909")
     .sustain(0.1)
   )
   .room(globalRoom)
-  .roomsize(0.8) // Großer Raum lässt den Sub massiv wummern
+  .roomsize(0.8) // A large room makes the sub boom heavily
   .gain(subLevel.mul(masterLevel))
 
   // STEM 3: BASS

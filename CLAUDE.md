@@ -1,15 +1,15 @@
 # cerulean-echoes
 
 Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control XL 3s via `midin()` and a
-Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/geraete.md`).
-Talk to the user in German; code comments stay in English. Explain audio basics plainly.
+Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/devices.md`).
+Talk to the user in English; code comments are English too. Explain audio basics plainly.
 
 ## Labels
 Everything the player reads is English and short: `@ctl` texts, control and option names, the live view (`▣ LC big`), the status box.
 One name per job in every track: row 1 Brightness, row 2 Space, fader Level, button 1 Pattern (Chords on a harmony column),
 global column Fog / Thin / Tension / Master / Chapter / Break. Row 3 and button 2 are named for what they do (Length, Complexity,
 Octave, Echo throw, Lift). A `@ctl` text is one short line (about 50 characters): what the control does, no ranges or history.
-No pattern strings (x..x) in the live view. Chat with the user stays German.
+No pattern strings (x..x) in the live view.
 User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms" = Master fader, "LK" = Launchkey,
 "keys" = the Launchkey keys, "drum C1 / E1" = Launchkey pad by Novation note name (C1 = note 36, E1 = 40).
 
@@ -20,8 +20,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
-  `harmonie/`, `melodie/`, `einwurf/`, `samples/`, `tools/`
-  (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + German handbook PDF).
+  `harmony/`, `melody/`, `stab/`, `brass/`, `guitar/`, `strings/`, `samples/`, `tools/`
+  (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + English handbook PDF).
   A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
   column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in
   the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
@@ -87,7 +87,7 @@ Use them instead of redoing the steps by hand:
 - Same sound, less CPU, "drops out", "compare old/new", "event by event": `/strudel-optimize`.
 - Levels, "louder/quieter", "can't hear", clipping, balance of stems, pads, keys and voices: `/strudel-mix`.
 - Layout sheet, "regenerate layout", `.syx`, custom mode, Novation Components: `/lcxl-layout`.
-- New board, "Kandidaten", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
+- New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
 
 Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,

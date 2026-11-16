@@ -33,7 +33,7 @@ where time and corrections go.
 ## Functional Requirements
 1. Extract from each transcript: user requests, user corrections and rejections ("no", "not like that", repeated
    instructions), repeated tool sequences, skill and subagent use, hook output and failures, long or abandoned turns,
-   handover notes (`uebergabe-*`, `prompt-naechster-agent.md`).
+   handover notes (`handover-*`, `next-agent-prompt.md`).
 2. Cluster findings into themes and count frequency across sessions.
 3. Compare themes against existing skills, hook, `CLAUDE.md` and memory: gap, outdated, or unused.
 4. Write `docs/workflow-review.md`: themes, evidence, ranked proposals.

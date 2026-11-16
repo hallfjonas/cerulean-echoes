@@ -1,9 +1,9 @@
 // Handbook for harmony-tutorial.strudel (intervals, scales, modes, chord types, keys).
 // Compile: typst compile harmony-tutorial.typ
 
-#set document(title: "Harmonie-Tutorial: Handbuch")
+#set document(title: "Harmony Tutorial: Handbook")
 #set page(paper: "a4", margin: (x: 20mm, y: 18mm), numbering: "1")
-#set text(font: "Helvetica", size: 9.8pt, lang: "de")
+#set text(font: "Helvetica", size: 9.8pt, lang: "en")
 #set par(leading: 0.68em, spacing: 1em, justify: false)
 #set heading(numbering: none)
 #show heading.where(level: 1): set text(size: 15pt)
@@ -24,9 +24,9 @@
 #let box-of(color, title, body) = block(breakable: false,
   width: 100%, inset: 8pt, radius: 3pt, fill: color.lighten(85%), stroke: 0.5pt + color.lighten(30%),
 )[#text(weight: "bold", fill: color.darken(20%))[#title] #h(0.4em) #body]
-#let merke(body) = box-of(blue, "Merke:", body)
-#let hoeren(body) = box-of(orange, "Hören:", body)
-#let szene(body) = box-of(rgb("#4a8a3c"), "In Techno und House:", body)
+#let remember(body) = box-of(blue, "Remember:", body)
+#let listen(body) = box-of(orange, "Listen:", body)
+#let scene(body) = box-of(rgb("#4a8a3c"), "In techno and house:", body)
 
 // Piano keyboard from C, two octaves. Keys are counted in semitones from that C (A = 9, next A = 21).
 // on = light blue, root = dark blue, char = orange.
@@ -76,411 +76,411 @@
 
 // ============================================================
 #align(left)[
-  #text(size: 22pt, weight: "bold")[Harmonie-Tutorial]
+  #text(size: 22pt, weight: "bold")[Harmony Tutorial]
   #v(-0.5em)
-  #text(size: 12pt, fill: luma(90))[Intervalle, Skalen, Modi, Akkorde und Tonarten hören lernen, für Techno und House]
+  #text(size: 12pt, fill: luma(90))[Learning to hear intervals, scales, modes, chords and keys, for techno and house]
   #v(-0.3em)
-  #text(size: 9pt, fill: luma(110))[Handbuch zu `lab/tutorials/harmony-tutorial.strudel`]
+  #text(size: 9pt, fill: luma(110))[Handbook for `lab/tutorials/harmony-tutorial.strudel`]
 ]
 
 #v(0.5em)
-#outline(title: [Inhalt], depth: 1, indent: 1em)
+#outline(title: [Contents], depth: 1, indent: 1em)
 
-= So arbeitest du mit dem Tutorial
+= How to work with the tutorial
 
-== Die Idee
+== The idea
 
-Musiktheorie lernt man nicht durch Lesen, sondern durch Hören: Ein Begriff wie „dorisch“ oder „vermindert“ ist erst dann verstanden, wenn du ihn erkennst, wenn er erklingt. Deshalb ist das Tutorial so gebaut:
+You do not learn music theory by reading but by listening: a term like "Dorian" or "diminished" is only understood once you recognise it when it sounds. That is why the tutorial is built like this:
 
-- Jedes Kapitel ist eine *Schleife*, die endlos läuft. Es gibt keinen Zeitdruck.
-- Statt Dinge nacheinander abzuspielen, gibt es *Slider*. Du stellst einen Zustand ein, hörst ihn dir in Ruhe an und änderst dann *genau eine Sache*.
-- Fast jeder Schritt verändert nur *einen einzigen Ton*. So hörst du, was dieser Ton bewirkt. Das ist der Kern der Methode.
-- Der wichtige Ton ist im Pianoroll *orange*.
+- Every chapter is a *loop* that runs endlessly. There is no time pressure.
+- Instead of playing things one after another, there are *sliders*. You set a state, listen to it calmly and then change *exactly one thing*.
+- Almost every step changes only *a single note*. So you hear what this note does. That is the core of the method.
+- The important note is *orange* in the piano roll.
 
-Dieses Handbuch erklärt zu jedem Kapitel die Theorie in einfachen Worten, gibt dir konkrete Höraufgaben und sagt, wo du das in Techno und House wiederfindest. Die Kommentare im Code sind eine Kurzfassung davon.
+For each chapter this handbook explains the theory in simple words, gives you concrete listening tasks and says where you find it in techno and house. The comments in the code are a short version of it.
 
-== Bedienung
+== Controls
 
-+ Öffne `harmony-tutorial.strudel` in Strudel (strudel.cc).
-+ Stelle oben `const CHAPTER = 0` auf das gewünschte Kapitel (0 bis 12) und werte einmal aus (Strg+Enter).
-+ Ab jetzt nur noch die *Slider des Kapitels* bewegen. Sie erscheinen direkt im Code, neben `slider(...)`. Sie wirken sofort, ohne neues Auswerten. Die Slider der anderen Kapitel sind zwar sichtbar, tun aber nichts.
-+ Unter der letzten Zeile zeigt das *Pianoroll* die gespielten Töne mit Namen. Die Töne stehen an ihrer echten Tonhöhe: Lücken zwischen zwei Balken zeigen dir, ob ein Schritt groß (Ganzton) oder klein (Halbton) ist.
-+ Die Drums laufen in einem eigenen Block mit dem Slider `DRUMS` (Lautstärke, 0 = aus). Für die Kapitel 0 bis 2 empfiehlt es sich, die Drums erst einmal auszuschalten.
++ Open `harmony-tutorial.strudel` in Strudel (strudel.cc).
++ Set `const CHAPTER = 0` at the top to the chapter you want (0 to 12) and evaluate once (Ctrl+Enter).
++ From then on move only *the chapter's sliders*. They appear right in the code, next to `slider(...)`. They act immediately, without evaluating again. The sliders of the other chapters are visible but do nothing.
++ Below the last line the *piano roll* shows the notes played, with names. The notes sit at their real pitch: gaps between two bars show you whether a step is big (whole tone) or small (semitone).
++ The drums run in their own block with the slider `DRUMS` (level, 0 = off). For chapters 0 to 2 it is best to switch the drums off at first.
 
-== Wie man übt
+== How to practise
 
-- *Vier bis acht Takte pro Einstellung.* Das Ohr braucht eine Weile, bis es einen Klang als „Zuhause“ annimmt. Erst dann hörst du die Änderung.
-- *Hin und zurück.* Nach einer Änderung immer wieder zurückschalten. Der Unterschied zeigt sich im Vergleich, nicht im einzelnen Zustand.
-- *Mitsingen oder mitsummen.* Wenn du einen Ton singen kannst, hast du ihn gehört. Besonders wichtig: den Grundton jederzeit summen können.
-- *Augen zu.* Erst hören, dann im Pianoroll nachsehen, ob du recht hattest.
-- *Kurze Einheiten.* 20 bis 30 Minuten, dafür regelmäßig. Ein Vorschlag steht am Ende (Übungsplan).
+- *Four to eight bars per setting.* The ear needs a while to accept a sound as "home". Only then do you hear the change.
+- *Back and forth.* After a change, always switch back again. The difference shows in the comparison, not in a single state.
+- *Sing or hum along.* If you can sing a note, you have heard it. Most important: being able to hum the root at any time.
+- *Eyes closed.* Listen first, then check in the piano roll whether you were right.
+- *Short sessions.* 20 to 30 minutes, but regularly. A suggestion is at the end (practice plan).
 
-== Notennamen und Zeichen
+== Note names and symbols
 
-Strudel und das Pianoroll benutzen *englische Notennamen*. Der wichtigste Unterschied zum Deutschen:
+Strudel and the piano roll use *English note names*:
 
 #tbl(
-  (auto, auto, 1fr),
-  [*Englisch (Strudel)*], [*Deutsch*], [*Bedeutung*],
-  [B], [H], [der Ton zwischen A und C],
-  [B♭ (im Pianoroll `Bb`)], [B], [B um einen Halbton erniedrigt],
-  [F♯ (im Pianoroll `F#`)], [Fis], [♯ = „Kreuz“, einen Halbton höher],
-  [E♭ (im Pianoroll `Eb`)], [Es], [♭ = „b“, einen Halbton tiefer],
-  [A3], [a (kleines a)], [die Zahl ist die Oktave. A4 = 440 Hz, A3 = 220 Hz, A1 = 55 Hz],
+  (auto, 1fr),
+  [*Name (Strudel)*], [*Meaning*],
+  [B], [the note between A and C (called H in German)],
+  [B♭ (in the piano roll `Bb`)], [B lowered by a semitone (called B in German)],
+  [F♯ (in the piano roll `F#`)], [♯ = "sharp", one semitone higher],
+  [E♭ (in the piano roll `Eb`)], [♭ = "flat", one semitone lower],
+  [A3], [the number is the octave. A4 = 440 Hz, A3 = 220 Hz, A1 = 55 Hz],
 )
 
-Alle Beispiele stehen auf dem Grundton *A*. Das ist eine typische Techno-Tonart, und auf der Klaviatur sind A-Moll und die meisten Modi leicht zu sehen.
+All examples are on the root *A*. That is a typical techno key, and on the keyboard A minor and most modes are easy to see.
 
-In den Klaviaturgrafiken in diesem Heft gilt: *dunkelblau* = Grundton, *hellblau* = Ton der Skala oder des Akkords, *orange* = der Ton, auf den es ankommt.
+In the keyboard pictures in this booklet: *dark blue* = root, *light blue* = note of the scale or chord, *orange* = the note that matters.
 
-#fig(onA((0, 2, 3, 5, 7, 8, 10, 12)), [Beispiel: die A-Moll-Skala (A B C D E F G A). Es sind nur weiße Tasten.])
+#fig(onA((0, 2, 3, 5, 7, 8, 10, 12)), [Example: the A minor scale (A B C D E F G A). Only white keys.])
 
 // ============================================================
-= Teil A: Abstände hören
+= Part A: Hearing distances
 
-== Kapitel 0: Grundton und Intervalle
+== Chapter 0: Root and intervals
 
-*Worum es geht.* Ein *Ton* hat eine Tonhöhe. Der kleinste Schritt in unserer Musik ist der *Halbton*: von einer Taste zur direkt benachbarten, egal ob weiß oder schwarz. Zwölf Halbtöne ergeben eine *Oktave*; danach wiederholen sich die Tonnamen (A3 zu A4: doppelte Frequenz).
+*What it is about.* A *note* has a pitch. The smallest step in our music is the *semitone*: from one key to the very next one, whether white or black. Twelve semitones make an *octave*; after that the note names repeat (A3 to A4: double frequency).
 
-Ein *Intervall* ist der Abstand zwischen zwei Tönen, gezählt in Halbtönen. Das ist die wichtigste Grundlage überhaupt: Jede Skala und jeder Akkord ist nichts anderes als eine Auswahl von Intervallen über einem Grundton. Wer Intervalle hört, hört Harmonie.
+An *interval* is the distance between two notes, counted in semitones. This is the most important foundation of all: every scale and every chord is nothing but a choice of intervals above a root. If you hear intervals, you hear harmony.
 
-Der *Grundton* (auch Tonika, englisch root oder tonic) ist der Ton, der sich wie „zuhause“ anfühlt. Im Kapitel hält ein *Bordunton* (Drone: ein Ton, der die ganze Zeit liegt) das A fest. Darüber spielt die Lead abwechselnd A (weiß) und einen zweiten Ton (orange), `N` Halbtöne höher.
+The *root* (also tonic) is the note that feels like "home". In the chapter a *drone* (a note that sounds all the time) holds the A. Above it the lead alternates between A (white) and a second note (orange), `N` semitones higher.
 
-*Slider:* `N` = 0 bis 12 Halbtöne.
+*Slider:* `N` = 0 to 12 semitones.
 
 #tbl(
   (auto, auto, 1fr, 1fr),
-  [*N*], [*Name*], [*Klang*], [*Wo du es triffst*],
-  [0], [Prime], [derselbe Ton], [–],
-  [1], [kleine Sekunde], [scharfe Reibung, Bedrohung], [phrygische Techno-Basslines (A–B♭), Horror],
-  [2], [große Sekunde], [neutraler Schritt], [Melodien, sus2-Akkorde],
-  [3], [kleine Terz], [dunkel, traurig: *der* Moll-Klang], [jeder Moll-Akkord, das meiste Techno],
-  [4], [große Terz], [hell, fröhlich: *der* Dur-Klang], [Dur-Akkorde, Disco, euphorisches House],
-  [5], [Quarte], [offen, hohl, wartend], [sus4-Akkorde, Dub-Techno-Akkorde],
-  [6], [Tritonus], [instabil, unheimlich], [verminderte Akkorde, Industrial, Acid],
-  [7], [Quinte], [stark, rein, „Power“], [Grundton+Quinte im Bass, Rave-Stabs],
-  [8], [kleine Sexte], [dunkel, dramatisch], [Moll-Melodien (A–F), Trance-Leads],
-  [9], [große Sexte], [warm, soulig], [dorisches Deep House, Jazz-Akkorde],
-  [10], [kleine Septime], [bluesig, offen, groovig], [m7-Akkorde (Deep House), mixolydische Riffs],
-  [11], [große Septime], [verträumt, sehnsüchtig, gespannt], [maj7-Akkorde (Nu-Disco), der Leitton],
-  [12], [Oktave], [derselbe Ton, höher], [Oktav-Basslines (House, Disco)],
+  [*N*], [*Name*], [*Sound*], [*Where you meet it*],
+  [0], [unison], [the same note], [–],
+  [1], [minor second], [sharp friction, threat], [Phrygian techno basslines (A–B♭), horror],
+  [2], [major second], [neutral step], [melodies, sus2 chords],
+  [3], [minor third], [dark, sad: *the* minor sound], [every minor chord, most techno],
+  [4], [major third], [bright, happy: *the* major sound], [major chords, disco, euphoric house],
+  [5], [fourth], [open, hollow, waiting], [sus4 chords, dub techno chords],
+  [6], [tritone], [unstable, eerie], [diminished chords, industrial, acid],
+  [7], [fifth], [strong, pure, "power"], [root + fifth in the bass, rave stabs],
+  [8], [minor sixth], [dark, dramatic], [minor melodies (A–F), trance leads],
+  [9], [major sixth], [warm, soulful], [Dorian deep house, jazz chords],
+  [10], [minor seventh], [bluesy, open, groovy], [m7 chords (deep house), Mixolydian riffs],
+  [11], [major seventh], [dreamy, longing, tense], [maj7 chords (nu-disco), the leading tone],
+  [12], [octave], [the same note, higher], [octave basslines (house, disco)],
 )
 
-*Warum klingen manche Intervalle ruhig und andere gespannt?* Bei Oktave (2:1) und Quinte (3:2) schwingen die beiden Töne in einfachen Verhältnissen; ihre Schwingungen passen oft zusammen, das Ohr hört Verschmelzung. Bei kleiner Sekunde oder Tritonus passen sie kaum zusammen; man hört ein Flirren oder Reiben (Schwebung). Dieses Reiben nennt man *Dissonanz* (Spannung), das ruhige Verschmelzen *Konsonanz* (Entspannung).
+*Why do some intervals sound calm and others tense?* With the octave (2:1) and the fifth (3:2) the two notes vibrate in simple ratios; their vibrations often line up, and the ear hears them merge. With a minor second or a tritone they hardly line up; you hear a shimmer or rub (beating). This rubbing is called *dissonance* (tension), the calm merging *consonance* (release).
 
-#hoeren[
-  + `N` = 0, dann 12, dann 7. Diese drei klingen fast wie „ein Ton“. Wie ruhig ist das?
-  + `N` = 7, dann 6. Ein Halbton weniger, und aus der stärksten Verbindung wird die unheimlichste.
-  + `N` = 3, dann 4 (mehrmals hin und her): das ist schon der ganze Unterschied zwischen Moll und Dur.
-  + `N` = 1 und 11: Beide wollen weiter. Die 11 will nach oben zur 12, die 1 nach unten zur 0. Spürst du die Richtung?
-  + Gehe alle Werte von 0 bis 12 durch und sortiere sie für dich in „ruhig“, „farbig“ und „gespannt“.
+#listen[
+  + `N` = 0, then 12, then 7. These three sound almost like "one note". How calm is that?
+  + `N` = 7, then 6. One semitone less, and the strongest bond becomes the eeriest.
+  + `N` = 3, then 4 (back and forth several times): that is the whole difference between minor and major.
+  + `N` = 1 and 11: both want to move on. 11 wants up to 12, 1 wants down to 0. Do you feel the direction?
+  + Go through all values from 0 to 12 and sort them for yourself into "calm", "colourful" and "tense".
 ]
 
-#merke[Musik lebt von Spannung und Entspannung. Spannung entsteht durch Intervalle, die reiben; Entspannung durch Intervalle, die verschmelzen.]
+#remember[Music lives on tension and release. Tension comes from intervals that rub; release from intervals that merge.]
 
-== Kapitel 1: Dur oder Moll – ein einziger Ton entscheidet
+== Chapter 1: Major or minor – a single note decides
 
-*Worum es geht.* Ein Akkord aus Grundton, Terz und Quinte heißt *Dreiklang*. Ob er Dur oder Moll ist, entscheidet nur die *Terz*, also der Ton drei oder vier Halbtöne über dem Grundton. Grundton, Quinte und Oktave bleiben gleich.
+*What it is about.* A chord of root, third and fifth is called a *triad*. Whether it is major or minor is decided only by the *third*, i.e. the note three or four semitones above the root. Root, fifth and octave stay the same.
 
-#fig(onA((0, 3, 7), c: (3,)), [A-Moll: A C E. Die kleine Terz (3 Halbtöne, C) ist orange.])
-#fig(onA((0, 4, 7), c: (4,)), [A-Dur: A C♯ E. Die große Terz (4 Halbtöne, C♯) ist orange.])
-#fig(onA((0, 7, 12)), [Ohne Terz: A E A, der „Power-Chord“ (Quintklang). Weder Dur noch Moll.])
+#fig(onA((0, 3, 7), c: (3,)), [A minor: A C E. The minor third (3 semitones, C) is orange.])
+#fig(onA((0, 4, 7), c: (4,)), [A major: A C♯ E. The major third (4 semitones, C♯) is orange.])
+#fig(onA((0, 7, 12)), [Without a third: A E A, the "power chord" (fifth chord). Neither major nor minor.])
 
-Im Kapitel spielt die Lead die Töne nacheinander (Arpeggio), ein Stab spielt sie gleichzeitig, der Bass bleibt auf A.
+In the chapter the lead plays the notes one after another (arpeggio), a stab plays them together, the bass stays on A.
 
-*Slider:* `THIRD`: 0 = Moll, 1 = Dur, 2 = ohne Terz.
+*Slider:* `THIRD`: 0 = minor, 1 = major, 2 = no third.
 
-#hoeren[
-  + Alle vier Takte zwischen 0 und 1 wechseln. Ein Ton wandert um einen Halbton, und die ganze Stimmung kippt.
-  + Achte im Arpeggio auf das orange C beziehungsweise C♯. Kannst du es mitsingen?
-  + Stelle 2 ein: Ohne Terz fehlt die Stimmung. Es klingt stark, aber neutral. Wechsle danach zu 0 und 1 zurück. Die Terz „färbt“ den Klang.
+#listen[
+  + Switch between 0 and 1 every four bars. One note moves by a semitone, and the whole mood tips over.
+  + In the arpeggio listen for the orange C or C♯. Can you sing it?
+  + Set 2: without a third the mood is missing. It sounds strong but neutral. Then switch back to 0 and 1. The third "colours" the sound.
 ]
 
-#szene[Techno ist überwiegend Moll oder ganz ohne Terz: Viele Stabs und Basslines bestehen nur aus Grundton und Quinte oder Oktave. So bleibt die Stimmung offen und passt unter jede Melodie. Disco, French House und Piano-House sind oft Dur.]
+#scene[Techno is mostly minor or has no third at all: many stabs and basslines consist only of root and fifth or octave. That keeps the mood open and fits under any melody. Disco, French house and piano house are often major.]
 
-== Kapitel 2: Warum es Skalen gibt
+== Chapter 2: Why scales exist
 
-*Worum es geht.* Es gibt zwölf verschiedene Töne. Eine *Skala* (Tonleiter) wählt davon sieben (manchmal fünf) aus. Warum? Die Lead spielt *zufällige* Töne, und der Slider bestimmt, aus welcher Auswahl:
+*What it is about.* There are twelve different notes. A *scale* picks seven (sometimes five) of them. Why? The lead plays *random* notes, and the slider sets which set they come from:
 
-- *0 chromatisch:* alle 12 Töne. Klingt ziellos und „falsch“, weil nichts dem Ohr sagt, wo zuhause ist.
-- *1 A-Moll:* 7 Töne mit den Schritten G H G G H G G (G = Ganzton = 2 Halbtöne, H = Halbton). Plötzlich ist es eine Melodie: Jeder Ton gehört zum Grundton A.
-- *2 A-Moll-Pentatonik:* 5 Töne. Es fehlen die zwei Töne, die nur einen Halbton von einem Nachbarn entfernt liegen (B und F). Ohne Halbtöne kann nichts mehr reiben.
+- *0 chromatic:* all 12 notes. Sounds aimless and "wrong", because nothing tells the ear where home is.
+- *1 A minor:* 7 notes with the steps W H W W H W W (W = whole tone = 2 semitones, H = half tone = semitone). Suddenly it is a melody: every note belongs to the root A.
+- *2 A minor pentatonic:* 5 notes. The two notes that lie only a semitone from a neighbour (B and F) are missing. Without semitones nothing can rub any more.
 
-#fig(onA((0, 2, 3, 5, 7, 8, 10, 12), c: (2, 8)), [A-Moll. Orange: B und F, die beiden Töne mit einem Halbton-Nachbarn (B–C, E–F).])
-#fig(onA((0, 3, 5, 7, 10, 12)), [A-Moll-Pentatonik: A C D E G. Ohne B und F gibt es keine Halbtonschritte mehr.])
+#fig(onA((0, 2, 3, 5, 7, 8, 10, 12), c: (2, 8)), [A minor. Orange: B and F, the two notes with a semitone neighbour (B–C, E–F).])
+#fig(onA((0, 3, 5, 7, 10, 12)), [A minor pentatonic: A C D E G. Without B and F there are no semitone steps left.])
 
-*Slider:* `SET` = Tonvorrat (0 bis 2), `SEED` = welche Zufallsmelodie (0 bis 31). Die Melodie wiederholt sich alle zwei Takte, damit du sie lernen kannst.
+*Sliders:* `SET` = note set (0 to 2), `SEED` = which random melody (0 to 31). The melody repeats every two bars so you can learn it.
 
-#hoeren[
-  + `SEED` festlassen, `SET` wechseln. Rhythmus und „Zufall“ bleiben gleich, nur der Tonvorrat ändert sich.
-  + `SET` = 1 oder 2 lassen und mehrere `SEED`s durchprobieren. Fast jede Melodie „funktioniert“.
-  + Vergleiche 1 und 2: Moll hat mehr Charakter (auch mehr Spannung), Pentatonik klingt glatter und sicherer.
+#listen[
+  + Keep `SEED` fixed, change `SET`. Rhythm and "randomness" stay the same, only the note set changes.
+  + Leave `SET` = 1 or 2 and try several `SEED`s. Almost every melody "works".
+  + Compare 1 and 2: minor has more character (and more tension), pentatonic sounds smoother and safer.
 ]
 
-#szene[Die Moll-Pentatonik ist die Skala für Acid-Linien, Rave-Leads und improvisierte Synth-Soli: Man kann keinen falschen Ton spielen. Wer live mit Reglern Töne auswählt, ist mit ihr auf der sicheren Seite.]
+#scene[Minor pentatonic is the scale for acid lines, rave leads and improvised synth solos: you cannot play a wrong note. If you pick notes live with knobs, it keeps you on the safe side.]
 
-#merke[Eine Skala ist keine Regel, sondern ein Vorrat: Sie sorgt dafür, dass alle Töne zum selben Zuhause gehören.]
+#remember[A scale is not a rule but a supply: it makes sure all notes belong to the same home.]
 
 // ============================================================
-= Teil B: Skalen und Modi
+= Part B: Scales and modes
 
-== Kapitel 3: Die sieben Modi, von hell nach dunkel
+== Chapter 3: The seven modes, from bright to dark
 
-*Worum es geht.* Spielt man nur die weißen Tasten, aber beginnt jeweils auf einem anderen Ton, entstehen sieben Skalen: die *Modi* (Kirchentonarten). Dur und Moll sind zwei davon. Im Tutorial stehen alle sieben auf A, damit du sie direkt vergleichen kannst.
+*What it is about.* If you play only the white keys but start on a different note each time, you get seven scales: the *modes* (church modes). Major and minor are two of them. In the tutorial all seven are on A, so you can compare them directly.
 
-Das Schöne: Sortiert man sie nach Helligkeit, ändert sich von einem Modus zum nächsten *genau ein Ton* um einen Halbton. Jeder Schritt lässt sich also als *ein* veränderter Ton hören.
+The nice part: sorted by brightness, *exactly one note* changes by a semitone from one mode to the next. So every step can be heard as *one* changed note.
 
 #tbl(
   (auto, auto, auto, auto, 1fr),
-  [*MODE*], [*Modus*], [*Schritte*], [*Änderung*], [*Klang*],
-  [0], [lydisch], [G G G H G G H], [erhöhte Quarte D♯], [schwebend, traumhaft, am hellsten],
-  [1], [Dur (ionisch)], [G G H G G G H], [Quarte zurück auf D], [fröhlich, aufgelöst],
-  [2], [mixolydisch], [G G H G G H G], [Septime runter auf G], [Dur, aber locker, bluesig],
-  [3], [dorisch], [G H G G G H G], [Terz runter auf C: jetzt Moll], [Moll, aber warm, soulig],
-  [4], [Moll (äolisch)], [G H G G H G G], [Sexte runter auf F], [dunkel, melancholisch],
-  [5], [phrygisch], [H G G G H G G], [Sekunde runter auf B♭], [am dunkelsten, bedrohlich],
-  [6], [lokrisch], [H G G H G G G], [Quinte runter auf E♭], [kein stabiles Zuhause],
+  [*MODE*], [*Mode*], [*Steps*], [*Change*], [*Sound*],
+  [0], [Lydian], [W W W H W W H], [raised fourth D♯], [floating, dreamlike, brightest],
+  [1], [major (Ionian)], [W W H W W W H], [fourth back to D], [happy, resolved],
+  [2], [Mixolydian], [W W H W W H W], [seventh down to G], [major, but relaxed, bluesy],
+  [3], [Dorian], [W H W W W H W], [third down to C: now minor], [minor, but warm, soulful],
+  [4], [minor (Aeolian)], [W H W W H W W], [sixth down to F], [dark, melancholic],
+  [5], [Phrygian], [H W W W H W W], [second down to B♭], [darkest, threatening],
+  [6], [Locrian], [H W W H W W W], [fifth down to E♭], [no stable home],
 )
 
-Jeder Modus hat einen *charakteristischen Ton*: den, der ihn von normalem Dur oder Moll unterscheidet. Er ist im Pianoroll orange.
+Every mode has a *characteristic note*: the one that sets it apart from plain major or minor. It is orange in the piano roll.
 
 #grid(columns: (auto, 1fr), column-gutter: 5mm, row-gutter: 2.5mm, align: horizon,
-  onA((0, 2, 4, 6, 7, 9, 11, 12), c: (6,)), [*lydisch*: D♯ (übermäßige Quarte)],
-  onA((0, 2, 4, 5, 7, 9, 11, 12), c: (11,)), [*Dur*: G♯ (große Septime, der Leitton)],
-  onA((0, 2, 4, 5, 7, 9, 10, 12), c: (10,)), [*mixolydisch*: G (kleine Septime in Dur)],
-  onA((0, 2, 3, 5, 7, 9, 10, 12), c: (9,)), [*dorisch*: F♯ (große Sexte in Moll)],
-  onA((0, 2, 3, 5, 7, 8, 10, 12), c: (8,)), [*Moll*: F (kleine Sexte)],
-  onA((0, 1, 3, 5, 7, 8, 10, 12), c: (1,)), [*phrygisch*: B♭ (kleine Sekunde)],
-  onA((0, 1, 3, 5, 6, 8, 10, 12), c: (6,)), [*lokrisch*: E♭ (verminderte Quinte)],
+  onA((0, 2, 4, 6, 7, 9, 11, 12), c: (6,)), [*Lydian*: D♯ (augmented fourth)],
+  onA((0, 2, 4, 5, 7, 9, 11, 12), c: (11,)), [*Major*: G♯ (major seventh, the leading tone)],
+  onA((0, 2, 4, 5, 7, 9, 10, 12), c: (10,)), [*Mixolydian*: G (minor seventh in major)],
+  onA((0, 2, 3, 5, 7, 9, 10, 12), c: (9,)), [*Dorian*: F♯ (major sixth in minor)],
+  onA((0, 2, 3, 5, 7, 8, 10, 12), c: (8,)), [*Minor*: F (minor sixth)],
+  onA((0, 1, 3, 5, 7, 8, 10, 12), c: (1,)), [*Phrygian*: B♭ (minor second)],
+  onA((0, 1, 3, 5, 6, 8, 10, 12), c: (6,)), [*Locrian*: E♭ (diminished fifth)],
 )
 
-Im Kapitel läuft die Skala in Takt 1 hoch, in Takt 2 runter. Der Stab spielt dazu den *Grundakkord* des Modus (Stufe 1, 3 und 5 übereinander).
+In the chapter the scale runs up in bar 1 and down in bar 2. The stab plays the mode's *home chord* along with it (degrees 1, 3 and 5 stacked).
 
-*Slider:* `MODE` = 0 bis 6 (Start: 4 = Moll).
+*Slider:* `MODE` = 0 to 6 (start: 4 = minor).
 
-#hoeren[
-  + Bei 4 (Moll) starten. Einen Schritt nach oben (3, dorisch): Welcher Ton ist anders? (F wird F♯.) Zurück zu 4. Mehrmals.
-  + So weiter bis 0, immer einen Schritt, immer hin und zurück. Dann von 4 abwärts bis 6.
-  + Achte auf den Stab: Bei 0 bis 2 ist der Grundakkord Dur, bei 3 bis 5 Moll, bei 6 *vermindert* (A C E♭). Deshalb taugt lokrisch nicht als Zuhause: Selbst der Heimakkord ist instabil.
-  + Springe von 0 auf 5: Das ist der Weg vom hellsten zum dunkelsten brauchbaren Modus.
+#listen[
+  + Start at 4 (minor). One step up (3, Dorian): which note is different? (F becomes F♯.) Back to 4. Several times.
+  + Go on like this to 0, always one step, always back and forth. Then from 4 downwards to 6.
+  + Listen to the stab: at 0 to 2 the home chord is major, at 3 to 5 minor, at 6 *diminished* (A C E♭). That is why Locrian is no good as a home: even the home chord is unstable.
+  + Jump from 0 to 5: that is the way from the brightest to the darkest usable mode.
 ]
 
-#merke[Modi sind keine sieben völlig verschiedenen Welten, sondern eine Helligkeitsleiter. Jede Stufe erniedrigt einen Ton.]
+#remember[Modes are not seven completely different worlds but a ladder of brightness. Each rung lowers one note.]
 
-== Kapitel 4: Jeder Modus in seinem typischen Riff
+== Chapter 4: Every mode in its typical riff
 
-*Worum es geht.* Skalen auf- und abwärts sind nur der erste Schritt. Jeder Modus hat typische Wendungen, die seinen charakteristischen Ton betonen, oft eine Zwei-Akkord-Schleife. Der Clou: Mit `COMPARE` = 1 spielt derselbe Riff im *Nachbarmodus*, dem genau dieser eine Ton fehlt. So hörst du, was ein einzelner Ton ausmacht.
+*What it is about.* Scales up and down are only the first step. Every mode has typical turns that stress its characteristic note, often a two-chord loop. The trick: with `COMPARE` = 1 the same riff plays in the *neighbouring mode*, which lacks exactly this one note. So you hear what a single note makes.
 
 #tbl(
   (auto, auto, auto, 1fr, auto),
-  [*RIFF*], [*Modus*], [*Akkorde*], [*Typisch für*], [*COMPARE*],
-  [0], [lydisch], [A – B (Dur auf Stufe II)], [Ambient-Pads, Film, Progressive House], [Dur (D♯ → D)],
-  [1], [Dur], [A – E], [Piano House, Disco, Hands-up], [mixolydisch (G♯ → G)],
-  [2], [mixolydisch], [A – G (♭VII)], [Funky House, Disco, Chicago], [Dur (G → G♯)],
-  [3], [dorisch], [Am7 – D7 (Dur-IV)], [*der* Deep-House-Vamp, Detroit], [Moll (F♯ → F)],
-  [4], [Moll], [Am – F (♭VI)], [Techno, Trance, melancholisches House], [dorisch (F → F♯)],
-  [5], [phrygisch], [Am – B♭ (♭II)], [harte Techno-Basslines, EBM], [Moll (B♭ → B)],
-  [6], [lokrisch], [nur A°], [Spannung, Horror, Industrial], [phrygisch (E♭ → E)],
+  [*RIFF*], [*Mode*], [*Chords*], [*Typical for*], [*COMPARE*],
+  [0], [Lydian], [A – B (major on degree II)], [ambient pads, film, progressive house], [major (D♯ → D)],
+  [1], [major], [A – E], [piano house, disco, hands-up], [Mixolydian (G♯ → G)],
+  [2], [Mixolydian], [A – G (♭VII)], [funky house, disco, Chicago], [major (G → G♯)],
+  [3], [Dorian], [Am7 – D7 (major IV)], [*the* deep house vamp, Detroit], [minor (F♯ → F)],
+  [4], [minor], [Am – F (♭VI)], [techno, trance, melancholic house], [Dorian (F → F♯)],
+  [5], [Phrygian], [Am – B♭ (♭II)], [hard techno basslines, EBM], [minor (B♭ → B)],
+  [6], [Locrian], [only A°], [tension, horror, industrial], [Phrygian (E♭ → E)],
 )
 
-Ein *Vamp* ist eine Schleife aus zwei Akkorden, die endlos hin und her pendelt. Fast jedes Deep-House-Stück ist so gebaut.
+A *vamp* is a loop of two chords that swings back and forth endlessly. Almost every deep house piece is built like this.
 
-*Slider:* `RIFF` = Modus (0 bis 6, Start 3), `COMPARE` = 0 (Original) oder 1 (Nachbar ohne den orangen Ton).
+*Sliders:* `RIFF` = mode (0 to 6, start 3), `COMPARE` = 0 (original) or 1 (neighbour without the orange note).
 
-#hoeren[
-  + `RIFF` = 3 (dorisch). Vier Takte hören, dann `COMPARE` = 1: Der Riff wird zu normalem Moll. Was geht verloren? (Meist: das Warme, Hoffnungsvolle.)
-  + `RIFF` = 4 (Moll) mit `COMPARE` = 1: genau die umgekehrte Richtung. Das Paar dorisch/Moll ist für House das wichtigste überhaupt.
-  + `RIFF` = 5 (phrygisch): Die Bassline pendelt zwischen A und B♭. Mit `COMPARE` = 1 wird daraus A–B: die Bedrohung ist weg.
-  + `RIFF` = 2 und 1 vergleichen: mixolydisch ist Dur mit „Lässigkeit“.
+#listen[
+  + `RIFF` = 3 (Dorian). Listen for four bars, then `COMPARE` = 1: the riff turns into plain minor. What gets lost? (Usually: the warm, hopeful part.)
+  + `RIFF` = 4 (minor) with `COMPARE` = 1: exactly the opposite direction. The Dorian/minor pair is the most important of all for house.
+  + `RIFF` = 5 (Phrygian): the bassline swings between A and B♭. With `COMPARE` = 1 it becomes A–B: the threat is gone.
+  + Compare `RIFF` = 2 and 1: Mixolydian is major with "swagger".
 ]
 
-#szene[Phrygische Halbton-Basslines (Grundton und der Ton einen Halbton darüber) sind ein Markenzeichen von hartem Techno und EBM. Der dorische Vamp i–IV (Am7–D7) ist das Fundament von Deep House und Detroit-Techno. Mixolydisch steckt in vielen Disco- und Funk-House-Riffs, lydisch in schwebenden Pads von Progressive House.]
+#scene[Phrygian semitone basslines (root and the note a semitone above) are a hallmark of hard techno and EBM. The Dorian vamp i–IV (Am7–D7) is the foundation of deep house and Detroit techno. Mixolydian is in many disco and funk house riffs, Lydian in the floating pads of progressive house.]
 
 // ============================================================
-= Teil C: Akkorde
+= Part C: Chords
 
-== Kapitel 5: Akkorde aus der Skala
+== Chapter 5: Chords from the scale
 
-*Worum es geht.* Einen Akkord baut man, indem man *jeden zweiten Ton* der Skala übereinanderstapelt: Stufe d, d+2, d+4 ergibt einen Dreiklang (3 Töne). Dazu d+6 ergibt einen *Septakkord* (4 Töne), dazu d+8 einen *Nonenakkord* (5 Töne).
+*What it is about.* You build a chord by stacking *every other note* of the scale: degrees d, d+2, d+4 give a triad (3 notes). Adding d+6 gives a *seventh chord* (4 notes), adding d+8 a *ninth chord* (5 notes).
 
-Weil die Skala ungleiche Schritte hat (Ganz- und Halbtöne), bekommt jeder gestapelte Akkord eine andere *Qualität*: Dur, Moll oder vermindert.
+Because the scale has unequal steps (whole and half tones), every stacked chord gets a different *quality*: major, minor or diminished.
 
 #tbl(
   (auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
   [*DEGREE*], [0], [1], [2], [3], [4], [5], [6],
-  [Stufe], [i], [ii°], [III], [iv], [v], [VI], [VII],
-  [Dreiklang in A-Moll], [Am], [B°], [C], [Dm], [Em], [F], [G],
-  [Septakkord], [Am7], [Bm7♭5], [Cmaj7], [Dm7], [Em7], [Fmaj7], [G7],
+  [Degree], [i], [ii°], [III], [iv], [v], [VI], [VII],
+  [Triad in A minor], [Am], [B°], [C], [Dm], [Em], [F], [G],
+  [Seventh chord], [Am7], [Bm7♭5], [Cmaj7], [Dm7], [Em7], [Fmaj7], [G7],
 )
 
-*Stufenschreibweise:* Römische Zahlen zählen die Akkorde in der Skala. Groß = Dur-Akkord, klein = Moll-Akkord, ° = vermindert. Der Vorteil: „i – VI – III – VII“ beschreibt dieselbe Akkordfolge in jeder Tonart. In A-Moll ist das Am – F – C – G, in D-Moll Dm – B♭ – F – C.
+*Roman numeral notation:* Roman numerals count the chords in the scale. Upper case = major chord, lower case = minor chord, ° = diminished. The advantage: "i – VI – III – VII" describes the same chord progression in every key. In A minor it is Am – F – C – G, in D minor Dm – B♭ – F – C.
 
-*Slider:* `DEGREE` = Stufe (0 bis 6), `SIZE` = 0 Dreiklang, 1 Septakkord, 2 Nonenakkord, `SCALE5` = Skala (gleiche Reihenfolge wie Kapitel 3, Start 4 = Moll).
+*Sliders:* `DEGREE` = degree (0 to 6), `SIZE` = 0 triad, 1 seventh chord, 2 ninth chord, `SCALE5` = scale (same order as chapter 3, start 4 = minor).
 
-#hoeren[
-  + `DEGREE` von 0 bis 6 durchgehen. Bei jedem Akkord: Dur oder Moll? Prüfe mit der Tabelle.
-  + `DEGREE` = 1 (B°): der eine verminderte Akkord der Skala. Er klingt gequetscht und will weiter.
-  + `DEGREE` = 0, `SIZE` von 0 über 1 auf 2: Aus Am wird Am7 und Am9. Weicher, jazziger, tiefer: das ist der Deep-House-Klang.
-  + `SCALE5` = 3 (dorisch), `DEGREE` = 3: Aus Dm wird D-Dur. Genau dieser Akkord macht den dorischen Vamp aus Kapitel 4.
+#listen[
+  + Go through `DEGREE` from 0 to 6. For each chord: major or minor? Check with the table.
+  + `DEGREE` = 1 (B°): the one diminished chord of the scale. It sounds squeezed and wants to move on.
+  + `DEGREE` = 0, `SIZE` from 0 via 1 to 2: Am becomes Am7 and Am9. Softer, jazzier, deeper: that is the deep house sound.
+  + `SCALE5` = 3 (Dorian), `DEGREE` = 3: Dm becomes D major. Exactly this chord makes the Dorian vamp from chapter 4.
 ]
 
-#merke[Eine Skala liefert ihre Akkorde gleich mit. Wer die Skala kennt, weiß, welche Akkorde „passen“.]
+#remember[A scale comes with its chords. If you know the scale, you know which chords "fit".]
 
-== Kapitel 6: Akkordtypen – fröhlich, traurig, gespannt, schwebend
+== Chapter 6: Chord types – happy, sad, tense, floating
 
-*Worum es geht.* Hier stehen alle Akkorde auf A, gebaut aus Halbtonschritten über dem Grundton (die Intervalle aus Kapitel 0). Takt 1 spielt den Akkord als Stab, Takt 2 dieselben Töne nacheinander, damit du jeden einzelnen hörst.
+*What it is about.* Here all chords are on A, built from semitone steps above the root (the intervals from chapter 0). Bar 1 plays the chord as a stab, bar 2 the same notes one after another, so you hear each one.
 
 #tbl(
   (auto, auto, auto, auto, 1fr, 1fr),
-  [*TYPE*], [*Name*], [*Schritte*], [*Töne*], [*Klang*], [*Techno / House*],
-  [0], [5 (Power)], [0 7 12], [A E A], [neutral, stark], [Rave-Stabs, Hoover, Techno-Bass],
-  [1], [Dur], [0 4 7], [A C♯ E], [hell, fröhlich], [Disco, French House, Piano House],
-  [2], [Moll], [0 3 7], [A C E], [dunkel, traurig], [das meiste Techno, Trance],
-  [3], [sus2], [0 2 7], [A B E], [offen, unaufgelöst], [Progressive House, Melodic-Techno-Pads],
-  [4], [sus4], [0 5 7], [A D E], [hohl, wartend], [Melodic-Techno-Stabs, löst sich in 1 oder 2 auf],
-  [5], [vermindert (dim)], [0 3 6], [A C E♭], [gequetscht, unruhig], [Spannungs-Stabs, Durchgang, Horror],
-  [6], [übermäßig (aug)], [0 4 8], [A C♯ F], [unheimlich, schwebend], [Riser, Breaks, nur kurz],
-  [7], [maj7], [0 4 7 11], [A C♯ E G♯], [verträumt, sehnsüchtig], [Nu-Disco, Balearic, Lounge House],
-  [8], [7 (Dominant-Sept)], [0 4 7 10], [A C♯ E G], [bluesig, will weiter], [Chicago-House-Orgeln, Gospel House],
-  [9], [m7], [0 3 7 10], [A C E G], [weich, warmes Moll], [Deep House: *der* House-Akkord],
-  [10], [m9], [0 3 7 10 14], [A C E G B], [üppig, jazzig], [Deep House, Detroit, Dub Techno],
-  [11], [Quartenstapel], [0 5 10 15], [A D G C], [hohl, modern, offen], [Dub-Techno-/Detroit-Stab],
-  [12], [m7♭5 (halbvermindert)], [0 3 6 10], [A C E♭ G], [dunkle, jazzige Spannung], [Deep-House-Wendungen vor Moll],
-  [13], [dim7 (vermindert sept)], [0 3 6 9], [A C E♭ F♯], [sehr gespannt, symmetrisch], [Builds, Horror, vor dem Drop],
+  [*TYPE*], [*Name*], [*Steps*], [*Notes*], [*Sound*], [*Techno / house*],
+  [0], [5 (power)], [0 7 12], [A E A], [neutral, strong], [rave stabs, hoover, techno bass],
+  [1], [major], [0 4 7], [A C♯ E], [bright, happy], [disco, French house, piano house],
+  [2], [minor], [0 3 7], [A C E], [dark, sad], [most techno, trance],
+  [3], [sus2], [0 2 7], [A B E], [open, unresolved], [progressive house, melodic techno pads],
+  [4], [sus4], [0 5 7], [A D E], [hollow, waiting], [melodic techno stabs, resolves to 1 or 2],
+  [5], [diminished (dim)], [0 3 6], [A C E♭], [squeezed, restless], [tension stabs, passing chord, horror],
+  [6], [augmented (aug)], [0 4 8], [A C♯ F], [eerie, floating], [risers, breaks, only briefly],
+  [7], [maj7], [0 4 7 11], [A C♯ E G♯], [dreamy, longing], [nu-disco, Balearic, lounge house],
+  [8], [7 (dominant seventh)], [0 4 7 10], [A C♯ E G], [bluesy, wants to move on], [Chicago house organs, gospel house],
+  [9], [m7], [0 3 7 10], [A C E G], [soft, warm minor], [deep house: *the* house chord],
+  [10], [m9], [0 3 7 10 14], [A C E G B], [lush, jazzy], [deep house, Detroit, dub techno],
+  [11], [stacked fourths], [0 5 10 15], [A D G C], [hollow, modern, open], [dub techno / Detroit stab],
+  [12], [m7♭5 (half-diminished)], [0 3 6 10], [A C E♭ G], [dark, jazzy tension], [deep house turns before minor],
+  [13], [dim7 (diminished seventh)], [0 3 6 9], [A C E♭ F♯], [very tense, symmetric], [builds, horror, before the drop],
 )
 
-=== Warum klingen sie so?
+=== Why do they sound like this?
 
-- *Die Terz entscheidet Dur (4) oder Moll (3).* Akkorde ohne Terz (Power, sus, Quartenstapel) sind weder noch; ihre Stimmung bleibt offen. Deshalb liebt Techno diese Akkorde: Sie passen zu jeder Bassline und klingen nie „fröhlich“ oder „traurig“.
-- *Die Quinte entscheidet stabil oder instabil.* Eine reine Quinte (7) gibt dem Akkord Halt. *Vermindert* senkt sie auf den Tritonus (6), *übermäßig* hebt sie auf 8. Beide verlieren dadurch ihr stabiles Zentrum: Sie klingen, als würden sie fallen oder schweben.
-- *Die Septime gibt Farbe.* Die kleine Septime (10) bringt Groove, Blues und Weichheit, die große Septime (11) Sehnsucht und Traum.
-- *sus* heißt „suspended“, aufgehängt: Die Terz ist durch die Sekunde (sus2) oder Quarte (sus4) ersetzt. Der Akkord wartet auf eine Auflösung, bekommt sie aber oft nicht. Genau das macht ihn für langgezogene Spannungsbögen nützlich.
+- *The third decides major (4) or minor (3).* Chords without a third (power, sus, stacked fourths) are neither; their mood stays open. That is why techno loves these chords: they fit any bassline and never sound "happy" or "sad".
+- *The fifth decides stable or unstable.* A perfect fifth (7) gives the chord a footing. *Diminished* lowers it to the tritone (6), *augmented* raises it to 8. Both lose their stable centre: they sound as if they were falling or floating.
+- *The seventh adds colour.* The minor seventh (10) brings groove, blues and softness, the major seventh (11) longing and dream.
+- *sus* means "suspended": the third is replaced by the second (sus2) or fourth (sus4). The chord waits for a resolution but often does not get it. That is exactly what makes it useful for long tension arcs.
 
-=== Vermindert und übermäßig genauer
+=== Diminished and augmented in more detail
 
-#fig(onA((0, 3, 6), c: (6,)), [*Vermindert* (A°): zwei kleine Terzen übereinander (3+3). Die Quinte ist um einen Halbton erniedrigt (E → E♭).])
-#fig(onA((0, 3, 6, 9), c: (6, 9)), [*Vermindert-Sept* (A°7): drei kleine Terzen (3+3+3). Der Abstand von F♯ zum nächsten A ist wieder 3. Der Akkord ist vollkommen symmetrisch.])
-#fig(onA((0, 3, 6, 10), c: (6,)), [*Halbvermindert* (Am7♭5): verminderter Dreiklang mit kleiner Septime. Weicher als dim7, typisch in Jazz und Deep House.])
-#fig(onA((0, 4, 8), c: (8,)), [*Übermäßig* (A+): zwei große Terzen (4+4). Die Quinte ist erhöht (E → F). Ebenfalls symmetrisch.])
+#fig(onA((0, 3, 6), c: (6,)), [*Diminished* (A°): two minor thirds stacked (3+3). The fifth is lowered by a semitone (E → E♭).])
+#fig(onA((0, 3, 6, 9), c: (6, 9)), [*Diminished seventh* (A°7): three minor thirds (3+3+3). The distance from F♯ to the next A is 3 again. The chord is perfectly symmetric.])
+#fig(onA((0, 3, 6, 10), c: (6,)), [*Half-diminished* (Am7♭5): diminished triad with a minor seventh. Softer than dim7, typical in jazz and deep house.])
+#fig(onA((0, 4, 8), c: (8,)), [*Augmented* (A+): two major thirds (4+4). The fifth is raised (E → F). Symmetric as well.])
 
-Symmetrische Akkorde (vermindert, übermäßig) bestehen nur aus gleich großen Schritten. Kein Ton hebt sich als Grundton hervor, das Ohr verliert sein „Zuhause“. Das macht sie zu idealen Spannungsmachern und zu schlechten Heimakkorden.
+Symmetric chords (diminished, augmented) consist only of equal steps. No note stands out as the root, and the ear loses its "home". That makes them ideal tension makers and poor home chords.
 
-*Slider:* `TYPE` = 0 bis 13 (Start 2 = Moll).
+*Slider:* `TYPE` = 0 to 13 (start 2 = minor).
 
-#hoeren[
-  + 1 → 2 → 5 (Dur, Moll, vermindert): Jeder Schritt senkt einen Ton um einen Halbton (erst die Terz, dann die Quinte).
-  + 1 → 6 (Dur, übermäßig): Nur die Quinte steigt. Hörst du, wie der Boden wegschwimmt?
-  + 2 → 9 → 10 (Moll, m7, m9): immer tieferes House.
-  + 9 → 12 → 13 (m7, halbvermindert, dim7): immer mehr Spannung.
-  + 3, 4 und 11 (sus2, sus4, Quartenstapel): Klingen sie Dur oder Moll? (Antwort: keins von beiden.)
+#listen[
+  + 1 → 2 → 5 (major, minor, diminished): each step lowers one note by a semitone (first the third, then the fifth).
+  + 1 → 6 (major, augmented): only the fifth rises. Do you hear the ground floating away?
+  + 2 → 9 → 10 (minor, m7, m9): deeper and deeper house.
+  + 9 → 12 → 13 (m7, half-diminished, dim7): more and more tension.
+  + 3, 4 and 11 (sus2, sus4, stacked fourths): do they sound major or minor? (Answer: neither.)
 ]
 
-== Kapitel 7: Verminderte Akkorde im Einsatz
+== Chapter 7: Diminished chords in use
 
-*Worum es geht.* Verminderte Akkorde sind selten „der“ Akkord eines Tracks. Sie sind Werkzeuge für Spannung. Das Kapitel zeigt drei typische Verwendungen (Slider `USE`):
+*What it is about.* Diminished chords are rarely "the" chord of a track. They are tools for tension. The chapter shows three typical uses (slider `USE`):
 
-*0 – Durchgangsakkord.* Die Schleife spielt Am | Dm | G♯°7 | Am. Der G♯°7 (G♯ B D F) steht einen Halbton unter dem Grundton A. Alle seine Töne lehnen sich an Am an: G♯ will nach A, B nach C, F nach E. Hör auf den Übergang von Takt 4 zu Takt 1: Der Akkord „fällt“ nach Hause. Klassisch in House-Piano, Garage und Gospel-House, oft auch direkt vor einem Drop.
+*0 – Passing chord.* The loop plays Am | Dm | G♯°7 | Am. The G♯°7 (G♯ B D F) sits a semitone below the root A. All its notes lean towards Am: G♯ wants to A, B to C, F to E. Listen to the move from bar 4 to bar 1: the chord "falls" home. Classic in house piano, garage and gospel house, often right before a drop too.
 
-#fig(kb(on: (8, 11, 14, 17), char: (8,)), [G♯°7: G♯ B D F. Orange: G♯, der Leitton einen Halbton unter A.])
+#fig(kb(on: (8, 11, 14, 17), char: (8,)), [G♯°7: G♯ B D F. Orange: G♯, the leading tone a semitone below A.])
 
-*1 – Symmetrie.* Ein dim7 besteht aus 3+3+3 Halbtönen. Verschiebt man ihn um 3 Halbtöne, erhält man *dieselben vier Töne* wieder (nur in anderer Lage). Es gibt deshalb nur drei verschiedene dim7-Akkorde. Im Kapitel steigt eine dim7-Form in Halbtönen (A°7, B♭°7, B°7, C°7), während der Bass auf A liegen bleibt. Sie steigt und steigt und landet nie: ein typischer Aufbau vor einem Drop.
+*1 – Symmetry.* A dim7 consists of 3+3+3 semitones. Shift it by 3 semitones and you get *the same four notes* again (just in a different position). So there are only three different dim7 chords. In the chapter a dim7 shape rises in semitones (A°7, B♭°7, B°7, C°7) while the bass stays on A. It rises and rises and never lands: a typical build before a drop.
 
-*2 – Bedrohungs-Stab.* Der Bass bleibt auf A, der Stab wechselt jeden Takt zwischen A-Moll (A C E) und A-vermindert (A C E♭). Nur die Quinte sinkt um einen Halbton (orange). Der Tritonus A–E♭ macht es bedrohlich: harter Techno, Acid, EBM.
+*2 – Threat stab.* The bass stays on A, the stab switches every bar between A minor (A C E) and A diminished (A C E♭). Only the fifth drops by a semitone (orange). The tritone A–E♭ makes it threatening: hard techno, acid, EBM.
 
-#hoeren[
-  + `USE` = 0 mit Drums auf 0. Summe die Melodie mit. Nach Takt 4 spürst du, wohin die Musik muss.
-  + `USE` = 1: Achte darauf, dass es nie „ankommt“. Stell dir vor, an der Stelle von Takt 1 käme der Drop.
-  + `USE` = 2: Ein einziger Halbton in einem Akkord verwandelt Melancholie in Bedrohung.
+#listen[
+  + `USE` = 0 with drums at 0. Hum the melody along. After bar 4 you feel where the music has to go.
+  + `USE` = 1: notice that it never "arrives". Imagine the drop coming at the place of bar 1.
+  + `USE` = 2: a single semitone in a chord turns melancholy into threat.
 ]
 
-#szene[Verminderte Akkorde kommen meist kurz vor: als Stab mit viel Hall, als Durchgang in einer House-Piano-Figur, als steigende Kette im Build-up. Ein ganzer Track auf einem verminderten Akkord ist selten, aber im Industrial und in dunklem Acid nicht unüblich.]
+#scene[Diminished chords mostly appear briefly: as a stab with lots of reverb, as a passing chord in a house piano figure, as a rising chain in a build-up. A whole track on a diminished chord is rare, but not unusual in industrial and dark acid.]
 
-== Kapitel 8: Chord Memory – eine Form, verschoben
+== Chapter 8: Chord memory – one shape, shifted
 
-*Worum es geht.* Viele Techno- und House-Tracks ignorieren die Skala komplett: Sie nehmen *eine* Akkordform und verschieben die ganze Form nach oben und unten. Alte Synthesizer hatten dafür eine „Chord Memory“-Taste: Ein gespeicherter Akkord liegt auf jeder Taste. Die Töne verlassen dabei die Tonart, aber das Ohr akzeptiert es, weil die Farbe des Akkords gleich bleibt (*Parallelverschiebung*).
+*What it is about.* Many techno and house tracks ignore the scale completely: they take *one* chord shape and shift the whole shape up and down. Old synthesizers had a "chord memory" button for this: a stored chord sits on every key. The notes leave the key, but the ear accepts it because the chord's colour stays the same (*parallel motion*).
 
-*Slider:* `SHAPE`: 0 Moll, 1 m7, 2 m9, 3 Quartenstapel (der Dub-Techno-Akkord), 4 maj7. `MOVE`: 0 bleibt auf A, 1 A–C–D–C (House), 2 A–G–F–G (Dub, absinkend), 3 A–B♭ (dunkler Techno-Halbton).
+*Sliders:* `SHAPE`: 0 minor, 1 m7, 2 m9, 3 stacked fourths (the dub techno chord), 4 maj7. `MOVE`: 0 stays on A, 1 A–C–D–C (house), 2 A–G–F–G (dub, sinking), 3 A–B♭ (dark techno semitone).
 
-Das lange Delay ist der Dub-Techno-Trick: Die Echos füllen den Raum zwischen den kurzen Stabs.
+The long delay is the dub techno trick: the echoes fill the space between the short stabs.
 
-#hoeren[
-  + `MOVE` festhalten, `SHAPE` wechseln: gleicher Rhythmus, aber Moll = Techno, m9 = Deep House, Quartenstapel = Dub Techno, maj7 = Nu-Disco.
-  + `SHAPE` = 3, `MOVE` = 2: der Basic-Channel-/Dub-Techno-Klang.
-  + Vergleiche mit Kapitel 5: Dort folgen die Akkorde der Skala (ihre Qualität wechselt), hier bleibt die Qualität gleich und die Tonart wird verlassen.
+#listen[
+  + Keep `MOVE` fixed, change `SHAPE`: same rhythm, but minor = techno, m9 = deep house, stacked fourths = dub techno, maj7 = nu-disco.
+  + `SHAPE` = 3, `MOVE` = 2: the Basic Channel / dub techno sound.
+  + Compare with chapter 5: there the chords follow the scale (their quality changes), here the quality stays the same and the key is left.
 ]
 
-#szene[Chord Memory prägt Detroit-Techno, Dub Techno (Basic Channel, Deepchord) und viel Deep House. Für dich als Live-Performer ist es besonders praktisch: Eine einzige Akkordform plus eine Grundton-Folge reicht für einen ganzen Track.]
+#scene[Chord memory shapes Detroit techno, dub techno (Basic Channel, Deepchord) and a lot of deep house. For you as a live performer it is especially handy: a single chord shape plus a sequence of roots is enough for a whole track.]
 
 // ============================================================
-= Teil D: Tonarten
+= Part D: Keys
 
-== Kapitel 9: Eine Tonart – Zuhause und Sog
+== Chapter 9: A key – home and pull
 
-*Worum es geht.* Eine *Tonart* ist eine Skala plus ein Heimakkord. In der Tonart A-Moll ist Am das Zuhause, alle anderen Akkorde sind Schritte davon weg und wieder zurück. Die Schleife spielt Am | F | Dm | ? und beginnt dann wieder mit Am. Der Slider `LAST` wählt den Akkord vor der Rückkehr:
+*What it is about.* A *key* is a scale plus a home chord. In the key of A minor, Am is home; all other chords are steps away from it and back. The loop plays Am | F | Dm | ? and then starts again with Am. The slider `LAST` picks the chord before the return:
 
 #tbl(
   (auto, auto, auto, 1fr),
-  [*LAST*], [*Akkord*], [*Stufe*], [*Wirkung*],
-  [0], [Am], [i], [bleibt zuhause: keine Bewegung, flach],
-  [1], [G], [VII], [natürliches Moll: weich, offen, wenig Sog. Typische Techno-/Trance-Schleife],
-  [2], [Em], [v], [natürliches Moll: sanft, etwas traurig],
-  [3], [E], [V], [mit G♯ aus harmonisch Moll: starker Sog nach Hause],
-  [4], [E7], [V7], [noch stärker: die klassische Kadenz],
-  [5], [G♯°7], [vii°7], [die verminderte Variante desselben Sogs (Kapitel 7)],
+  [*LAST*], [*Chord*], [*Degree*], [*Effect*],
+  [0], [Am], [i], [stays home: no movement, flat],
+  [1], [G], [VII], [natural minor: soft, open, little pull. Typical techno/trance loop],
+  [2], [Em], [v], [natural minor: gentle, a bit sad],
+  [3], [E], [V], [with G♯ from harmonic minor: strong pull home],
+  [4], [E7], [V7], [even stronger: the classic cadence],
+  [5], [G♯°7], [vii°7], [the diminished version of the same pull (chapter 7)],
 )
 
-*Der Leitton.* Der Sog kommt von G♯ (orange), einen Halbton unter A. Ein Ton einen Halbton unter dem Grundton heißt *Leitton*: Er „leitet“ nach Hause, weil der Halbtonschritt so klein ist, dass das Ohr ihn vervollständigen will (siehe Intervall 11 in Kapitel 0). Natürliches Moll hat G, zwei Halbtöne unter A, und zieht deshalb nicht. Darum gibt es *harmonisch Moll* (A B C D E F G♯): Moll, aber mit Leitton.
+*The leading tone.* The pull comes from G♯ (orange), a semitone below A. A note a semitone below the root is called the *leading tone*: it "leads" home, because the semitone step is so small that the ear wants to complete it (see interval 11 in chapter 0). Natural minor has G, two semitones below A, and so does not pull. That is why *harmonic minor* exists (A B C D E F G♯): minor, but with a leading tone.
 
-#fig(onA((0, 2, 3, 5, 7, 8, 11, 12), c: (11,)), [Harmonisch Moll auf A: wie Moll, aber G♯ statt G. Zwischen F und G♯ liegt ein auffälliger Schritt von 3 Halbtönen („orientalischer“ Klang).])
+#fig(onA((0, 2, 3, 5, 7, 8, 11, 12), c: (11,)), [Harmonic minor on A: like minor, but G♯ instead of G. Between F and G♯ lies a striking step of 3 semitones ("oriental" sound).])
 
-Eine *Kadenz* ist die Akkordfolge, die einen Abschnitt beendet, hier der Schritt vom vierten Takt zurück zu Am.
+A *cadence* is the chord progression that ends a section, here the step from the fourth bar back to Am.
 
-#hoeren[
-  + 1 und 3 mehrmals vergleichen. Bei 3 will Takt 4 in Takt 1 „hineinfallen“, bei 1 schwebt es weiter.
-  + 0: Ohne Bewegung fehlt die Spannung, also auch die Erleichterung bei der Rückkehr.
-  + 4 und 5: noch mehr Sog. Welche Variante wirkt für dich am dramatischsten?
+#listen[
+  + Compare 1 and 3 several times. At 3 bar 4 wants to "fall into" bar 1, at 1 it keeps floating.
+  + 0: without movement the tension is missing, and so is the relief on returning.
+  + 4 and 5: even more pull. Which version feels most dramatic to you?
 ]
 
-#szene[Techno vermeidet den Sog oft bewusst (LAST = 0 oder 1): Die Schleife löst sich nie auf und wirkt dadurch hypnotisch. House und Trance setzen den Sog gezielt ein, um einen Drop oder eine Rückkehr zu landen. Harmonisch Moll ist typisch für Trance-Leads.]
+#scene[Techno often avoids the pull on purpose (LAST = 0 or 1): the loop never resolves and so feels hypnotic. House and trance use the pull deliberately to land a drop or a return. Harmonic minor is typical for trance leads.]
 
-== Kapitel 10: Gleiche Töne, anderes Zuhause
+== Chapter 10: Same notes, different home
 
-*Worum es geht.* Die Lead spielt nur weiße Tasten, also die Töne von C-Dur, die zugleich die Töne von A-Moll sind. Nur Drone und Bass ändern sich; sie bestimmen, welcher Ton das Zuhause ist. Reihenfolge wie in Kapitel 3, von hell nach dunkel:
+*What it is about.* The lead plays only white keys, i.e. the notes of C major, which are also the notes of A minor. Only drone and bass change; they decide which note is home. Order as in chapter 3, from bright to dark:
 
 #tbl(
   (1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
   [*0*], [*1*], [*2*], [*3*], [*4*], [*5*], [*6*],
-  [F lydisch], [C Dur], [G mixolydisch], [D dorisch], [A Moll], [E phrygisch], [B lokrisch],
+  [F Lydian], [C major], [G Mixolydian], [D Dorian], [A minor], [E Phrygian], [B Locrian],
 )
 
-Das ist das Prinzip der *Paralleltonarten*: C-Dur und A-Moll teilen alle Töne (keine Vorzeichen), nur das Zuhause ist ein anderes. Und es ist eine zweite Sicht auf die Modi: Die Modi sind dieselben Töne mit einem anderen Grundton.
+That is the principle of *relative keys*: C major and A minor share all notes (no sharps or flats), only the home is a different one. And it is a second view of the modes: the modes are the same notes with a different root.
 
-*Slider:* `HOME` = 0 bis 6 (Start 4 = A).
+*Slider:* `HOME` = 0 to 6 (start 4 = A).
 
-#hoeren[
-  + Summe die Melodie mit. Dann `HOME` wechseln: Kein einziger Ton der Melodie ändert sich, aber ihre Stimmung schon.
-  + 1 (C) gegen 4 (A): Dur und Moll mit denselben Tönen.
-  + 3 (D dorisch) und 5 (E phrygisch): Wie klingt dieselbe Melodie über diesen Grundtönen?
+#listen[
+  + Hum the melody along. Then change `HOME`: not a single note of the melody changes, but its mood does.
+  + 1 (C) against 4 (A): major and minor with the same notes.
+  + 3 (D Dorian) and 5 (E Phrygian): how does the same melody sound over these roots?
 ]
 
-#merke[In einem Track legt der Bass das Zuhause fest (und eine gestimmte Kick), nicht die Melodie. Wer den Bass ändert, ändert die Tonart, auch wenn sonst alles gleich bleibt.]
+#remember[In a track the bass sets the home (and a tuned kick), not the melody. Change the bass and you change the key, even if everything else stays the same.]
 
-== Kapitel 11: Alle Tonarten – Transponieren und Quintenzirkel
+== Chapter 11: All keys – transposing and the circle of fifths
 
-*Worum es geht.* Derselbe kleine Track in jeder Tonart: in Dur mit I – V – vi – IV, in Moll mit i – VI – III – VII. *Transponieren* heißt, alles um denselben Abstand zu verschieben. Die Form bleibt gleich, nur die Tonhöhe ändert sich.
+*What it is about.* The same little track in every key: in major with I – V – vi – IV, in minor with i – VI – III – VII. *Transposing* means shifting everything by the same distance. The shape stays the same, only the pitch changes.
 
-Der Slider `KEY` wandert den *Quintenzirkel* entlang: Jeder Schritt geht eine Quinte (7 Halbtöne) nach oben.
+The slider `KEY` walks along the *circle of fifths*: each step goes up a fifth (7 semitones).
 
 #align(center, circle-of-fifths)
 
-Außen die Dur-Tonarten, innen die Moll-Paralleltonarten (gleiche Töne, Grundton 3 Halbtöne tiefer). In der Mitte die Camelot-Nummern (B = Dur, A = Moll), wie DJ-Software sie anzeigt.
+Outside the major keys, inside the relative minor keys (same notes, root 3 semitones lower). In the middle the Camelot numbers (B = major, A = minor), as DJ software shows them.
 
-*Nachbarn teilen sechs von sieben Tönen.* Ein Schritt im Uhrzeigersinn fügt ein Kreuz hinzu (oder nimmt ein ♭ weg). Der neue Ton ist im Pianoroll orange: in Dur die Septime (der Leitton der neuen Tonart), in Moll die Sekunde. Mit `MINOR` = 1 spielt der Track die Moll-Tonart auf demselben Grundton (C-Moll, G-Moll …).
+*Neighbours share six of seven notes.* One step clockwise adds a sharp (or removes a ♭). The new note is orange in the piano roll: in major the seventh (the leading tone of the new key), in minor the second. With `MINOR` = 1 the track plays the minor key on the same root (C minor, G minor …).
 
 #tbl(
   (auto, auto, auto, auto),
-  [*Dur*], [*Moll (parallel)*], [*Vorzeichen*], [*Camelot*],
-  [C], [Am], [keine], [8B / 8A],
+  [*Major*], [*Minor (relative)*], [*Key signature*], [*Camelot*],
+  [C], [Am], [none], [8B / 8A],
   [G], [Em], [1 ♯ (F♯)], [9B / 9A],
   [D], [Bm], [2 ♯ (F♯ C♯)], [10B / 10A],
   [A], [F♯m], [3 ♯], [11B / 11A],
@@ -494,128 +494,128 @@ Außen die Dur-Tonarten, innen die Moll-Paralleltonarten (gleiche Töne, Grundto
   [F], [Dm], [1 ♭ (B♭)], [7B / 7A],
 )
 
-*Slider:* `KEY` = Position im Quintenzirkel (0 = C … 11 = F, Start 3 = A), `MINOR` = 0 Dur, 1 Moll.
+*Sliders:* `KEY` = position on the circle of fifths (0 = C … 11 = F, start 3 = A), `MINOR` = 0 major, 1 minor.
 
-#hoeren[
-  + `KEY` um einen Schritt verschieben und den einen orangen, neuen Ton suchen.
-  + Von 0 auf 6 springen (C → F♯): Fast alle Töne ändern sich. Diese beiden Tonarten passen am schlechtesten zusammen.
-  + Achte auf den Bass: Tiefe Tonarten (E, F) machen ihn schwer, hohe (B, C) heller. Die Tonart wählt man in elektronischer Musik oft nach dem Bass.
+#listen[
+  + Move `KEY` by one step and look for the one orange, new note.
+  + Jump from 0 to 6 (C → F♯): almost all notes change. These two keys fit together worst.
+  + Listen to the bass: low keys (E, F) make it heavy, high ones (B, C) brighter. In electronic music the key is often chosen by the bass.
 ]
 
-#szene[*Harmonisches Mischen:* DJs blenden Tracks in benachbarten Tonarten ineinander (gleiche Camelot-Zahl, oder ±1). Für deine eigenen Tracks heißt das: Alle tonalen Elemente (Bass, Pad, Stab, Vocal-Sample) gehören in dieselbe Tonart, sonst reibt es sofort. Viele Produzenten stimmen auch die Kick auf den Grundton.]
+#scene[*Harmonic mixing:* DJs blend tracks in neighbouring keys (same Camelot number, or ±1). For your own tracks this means: all tonal elements (bass, pad, stab, vocal sample) belong in the same key, otherwise it rubs at once. Many producers also tune the kick to the root.]
 
-== Kapitel 12: Spielwiese
+== Chapter 12: Playground
 
-*Worum es geht.* Ein kleiner Track, der nur in Skalenstufen geschrieben ist. Deshalb folgt er jeder Tonart, jedem Modus und jeder Akkordgröße.
+*What it is about.* A small track written only in scale degrees. That is why it follows every key, every mode and every chord size.
 
 #tbl(
   (auto, 1fr),
-  [*Slider*], [*Funktion*],
-  [`ROOT`], [Tonart: Halbtöne über A (0 = A, 3 = C, 5 = D, −4 = F …)],
-  [`MODE12`], [Skala, von hell nach dunkel (Kapitel 3)],
-  [`PROG`], [Akkordfolge: 0 i–VI–III–VII (Techno/Trance), 1 i–iv (Deep-House-Vamp), 2 i–VII (hypnotisch), 3 i–II (phrygische Bedrohung)],
-  [`CHORDS`], [0 Dreiklänge, 1 Septakkorde, 2 Nonenakkorde (Kapitel 5)],
+  [*Slider*], [*Function*],
+  [`ROOT`], [key: semitones above A (0 = A, 3 = C, 5 = D, −4 = F …)],
+  [`MODE12`], [scale, from bright to dark (chapter 3)],
+  [`PROG`], [chord progression: 0 i–VI–III–VII (techno/trance), 1 i–iv (deep house vamp), 2 i–VII (hypnotic), 3 i–II (Phrygian threat)],
+  [`CHORDS`], [0 triads, 1 seventh chords, 2 ninth chords (chapter 5)],
 )
 
-Startpunkte zum Ausprobieren:
+Starting points to try:
 
 #tbl(
   (auto, auto, auto, auto, 1fr),
-  [*MODE12*], [*PROG*], [*CHORDS*], [*ROOT*], [*Ergebnis*],
-  [3 (dorisch)], [1], [2], [0], [Deep House],
-  [5 (phrygisch)], [3], [0], [−4 (F)], [harter Techno],
-  [1 (Dur)], [0], [1], [3 (C)], [euphorisches House],
-  [4 (Moll)], [2], [0], [0], [hypnotischer Techno],
-  [0 (lydisch)], [2], [2], [3], [schwebendes Ambient/Progressive],
+  [*MODE12*], [*PROG*], [*CHORDS*], [*ROOT*], [*Result*],
+  [3 (Dorian)], [1], [2], [0], [deep house],
+  [5 (Phrygian)], [3], [0], [−4 (F)], [hard techno],
+  [1 (major)], [0], [1], [3 (C)], [euphoric house],
+  [4 (minor)], [2], [0], [0], [hypnotic techno],
+  [0 (Lydian)], [2], [2], [3], [floating ambient/progressive],
 )
 
 // ============================================================
-= Anhang
+= Appendix
 
-== Übungsplan
+== Practice plan
 
 #tbl(
   (auto, 1fr, 1fr),
-  [*Einheit*], [*Kapitel*], [*Ziel*],
-  [1], [0, 1], [Intervalle 3, 4, 7, 12 sicher erkennen; Dur und Moll unterscheiden],
-  [2], [2, 3], [Skala als Tonvorrat; die Helligkeitsleiter von Moll aus nach oben],
-  [3], [3, 4], [jeden Modus über seinen orangen Ton erkennen; dorisch gegen Moll],
-  [4], [5, 6], [Akkordqualitäten: Dur, Moll, vermindert, übermäßig, sus, 7er],
-  [5], [7, 8], [Spannung mit verminderten Akkorden; Chord Memory],
-  [6], [9, 10, 11], [Leitton und Kadenz; Paralleltonarten; Quintenzirkel],
-  [danach], [12], [eigene Kombinationen, dann in einen eigenen Track übertragen],
+  [*Session*], [*Chapters*], [*Goal*],
+  [1], [0, 1], [recognise intervals 3, 4, 7, 12 reliably; tell major and minor apart],
+  [2], [2, 3], [scale as a note supply; the brightness ladder upwards from minor],
+  [3], [3, 4], [recognise every mode by its orange note; Dorian against minor],
+  [4], [5, 6], [chord qualities: major, minor, diminished, augmented, sus, sevenths],
+  [5], [7, 8], [tension with diminished chords; chord memory],
+  [6], [9, 10, 11], [leading tone and cadence; relative keys; circle of fifths],
+  [after that], [12], [your own combinations, then carry them over to a track of your own],
 )
 
-Zum Wiederholen: Wähle ein Kapitel, stelle einen Slider blind (ohne hinzusehen) auf einen Zufallswert und rate, was du hörst. Dann im Code nachsehen.
+To review: pick a chapter, set a slider blind (without looking) to a random value and guess what you hear. Then check in the code.
 
-== Häufige Akkordfolgen
+== Common chord progressions
 
 #tbl(
   (auto, auto, 1fr),
-  [*Stufen*], [*in A-Moll / C-Dur*], [*Charakter und Einsatz*],
-  [i – VI – III – VII], [Am – F – C – G], [dunkel-episch: Techno, Trance, Electronica],
-  [i – VII – VI – VII], [Am – G – F – G], [treibend: Trance, Breakdowns],
-  [i – iv], [Am – Dm (dorisch: Am – D)], [Deep-House-Vamp],
-  [i – VII], [Am – G], [hypnotisch, endlos],
-  [i – ♭II], [Am – B♭], [phrygisch, bedrohlich: harter Techno, EBM],
-  [i – iv – v], [Am – Dm – Em], [klassisches Moll],
-  [i – VI – iv – V], [Am – F – Dm – E], [Moll mit Leitton: Sog zum Drop],
-  [I – V – vi – IV], [C – G – Am – F], [Pop- und House-Hymnen, hell bis gefühlvoll],
-  [I – ♭VII], [A – G], [mixolydisch: Disco, Funk House],
+  [*Degrees*], [*in A minor / C major*], [*Character and use*],
+  [i – VI – III – VII], [Am – F – C – G], [dark and epic: techno, trance, electronica],
+  [i – VII – VI – VII], [Am – G – F – G], [driving: trance, breakdowns],
+  [i – iv], [Am – Dm (Dorian: Am – D)], [deep house vamp],
+  [i – VII], [Am – G], [hypnotic, endless],
+  [i – ♭II], [Am – B♭], [Phrygian, threatening: hard techno, EBM],
+  [i – iv – v], [Am – Dm – Em], [classic minor],
+  [i – VI – iv – V], [Am – F – Dm – E], [minor with a leading tone: pull towards the drop],
+  [I – V – vi – IV], [C – G – Am – F], [pop and house anthems, bright to emotional],
+  [I – ♭VII], [A – G], [Mixolydian: disco, funk house],
 )
 
-== Strudel-Spickzettel
+== Strudel cheat sheet
 
 #tbl(
   (auto, 1fr),
-  [*Code*], [*Bedeutung*],
-  [`n("0 2 4").scale('A:minor')`], [Skalenstufen (0 = Grundton) in eine Skala setzen. Stufe 7 = Grundton eine Oktave höher],
-  [`'A:dorian'`, `'C3:major'`], [Grundton (optional mit Oktave), Doppelpunkt, Skalenname auf Englisch],
-  [`n("[0,2,4]")`], [Komma = gleichzeitig: ein Akkord aus Stufe 1, 3 und 5],
-  [`.trans(-12)`], [alle Töne um Halbtöne verschieben (−12 = eine Oktave tiefer)],
-  [`note("a3 c4 e4")`], [feste Tonnamen statt Stufen],
-  [`.struct("~ x ~ x")`], [Rhythmus aufprägen (x = spielen, \~ = Pause)],
+  [*Code*], [*Meaning*],
+  [`n("0 2 4").scale('A:minor')`], [put scale degrees (0 = root) into a scale. Degree 7 = root an octave higher],
+  [`'A:dorian'`, `'C3:major'`], [root (optionally with octave), colon, scale name in English],
+  [`n("[0,2,4]")`], [comma = at the same time: a chord of degrees 1, 3 and 5],
+  [`.trans(-12)`], [shift all notes by semitones (−12 = one octave lower)],
+  [`note("a3 c4 e4")`], [fixed note names instead of degrees],
+  [`.struct("~ x ~ x")`], [impose a rhythm (x = play, \~ = rest)],
 )
 
-Skalennamen in Strudel: `major`, `minor`, `dorian`, `phrygian`, `lydian`, `mixolydian`, `locrian`, `harmonic minor`, `melodic minor`, `major pentatonic`, `minor pentatonic`, `chromatic` (auch `ionian` und `aeolian`).
+Scale names in Strudel: `major`, `minor`, `dorian`, `phrygian`, `lydian`, `mixolydian`, `locrian`, `harmonic minor`, `melodic minor`, `major pentatonic`, `minor pentatonic`, `chromatic` (also `ionian` and `aeolian`).
 
-Wer in einem eigenen Track mit Stufen statt Tonnamen schreibt, kann Tonart und Modus später mit einem einzigen Wert ändern, genau wie in Kapitel 12.
+If you write a track of your own in degrees instead of note names, you can change key and mode later with a single value, just like in chapter 12.
 
-== Weitere Skalen (nicht im Tutorial)
+== More scales (not in the tutorial)
 
 #tbl(
   (auto, auto, auto, 1fr),
-  [*Skala*], [*Schritte*], [*auf A*], [*Klang und Einsatz*],
-  [melodisch Moll], [G H G G G G H], [A B C D E F♯ G♯], [Moll mit heller Sexte und Septime: Melodien, Leads],
-  [Dur-Pentatonik], [G G 3 G 3], [A B C♯ E F♯], [hell, offen: Hooks, Piano-Loops],
-  [Blues], [3 G H H 3 G], [A C D E♭ E G], [Moll-Pentatonik mit „Blue Note“: Acid- und Blues-Anklänge],
-  [Ganzton], [G G G G G G], [A B C♯ D♯ F G], [ohne Zentrum, traumhaft: Ambient, experimenteller Techno],
+  [*Scale*], [*Steps*], [*on A*], [*Sound and use*],
+  [melodic minor], [W H W W W W H], [A B C D E F♯ G♯], [minor with a bright sixth and seventh: melodies, leads],
+  [major pentatonic], [W W 3 W 3], [A B C♯ E F♯], [bright, open: hooks, piano loops],
+  [blues], [3 W H H 3 W], [A C D E♭ E G], [minor pentatonic with a "blue note": acid and blues touches],
+  [whole tone], [W W W W W W], [A B C♯ D♯ F G], [no centre, dreamlike: ambient, experimental techno],
 )
 
-(3 = drei Halbtöne.)
+(W = whole tone, H = semitone, 3 = three semitones.)
 
-== Glossar
+== Glossary
 
 #tbl(
-  (auto, auto, 1fr),
-  [*Deutsch*], [*Englisch*], [*Erklärung*],
-  [Halbton, Ganzton], [semitone, whole tone], [kleinster Abstand (1 Taste); zwei Halbtöne ergeben einen Ganzton],
-  [Oktave], [octave], [Abstand mit doppelter Frequenz (12 Halbtöne); die Tonnamen wiederholen sich],
-  [Intervall], [interval], [Abstand zwischen zwei Tönen],
-  [Grundton, Tonika], [root, tonic], [das Zentrum einer Skala oder Tonart, das „Zuhause“],
-  [Skala, Tonleiter], [scale], [Auswahl von Tönen innerhalb einer Oktave],
-  [Modus], [mode], [eine der sieben Skalen der weißen Tasten, z. B. dorisch],
-  [Stufe], [degree], [Position eines Tons oder Akkords in der Skala (I, II, III …)],
-  [Dreiklang], [triad], [Grundton, Terz und Quinte übereinander],
-  [Septakkord], [seventh chord], [Dreiklang plus Septime],
-  [vermindert], [diminished (dim, °)], [kleine Terz + verminderte Quinte (0 3 6)],
-  [übermäßig], [augmented (aug, +)], [große Terz + übermäßige Quinte (0 4 8)],
-  [Vorhalt], [suspended (sus)], [Terz durch Sekunde oder Quarte ersetzt],
-  [Leitton], [leading tone], [Ton einen Halbton unter dem Grundton, zieht nach Hause],
-  [Kadenz], [cadence], [Akkordfolge, die einen Abschnitt abschließt],
-  [Paralleltonart], [relative key], [Dur- und Moll-Tonart mit denselben Tönen],
-  [Quintenzirkel], [circle of fifths], [alle Tonarten im Quintabstand angeordnet],
-  [Konsonanz, Dissonanz], [consonance, dissonance], [Verschmelzen (ruhig) und Reiben (gespannt) von Tönen],
-  [Bordunton], [drone], [ein lange liegender Ton, der das Zuhause hörbar macht],
-  [Vamp], [vamp], [Schleife aus wenigen Akkorden, die endlos pendelt],
+  (auto, 1fr),
+  [*Term*], [*Meaning*],
+  [semitone, whole tone], [smallest distance (1 key); two semitones make a whole tone],
+  [octave], [distance with double frequency (12 semitones); the note names repeat],
+  [interval], [distance between two notes],
+  [root, tonic], [the centre of a scale or key, the "home"],
+  [scale], [choice of notes within an octave],
+  [mode], [one of the seven scales of the white keys, e.g. Dorian],
+  [degree], [position of a note or chord in the scale (I, II, III …)],
+  [triad], [root, third and fifth stacked],
+  [seventh chord], [triad plus seventh],
+  [diminished (dim, °)], [minor third + diminished fifth (0 3 6)],
+  [augmented (aug, +)], [major third + augmented fifth (0 4 8)],
+  [suspended (sus)], [third replaced by the second or fourth],
+  [leading tone], [note a semitone below the root, pulls home],
+  [cadence], [chord progression that closes a section],
+  [relative key], [major and minor key with the same notes],
+  [circle of fifths], [all keys arranged a fifth apart],
+  [consonance, dissonance], [merging (calm) and rubbing (tense) of notes],
+  [drone], [a long held note that makes the home audible],
+  [vamp], [loop of a few chords that swings back and forth endlessly],
 )

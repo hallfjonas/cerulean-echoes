@@ -2,7 +2,7 @@
 // Compile: typst compile skills.typ
 
 #set page(paper: "a4", margin: (x: 20mm, y: 18mm), numbering: "1")
-#set text(font: "Helvetica", size: 9.5pt, lang: "de")
+#set text(font: "Helvetica", size: 9.5pt, lang: "en")
 #set par(justify: false, leading: 0.6em)
 #set heading(numbering: "1.")
 #show heading.where(level: 1): set text(size: 13pt)
@@ -12,96 +12,96 @@
 #let box-note(body) = block(fill: rgb("#eef4fb"), inset: 7pt, radius: 3pt, width: 100%, body)
 
 #align(center)[
-  #text(size: 18pt, weight: "bold")[cerulean-echoes — Claude-Setup]
+  #text(size: 18pt, weight: "bold")[cerulean-echoes — Claude setup]
   #v(-4pt)
-  #text(fill: luma(100))[Was Claude in diesem Projekt immer weiß, und welche Abläufe es auf Abruf kann]
+  #text(fill: luma(100))[What Claude always knows in this project, and which workflows it runs on request]
 ]
 
-= Aufbau: global und Skills
+= Structure: global and skills
 
 #table(
   columns: (28mm, 1fr, 1fr),
   stroke: 0.4pt + luma(180),
   inset: 5pt,
   table.header([], [*`CLAUDE.md`*], [*Skills* (`.claude/skills/…`)]),
-  [Wann geladen], [in jeder Sitzung automatisch], [nur wenn die Aufgabe passt, oder per `/name`],
-  [Inhalt], [kurze feste Regeln: Ordner, Controller-Belegung, „neue Datei statt überschreiben“, Effizienz-Regeln],
-    [ausführliche Abläufe mit Schritten, Befehlen, Zielwerten und Skripten],
-  [Länge], [kurz halten (kostet in jeder Sitzung Platz)], [darf lang sein],
+  [When loaded], [automatically in every session], [only when the task fits, or via `/name`],
+  [Content], [short fixed rules: folders, controller mapping, "new file instead of overwriting", efficiency rules],
+    [detailed workflows with steps, commands, target values and scripts],
+  [Length], [keep short (takes space in every session)], [may be long],
 )
 
-Die Skripte der Skills liegen in `tools/` (einmalig `cd tools && npm install`). Ein Hook in `.claude/settings.json`
-sorgt dafür, dass die Layout-Blätter nach jeder Änderung an einem Track neu erzeugt werden.
+The skills' scripts live in `tools/` (once: `cd tools && npm install`). A hook in `.claude/settings.json`
+regenerates the layout sheets after every change to a track.
 
 #box-note[
-  *Aufrufen:* im Chat einfach die Aufgabe beschreiben („mach Track 007 effizienter“, „pegel die Stems“) oder direkt
-  `/strudel-optimize`, `/strudel-mix`, `/lcxl-layout` tippen.
+  *Calling:* just describe the task in chat ("make track 007 more efficient", "level the stems") or type
+  `/strudel-optimize`, `/strudel-mix`, `/lcxl-layout` directly.
 ]
 
-= `/strudel-optimize` — weniger CPU, gleicher Klang
+= `/strudel-optimize` — less CPU, same sound
 
-*Problem:* Strudel berechnet jedes Event jeder Schicht, auch wenn es stumm ist (Fader auf 0, Density darunter,
-falscher Obertonmodus). Bei Track 006 waren das 746 Events pro Zyklus; die Rechenzeit lag bei rund 0,7 s pro Zyklus
-(ein Zyklus dauert 1,7 s) — daher die Aussetzer.
+*Problem:* Strudel computes every event of every layer, even when it is silent (fader at 0, density below,
+wrong overtone mode). In track 006 that was 746 events per cycle; compute time was about 0.7 s per cycle
+(a cycle lasts 1.7 s) — hence the dropouts.
 
-*Lösung:* stumme Teile werden gar nicht erst abgefragt („Gating“):
+*Fix:* silent parts are not queried at all ("gating"):
 
 ```js
 const gate = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
 ```
 
-- *Stems:* `strip()` legt hpf, lpf und Pegel an und schaltet den Stem ab, solange Fader oder Master auf 0 stehen.
-- *Layer:* Haupt-/Extra-Layer nur, solange ihr Crossfade-Anteil über 0 ist; Obertöne nur im passenden Modus und
-  oberhalb ihrer Density-Stufe.
-- *Buttons und gekoppelte Knöpfe* merken sich ihren Zustand. Sie werden einmal angelegt und über `stateTaps` bei
-  jedem Tick abgefragt, damit kein Tastendruck verloren geht, während ein Stem abgeschaltet ist.
-- *Sicherheitsnetz* am Ende: alles mit Gain 0 wird verworfen.
+- *Stems:* `strip()` applies hpf, lpf and level and switches the stem off while fader or master is at 0.
+- *Layers:* main/extra layer only while its crossfade share is above 0; overtones only in the matching mode and
+  above their density step.
+- *Buttons and linked knobs* keep their state. They are created once and queried via `stateTaps` on
+  every tick, so no button press is lost while a stem is switched off.
+- *Safety net* at the end: everything with gain 0 is dropped.
 
-*Nachweis:* `compare.mjs` spielt alte und neue Fassung mit denselben Reglerstellungen ab (feste Stellungen,
-Zufallsstellungen, alle Regler in Bewegung, Tastendrücke) und vergleicht jedes hörbare Event.
+*Proof:* `compare.mjs` plays the old and new version with the same control positions (fixed positions,
+random positions, all controls moving, button presses) and compares every audible event.
 
 #table(
   columns: (1fr, auto, auto, auto),
   stroke: 0.4pt + luma(180), inset: 5pt,
-  table.header([*Track 006 → 006-lean*], [*Events/Zyklus*], [*Rechenzeit/Zyklus*], [*identisch*]),
-  [alle Fader 0], [746 → 0], [≈ 700 → 65 ms], [ja],
-  [typisch (Drums + 2 Melodien)], [746 → 120], [≈ 780 → 170 ms], [ja],
-  [alles auf 1], [746 → 442], [≈ 900 → 800 ms], [ja],
+  table.header([*Track 006 → 006-lean*], [*Events/cycle*], [*Compute time/cycle*], [*identical*]),
+  [all faders 0], [746 → 0], [≈ 700 → 65 ms], [yes],
+  [typical (drums + 2 melodies)], [746 → 120], [≈ 780 → 170 ms], [yes],
+  [everything at 1], [746 → 442], [≈ 900 → 800 ms], [yes],
 )
 
-= `/strudel-mix` — automatisches Pre-Mixing
+= `/strudel-mix` — automatic pre-mixing
 
-Jeder Stem wird einzeln offline mit superdough (Strudels Audio-Engine) gerendert und seine Lautheit gemessen
-(LUFS: Lautheit so, wie das Ohr sie ungefähr empfindet; dazu der Spitzenpegel). Daraus folgen neue Fader-Maxima.
+Each stem is rendered on its own offline with superdough (Strudel's audio engine) and its loudness measured
+(LUFS: loudness roughly as the ear perceives it; plus the peak level). New fader maxima follow from that.
 
 ```sh
 node strudel-sim/measure.mjs ../tracks/historic/006/006-lean-mix.strudel stem1_kick=5,29 stem4_hats=8,32
 ```
 
-*Zielwerte* (Faustregel Techno, relativ zur Kick bei Fader 1):
+*Target values* (techno rule of thumb, relative to the kick at fader 1):
 
 #table(
   columns: (1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
   stroke: 0.4pt + luma(180), inset: 5pt,
-  [Kick], [Sub, Bass], [Clap], [Melodien], [Hats], [Perkussion, FX],
+  [Kick], [Sub, bass], [Clap], [Melodies], [Hats], [Percussion, FX],
   [0 dB], [−3 … −5], [−5 … −6], [−4 … −6], [−9 … −11], [−8 … −12],
 )
 
-Umrechnung: neues Maximum = altes × 10#super[dB/20] (−3 dB ≈ × 0,71; −6 dB ≈ × 0,5).
+Conversion: new maximum = old × 10#super[dB/20] (−3 dB ≈ × 0.71; −6 dB ≈ × 0.5).
 
-*Beispiel Track 006:* Hats (−13 LUFS) und Clap (−15 LUFS) lagen fast auf Kick-Niveau (−11 LUFS).
-In `006-lean-mix` sind ihre Fader-Maxima gesenkt: Hats 1 → 0,4, Clap 2,5 → 1,4. Außerdem gemeldet: der Sub
-übersteuert bei Density 0,5 (Spitzenpegel 3,3).
+*Example track 006:* hats (−13 LUFS) and clap (−15 LUFS) were almost at kick level (−11 LUFS).
+In `006-lean-mix` their fader maxima are lowered: hats 1 → 0.4, clap 2.5 → 1.4. Also reported: the sub
+clips at density 0.5 (peak level 3.3).
 
 #box-note[
-  *Grenzen:* LUFS unterschätzt helle, kurze Klänge (Hats, Claps), und kleine Lautsprecher verlieren den Bass.
-  Die Messung liefert die Grobeinstellung — den letzten Schliff macht das Ohr.
+  *Limits:* LUFS underrates bright, short sounds (hats, claps), and small speakers lose the bass.
+  The measurement gives the rough setting — the ear does the final polish.
 ]
 
-= `/lcxl-layout` — Layout-Blätter, die nicht veralten
+= `/lcxl-layout` — layout sheets that never go stale
 
-Das Layout-Blatt (PDF) entsteht aus Kommentaren direkt im Track, neben dem Code, der den Regler liest.
-Die CC-Nummern rechnet das Skript selbst aus der Position aus.
+The layout sheet (PDF) is built from comments right in the track, next to the code that reads the control.
+The script works out the CC numbers from the position itself.
 
 ```js
 // @col 16:4 4 Hats
@@ -113,28 +113,28 @@ const hatsCol = col(4)
 #table(
   columns: (32mm, 1fr),
   stroke: 0.4pt + luma(180), inset: 5pt,
-  [`@layout`, `@note`], [Titel und Einleitungstext],
-  [`@mode 16 …`], [eine Seite pro Mode],
-  [`@col`, `@row`], [Spaltenüberschrift, Zeilenbeschriftung (`\` = Zeilenumbruch)],
-  [`@ctl <pos> Name | Text`], [ein Regler. `pos` = `16:1.k1` (Mode:Spalte.Reihe); Reihen `k1 k2 k3 fader b1 b2`],
-  [`2:1-7.k1`], [gleicher Regler in mehreren Spalten; ab Spalte 2 steht „wie …“],
-  [`g.fader`], [globale Spalte 8, auf jeder Seite, CC n / n + 48],
+  [`@layout`, `@note`], [title and intro text],
+  [`@mode 16 …`], [one page per mode],
+  [`@col`, `@row`], [column heading, row label (`\` = line break)],
+  [`@ctl <pos> Name | Text`], [one control. `pos` = `16:1.k1` (mode:column.row); rows `k1 k2 k3 fader b1 b2`],
+  [`2:1-7.k1`], [same control in several columns; from column 2 on it reads "as …"],
+  [`g.fader`], [global column 8, on every page, CC n / n + 48],
 )
 
-*Automatisch aktuell:*
-- Wenn Claude einen Track ändert, erzeugt der Hook das PDF sofort neu; kaputte Tags werden gemeldet.
-- Bei Änderungen von Hand: `cd tools && npm run watch` läuft im Hintergrund und erzeugt bei jedem Speichern neu.
-- Alle auf einmal: `npm run layouts`.
+*Always up to date:*
+- When Claude changes a track, the hook regenerates the PDF at once; broken tags are reported.
+- For changes by hand: `cd tools && npm run watch` runs in the background and regenerates on every save.
+- All at once: `npm run layouts`.
 
-= Dateien
+= Files
 
 #table(
   columns: (62mm, 1fr),
   stroke: 0.4pt + luma(180), inset: 5pt,
-  [`CLAUDE.md`], [globale Projektregeln],
-  [`.claude/skills/*/SKILL.md`], [die drei Skills],
-  [`.claude/settings.json`], [Hook für die Layout-Blätter],
-  [`tools/strudel-sim/`], [`harness` (Track in Node auswerten), `compare` (Gleichheit + CPU), `render` + `measure` (Lautheit)],
-  [`tools/lcxl-layout/`], [`gen-layout` (Tags → PDF), `lcxl3.typ` (Vorlage), `hook`, `watch`],
-  [`docs/skills.typ`], [dieses Dokument],
+  [`CLAUDE.md`], [global project rules],
+  [`.claude/skills/*/SKILL.md`], [the three skills],
+  [`.claude/settings.json`], [hook for the layout sheets],
+  [`tools/strudel-sim/`], [`harness` (evaluate a track in Node), `compare` (equality + CPU), `render` + `measure` (loudness)],
+  [`tools/lcxl-layout/`], [`gen-layout` (tags → PDF), `lcxl3.typ` (template), `hook`, `watch`],
+  [`docs/skills.typ`], [this document],
 )

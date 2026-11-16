@@ -50,7 +50,7 @@ It has its own copy of the voice map: add the new key there too. Set `gain` so t
 ## 5. Check and report
 - `cd tools && node strudel-sim/check-sounds.mjs <track>` (online): updates `samples/sounds.json`; a file not on
   `origin/main` yet prints `warning: … plays only after push to main` (run `git fetch` first for a current answer).
-- The hook regenerates layout sheet and `.syx`; update the pad list in `midi-layouts/geraete.md` if names changed.
+- The hook regenerates layout sheet and `.syx`; update the pad list in `midi-layouts/devices.md` if names changed.
 - Tell the user (German): which pad (note name and position), the file and its size, the level, and that it plays on
   strudel.cc only after the file is pushed to `main` (commit + push / merge; not committed by you unless asked).
 - Test before merging: push the branch and point `OWN_SAMPLES` temporarily at

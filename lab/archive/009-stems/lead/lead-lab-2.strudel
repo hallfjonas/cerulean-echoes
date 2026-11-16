@@ -4,13 +4,13 @@
 // Round 2 (round 1 and its grades: feedback.md, old/). Kept: the pan flute (best sound of round 1). New: real
 // recordings — VSCO 2 trumpet and flute (staccato for short notes, with vibrato for long ones; CC0) and the Karoryfer
 // Weresax alto (CC0). Reference: the trumpet and flute of “Escravos De Jo” (Joe Claussell / Kerri Chandler, live jam).
-// Written in Strudel's pattern language, the ideas taken from the research (stems-ideen.md, “Recherche Runde 2a”):
-//   Ruf + Antwort: a motif in bar 1, in bar 2 the same motif a step lower and a 16th later (sequence + displacement,
+// Written in Strudel's pattern language, the ideas taken from the research (stem-ideas.md, “research round 2a”):
+//   Call + answer: a motif in bar 1, in bar 2 the same motif a step lower and a 16th later (sequence + displacement,
 //     the motif development of a jazz solo; the call / response of Felix Roos' tunes with off / late)
 //   Impro: every bar one motif from a small library, chosen at random with weights, sometimes a bar of rest
 //     (kindohm: generative on the level of motifs, not single notes; wchooseCycles) — changes every bar on purpose
 //   Riff: random notes cut out with ribbon and repeated (a fixed riff from a seed: the same every loop)
-//   Lang: long notes with vibrato, one per bar, around the chord's 9th / 5th
+//   Long: long notes with vibrato, one per bar, around the chord's 9th / 5th
 // Notes: A dorian (A B C D E F♯ G: both chords, Am9 and D9, live in it), degree 0 = A4 (alto: A3).
 // Groove: swing as the drums, the lead 8 ms behind the beat (laid back), strength varies (perlin).
 // Levels: from the files' measured RMS / peaks; the pan flute as round 1: level with the faders.
@@ -20,7 +20,7 @@
 // @note Real trumpet and flute (VSCO 2) and alto sax (Weresax), all CC0, against the pan flute of round 1. Same four ways of playing on every column.
 // @note Mode 2: fader 6 = drums (knob 1 = swing, button 2 = drums out), fader 7 = bass, fader 8 = keys of 009; column 5 button 1 = harmony (one chord ↔ Am9/D9).
 // @guide What to listen for | Which instrument carries a jazzy house lead? Does Impro feel improvised (and still good), or is the fixed riff better?
-// @guide Harmony | Ein Akkord: Am9. Wechsel: Am9 2 bars, D9 2 bars. The lead stays in A dorian over both.
+// @guide Harmony | One chord: Am9. Change: Am9 2 bars, D9 2 bars. The lead stays in A dorian over both.
 // @mode 16 Mode 16 — Candidates
 // @col 16:1 1 Trumpet
 // @col 16:2 2 Flute
@@ -43,7 +43,7 @@
 // @col 2:6 6 Drums
 // @col 2:7 7 Bass
 // @col 2:8 8 Keys
-// @ctl 2:5.b1 Harmony | Ein Akkord ↔ Wechsel, at the next 4-bar phrase.
+// @ctl 2:5.b1 Harmony | One chord ↔ Change, at the next 4-bar phrase.
 // @ctl 2:6.fader Drums | 909 kick, off-beat hat, clap, shaker.
 // @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %; 55–58 % = house.
 // @ctl 2:6.b2 Drums out | horns, keys and bass alone while held.
@@ -73,19 +73,19 @@ const MOTIFS = [
   '[0 ~] ~ ~ [~ 2] [3 ~] [~ 4] ~ ~',
 ]
 const ways = (short, long, root, seed) => [
-  ['Ruf + Antwort', n(mini('<[' + MOTIFS[0] + '] ~>')).superimpose(x => x.late(1 + 1 / 16).add(n(-2))).scale(root + ':dorian').s(short)],
+  ['Call + answer', n(mini('<[' + MOTIFS[0] + '] ~>')).superimpose(x => x.late(1 + 1 / 16).add(n(-2))).scale(root + ':dorian').s(short)],
   ['Impro', n(wchooseCycles([mini(MOTIFS[0]), 3], [mini(MOTIFS[1]), 3], [mini(MOTIFS[2]), 2], [mini(MOTIFS[3]), 2], [mini('~'), 2]))
     .scale(root + ':dorian').s(short)],
   ['Riff', n(irand(8).segment(16)).struct(mini('~ x ~ [x x] ~ x ~ ~ x ~ ~ x ~ ~ ~ ~')).ribbon(seed, 2).scale(root + ':dorian').s(short)],
-  ['Lang', n(mini('<[1@3 ~] [4@2 3@2] [1@3 ~] [~ 6@3]>')).scale(root + ':dorian').s(long).clip(0.95)],
+  ['Long', n(mini('<[1@3 ~] [4@2 3@2] [1@3 ~] [~ 6@3]>')).scale(root + ':dorian').s(long).clip(0.95)],
 ]
 // laid back: 8 ms behind the beat; strength from perlin
 const groove = pat => pat.velocity(perlin.range(0.7, 1)).late(0.004)
 const makeCols = h => [
-  { name: 'Trompete', range: [600, 12000], gain: 1, pats: ways('tpt_stac', 'tpt_vib', 'A4', 7) },
-  { name: 'Flöte', range: [800, 14000], gain: 1, pats: ways('flute_stac', 'flute_vib', 'A4', 11) },
-  { name: 'Altsax', range: [500, 10000], gain: 0.25, pats: ways('alto', 'alto', 'A3', 23) },
-  { name: 'Panflöte', range: [600, 10000], gain: 0.7, pats: ways('gm_pan_flute', 'gm_pan_flute', 'A4', 42) },
+  { name: 'Trumpet', range: [600, 12000], gain: 1, pats: ways('tpt_stac', 'tpt_vib', 'A4', 7) },
+  { name: 'Flute', range: [800, 14000], gain: 1, pats: ways('flute_stac', 'flute_vib', 'A4', 11) },
+  { name: 'Alto sax', range: [500, 10000], gain: 0.25, pats: ways('alto', 'alto', 'A3', 23) },
+  { name: 'Pan flute', range: [600, 10000], gain: 0.7, pats: ways('gm_pan_flute', 'gm_pan_flute', 'A4', 42) },
 ].map(c => ({ ...c, pats: c.pats.map(([name, p]) => [name, groove(p)]) }))
 
 // ============================================================
@@ -107,7 +107,7 @@ const CH = {
   Am9: { name: 'Am9', bass: 33, keys: [55, 59, 60, 64], tones: [9, 0, 4, 7, 11], penta: [9, 0, 2, 4, 7] },
   D9: { name: 'D9', bass: 38, keys: [54, 57, 60, 64], tones: [2, 6, 9, 0, 4], penta: [2, 4, 6, 9, 11] },
 }
-const HARMONIES = [['Ein Akkord', ['Am9', 'Am9', 'Am9', 'Am9']], ['Wechsel', ['Am9', 'Am9', 'D9', 'D9']]]
+const HARMONIES = [['One chord', ['Am9', 'Am9', 'Am9', 'Am9']], ['Change', ['Am9', 'Am9', 'D9', 'D9']]]
 const POOL = {}
 const inRange = (pcs, lo, hi) => POOL[pcs.join() + ':' + lo + ':' + hi] ??= (() => {
   const o = []; for (let m = lo; m <= hi; m++) if (pcs.includes(md(m, 12))) o.push(m); return o })()
@@ -211,17 +211,17 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], c.k3name ?? 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], 'Space'), k3: knob(S.val[29 + i], c.k3name ?? 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo-Wurf') + '</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>' + esc(c.b2name ?? 'Echo throw') + '</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -232,7 +232,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -240,13 +240,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -259,13 +259,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
       }),
     ].join('\n')

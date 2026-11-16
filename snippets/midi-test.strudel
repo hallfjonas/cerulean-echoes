@@ -13,22 +13,22 @@ if (!box) {
 const show = (...lines) => { box.textContent = lines.join("\n") }
 
 if (!navigator.requestMIDIAccess) {
-  show("Kein Web MIDI hier.", "Diese Umgebung kann keine MIDI-Geräte lesen.")
+  show("No Web MIDI here.", "This environment cannot read MIDI devices.")
 } else {
   try {
     const access = await navigator.requestMIDIAccess()
     const inputs = [...access.inputs.values()].map(i => i.name)
-    const header = ["MIDI-Eingänge:", ...(inputs.length ? inputs.map(n => "  " + n) : ["  (keine)"])]
-    show(...header, "", "Letzte Nachricht: noch keine, dreh einen Regler")
+    const header = ["MIDI inputs:", ...(inputs.length ? inputs.map(n => "  " + n) : ["  (none)"])]
+    show(...header, "", "Last message: none yet, turn a knob")
     for (const input of access.inputs.values()) {
       input.onmidimessage = e => {
         const [st, num, val] = e.data
-        show(...header, "", `Letzte Nachricht: ${input.name}`,
-          `  Kanal ${(st & 0x0f) + 1}, ${(st & 0xf0) === 0xb0 ? "CC" : "Typ " + (st >> 4)} ${num} = ${val}`)
+        show(...header, "", `Last message: ${input.name}`,
+          `  Channel ${(st & 0x0f) + 1}, ${(st & 0xf0) === 0xb0 ? "CC" : "Type " + (st >> 4)} ${num} = ${val}`)
       }
     }
   } catch (err) {
-    show("MIDI-Zugriff verweigert:", String(err))
+    show("MIDI access denied:", String(err))
   }
 }
 

@@ -1,6 +1,6 @@
 ---
 name: lab-to-track
-description: Move a finished lab column into a track column 1:1 (same controls, sounds, rhythms, levels). Use for 'into the track', 'in den Track', 'übernehmen', 'take column N into 009', 'port the winner', 'Gewinner übernehmen', 'put our keys/bass into the track'.
+description: Move a finished lab column into a track column 1:1 (same controls, sounds, rhythms, levels). Use for 'into the track', 'take column N into 009', 'port the winner', 'put our keys/bass into the track'.
 ---
 
 # Lab column → track column, 1:1

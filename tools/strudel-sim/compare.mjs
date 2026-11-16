@@ -38,12 +38,12 @@ const dynamics = { 'ride A': ride(4), 'ride B': ride(5) }
 const CYC = 4
 
 const keep = h => audible(h) && !(ignoreCutoff0 && h.value.cutoff === 0)
-const report = (name, old, neu, msOld, msNew) => {
-  const a = sig(old.filter(keep)), b = sig(neu.filter(audible))
+const report = (name, old, fresh, msOld, msNew) => {
+  const a = sig(old.filter(keep)), b = sig(fresh.filter(audible))
   const same = a.length === b.length && a.every((x, i) => x === b[i])
   const dups = s => s.length - new Set(s).size
   const ms = msOld === undefined ? '' : `  query ms/cycle old ${msOld.toFixed(0)} new ${msNew.toFixed(0)}`
-  console.log(`${name.padEnd(11)} events/cycle old ${(old.length / CYC).toFixed(0).padStart(4)} (audible ${(a.length / CYC).toFixed(0)}) new ${(neu.length / CYC).toFixed(0).padStart(4)}${ms}  dup onsets ${dups(a)}/${dups(b)}  identical: ${same}`)
+  console.log(`${name.padEnd(11)} events/cycle old ${(old.length / CYC).toFixed(0).padStart(4)} (audible ${(a.length / CYC).toFixed(0)}) new ${(fresh.length / CYC).toFixed(0).padStart(4)}${ms}  dup onsets ${dups(a)}/${dups(b)}  identical: ${same}`)
   if (!same) {
     const sa = new Set(a), sb = new Set(b)
     console.log('  only old:', a.filter(x => !sb.has(x)).slice(0, 2))
