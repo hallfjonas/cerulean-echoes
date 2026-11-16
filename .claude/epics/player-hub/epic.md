@@ -2,7 +2,7 @@
 name: player-hub
 status: backlog
 created: 2026-11-15T18:58:29Z
-updated: 2026-11-15T21:50:00Z
+updated: 2026-11-16T10:00:00Z
 progress: 0%
 prd: .claude/prds/player-hub.md
 github: (will be set on sync)
@@ -18,8 +18,7 @@ Tools page. The analysis page stays as an extra tool on the Tools page. Each tra
 truth: the player taps it in memory when it loads it, no tapped copies on disk, and the same file still plays when
 pasted into strudel.cc. The player can switch from the playing track to any other track with a transition on the
 Fog knob (set mode, as in 011). Keep the Strudel engine behind one module so a SuperCollider engine can replace it
-later. Finish with a written scope and evaluation of three future ideas (LLM edits from the UI, auto-perform,
-producer mode).
+later. Where the player may go next (LLM edits, auto-perform, producer mode) is the separate epic `player-vision`.
 
 ## Architecture Decisions
 
@@ -90,8 +89,7 @@ producer mode).
    (`server.mjs`, `catalogue.mjs`), Tools page (`tools.html`, `tools.mjs`, server route).
 3. Lab boards and transitions once catalogue exists (transitions also need `make-set.mjs`; one at a time with any
    change to set 011).
-4. Future-ideas evaluation can run any time (doc only).
-5. Docs last.
+4. Docs last.
 
 Risks: lab boards may not all have a top-level master `stack(` that tapping needs (fallback: list the rest
 greyed); `make-set.mjs` patches are written against the frozen dual sources: one-file tracks differ (single layout,
@@ -99,14 +97,6 @@ greyed); `make-set.mjs` patches are written against the frozen dual sources: one
 silent one, as the set does); the generic set path must not change 011 (`check-set.mjs` before/after); spawning
 tools from a page on a shared machine (mitigated: whitelist, one job); open epics `launchkey-knob-target` and
 `drop-buildup` change the LC view the player opens, coordinate merges.
-
-## Future Ideas: first take (input for task 008)
-
-| Idea | What exists | Needs | First slice | Gut effort |
-|---|---|---|---|---|
-| LLM edit from UI | `@ctl` comments name every control; LC view knows CC → name; tracks reload from source on request | click target → `{track, ctl, code range, current value}`; a chat panel that shows what is selected and how it is set now, keeps the conversation, and shows each change (diff + new value) before it plays; server endpoint calling `claude -p` (session kept per chat) on a new track file (non-destructive rule); hot reload without stop | Click a knob in LC view → panel shows control name, its code and current CC value → chat → Claude writes `NNN-<name>-v2.strudel` → player offers it, chat continues on v2 | M |
-| Auto-perform | `midin` reads from a ports map with last-moved-wins per CC | a virtual port (`ports.set('Auto', …)`) fed by a script timeline (bar-quantised CC moves) or an LLM agent per phrase; human move overrides by last-moved | Script player: JSON timeline of CC moves played into a virtual port, human can grab any control | S (script) / L (AI) |
-| Producer mode | chapters per track, set frame for sections in sequence, Tension / Break | a song form (`intro 8 bars, verse 1, chorus, verse 2, chorus, outro`) mapped to track sections; a genre description (e.g. indie pop) → stems; a timeline that drives chapter / tension per section | Song form as JSON → timeline of chapter + Tension moves on an existing track (reuses auto-perform's virtual port) | L |
 
 ## Task Breakdown Preview
 
@@ -123,10 +113,7 @@ tools from a page on a shared machine (mitigated: whitelist, one job); open epic
 6. **Track transitions** — `// @set` tags in 007-010, two-track set from one-file tracks in `make-set.mjs`,
    `/transition/<from>/<to>`, Switch / Transition in the player; 011 unchanged (`check-set.mjs`). (after 3)
 7. **Shared nav + look** — `nav.mjs`, `ui.css` across player, tools, analysis. (after 2 and 4)
-8. **Future ideas scope & eval** — `docs/player-future.md`: LLM edits (incl. selection feedback and chat), auto-
-   perform, producer mode: prerequisites, effort, risks, SuperCollider touchpoints, recommendation, first slice
-   each. (parallel, any time)
-9. **Docs** — README rewrite (player-first), `CLAUDE.md` (player = main tool, single source, Tools page,
+8. **Docs** — README rewrite (player-first), `CLAUDE.md` (player = main tool, single source, Tools page,
    transitions), remove stale notes. (last)
 
 ## Dependencies
@@ -150,8 +137,7 @@ tools from a page on a shared machine (mitigated: whitelist, one job); open epic
 - At least one lab board plays with controllers in the player.
 - While 008 plays, picking 009 → Transition: the Fog knob in set mode moves from 008 to 009 without a stop;
   `check-set.mjs` on 011 unchanged.
-- `docs/player-future.md` exists with a recommendation per idea.
 
 ## Estimated Effort
 
-9 tasks, about 4–5 working sessions. Critical path: 1 → 3 → 6 → 9. Tasks 2, 4, 5, 7, 8 off the critical path.
+8 tasks, about 4–5 working sessions. Critical path: 1 → 3 → 6 → 8. Tasks 2, 4, 5, 7 off the critical path.
