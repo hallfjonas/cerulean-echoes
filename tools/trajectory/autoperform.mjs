@@ -101,7 +101,11 @@ export const valueChanges = (script, stepBars) => {
     .sort((a, b) => a.bar - b.bar)
 }
 
-export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
+// The bar line the script starts on: the nearest one, never before 0. Rounding down turned a clock reading just below
+// 0 or just below a bar line into the bar before and played the whole script a bar early.
+export const startBarOf = cycle => Math.max(0, Math.round(cycle))
+
+export const createPerformer =({ midi, engine, onChange = () => {} }) => {
   let timer = null, script = null, compiled = null, startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
   const written = new Map(), lkWritten = new Map()
 
@@ -165,7 +169,7 @@ export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
       lkWritten.clear()
       fired = 0
       firedNotes = 0
-      startBar = Math.floor(engine.cycle())
+      startBar = startBarOf(engine.cycle())
       timer = setInterval(tick, TICK_MS)
       tick()
     },
