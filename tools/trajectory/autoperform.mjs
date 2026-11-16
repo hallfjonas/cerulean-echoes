@@ -152,7 +152,7 @@ export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
       }
     }
     if (bar > compiled.end && !held.length && !sounding.length) stop()
-    else onChange({ bar, end: compiled.end, title: script.title, section: sectionAt(script, bar) })
+    else onChange({ bar, end: compiled.end, script, section: sectionAt(script, bar) })
   }
 
   return {
@@ -174,16 +174,42 @@ export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
   }
 }
 
-// The Auto-perform section of the settings drawer: script select, Start / Stop (key P in the player)
+// Top bar text for the section that holds `bar`: its name and the bars left in it, or '' without a section
+export const sectionLabel = (section, bar) => {
+  if (!section) return ''
+  const left = Math.ceil(section.to - bar)
+  return `${section.name} · ${left} bar${left === 1 ? '' : 's'} left`
+}
+
+const element = (tag, props) => Object.assign(document.createElement(tag), props)
+
+// Title, mood and section list of the playing script; items: [{ item, section }] to mark the current section
+const scriptInfo = script => {
+  if (!script) return { nodes: [], items: [] }
+  const items = (script.sections ?? []).map(section => ({ section, item: element('li', {
+    textContent: `${section.name} (bars ${section.from + 1}-${section.to})`, title: section.intent ?? '' }) }))
+  const list = element('ol', { className: 'script-sections' })
+  list.append(...items.map(({ item }) => item))
+  const nodes = [
+    script.title && element('div', { className: 'script-title', textContent: script.title }),
+    script.mood && element('div', { className: 'script-mood', textContent: script.mood }),
+    items.length && list,
+  ].filter(Boolean)
+  return { nodes, items }
+}
+
+// The Auto-perform section of the settings drawer: script select, Start / Stop (key P in the player), and while a
+// script plays its title, mood and sections with the current one marked
 export const mountAutoPerform = (container, { onStart, onStop }) => {
-  const heading = Object.assign(document.createElement('h2'), { textContent: 'Auto-perform' })
+  const heading = element('h2', { textContent: 'Auto-perform' })
   const select = document.createElement('select')
-  const button = Object.assign(document.createElement('button'), { textContent: 'Start', title: 'Key P' })
-  const state = Object.assign(document.createElement('output'), { textContent: '' })
+  const button = element('button', { textContent: 'Start', title: 'Key P' })
+  const state = element('output', { textContent: '' })
   const row = document.createElement('label')
-  row.append(Object.assign(document.createElement('span'), { textContent: 'Script' }), state, select)
-  container.replaceChildren(heading, row, button)
-  let running = false
+  row.append(element('span', { textContent: 'Script' }), state, select)
+  const info = element('div', { className: 'script-info' })
+  container.replaceChildren(heading, row, button, info)
+  let running = false, shown = null, items = []
   const toggle = () => running ? onStop() : select.value && onStart(select.value)
   button.onclick = toggle
   return {
@@ -193,10 +219,17 @@ export const mountAutoPerform = (container, { onStart, onStop }) => {
       button.disabled = !ids.length
       state.textContent = ids.length ? '' : 'none for this track'
     },
-    show: (isRunning, text = '') => {
+    show: (isRunning, text = '', progress = null) => {
       running = isRunning
       button.textContent = isRunning ? 'Stop' : 'Start'
       state.textContent = text
+      if ((progress?.script ?? null) !== shown) {
+        shown = progress?.script ?? null
+        const built = scriptInfo(shown)
+        info.replaceChildren(...built.nodes)
+        items = built.items
+      }
+      for (const { item, section } of items) item.classList.toggle('now', section === progress?.section)
     },
   }
 }

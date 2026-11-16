@@ -112,6 +112,8 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 - Pick a script in the drawer, **Start** (or **P**) reloads the track so the script begins from silence; **Stop** (or
   **P**) ends it and releases held keys (the controls keep their values). The next Start sets every control of both
   virtual inputs back to 0.
+- While a script plays, the drawer shows its title, mood and sections (the current one in bold, `intent` on hover),
+  and the top bar the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
   step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 31-38, keys that parse.
   `npm run verify` runs it.
