@@ -9,3 +9,5 @@ node_modules/
 tools/trajectory/tapped/
 Scarlett*
 *.band
+
+tools/session-digest/out/
