@@ -45,6 +45,8 @@ export const createEngine = midi => {
       await evaluate(code)
     },
     stop: () => hush(),
-    cycle: () => repl?.scheduler.now() ?? 0,
+    // The cycle the scheduler's next query starts at, not now(): it queries ahead, so a control set or a key queued
+    // now is heard from this cycle on (with now() every scripted step came about a tenth of a bar late)
+    cycle: () => repl?.scheduler.lastEnd ?? repl?.scheduler.now() ?? 0,
   }
 }
