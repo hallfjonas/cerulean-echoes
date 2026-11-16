@@ -1,15 +1,15 @@
 # Techno night
 
-Design for `perform/008-groove-techno/techno-night.json`. Status: proposal, waiting for the user's approval
-(Loop 1 / Round 1). No script yet.
+Design for `perform/008-groove-techno/techno-night.json`. Status: design approved (Loop 1); the script is in
+Loop 2, round 1 changes applied (see `feedback.md`). The rows below match the script after round 1.
 
 ## Meta
 - Track: 008-groove-techno
-- Length: 320 bars = 9 min 9 s at 140 BPM (1 bar = 4 beats = 1.71 s; 320 x 240 / 140 = 549 s)
-- Mood: dark, hypnotic, driving; warm only for the second drop
+- Length: 336 bars = 9 min 36 s at 140 BPM (1 bar = 4 beats = 1.71 s; 336 x 240 / 140 = 576 s)
+- Mood: dark, hypnotic, driving
 - Story: A kick and hats alone, then rumble, bass and clap join in 16-bar steps and the pads colour the groove. A
   long build drops into the first peak, a break pulls the low end out and brings it back on the one, a muffled dip
-  and a second, bigger build lead to the two full peaks. The colour then leaves one stem at a time, the kick last.
+  and a second, bigger build lead to the two full peaks. The colour then drifts out slowly, stem by stem over long ramps, the rhythm layers next and the kick last.
 - References: Yanamaste live set at KHIDI Tbilisi (layering over a long slot), Marie Montexier at Nation of Gondwana
   2025 (hypnotic loop, slow filter moves). The genre section of `docs/references.md` has no notes; the "listen for"
   here is the agent's guess, not heard.
@@ -22,20 +22,20 @@ Design for `perform/008-groove-techno/techno-night.json`. Status: proposal, wait
 ## Sections
 | Section | Bars | LC controls (by @ctl name) | Launchkey | Intent |
 |---|---|---|---|---|
-| Kick | 1-16 | Kick Level 0.7 at 1; Hats Level 0.5 at 9 | - | Kick alone, hats on the off-beat |
-| Bass | 17-32 | Rumble Level 0.6 at 17; Sub Level 0.6 at 21; Clap Level 0.6 at 25; Bassline Level 0.55 at 29 | - | Foundation joins, one stem per 4 bars |
-| Colour | 33-48 | Pads Level 0 -> 0.5 ramp 8 at 33; Percussion Level 0.5 at 41; Hats Pattern press at 41; Strings Level 0.3 at 45 | - | Pads and percussion colour the groove |
-| Build 1 | 49-64 | Tension 0 -> 1 ramp 16; Thin 0 -> 0.5 ramp 8 at 49; Rumble Riser hold 63-64; Clap Swell hold 61-64; Clap Pattern press x2 at 64; Chapter press at 64 | pad 48 (Crash reverse) at 63 | Lift into the first drop |
-| Drop 1 | 65-96 | Tension 0, Thin 0 at 65; Wumms 0.5; Pads Level 0.4; Stab Level 0.5 at 73; Sequence Level 0.4 at 81; Bassline Pattern press at 89 | pad 46 (Braaam) at 65 | Release: full clap, tense chapter, stab and loop |
+| Kick | 1-16 | Kick Level 0.7 at 1; Hats Level 0.5 at 3, Hats Brightness 0 -> 0.7 ramp 14, Hats Pattern press at 7; Percussion Level 0.45 at 5, Percussion Brightness 0 -> 0.7 ramp 12; Clap Level 0.55 and Rumble Level 0.5 at 9; Sub Level 0.55 at 13 | - | Rhythm layers arrive within the first bars, brighter over time |
+| Bass | 17-32 | Bassline Level 0.55 at 17; Pads Level 0 -> 0.4 ramp 8 at 17; Strings Level 0 -> 0.3 ramp 8 at 21; Pads Level 0.5 ramp 4 at 25 | - | Bass and pads join early |
+| Colour | 33-48 | Pads Brightness 0 -> 0.6 ramp 16; Hats Complexity 0.3 at 33; Percussion Complexity 0.3 at 37; Dark perc Level 0.3 at 41 | - | Brighter, busier groove before the build |
+| Build 1 | 49-64 | Tension 0 -> 1 ramp 16; Thin 0 -> 0.5 ramp 8; Percussion Level 0.5, Percussion Complexity 0 at 49; Hats, Percussion, Pads Brightness back to 0 ramp 16; Rumble Riser hold 63-64; Clap Swell hold 61-64; Clap Pattern press x2 at 64; Chapter press at 64 | pad 48 (Crash reverse) at 63.5; pad 46 (Braaam) at 64.5, quiet through Pad Fog (Launchkey knob 8) 0.85 from 64.25 | Lift into the first drop; crash then quiet bram right before the drop |
+| Drop 1 | 65-96 | Tension 0, Thin 0 at 65; Wumms 0.5; Pads Level 0.4; Hats Complexity 0, Dark perc 0 at 65; Stab Level 0.5 at 73; Sequence Level 0.4 at 81; Bassline Pattern press at 89 | Pad Fog back to 0 at 66 | Release: full clap, tense chapter, stab and loop |
 | Break 1 | 97-112 | Break press at 96; Fog 0 -> 0.5 ramp 8 at 97; Pads Level 0.7, Pads Pattern press, Strings Level 0.5, FX Level 0.4 at 97; Tension 0 -> 0.6 ramp 8 at 105; Break press at 112 | keys: F minor chords, mod wheel 0.6; pad 51 (Wind) at 97 | Low end out, hats and percussion keep going, back on the one |
-| Drop 2 | 113-144 | Chapter press at 112 (warm); Fog 0, Tension 0 at 113; Wumms 0.7; Hats Complexity 0.5, Bassline Complexity 0.5 at 121; Answer Level 0.35 at 129; Sequence Pattern press at 137 | pad 46 (Braaam) at 113 | Warm second drop, more rhythm |
-| Dip | 145-160 | Fog 0 -> 0.7 ramp 8 at 145, back to 0 ramp 4 at 157; Bassline Level 0.55 -> 0.3 ramp 4 at 145; Sequence Level 0.6; FX Level 0.5 | - | Muffled breather, beat keeps going |
-| Build 2 | 161-176 | Tension 0 -> 1 ramp 16; Thin 0 -> 0.6 ramp 12; Bassline Level 0.7 at 161; Kick Double time hold 173-176; Rumble Riser hold 175-176; Clap Swell hold 173-176; Chapter press at 176 (dark) | pad 48 (Crash reverse) at 175 | Bigger lift, double-time kick at the end |
-| Peak 1 | 177-208 | Tension 0, Thin 0 at 177; Wumms 0.9; Stab Level 0.6 at 185; Dark perc Level 0.5 at 193; Hats Pattern press at 193; Stab Variation 0.5 at 201 | pad 46 (Braaam) at 177 | Full dark groove, most stems on |
-| Break 2 | 209-224 | Break press at 208; Hats and Percussion Level 0.4; Pads Level 0.7, Strings Level 0.6, FX Level 0.6, FX Open hold 217-220; Fog 0 -> 0.4 ramp 8 at 209; Break press at 224 | keys: slow chords, mod wheel 0.6; pad 43 (Vast) at 209 | Long, airy pause before the last run |
-| Peak 2 | 225-272 | Chapter press at 224 (tense); Fog 0 at 225; Wumms 0.9; Hats Level 0.5, Percussion Level 0.5; Answer Level 0.4 at 233; Dark perc Level 0.5 at 241; Pads Pattern press at 249; Sequence Complexity 0.6 at 257 | pad 46 (Braaam) at 225 | Last peak, new chords at the halfway mark |
-| Strip | 273-304 | Wumms 0.9 -> 0.5 ramp 16; Level 0 ramp 2, one stem per 4 bars: Answer 273, Stab 277, Dark perc 281, Sequence 285, FX 289, Strings 293, Pads 297, Bassline 301 | - | The colour leaves, the beat stays |
-| Out | 305-320 | Wumms 0; Clap Level 0 at 305; Sub Level 0 at 309; Rumble and Percussion Level 0 at 313; Hats Level 0 at 315; Kick Level 0.7 -> 0 ramp 4 at 317 | - | Kick and hats last, then silence |
+| Drop 2 | 113-144 | Fog 0, Tension 0 at 113; Wumms 0.7; Hats Complexity 0.5, Bassline Complexity 0.5 at 121; Answer Level 0.35 at 129; Sequence Pattern press at 137 (no Chapter press: stays tense) | pad 46 (Braaam) at 113 | Second drop, same chapter, more rhythm |
+| Dip | 145-160 | Fog 0 -> 0.5 ramp 12 at 145, back to 0 ramp 8 at 155; Bassline Level 0.55 -> 0.45 ramp 8 at 145; Sequence Level 0.6 ramp 8 at 149; FX Level 0.5 ramp 8 at 153 | - | Gentle muffled breather, changes staggered |
+| Build 2 | 161-176 | Tension 0 -> 1 ramp 16; Thin 0 -> 0.6 ramp 12; Bassline Level 0.7 ramp 4 at 161; Kick Double time hold 173-176; Rumble Riser hold 175-176; Chapter press x2 at 175 (tense -> warm -> dark, lands at 176); no Clap Swell | pad 48 (Crash reverse) at 175.5 | Strong lift, thinner than before |
+| Peak 1 | 177-208 | Tension 0, Thin 0 at 177; Wumms 0.9; Stab Level 0.6 at 185; Dark perc Level 0.5 at 193; Hats Pattern press at 193; Stab Variation 0.5 at 201 | - (no bram) | Full dark groove, most stems on |
+| Break 2 | 209-224 | Break press at 208; Hats and Percussion Level 0.4; Pads Level 0.7, Strings Level 0.6, FX Level 0.6, FX Open hold 217-220; Fog 0 -> 0.4 ramp 8 at 209; Break press at 224; Chapter press at 224 (tense) | keys: slow chords, mod wheel 0.6; pad 43 (Vast) at 209 | Long, airy pause before the last run |
+| Peak 2 | 225-256 | Fog 0 at 225; Wumms 0.9; Hats Level 0.5, Percussion Level 0.5; Answer Level 0.4 at 233; Pads Pattern press at 245; Sequence Complexity 0.6 at 249 | pad 46 (Braaam) at 225 | Last peak, new chords at the halfway mark |
+| Strip | 257-304 | Wumms 0.9 -> 0.5 ramp 32 at 257, then 0 ramp 24 at 289; Level 0 ramp 12: Answer 257, Stab 263, Dark perc 269, Sequence 275; ramp 16: FX 281, Strings 287, Pads 293, Bassline 299 | - | The colour leaves slowly, the beat stays |
+| Out | 305-336 | Level 0 ramp 8: Clap 307, Sub 313, Rumble and Percussion 319, Hats 325; Kick Level 0.7 -> 0 ramp 8 at 329 | - | Rhythm layers fade, kick last, then silence |
 
 ## Risks
 - CPU peak: Peak 2 (225-272) and the end of Build 2 (173-176): around 12 stems, Tension at 1 (echo and reverb on all

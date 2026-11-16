@@ -1,32 +1,32 @@
 {
   "track": "008-groove-techno",
   "title": "Techno night",
-  "bars": 320,
-  "mood": "dark, hypnotic, driving; warm only for the second drop",
+  "bars": 336,
+  "mood": "dark, hypnotic, driving",
   "sections": [
     {
       "name": "Kick",
       "from": 0,
       "to": 16,
-      "intent": "Kick alone, hats on the off-beat"
+      "intent": "Kick, hats and percussion arrive within the first bars"
     },
     {
       "name": "Bass",
       "from": 16,
       "to": 32,
-      "intent": "Foundation joins, one stem per 4 bars"
+      "intent": "Foundation joins, pads fade in"
     },
     {
       "name": "Colour",
       "from": 32,
       "to": 48,
-      "intent": "Pads and percussion colour the groove"
+      "intent": "Pads, percussion and brighter hats colour the groove"
     },
     {
       "name": "Build 1",
       "from": 48,
       "to": 64,
-      "intent": "Lift into the first drop"
+      "intent": "Lift into the first drop, quiet bram just before it"
     },
     {
       "name": "Drop 1",
@@ -44,13 +44,13 @@
       "name": "Drop 2",
       "from": 112,
       "to": 144,
-      "intent": "Warm second drop, more rhythm"
+      "intent": "Second drop, same chapter, more rhythm"
     },
     {
       "name": "Dip",
       "from": 144,
       "to": 160,
-      "intent": "Muffled breather, beat keeps going"
+      "intent": "Gentle muffled breather, beat keeps going"
     },
     {
       "name": "Build 2",
@@ -73,20 +73,20 @@
     {
       "name": "Peak 2",
       "from": 224,
-      "to": 272,
+      "to": 256,
       "intent": "Last peak, new chords at the halfway mark"
     },
     {
       "name": "Strip",
-      "from": 272,
+      "from": 256,
       "to": 304,
-      "intent": "The colour leaves, the beat stays"
+      "intent": "The colour leaves slowly, the beat stays"
     },
     {
       "name": "Out",
       "from": 304,
-      "to": 320,
-      "intent": "Kick and hats last, then silence"
+      "to": 336,
+      "intent": "Rhythm layers fade, kick last, then silence"
     }
   ],
   "steps": [
@@ -96,48 +96,88 @@
       "value": 0.7
     },
     {
-      "bar": 8,
+      "bar": 2,
       "cc": 10,
       "value": 0.5
     },
     {
-      "bar": 16,
-      "cc": 6,
-      "value": 0.6
+      "bar": 2,
+      "cc": 18,
+      "value": 0.7,
+      "ramp": 14
     },
     {
-      "bar": 20,
-      "cc": 7,
-      "value": 0.6
+      "bar": 6,
+      "press": 42
     },
     {
-      "bar": 24,
+      "bar": 4,
+      "cc": 11,
+      "value": 0.45
+    },
+    {
+      "bar": 4,
+      "cc": 19,
+      "value": 0.7,
+      "ramp": 12
+    },
+    {
+      "bar": 8,
       "cc": 9,
-      "value": 0.6
+      "value": 0.55
     },
     {
-      "bar": 28,
+      "bar": 8,
+      "cc": 6,
+      "value": 0.5
+    },
+    {
+      "bar": 12,
+      "cc": 7,
+      "value": 0.55
+    },
+    {
+      "bar": 16,
       "cc": 8,
       "value": 0.55
     },
     {
-      "bar": 32,
+      "bar": 16,
       "cc": 53,
-      "value": 0.5,
+      "value": 0.4,
       "ramp": 8
     },
     {
-      "bar": 40,
-      "cc": 11,
-      "value": 0.5
-    },
-    {
-      "bar": 40,
-      "press": 42
-    },
-    {
-      "bar": 44,
+      "bar": 20,
       "cc": 54,
+      "value": 0.3,
+      "ramp": 8
+    },
+    {
+      "bar": 24,
+      "cc": 53,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 32,
+      "cc": 61,
+      "value": 0.6,
+      "ramp": 16
+    },
+    {
+      "bar": 32,
+      "cc": 34,
+      "value": 0.3
+    },
+    {
+      "bar": 36,
+      "cc": 35,
+      "value": 0.3
+    },
+    {
+      "bar": 40,
+      "cc": 58,
       "value": 0.3
     },
     {
@@ -151,6 +191,34 @@
       "cc": 28,
       "value": 0.5,
       "ramp": 8
+    },
+    {
+      "bar": 48,
+      "cc": 11,
+      "value": 0.5
+    },
+    {
+      "bar": 48,
+      "cc": 35,
+      "value": 0
+    },
+    {
+      "bar": 48,
+      "cc": 18,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 48,
+      "cc": 19,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 48,
+      "cc": 61,
+      "value": 0,
+      "ramp": 16
     },
     {
       "bar": 62,
@@ -185,8 +253,22 @@
       "press": 44
     },
     {
-      "bar": 62,
+      "bar": 62.5,
       "pad": 48
+    },
+    {
+      "bar": 63.25,
+      "lk": 38,
+      "value": 0.85
+    },
+    {
+      "bar": 63.5,
+      "pad": 46
+    },
+    {
+      "bar": 65,
+      "lk": 38,
+      "value": 0
     },
     {
       "bar": 64,
@@ -210,7 +292,13 @@
     },
     {
       "bar": 64,
-      "pad": 46
+      "cc": 34,
+      "value": 0
+    },
+    {
+      "bar": 64,
+      "cc": 58,
+      "value": 0
     },
     {
       "bar": 72,
@@ -299,10 +387,6 @@
       "length": 2
     },
     {
-      "bar": 111,
-      "press": 44
-    },
-    {
       "bar": 112,
       "cc": 20,
       "value": 0
@@ -343,30 +427,32 @@
     {
       "bar": 144,
       "cc": 20,
-      "value": 0.7,
-      "ramp": 8
+      "value": 0.5,
+      "ramp": 12
     },
     {
-      "bar": 156,
+      "bar": 154,
       "cc": 20,
       "value": 0,
-      "ramp": 4
+      "ramp": 8
     },
     {
       "bar": 144,
       "cc": 8,
-      "value": 0.3,
-      "ramp": 4
+      "value": 0.45,
+      "ramp": 8
     },
     {
-      "bar": 144,
+      "bar": 148,
       "cc": 55,
-      "value": 0.6
+      "value": 0.6,
+      "ramp": 8
     },
     {
-      "bar": 144,
+      "bar": 152,
       "cc": 59,
-      "value": 0.5
+      "value": 0.5,
+      "ramp": 8
     },
     {
       "bar": 160,
@@ -383,7 +469,8 @@
     {
       "bar": 160,
       "cc": 8,
-      "value": 0.7
+      "value": 0.7,
+      "ramp": 4
     },
     {
       "bar": 172,
@@ -406,21 +493,15 @@
       "value": 0
     },
     {
-      "bar": 172,
-      "cc": 49,
-      "value": 1
-    },
-    {
-      "bar": 176,
-      "cc": 49,
-      "value": 0
-    },
-    {
-      "bar": 175,
+      "bar": 174,
       "press": 44
     },
     {
-      "bar": 174,
+      "bar": 174.5,
+      "press": 44
+    },
+    {
+      "bar": 174.5,
       "pad": 48
     },
     {
@@ -437,10 +518,6 @@
       "bar": 176,
       "cc": 12,
       "value": 0.9
-    },
-    {
-      "bar": 176,
-      "pad": 46
     },
     {
       "bar": 184,
@@ -566,108 +643,109 @@
       "value": 0.4
     },
     {
-      "bar": 240,
-      "cc": 58,
-      "value": 0.5
-    },
-    {
-      "bar": 248,
+      "bar": 244,
       "press": 85
     },
     {
-      "bar": 256,
+      "bar": 248,
       "cc": 79,
       "value": 0.6
     },
     {
-      "bar": 272,
+      "bar": 256,
       "cc": 12,
       "value": 0.5,
-      "ramp": 16
-    },
-    {
-      "bar": 272,
-      "cc": 57,
-      "value": 0,
-      "ramp": 2
-    },
-    {
-      "bar": 276,
-      "cc": 56,
-      "value": 0,
-      "ramp": 2
-    },
-    {
-      "bar": 280,
-      "cc": 58,
-      "value": 0,
-      "ramp": 2
-    },
-    {
-      "bar": 284,
-      "cc": 55,
-      "value": 0,
-      "ramp": 2
+      "ramp": 32
     },
     {
       "bar": 288,
+      "cc": 12,
+      "value": 0,
+      "ramp": 24
+    },
+    {
+      "bar": 256,
+      "cc": 57,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 262,
+      "cc": 56,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 268,
+      "cc": 58,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 274,
+      "cc": 55,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 280,
       "cc": 59,
       "value": 0,
-      "ramp": 2
+      "ramp": 16
+    },
+    {
+      "bar": 286,
+      "cc": 54,
+      "value": 0,
+      "ramp": 16
     },
     {
       "bar": 292,
-      "cc": 54,
-      "value": 0,
-      "ramp": 2
-    },
-    {
-      "bar": 296,
       "cc": 53,
       "value": 0,
-      "ramp": 2
+      "ramp": 16
     },
     {
-      "bar": 300,
+      "bar": 298,
       "cc": 8,
       "value": 0,
-      "ramp": 2
+      "ramp": 16
     },
     {
-      "bar": 304,
-      "cc": 12,
-      "value": 0
-    },
-    {
-      "bar": 304,
+      "bar": 306,
       "cc": 9,
-      "value": 0
+      "value": 0,
+      "ramp": 8
     },
     {
-      "bar": 308,
+      "bar": 312,
       "cc": 7,
-      "value": 0
+      "value": 0,
+      "ramp": 8
     },
     {
-      "bar": 312,
+      "bar": 318,
       "cc": 6,
-      "value": 0
+      "value": 0,
+      "ramp": 8
     },
     {
-      "bar": 312,
+      "bar": 318,
       "cc": 11,
-      "value": 0
+      "value": 0,
+      "ramp": 8
     },
     {
-      "bar": 314,
+      "bar": 324,
       "cc": 10,
-      "value": 0
+      "value": 0,
+      "ramp": 8
     },
     {
-      "bar": 316,
+      "bar": 328,
       "cc": 5,
       "value": 0,
-      "ramp": 4
+      "ramp": 8
     }
   ]
 }
