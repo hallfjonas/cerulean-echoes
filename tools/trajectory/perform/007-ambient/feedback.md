@@ -19,3 +19,13 @@
 - Decision: approved
 - Approval: Design approved by the user on 2026-11-16 ("Sounds good for 007, but let david's Text shimmer through one
   more time during the track at an appropriate time"). Approval with one amendment, applied in drift.md.
+
+## Loop 2 / Round 1 - drift.json (2026-11-16)
+- User: "There is too long of a gap between the voice ending and the music starting. The music should already slowly
+  fade in as he speaks. Same in outro. Otherwise excellent"
+- Changed: Intro: Pad (CC 53) 0 -> 0.6 ramp 16 from bar 5 and Drone (CC 7) 0 -> 0.3 ramp 16 from bar 9 (were bar 17,
+  ramp 8), so they grow under David; Sea / Wind (CC 6) 0.4 over 10 bars (was 0.3 over 8). Outro: Sea / Wind 0.4 and
+  Pad 0.7 ramp 8 at bar 137 keep a bed; Shaker / Rim ramp 6 at 137, Pulse / Bass ramp 6 at 141 (were 4); Voice
+  (CC 59) enters at 141 over 6 bars (was 145 over 2) and Choir / Glitter go out at 143 over 6 (were 145 over 4).
+  Scenario: pad and drone sound in bars 1-8 already; bars 145-160 keep sawtooth, sine, triangle and brown noise.
+- Decision: again

@@ -36,15 +36,15 @@ Glitter 58, Voice 59); column 8 global: Master 12, Fog 20, Room 28, Tension 36, 
 
 | Section | Bars | LC controls (by @ctl name) | Launchkey | Intent |
 |---|---|---|---|---|
-| Voice in | 1-16 | Master 0 -> 0.8 ramp 8; Voice Level 0 -> 0.5 ramp 2 at 1, Distortion 0.3, Space 0.5; Sea / Wind Level 0 -> 0.3 ramp 8, Space 0.6; Voice Level 0 ramp 4 at 13 | - | David opens over the waves, then steps back |
-| Pad | 17-28 | Pad Level 0 -> 0.6 ramp 8, Space 0.5; Drone Level 0 -> 0.3 ramp 8 | - | Chords and low fifths grow |
+| Voice in | 1-16 | Master 0 -> 0.8 ramp 8; Voice Level 0 -> 0.5 ramp 2 at 1, Distortion 0.3, Space 0.5; Sea / Wind Level 0 -> 0.4 ramp 10, Space 0.6; Pad Level 0 -> 0.6 ramp 16 at 5; Drone Level 0 -> 0.3 ramp 16 at 9; Voice Level 0 ramp 4 at 13 | - | David opens over waves, pad and drone already fading in under him |
+| Pad | 17-28 | Pad and Drone keep growing (set in Voice in; Pad Space 0.5) | - | Chords and low fifths grow |
 | Heartbeat | 29-40 | Pulse Level 0 -> 0.35 ramp 4 (Punch 0); Bass Level 0 -> 0.3 ramp 4; Drone Pattern press at 33 | - | The floor arrives, soft |
 | Colour | 41-60 | Eno / Shimmer Level 0 -> 0.5 ramp 4, Layer press at 41; Choir Level 0.4 at 49; Glitter Level 0.3 at 53, Complexity 0.2 | - | Bowed shimmer, choir, first sparkles |
 | Motion | 61-76 | Rim Level 0.3 at 61; Shaker Level 0.3 at 65; Marimba Level 0.4 at 69, Complexity 0.3; Chapter press at 69 (melancholic) | - | Small percussion, darker colour |
 | Break | 77-92 | Break press at 77; Fog 0 -> 0.5 ramp 4; Sea / Wind Level 0.4 ramp 4; Voice Level 0 -> 0.35 ramp 2 at 81, Space 0.9, Level 0 ramp 3 at 85, Space 0.5 at 88; Break press at 89 (back on the one); Fog 0.5 -> 0 ramp 2 at 89 | keys d3 a3 e4 at 79, f#3 a3 c#4 at 85; mod wheel 0 -> 0.6 ramp 2 at 77 | Beat out, keys over the drone, David shimmers through, return |
 | Peak | 93-120 | Tension 0 -> 0.7 ramp 24; Toms Level 0.5 at 97; Choir Complexity 0.5; Glitter Complexity 0.6 at 101; Chapter press at 109 (strange); Pad Brightness 0.7 | pad Glockenspiel (44) at 101 and 113; keys b2 d3 a3 at 105 | Fullest, strangest, builds |
 | Release | 121-136 | Tension 0.7 -> 0 ramp 8; Chapter press at 121 (floating); Toms Level 0 ramp 4 at 125; Marimba Level 0 ramp 4 at 129; Glitter Complexity 0.2 | pad Wind (48) at 129; LK knob 8 (CC 38) 0 -> 0.4 ramp 8 | Calm down, back to floating |
-| Voice out | 137-160 | Shaker, Rim Level 0 ramp 4 at 137; Pulse, Bass Level 0 ramp 4 at 141; Choir, Glitter Level 0 ramp 4 at 145; Voice Level 0 -> 0.5 ramp 2 at 145, Distortion 0.3; Fog 0 -> 0.4 ramp 12 at 145; Master 0.8 -> 0 ramp 8 at 153 | mod wheel 0 ramp 4 at 141 | Thin out, David closes, fade |
+| Voice out | 137-160 | Sea / Wind Level 0.4 and Pad Level 0.7 ramp 8 at 137 (the bed stays); Shaker, Rim Level 0 ramp 6 at 137; Pulse, Bass Level 0 ramp 6 at 141; Voice Level 0 -> 0.5 ramp 6 at 141, Distortion 0.3; Choir, Glitter Level 0 ramp 6 at 143; Fog 0 -> 0.4 ramp 12 at 145; Master 0.8 -> 0 ramp 8 at 153 | mod wheel 0 ramp 4 at 141 | Thin out, David closes, fade |
 
 ## Risks
 - CPU peak: Peak (93-120): 12+ stems (Jojo beat stems, pad, bowed, marimba, toms, choir, glitter, keys) plus Tension

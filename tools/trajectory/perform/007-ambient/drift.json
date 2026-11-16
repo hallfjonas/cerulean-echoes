@@ -90,8 +90,8 @@
     {
       "bar": 0,
       "cc": 6,
-      "value": 0.3,
-      "ramp": 8
+      "value": 0.4,
+      "ramp": 10
     },
     {
       "bar": 0,
@@ -99,27 +99,27 @@
       "value": 0.6
     },
     {
-      "bar": 12,
-      "cc": 59,
-      "value": 0,
-      "ramp": 4
-    },
-    {
-      "bar": 16,
+      "bar": 4,
       "cc": 53,
       "value": 0.6,
-      "ramp": 8
+      "ramp": 16
     },
     {
-      "bar": 16,
+      "bar": 4,
       "cc": 69,
       "value": 0.5
     },
     {
-      "bar": 16,
+      "bar": 8,
       "cc": 7,
       "value": 0.3,
-      "ramp": 8
+      "ramp": 16
+    },
+    {
+      "bar": 12,
+      "cc": 59,
+      "value": 0,
+      "ramp": 4
     },
     {
       "bar": 28,
@@ -337,25 +337,37 @@
       "bar": 136,
       "cc": 10,
       "value": 0,
-      "ramp": 4
+      "ramp": 6
     },
     {
       "bar": 136,
       "cc": 9,
       "value": 0,
-      "ramp": 4
+      "ramp": 6
+    },
+    {
+      "bar": 136,
+      "cc": 6,
+      "value": 0.4,
+      "ramp": 8
+    },
+    {
+      "bar": 136,
+      "cc": 53,
+      "value": 0.7,
+      "ramp": 8
     },
     {
       "bar": 140,
       "cc": 5,
       "value": 0,
-      "ramp": 4
+      "ramp": 6
     },
     {
       "bar": 140,
       "cc": 8,
       "value": 0,
-      "ramp": 4
+      "ramp": 6
     },
     {
       "bar": 140,
@@ -364,27 +376,27 @@
       "ramp": 4
     },
     {
-      "bar": 144,
-      "cc": 57,
-      "value": 0,
-      "ramp": 4
-    },
-    {
-      "bar": 144,
-      "cc": 58,
-      "value": 0,
-      "ramp": 4
-    },
-    {
-      "bar": 144,
+      "bar": 140,
       "cc": 59,
       "value": 0.5,
-      "ramp": 2
+      "ramp": 6
     },
     {
-      "bar": 144,
+      "bar": 140,
       "cc": 83,
       "value": 0.3
+    },
+    {
+      "bar": 142,
+      "cc": 57,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 142,
+      "cc": 58,
+      "value": 0,
+      "ramp": 6
     },
     {
       "bar": 144,
