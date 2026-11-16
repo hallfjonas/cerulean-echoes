@@ -19,3 +19,9 @@
   Rhodes 0.8 -> 0.667 (0.8 is in the fade-out third, 10 dB quieter). The user's own Launchkey not controlling the track
   is an engine matter (handled separately).
 - Decision: again
+
+## Loop 2 / Round 2 - dance-floor.json (2026-11-16)
+- User: "Listen in the player: 007, 008, 009, and 010 after the timing fix --> ALL PERFECT NOW; Timing fix not needed"
+- Changed: nothing. The user also reports: real Launchkey while the script plays "WORKS AS WELL! Only knobs broken".
+- Decision: approved
+- Approval: Performance approved by the user on 2026-11-16 ("ALL PERFECT NOW").

@@ -20,6 +20,12 @@
 - Approval: Performance taken as approved by the user on 2026-11-16 ("Now move on"; after "It works well for a smooth
   background journey track", "Human take-over works as well"). Not measured: clipping (`npm run audibility`), CPU peak.
 
+## Loop 2 / Round 3 - journey.json (2026-11-16)
+- User: "Listen in the player: 007, 008, 009, and 010 after the timing fix --> ALL PERFECT NOW; Timing fix not needed"
+- Changed: nothing. Re-listened after the player timing fix.
+- Decision: approved
+- Approval: Performance approved by the user on 2026-11-16 ("ALL PERFECT NOW").
+
 ## Lessons
 - Starting from an existing spike script (`spike-run.json`) made the design a one-round loop: describe the moves in
   sections, keep the steps.

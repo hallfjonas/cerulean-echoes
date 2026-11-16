@@ -8,3 +8,9 @@
   time of "air" (mm:ss); bar = seconds / 3.43. Sea / Wind (CC 6) now ramps in over bars 1-11; it would then start 1-2
   bars before that word.
 - Decision: again
+
+## Loop 2 / Round 3 - drift.json (2026-11-16)
+- User: "Listen in the player: 007, 008, 009, and 010 after the timing fix --> ALL PERFECT NOW; Timing fix not needed"
+- Changed: nothing. The wind cue on "air" was never applied (time unknown); the user approved without it.
+- Decision: approved
+- Approval: Performance approved by the user on 2026-11-16 ("ALL PERFECT NOW").
