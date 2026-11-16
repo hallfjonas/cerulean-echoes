@@ -1,11 +1,13 @@
-// Checks the auto-perform scripts (perform/<track>/<script>.json, see autoperform.mjs) against their track: the shape
-// of every step, every CC a control of the track's @ctl tags, every press one of its buttons.
+// Checks the auto-perform scripts (perform/<track>/<script>.json, see autoperform.mjs) against their track: the meta
+// fields (sections in order, inside `bars`, every step in a section), the shape of every step, every CC a control of
+// the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 31-38, keys that parse.
 // usage (in tools/): node trajectory/check-perform.mjs [<track.strudel> …]   (default: every track that has scripts)
 // Exit 1 if a script fails.
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { parse } from '../lcxl-layout/gen-layout.mjs'
+import { LK_CCS, PADS, isLaunchkeyStep, keyNotes } from './autoperform.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const repo = path.resolve(here, '..', '..')
@@ -32,16 +34,72 @@ export const controlsOf = src => {
 }
 
 const isBar = bar => Number.isFinite(bar) && bar >= 0
+const SCRIPT_FIELDS = ['track', 'steps', 'title', 'bars', 'mood', 'sections']
+const SECTION_FIELDS = ['name', 'from', 'to', 'intent']
+const isText = text => typeof text === 'string' && text.trim() !== ''
+const hasOnly = (step, required, optional = []) => required.every(k => k in step) &&
+  Object.keys(step).every(k => required.includes(k) || optional.includes(k))
+
+const checkMeta = script => {
+  const errors = []
+  const unknown = Object.keys(script).filter(k => !SCRIPT_FIELDS.includes(k))
+  if (unknown.length) errors.push(`unknown field ${unknown.join(', ')} (fields: ${SCRIPT_FIELDS.join(', ')})`)
+  if (script.title !== undefined && !isText(script.title)) errors.push('title must be a text')
+  if (script.mood !== undefined && !isText(script.mood)) errors.push('mood must be a text')
+  if (script.bars !== undefined && !(script.bars > 0)) errors.push('bars must be a number > 0')
+  if (script.sections === undefined) return errors
+  if (!Array.isArray(script.sections)) return [...errors, 'sections is not a list']
+  script.sections.forEach((section, i) => {
+    const at = `section ${i + 1} (${section.name})`
+    const previous = script.sections[i - 1]
+    if (!hasOnly(section, ['name', 'from', 'to'], ['intent'])) errors.push(`${at}: needs name, from, to (intent)`)
+    if (!isText(section.name) || section.name.trim().split(/\s+/).length > 2)
+      errors.push(`${at}: name must be one or two words`)
+    if (section.intent !== undefined && !isText(section.intent)) errors.push(`${at}: intent must be a text`)
+    if (!isBar(section.from) || !(section.to > section.from)) errors.push(`${at}: needs 0 ≤ from < to (bars)`)
+    if (previous && section.from < previous.to) errors.push(`${at}: starts before section ${i} ends (${previous.to})`)
+    if (script.bars !== undefined && section.to > script.bars) errors.push(`${at}: ends after bar ${script.bars}`)
+  })
+  return errors
+}
+
+const checkLaunchkeyStep = (step, at) => {
+  const errors = []
+  if (step.keys !== undefined) {
+    if (!hasOnly(step, ['bar', 'keys'], ['velocity', 'length'])) errors.push(`${at}: needs bar, keys (velocity length)`)
+    if (typeof step.keys !== 'string' || !keyNotes(step.keys))
+      errors.push(`${at}: keys '${step.keys}' must be note names or MIDI numbers, space-separated ('c3 e3 g3')`)
+    if (step.velocity !== undefined && !(step.velocity > 0 && step.velocity <= 1)) errors.push(`${at}: velocity 0..1`)
+    if (step.length !== undefined && !(step.length > 0)) errors.push(`${at}: length must be > 0 bars`)
+  } else if (step.pad !== undefined) {
+    if (!hasOnly(step, ['bar', 'pad'])) errors.push(`${at}: a pad step has only bar and pad`)
+    if (!(Number.isInteger(step.pad) && step.pad >= PADS[0] && step.pad <= PADS[1]))
+      errors.push(`${at}: pad must be a note ${PADS[0]}-${PADS[1]}`)
+  } else {
+    if (!hasOnly(step, ['bar', 'lk', 'value'], ['ramp'])) errors.push(`${at}: needs bar, lk, value (ramp)`)
+    if (!LK_CCS.includes(step.lk)) errors.push(`${at}: lk ${step.lk} is not the mod wheel (1) or a knob (31-38)`)
+    if (!(step.value >= 0 && step.value <= 1)) errors.push(`${at}: value must be 0..1`)
+    if (step.ramp !== undefined && !(step.ramp > 0)) errors.push(`${at}: ramp must be > 0 bars`)
+  }
+  return errors
+}
 
 export const checkScript = (script, controls, trackId) => {
   const errors = []
   if (script.track !== trackId) errors.push(`track is '${script.track}', expected '${trackId}'`)
   if (!Array.isArray(script.steps)) return [...errors, 'steps is not a list']
+  errors.push(...checkMeta(script))
+  const sections = Array.isArray(script.sections) && script.sections.length ? script.sections : null
   script.steps.forEach((step, i) => {
     const at = `step ${i + 1} (bar ${step.bar})`
     const keys = Object.keys(step).sort().join(',')
     if (!isBar(step.bar)) errors.push(`${at}: bar must be a number ≥ 0`)
-    if (step.press !== undefined) {
+    else if (sections && !sections.some(s => s.from <= step.bar && step.bar < s.to))
+      errors.push(`${at}: in no section`)
+    if (script.bars !== undefined && step.bar + (step.ramp ?? 0) > script.bars)
+      errors.push(`${at}: ends after bar ${script.bars}`)
+    if (isLaunchkeyStep(step)) errors.push(...checkLaunchkeyStep(step, at))
+    else if (step.press !== undefined) {
       if (keys !== 'bar,press') errors.push(`${at}: a press step has only bar and press`)
       else if (!controls.has(step.press)) errors.push(`${at}: press ${step.press} is not a control of the track`)
       else if (!controls.get(step.press).button) errors.push(`${at}: press ${step.press} is not a button`)
@@ -81,7 +139,8 @@ export const checkTrack = file => {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2).map(f => path.resolve(process.env.INIT_CWD ?? process.cwd(), f))
-  const files = args.length ? args : fs.readdirSync(PERFORM).sort().map(id => trackFileOf(id) ?? path.join(PERFORM, id))
+  const files = args.length ? args : fs.readdirSync(PERFORM, { withFileTypes: true }).filter(e => e.isDirectory())
+    .map(e => e.name).sort().map(id => trackFileOf(id) ?? path.join(PERFORM, id))
   let failed = false
   for (const file of files) {
     if (!fs.existsSync(file)) {
