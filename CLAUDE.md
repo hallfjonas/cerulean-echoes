@@ -44,11 +44,6 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   take either side and regenerate (hook, `npm run layouts`/`syx`/`set`).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
-## Epics (ccpm)
-PRDs and epics (`.claude/prds/`, `.claude/epics/`) are tracked in git and written in English. Check every fact and path
-against the tree before writing, and note overlaps with open epics. Parallel agents get disjoint file lists and must
-end with a report.
-
 ## Live tracks (007, 008, 009, 010): one file each
 The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-ambient`, `008-groove-techno`,
 `009-house`, `010-ambient-house`), every controller optional. Edit these files.
