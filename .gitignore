@@ -6,6 +6,7 @@ node_modules/
 .claude/*
 !.claude/skills/
 !.claude/epics/
+!.claude/prds/
 !.claude/settings.json
 !.claude/launch.json
 !.gitattributes
