@@ -1,6 +1,6 @@
 ---
 name: strudel-optimize
-description: Make a dense Strudel track cheaper to compute without changing its sound (gate silent stems/layers, mapping as data), and prove it with an event-by-event comparison in Node. Use when a track drops out, the CPU is high, or a track should be restructured "without audible changes".
+description: Make a Strudel track cheaper to compute without changing its sound and prove it event by event. Use for 'drops out', 'CPU', 'Aussetzer', 'too heavy', 'compare old/new', 'vergleich', 'same sound', 'identical', 'event by event', 'gate silent', 'inaudible'.
 ---
 
 # Strudel optimize
@@ -28,7 +28,7 @@ Goal: only audible events get computed. The sound and every MIDI control must st
 ## Verify (required)
 ```sh
 cd tools && npm install            # once
-node strudel-sim/compare.mjs ../tracks/NNN/NNN.strudel ../tracks/<genre>/NNN-<name>/NNN-lean.strudel [--ignore-cutoff0]
+node strudel-sim/compare.mjs ../tracks/<genre>/NNN-<name>/NNN-<name>.strudel ../tracks/<genre>/NNN-<name>/NNN-lean.strudel [--ignore-cutoff0]
 ```
 Runs fixed positions (all 0 / 0.5 / 1, random snapshots) and two "rides" (all controls moving, buttons tapped)
 and prints events per cycle, query time per cycle, and `identical: true|false` for the audible events.

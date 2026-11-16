@@ -1,0 +1,173 @@
+// LC view of this evaluation: names from the tags in the editor (strudel.cc keeps the text in strudelMirror),
+// buttons from the change() rows (row i = column i + 1), chapter and break on column 8
+if (lcView) {
+  const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 16 / Mode 1)
+  const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
+  const code = globalThis.strudelMirror?.code ?? ''
+  const TAGS = {}
+  for (const m of code.matchAll(/^\/\/ @(?:mode|col|ctl) (\S+) (.*)$/gm)) TAGS[m[1]] = m[2]
+  for (const m of code.matchAll(/^\/\/ @lk (\S+) (.*)$/gm)) TAGS['lk.' + m[1]] = m[2]
+  // Tag prefix of a page: dual file B16 (Jojo) / 16 (Jonas), single file 16 (Mode 1) / 2 (Mode 2)
+  const isSingleFile = /^\/\/ @ctl 2:/m.test(code)
+  const prefix = page => page === 'jojo' ? (isSingleFile ? '16' : 'B16') : (isSingleFile ? '2' : '16')
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])
+  const isGlobal = (page, n) => n === 8 && (alone || page === 'jonas')
+  // Short page title without the players' names: 'Mode 2 — Jonas: Colour (chords + melodies)' → 'Mode 2 — Chords +
+  // melodies', 'Jonas — Colour (chords + melodies)' → 'Chords + melodies'
+  const shortTitle = t => {
+    const m = t.match(/^(.*?) — .*?\((.+?)\)/)
+    if (!m) return t.split(' · ')[0]
+    const what = m[2][0].toUpperCase() + m[2].slice(1)
+    return /^Mode \d/.test(m[1]) ? m[1] + ' — ' + what : what
+  }
+
+  lcView.side = name => name?.includes(LC_PORT) ? 'jonas'
+    : name?.includes(LK_NAME) && !name.includes('DAW') ? 'lk' : null
+  // Column 8 CCs ((cc - 4) % 8 == 0) are on both pages and keep the page; the Launchkey keeps it too
+  lcView.pageOf = (side, cc) => side === 'lk' ? lcView.page
+    : !alone ? side : (cc - 4) % 8 === 0 ? lcView.page : cc > 52 ? 'jonas' : 'jojo'
+  // Column 8 knobs and fader: the value the sound really uses (glob, last moved of Mode 1 / Mode 2), not the last raw
+  // CC the view saw, so a global knob left on can never hide behind a stale or missing number
+  const GLOBAL_USED = { k1: glob.bright, k2: glob.space, k3: glob.char, fader: glob.level }
+  const used = pat => { try { return pat.queryArc(0, 0.01)[0]?.value } catch (e) { return undefined } }
+  const valueOf = (page, n, row) => {
+    if (isGlobal(page, n) && GLOBAL_USED[row]) return used(GLOBAL_USED[row])
+    const base = CC_ROW[row] + n
+    const t = lcView.cc[alone ? 'jonas' : page]
+    return alone && page === 'jonas' && n < 8 ? t[base + 48] : t[base] ?? (n === 8 ? t[base + 48] : undefined)
+  }
+  const pending = (now, next) => esc(now) + (next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+  const choice = (page, n) => {
+    if (isGlobal(page, n)) return lcChapter()
+    const r = STATUS[page][n - 1]
+    if (!r) return ['', '']
+    const show = i => !r.names ? (i + 1) + ' / ' + r.n : typeof r.names === 'function' ? r.names(i) : r.names[i]
+    return [show(r.latch.now), show(r.latch.pending)]
+  }
+  // Button 1 in two lines like button 2: its name and the choice; while a change waits for the bar line, the current
+  // choice small on top and the next one below (so the button keeps its size)
+  const b1Lines = (name, now, next) => next !== now ? '<span>' + esc(now) + '</span><b class=next>→ ' + esc(next) + '</b>'
+    : '<span>' + esc(name) + '</span><b>' + esc(now) + '</b>'
+  const cell = (page, n, row) => {
+    const val = valueOf(page, n, row)
+    const [name, desc] = (TAGS[isGlobal(page, n) ? 'g.' + row : prefix(page) + ':' + n + '.' + row] ?? '').split(' | ')
+    const num = val === undefined ? '–' : Math.round(val * 100)
+    const v = 'style="--v:' + (val ?? 0) + '"'
+    const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
+    if (row === 'fader') return '<div class="cell fader"' + title + '><div class=bar ' + v + '><i></i></div>' +
+      '<b>' + num + '</b><span>' + esc(name) + '</span></div>'
+    if (row === 'b1') return '<div class="cell btn"' + title + '>' + b1Lines(name, ...choice(page, n)) + '</div>'
+    if (row === 'b2') {
+      const on = isGlobal(page, n) ? breakLatch.pending === 1 : (val ?? 0) > 0.5
+      const what = isGlobal(page, n) ? pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on')
+        : on ? 'held' : ''
+      return '<div class="cell btn' + (on ? ' on' : '') + '"' + title + '><span>' + esc(name) + '</span><b>' + what + '</b></div>'
+    }
+    return '<div class="cell knob"' + title + '><div class=dial ' + v + '></div><b>' + num + '</b><span>' + esc(name) + '</span></div>'
+  }
+  // Launchkey row: mod wheel (keys level) and knobs 1-8, names from the @lk tags; shown while a Launchkey is connected
+  lcView.cc.lk ??= {}
+  const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, LK_KNOB_1 + n - 1])]
+  const lkCell = ([key, cc]) => {
+    const val = lcView.cc.lk[cc]
+    const [name, desc] = (TAGS['lk.' + key] ?? key).split(' | ')
+    const num = val === undefined ? '–' : Math.round(val * 100)
+    const v = 'style="--v:' + (val ?? 0) + '"'
+    const title = ' title="' + esc(desc ?? '').replace(/"/g, '&quot;') + '"'
+    const mark = key === 'level' ? '<div class=bar ' + v + '><i></i></div>' : '<div class=dial ' + v + '></div>'
+    return '<div class="cell ' + (key === 'level' ? 'fader' : 'knob') + '"' + title + '>' + mark + '<b>' + num + '</b><span>' +
+      esc(name) + '</span></div>'
+  }
+  // The 25 keys (the window moves to the octave played) and the 16 pads in the Launchkey's
+  // default layout (C1 = 36 bottom left: 36-39 bottom left, 40-43 top left, 44-47 bottom right, 48-51 top right)
+  lcView.keys ??= new Set(); lcView.pads ??= new Set(); lcView.base ??= 48
+  const BLACK = [1, 3, 6, 8, 10]
+  // Pads are matched by their place among the 16 (as shotOf plays them), whatever note numbers they send
+  const padIdx = n => ((n - LK_PAD_NOTE_1) % 16 + 16) % 16
+  const padLit = n => [...lcView.pads].some(p => padIdx(p) === padIdx(n)) ||
+    Object.entries(lcView.padAt ?? {}).some(([p, t]) => padIdx(p) === padIdx(n) && performance.now() - t < 250)
+  const lkPlay = () => '<div class=lkplay><div class=lkkeys>' + [...Array(25).keys()].map(i => {
+    const m = lcView.base + i
+    return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (inKey(m) ? ' in' : '') + (lcView.keys.has(m) ? ' on' : '') + '"></i>'
+  }).join('') + '</div><div class=lkpads>' + [40, 36].flatMap(b => [0, 1, 2, 3, 8, 9, 10, 11].map(i =>
+    '<i class="' + (lcView.padVoice?.[b + i - 36] ? 'voice' : '') + (padLit(b + i) ? ' on' : '') + '">' +
+    esc(lcView.padNames?.[b + i - 36] ?? '') + '</i>')).join('') + '</div></div>'
+  const lkHtml = () => !lkCc ? '' : '<div class=lk><div class="col g">Launchkey</div><div class=lkbody><div class=lkmain><div class=lkrow>' +
+    LK_CTLS.slice(1).map(lkCell).join('') + '</div>' + lkPlay() + '</div>' + lkCell(LK_CTLS[0]) + '</div></div>'
+  // Bar in the cycle (bars) and beat in the bar (dots, the one ringed), then the bar's chord
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const beatHtml = () => beatNow.bar === null ? '–' : (beatNow.bar % CYCLE + 1) + ' / ' + CYCLE +
+    '<span class=bars>' + marks(CYCLE, beatNow.bar % CYCLE) + '</span><span class=beats>' + marks(4, beatNow.beat) + '</span>' +
+    (chordAt(beatNow.bar) ? '<span class=chord>' + esc(chordAt(beatNow.bar)) + '</span>' : '')
+  lcView.css = [
+    ':root{--acc:#ddd}html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(10px,.8vw,18px)/1.25 system-ui,sans-serif}',
+    '.pages{flex:1;display:flex;gap:1vw;min-height:0}',
+    '.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:.4vh;min-height:0;padding:.6vh .8vw;border:2px solid #222;border-radius:8px}',
+    '.page.live{border-color:var(--acc)}.page h2{margin:0;font-size:1.15em;color:var(--acc)}',
+    '#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}',
+    '.head{display:flex;gap:2.5vw;align-items:baseline;flex-wrap:wrap}.head h1{margin:0;font-size:1.6em;color:var(--acc)}',
+    '.head .k{opacity:.6;margin-right:.4em}.next{color:var(--acc)}',
+    '.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:2.9em repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 3.3em 3.3em;gap:.8vh .5vw}',
+    '.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}.col.g{color:var(--acc)}',
+    '.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}',
+    '.cell span{opacity:.7;font-size:.85em;overflow-wrap:anywhere}.cell b{font-variant-numeric:tabular-nums}',
+    '.dial{width:min(3vw,6.5vh);aspect-ratio:1;border-radius:50%;',
+    'background:conic-gradient(from -135deg,var(--acc) 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);',
+    '-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}',
+    '.bar{position:relative;width:1vw;min-width:12px;flex:1;min-height:30px;background:#333;border-radius:4px;overflow:hidden}',
+    '.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:var(--acc)}',
+    '.btn{background:#222;border-radius:6px;padding:.4em .3em;justify-content:flex-start;overflow:hidden;box-sizing:border-box}',
+    '.btn b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.btn .next{display:block;overflow:hidden;text-overflow:ellipsis}.btn.on{background:var(--acc);color:#111}',
+    '.btn.on span{opacity:.8}.btn b{font-size:1.05em}',
+    '.beats{margin-left:.6em}.beats i{display:inline-block;width:.75em;height:.75em;border-radius:50%;background:#333;margin-left:.3em}',
+    '.beats i:first-child{outline:2px solid #555}.beats i.on{background:var(--acc)}',
+    '.bars{margin-left:.6em}.bars i{display:inline-block;width:1.1em;height:.55em;border-radius:2px;background:#333;margin-left:.15em}',
+    '.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}',
+    '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(8,1fr);gap:.8vw;height:14vh}',
+    '.lkbody{display:flex;gap:1vw}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5vh}.lkbody>.fader{flex:none;width:5vw;justify-content:flex-start}',
+    '.lkplay{display:flex;gap:2vw;height:7vh}.lkkeys{flex:3;display:grid;grid-template-columns:repeat(25,1fr);gap:2px}',
+    // Keys: green = in the track's scale now, red = off key; pressed = bright
+    '.lkkeys i{border-radius:3px;background:#5a2a2a}.lkkeys i.blk{background:#3a1a1a;border:1px solid #6a3434}',
+    '.lkkeys i.in{background:#2f6a3c}.lkkeys i.blk.in{background:#1f4a2a;border-color:#3f8a50}',
+    '.lkkeys i.on{background:#ff5050}.lkkeys i.in.on{background:#6ff08a}',
+    '.lkpads{flex:2;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:1fr 1fr;gap:4px}',
+    '.lkpads i{border-radius:4px;background:#2a2a2a;display:flex;align-items:center;justify-content:center;text-align:center;',
+    'font:normal .75em/1.1 system-ui,sans-serif;color:#bbb;overflow:hidden;padding:0 2px}.lkpads i.on{background:#f0a040;color:#111}',
+    '.lkpads i.voice{background:#3b2d52;color:#dccbf7}.lkpads i.voice.on{background:#b48cf0;color:#111}',
+  ].join('\n')
+  // One page as a block: its title, the column names and the six rows. The page moved last gets a frame in its colour.
+  // The pages stand side by side like the two controllers on the table; swap the order here if Jonas stands left.
+  const PAGE_ORDER = ['jojo', 'jonas']
+  const cols = [1, 2, 3, 4, 5, 6, 7, 8]
+  const pageHtml = page => '<section class="page' + (page === lcView.page ? ' live' : '') + '" style="--acc:' +
+    (page === 'jojo' ? '#f0a040' : '#50c8e8') + '"><h2>' +
+    esc(shortTitle(TAGS[prefix(page)] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2'))) + '</h2><div class=grid>' +
+    cols.map(n => '<div class="col' + (isGlobal(page, n) ? ' g' : '') + '">' +
+      esc((TAGS[prefix(page) + ':' + n] ?? (isGlobal(page, n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
+    ROWS.map(row => cols.map(n => cell(page, n, row)).join('')).join('') + '</div></section>'
+  lcView.draw = () => {
+    const doc = lcView.win.document
+    const root = doc.getElementById('lc')
+    if (!root) return
+    root.innerHTML = '<div class=head>' +
+      '<div><span class=k>Chapter</span>' + pending(...lcChapter()) + '</div>' +
+      lcHead().map(([k, text]) => '<div><span class=k>' + esc(k) + '</span>' + esc(text) + '</div>').join('') +
+      '<div><span class=k>Bar</span>' + beatHtml() + '</div>' +
+      // Global knobs that are not at 0 (Fog, Thin, Tension …) stand in the head line, in the accent colour
+      ['k1', 'k2', 'k3'].map(r => [(TAGS['g.' + r] ?? r).split(' | ')[0], used(GLOBAL_USED[r]) ?? 0]).filter(([, v]) => v > 0.01)
+        .map(([k, v]) => '<div class=next><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
+      '<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>' +
+      (code ? '' : '<div class=next>Namen fehlen: Editor nicht gefunden</div>') +
+      (lcView.other ? '<div><span class=k>MIDI</span>' + esc(lcView.other) + '</div>' : '') + '</div><div class=pages>' +
+      PAGE_ORDER.map(pageHtml).join('') + '</div>' + lkHtml()
+    // Keys level bar as tall as the LC level faders (the LC grid sets their height)
+    const ref = root.querySelector('.page .fader .bar'), lkBar = root.querySelector('.lkbody>.fader .bar')
+    // The bar itself in the middle of the Launchkey block (number and name hang below it)
+    const lkBody = root.querySelector('.lkbody')
+    if (ref && lkBar) Object.assign(lkBar.style, { flex: 'none', height: ref.offsetHeight + 'px',
+      marginTop: Math.max(0, (lkBody.clientHeight - ref.offsetHeight) / 2) + 'px' })
+  }
+  // Another track's status box may be the one on the page now: the link moves into it
+  if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)
+  if (lcView.win && !lcView.win.closed) lcView.win.document.head.innerHTML = '<style>' + lcView.css + '</style>'
+}

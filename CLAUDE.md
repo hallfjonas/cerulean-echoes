@@ -10,6 +10,8 @@ One name per job in every track: row 1 Brightness, row 2 Space, fader Level, but
 global column Fog / Thin / Tension / Master / Chapter / Break. Row 3 and button 2 are named for what they do (Length, Complexity,
 Octave, Echo throw, Lift). A `@ctl` text is one short line (about 50 characters): what the control does, no ranges or history.
 No pattern strings (x..x) in the live view. Chat with the user stays German.
+User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms" = Master fader, "LK" = Launchkey,
+"keys" = the Launchkey keys, "drum C1 / E1" = Launchkey pad by Novation note name (C1 = note 36, E1 = 40).
 
 ## Layout
 - `tracks/<genre>/NNN-<name>/` — one folder per track, grouped by genre (`ambient`, `ambient-house`, `house`,
@@ -33,6 +35,19 @@ No pattern strings (x..x) in the live view. Chat with the user stays German.
 - Ask before changing sound, effects, orbits, reverb/delay, naming or the controller layout, unless that is the task.
 - Single quotes for plain text in Strudel (double quotes are parsed as mini-notation).
 - Boards and stems need rhythm, not just held notes.
+
+## Git
+- Never push to main or force-push it; branch from a fresh `origin/main`, one PR per feature.
+- Before a multi-file edit: `git status`, and look for sibling branches/PRs and other sessions working on the same
+  track (`gh pr list`), so nothing is built twice or overwritten.
+- Generated files (layout PDFs, `.syx`, `-single`, `011-set-dual.strudel`) are never merged by hand: on a conflict
+  take either side and regenerate (hook, `npm run layouts`/`syx`/`set`).
+- No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
+
+## Epics (ccpm)
+PRDs and epics (`.claude/prds/`, `.claude/epics/`) are tracked in git and written in English. Check every fact and path
+against the tree before writing, and note overlaps with open epics. Parallel agents get disjoint file lists and must
+end with a report.
 
 ## Live tracks (007, 008, 009, 010): one file each
 The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-ambient`, `008-groove-techno`,
@@ -67,6 +82,38 @@ The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-am
   fader and knobs read from both modes' CCs via `lastMoved` (last moved wins).
 - In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/historic/006/006-arp.strudel`).
 
+## Skills and tools
+Use them instead of redoing the steps by hand:
+- Same sound, less CPU, "drops out", "compare old/new", "event by event": `/strudel-optimize`.
+- Levels, "louder/quieter", "can't hear", clipping, balance of stems, pads, keys and voices: `/strudel-mix`.
+- Layout sheet, "regenerate layout", `.syx`, custom mode, Novation Components: `/lcxl-layout`.
+- New board, "Kandidaten", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
+- A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
+
+Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,
+syx, single and tapped copy regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit
+with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
+
+Tools (run in `tools/`):
+- After editing a track: `npm run verify -- <track…>` (transpile, compare vs HEAD, sounds, layout/syx, tapped;
+  no args = all changed tracks; `--online` checks sounds online)
+- Old vs new, event by event: `npm run compare -- <old.strudel> <new.strudel> [--stem <name>]`
+- Levels are measured, not guessed: `npm run audibility -- <track>` (mix, every stem, Launchkey keys and pads at the
+  default state; flags SILENT / LOW / CLIPS); per-stem fader ranges: `npm run measure -- <track> stem=faderCC[,charCC] …`
+  (for 007-010 pass `--base '{"12":1,"60":1}'`)
+- Sounds load? `node strudel-sim/check-sounds.mjs [--offline] <track…>`; broken bank sound:
+  `node strudel-sim/mirror-sound.mjs <sound>`
+- Controller scenario without a throwaway script: `npm run scenario -- <track> --cc 13=0.5@1 --press 37@2 --pad 36@1
+  --lk 31=0.7 --keys '<c3 e3>' --lc 2 --cc2 … [--before 0-4 --after 4-8] [--stems|--events|--view]` (`--view` = LC view
+  as text)
+- Syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
+- Set 011: `npm run set` (build + check); continuum: `npm run continuum`
+- Layout sheets / `.syx`: `npm run layouts`, `npm run syx`; on save: `npm run watch`
+- Trajectory: `node trajectory/server.mjs [port]` + `node trajectory/make-tapped.mjs <track>`
+- Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--only <id>]`
+- Outline a long track before reading it: `npm run track-map -- <track>`, then `sed -n` ranges
+- Paths cited in docs, skills and epics exist? `npm run path-lint` (planned files in epics show up too)
+
 ## Writing efficient Strudel (CPU)
 Strudel computes every event of every layer even when it is silent; dense tracks then drop out.
 - Gate silent parts so they are not queried at all: `gate(cond, pat) = cond.fmap(on => on ? pat : silence).innerJoin()`.
@@ -78,10 +125,17 @@ Strudel computes every event of every layer even when it is silent; dense tracks
 - Keep the safety net at the end of the master: `.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)`.
 - Prove a restructuring is inaudible with `/strudel-optimize` (compares old and new event by event).
 
+## Shared code in 007-010
+Blocks the four live tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
+`tools/shared/<name>.strudel-part`. Edit the block in one track, then `npm run shared -- --from <track> <name>` (in
+`tools/`); never hand-patch four copies. `npm run shared -- --check` shows drift.
+
 ## Sounds that load (samples/sounds.json)
 Every sound a track plays must load in a browser, on strudel.cc and in the player (`tools/trajectory/player.html`
 loads the same banks as strudel.cc, `banks.mjs`, plus the gm_* soundfonts). `samples/sounds.json` is the list:
 `ok` (whitelist, where it loads from) and `broken` (blacklist, why).
+- Own samples load from raw.githubusercontent `main`: check-sounds warns "plays only after push to main" until the
+  file is on `origin/main`.
 - After adding or changing a sound: `cd tools && node strudel-sim/check-sounds.mjs <track>` (plays the track in the
   simulator with every control and pad, fetches each sound's file, updates the list). The hook compares every edited
   track with the list offline and reports broken or unchecked sounds.

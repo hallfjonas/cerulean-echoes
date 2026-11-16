@@ -1,6 +1,6 @@
 ---
 name: lab-board
-description: Create or run a new round of a lab board (lab/<instrument or role>/<name>-N.strudel) - candidate columns on the stem-lab engine, layout sheet, feedback.md, round rotation. Use when the user wants candidates for an instrument or track role ("build a board for X", "next round", "new lab for 008 chords").
+description: Build or run a new round of a lab board (candidate columns for an instrument or track role), layout sheet, feedback.md, round rotation. Use for 'board', 'Kandidaten', 'next round', 'nächste Runde', 'new lab', 'candidates for chords/bass/keys', 'compare sounds', 'Board bauen'.
 ---
 
 # Lab board: candidate columns, played on the LC XL 3

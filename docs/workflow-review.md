@@ -169,26 +169,48 @@ Overlap notes: P2 does not replace `strudel-optimize` (CPU restructuring and its
 it runs their checks as one command. P8 is the only new skill; no existing skill covers adding a sample.
 
 ## Selection
-Tick the proposals to build (build waits for epic `english-repo` task 002 to land):
+All 17 proposals were selected and built (2026-11-16):
 
-- [ ] P1 Bash hook for track edits
-- [ ] P2 `npm run verify` + tools cheat sheet
-- [ ] P3 Skill descriptions with trigger words
-- [ ] P4 Git rules + `.gitattributes`
-- [ ] P5 Controller scenario CLI
-- [ ] P6 Track `.claude/settings.json` and PRDs
-- [ ] P7 `strudel-mix` for pads/keys/voices + audibility check
-- [ ] P8 `add-sample` skill
-- [ ] P9 Launchkey table + user vocabulary
-- [ ] P10 Path lint
-- [ ] P11 Shared-block sync
-- [ ] P12 Track map
-- [ ] P13 Epic conventions
-- [ ] P14 Deps on session start
-- [ ] P15 `launch.json`
-- [ ] P16 Big-file guard
-- [ ] P17 Memory refresh
+- [x] P1 Bash hook for track edits
+- [x] P2 `npm run verify` + tools cheat sheet
+- [x] P3 Skill descriptions with trigger words
+- [x] P4 Git rules + `.gitattributes`
+- [x] P5 Controller scenario CLI
+- [x] P6 Track `.claude/settings.json` and PRDs
+- [x] P7 `strudel-mix` for pads/keys/voices + audibility check
+- [x] P8 `add-sample` skill
+- [x] P9 Launchkey table + user vocabulary
+- [x] P10 Path lint
+- [x] P11 Shared-block sync
+- [x] P12 Track map
+- [x] P13 Epic conventions
+- [x] P14 Deps on session start
+- [x] P15 `launch.json`
+- [x] P16 Big-file guard
+- [x] P17 Memory refresh
 
 ## Outcome
-Filled in after the build (task 7): each built item, the past task it was tried on, and the result. Rejected items
-with reason.
+Built 2026-11-16, each item tried once on a real past case. Nothing rejected; partial items say what is missing.
+
+| # | Built | Tried on | Result |
+|---|---|---|---|
+| P1 | `tools/lcxl-layout/bash-hook.mjs` (PostToolUse Bash); `hook.mjs` refactored into `refresh()` and now reports one line per file as `additionalContext` | temp lab board edited by shell; dirty 009 | Regenerates PDF/single, no-op on the next call (~0.1 s), broken `@ctl` → exit 2. First run without cache only takes files changed in the last 10 minutes |
+| P2 | `tools/verify/verify.mjs`, `npm run verify`; Tools cheat sheet in `CLAUDE.md`; stale `layouts`/`syx` globs fixed | 007–010 after the P11 edit | 5–15 s per track; compare reports identical / changed per scenario. Layout PDFs are now byte-stable (`typst --creation-timestamp 0`) |
+| P3 | Trigger-word descriptions for all six project skills; "Skills and tools" section in `CLAUDE.md` | — | Effect shows only in later sessions; rerun the digest to count invocations |
+| P4 | `## Git` rules in `CLAUDE.md`; `.gitattributes` (PDF, syx, audio binary; generated files marked) | — | Rules only |
+| P5 | `tools/strudel-sim/scenario.mjs` (`npm run scenario`); `harness.mjs` gains fake WebMidi ports, midikeys queue, stem tap (backward compatible) | 009 Chapter press; 010 two LCs on the kick fader; 009 pads | All three behave as in the browser; `--view` dumps the LC view as text (no bar counter, no styling) |
+| P6 | `.gitignore` tracks `.claude/settings.json`, `launch.json`, `prds/`, `.gitattributes` | — | Hooks and PRDs now reach every checkout |
+| P7 | `tools/strudel-sim/audibility.mjs` (`npm run audibility`); `render.mjs` loads banks, soundfonts and the track's own samples, keys render; `strudel-mix` skill rewritten | 010 ambient-house | Found: `stemJ8_shake` is always silent (`colJojo(8)` maps to `off()`); Marimba D and Glockenspiel pads LOW; Rim echo and Shaker pads clip; noise, hats, bells, birds LOW. Not fixed (sound changes need the user) |
+| P8 | Skill `add-sample`; `check-sounds.mjs` warns "plays only after push to main" | copy of 010 with an unpushed dummy sample | Warning in both modes, exit code unchanged. `pad-levels.mjs` keeps its own voice map (skill says so) |
+| P9 | `midi-layouts/geraete.md`: full Launchkey table (pad grid C1 = 36 … E1 = 40, knobs absolute, untested buttons marked); vocabulary line in `CLAUDE.md` | transcripts and tracks | Pad channel 10 confirmed in use, button CCs still unmeasured |
+| P10 | `tools/path-lint.mjs` (`npm run path-lint`) | whole repo | 62 hits, all planned files in epics/PRDs, example names, or deleted files the review quotes; `CLAUDE.md`, skills and devices doc clean. Not run as a commit hook (too noisy while epics name planned files) |
+| P11 | `// @shared` regions (10 regions) in 007–010, canonical copies in `tools/shared/`, `npm run shared [-- --check / --from]` | 007–010 | `--check` 38× same. `controls` and `lc-view-draw` unified; compare identical on 008–010; 007 `ride B` differs, but HEAD vs HEAD differs the same way (compare is nondeterministic there). Left unmarked: 009's view draw, 008's `columns` (knob defaults), the status boxes |
+| P12 | `tools/track-map.mjs` (`npm run track-map`) | 008 (1462 lines) | ~80-line outline with sections, tags, stems, master |
+| P13 | `## Epics (ccpm)` in `CLAUDE.md` | — | Rules only |
+| P14 | `tools/hooks/session-start.mjs` (SessionStart) | scratch copy of `tools/` without `node_modules` | Runs `npm ci` once, silent afterwards |
+| P15 | `.claude/launch.json`: `trajectory` (8766) and `static` (repo root on 8770) | — | Config only |
+| P16 | `tools/hooks/commit-guard.mjs` (PreToolUse Bash on `git commit`) | 11 MB staged file | Refused with file and size; recordings are tracked on purpose, so no new `.gitignore` entries |
+| P17 | Memory: `one-file-any-controllers` fixed (`old/` → git history, set sources); new `machine-tools` | — | Trajectory visual reference not added (no source for it) |
+
+Follow-ups found during the build: 010 shaker stem silent and pad levels (P7); `measure.mjs` default `--base` (CC 21–28)
+is from the 006 layout; 008/009/010/011 load piano samples from the `johannes` branch; `lab/harmonie/old/` still exists.
