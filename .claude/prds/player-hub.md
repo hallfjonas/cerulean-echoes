@@ -15,9 +15,10 @@ repo: the page that opens at `http://localhost:8766`, the single interface throu
 landing page becomes an extra tool, the visual settings move out of the way, and the Node tools the players reach
 for (sound check, loudness, layout sheets, stem-lab boards, set build) get a page of their own in the same app.
 Each track file stays the single source of truth: the player taps it on demand, and the same file plays on
-strudel.cc. From the playing track the player can move to any other track through a transition on the Fog knob.
-A scoped evaluation of three future directions (LLM edits from the UI, auto-perform, producer mode) is part of the
-work; building them is not.
+strudel.cc. (Moving between tracks on the Fog knob is the separate PRD `track-transitions`.) A script player
+(auto-perform, open loop) plays a track without a controller, so every feature can be tested at the
+desk. A scoped evaluation of two future directions (LLM edits from the UI, producer mode) is part of the work;
+building them is not.
 
 ## Problem Statement
 
@@ -29,11 +30,14 @@ work; building them is not.
   nobody touches mid-track.
 - A track only shows up in the player after someone ran `make-tapped.mjs` once by hand, and the tapped copy is a
   second file per track that the hook has to keep in step.
-- Set 011 moves through four fixed tracks. Moving from the playing track to a freely chosen one means Stop, pick,
-  Play: a gap in the music.
 - The repo's tools live as CLI commands spread over `tools/` (`strudel-sim/check-sounds.mjs`, `measure`,
   `lcxl-layout`, `stem-lab/sync.mjs` / `check.mjs`, `npm run set`). Using them means a terminal, the right folder
   and the right arguments. Lab boards cannot be played in the player at all.
+- Testing a track or a player feature needs the controllers in hand. Without a Launch Control all faders sit at 0
+  (silence) and nothing can be tried. A manual spike (`.claude/epics/player-hub/auto-perform-spike.md`) played 010 for
+  four minutes from injected console code, so the idea works, but it took hand-written page hacks.
+- If the browser never settles `navigator.requestMIDIAccess()` (it hangs in the built-in browser pane), Play never
+  starts, so the player cannot be used or tested there at all.
 - The audio engine is Strudel in the browser. The keys (Launchkey) suffer most from its latency; SuperCollider may
   replace it later. Today the Strudel calls are spread through `player.html`, so a later swap would touch
   everything.
@@ -42,7 +46,7 @@ work; building them is not.
 
 1. **As a player (Jojo or Jonas), I open one URL and play a track.**
    - `http://localhost:8766` shows the player directly; no landing page, no second URL.
-   - Every one-file live track (007, 008, 009, 009-riffs, 010) is in the track list without a manual tap step.
+   - Every one-file live track (007, 008, 009, 010) is in the track list without a manual tap step.
    - Track select, Play, Stop and the status line (track, MIDI inputs, visuals) are the only controls visible
      while playing.
 2. **As a player, I find the visual settings when I want them and never by accident.**
@@ -60,11 +64,15 @@ work; building them is not.
 5. **As the track builder, I edit only the track file.**
    - No tapped copies to update: the player plays the file as it is now.
    - The same file plays when pasted into strudel.cc.
-6. **As a player, I move from the playing track to another one without a gap.**
-   - While a track plays I pick any other track and choose Transition; the Fog knob in set mode (as in 011) moves
-     from one to the other, chapters change on the phrase as in the set.
+6. **As the track builder, I test a track or a player feature without a MIDI controller.**
+   - Play works with no controller and no Web MIDI answer: the page continues after a short wait and says so.
+   - I pick a script (a timeline of control moves and button presses, in bars) and the track plays it: stems come
+     in, Tension builds, Chapter and Break are pressed, Fog sweeps, the master fades out.
+   - I can grab any control with a real controller while a script runs; my move wins until the script moves it again
+     later (last moved wins, as between two Launch Controls).
+   - A script is a small JSON file I can write for the case I want to test, e.g. "press Chapter at bar 16".
 7. **As the team, we know which future idea to build next.**
-   - A written evaluation covers LLM edits from the UI, auto-perform and producer mode: what each needs, what
+   - A written evaluation covers LLM edits from the UI and producer mode: what each needs, what
      exists already, effort, risks, a recommendation and a first slice.
    - For LLM edits it covers how the player shows what is selected and how it is set now, and how a chat about a
      change keeps going over several rounds.
@@ -89,10 +97,17 @@ work; building them is not.
 - FR6: All engine-specific calls (start, load code, stop, the `midin` / `midikeys` shims, sample banks) live in one
   module behind a small interface the page uses. Controller input (Web MIDI) stays outside it, so a later
   SuperCollider engine can take the same input.
-- FR7: `docs/player-future.md` holds the evaluation from story 7.
-- FR9: Transitions: the server builds a two-track set (A → B) from the one-file tracks on request, with the frame
-  and Fog-knob set mode of 011. Per-track set parameters (BPM grid, phrase, orbits, transpose) are read from a tag
-  in each track. Set 011 stays as it is.
+- FR7: `docs/player-future.md` holds the evaluation from story 7. It is delivered and accepted in the `player-vision`
+  epic (its success criteria), not here; that epic also deletes the unused root `VISION.md`).
+- FR10: Play does not wait on Web MIDI for good: if `requestMIDIAccess()` has not answered after 2 s, the player
+  continues with no hardware ports and shows "No MIDI" in the status line.
+- FR11: Auto-perform (script player, open loop). `midi.mjs` gets a virtual port named `LCXL3 Auto` in the ports map
+  (the existing per-CC last-moved rule applies, so a real controller can take any control). A script is JSON
+  `{ track, steps: [{ bar, cc, value, ramp? }, { bar, press }] }`, in bars of the playing track (not wall-clock),
+  with a button held for at least two scheduler ticks. The server lists the scripts per track in `/catalogue`; the
+  settings panel has a script select, Start / Stop and a key (P). The first scripts: the 010 run of the spike, and one
+  that presses every button of a track once. Controls the script does not set stay at 0 (all knobs at 0 must already
+  sound good). Closed loop and LLM-steered performance stay in `player-vision`.
 - FR8: README, `CLAUDE.md` and `.claude/launch.json` point at `http://localhost:8766` as the way to play tracks.
 
 ## Non-Functional Requirements
@@ -115,9 +130,10 @@ work; building them is not.
 - Each of the 5 listed checks runs from the Tools page on a real track and shows the same output as the CLI.
 - At least one lab board plays in the player with controllers and visuals.
 - Editing a track and pressing Play plays the edit, with no tap step and no tapped file in the repo.
-- While a track plays, picking another one and Transition moves to it on the Fog knob without a stop.
-- `docs/player-future.md` exists with a recommendation for each of the three ideas, and the team picked (or
-  rejected) a first slice.
+- With no controller connected, Play starts 010 and a script plays it from silence to a full mix and back to silence
+  (stems in, Tension, Chapter, Break, Fog, master fade), heard and shown in the LC view.
+- Moving a real control while a script runs takes that control over; the script's later move for it wins again.
+- In a browser where `requestMIDIAccess()` never answers, Play still starts after 2 s.
 - `grep` finds no Strudel import outside the engine module in the player's page code.
 
 ## Constraints & Assumptions
@@ -126,27 +142,29 @@ work; building them is not.
   check, check-sounds, measure, layouts / syx, set build). `phrase-cut` (Python, downloads) stays CLI-only.
 - The audio-analysis path (`analyse.mjs`, `analyse-file.mjs`, live input, JSONL recording) stays as a tool that
   may be used later.
-- The set 011 stays generated by `tools/set/make-set.mjs`; the player plays it as one more track if wanted.
+- The set 011 stays generated by `tools/set/make-set.mjs`; the player does not list it in this PRD.
 - Strudel 1.2.6 from unpkg stays the engine for this epic.
 - Machine shared with other agents: no parallel heavy jobs.
 
 ## Out of Scope
 
 - Replacing Strudel with SuperCollider (only the seam in FR6).
-- Building LLM edits, auto-perform or producer mode (only the evaluation, FR7).
+- Building LLM edits or producer mode (only the evaluation, FR7).
+- Closed-loop or LLM-steered auto-perform, meta-steering curves, measurement (`player-vision`); FR11 is the open-loop
+  script player only.
 - Changes to tracks, sounds, controller layouts or the visuals themselves.
 - Hosting the player anywhere but localhost; accounts; mobile layout.
 - Playing tracks in strudel.cc stays possible (FR4), no longer the main path.
 - Developing the Analysis page further.
-- Transitions between lab boards; transitions other than the set's Fog-knob crossfade.
+- Transitions between tracks (`track-transitions`).
 
 ## Dependencies
 
-- `tools/trajectory/make-tapped.mjs` (tap on demand), `tools/set/make-set.mjs` + `set-frame.strudel` (transitions),
-  `render.mjs`, `smoothing.mjs`, `strudel-source.mjs`.
+- `tools/trajectory/make-tapped.mjs` (tap on demand), `render.mjs`, `smoothing.mjs`, `strudel-source.mjs`.
 - The CLI tools behind the Tools page: `strudel-sim/check-sounds.mjs`, `strudel-sim/measure.mjs`,
   `lcxl-layout/gen-layout.mjs` + `make-syx.mjs`, `stem-lab/sync.mjs` + `check.mjs`, `set/make-set.mjs` +
   `check-set.mjs`.
 - The layout hook and `npm run watch` (their tap step goes).
+- The spike report `.claude/epics/player-hub/auto-perform-spike.md` (timeline and CC map of the 010 run).
 - Open epics touching the player's view: `launchkey-knob-target` (LC view keyboard), `drop-buildup` (countdown in
   the live view). Coordinate if they run at the same time.

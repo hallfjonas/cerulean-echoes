@@ -1,7 +1,7 @@
 ---
 name: auto-perform-spike
 created: 2026-11-16T12:00:00Z
-epic: player-vision
+epic: player-hub
 type: report
 ---
 

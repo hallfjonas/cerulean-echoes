@@ -4,157 +4,124 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trajectory Player</title>
+<link rel="stylesheet" href="ui.css">
 <style>
-  :root { --bg: #0a1a26; --fg: #eef4f2; --dim: #7fa3b2; --line: #2c4e63 }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px system-ui, sans-serif; overflow: hidden }
   #view { position: fixed; inset: 0; display: block }
-  header { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 10px 16px;
-    align-items: center; padding: 10px 16px; background: rgba(4, 6, 13, 0.8); z-index: 1; transition: opacity 0.6s }
-  body.idle header { opacity: 0; pointer-events: none }
-  body.idle { cursor: none }
-  button, select { background: #163449; color: var(--fg); border: 1px solid var(--line); border-radius: 6px;
-    padding: 6px 10px; font: inherit; cursor: pointer }
-  label { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: 13px }
-  input[type=range] { width: 140px; accent-color: #4fb3e0 }
-  output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em }
-  #status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px }
+  #drawer label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
+  #drawer label input[type=range] { grid-column: 1 / 3; width: 100% }
+  #drawer label output { grid-row: 1; grid-column: 2 }
+  #drawer label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
+  #drawer label select { grid-column: 1 / 3 }
 </style>
+<script type="module" src="nav.mjs"></script>
 <script type="importmap">
 { "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
 </script>
 </head>
-<body>
-<!-- Plays a tapped track (make-tapped.mjs) right here and shows it: no strudel.cc needed. Every control the track
-     reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
+<body class="overlay">
+<!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here and shows it: no strudel.cc needed.
+     Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
      last per number); a control not moved yet reads 0. Two homotopy controls:
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
-     Axes, labels, beat rings and the LC view's frame around the page moved last can be switched off. The track's status box (bottom right) hides while its LC view
-     is open in another window. -->
+     The visual settings live in the Settings drawer (key S, generated from settings.mjs, kept in localStorage).
+     Auto-perform (in the drawer, key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start
+     reloads the track so the script begins from silence.
+     The track's status box (bottom right) hides while its LC view is open in another window. -->
 <canvas id="view"></canvas>
 <header>
   <select id="track"></select>
   <button id="play">Play</button>
   <button id="stop">Stop</button>
-  <label title="0 = hard, sharp, wild · 1 = soft, smeared, sluggish">Hard
-    <input id="character" type="range" min="0" max="1" step="0.01" value="0"> Soft <output id="characterValue">0.00</output></label>
-  <label title="0 = raw signals · 1 = moving average over 2^53 lines (max_int): frozen">Raw
-    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0.06"> Smooth <output id="smoothingValue">302 ms</output></label>
-  <label title="Key A"><input id="axes" type="checkbox"> Axes</label>
-  <label title="Key L"><input id="labels" type="checkbox"> Labels</label>
-  <label title="Key B: rings from the kick on every beat"><input id="rings" type="checkbox" checked> Beat rings</label>
-  <label title="Key H: frame around the controller page used last in the LC view"><input id="lcFrame" type="checkbox" checked> LC frame</label>
   <span id="status">loading Strudel …</span>
+  <button id="settingsToggle" title="Key S">Settings</button>
 </header>
+<aside id="drawer"></aside>
 <script type="module">
-import { initStrudel, evaluate, samples, hush, signal, reify, Pattern, Hap, TimeSpan } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
-import { createSmoother, describeWindow } from './smoothing.mjs'
-import { BANKS, SOUNDFONTS } from './banks.mjs'
+import { createSmoother } from './smoothing.mjs'
+import * as midi from './midi.mjs'
+import { createEngine } from './engine-strudel.mjs'
+import { mountSettings } from './settings.mjs'
+import { mountHelp } from './help.mjs'
+import { createPerformer, mountAutoPerform } from './autoperform.mjs'
 
 const $ = id => document.getElementById(id)
+mountHelp([
+  { heading: 'What it does', text: 'Plays a live track or lab board right here and shows its visuals: every stem with its '
+    + 'name, and the tempo from Strudel\'s clock. No strudel.cc needed.' },
+  { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
+    + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
+  { heading: 'Output', text: 'Sound and visuals. Nothing is written to disk.' },
+  { heading: 'How to use', text: ['Pick a track and press Play.', 'Play the controllers, or open Settings (S) and start '
+    + 'Auto-perform (P) to try the track without hardware.', 'Settings holds the visual controls; F is fullscreen.',
+    'The top bar hides after 3 s without the mouse.'] }
+], { title: 'About this page' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
-let label = 'loading Strudel …', visuals = '', midiInputs = 0
+let label = 'loading Strudel …', visuals = '', autoLabel = ''
 createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
 
-// Web MIDI per input, as in strudel.cc: each input keeps the last value of every CC (with the time it came) and the
-// keys pressed since the last query. DAW ports are left out.
-let midiAccess = null
-const ports = new Map()
-const listen = () => {
-  midiInputs = 0
-  for (const input of midiAccess.inputs.values()) {
-    if (/DAW/.test(input.name)) continue
-    midiInputs++
-    const port = ports.get(input.name) ?? { cc: new Map(), keys: [] }
-    ports.set(input.name, port)
-    input.onmidimessage = ({ data: [status, a, b] }) => {
-      const kind = status & 0xf0
-      if (kind === 0xb0) port.cc.set(a, { value: b / 127, time: performance.now() })
-      else if (kind === 0x90 && b > 0) port.keys.push({ note: a, velocity: b / 127, midichan: (status & 0x0f) + 1 })
-    }
+const engine = createEngine(midi)
+engine.ready.then(() => { label = 'ready' })
+let catalogue = []
+const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
+fetch('catalogue').then(r => r.json()).then(entries => {
+  catalogue = entries
+  const group = (label, kind) => {
+    const optgroup = document.createElement('optgroup')
+    optgroup.label = label
+    optgroup.append(...entries.filter(entry => entry.kind === kind).map(({ id, label: text, taps, noTapReason }) => {
+      const option = new Option(taps ? text : `${text} (no tap)`, id)
+      option.disabled = !taps
+      option.title = noTapReason ?? ''
+      return option
+    }))
+    return optgroup
   }
-}
-const midiReady = (navigator.requestMIDIAccess?.() ?? Promise.reject())
-  .then(access => { midiAccess = access; listen(); access.onstatechange = listen })
-  .catch(() => {})
-// The one-file tracks find their Launch Controls by port name through WebMidi.inputs
-globalThis.WebMidi = {
-  get inputs() { return midiAccess ? [...midiAccess.inputs.values()] : [] },
-  get outputs() { return midiAccess ? [...midiAccess.outputs.values()] : [] },
-}
-// Inputs whose name contains `name`; without a name every input but the Launchkey (its knobs send the same CC
-// numbers as the Launch Controls' second knob row)
-const matching = name => [...ports].filter(([n]) => name ? n.includes(name) : !n.includes('Launchkey')).map(([, p]) => p)
-// midin(name): one input (an error if it is missing, so a track can fall back), per CC the input moved last wins
-globalThis.midin = async name => {
-  if (name && !matching(name).length) throw new Error('MIDI input not found: ' + name)
-  return cc => signal(() => {
-    let last = null
-    for (const port of matching(name)) {
-      const v = port.cc.get(cc)
-      if (v && (!last || v.time > last.time)) last = v
-    }
-    return last?.value ?? 0
-  })
-}
-// midikeys(name)(length): every key pressed since the last query as a note of `length` cycles from the start of
-// that query (no note-off, as in strudel.cc). Each query empties the queue, so a track reads it through one query.
-globalThis.midikeys = async name => {
-  if (!matching(name).length) throw new Error('MIDI input not found: ' + name)
-  return length => new Pattern(state => {
-    const keys = matching(name).flatMap(port => port.keys.splice(0))
-    if (!keys.length) return []
-    const begin = state.span.begin
-    const cycles = reify(length).query(state.setSpan(new TimeSpan(begin, begin.add(1 / 64))))[0]?.value ?? 0.5
-    const whole = new TimeSpan(begin, begin.add(cycles))
-    return keys.map(key => new Hap(whole, state.span.intersection(whole), key))
-  })
-}
-
-// The banks from banks.mjs and the gm_* soundfonts, as strudel.cc has them
-const ready = initStrudel({
-  prebake: () => Promise.all([
-    ...BANKS.map(url => samples(url)),
-    import(SOUNDFONTS + 'fontloader.mjs').then(({ registerSoundfonts }) => registerSoundfonts()),
-  ]),
+  $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
+  $('track').value = ['010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
+  showScripts()
 })
-ready.then(() => { label = 'ready' })
-fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f.replace(/-tapped\.strudel$/, ''), f))))
+$('track').onchange = showScripts
 
-$('play').onclick = async () => {
-  await Promise.all([ready, midiReady])
+const performer = createPerformer({ midi, engine, onChange: progress => {
+  autoLabel = progress ? `auto bar ${Math.floor(progress.bar) + 1} / ${Math.ceil(progress.end)}` : ''
+  autoPerform.show(!!progress, autoLabel)
+} })
+
+const play = async () => {
+  performer.stop()
+  await Promise.all([engine.ready, midi.ready])
   label = 'loading track …'
-  const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
-  // The track's LC view reads the control names from strudel.cc's editor text; here the track itself stands in
-  globalThis.strudelMirror = { code }
+  const code = await fetch('track/' + encodeURIComponent($('track').value), { cache: 'no-store' }).then(r => r.text())
   try {
-    await evaluate(code)
-    label = 'playing: ' + $('track').value.replace(/-tapped\.strudel$/, '')
+    await engine.load(code)
+    label = 'playing: ' + $('track').value
   } catch (error) {
     label = 'Error: ' + error.message
+    return false
   }
+  return true
 }
-$('stop').onclick = () => { hush(); label = 'stopped' }
+$('play').onclick = play
+$('stop').onclick = () => { performer.stop(); engine.stop(); label = 'stopped' }
 
-const slider = (id, apply, show = v => v.toFixed(2)) => {
-  const update = () => { apply(Number($(id).value)); $(id + 'Value').textContent = show(Number($(id).value)) }
-  $(id).oninput = update
-  update()
+const startScript = async id => {
+  const track = $('track').value
+  const response = await fetch(`perform/${encodeURIComponent(track)}/${encodeURIComponent(id)}`, { cache: 'no-store' })
+  if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
+  const script = await response.json()
+  if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
+  midi.addAuto()
+  if (await play()) performer.start(script)
 }
-slider('character', v => renderer.setCharacter(v))
-slider('smoothing', v => { smoother.setAmount(v); renderer.setSmoothing(v) }, describeWindow)
 
-const checkbox = (id, apply) => {
-  $(id).onchange = () => apply($(id).checked)
-  apply($(id).checked)
-}
-checkbox('axes', renderer.setAxes)
-checkbox('labels', renderer.setLabels)
-checkbox('rings', renderer.setRings)
+const settings = mountSettings($('drawer'), { renderer, smoother })
+$('settingsToggle').onclick = settings.toggle
+const autoPerform = mountAutoPerform(settings.autoPerformContainer, { onStart: startScript, onStop: performer.stop })
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement
@@ -166,28 +133,27 @@ const applyLcFrame = () => {
   const view = globalThis.lcxlView, doc = view?.win && !view.win.closed ? view.win.document : null
   if (!doc) return
   const style = doc.getElementById('noFrame')
-  if ($('lcFrame').checked) style?.remove()
+  if (settings.get('lcFrame')) style?.remove()
   else if (!style) doc.head.append(Object.assign(doc.createElement('style'), { id: 'noFrame', textContent: NO_FRAME_CSS }))
 }
 
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
-  $('status').textContent = `${label} · MIDI: ${midiInputs} inputs${visuals ? ' · ' + visuals : ''}`
+  const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
+  $('status').textContent = [label, midiText, autoLabel, visuals].filter(Boolean).join(' · ')
   requestAnimationFrame(showStatus)
 }
 showStatus()
 
 const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
 addEventListener('keydown', event => {
-  if (['SELECT', 'INPUT'].includes(event.target.tagName)) return
+  const { tagName, type } = event.target
+  if (tagName === 'SELECT' || (tagName === 'INPUT' && !['checkbox', 'range'].includes(type))) return
   if (event.key === 'f') toggleFullscreen()
-  if (event.key === 'v') renderer.toggleLook()
-  if (event.key === 'a') $('axes').click()
-  if (event.key === 'l') $('labels').click()
-  if (event.key === 'b') $('rings').click()
-  if (event.key === 'h') $('lcFrame').click()
-  if (event.key === 'w') renderer.toggleWiden()
+  if (event.key === 's') settings.toggle()
+  else if (event.key === 'p') autoPerform.toggle()
+  else settings.handleKey(event.key)
 })
 let idleTimer
 const wake = () => {

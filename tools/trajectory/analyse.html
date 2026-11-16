@@ -4,25 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trajectory</title>
+<link rel="stylesheet" href="ui.css">
 <style>
-  :root { --bg: #071521; --fg: #eef4f2; --dim: #7fa3b2; --line: #2c4e63 }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px system-ui, sans-serif; overflow: hidden }
-  header { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-    padding: 10px 16px; background: rgba(7, 21, 33, 0.85); z-index: 1; transition: opacity 0.6s }
-  body.idle header { opacity: 0; pointer-events: none }
-  body.idle { cursor: none }
-  button, select, label.file { background: #163449; color: var(--fg); border: 1px solid var(--line); border-radius: 6px;
-    padding: 6px 10px; font: inherit; cursor: pointer }
-  button.on { background: #b5651d; border-color: #f5a55a }
   input[type=file] { display: none }
   .meter { display: flex; flex-direction: column; gap: 3px; width: 90px }
   .meter span { display: block; height: 5px; background: #4fb3e0; border-radius: 3px; width: 0; transition: width 0.1s }
-  #status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums }
   label.switch { display: flex; gap: 6px; align-items: center; color: var(--dim); font-size: 13px }
   canvas { display: block }
 </style>
+<script type="module" src="nav.mjs"></script>
 </head>
-<body>
+<body class="overlay">
 <header>
   <label class="file">File …<input id="file" type="file" accept="audio/*"></label>
   <select id="device"><option value="">Choose input …</option></select>
@@ -47,12 +39,23 @@
 </header>
 <canvas id="view"></canvas>
 <script type="module">
+import { mountHelp } from './help.mjs'
 import { createAnalyser } from './analyse.mjs'
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
 import { createSmoother, describeWindow } from './smoothing.mjs'
 
 const $ = id => document.getElementById(id)
+mountHelp([
+  { heading: 'What it does', text: 'Draws the trajectory of a sound: where each voice sits left/right (pan), low/high '
+    + '(frequency) and in time. It listens to a file, a live audio input or the events of a track playing on strudel.cc.' },
+  { heading: 'Input', text: 'An audio file, an audio input (channels 1/2, or 3/4 for the loopback of a Scarlett) '
+    + 'or the Strudel relay (node trajectory/server.mjs).' },
+  { heading: 'Output', text: 'The live picture, and with Record a JSONL file of the analysed lines that Download JSONL saves.' },
+  { heading: 'How to use', text: ['Pick File …, or choose an input and press Start live, or press Strudel.',
+    'Shape the picture with the Hard / Soft and Raw / Smooth sliders; the recording stays raw.',
+    'Keys: F fullscreen, V look, A axes, L labels, B beat rings, W pan width.'] }
+], { title: 'About this page' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 

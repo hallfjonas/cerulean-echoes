@@ -437,6 +437,8 @@ export function createRenderer(canvas) {
     setAxes: on => { axes = on },
     setRings: on => { rings = on; clearTrail() },
     toggleWiden: () => { widen = !widen },
+    setWiden: on => { widen = on },
+    setLook: name => { look = name },
     toggleLook: () => { look = { deck: 'ocean', ocean: 'clean', clean: 'deck' }[look] },
     setCharacter: value => { character = clamp(value) },
     setSmoothing: value => { motion = (1 - clamp(value)) ** 2 },

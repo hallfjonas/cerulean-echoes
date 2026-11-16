@@ -2,7 +2,6 @@
 // A -dual.strudel file (or the dual-lc template) also rewrites its single version (make-single.mjs) and that sheet.
 // Tracks (tracks/) also get their custom modes (.syx, make-syx.mjs).
 // Files without @ctl tags are skipped. A broken tag or Typst error is reported back (exit 2).
-// A track with a tapped copy (tools/trajectory/tapped/) gets that copy rebuilt (make-tapped.mjs).
 // A track (tracks/, not old/) is compared with the sound list samples/sounds.json (check-sounds.mjs --offline): a sound
 // that is broken or not checked yet is reported back (exit 2).
 // On success one line says what was regenerated. bash-hook.mjs runs the same `refresh` for files changed via Bash;
@@ -35,9 +34,7 @@ export async function refresh(file) {
     const { generate } = await import('./gen-layout.mjs')
     const { makeSingle, singleOf } = await import('./make-single.mjs')
     const { generate: makeSyx } = await import('./make-syx.mjs')
-    const { refreshTapped } = await import('../trajectory/make-tapped.mjs')
     ;({ checkOffline } = await import('../strudel-sim/check-sounds.mjs'))
-    if (refreshTapped(file)) made.push('tapped')
     const files = [file]
     if (singleOf(file)) {
       files.push(makeSingle(file))

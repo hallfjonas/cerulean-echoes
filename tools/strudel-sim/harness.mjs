@@ -3,13 +3,14 @@ import * as core from '@strudel/core'
 import * as mini from '@strudel/mini'
 import * as tonal from '@strudel/tonal'
 import fs from 'fs'
+import { findMaster } from '../trajectory/make-tapped.mjs'
 
 Object.assign(globalThis, core, mini, tonal)
 mini.miniAllStrings()   // plain JS has no transpiler, so parse every string as mini-notation
 const AsyncFunction = (async () => {}).constructor
 
 // vals: { cc: value 0..1 }, mutable while running. expr: return this expression (e.g. a stem name)
-// instead of the master, which is the last top-level `stack(` in the file.
+// instead of the master, which is the last top-level `stack(` in the file (else its last top-level expression).
 // A Launchkey (port name contains 'Launchkey') reads its own CCs from vals.lk<cc> (its knobs share CC numbers with the
 // LC); its keys play vals.keys (mini-notation of notes, e.g. '<[f3,ab3,c4] [db3,f3,ab3]>'), else nothing.
 // vals.midiQueue (optional array of { note, velocity, midichan }): notes that arrived since the last query, as
@@ -20,8 +21,7 @@ const AsyncFunction = (async () => {}).constructor
 // the master's haps then carry value._stem.
 export async function load(file, vals, expr, opts = {}) {
   const src = fs.readFileSync(file, 'utf8')
-  const master = [...src.matchAll(/^stack\(/gm)].pop()
-  if (!master) throw new Error(`${file}: no top-level stack( (master) found`)
+  const master = findMaster(src, file)
   const masterSrc = opts.tap ? src.slice(master.index).replace(/\bstem\w+\b/g, m => `__tag(${m}, '${m}')`)
     : src.slice(master.index)
   const body = src.slice(0, master.index) + (expr ? `return ${expr}` : 'return ' + masterSrc)

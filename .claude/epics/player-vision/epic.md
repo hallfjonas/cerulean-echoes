@@ -2,7 +2,7 @@
 name: player-vision
 status: backlog
 created: 2026-11-16T10:00:00Z
-updated: 2026-11-16T10:00:00Z
+updated: 2026-11-16T14:00:00Z
 progress: 0%
 prd: .claude/prds/player-hub.md
 github: (will be set on sync)
@@ -13,19 +13,22 @@ github: (will be set on sync)
 ## Overview
 
 Split off from `player-hub`. `player-hub` builds the player as it is needed now; this epic is thinking, not code.
-It answers where the player might evolve and writes the answer down as `VISION.md` at the repo root (today two
-lines; `tools/trajectory/README.md` already points to a "MUSIC ARCHITECTURE" section there that does not exist yet).
+It answers where the player might evolve and writes the answer down as `docs/player-future.md` (the file the player-hub PRD names for the evaluation, FR7). The
+two-line `VISION.md` at the repo root is not useful and is deleted in the same task; `tools/trajectory/README.md`
+points to a "MUSIC ARCHITECTURE" section in it that never existed, so that link moves to `docs/player-future.md`, where
+the section is written.
 No code in this epic. A vision that needs code to be tried (a prototype of a measurement tool, say) becomes a
 slice in a later epic.
 
 ## Deliverable
 
-`VISION.md`, written for the player and for us deciding what to build next:
+`docs/player-future.md`, written for the player and for us deciding what to build next:
 
 - The direction in a few sentences: beginners enter easily, experts work at the next abstraction level.
 - Per idea: what it is, what exists in the repo, what is missing, risks, first slice, rough effort, and its
   touchpoints with the engine seam (including a SuperCollider engine). Ideas: LLM edits from the UI, auto-perform
-  (with meta-steering and the measurement it needs), producer mode (with its four inputs), and the music
+  beyond the open-loop script player (meta-steering and the measurement it needs; the script player itself is built
+  in `player-hub`, task 9), producer mode (with its four inputs), and the music
   architecture (trajectory: pan, frequency, time) the trajectory README refers to.
 - How the ideas build on each other (measure → map → steer; the virtual port shared by auto-perform and producer
   mode; one song model).
@@ -35,14 +38,16 @@ slice in a later epic.
 
 1. **Collect and sharpen the ideas** — go through the source material below and the player-hub PRD; talk through
    open questions with the user (which idea matters most, what a beginner and an expert each do with it).
-2. **Write `VISION.md`** — structure above; English, plain words, short.
+2. **Write `docs/player-future.md`** — structure above; English, plain words, short. In the same task: delete
+   `VISION.md`, and repoint the link in `tools/trajectory/README.md` to the MUSIC ARCHITECTURE section of the new file.
 3. **Review with the user** — fix what is off, pick the first slice; if it becomes work, open a new epic for it.
 
 ## Success Criteria
 
-- `VISION.md` exists at the repo root and covers every idea above with the fields listed.
+- `docs/player-future.md` exists and covers every idea above with the fields listed; `VISION.md` is gone and
+  nothing links to it.
 - It ends with a recommendation naming one first slice.
-- The README link to the MUSIC ARCHITECTURE section works.
+- The README link to the MUSIC ARCHITECTURE section points to `docs/player-future.md` and works.
 
 ## Estimated Effort
 
@@ -53,8 +58,8 @@ slice in a later epic.
 | Idea | What exists | Needs | First slice | Gut effort |
 |---|---|---|---|---|
 | LLM edit from UI | `@ctl` comments name every control; LC view knows CC → name; tracks reload from source on request | click target → `{track, ctl, code range, current value}`; a chat panel that shows what is selected and how it is set now, keeps the conversation, and shows each change (diff + new value) before it plays; server endpoint calling `claude -p` (session kept per chat) on a new track file (non-destructive rule); hot reload without stop | Click a knob in LC view → panel shows control name, its code and current CC value → chat → Claude writes `NNN-<name>-v2.strudel` → player offers it, chat continues on v2 | M |
-| Auto-perform | `midin` reads from a ports map with last-moved-wins per CC | a virtual port (`ports.set('Auto', …)`) fed by a script timeline (bar-quantised CC moves) or an LLM agent per phrase; human move overrides by last-moved | Script player: JSON timeline of CC moves played into a virtual port, human can grab any control | S (script) / L (AI) |
-| Producer mode | chapters per track, set frame for sections in sequence, Tension / Break; lab boards per role (bass, harmony, melody, guitar …) to pick sounds from | one intermediate song model (tempo, key, metre, sections, parts with notes and chords) that every input fills and one generator turns into a one-file track; a timeline that drives chapter / tension per section | Song form as JSON → timeline of chapter + Tension moves on an existing track (reuses auto-perform's virtual port) | L |
+| Auto-perform (beyond the script player) | The script player and its virtual port (`LCXL3 Auto`, JSON timeline in bars, human grabs by last-moved) are built in `player-hub` task 9; the spike report is `.claude/epics/player-hub/auto-perform-spike.md` | meta-steering (closed loop on measured output) or an LLM agent per phrase, both writing into the same virtual port | `meta.mjs` measurement series, then energy curve → timeline | M (measure) / L (AI) |
+| Producer mode | chapters per track, set frame for sections in sequence, Tension / Break; lab boards per role (bass, harmony, melody, guitar …) to pick sounds from | one intermediate song model (tempo, key, metre, sections, parts with notes and chords) that every input fills and one generator turns into a one-file track; a timeline that drives chapter / tension per section | Song form as JSON → timeline of chapter + Tension moves on an existing track (reuses the script player of `player-hub` task 9) | L |
 
 Producer mode inputs (each fills the same song model, then the same generator writes `NNN-<name>.strudel` in the
 one-file layout, non-destructive):
@@ -74,8 +79,8 @@ Auto-perform ideas:
 
 Meta-steering levels, each built on the one before:
 
-1. **Open loop:** the curve is sampled per bar and written into the virtual port as CC moves (the script player).
-   A fixed energy → control map per track; the human can still override by last-moved.
+1. **Open loop:** the curve is sampled per bar and written into the virtual port as CC moves (the script player,
+   built in `player-hub`). A fixed energy → control map per track; the human can still override by last-moved.
 2. **Closed loop:** the player measures the real output (per-stem loudness, event density, brightness from the
    analysis tap) and nudges controls until the measured energy follows the curve, so the same curve works on any track.
 3. **Agent:** an LLM per phrase reads the trajectory, the measured state and the control names (`@ctl`), then picks

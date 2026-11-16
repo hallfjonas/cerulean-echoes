@@ -1,12 +1,14 @@
 // Play a controller scenario on a track in Node and report what sounds: CCs, button presses, Launchkey pads, knobs and
 // keys from the command line, one or more LC XL 3s, optionally the LC view text. Usage: USAGE (or run without args).
 import { load, STEP } from './harness.mjs'
+import { valueChanges } from '../trajectory/autoperform.mjs'
 import fs from 'fs'
 
 const USAGE = `usage (in tools/): node strudel-sim/scenario.mjs <track.strudel> [steps…] [output]
 steps (values 0..1, sent as MIDI 0..127; @c = at cycle c, default 0; lists with commas, flags may repeat):
   --cc 13=0.5,85=1@2     LC 1 CCs (Mode 1 = CC 5-51, Mode 2 = CC + 48, column 8 on both)
   --press 37@2,37@2.5    LC 1 button presses (momentary: 1, then 0 one tick = ${STEP} cycles later)
+  --script <file.json>   an auto-perform script (trajectory/perform/…) on LC 1, bars = cycles
   --lc 2                 number of LC XL 3s connected (default 1; 0 = none)
   --cc2 …  --press2 …    the same for LC 2 (--cc3 for LC 3 …); per CC the one moved last wins, as in the tracks
   --faders 1             every fader of LC 1 (CC 5-12 and 53-60) to this value at cycle 0
@@ -42,6 +44,8 @@ const midi = v => Math.round(Number(v) * 127)
 const parseAt = s => { const [what, at = 0] = s.split('@'); return [what, Number(at)] }
 const ccKey = (lc, cc) => lc === 1 ? cc : 'lc' + lc + '.' + cc
 const lcPort = lc => `LCXL3 ${lc} MIDI`
+const pressAt = (lc, cc, at) => steps.push({ at, key: ccKey(lc, cc), v: 127, port: lcPort(lc), data: [0xbf, cc] },
+  { at: at + STEP, key: ccKey(lc, cc), v: 0, port: lcPort(lc), data: [0xbf, cc] })
 for (const a of new Set(args.filter(a => /^--(cc|press)\d*$/.test(a)))) {
   const [, kind, n] = a.match(/^--(cc|press)(\d*)$/), lc = Number(n || 1)
   for (const s of values(a)) {
@@ -50,11 +54,15 @@ for (const a of new Set(args.filter(a => /^--(cc|press)\d*$/.test(a)))) {
       const [cc, v] = what.split('=').map(Number)
       steps.push({ at, key: ccKey(lc, cc), v: midi(v), port: lcPort(lc), data: [0xbf, cc] })
     } else {
-      const cc = Number(what)
-      steps.push({ at, key: ccKey(lc, cc), v: 127, port: lcPort(lc), data: [0xbf, cc] },
-        { at: at + STEP, key: ccKey(lc, cc), v: 0, port: lcPort(lc), data: [0xbf, cc] })
+      pressAt(lc, Number(what), at)
     }
   }
+}
+for (const file of values('--script')) {
+  const script = JSON.parse(fs.readFileSync(file, 'utf8'))
+  for (const { bar, cc, value } of valueChanges(script, STEP))
+    steps.push({ at: bar, key: cc, v: midi(value), port: lcPort(1), data: [0xbf, cc] })
+  for (const { bar, press } of script.steps.filter(s => s.press !== undefined)) pressAt(1, press, bar)
 }
 for (const v of values('--faders'))
   for (const cc of [5, 6, 7, 8, 9, 10, 11, 12].flatMap(c => [c, c + 48]))

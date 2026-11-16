@@ -87,11 +87,11 @@ Use them instead of redoing the steps by hand:
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
 
 Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,
-syx, single and tapped copy regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit
+syx and single regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit
 with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
 
 Tools (run in `tools/`):
-- After editing a track: `npm run verify -- <track…>` (transpile, compare vs HEAD, sounds, layout/syx, tapped;
+- After editing a track: `npm run verify -- <track…>` (transpile, compare vs HEAD, sounds, layout/syx, tap, auto-perform scripts;
   no args = all changed tracks; `--online` checks sounds online)
 - Old vs new, event by event: `npm run compare -- <old.strudel> <new.strudel> [--stem <name>]`
 - Levels are measured, not guessed: `npm run audibility -- <track>` (mix, every stem, Launchkey keys and pads at the
@@ -105,10 +105,25 @@ Tools (run in `tools/`):
 - Syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
 - Layout sheets / `.syx`: `npm run layouts`, `npm run syx`; on save: `npm run watch`
-- Trajectory: `node trajectory/server.mjs [port]` + `node trajectory/make-tapped.mjs <track>`
+- The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
+  `node trajectory/make-tapped.mjs <track>` puts the tapped code on the clipboard for strudel.cc
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
 - Outline a long track before reading it: `npm run track-map -- <track>`, then `sed -n` ranges
 - Paths cited in docs, skills and epics exist? `npm run path-lint` (planned files in epics show up too)
+
+## The player (tools/trajectory)
+The player is the main tool: `cd tools && node trajectory/server.mjs`, then http://localhost:8766 (README:
+`tools/trajectory/README.md`). It plays any live track (Live) or lab board (Lab) from the catalogue with the visuals.
+- Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
+  current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
+  strudel.cc.
+- Settings drawer (key S) holds the visual settings; the Tools page (`/tools.html`) runs the Node checks (check
+  sounds, loudness, layouts, stem lab, set build) against a catalogue entry, one job at a time; Analysis
+  (`/analyse.html`) is a tool there.
+- Auto-perform (drawer, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars) into the virtual
+  controller `LCXL3 Auto`: use it to try a track or the player without controllers. A new control or a changed `@ctl`
+  needs the script checked (`node trajectory/check-perform.mjs`, part of `npm run verify`).
+- Without Web MIDI the player still plays ("No MIDI").
 
 ## Writing efficient Strudel (CPU)
 Strudel computes every event of every layer even when it is silent; dense tracks then drop out.
