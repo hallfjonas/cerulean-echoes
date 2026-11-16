@@ -46,7 +46,7 @@ import * as midi from './midi.mjs'
 import { createEngine } from './engine-strudel.mjs'
 import { mountSettings } from './settings.mjs'
 import { mountHelp } from './help.mjs'
-import { createPerformer, mountAutoPerform } from './autoperform.mjs'
+import { createPerformer, mountAutoPerform, usesLaunchkey } from './autoperform.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -115,7 +115,7 @@ const startScript = async id => {
   if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
   const script = await response.json()
   if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
-  midi.addAuto()
+  midi.addAuto({ launchkey: usesLaunchkey(script) })
   if (await play()) performer.start(script)
 }
 

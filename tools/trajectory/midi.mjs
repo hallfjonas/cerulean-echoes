@@ -3,9 +3,13 @@
 // cc(name, number) and takeKeys(name); a control not moved yet reads 0.
 // The virtual input 'LCXL3 Auto' (addAuto, fed by autoperform.mjs through setAuto) sits in the same ports map: the
 // tracks treat it as one more Launch Control, so a real controller moved later takes a control over (last moved wins).
+// The virtual input 'Launchkey MK4 25 Auto' (setAutoLk, noteAuto, noteOffAuto) contains the name the tracks look up
+// with midin / midikeys ('Launchkey MK4 25'), so they hear it as a second Launchkey; like the real one it is left out
+// of the nameless lookup (matching).
 // The tracks' LC view asks the browser for Web MIDI itself: navigator.requestMIDIAccess is wrapped so its answer also
-// holds the virtual input (sending what setAuto sets as channel-16 CC messages); refused or unanswered after 2 s (like
-// ready), it holds the virtual input alone.
+// holds both virtual inputs (sending what setAuto sets as channel-16 CC messages, the Launchkey's as channel-1 CCs and
+// note-on / note-off, pads on channel 10); refused or unanswered after 2 s (like ready), it holds the virtual inputs
+// alone.
 let access = null
 let inputCount = 0
 const ports = new Map()
@@ -39,34 +43,68 @@ export const ready = settle(nativeRequest?.() ?? Promise.resolve(null))
   .catch(() => {})
 
 export const AUTO_PORT = 'LCXL3 Auto'
-const auto = { cc: new Map(), keys: [] }
-const autoInput = Object.assign(new EventTarget(), { name: AUTO_PORT, type: 'input', state: 'connected' })
-const sendAuto = (number, value) => autoInput.dispatchEvent(
-  Object.assign(new Event('midimessage'), { data: new Uint8Array([0xbf, number, Math.round(value * 127)]) }))
+export const LK_AUTO_PORT = 'Launchkey MK4 25 Auto'
+const virtualPort = name => ({
+  name,
+  state: { cc: new Map(), keys: [] },
+  input: Object.assign(new EventTarget(), { name, type: 'input', state: 'connected' }),
+})
+const auto = virtualPort(AUTO_PORT)
+const lkAuto = virtualPort(LK_AUTO_PORT)
+const lkHeld = new Map()
+const send = (port, ...bytes) => port.input.dispatchEvent(
+  Object.assign(new Event('midimessage'), { data: new Uint8Array(bytes) }))
+const sendAuto = (number, value) => send(auto, 0xbf, number, Math.round(value * 127))
+const sendLk = (number, value) => send(lkAuto, 0xb0, number, Math.round(value * 127))
 
 const requestReal = options => (nativeRequest?.(options) ?? Promise.resolve(null)).catch(() => nativeRequest())
 navigator.requestMIDIAccess = options => settle(requestReal(options)).catch(() => null)
   .then(real => ({
-    inputs: new Map([...(real?.inputs ?? []), [AUTO_PORT, autoInput]]),
+    inputs: new Map([...(real?.inputs ?? []), [AUTO_PORT, auto.input], [LK_AUTO_PORT, lkAuto.input]]),
     outputs: real?.outputs ?? new Map(),
     addEventListener: (...args) => real?.addEventListener(...args),
   }))
 
-export const addAuto = () => {
+// The virtual Launchkey is in the ports map only while a script plays Launchkey steps, so a script without them plays
+// as with no Launchkey connected
+export const addAuto = ({ launchkey = false } = {}) => {
+  if (launchkey) ports.set(LK_AUTO_PORT, lkAuto.state)
+  else ports.delete(LK_AUTO_PORT)
   if (ports.has(AUTO_PORT)) return false
-  ports.set(AUTO_PORT, auto)
+  ports.set(AUTO_PORT, auto.state)
   return true
 }
 export const setAuto = (number, value) => {
-  auto.cc.set(number, { value, time: performance.now() })
+  auto.state.cc.set(number, { value, time: performance.now() })
   sendAuto(number, value)
 }
+export const setAutoLk = (number, value) => {
+  lkAuto.state.cc.set(number, { value, time: performance.now() })
+  sendLk(number, value)
+}
+export const noteAuto = (note, velocity, midichan) => {
+  const velocityByte = Math.max(1, Math.round(velocity * 127))
+  lkAuto.state.keys.push({ note, velocity: velocityByte / 127, midichan })
+  lkHeld.set(`${midichan}:${note}`, { note, midichan })
+  send(lkAuto, 0x90 | (midichan - 1), note, velocityByte)
+}
+export const noteOffAuto = (note, midichan) => {
+  lkHeld.delete(`${midichan}:${note}`)
+  send(lkAuto, 0x80 | (midichan - 1), note, 0)
+}
+export const releaseAutoKeys = () => {
+  for (const { note, midichan } of [...lkHeld.values()]) noteOffAuto(note, midichan)
+}
 export const resetAuto = () => {
-  for (const number of auto.cc.keys()) sendAuto(number, 0)
-  auto.cc.clear()
+  for (const number of auto.state.cc.keys()) sendAuto(number, 0)
+  auto.state.cc.clear()
+  for (const number of lkAuto.state.cc.keys()) sendLk(number, 0)
+  lkAuto.state.cc.clear()
+  releaseAutoKeys()
+  lkAuto.state.keys.length = 0
 }
 
-const virtualInputs = () => ports.has(AUTO_PORT) ? [{ name: AUTO_PORT }] : []
+const virtualInputs = () => [AUTO_PORT, LK_AUTO_PORT].filter(name => ports.has(name)).map(name => ({ name }))
 export const inputs = () => [...(access ? access.inputs.values() : []), ...virtualInputs()]
 export const outputs = () => access ? [...access.outputs.values()] : []
 export const count = () => inputCount

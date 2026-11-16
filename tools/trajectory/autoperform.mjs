@@ -1,14 +1,52 @@
-// Auto-perform: plays a script of control moves and button presses into the virtual input 'LCXL3 Auto' (midi.mjs), so
-// a track can be tried without a controller. Open loop: the script does not listen to what it hears.
-// Script: { track, steps: [{ bar, cc, value, ramp? }, { bar, press }] }. Bars of the playing track (1 cycle = 1 bar in
-// every live track), counted from the start; value 0..1 (sent as MIDI 0..127); ramp = bars to move from the control's
-// value at `bar` to `value`; press = the CC of a momentary button. A control the script never sets stays at 0.
+// Auto-perform: plays a script of control moves and button presses into the virtual input 'LCXL3 Auto' and keys, drum
+// pads and knobs into the virtual Launchkey 'Launchkey MK4 25 Auto' (midi.mjs), so a track can be tried without a
+// controller. Open loop: the script does not listen to what it hears.
+// Script: { track, title?, bars?, mood?, sections?: [{ name, from, to, intent? }], steps } with steps
+//   { bar, cc, value, ramp? }            a Launch Control CC (value 0..1, sent as MIDI 0..127)
+//   { bar, press }                       a momentary Launch Control button (its CC)
+//   { bar, keys, velocity?, length? }    Launchkey keys: note names played together ('c3 e3 g3' = chord)
+//   { bar, pad }                         a Launchkey drum pad (note 36-51, channel 10)
+//   { bar, lk, value, ramp? }            a Launchkey CC: mod wheel 1 (keys level) or knob 31-38
+// Bars of the playing track (1 cycle = 1 bar in every live track), counted from the start; ramp = bars to move from
+// the control's value at `bar` to `value`. A control the script never sets stays at 0. velocity 0..1 (default 0.8);
+// length = bars a key is held (default 1): the tracks' midikeys has no note-off, so the sound's length is the track's
+// (knob 5 Length in 009/010); length only sets when the note-off reaches the LC view. Sections: bar ranges [from, to).
 // Steps follow the engine's cycle clock, read every scheduler tick, so they stay on the bar whatever the tempo; a press
 // is held for two scheduler ticks, or the tracks' cycleButton can miss it.
 export const TICK_MS = 50
 export const HOLD_TICKS = 2
+export const PADS = [36, 51]
+export const LK_CCS = [1, 31, 32, 33, 34, 35, 36, 37, 38]
+export const PAD_CHANNEL = 10
+const KEYS_CHANNEL = 1
+const DEFAULT_VELOCITY = 0.8
+const DEFAULT_LENGTH = 1
 
 const midiValue = value => Math.round(value * 127) / 127
+
+const CHROMA = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }
+const ACCIDENTAL = { '#': 1, s: 1, b: -1, f: -1 }
+// A note name as Strudel reads it (c4 = 60, octave 3 if left out, # / s sharp, b / f flat) or a MIDI number
+export const noteNumber = name => {
+  if (/^\d+$/.test(name)) return Number(name) <= 127 ? Number(name) : null
+  const match = name.match(/^([a-g])([#sbf]*)(-?\d)?$/i)
+  if (!match) return null
+  const [, letter, accidentals, octave = '3'] = match
+  const note = (Number(octave) + 1) * 12 + CHROMA[letter.toLowerCase()] +
+    [...accidentals].reduce((sum, a) => sum + ACCIDENTAL[a], 0)
+  return note >= 0 && note <= 127 ? note : null
+}
+// The MIDI notes of a keys step, or null if one of them is not a note
+export const keyNotes = keys => {
+  const notes = String(keys).trim().split(/\s+/).map(noteNumber)
+  return notes.length && notes.every(n => n !== null) ? notes : null
+}
+
+export const isLaunchkeyStep = step => step.keys !== undefined || step.pad !== undefined || step.lk !== undefined
+export const usesLaunchkey = script => (script.steps ?? []).some(isLaunchkeyStep)
+
+// The section that holds `bar`, or null
+export const sectionAt = (script, bar) => (script.sections ?? []).find(s => s.from <= bar && bar < s.to) ?? null
 
 const valueOn = (curve, bar) => {
   const segment = curve.findLast(s => s.bar <= bar)
@@ -17,44 +55,61 @@ const valueOn = (curve, bar) => {
   return midiValue(segment.from + (segment.to - segment.from) * progress)
 }
 
-export const compile = script => {
-  const curves = new Map()
-  const presses = []
-  for (const step of [...script.steps].sort((a, b) => a.bar - b.bar)) {
-    if (step.press !== undefined) {
-      presses.push({ bar: step.bar, cc: step.press })
-      continue
-    }
-    const curve = curves.get(step.cc) ?? []
-    curves.set(step.cc, curve)
-    curve.push({ bar: step.bar, from: valueOn(curve, step.bar) ?? 0, to: step.value, ramp: step.ramp ?? 0 })
-  }
-  const ends = [...curves.values()].flat().map(s => s.bar + s.ramp).concat(presses.map(p => p.bar))
-  return { curves, presses, end: Math.max(0, ...ends) }
+const addSegment = (curves, cc, step) => {
+  const curve = curves.get(cc) ?? []
+  curves.set(cc, curve)
+  curve.push({ bar: step.bar, from: valueOn(curve, step.bar) ?? 0, to: step.value, ramp: step.ramp ?? 0 })
 }
 
-// Every change of a control value, sampled every `stepBars` bars: [{ bar, cc, value }] (for the Node scenario tool)
-export const valueChanges = (script, stepBars) => {
-  const { curves, end } = compile(script)
+// curves / lkCurves: CC → value segments; presses: [{ bar, cc }]; notes: Launchkey note-ons in bar order
+// [{ bar, notes, velocity, length, midichan }] (a pad's length is 0: its note-off follows on the next tick)
+export const compile = script => {
+  const curves = new Map(), lkCurves = new Map()
+  const presses = [], notes = []
+  for (const step of [...script.steps].sort((a, b) => a.bar - b.bar)) {
+    if (step.press !== undefined) presses.push({ bar: step.bar, cc: step.press })
+    else if (step.keys !== undefined) notes.push({ bar: step.bar, notes: keyNotes(step.keys) ?? [],
+      velocity: step.velocity ?? DEFAULT_VELOCITY, length: step.length ?? DEFAULT_LENGTH, midichan: KEYS_CHANNEL })
+    else if (step.pad !== undefined) notes.push({ bar: step.bar, notes: [step.pad], velocity: DEFAULT_VELOCITY,
+      length: 0, midichan: PAD_CHANNEL })
+    else if (step.lk !== undefined) addSegment(lkCurves, step.lk, step)
+    else addSegment(curves, step.cc, step)
+  }
+  const ends = [...curves.values(), ...lkCurves.values()].flat().map(s => s.bar + s.ramp)
+    .concat(presses.map(p => p.bar), notes.map(n => n.bar + n.length))
+  return { curves, lkCurves, presses, notes, end: Math.max(0, script.bars ?? 0, ...ends) }
+}
+
+const changesOf = (curves, end, stepBars, lk) => {
   const changes = []
   for (const [cc, curve] of curves) {
     let last
     for (let bar = curve[0].bar; bar <= end + 1e-9; bar += stepBars) {
       const value = valueOn(curve, bar)
-      if (value !== last) changes.push({ bar, cc, value })
+      if (value !== last) changes.push(lk ? { bar, cc, value, lk } : { bar, cc, value })
       last = value
     }
   }
-  return changes.sort((a, b) => a.bar - b.bar)
+  return changes
+}
+
+// Every change of a control value, sampled every `stepBars` bars: [{ bar, cc, value, lk? }] (for the Node scenario
+// tool; lk: true for a Launchkey CC)
+export const valueChanges = (script, stepBars) => {
+  const { curves, lkCurves, end } = compile(script)
+  return [...changesOf(curves, end, stepBars, false), ...changesOf(lkCurves, end, stepBars, true)]
+    .sort((a, b) => a.bar - b.bar)
 }
 
 export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
-  let timer = null, compiled = null, startBar = 0, fired = 0, held = []
-  const written = new Map()
+  let timer = null, script = null, compiled = null, startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
+  const written = new Map(), lkWritten = new Map()
 
   const release = () => {
     for (const press of held) midi.setAuto(press.cc, 0)
     held = []
+    midi.releaseAutoKeys()
+    sounding = []
   }
   const stop = () => {
     clearInterval(timer)
@@ -62,17 +117,26 @@ export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
     release()
     onChange(null)
   }
+  const write = (curves, cache, send, bar) => {
+    for (const [cc, curve] of curves) {
+      const value = valueOn(curve, bar)
+      if (value === undefined || cache.get(cc) === value) continue
+      cache.set(cc, value)
+      send(cc, value)
+    }
+  }
   const tick = () => {
     const bar = engine.cycle() - startBar
-    for (const [cc, curve] of compiled.curves) {
-      const value = valueOn(curve, bar)
-      if (value === undefined || written.get(cc) === value) continue
-      written.set(cc, value)
-      midi.setAuto(cc, value)
-    }
+    write(compiled.curves, written, midi.setAuto, bar)
+    write(compiled.lkCurves, lkWritten, midi.setAutoLk, bar)
     held = held.filter(press => {
       if (--press.ticks > 0) return true
       midi.setAuto(press.cc, 0)
+      return false
+    })
+    sounding = sounding.filter(note => {
+      if (note.off > bar) return true
+      midi.noteOffAuto(note.note, note.midichan)
       return false
     })
     for (; fired < compiled.presses.length && compiled.presses[fired].bar <= bar; fired++) {
@@ -80,17 +144,27 @@ export const createPerformer = ({ midi, engine, onChange = () => {} }) => {
       midi.setAuto(cc, 1)
       held.push({ cc, ticks: HOLD_TICKS })
     }
-    if (bar > compiled.end && !held.length) stop()
-    else onChange({ bar, end: compiled.end })
+    for (; firedNotes < compiled.notes.length && compiled.notes[firedNotes].bar <= bar; firedNotes++) {
+      const { notes, velocity, length, midichan } = compiled.notes[firedNotes]
+      for (const note of notes) {
+        midi.noteAuto(note, velocity, midichan)
+        sounding.push({ note, midichan, off: bar + length })
+      }
+    }
+    if (bar > compiled.end && !held.length && !sounding.length) stop()
+    else onChange({ bar, end: compiled.end, title: script.title, section: sectionAt(script, bar) })
   }
 
   return {
-    start: script => {
+    start: next => {
       if (timer) stop()
+      script = next
       compiled = compile(script)
       midi.resetAuto()
       written.clear()
+      lkWritten.clear()
       fired = 0
+      firedNotes = 0
       startBar = Math.floor(engine.cycle())
       timer = setInterval(tick, TICK_MS)
       tick()
