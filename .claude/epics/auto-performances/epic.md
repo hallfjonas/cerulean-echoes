@@ -1,11 +1,11 @@
 ---
 name: auto-performances
-status: backlog
+status: in-progress
 created: 2026-11-16T16:13:34Z
-updated: 2026-11-16T16:13:34Z
-progress: 0%
+updated: 2026-11-16T21:00:00Z
+progress: 45%
 prd: .claude/prds/auto-performances.md
-github: (will be set on sync)
+github: https://github.com/hallfjonas/cerulean-echoes/pull/26 (single PR, no per-task issues)
 ---
 
 # Epic: auto-performances
@@ -85,14 +85,37 @@ listens in the player.
 About 33 agent hours plus the user's listening time; the review loops set the calendar time, not the code.
 
 ## Tasks Created
-- [ ] 001.md - Script format v2: meta, sections, Launchkey steps (parallel: true)
-- [ ] 002.md - Player shows title and current section (parallel: false, after 001)
-- [ ] 003.md - Design template and feedback log format (parallel: true)
-- [ ] 004.md - Pilot: 010 ambient house performance (parallel: false, after 001 + 003)
-- [ ] 005.md - 007 ambient performance (parallel: true, after 004)
-- [ ] 006.md - 008 groove techno performance (parallel: true, after 004)
-- [ ] 007.md - 009 house performance (parallel: true, after 004)
-- [ ] 008.md - Skill auto-perform from what we learned (parallel: false, after 005-007)
+- [~] 001.md - Script format v2: meta, sections, Launchkey steps (done; open: keys and pads heard in Chrome)
+- [x] 002.md - Player shows title and current section (done)
+- [x] 003.md - Design template and feedback log format (done)
+- [~] 004.md - Pilot: 010 ambient house performance (approved in loop 2, but before the timing fix: re-listen; clipping unmeasured)
+- [~] 005.md - 007 ambient performance, "drift" (loop 2 round 2: wind cue on "air" needs the recording time)
+- [~] 006.md - 008 groove techno performance, "techno-night" (loop 2 round 1 applied, waiting for the next listen)
+- [~] 007.md - 009 house performance, "dance-floor" (loop 2 round 1 applied, waiting for the next listen)
+- [ ] 008.md - Skill auto-perform from what we learned (after 005-007 are approved)
+
+Delivered together in PR #26. `[x]` done, `[~]` in progress.
+
+## Progress notes
+- **Pilot findings that changed the plan:** a performance starts from an existing script when there is one (010 needed
+  one design round); the length in minutes goes into the design and is checked once with a stopwatch against the top
+  bar; the built-in browser pane cannot play (no Web MIDI), so the user listens in Chrome, with the player started from
+  the working tree on its own port.
+- **Timing bug found in loop 2:** in the player every script started one bar early and each step came about a tenth of a
+  bar late (start bar rounded down from a clock just below 0; steps read the current time, not the scheduler's query
+  position). Fixed in `autoperform.mjs` / `engine-strudel.mjs`. The Node scenario counts bars directly and could not
+  show it, so a script is only proven by a listen in the player.
+- **Launchkey in scripts:** the real and the virtual Launchkey both feed the track (shared key queue, last moved wins
+  for knobs and mod wheel). Keys sound only while the mod wheel is above 0, and knobs read 0 until set (Brightness,
+  Length): scripts set them before the first keys. Pads are one-shots and are used sparingly, on the beat grid.
+- **Per-track findings:** 007 needs a transcript or the user's timestamp to cue sounds to David's words (no speech to
+  text installed); music must already fade in under the voice. 008 needs a lively intro, one quiet bram before a drop
+  and a long, gradual drift-out. 009 keys need explicit Brightness and Length steps.
+- **Working method:** designs were drafted by one agent per track in parallel, scripts by the same agent after approval;
+  heavy runs (scenario, audibility) take a lock directory so one runs at a time on the 16 GB machine; worktrees share
+  one `tools/node_modules` through a symlink.
+- **Not measured:** clipping for any script (`npm run audibility` measures the default state and crashes on 007) and
+  CPU at the densest section; both stay open until a measured or listened pass.
 
 Total tasks: 8
 Parallel tasks: 5
