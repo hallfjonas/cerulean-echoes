@@ -2,8 +2,8 @@
 name: auto-performances
 status: in-progress
 created: 2026-11-16T16:13:34Z
-updated: 2026-11-16T21:00:00Z
-progress: 45%
+updated: 2026-11-16T22:00:00Z
+progress: 85%
 prd: .claude/prds/auto-performances.md
 github: https://github.com/hallfjonas/cerulean-echoes/pull/26 (single PR, no per-task issues)
 ---
@@ -85,16 +85,16 @@ listens in the player.
 About 33 agent hours plus the user's listening time; the review loops set the calendar time, not the code.
 
 ## Tasks Created
-- [~] 001.md - Script format v2: meta, sections, Launchkey steps (done; open: keys and pads heard in Chrome)
+- [x] 001.md - Script format v2: meta, sections, Launchkey steps (user confirmed real Launchkey works while a script plays)
 - [x] 002.md - Player shows title and current section (done)
 - [x] 003.md - Design template and feedback log format (done)
-- [~] 004.md - Pilot: 010 ambient house performance (approved in loop 2, but before the timing fix: re-listen; clipping unmeasured)
-- [~] 005.md - 007 ambient performance, "drift" (loop 2 round 2: wind cue on "air" needs the recording time)
-- [~] 006.md - 008 groove techno performance, "techno-night" (loop 2 round 1 applied, waiting for the next listen)
-- [~] 007.md - 009 house performance, "dance-floor" (loop 2 round 1 applied, waiting for the next listen)
-- [ ] 008.md - Skill auto-perform from what we learned (after 005-007 are approved)
+- [x] 004.md - Pilot: 010 ambient house performance (approved, re-confirmed after the timing fix; clipping unmeasured)
+- [x] 005.md - 007 ambient performance, "drift" (approved; the wind cue on "air" was dropped, time unknown)
+- [x] 006.md - 008 groove techno performance, "techno-night" (approved)
+- [x] 007.md - 009 house performance, "dance-floor" (approved)
+- [ ] 008.md - Skill auto-perform from what we learned (next; all four performances approved)
 
-Delivered together in PR #26. `[x]` done, `[~]` in progress.
+Delivered together in PR #26. `[x]` done.
 
 ## Progress notes
 - **Pilot findings that changed the plan:** a performance starts from an existing script when there is one (010 needed
@@ -114,6 +114,9 @@ Delivered together in PR #26. `[x]` done, `[~]` in progress.
 - **Working method:** designs were drafted by one agent per track in parallel, scripts by the same agent after approval;
   heavy runs (scenario, audibility) take a lock directory so one runs at a time on the 16 GB machine; worktrees share
   one `tools/node_modules` through a symlink.
+- **Loop 2 result (2026-11-16):** the user approved all four performances ("ALL PERFECT NOW"); the timing fix stays
+  (the performances were approved with it in place). The real Launchkey works while a script plays; the Launchkey knobs
+  (CC 31-38) work.
 - **Not measured:** clipping for any script (`npm run audibility` measures the default state and crashes on 007) and
   CPU at the densest section; both stay open until a measured or listened pass.
 
