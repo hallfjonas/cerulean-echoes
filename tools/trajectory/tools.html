@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+  header, main { padding: 10px 16px }
+  pre { margin: 0; padding: 10px 16px; font: 13px ui-monospace, monospace; white-space: pre-wrap;
+    word-break: break-word }
+  pre .stderr { color: var(--err) }
+  pre .start, pre .exit { color: var(--dim) }
+  section { color: var(--dim); font-size: 14px }
+</style>
+<script type="module" src="nav.mjs"></script>
+</head>
+<body>
+<header>
+  <select id="command"></select>
+  <select id="target"></select>
+  <button id="run">Run</button>
+  <button id="stop">Stop</button>
+  <span id="status">ready</span>
+</header>
+<main>
+  <section>Page tools: <a href="analyse.html">Analysis</a> (trajectory of a recording or live input)</section>
+</main>
+<pre id="log"></pre>
+<script type="module">
+const $ = id => document.getElementById(id)
+const kindOf = entry => entry.kind ?? 'live'
+const labelOf = entry => entry.label ?? entry.id
+let commands = []
+let catalogue = []
+
+const showTargets = () => {
+  const kinds = commands.find(command => command.id === $('command').value)?.kinds ?? []
+  const targets = catalogue.filter(entry => kinds.includes(kindOf(entry)))
+  $('target').replaceChildren(...targets.map(entry => new Option(`${kindOf(entry)} · ${labelOf(entry)}`, entry.id)))
+  $('target').hidden = !kinds.length
+}
+
+const print = (text, kind) => {
+  const line = document.createElement('span')
+  line.className = kind
+  line.textContent = text + '\n'
+  $('log').append(line)
+  line.scrollIntoView({ block: 'end' })
+}
+
+const readEvents = async (body, onEvent) => {
+  const reader = body.pipeThrough(new TextDecoderStream()).getReader()
+  let buffer = ''
+  for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) {
+    const blocks = (buffer + chunk.value).split('\n\n')
+    buffer = blocks.pop()
+    for (const block of blocks) {
+      const lines = block.split('\n')
+      const event = lines.find(line => line.startsWith('event: '))?.slice('event: '.length) ?? 'message'
+      const data = lines.filter(line => line.startsWith('data: ')).map(line => line.slice('data: '.length))
+      onEvent(event, data.join('\n'))
+    }
+  }
+}
+
+const setRunning = running => {
+  $('run').disabled = running
+  $('command').disabled = $('target').disabled = running
+}
+
+$('command').onchange = showTargets
+$('run').onclick = async () => {
+  const command = commands.find(entry => entry.id === $('command').value)
+  if (!command) return
+  const path = command.kinds.length ? `${command.id}/${encodeURIComponent($('target').value)}` : command.id
+  $('log').replaceChildren()
+  setRunning(true)
+  $('status').textContent = 'running …'
+  try {
+    const response = await fetch(`run/${path}`, { method: 'POST' })
+    if (!response.ok) {
+      $('status').textContent = `${response.status}: ${await response.text()}`
+      return
+    }
+    let last = null
+    await readEvents(response.body, (event, data) => {
+      if (event === 'exit') last = data
+      print(event === 'start' ? `$ ${data}` : event === 'exit' ? `exit ${data}` : data, event)
+    })
+    $('status').textContent = last === '0' ? 'done' : `stopped (exit ${last})`
+  } catch (error) {
+    $('status').textContent = error.message
+  } finally {
+    setRunning(false)
+  }
+}
+$('stop').onclick = async () => {
+  const response = await fetch('run', { method: 'DELETE' })
+  if (!response.ok) $('status').textContent = await response.text()
+}
+
+;[commands, catalogue] = await Promise.all([fetch('tools').then(r => r.json()), fetch('catalogue').then(r => r.json())])
+$('command').replaceChildren(...commands.map(command => new Option(command.label, command.id)))
+showTargets()
+</script>
+</body>
+</html>

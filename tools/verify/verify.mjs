@@ -1,6 +1,7 @@
-// One check for edited tracks: transpile, compare with the HEAD version, sounds, layout sheet + .syx, tapped copy.
+// One check for edited tracks: transpile, compare with the HEAD version, sounds, layout sheet + .syx, tap, auto-perform
+// scripts (every CC in the track's @ctl, trajectory/check-perform.mjs).
 // usage (in tools/): node verify/verify.mjs [--online] [<file.strudel> …]
-//   no files: every .strudel file changed vs HEAD (git status)
+//   no files: every .strudel file changed vs HEAD (git status), and the track of every changed auto-perform script
 //   --online: check sounds online and update samples/sounds.json (default: offline against the list)
 // A compare difference is reported as "changed", not as a failure (the edit may be meant to change the sound).
 // Exit 1 if a step fails.
@@ -12,8 +13,9 @@ import { fileURLToPath } from 'url'
 import { generate as makeLayout } from '../lcxl-layout/gen-layout.mjs'
 import { makeSingle, singleOf } from '../lcxl-layout/make-single.mjs'
 import { generate as makeSyx } from '../lcxl-layout/make-syx.mjs'
-import { refreshTapped } from '../trajectory/make-tapped.mjs'
+import { tapSource } from '../trajectory/make-tapped.mjs'
 import { checkOffline } from '../strudel-sim/check-sounds.mjs'
+import { checkTrack, trackFileOf } from '../trajectory/check-perform.mjs'
 
 const tools = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const root = path.resolve(tools, '..')
@@ -22,9 +24,14 @@ const online = args.includes('--online')
 
 const git = (...a) => execFileSync('git', a, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
 const node = (script, ...a) => spawnSync('node', [path.join(tools, script), ...a], { cwd: tools, encoding: 'utf8' })
-const changedFiles = () => git('status', '--porcelain', '--untracked-files=all').split('\n')
-  .filter(l => l.endsWith('.strudel') && l[0] !== 'D' && l[1] !== 'D')
-  .map(l => path.join(root, l.slice(3).split(' -> ').pop()))
+const changed = () => git('status', '--porcelain', '--untracked-files=all').split('\n')
+  .filter(l => l && l[0] !== 'D' && l[1] !== 'D').map(l => l.slice(3).split(' -> ').pop())
+const changedFiles = () => {
+  const files = changed()
+  const scriptTracks = files.map(f => f.match(/^tools\/trajectory\/perform\/([\w-]+)\/[\w-]+\.json$/)?.[1])
+    .filter(Boolean).map(trackFileOf).filter(Boolean)
+  return [...new Set([...files.filter(f => f.endsWith('.strudel')).map(f => path.join(root, f)), ...scriptTracks])]
+}
 const isTrack = file => file.startsWith(path.join(root, 'tracks') + path.sep)
 
 const files = args.filter(a => a.endsWith('.strudel')).map(f => path.resolve(process.env.INIT_CWD ?? process.cwd(), f))
@@ -78,12 +85,20 @@ function layout(file) {
   return written.length ? ['ok', written.join(', ')] : ['skip', 'no @ctl tags']
 }
 
-function tapped(file) {
-  const r = refreshTapped(file)
-  return r ? ['ok', path.relative(tools, r.target)] : ['skip', 'no tapped copy']
+function tap(file) {
+  try { return ['ok', `${tapSource(fs.readFileSync(file, 'utf8'), path.basename(file)).stems.length} stems`] }
+  catch (e) { return ['skip', e.message] }
 }
 
-const steps = { transpile, compare, sounds, layout, tapped }
+function perform(file) {
+  const results = Object.entries(checkTrack(file))
+  if (!results.length) return ['skip', 'no auto-perform scripts']
+  const failed = results.filter(([, errors]) => errors.length)
+  if (!failed.length) return ['ok', `${results.length} scripts: ${results.map(([f]) => path.basename(f)).join(', ')}`]
+  return ['FAIL', failed.map(([f, errors]) => `${path.basename(f)}: ${errors.join('; ')}`).join(' | ')]
+}
+
+const steps = { transpile, compare, sounds, layout, tap, perform }
 let failed = false
 for (const file of files) {
   const name = path.basename(file)

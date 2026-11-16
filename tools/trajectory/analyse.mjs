@@ -1,5 +1,5 @@
 // Trajectory analysis of a stereo signal: five frequency bands stand in for stems, plus one global pulse.
-// Shared by the browser page (index.html) and the Node CLI (analyse-file.mjs). Each emitted frame is a list of lines:
+// Shared by the browser page (analyse.html) and the Node CLI (analyse-file.mjs). Each emitted frame is a list of lines:
 //   { t, stem, x, y, z, e, on }   per band: x pan -1..1, y log frequency (20 Hz-20 kHz → 0..1; the strongest partial
 //                                 in tonal bands, the spectral centroid in noisy ones, blended by flatness), z depth 0..1
 //                                 (L/R decorrelation, a reverb/width proxy), e energy 0..1, on 1 if an onset fell in

@@ -1,7 +1,7 @@
 // Claude Code PostToolUse hook (Bash): tracks edited via Bash (python3 -, sed -i) get the same regeneration as an
 // Edit (hook.mjs). Candidates are the .strudel files git sees as modified or untracked; a content hash per file
 // (cache in the OS temp dir, one per checkout, shared with hook.mjs) tells which changed since the last run. Outputs
-// the processing writes itself (-single files, the dual-lc test file) are skipped; tapped copies are git-ignored.
+// the processing writes itself (-single files, the dual-lc test file) are skipped.
 // A file not in the cache yet is processed only if it changed in the last 10 minutes. An error is reported once per
 // content change, not on every later Bash call.
 import { execFileSync } from 'child_process'
