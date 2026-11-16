@@ -65,7 +65,15 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 - Launchkey steps go to a second virtual input, `Launchkey MK4 25 Auto`. Its name contains `Launchkey MK4 25`, the
   name every live track looks up with `midin` and `midikeys`, so the track hears it as a Launchkey (keys and pads in
   `stemLK`, knobs, mod wheel) and the LC view shows it. It is connected only while a script with Launchkey steps
-  plays; a script without them plays as with no Launchkey. A real Launchkey plays along (last moved wins per CC).
+  plays; a script without them plays as with no Launchkey.
+- **Real and virtual Launchkey together.** Both inputs match the tracks' lookup, and `midi.mjs` reads them as one:
+  the keys and pads of both land in the same queue (`takeKeys` takes from every matching input), so your own keys
+  and pads sound next to the scripted ones; a knob or the mod wheel follows whichever moved last, so turning it takes
+  it over from the script until the script sets it again (a ramp sets it on every tick). Your keys need the mod wheel
+  up like the script's: if the script last set `lk` 1 to 0, or you have not moved the wheel since the track loaded,
+  move it. The track looks the Launchkey up once, when it loads: with Play or a script without Launchkey steps, a
+  real Launchkey has to be connected before that; with Launchkey steps the lookup finds the virtual one, and a real
+  Launchkey plugged in later is heard as well.
 - Scripts are JSON in `perform/<track>/*.json`, listed with the track in the catalogue. Every live track has
   `every-button.json`; 010 also has `spike-run.json`. Bars count from the start (1 cycle = 1 bar); values are 0…1
   (sent as MIDI 0…127); a ramp moves from the value at `bar` to `value` over that many bars; a control the script
@@ -108,7 +116,9 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   `length` only sets when the note-off reaches the LC view. Keys stay silent while the mod wheel (`lk` 1) is at 0, and
   keys or pads at bar 0 are dropped (the tracks drop what waits in the queue on their first query): start them later.
 - Steps follow the engine's cycle clock, not a timer, so they stay on the bar whatever the tempo; a press is held for
-  two scheduler ticks so the tracks' `cycleButton` sees it.
+  two scheduler ticks so the tracks' `cycleButton` sees it. The clock is the cycle the scheduler queries next (it
+  runs ahead of what sounds), so a step is heard within one scheduler tick of its bar, and bar 0 is the bar line
+  nearest the start.
 - Pick a script in the drawer, **Start** (or **P**) reloads the track so the script begins from silence; **Stop** (or
   **P**) ends it and releases held keys (the controls keep their values). The next Start sets every control of both
   virtual inputs back to 0.
@@ -190,7 +200,7 @@ Both inputs write **the same format**; the renderer does not know where the musi
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
 | `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/tools` and `/run` (Tools page), relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
 | `player.html` | the player page: loads a track through the engine, shows it with `render.mjs`, top bar and drawer |
-| `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()`, the `midin` / `midikeys` shims |
+| `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
 | `autoperform.mjs` | the script player and the drawer section |
 | `settings.mjs` | every visual setting as data; builds the drawer and the keys |
