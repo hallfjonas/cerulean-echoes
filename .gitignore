@@ -7,6 +7,11 @@ node_modules/
 !.claude/skills/
 !.claude/epics/
 !.claude/prds/
+!.claude/settings.json
+!.claude/launch.json
+!.gitattributes
 tools/trajectory/tapped/
 Scarlett*
 *.band
+
+tools/session-digest/out/

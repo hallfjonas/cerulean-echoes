@@ -61,6 +61,7 @@
 // @guide Playing alone | A run is: build the beat in Mode 1, switch to Mode 2, add colour, use column 8 for the drop. Mode 1 is set up in Components with the same CCs as Mode 16.
 // @guide Playing alone | Faders are shared hardware: after a mode switch each sound keeps its value until you touch its fader, then it jumps to where the fader physically is. Move faders gently after switching.
 // @guide Playing together | Both Launch Controls have the full layout and steer the same sounds: whoever moves a control last sets its value, a button press counts from either. Agree who plays which page.
+// @shared inputs begin
 // Every Launch Control XL 3 that is connected (by the port name, whatever it is renamed to; not its DAW port).
 // Without Web MIDI (the Node tools) one plain midin() stands in.
 const LC_PORT = 'LCXL3'
@@ -89,11 +90,13 @@ const fadeMain  = knob => ramp(knob, 1, 0.5)
 const fadeExtra = knob => ramp(knob, 0, 0.5)
 // Exponential knob range for filters (Hz), so every part of the knob travel is audible
 const expRange = (knob, lo, hi) => knob.fmap(v => lo * Math.pow(hi / lo, v))
+// @shared inputs end
 
 const bpm  = 120
 const beat = 60 / bpm   // seconds per quarter note, for delay times
 setcpm(bpm / 4)
 
+// @shared columns begin
 // Mapping of column n (1-8): brightness, space, character (knob rows 1-3), fader, button rows 1-2
 const colMap = (read, n) => ({ bright: read(12 + n), space: read(20 + n), char: read(28 + n), level: read(4 + n), btn: read(36 + n), btn2: read(44 + n) })
 const off = () => signal(() => 0)
@@ -106,7 +109,9 @@ const lcCc = c => lcMemo[c] ??= !lcInputs.length ? off()
 const alone    = true
 const colJonas = n => colMap(n === 8 ? c => lastMoved(lcCc(c), lcCc(c + 48)) : c => lcCc(c + 48), n)
 const colJojo  = n => n === 8 ? colMap(off, n) : colMap(lcCc, n)
+// @shared columns end
 
+// @shared controls begin
 const gate  = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
 const above = (sig, x) => sig.fmap(v => v > x)
 const and   = (a, b) => a.fmap(x => y => x && y).appLeft(b)
@@ -174,6 +179,7 @@ const heldRamp = (button, cycles) => {
   taps.push(pat)
   return pat
 }
+// @shared controls end
 
 // Freeze: while the button is held, keep returning the value that was playing when it was pressed
 const freeze = (button, pat) => {
@@ -222,6 +228,7 @@ const statusUi = !hasPage ? null : globalThis.houseStatus ??= (() => {
   return { text, box }
 })()
 
+// @shared lc-view-window begin
 // LC view: a big, normal window (second screen, full screen) that draws both controller pages side by side, Jojo
 // (Mode 1) left, Jonas (Mode 2) right: each control's name from the @ctl tags in the editor, its value, and what the buttons
 // have chosen. The page in use gets a frame in its colour: two controllers = the one moved last; one controller = the
@@ -306,6 +313,7 @@ const lcView = !hasPage ? null : globalThis.lcxlView ??= (() => {
   v.link = link
   return v
 })()
+// @shared lc-view-window end
 
 // Rows of the status box, filled by change(): { label, latch, n, names } per player
 const STATUS = { jojo: [], jonas: [] }
@@ -327,6 +335,7 @@ const showStatus = () => {
   ].join('\n')
   lcView?.update()
 }
+// @shared change begin
 // Button 1 of a stem: n patterns (default 8), one step per press, taking over at the next bar
 const change = (button, who, label, n = 8, names) => {
   const latch = barLatch()
@@ -334,6 +343,7 @@ const change = (button, who, label, n = 8, names) => {
   STATUS[who].push({ label, latch, n, names })
   return latch
 }
+// @shared change end
 // Pattern number i of a list, switched by a change latch
 const pick = (latch, pats) => latch.pat.fmap(i => pats[i]).innerJoin()
 
@@ -895,16 +905,22 @@ const stateTaps = stack(...taps).filterValues(() => false)
 // What the LC view shows for this track: the chapter (now, next) on column 8 button 1, and extra lines at the top
 const lcChapter = () => [CHAPTERS[chapterLatch.now].name, CHAPTERS[chapterLatch.pending].name]
 const lcHead    = () => [['Chords', CHAPTERS[chapterLatch.now].chords]]
+// Keys in D minor (pitch class 2), the track's scale, light up softly in the LC view
+const D_MINOR = [0, 2, 3, 5, 7, 8, 10]
+const inKey = m => D_MINOR.includes(((m - 2) % 12 + 12) % 12)
 // Where the music is (LC view): the beat in the bar and the bar in the big cycle. A silent event per beat moves it at
 // the moment the beat sounds (onTrigger, as in the set). chordAt(bar) = the chord of that bar ('' = none shown)
 const CYCLE   = 4   // one phrase: 4 chords, one per bar
 const chordAt = bar => CHAPTERS[chapterLatch.now].chords.split(' – ')[bar % 4]
+// @shared beat-tick begin
 const beatNow = { bar: null, beat: null }
 const beatTick = pure(0).segment(4).fmap(() => ({})).onTrigger((hap, now, cps, t) => {
   const pos = hap.whole.begin.valueOf(), bar = Math.floor(pos + 1e-9), beat = Math.floor((pos - bar) * 4 + 1e-9)
   setTimeout(() => { beatNow.bar = bar; beatNow.beat = beat; lcView?.update() }, Math.max(0, (t - now) * 1000))
 }, true)
+// @shared beat-tick end
 
+// @shared lc-view-draw begin
 // LC view of this evaluation: names from the tags in the editor (strudel.cc keeps the text in strudelMirror),
 // buttons from the change() rows (row i = column i + 1), chapter and break on column 8
 if (lcView) {
@@ -989,9 +1005,6 @@ if (lcView) {
   // default layout (C1 = 36 bottom left: 36-39 bottom left, 40-43 top left, 44-47 bottom right, 48-51 top right)
   lcView.keys ??= new Set(); lcView.pads ??= new Set(); lcView.base ??= 48
   const BLACK = [1, 3, 6, 8, 10]
-  // Keys in D minor (pitch class 2), the track's scale, light up softly
-  const D_MINOR = [0, 2, 3, 5, 7, 8, 10]
-  const inKey = m => D_MINOR.includes(((m - 2) % 12 + 12) % 12)
   // Pads are matched by their place among the 16 (as shotOf plays them), whatever note numbers they send
   const padIdx = n => ((n - LK_PAD_NOTE_1) % 16 + 16) % 16
   const padLit = n => [...lcView.pads].some(p => padIdx(p) === padIdx(n)) ||
@@ -1081,6 +1094,7 @@ if (lcView) {
   if (statusUi?.box && lcView.link) statusUi.box.append(lcView.link)
   if (lcView.win && !lcView.win.closed) lcView.win.document.head.innerHTML = '<style>' + lcView.css + '</style>'
 }
+// @shared lc-view-draw end
 showStatus()
 
 
@@ -1102,6 +1116,7 @@ showStatus()
 // @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
 // @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @shared launchkey begin
 const LK_PAD_CHAN = 10
 const LK_PAD_NOTE_1 = 36
 const lkKnob = n => lkCc ? lkCc(LK_KNOB_1 + n - 1) : off()
@@ -1124,6 +1139,7 @@ const shareQuery = pat => {
     return haps
   })
 }
+// @shared launchkey end
 
 // Keys (as Jonas' keys in 009): Steinway B (VCSL vl3, trimmed copies in our repo) and the Rhodes Mark I (jRhodes3d)
 const JRH = 'https://raw.githubusercontent.com/sfzinstruments/jlearman.jRhodes3d/master/jRhodes3d-mono/'
@@ -1166,12 +1182,14 @@ const LK_SHOTS = [
   { name: 'Crash reverse', s: 'rolandtr909_cr', speed: -0.6, gain: 0.54 },
   { name: 'Voice ooh', s: 'gm_voice_oohs', note: 62, attack: 0.2, release: 1.5, room: 0.7 },
 ]
+// @shared pad-names begin
 const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
 if (lcView) {
   lcView.padNames = LK_SHOTS.map(shot => shot.name)
   lcView.padVoice = LK_SHOTS.map(shot => shot.s in VOICE_SAMPLES)
   lcView.update()
 }
+// @shared pad-names end
 
 const lkNotes = lkKeys ? shareQuery(lkKeys(lkKnob(5).range(0.25, 2))) : silence
 const lkKeyNotes = lkNotes.filterValues(v => !isPadHit(v))
@@ -1227,6 +1245,7 @@ const lkPad = lkVoices
   .orbit(2)
   .postgain(lkKeysLevel.mul(globalLevel))
 
+// @shared pad-once begin
 const lkShotTone = expRange(lkKnob(8), 18000, 800)
 // A shot with `once` ignores new hits until it has played out. A hit already let through passes again when queried
 // twice (its start is remembered); a start more than 4 cycles before the run (track restarted) starts afresh.
@@ -1240,6 +1259,7 @@ const lkOnce = hap => {
   lkOnceRuns[s] = { start: t, until: t + once * bpm / 240, hits: [t, ...(run?.hits ?? [])].slice(0, 8) }
   return true
 }
+// @shared pad-once end
 const lkShots = lkNotes.filterValues(isPadHit)
   .fmap(({ note, ...v }) => tone => room => {
     const { name, ...shot } = shotOf(note)

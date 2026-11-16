@@ -92,7 +92,7 @@ export function generate(file, root = process.cwd()) {
   const data = build(parse(fs.readFileSync(file, 'utf8'), source))
   if (!data) return null
   const pdf = file.replace(/\.strudel$/, '') + '-layout.pdf'
-  execFileSync('typst', ['compile', template, pdf, '--input', `data=${JSON.stringify(data)}`], { stdio: ['ignore', 'ignore', 'pipe'] })
+  execFileSync('typst', ['compile', template, pdf, '--creation-timestamp', '0', '--input', `data=${JSON.stringify(data)}`], { stdio: ['ignore', 'ignore', 'pipe'] })
   return pdf
 }
 

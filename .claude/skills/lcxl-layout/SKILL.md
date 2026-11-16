@@ -1,6 +1,6 @@
 ---
 name: lcxl-layout
-description: Create or update the Launch Control XL 3 layout sheet (Typst → PDF) of a Strudel track from @ctl comments in the track. Use when a track's controller mapping is new or changed, or the user asks for a layout/cheat sheet.
+description: Regenerate the LC XL 3 layout sheet (PDF) and custom modes (.syx) of a track from its @ctl comments. Use for 'layout sheet', 'regenerate layout', 'cheat sheet', 'syx', 'custom mode', 'Components', 'Belegung', '@ctl', 'Mode 1/Mode 2 load', 'control names on the display'.
 ---
 
 # LC XL 3 layout sheets

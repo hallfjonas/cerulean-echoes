@@ -5,8 +5,10 @@
 // (plus every Launchkey pad); a sound is checked by fetching the first byte of the file it plays, as a browser would.
 // usage (in tools/): node strudel-sim/check-sounds.mjs <track.strudel> …            check online, update the list
 //                    node strudel-sim/check-sounds.mjs --offline <track.strudel> …  only compare with the list
-// Exit 1 if a track uses a broken sound or (offline) one the list does not know yet.
+// Exit 1 if a track uses a broken sound or (offline) one the list does not know yet. A sample of this repository that
+// origin/main does not have yet is a warning: strudel.cc loads it from main, so it plays only once pushed there.
 import fs from 'fs'
+import { spawnSync } from 'child_process'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { load, run } from './harness.mjs'
@@ -73,13 +75,20 @@ const loadSoundfonts = async () => soundfonts ??= await fetch(SOUNDFONTS + 'gm.m
   return fonts
 })
 
-// Where a sound plays from: the file URL (null for a synth) and its source, or null if nowhere
-async function locate({ s, n }, own) {
+const locateOwn = ({ s, n }, own) => {
   const key = s.toLowerCase()
   for (const { map, base, from } of [...own].reverse()) {
     const entry = Object.entries(map).find(([k]) => k.toLowerCase() === key)?.[1]
     if (entry) return { url: (map._base ?? base) + fileOf(entry, n), from }
   }
+  return null
+}
+
+// Where a sound plays from: the file URL (null for a synth) and its source, or null if nowhere
+async function locate({ s, n }, own) {
+  const key = s.toLowerCase()
+  const mine = locateOwn({ s, n }, own)
+  if (mine) return mine
   if (SYNTHS.includes(key)) return { url: null, from: 'synth' }
   for (const { url, map } of await loadBanks()) {
     const entry = Object.entries(map).find(([k]) => k.toLowerCase() === key)?.[1]
@@ -110,6 +119,17 @@ const loadable = url => checked.get(url) ?? checked.set(url, (async () => {
   } catch (e) { return e.message + ': ' + url }
 })()).get(url)
 
+// The path of a file of this repository that origin/main does not have yet (as of the last fetch), else null
+const onMain = new Map()
+const notOnMain = url => {
+  if (!url?.startsWith(OWN_SAMPLES)) return null
+  const local = 'samples/' + decodeURIComponent(url.slice(OWN_SAMPLES.length))
+  if (!onMain.has(local))
+    onMain.set(local, spawnSync('git', ['cat-file', '-e', 'origin/main:' + local], { cwd: root }).status === 0)
+  return onMain.get(local) ? null : local
+}
+const unpushedLine = (name, local) => name + ' — not on origin/main yet, plays only after push to main: ' + local
+
 async function checkOnline(file) {
   const { used, own } = await usedSounds(file)
   const result = {}
@@ -117,20 +137,28 @@ async function checkOnline(file) {
     const at = await locate(sound, own)
     const err = !at ? 'unknown sound' : at.url && await loadable(at.url)
     const name = sound.n ? sound.s + ':' + sound.n : sound.s
-    result[name] = err ? { broken: err } : { ok: at.from }
+    result[name] = err ? { broken: err } : { ok: at.from, unpushed: notOnMain(at.url) }
   }
   return result
 }
 
 const readList = () => fs.existsSync(LIST) ? JSON.parse(fs.readFileSync(LIST, 'utf8')) : { ok: {}, broken: {} }
 
-// Offline: the sounds of a track that the list has as broken or does not know
-export async function checkOffline(file) {
+// Offline: the sounds of a track that the list has as broken or does not know (problems), and its own samples that
+// are not on origin/main yet (warnings)
+async function offlineReport(file) {
   const list = readList()
-  const { used } = await usedSounds(file, 12)
-  return used.map(({ s, n }) => n ? s + ':' + n : s).flatMap(name =>
+  const { used, own } = await usedSounds(file, 12)
+  const name = ({ s, n }) => n ? s + ':' + n : s
+  const problems = used.map(name).flatMap(name =>
     list.broken[name] ? [name + ' — broken: ' + list.broken[name]] : list.ok[name] ? [] : [name + ' — not checked yet'])
+  const warnings = used.flatMap(sound => {
+    const local = notOnMain(locateOwn(sound, own)?.url)
+    return local ? [unpushedLine(name(sound), local)] : []
+  })
+  return { problems, warnings }
 }
+export const checkOffline = async file => (await offlineReport(file)).problems
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const offline = process.argv.includes('--offline')
@@ -138,8 +166,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   let bad = false
   if (offline) {
     for (const file of tracks) {
-      const problems = await checkOffline(file)
-      console.log(path.basename(file) + ': ' + (problems.length ? '\n  ' + problems.join('\n  ') : 'all sounds ok'))
+      const { problems, warnings } = await offlineReport(file)
+      console.log(path.basename(file) + ': ' + (problems.length ? '\n  ' + problems.join('\n  ') : 'all sounds ok') +
+        warnings.map(w => '\n  warning: ' + w).join(''))
       bad ||= problems.length > 0
     }
   } else {
@@ -148,7 +177,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const result = await checkOnline(file)
       const broken = Object.entries(result).filter(([, r]) => r.broken)
       console.log(`${path.basename(file)}: ${Object.keys(result).length} sounds, ${broken.length} broken` +
-        broken.map(([name, r]) => '\n  ' + name + ' — ' + r.broken).join(''))
+        broken.map(([name, r]) => '\n  ' + name + ' — ' + r.broken).join('') +
+        Object.entries(result).filter(([, r]) => r.unpushed).map(([name, r]) =>
+          '\n  warning: ' + unpushedLine(name, r.unpushed)).join(''))
       for (const [name, r] of Object.entries(result)) {
         delete list.ok[name]; delete list.broken[name]
         if (r.broken) list.broken[name] = r.broken

@@ -1,6 +1,6 @@
 ---
 name: lab-to-track
-description: Move a finished lab column (lab/<instrument>/<board>.strudel) into a track column 1:1 - same controls, sounds, rhythms, touch, levels. Use when the user says a lab result should go into a track ("put our keys into 009", "take column N of the board into the track").
+description: Move a finished lab column into a track column 1:1 (same controls, sounds, rhythms, levels). Use for 'into the track', 'take column N into 009', 'port the winner', 'put our keys/bass into the track'.
 ---
 
 # Lab column → track column, 1:1
