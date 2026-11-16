@@ -1,5 +1,6 @@
 // Turns Claude Code session transcripts (JSONL) of this project into compact Markdown digests for review.
-// Usage: node session-digest/digest.mjs [--since 2026-11-10] [--only <session-id-prefix>] [--dir <transcript dir>]
+// Usage: node session-digest/digest.mjs [--since 2026-11-10] [--until 2026-11-15] [--only <session-id-prefix>]
+//   [--dir <transcript dir>]. A session belongs to the day it started; --until is inclusive.
 // Writes tools/session-digest/out/<session>.md (git-ignored: it holds private chat content) and out/index.md.
 // Each digest lists user messages (flagged corrections), per turn the tool sequence, errors, hook output, skills and
 // subagents, handover notes, repeated tool sequences, edit reverts, and a short summary of every subagent transcript.
@@ -11,6 +12,7 @@ import { fileURLToPath } from 'url'
 const args = process.argv.slice(2)
 const option = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback)
 const since = option('--since', '2026-11-10')
+const until = option('--until', '9999-12-31')
 const only = option('--only', null)
 const projectSlug = '-Users-jonas-hall-Documents-GitHub-cerulean-echoes'
 const transcriptDir = option('--dir', path.join(os.homedir(), '.claude', 'projects', projectSlug))
@@ -227,7 +229,7 @@ function digest(sessionFile) {
   const id = path.basename(sessionFile, '.jsonl')
   const records = readJsonl(sessionFile)
   const stamps = records.map(record => record.timestamp).filter(Boolean).sort()
-  if (!stamps.length || stamps[0].slice(0, 10) < since) return null
+  if (!stamps.length || stamps[0].slice(0, 10) < since || stamps[0].slice(0, 10) > until) return null
   const { turns, calls, stats } = parseSession(records)
   const humanTurns = turns.filter(turn => turn.kind === 'human')
   const corrections = humanTurns.filter(turn => isCorrection(turn.text))
@@ -300,6 +302,7 @@ function digest(sessionFile) {
   }
 }
 
+if (!only) fs.rmSync(outDir, { recursive: true, force: true })
 fs.mkdirSync(outDir, { recursive: true })
 const sessionFiles = fs
   .readdirSync(transcriptDir)
@@ -321,7 +324,7 @@ for (const file of sessionFiles) {
 results.sort((a, b) => a.start.localeCompare(b.start))
 if (!only) {
   const index = [
-    `# Session digests since ${since}`,
+    `# Session digests ${since} to ${until === '9999-12-31' ? 'today' : until}`,
     '',
     '| Start | Session | Title | Human turns | Corrections? | Tool calls | Errors | Subagents |',
     '|---|---|---|---|---|---|---|---|',

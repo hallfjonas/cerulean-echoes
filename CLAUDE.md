@@ -84,6 +84,7 @@ Use them instead of redoing the steps by hand:
 - Layout sheet, "regenerate layout", `.syx`, custom mode, Novation Components: `/lcxl-layout`.
 - New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
+- Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
 
 Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,
 syx, single and tapped copy regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit
