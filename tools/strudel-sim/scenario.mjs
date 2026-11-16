@@ -1,14 +1,16 @@
 // Play a controller scenario on a track in Node and report what sounds: CCs, button presses, Launchkey pads, knobs and
 // keys from the command line, one or more LC XL 3s, optionally the LC view text. Usage: USAGE (or run without args).
 import { load, STEP } from './harness.mjs'
-import { valueChanges } from '../trajectory/autoperform.mjs'
+import { compile, valueChanges } from '../trajectory/autoperform.mjs'
 import fs from 'fs'
 
 const USAGE = `usage (in tools/): node strudel-sim/scenario.mjs <track.strudel> [steps…] [output]
 steps (values 0..1, sent as MIDI 0..127; @c = at cycle c, default 0; lists with commas, flags may repeat):
   --cc 13=0.5,85=1@2     LC 1 CCs (Mode 1 = CC 5-51, Mode 2 = CC + 48, column 8 on both)
   --press 37@2,37@2.5    LC 1 button presses (momentary: 1, then 0 one tick = ${STEP} cycles later)
-  --script <file.json>   an auto-perform script (trajectory/perform/…) on LC 1, bars = cycles
+  --script <file.json>   an auto-perform script (trajectory/perform/…): LC steps on LC 1, keys / pads / lk steps on the
+                         Launchkey, bars = cycles; runs the whole script unless a window is given, then prints the
+                         level per section (the script's sections, else one)
   --lc 2                 number of LC XL 3s connected (default 1; 0 = none)
   --cc2 …  --press2 …    the same for LC 2 (--cc3 for LC 3 …); per CC the one moved last wins, as in the tracks
   --faders 1             every fader of LC 1 (CC 5-12 and 53-60) to this value at cycle 0
@@ -35,8 +37,11 @@ const ports = [...Array(lcCount).keys()].flatMap(i => [`LCXL3 ${i + 1} MIDI`, `L
   .concat(flag('--no-lk') ? [] : ['Launchkey MK4 25 MIDI', 'Launchkey MK4 25 DAW'])
 const LK_PORT = 'Launchkey MK4 25 MIDI'
 const WINDOW = ['--from', '--to', '--before', '--after']
+const scripts = values('--script').map(file => JSON.parse(fs.readFileSync(file, 'utf8')))
+const scriptEnd = Math.max(0, ...scripts.map(script => Math.ceil(compile(script).end)))
+const defaultTo = scriptEnd && !flag('--from') ? scriptEnd : Number(one('--from', 0)) + 4
 const windows = flag('--before') ? [span(one('--before')), span(one('--after'))]
-  : [[Number(one('--from', 0)), Number(one('--to', Number(one('--from', 0)) + 4))]]
+  : [[Number(one('--from', 0)), Number(one('--to', defaultTo))]]
 
 // Every step: at cycle `at`, set vals[key] (or queue a note) and tell the LC view on its port
 const steps = []
@@ -58,11 +63,17 @@ for (const a of new Set(args.filter(a => /^--(cc|press)\d*$/.test(a)))) {
     }
   }
 }
-for (const file of values('--script')) {
-  const script = JSON.parse(fs.readFileSync(file, 'utf8'))
-  for (const { bar, cc, value } of valueChanges(script, STEP))
-    steps.push({ at: bar, key: cc, v: midi(value), port: lcPort(1), data: [0xbf, cc] })
+for (const script of scripts) {
+  for (const { bar, cc, value, lk } of valueChanges(script, STEP))
+    steps.push(lk ? { at: bar, key: 'lk' + cc, v: midi(value), port: LK_PORT, data: [0xb0, cc] }
+      : { at: bar, key: cc, v: midi(value), port: lcPort(1), data: [0xbf, cc] })
   for (const { bar, press } of script.steps.filter(s => s.press !== undefined)) pressAt(1, press, bar)
+  for (const { bar, notes, velocity, length, midichan } of compile(script).notes) {
+    const v = Math.max(1, midi(velocity)), channel = midichan - 1, off = bar + Math.max(STEP, length)
+    for (const note of notes)
+      steps.push({ at: bar, pad: { note, velocity: v / 127, midichan }, v, port: LK_PORT,
+        data: [0x90 | channel, note] }, { at: off, v: 0, port: LK_PORT, data: [0x80 | channel, note] })
+  }
 }
 for (const v of values('--faders'))
   for (const cc of [5, 6, 7, 8, 9, 10, 11, 12].flatMap(c => [c, c + 48]))
@@ -230,5 +241,32 @@ if (windows.length === 2) {
     const diff = vb.flatMap((l, i) => l === va[i] ? [] : [...(va[i] !== undefined ? ['- ' + va[i]] : []), '+ ' + l])
     console.log('\n== view changes\n' + (diff.join('\n') || '  nothing'))
   }
+}
+
+// Level per section of the script: the loudest audible event of each stem (gain × postgain × velocity, in dB)
+const scriptSections = scripts.find(s => s.sections?.length)?.sections ??
+  (scripts.length ? [{ name: 'Script', from: 0, to: scriptEnd }] : [])
+const sections = scriptSections.filter(s => s.from < end - 1e-9)
+if (sections.length) {
+  const levelOf = v => (v.gain ?? 1) * (v.postgain ?? 1) * (v.velocity ?? 1)
+  const dB = x => x > 0 ? (20 * Math.log10(x)).toFixed(1) : '–'
+  const inSection = s => played.filter(inWin([s.from, Math.min(s.to, end)])).filter(h => h.value?.s !== undefined)
+  const heard = sections.map(inSection)
+  const stems = [...new Set(heard.flat().map(h => h.value._stem ?? '?'))].sort()
+  const loudest = (haps, stem) => Math.max(0, ...haps.filter(h => (h.value._stem ?? '?') === stem)
+    .map(h => levelOf(h.value)))
+  const rows = [
+    ['section', ...sections.map(s => s.name)],
+    ['bars', ...sections.map(s => `${s.from}-${Math.min(s.to, end)}`)],
+    ['audible events', ...heard.map(h => h.length)],
+    ['stems heard', ...heard.map(h => new Set(h.map(x => x.value._stem ?? '?')).size)],
+    ['loudest (dB)', ...heard.map(h => dB(Math.max(0, ...h.map(x => levelOf(x.value)))))],
+    ...stems.map(stem => ['  ' + stem, ...heard.map(h => dB(loudest(h, stem)))]),
+    ['flag', ...heard.map((h, i) => [!h.length && 'SILENT', sections[i].to > end && 'CUT'].filter(Boolean)
+      .join(' ') || 'ok')],
+  ]
+  const width = Math.max(9, ...rows.flatMap(r => r.slice(1).map(c => String(c).length + 2)))
+  console.log('\n== level per section (event gains, not rendered audio: CLIPS and LUFS need npm run audibility)')
+  console.log(rows.map(r => r.map((c, i) => i ? String(c).padStart(width) : String(c).padEnd(22)).join('')).join('\n'))
 }
 process.exit(0)
