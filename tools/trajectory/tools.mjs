@@ -1,7 +1,7 @@
 // The Tools page's commands: a fixed whitelist of the scripts in tools/, each run as `node <script> <args>` in tools/.
 // A command takes a catalogue entry of one of its kinds ('live' track, 'lab' board) or, with no kinds, nothing.
 // Paths never come from the request: the target is a catalogue id, its file is looked up in the catalogue.
-//   GET    /tools                 the commands as [{ id, label, kinds }]
+//   GET    /tools                 the commands as [{ id, label, kinds, help }]; help = { does, input, output, use }
 //   POST   /run/<command>[/<id>]  runs it; the response is server-sent events: 'start', 'stdout' / 'stderr' (one
 //                                 line each), 'exit' (exit code or signal). One job at a time: 409 while one runs.
 //   DELETE /run                   stops the running job (its whole process group)
@@ -18,16 +18,64 @@ const ALL_FADERS_UP = JSON.stringify(Object.fromEntries([...Array(8).keys()].map
 
 export const COMMANDS = {
   'check-sounds': { label: 'Check sounds', kinds: ['live', 'lab'],
+    help: {
+      does: 'Plays the track in the simulator with every control and Launchkey pad, collects the sounds it uses and checks '
+        + 'that each one loads in a browser.',
+      input: 'A live track or lab board from the catalogue.',
+      output: 'A log line per sound (ok, broken, or plays only after push to main). Updates samples/sounds.json. '
+        + 'Exit code 1 when the track uses a broken sound.',
+      use: ['Pick a track or board.', 'Run; it fetches every sound, so it needs network access.',
+        'Fix or replace every sound reported broken.']
+    },
     steps: file => [['strudel-sim/check-sounds.mjs', file]] },
   loudness: { label: 'Loudness (every stem, keys, pads)', kinds: ['live'],
+    help: {
+      does: 'Renders the mix, every stem alone, the Launchkey keys and every pad at the default state '
+        + '(faders up, knobs at 0) and measures how loud each one is.',
+      input: 'A live track from the catalogue.',
+      output: 'One loudness line per part, flagged SILENT (no sound), LOW (more than 12 dB below the median stem) '
+        + 'or CLIPS (peak above 1). Nothing is written to disk.',
+      use: ['Pick a track.', 'Run; every part renders one after another, so it takes a while.',
+        'Raise a LOW part or lower a CLIPS part in the track, then run again.']
+    },
     steps: file => [['strudel-sim/audibility.mjs', file]] },
   layouts: { label: 'Layout sheet + syx', kinds: ['live'],
+    help: {
+      does: 'Builds the printable controller layout sheet and the Launch Control XL 3 custom modes from the @ctl '
+        + 'comments of the track.',
+      input: 'A live track from the catalogue (its @ctl, @mode and @col comments are the source).',
+      output: 'Writes <track>-layout.pdf, <track>-mode1.syx and <track>-mode2.syx next to the track file.',
+      use: ['Pick a track.', 'Run.', 'Load the .syx files into the controller with Novation Components '
+        + '(slots 1 and 2); print or open the PDF.']
+    },
     steps: file => [['lcxl-layout/gen-layout.mjs', file], ['lcxl-layout/make-syx.mjs', file]] },
   'stem-lab-sync': { label: 'Stem lab: sync engine', kinds: ['lab'], accepts: source => source.includes(ENGINE_BANNER),
+    help: {
+      does: 'Copies the shared engine over everything from the ENGINE banner on in a stem lab board, so every board '
+        + 'runs the same engine and keeps only its own head (columns, samples).',
+      input: 'A lab board that has the ENGINE banner (other boards are refused).',
+      output: 'Rewrites the board file in place.',
+      use: ['Edit the engine part in tools/stem-lab, not in a board.', 'Pick a board.', 'Run, then check the git diff.']
+    },
     steps: file => [['stem-lab/sync.mjs', file]] },
   'stem-lab-check': { label: 'Stem lab: what each column plays', kinds: ['lab'],
+    help: {
+      does: 'Queries a board for 8 bars with every fader up and prints what each column plays. No audio.',
+      input: 'A lab board from the catalogue.',
+      output: 'Events per column and bar in the log. Nothing is written to disk.',
+      use: ['Pick a board.', 'Run.', 'Use it to see that every column plays rhythm and not just held notes.']
+    },
     steps: file => [['stem-lab/check.mjs', file, ALL_FADERS_UP]] },
-  set: { label: 'Build set 011', kinds: [], steps: () => [['set/make-set.mjs'], ['set/check-set.mjs', '2']] },
+  set: { label: 'Build set 011', kinds: [],
+    help: {
+      does: 'Builds the set (007 → 010 → 009 → 008 as one performance) from the frozen dual tracks and the set frame, '
+        + 'then proves that each track plays event by event on its plateau.',
+      input: 'None. The sources are in tracks/sets/011-combining-all/sources and tools/set/set-frame.strudel.',
+      output: 'Writes 011-set-dual.strudel, its layout sheet and .syx modes; the log shows the check per track and '
+        + 'the query time per cycle.',
+      use: ['Run after changing a frozen source or the frame.', 'Read the check lines; every plateau must match.']
+    },
+    steps: () => [['set/make-set.mjs'], ['set/check-set.mjs', '2']] },
 }
 
 const plan = (commandId, targetId) => {
@@ -84,7 +132,7 @@ const stop = () => {
 export const handleTools = (request, response, url, fromOwnPage) => {
   if (!fromOwnPage(request)) return response.writeHead(403).end('forbidden')
   if (url.pathname === '/tools' && request.method === 'GET') {
-    const list = Object.entries(COMMANDS).map(([id, { label, kinds }]) => ({ id, label, kinds }))
+    const list = Object.entries(COMMANDS).map(([id, { label, kinds, help }]) => ({ id, label, kinds, help }))
     return response.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
       .end(JSON.stringify(list))
   }

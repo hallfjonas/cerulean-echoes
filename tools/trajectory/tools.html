@@ -28,13 +28,25 @@
 </main>
 <pre id="log"></pre>
 <script type="module">
+import { mountHelp } from './help.mjs'
+
 const $ = id => document.getElementById(id)
 const kindOf = entry => entry.kind ?? 'live'
 const labelOf = entry => entry.label ?? entry.id
 let commands = []
 let catalogue = []
 
+const help = mountHelp([], { title: 'About this tool' })
+
+const showHelp = () => {
+  const { help: text, label } = commands.find(command => command.id === $('command').value) ?? {}
+  if (!text) return help.setSections([])
+  help.setSections([{ heading: label, text: text.does }, { heading: 'Input', text: text.input },
+    { heading: 'Output', text: text.output }, { heading: 'How to use', text: text.use }])
+}
+
 const showTargets = () => {
+  showHelp()
   const kinds = commands.find(command => command.id === $('command').value)?.kinds ?? []
   const targets = catalogue.filter(entry => kinds.includes(kindOf(entry)))
   $('target').replaceChildren(...targets.map(entry => new Option(`${kindOf(entry)} · ${labelOf(entry)}`, entry.id)))

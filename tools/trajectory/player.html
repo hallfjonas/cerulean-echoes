@@ -45,9 +45,20 @@ import { createSmoother } from './smoothing.mjs'
 import * as midi from './midi.mjs'
 import { createEngine } from './engine-strudel.mjs'
 import { mountSettings } from './settings.mjs'
+import { mountHelp } from './help.mjs'
 import { createPerformer, mountAutoPerform } from './autoperform.mjs'
 
 const $ = id => document.getElementById(id)
+mountHelp([
+  { heading: 'What it does', text: 'Plays a live track or lab board right here and shows its visuals: every stem with its '
+    + 'name, and the tempo from Strudel\'s clock. No strudel.cc needed.' },
+  { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
+    + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
+  { heading: 'Output', text: 'Sound and visuals. Nothing is written to disk.' },
+  { heading: 'How to use', text: ['Pick a track and press Play.', 'Play the controllers, or open Settings (S) and start '
+    + 'Auto-perform (P) to try the track without hardware.', 'Settings holds the visual controls; F is fullscreen.',
+    'The top bar hides after 3 s without the mouse.'] }
+], { title: 'About this page' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''

@@ -27,3 +27,14 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #drawer.open { transform: none; visibility: visible }
 #drawer h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600 }
 #drawer section { border-top: 1px solid var(--line); padding-top: 14px }
+#help { position: fixed; top: 0; right: 0; bottom: 0; width: 320px; box-sizing: border-box; padding: 16px;
+  background: var(--panel); border-left: 1px solid var(--line); z-index: 2; overflow-y: auto; font-size: 14px }
+#help[hidden] { display: none }
+#help h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600 }
+#help h3 { margin: 14px 0 4px; font-size: 12px; font-weight: 600; color: var(--dim); text-transform: uppercase;
+  letter-spacing: 0.04em }
+#help p, #help ol { margin: 0; line-height: 1.45 }
+#help ol { padding-left: 20px }
+body.help-open:not(.overlay) { margin-right: 320px }
+body.help-open.overlay header { right: 320px }
+body.help-open #drawer { right: 320px }

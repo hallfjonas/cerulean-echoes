@@ -81,6 +81,13 @@ from the catalogue (filtered by what the command accepts), **Run** (live log) or
 sheet + syx, stem lab sync and check (boards), build set 011. Paths never come from the page: a target is a catalogue
 id. **Analysis** (`analyse.html`) is a tool on the same page: the audio analysis from a file or input, with recording.
 
+### Help panel
+
+Every page has a **Help** button (key **?**) that opens a collapsible panel on the right (open by default): what the page does, its input
+and output, how to use it. On the Tools page it follows the chosen command; the text lives with the command in
+`tools.mjs` (`help`: `does`, `input`, `output`, `use`). Closing it is remembered. A new page calls
+`mountHelp(sections)` from `help.mjs`.
+
 ### Strudel.cc
 
 Every live track file plays on strudel.cc as it is; the player adds nothing to it. To see the visuals of a track that
@@ -140,7 +147,7 @@ Both inputs write **the same format**; the renderer does not know where the musi
 | `settings.mjs` | every visual setting as data; builds the drawer and the keys |
 | `catalogue.mjs` | scans live tracks and lab boards, their auto-perform scripts |
 | `tools.mjs` | the Tools page commands (whitelist), job runner |
-| `tools.html`, `nav.mjs`, `ui.css` | the Tools page, the shared top navigation and look |
+| `tools.html`, `nav.mjs`, `help.mjs`, `ui.css` | the Tools page, the shared top navigation, the Help panel and look |
 | `banks.mjs` | sample banks and soundfonts the player loads, as strudel.cc does |
 | `analyse.html` | the analysis page: sources, channel choice, recording, keys |
 
