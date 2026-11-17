@@ -36,6 +36,49 @@ performance on it, trim or loop a section, and play live on top of it (last move
 - The engine (`engine-strudel.mjs`) never hands out its audio output.
 - Nothing in the player writes files except the Tools page jobs. `recordings/` does not exist.
 
+## Spike findings
+
+Task 1, 2026-11-17. Read against the bundle the player loads (`@strudel/web@1.2.6/dist/index.mjs` from unpkg) and
+measured in the player (port 8777, lab-kick-kick-lab and 010-ambient-house, no controllers, virtual inputs driven
+from the console).
+
+**Correction to "Where it stands".** Launchkey replay already exists on main: `autoperform.mjs` plays `keys`, `pad`
+and `lk` steps into the virtual input `Launchkey MK4 25 Auto` (`midi.LK_AUTO_PORT`, also in the wrapped Web MIDI);
+`compile`, `valueChanges` and `check-perform` know them. Task 5 shrinks to the v2 additions below.
+
+**(a) Audio tap point.** Every sound superdough makes runs orbit → `connectToDestination` → one `ChannelMergerNode` →
+one `GainNode` (`destinationGain`) → `ctx.destination`. The controller that owns it (`getSuperdoughAudioController`)
+is not exported in 1.2.6, so the node cannot be fetched. Measured: during play exactly one node connects to
+`ctx.destination` (a `GainNode`, gain 1), and it survives Stop and a new Play (`resetGlobalEffects` would rebuild it,
+but nothing in the player calls it). Decision: the wrap is the method, not the fallback. `engine-strudel.mjs` wraps
+`AudioNode.prototype.connect` before `initStrudel`: a connect to an `AudioDestinationNode` goes to a `masterBus`
+GainNode instead, which feeds `ctx.destination` and the recorder worklet. This also catches a rebuilt
+`destinationGain` and the `dough` worklet, which connects to the destination directly. Context: 48 kHz, stereo.
+
+**(b) Clock reset.** `evaluate` does not reset the clock: it only swaps the pattern while the scheduler runs.
+Measured: Play on a playing board went on at cycle 7.25; Stop then Play restarted at cycle 0 (`Cyclist.stop` sets
+`lastEnd = 0`, `start` zeroes the cps anchor). The player's Play and auto-perform Start call `engine.load` without
+`hush`, so today a script starts at whatever cycle the track was on (`startBarOf` rounds to the nearest bar) and
+`<a b>` alternations and slow patterns start in a random phase. **Change to the plan:** `engine.load` gets a fresh
+start (`hush()` before `evaluate`) for every load the capture or a replay starts from; with it, bar 0 = cycle 0, the
+query grid is the same on every run, and no phase wait is needed. A small task, done with task 5. Values set before
+the load survive it (`midi.mjs` port maps), hence the bar-0 snapshot in the take.
+
+**(c) Key timing.** The scheduler queries in bursts every 100 ms (two queries of 50 ms each), about 0.2 s ahead.
+A key is placed at the start of the next query, which is `engine.cycle()` (`lastEnd`) at the moment it arrives.
+Measured on 010 (cps 0.5): 8 keys landed on cycles 14.1, 14.6, 15.05 … 16.85, all on the 0.05-cycle burst grid,
+0.08-0.12 cycles after `getTime()` at the press. So the take stores `engine.cycle()` at arrival, and the performer
+fires a key on the first tick where that bar has been reached: the next query starts at the same cycle, the key lands
+in the same place. Not measured end to end (no take writer yet): a burst of three queries (a late timer) can skip
+the recorded boundary and put a key one query (25 ms at cps 0.5) late; `check-replay` (task 7) will show it.
+CC moves follow the same rule (`midin` signals read the value at query time).
+
+**Format.** The script format v2 is fixed in `step-format-v2.md`: the existing steps, `velocity` on pads, the `take`
+meta field, a 1e-6 bar tolerance in the performer, take and recording file names and the audio sidecar.
+
+**Plan changes.** Task 5 is small (pad velocity, `take` meta in `check-perform`, bar tolerance, fresh-start load).
+Tasks 2, 4 and 5 can start now. The risk "replay waits for the recorded phase" is gone once loads hush first.
+
 ## Architecture Decisions
 
 - **Two recordings, one control.** A Record button (key R) in the top bar and a "Recording" section in the drawer. The
