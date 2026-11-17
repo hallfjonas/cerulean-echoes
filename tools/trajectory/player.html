@@ -12,6 +12,13 @@
   #drawer label output { grid-row: 1; grid-column: 2 }
   #drawer label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
   #drawer label select { grid-column: 1 / 3 }
+  #drawer label.inline { display: inline-flex; margin: 0 0 0 10px }
+  #record.recording { background: #a3262a; border-color: #ff5a5f }
+  #recInfo { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-variant-numeric: tabular-nums }
+  #recInfo[hidden] { display: none }
+  #recMeter { width: 60px; height: 6px; background: var(--control); border-radius: 3px; overflow: hidden }
+  #recMeter span { display: block; height: 100%; width: 0; background: #ff5a5f }
+  #recError { color: var(--err); font-size: 13px }
 </style>
 <script type="module" src="nav.mjs"></script>
 <script type="importmap">
@@ -30,12 +37,18 @@
      reloads the track so the script begins from silence.
      Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" in the
      drawer posts it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
+     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
+     from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
+     tail. Stop, a track change or a new auto-perform run ends a recording.
      The track's status box (bottom right) hides while its LC view is open in another window. -->
 <canvas id="view"></canvas>
 <header>
   <select id="track"></select>
   <button id="play">Play</button>
   <button id="stop">Stop</button>
+  <button id="record" title="Key R">Record</button>
+  <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
+  <span id="recError"></span>
   <span id="status">loading Strudel …</span>
   <button id="settingsToggle" title="Key S">Settings</button>
 </header>
@@ -50,6 +63,7 @@ import { mountSettings } from './settings.mjs'
 import { mountHelp } from './help.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
+import { createRecorder as createAudioRecorder } from './recorder.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -66,7 +80,10 @@ mountHelp([
     'Save take in Settings writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
     'Start plays it back from a fresh load; what you play on top during a replay is captured too.',
     'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
-    + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] }
+    + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
+  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
+    'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
+    'Stop or another track ends a recording. Recordings stay out of git.'] }
 ], { title: 'About this page' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
@@ -95,16 +112,68 @@ fetch('catalogue').then(r => r.json()).then(entries => {
   $('track').value = ['010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
   showScripts()
 })
-$('track').onchange = showScripts
+$('track').onchange = () => {
+  showScripts()
+  stopRecording()
+}
 
+const TAIL_SECONDS = 4
+let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecording = false, tailTimer = null
+let performing = null
+const queueRecord = task => (recordQueue = recordQueue.then(task))
+const audio = createAudioRecorder({ engine, onError: error => {
+  recordError = error.message
+  stopRecording()
+} })
+const startRecording = (source, script = null) => queueRecord(async () => {
+  if (audio.recording) return
+  recordError = ''
+  try {
+    await engine.ready
+    await audio.start({ track: $('track').value, source, script })
+    autoRecording = source === 'auto'
+  } catch (error) {
+    recordError = error.message
+  }
+})
+const stopRecording = (endedBy = 'stop') => {
+  clearTimeout(tailTimer)
+  tailTimer = null
+  return queueRecord(async () => {
+    if (!audio.recording) return
+    const file = audio.name + '.wav'
+    autoRecording = false
+    try {
+      await audio.stop(endedBy)
+      lastFile = file
+    } catch (error) {
+      recordError = error.message
+    }
+  })
+}
+const toggleRecord = () => audio.recording ? stopRecording() : startRecording(performing ? 'auto' : 'human', performing)
+$('record').onclick = toggleRecord
+
+let running = false, stoppedByPage = false
 const performer = createPerformer({ midi, engine, onChange: progress => {
+  if (!progress && running && autoRecording) {
+    if (stoppedByPage) stopRecording()
+    else tailTimer = setTimeout(() => stopRecording('script-end'), TAIL_SECONDS * 1000)
+  }
+  running = !!progress
+  performing = progress ? performing : null
   const barText = progress ? `auto bar ${Math.floor(progress.bar) + 1} / ${Math.ceil(progress.end)}` : ''
   autoLabel = [barText, progress && sectionLabel(progress.section, progress.bar)].filter(Boolean).join(' · ')
   autoPerform.show(!!progress, barText, progress)
 } })
+const stopPerformer = () => {
+  stoppedByPage = true
+  performer.stop()
+  stoppedByPage = false
+}
 
 const play = async script => {
-  performer.stop()
+  stopPerformer()
   await Promise.all([engine.ready, midi.ready])
   label = 'loading track …'
   const track = $('track').value
@@ -122,7 +191,7 @@ const play = async script => {
   return true
 }
 $('play').onclick = () => play()
-$('stop').onclick = () => { performer.stop(); engine.stop(); label = 'stopped' }
+$('stop').onclick = () => { stopPerformer(); engine.stop(); stopRecording(); label = 'stopped' }
 
 const startScript = async id => {
   const track = $('track').value
@@ -131,12 +200,22 @@ const startScript = async id => {
   const script = await response.json()
   if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
   midi.addAuto({ launchkey: usesLaunchkey(script) })
-  if (await play(id)) performer.start(script)
+  const recordAudio = $('recordAuto').checked
+  if (recordAudio) await stopRecording()
+  if (!await play(id)) return
+  if (recordAudio) await startRecording('auto', id)
+  performing = id
+  performer.start(script)
 }
 
 const settings = mountSettings($('drawer'), { renderer, smoother })
 $('settingsToggle').onclick = settings.toggle
-const autoPerform = mountAutoPerform(settings.autoPerformContainer, { onStart: startScript, onStop: performer.stop })
+const autoPerform = mountAutoPerform(settings.autoPerformContainer, { onStart: startScript, onStop: stopPerformer })
+const recordAutoLabel = document.createElement('label')
+recordAutoLabel.className = 'inline'
+recordAutoLabel.title = 'Records from Start to the end of the script plus 4 s'
+recordAutoLabel.innerHTML = '<input type="checkbox" id="recordAuto"> Record audio'
+settings.autoPerformContainer.querySelector('button').after(recordAutoLabel)
 
 const saveTake = async () => {
   const session = recorder.session()
@@ -159,6 +238,31 @@ const takeSection = document.createElement('section')
 takeSection.innerHTML = '<h2>Take</h2><button id="saveTake">Save take</button> <output id="takeState"></output>'
 $('drawer').append(takeSection)
 $('saveTake').onclick = saveTake
+const recordSection = document.createElement('section')
+recordSection.innerHTML = '<h2>Recording</h2><button id="recordDrawer" title="Key R">Record</button> '
+  + '<output id="recFile"></output>'
+$('drawer').append(recordSection)
+$('recordDrawer').onclick = toggleRecord
+
+const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
+const meterWidth = peak => Math.max(0, Math.min(1, 1 + Math.log10(Math.max(peak, 1e-6)) / 3)) * 100
+const setText = (element, text) => { if (element.textContent !== text) element.textContent = text }
+const showRecording = () => {
+  const on = audio.recording
+  for (const button of [$('record'), $('recordDrawer')]) {
+    button.classList.toggle('recording', on)
+    setText(button, on ? 'Stop rec' : 'Record')
+  }
+  $('recInfo').hidden = !on
+  setText($('recError'), recordError && 'Rec error: ' + recordError)
+  if (on) {
+    const seconds = audio.elapsed()
+    setText($('recTime'), clock(seconds))
+    $('recMeter').firstChild.style.width = meterWidth(audio.level()) + '%'
+    const megabytes = (seconds * engine.output().context.sampleRate * 4 / 1e6).toFixed(1)
+    setText($('recFile'), `${audio.name}.wav · ${megabytes} MB` + (tailTimer ? ' · tail' : ''))
+  } else setText($('recFile'), lastFile ? 'Last: ' + lastFile : '')
+}
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement
@@ -177,6 +281,7 @@ const applyLcFrame = () => {
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
+  showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
   $('status').textContent = [label, midiText, autoLabel, visuals].filter(Boolean).join(' · ')
   requestAnimationFrame(showStatus)
@@ -190,6 +295,7 @@ addEventListener('keydown', event => {
   if (event.key === 'f') toggleFullscreen()
   if (event.key === 's') settings.toggle()
   else if (event.key === 'p') autoPerform.toggle()
+  else if (event.key === 'r') toggleRecord()
   else settings.handleKey(event.key)
 })
 let idleTimer
