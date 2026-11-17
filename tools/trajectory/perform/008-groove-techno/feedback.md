@@ -202,4 +202,16 @@
     at 181.
 - Decision: again
 
+## Loop 2 / Round 8 - warehouse.json (2026-11-17)
+- User: "Intro (bars 1-64) good, but a bit too long. Groove (bars 65-88) very nice; transition to bounce a bit strong;
+  might be a good place to pause the beat for a cycle"
+- Changed (bars 1-based):
+  - Intro cut from 64 to 48 bars: Curious 24 -> 16, Hats 24 -> 16 (same steps, closer together), Build stays 16 bars.
+    Everything after shifts 16 bars earlier: Groove 49-72, Bounce 73-96, Peak 1 137, total 192 bars = 5 min 29 s.
+  - Beat pause: Kick, Clap and Percussion Level 0 for bar 72 (last Groove bar), back on the one at 73 with the rolling
+    bass; bass and hats play on. The staggered changes of round 6 stay.
+  - Open hats alone were too loud: Hats Level (CC 10) starts at 0.3 at 17 and rises to 0.5 (the level of the fast
+    hats, unchanged) over 11 bars from 18.
+- Decision: approved
+
 ## Lessons
