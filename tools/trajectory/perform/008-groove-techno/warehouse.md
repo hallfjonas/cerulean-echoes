@@ -1,49 +1,49 @@
 # Warehouse
 
-Design for `perform/008-groove-techno/warehouse.json`. Status: proposal, waiting for the user's approval
-(Loop 1 / Round 1). A second performance for 008 beside the approved `techno-night`; it keeps what the user praised
-there and tries a shorter, more constant peak-time shape.
+Design for `perform/008-groove-techno/warehouse.json`. Status: proposal, revised after Loop 1 / Round 1 (see
+`feedback.md`), waiting for the user's approval. A second performance for 008 beside the approved `techno-night`.
 
 ## Meta
 - Track: 008-groove-techno
-- Length: 224 bars = 6 min 24 s at 140 BPM (1 bar = 4 beats = 1.714 s; 224 x 240 / 140 = 384 s), seven 32-bar blocks
-- Mood: dark, hypnotic, relentless; one tense second half
-- Story: The rhythm arrives fast, no bare kick: hats and percussion within the first bars, bass and clap by bar 17.
-  A first lift drops into a long, steady groove, one short break takes the low end out and puts it back on the one, and
-  a second, stronger lift with a surprising drop-in leads to the peak. The drift-out starts early and takes a whole
-  block, stem by stem, the kick last.
-- Difference to `techno-night` (9 min 36 s, two breaks, a dip, two builds): shorter, one break only, no mood change
-  (the chapter stays Dark), the pads of the Launchkey are used as grid accents instead of atmosphere.
+- Length: 256 bars = 7 min 19 s at 140 BPM (1 bar = 4 beats = 1.714 s; 256 x 240 / 140 = 439 s), eight 32-bar blocks
+- Mood: dark from the first bar, curious, then driving and hypnotic
+- Story: No kick at the start: a curious melody (Answer, Pads) and Dark perc in a dark chapter. Fast hats arrive, then
+  a slow rumble, bass and sequence. A short build releases into a drop that brings in the full beat at once. The groove
+  runs a good while, with short bass breaks and occasional double times. A slow-down leads to a proper, longer build,
+  a high-energy peak, and a drift-out that retraces the way in, with a twist at the very end.
 - References: Yanamaste live set at KHIDI Tbilisi (layering over a slot), Marie Montexier at Nation of Gondwana 2025
   (hypnotic loop, slow filter moves). The references file has no notes for these; the "listen for" is not heard.
-- Basis: `@ctl` / `@col` tags of the track. Mode 1 (Jojo): Kick 1 .. Percussion 7, fader CC 5-11, knob rows 13-19 /
-  21-27 / 29-35, buttons 37-43 / 45-51. Mode 2 (Jonas), CC + 48: Pads, Strings, Sequence, Stab, Answer, Dark perc, FX.
-  Column 8: Wumms fader 12, Fog 20, Thin 28, Tension 36, Chapter 44, Break 52. Launchkey: mod wheel CC 1, knobs
-  CC 31-38 (Brightness 31, Length 35, Space 36, Echo 37, Pad Fog 38), pads 36-51 (Low tom 44, Rim echo 45, Braaam 46,
-  Open hat 47, Crash reverse 48, Shaker 49). A press lands at the next bar, so "press at 63" sounds at bar 64.
+- Basis: `@ctl` / `@col` tags of the track. Mode 1 (Jojo): Kick 1, Rumble 2, Sub 3, Bassline 4, Clap 5, Hats 6,
+  Percussion 7, fader CC 5-11, knob rows 13-19 / 21-27 / 29-35, buttons 37-43 / 45-51. Mode 2 (Jonas), CC + 48: Pads,
+  Strings, Sequence, Stab, Answer, Dark perc, FX. Column 8: Wumms fader 12, Fog 20, Thin 28, Tension 36, Chapter 44,
+  Break 52. Chapter cycles Dark, tense, warm: it starts on Dark and is not pressed until the twist. Launchkey: mod wheel
+  CC 1, knobs CC 31-38, pads 36-51 (Low tom 44, Rim echo 45, Braaam 46, Open hat 47, Crash reverse 48, Shaker 49).
+  A press lands at the next bar, so "press at 63" sounds at bar 64.
 
 ## Sections
 | Section | Bars | LC controls (by @ctl name) | Launchkey | Intent |
 |---|---|---|---|---|
-| Arrive | 1-16 | Kick Level at 1; Hats Level at 3, Percussion Level at 5, Clap and Rumble Level at 9, Sub Level at 13; Hats and Percussion Brightness rise | - | Rhythm at once, brighter over time |
-| Groove | 17-48 | Bassline Level at 17; Pads Level at 25, Strings Level at 33; Hats, Percussion, Bassline Pattern presses on phrase lines; Percussion Complexity up | - | Settle into the groove, one layer per phrase |
-| Lift | 49-64 | Tension 0 -> 0.8 over 12; Thin 0 -> 0.5 over 8, back down; Riser hold in the last 2 bars; Sequence Level at 49 | Crash reverse at 62.5; quiet Braaam at 64.5 (Pad Fog 0.85) | Build into the drop, bram quiet just before it |
-| Warehouse | 65-96 | Tension to 0 at 66; Wumms 0.8; Stab Level, Answer Level; Bassline Octave hold at 81 | Rim echo and Low tom on the grid in bars 73 and 89 | First peak, steady and driving |
-| Break | 97-104 | Break press at 96 (low end out); Strings and Pads keep playing; Break press at 103 (all back on the one) | keys chord f3 ab3 c4 (mod wheel 0.6) | Short pull-back, return on the one |
-| Return | 105-144 | Tension 0 -> 1 over 24 from bar 121; Thin up; Double time hold in the last 4 bars; Drop out hold on bar 144 | Crash reverse at 142.5 | Second lift, kick drops out for one bar for the surprise |
-| Peak | 145-192 | Wumms 0.9; all stems up; Percussion Fill hold at phrase ends; Chapter stays Dark | Braaam at 145; Open hat and Shaker accents on the grid | Full groove, enjoy it |
-| Drift | 193-224 | Strip: Answer, Stab, Sequence out over 12-bar ramps from 193; Pads, Strings, Bassline over 16-bar ramps from 205; Wumms 0.9 -> 0 over 32; Hats and Percussion out last, kick last | - | Early, slow, gradual fade |
+| Curious | 1-32 | Pads Level at 1, Answer Level at 5 (Answer Pattern press at 17), Dark perc Level at 9; Fog 0.5 -> 0 over 24 | - | A dark, curious melody over a ticking percussion, no kick |
+| Hats | 33-64 | Hats Level at 33, Hats Pattern pressed twice (driving) and Complexity up over 24; Rumble Level 0 -> 0.5 over 16 from 41; Bassline Level at 49 and Sequence Level at 57, ramps of 8 | - | Fast hats first, then rumble, bass and sequence slowly, still no kick |
+| Build | 65-80 | Tension 0 -> 0.9 over 14; Thin 0 -> 0.5 over 12; Riser hold in the last 2 bars | Crash reverse at 78.5; quiet Braaam at 80.5 (Pad Fog 0.85) | Short build, bram quiet just before the drop |
+| Drop | 81-144 | Tension to 0 at 80 ramp end, snap at 81; Kick, Clap, Sub, Percussion Level all up at 81 (the full beat in at once); Wumms 0.85; Bass breaks: Break press at 104 and 107 (3 bars), 128 and 131; Double time hold on 2 bars at 113 and 137 | Rim echo on the grid in bars 97 and 121 | Enjoy the full groove for a good while, short bass breaks, rare double times |
+| Slow down | 145-160 | Kick, Clap and Percussion Level down over 12, Wumms 0.9 -> 0.5; Thin 0 -> 0.4, Fog 0 -> 0.3 | - | Let the energy sink back to melody and hats |
+| Proper build | 161-192 | Kick, Clap, Percussion Level back up from 177; Tension 0 -> 1 over 28; Thin up; Clap Swell hold 4 bars at 185; Riser hold at 189; Double time hold at 189; Drop out hold on bar 192 | Crash reverse at 190.5 | A real, longer build, kick out for one bar before the peak |
+| Peak | 193-224 | Tension to 0 at 193; Wumms 0.95, all stems up; Stab Level; Percussion Fill hold at phrase ends; Double time hold 2 bars at 209 | Braaam at 193; Open hat and Shaker accents on the grid | High energy |
+| Drift | 225-256 | The way in, backwards: Stab, Sequence out over 8 from 225; Bassline, Rumble over 12 from 233; Kick, Clap, Sub, Percussion out over 8 from 241; Hats out from 249; Wumms 0.95 -> 0.3 over 24; leaves Answer, Pads, Dark perc; twist: Chapter pressed twice at 244 and 245 to warm, Answer Echo throw held at 249 | - | Retrace the opening, with the chords turning warm at the end |
 
 ## Risks
-- CPU peak: Peak (145-192) with every stem and Tension at its end; Strings is the first one to drop if it stutters.
-- Clipping: Warehouse and Peak (Wumms 0.8-0.9, stems around 0.7) and the Braaam hits; `npm run audibility` measures the
-  default state only, so this stays unmeasured until the user listens.
-- Silent stretches: none planned; bar 144 has no kick on purpose (one bar).
-- Tension ramps end on the same bar as the snap to 0 in `techno-night` (unconfirmed which wins): here the snap is
-  written one bar after the ramp end.
+- CPU peak: Peak (193-224), every stem and Tension at its end; Strings stays out of the performance to keep it lighter.
+- Clipping: Drop and Peak (Wumms 0.85-0.95, the full beat arriving at once) and the Braaam hits; `npm run audibility`
+  measures the default state only, so this stays unmeasured until the user listens.
+- Silent stretches: none planned; the first bars have Pads and Answer, the break bars keep hats and melody.
+- Timing: the Tension snap is written one bar after its ramp end (in `techno-night` it is unconfirmed which wins).
 
 ## Open questions
-- Length: 6 min 24 s as proposed, or about 8 min (a third 32-bar block of Warehouse)?
-- Keys: keep the one keys chord in the Break, or play controller-only plus pads?
+- "Slow down": read here as a sinking of energy (kick and clap out, Thin and Fog up) because the track's tempo cannot be
+  changed from the controllers. Is that what you mean?
+- The twist at the end: chords turn warm (Chapter pressed to warm) plus an echo throw on the Answer. Other options: end on
+  a held Wind pad, or Strings enter alone.
+- Length: 7 min 19 s as proposed, or longer / shorter?
+- Keys: none in this design; pads only as accents. Add a keys chord in the slow-down?
 - Should it sit beside `techno-night` (two scripts for 008) or replace it once approved?
-- Section names are working titles.

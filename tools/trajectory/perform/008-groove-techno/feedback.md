@@ -41,4 +41,17 @@
 - Decision: approved
 - Approval: Performance approved by the user on 2026-11-16 ("ALL PERFECT NOW").
 
+## Loop 1 / Round 1 - warehouse.md (2026-11-17)
+- User: "chapter dark from the get go; begin with some curious melodic elements: answer, pads; dark perc --> eventually
+  bring in some fast hats, slowly a rumble and bass and sequence; build-up tension (not too long) and release with a
+  drop that inserts the full beat; then enjoy that for a good while; play with short bass breaks and double times
+  (nothing too crazy, but occasionally); eventually slow down and proper build up; high energy peak and then drift out
+  (the same way you came in, but with a twist)"
+- Changed: design rebuilt around that arc: no kick until the drop, Chapter stays Dark until the twist, intro with
+  Answer, Pads and Dark perc, fast hats then rumble, bass and sequence, a short build, a drop that brings the full beat
+  in at once, a long groove with short bass breaks and occasional double times, a slow-down, a longer build, a peak and a
+  drift-out that retraces the intro with a warm-chapter twist. Length 224 -> 256 bars (7 min 19 s). Open: how "slow down"
+  is meant, which twist, length.
+- Decision: again
+
 ## Lessons
