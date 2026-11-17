@@ -72,8 +72,8 @@ take: {
 
 ## Take conversion (task 6)
 
-- Bar 0 snapshot: every CC value the non-virtual ports hold at the load (`midi.mjs` keeps values moved before Play)
-  becomes a `cc` / `lk` step at bar 0.
+- Bar 0 snapshot: every CC value the ports hold at the load (`midi.mjs` keeps values moved before Play; the virtual
+  ports hold a primed script's bar 0 when the play is a replay, task 7) becomes a `cc` / `lk` step at bar 0.
 - Capture bar = `engine.cycle()` at message arrival minus the load's start cycle (0 after a fresh load). That is the
   scheduler's `lastEnd`, the start of the next query, which is exactly where `midikeys` places the key and from where
   a `midin` signal reads the new value; replaying at that bar lands the same place.
@@ -86,7 +86,7 @@ take: {
 | File | Content |
 |---|---|
 | `tools/trajectory/perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<source>.json` | the take (a script with `take`) |
-| `tools/trajectory/perform/<track>/takes/<same name>.events.jsonl` | tapped events of the original play, one batch per line as posted to `/events` (task 7) |
+| `tools/trajectory/perform/<track>/takes/<same name>.events.jsonl` | tapped events of the play, one batch per line as posted to `/events`, `cycle` counted from the load's bar line (task 7) |
 | `recordings/<track>/<YYYY-MM-DD>-<HHMMSS>-<human\|auto>.wav` | audio, 16-bit PCM, context sample rate, stereo |
 | `recordings/<track>/<same name>.json` | audio sidecar (below) |
 

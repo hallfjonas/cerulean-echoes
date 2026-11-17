@@ -89,6 +89,15 @@ alternating without and with recording, two pairs per track): no underrun (`Audi
 renderer CPU 43-48 % (008) and 25-41 % (010) with no difference between phases beyond what the script sections move.
 Every WAV has as many samples as the wall time (25.00 s for 25 s) and no silent gap (`silencedetect` -80 dB / 10 ms).
 
+**Replay fidelity (task 7, 2026-11-17).** A take keeps the tapped events of its play (`<name>.events.jsonl`, take
+`events`); a replay saved as a take names its original (`take.script`), and saving it answers the verdict in the
+drawer; `check-replay.mjs` (Tools: Check replay fidelity) lists every differing bar with a reason (`replay-check.mjs`).
+The performer is primed before the load (`prime`: reset, then bar-0 values), so neither the reset of the last run
+nor a late bar 0 reaches the capture or the first query; the snapshot includes the virtual inputs. Measured on 010
+(player pane, auto-perform `journey` 38 bars, replayed): 37 of 38 bars identical, one Hats event one MIDI step
+quieter (a thinned ramp within 1 step). A capture made while the tab was in the background (timers at 1 s) replayed
+with 8 of 30 bars differing, and the check said so.
+
 **Plan changes.** Task 5 is small (pad velocity, `take` meta in `check-perform`, bar tolerance, fresh-start load).
 Tasks 2, 4 and 5 can start now. The risk "replay waits for the recorded phase" is gone once loads hush first.
 

@@ -15,6 +15,9 @@
 // fires once the clock is within BAR_TOLERANCE of its bar (takes round bars to 4 decimals); a press is held for two
 // scheduler ticks, or the tracks' cycleButton can miss it. A take (a recorded script) adds the meta field `take`,
 // which playing ignores.
+// prime(script) before the track loads, then start(script) after it: the last run's values are reset and the script's
+// bar-0 values set before the load, so the first query already reads them (and a capture of the play sees neither
+// the reset nor a late bar-0 step). start alone does both just after the load, a query or two late.
 export const TICK_MS = 50
 export const HOLD_TICKS = 2
 export const BAR_TOLERANCE = 1e-6
@@ -109,7 +112,8 @@ export const valueChanges = (script, stepBars) => {
 export const startBarOf = cycle => Math.max(0, Math.round(cycle))
 
 export const createPerformer =({ midi, engine, onChange = () => {} }) => {
-  let timer = null, script = null, compiled = null, startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
+  let timer = null, script = null, compiled = null, primed = null
+  let startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
   const written = new Map(), lkWritten = new Map()
 
   const release = () => {
@@ -131,6 +135,17 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
       cache.set(cc, value)
       send(cc, value)
     }
+  }
+  const prepare = next => {
+    script = next
+    compiled = compile(script)
+    midi.resetAuto()
+    written.clear()
+    lkWritten.clear()
+    fired = 0
+    firedNotes = 0
+    write(compiled.curves, written, midi.setAuto, 0)
+    write(compiled.lkCurves, lkWritten, midi.setAutoLk, 0)
   }
   const tick = () => {
     const bar = engine.cycle() - startBar
@@ -166,16 +181,16 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
   return {
     start: next => {
       if (timer) stop()
-      script = next
-      compiled = compile(script)
-      midi.resetAuto()
-      written.clear()
-      lkWritten.clear()
-      fired = 0
-      firedNotes = 0
+      if (next !== primed) prepare(next)
+      primed = null
       startBar = startBarOf(engine.cycle())
       timer = setInterval(tick, TICK_MS)
       tick()
+    },
+    prime: next => {
+      if (timer) stop()
+      prepare(next)
+      primed = next
     },
     stop: () => { if (timer) stop() },
     running: () => timer !== null,

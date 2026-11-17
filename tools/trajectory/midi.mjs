@@ -141,8 +141,9 @@ export const onMessage = callback => {
   return () => listeners.delete(callback)
 }
 
-// The CC values the real inputs hold now as [{ port, cc, value (0..1), time }]
-export const heldCcs = () => [...ports].filter(([name]) => name !== AUTO_PORT && name !== LK_AUTO_PORT)
+// The CC values every input holds now as [{ port, cc, value (0..1), time }]: the virtual inputs too, since what they
+// hold at a load (a primed script's bar 0, or what an earlier run left) is heard like a real controller's position
+export const heldCcs = () => [...ports]
   .flatMap(([port, { cc }]) => [...cc].map(([number, { value, time }]) => ({ port, cc: number, value, time })))
 
 export const takeKeys = name => matching(name).flatMap(port => port.keys.splice(0))

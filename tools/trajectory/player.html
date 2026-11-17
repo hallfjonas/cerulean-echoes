@@ -88,7 +88,8 @@ mountHelp([
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
-createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
+createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text },
+  onBatch: batch => recorder.addEvents(batch) })
 
 const engine = createEngine(midi)
 const recorder = createRecorder({ midi, engine })
@@ -200,6 +201,7 @@ const startScript = async id => {
   const script = await response.json()
   if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
   midi.addAuto({ launchkey: usesLaunchkey(script) })
+  performer.prime(script)
   const recordAudio = $('recordAuto').checked
   if (recordAudio) await stopRecording()
   if (!await play(id)) return
@@ -233,6 +235,7 @@ const saveTake = async () => {
   }
   $('takeState').textContent = `${result.id} (${result.steps} steps)`
     + (result.problems.length ? ` · check: ${result.problems.join('; ')}` : '')
+    + (result.replay ? ` · replay: ${result.replay}` : '')
 }
 const takeSection = document.createElement('section')
 takeSection.innerHTML = '<h2>Take</h2><button id="saveTake">Save take</button> <output id="takeState"></output>'
