@@ -149,5 +149,4 @@ judge.
 
 ## Order with other epics
 
-- `english-repo` renames `lab/` folders and touches every track: do not run in parallel; finish one first.
-- `launchkey-knob-target` and `player-hub` also change the live tracks / LC view: merge one at a time.
+- `launchkey-knob-target` also changes the live tracks / LC view: merge one at a time.

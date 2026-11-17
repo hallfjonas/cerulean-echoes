@@ -1,11 +1,15 @@
 
 ## Action Items
-### Jonas
-+ Improve Animation:
-    - not impacted by knobs, e.g, higher brightsness on hats should move them higher on y-axis
-    - if level fader is at 0, the dot should hide
-    - the dot should be larger and brighter depending on how loud it is
-    - colors should be used to describe some element of the music --> RGB could give three dimensions here...
 
-### Johannes
+# Backend
 + Switch to Supercollider to minimize latency
+
+# Player
+
+## Features
+- Live-player recording button
+- auto-perform: jump to a certain chapter by clicking on it
+
+## UI
+- About this page: the hide/expand button should be inside that page
+- Settings page: shuold also be hidable with the same functionality; open settings page blocks hiding both
