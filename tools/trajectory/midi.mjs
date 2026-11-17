@@ -13,6 +13,11 @@
 let access = null
 let inputCount = 0
 const ports = new Map()
+const listeners = new Set()
+const emit = (port, status, a, b) => {
+  const message = { port, status, data: [a, b], time: performance.now() }
+  for (const listener of listeners) listener(message)
+}
 
 const listen = () => {
   inputCount = 0
@@ -22,6 +27,7 @@ const listen = () => {
     const port = ports.get(input.name) ?? { cc: new Map(), keys: [] }
     ports.set(input.name, port)
     input.onmidimessage = ({ data: [status, a, b] }) => {
+      emit(input.name, status, a, b)
       const kind = status & 0xf0
       if (kind === 0xb0) port.cc.set(a, { value: b / 127, time: performance.now() })
       else if (kind === 0x90 && b > 0) port.keys.push({ note: a, velocity: b / 127, midichan: (status & 0x0f) + 1 })
@@ -52,8 +58,10 @@ const virtualPort = name => ({
 const auto = virtualPort(AUTO_PORT)
 const lkAuto = virtualPort(LK_AUTO_PORT)
 const lkHeld = new Map()
-const send = (port, ...bytes) => port.input.dispatchEvent(
-  Object.assign(new Event('midimessage'), { data: new Uint8Array(bytes) }))
+const send = (port, ...bytes) => {
+  emit(port.name, ...bytes)
+  port.input.dispatchEvent(Object.assign(new Event('midimessage'), { data: new Uint8Array(bytes) }))
+}
 const sendAuto = (number, value) => send(auto, 0xbf, number, Math.round(value * 127))
 const sendLk = (number, value) => send(lkAuto, 0xb0, number, Math.round(value * 127))
 
@@ -125,5 +133,16 @@ export const cc = (name, number) => {
   }
   return last?.value ?? 0
 }
+
+// Every message of every non-DAW input and of both virtual inputs as { port, status, data: [a, b], time }; returns
+// the unsubscribe
+export const onMessage = callback => {
+  listeners.add(callback)
+  return () => listeners.delete(callback)
+}
+
+// The CC values the real inputs hold now as [{ port, cc, value (0..1), time }]
+export const heldCcs = () => [...ports].filter(([name]) => name !== AUTO_PORT && name !== LK_AUTO_PORT)
+  .flatMap(([port, { cc }]) => [...cc].map(([number, { value, time }]) => ({ port, cc: number, value, time })))
 
 export const takeKeys = name => matching(name).flatMap(port => port.keys.splice(0))
