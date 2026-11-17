@@ -79,4 +79,27 @@
   - Percussion Fill holds at 184, 200, 208 (the middle one moved off the break bar).
 - Decision: again
 
+## Loop 2 / Round 2 - warehouse.json (2026-11-17)
+- User: "Play with the bassline's brightness during the main part. Replace the build up + drop with a drift + drop -->
+  exactly the drift you use in the outro; let the drift in the outro be a bit faster; keep the beat alive there but
+  still take out some energy"
+- Mapping: Bassline Brightness = Mode 1 column 4 row 1 (CC 16), swept slowly in Drop and Peak. "Build up + drop" = the
+  first Build (49-64), now Drift 1 followed by the same drop. The drift is one shape used in both places (written
+  once for the outro, then reused for the first). The outro drift is 24 bars (was 32), the beat stays alive and
+  fades together in the last 8 bars, because Wumms is not a master fader (0 = plain mix) and cannot fade the beat.
+- Changed (bars 1-based):
+  - Bassline Brightness (CC 16): Drop 0.3 at 73, 0.8 over 12 from 77, 0.3 over 8 from 93, 0.85 over 12 from 109, 0.4
+    over 8 from 125, 0.3 over 8 from 137; Peak 0.5 at 185, 0.9 over 12 from 189, 0.4 over 8 from 205. Breaks and double
+    times unchanged in pairing, moved 8 bars later with the rest (104/105, 128/129, Peak 200/201).
+  - Drift 1 (49-72, 24 bars, replaces Build 49-64, 16 bars): no Tension, no Riser. Stab and Sequence out over 8; Thin up
+    to 0.4 and Fog to 0.3 over 16; Pads to 0.35 and Dark perc to 0.2 over 16; Bassline and Rumble out over 12 from 53;
+    Hats and Answer stay. The drop at 73 sets Thin and Fog to 0 and brings Pads, Dark perc, Rumble, Bassline, Sequence
+    and the whole beat in at once.
+  - Drift 2 (217-240, 24 bars, was 209-240 with a stem-by-stem beat exit): the same shape plus Wumms 0.95 -> 0.5 over
+    16, Sub out over 8 from 225, the warm Chapter twist (presses at 227 and 228), Answer Space up at 231, then Kick,
+    Clap, Percussion and Hats fade together over 8 from 233. The twist and Answer echo are kept: they do not clash with the
+    beat.
+  - Everything after the first drift shifts 8 bars later; length stays 240 bars = 6 min 51 s.
+- Decision: again
+
 ## Lessons
