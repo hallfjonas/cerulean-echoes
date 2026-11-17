@@ -177,4 +177,29 @@
   Bounce block, the bass break at 96 and the Double time at 97 are unchanged.
 - Decision: again
 
+## Loop 2 / Round 7 - warehouse.json (2026-11-17)
+- User: "1. the melodies are too overloaded; they should be more sparse across the whole song. 2. first four beat drop
+  --> remove the double time afterwads. 3. only use two of these short beat drops (the second one should have the double
+  time); 4. The drift before the drop should play exactly the scene at the very end of the track for a 4 cycles; then
+  come in with the whole beat and all. 5. The clap should come in 2-4 cycle after the first drop. 6. The second drop is
+  not clean enough"
+- Reading: "four beat drop" = the one-bar bass break (4 beats). "Second drop" = the Peak drop-in at 153.
+- Changed (bars 1-based):
+  - 1: Levels down (Pads bed 0.5 -> 0.4, Answer 0.45 -> 0.35, Sequence 0.4 -> 0.3, Stab 0.5/0.6 -> 0.4/0.45, Dark perc
+    0.3 -> 0.2; drift ends Pads 0.3, Dark perc 0.15). At most two of Answer, Sequence, Stab in front: Groove Answer;
+    Bounce Stab and Sequence (Sequence out at 65, back at 83 over 4, Answer out over 4 from 81); Roll Answer and Stab
+    (Sequence out, Answer back over 4 from 113); Peak 1 Stab; Peak 2 Sequence and Answer. Stab and Dark perc pattern
+    presses at 113 and 153/169 removed.
+  - 2/3: two bass breaks: 96 with no double time, 168 with Double time at 169. The pair at 120/121 is gone.
+  - 4: the last 4 bars of Drift 1 (149-152) and Drift 2 (205-208) run the same end-scene function (Answer Space 0.9
+    over 2, Kick, Clap, Percussion, Hats out over 4). Differences: Drift 2 is warm and its beat is still leaving; Drift 1
+    is dark and only the Hats are left to leave. The Answer Space step moved from 199 to 205.
+  - 5: Clap Level (CC 9) moved from 65 to 68.
+  - 6: Peak 1 at 153: only rhythm and bass (Kick, Clap, Percussion, Sub, Rumble, Bassline, Hats) plus Thin, Fog 0, Wumms
+    0.95; Answer, Pads, Dark perc cut. No half-beat tail, no pattern, riser or fill on the bar. Then one at a time:
+    Bassline Pattern 157 with Pads over 4, Clap Pattern 161 with Stab over 4, Sub Pattern 165 with Dark perc over 4.
+    Peak 2 start (169): only the break and Double time; Stab out, bass pattern and Hats at 173, Sequence at 177, Answer
+    at 181.
+- Decision: again
+
 ## Lessons
