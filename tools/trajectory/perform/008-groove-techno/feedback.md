@@ -54,4 +54,11 @@
   is meant, which twist, length.
 - Decision: again
 
+## Loop 1 / Round 2 - warehouse.md (2026-11-17)
+- User: "Yes, approved" (answering whether "slow down" means the energy sinks with the tempo unchanged)
+- Changed: nothing. The open questions resolve to the proposals in the design: warm-chapter twist plus Answer echo,
+  256 bars, no keys, pads as accents only, the script sits beside techno-night.
+- Decision: approved
+- Approval: Design approved by the user on 2026-11-17 ("Yes, approved").
+
 ## Lessons

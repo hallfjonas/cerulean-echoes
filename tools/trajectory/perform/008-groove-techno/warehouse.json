@@ -1,0 +1,526 @@
+{
+  "track": "008-groove-techno",
+  "title": "Warehouse",
+  "bars": 256,
+  "mood": "dark from the first bar, curious, then driving and hypnotic",
+  "sections": [
+    {
+      "name": "Curious",
+      "from": 0,
+      "to": 32,
+      "intent": "A dark, curious melody over a ticking percussion, no kick"
+    },
+    {
+      "name": "Hats",
+      "from": 32,
+      "to": 64,
+      "intent": "Fast hats first, then rumble, bass and sequence slowly, still no kick"
+    },
+    {
+      "name": "Build",
+      "from": 64,
+      "to": 80,
+      "intent": "Short build, bram quiet just before the drop"
+    },
+    {
+      "name": "Drop",
+      "from": 80,
+      "to": 144,
+      "intent": "Full groove, short bass breaks, rare double times"
+    },
+    {
+      "name": "Slow down",
+      "from": 144,
+      "to": 160,
+      "intent": "Let the energy sink back to melody and hats"
+    },
+    {
+      "name": "Proper build",
+      "from": 160,
+      "to": 192,
+      "intent": "A real, longer build, kick out for one bar before the peak"
+    },
+    {
+      "name": "Peak",
+      "from": 192,
+      "to": 224,
+      "intent": "High energy"
+    },
+    {
+      "name": "Drift",
+      "from": 224,
+      "to": 256,
+      "intent": "Retrace the opening, with the chords turning warm at the end"
+    }
+  ],
+  "steps": [
+    {
+      "bar": 0,
+      "cc": 53,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 0,
+      "cc": 20,
+      "value": 0.5
+    },
+    {
+      "bar": 1,
+      "cc": 20,
+      "value": 0,
+      "ramp": 24
+    },
+    {
+      "bar": 4,
+      "cc": 57,
+      "value": 0.45
+    },
+    {
+      "bar": 8,
+      "cc": 58,
+      "value": 0.3
+    },
+    {
+      "bar": 16,
+      "press": 89
+    },
+    {
+      "bar": 32,
+      "cc": 10,
+      "value": 0.5
+    },
+    {
+      "bar": 32,
+      "press": 42
+    },
+    {
+      "bar": 34,
+      "press": 42
+    },
+    {
+      "bar": 32,
+      "cc": 34,
+      "value": 0.6,
+      "ramp": 24
+    },
+    {
+      "bar": 40,
+      "cc": 6,
+      "value": 0.5,
+      "ramp": 16
+    },
+    {
+      "bar": 48,
+      "cc": 8,
+      "value": 0.55,
+      "ramp": 8
+    },
+    {
+      "bar": 56,
+      "cc": 55,
+      "value": 0.4,
+      "ramp": 8
+    },
+    {
+      "bar": 64,
+      "cc": 36,
+      "value": 0.9,
+      "ramp": 15
+    },
+    {
+      "bar": 64,
+      "cc": 28,
+      "value": 0.5,
+      "ramp": 12
+    },
+    {
+      "bar": 78,
+      "cc": 46,
+      "value": 1
+    },
+    {
+      "bar": 80,
+      "cc": 46,
+      "value": 0
+    },
+    {
+      "bar": 77.5,
+      "pad": 48
+    },
+    {
+      "bar": 79.25,
+      "lk": 38,
+      "value": 0.85
+    },
+    {
+      "bar": 79.5,
+      "pad": 46
+    },
+    {
+      "bar": 80,
+      "cc": 36,
+      "value": 0
+    },
+    {
+      "bar": 80,
+      "cc": 28,
+      "value": 0
+    },
+    {
+      "bar": 81,
+      "lk": 38,
+      "value": 0
+    },
+    {
+      "bar": 80,
+      "cc": 5,
+      "value": 0.7
+    },
+    {
+      "bar": 80,
+      "cc": 9,
+      "value": 0.55
+    },
+    {
+      "bar": 80,
+      "cc": 7,
+      "value": 0.55
+    },
+    {
+      "bar": 80,
+      "cc": 11,
+      "value": 0.5
+    },
+    {
+      "bar": 80,
+      "cc": 12,
+      "value": 0.85
+    },
+    {
+      "bar": 96,
+      "pad": 45
+    },
+    {
+      "bar": 120,
+      "pad": 45
+    },
+    {
+      "bar": 103,
+      "press": 52
+    },
+    {
+      "bar": 106,
+      "press": 52
+    },
+    {
+      "bar": 127,
+      "press": 52
+    },
+    {
+      "bar": 130,
+      "press": 52
+    },
+    {
+      "bar": 112,
+      "cc": 37,
+      "value": 1
+    },
+    {
+      "bar": 114,
+      "cc": 37,
+      "value": 0
+    },
+    {
+      "bar": 136,
+      "cc": 37,
+      "value": 1
+    },
+    {
+      "bar": 138,
+      "cc": 37,
+      "value": 0
+    },
+    {
+      "bar": 144,
+      "cc": 5,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 144,
+      "cc": 9,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 144,
+      "cc": 11,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 144,
+      "cc": 12,
+      "value": 0.5,
+      "ramp": 12
+    },
+    {
+      "bar": 144,
+      "cc": 28,
+      "value": 0.4,
+      "ramp": 12
+    },
+    {
+      "bar": 144,
+      "cc": 20,
+      "value": 0.3,
+      "ramp": 12
+    },
+    {
+      "bar": 160,
+      "cc": 36,
+      "value": 1,
+      "ramp": 31
+    },
+    {
+      "bar": 160,
+      "cc": 28,
+      "value": 0.7,
+      "ramp": 28
+    },
+    {
+      "bar": 160,
+      "cc": 20,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 176,
+      "cc": 5,
+      "value": 0.6,
+      "ramp": 4
+    },
+    {
+      "bar": 176,
+      "cc": 9,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 176,
+      "cc": 11,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 184,
+      "cc": 49,
+      "value": 1
+    },
+    {
+      "bar": 188,
+      "cc": 49,
+      "value": 0
+    },
+    {
+      "bar": 188,
+      "cc": 46,
+      "value": 1
+    },
+    {
+      "bar": 190,
+      "cc": 46,
+      "value": 0
+    },
+    {
+      "bar": 188,
+      "cc": 37,
+      "value": 1
+    },
+    {
+      "bar": 191,
+      "cc": 37,
+      "value": 0
+    },
+    {
+      "bar": 191,
+      "cc": 45,
+      "value": 1
+    },
+    {
+      "bar": 192,
+      "cc": 45,
+      "value": 0
+    },
+    {
+      "bar": 189.5,
+      "pad": 48
+    },
+    {
+      "bar": 192,
+      "cc": 36,
+      "value": 0
+    },
+    {
+      "bar": 192,
+      "cc": 28,
+      "value": 0
+    },
+    {
+      "bar": 192,
+      "cc": 12,
+      "value": 0.95
+    },
+    {
+      "bar": 192,
+      "cc": 5,
+      "value": 0.7
+    },
+    {
+      "bar": 192,
+      "cc": 9,
+      "value": 0.55
+    },
+    {
+      "bar": 192,
+      "cc": 11,
+      "value": 0.5
+    },
+    {
+      "bar": 192,
+      "cc": 56,
+      "value": 0.6
+    },
+    {
+      "bar": 192,
+      "pad": 46
+    },
+    {
+      "bar": 199,
+      "cc": 51,
+      "value": 1
+    },
+    {
+      "bar": 200,
+      "cc": 51,
+      "value": 0
+    },
+    {
+      "bar": 207,
+      "cc": 51,
+      "value": 1
+    },
+    {
+      "bar": 208,
+      "cc": 51,
+      "value": 0
+    },
+    {
+      "bar": 215,
+      "cc": 51,
+      "value": 1
+    },
+    {
+      "bar": 216,
+      "cc": 51,
+      "value": 0
+    },
+    {
+      "bar": 208,
+      "cc": 37,
+      "value": 1
+    },
+    {
+      "bar": 210,
+      "cc": 37,
+      "value": 0
+    },
+    {
+      "bar": 204,
+      "pad": 47
+    },
+    {
+      "bar": 212,
+      "pad": 49
+    },
+    {
+      "bar": 220,
+      "pad": 47
+    },
+    {
+      "bar": 224,
+      "cc": 56,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 224,
+      "cc": 55,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 224,
+      "cc": 12,
+      "value": 0.3,
+      "ramp": 24
+    },
+    {
+      "bar": 232,
+      "cc": 8,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 232,
+      "cc": 6,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 240,
+      "cc": 5,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 240,
+      "cc": 9,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 240,
+      "cc": 7,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 240,
+      "cc": 11,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 243,
+      "press": 44
+    },
+    {
+      "bar": 244,
+      "press": 44
+    },
+    {
+      "bar": 248,
+      "cc": 10,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 248,
+      "cc": 73,
+      "value": 0.9,
+      "ramp": 4
+    }
+  ]
+}
