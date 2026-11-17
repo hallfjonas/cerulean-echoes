@@ -124,4 +124,39 @@
   - Length 208 bars = 5 min 57 s (was 240 bars, 6 min 51 s).
 - Decision: again
 
+## Loop 2 / Round 4 - warehouse.json (2026-11-17)
+- User: "Something sounded weird in the second drop (as if the melodies came in slightly before the rhythm; but could be
+  a CPU mistake because I open UI in external window there); please check. Keep the beat alive during the outro; only
+  take it out in the last. Remove the dark perc from the intro; only bring it in later. Bring in open hat first and
+  wait with fast hats a bit; bring in sub first, rumble only once kick is there; bring in sequence earlier --> good
+  compliment to answer. Bassline brightness shift barely noticable. Needs more variety across the different sections (a
+  bit too monotonous now over time; constance in each section is good tho). The kick needs to be removed much earlier in
+  the middle drift."
+- Reading: "second drop" = the Peak drop-in at bar 153. "In the last" = the last 4 bars (2 bars would also fit).
+- Findings on the second drop: the scenario shows no melody ahead of the rhythm (kick on 152.000 and every Level step on
+  the same bar line, in one scheduler tick); the script cannot explain it alone. Candidates: (1) the Drop out hold and the
+  Level steps are sampled in the same tick, but nine stems un-gate at once (CPU spike, a UI window makes it worse); (2) the
+  pad chord change lands on the bar line while the kick came back through a gate; (3) sustained melodic notes already
+  sounding while the kick was out for the bar before.
+- Changed (bars 1-based):
+  - Peak drop-in: no Drop out hold any more (the kick is already gone). Rhythm (Kick, Clap, Percussion, Sub, Rumble)
+    at 153; Pads, Dark perc, Bassline, Sequence, Stab half a beat later (153.125, no ramp, never earlier).
+  - Outro (Drift 2, 185-208): the whole beat stays; Kick, Clap, Percussion and Hats out together over the last 4 bars
+    (205-208), was the last 8 bars. Twist and Answer echo unchanged.
+  - Dark perc (CC 58): removed from Curious and Hats; in at 73 (Groove, after the drop).
+  - Intro: Hats at 3 (open off-beat, Pattern 1) with Complexity 0.25 from 25; fast hats later (Hats Pattern pressed at 33
+    and 41, Complexity 0.6 at 33). Sub at 17 (Level 0.5, before any kick). Rumble no longer in the intro: from 63 only,
+    for the Riser (it lives in the Rumble stem), then on with the drop. Sequence at 9 (Answer's companion; Answer Pattern
+    press at 13). Bassline at 37, as before.
+  - Bassline Brightness (CC 16): 0.1 -> 0.95 over 16 from 73; 0.05 over 8 from 97; 0.6 from 105; 0.1 over 4 from 113,
+    0.95 over 8 from 117, 0.3 at 125; 0.5 at 129; 0.9 at 153, 0.1 over 8 from 161; 0.95 over 16 from 169. Bass filter
+    median per scenario: 489 Hz (0.05) to 2335 Hz (0.95), about 4.8 times (before: 0.3 to 0.85 over 12 bars).
+  - Variety: three Drop blocks (Groove 65-88, Bounce 89-112, Roll 113-128) and two Peak blocks (153-168, 169-184), each
+    with its own Pattern presses (Bassline, Percussion, Sequence, Stab, Answer, Clap, Dark perc, Sub), Hats Complexity,
+    Stab on from 89; no Chapter press before the twist.
+  - Middle drift (Drift 1, 129-152): Kick and Clap out over 4 bars from 129, Percussion over 6 bars from 133, the rest of
+    the shape as before.
+  - Length stays 208 bars = 5 min 57 s.
+- Decision: again
+
 ## Lessons
