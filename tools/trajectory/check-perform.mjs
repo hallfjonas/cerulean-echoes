@@ -1,6 +1,7 @@
 // Checks the auto-perform scripts (perform/<track>/<script>.json, see autoperform.mjs) against their track: the meta
 // fields (sections in order, inside `bars`, every step in a section), the shape of every step, every CC a control of
-// the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 31-38, keys that parse.
+// the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 31-38, keys that parse,
+// velocities 0..1, and the `take` meta field of a take (perform/<track>/takes/<take>.json, checked like a script).
 // usage (in tools/): node trajectory/check-perform.mjs [<track.strudel> …]   (default: every track that has scripts)
 // Exit 1 if a script fails.
 import fs from 'fs'
@@ -34,11 +35,29 @@ export const controlsOf = src => {
 }
 
 const isBar = bar => Number.isFinite(bar) && bar >= 0
-const SCRIPT_FIELDS = ['track', 'steps', 'title', 'bars', 'mood', 'sections']
+const SCRIPT_FIELDS = ['track', 'steps', 'title', 'bars', 'mood', 'sections', 'take']
+const TAKE_SOURCES = ['human', 'auto', 'mixed']
 const SECTION_FIELDS = ['name', 'from', 'to', 'intent']
 const isText = text => typeof text === 'string' && text.trim() !== ''
 const hasOnly = (step, required, optional = []) => required.every(k => k in step) &&
   Object.keys(step).every(k => required.includes(k) || optional.includes(k))
+
+const checkTake = take => {
+  if (take === null || typeof take !== 'object' || Array.isArray(take)) return ['take must be an object']
+  const errors = []
+  if (!hasOnly(take, ['source', 'recordedAt', 'trackHash', 'cps', 'inputs'], ['script', 'events']))
+    errors.push('take: needs source, recordedAt, trackHash, cps, inputs (script events)')
+  if (!TAKE_SOURCES.includes(take.source)) errors.push(`take: source must be one of ${TAKE_SOURCES.join(', ')}`)
+  if (!isText(take.recordedAt) || Number.isNaN(Date.parse(take.recordedAt)))
+    errors.push('take: recordedAt must be an ISO time')
+  if (!/^[0-9a-f]{40}$/.test(take.trackHash)) errors.push('take: trackHash must be a sha1 in hex')
+  if (!(take.cps > 0)) errors.push('take: cps must be a number > 0')
+  if (!Array.isArray(take.inputs) || !take.inputs.every(isText))
+    errors.push('take: inputs must be a list of port names')
+  if (take.script !== undefined && !isText(take.script)) errors.push('take: script must be a text')
+  if (take.events !== undefined && !isText(take.events)) errors.push('take: events must be a text')
+  return errors
+}
 
 const checkMeta = script => {
   const errors = []
@@ -47,6 +66,7 @@ const checkMeta = script => {
   if (script.title !== undefined && !isText(script.title)) errors.push('title must be a text')
   if (script.mood !== undefined && !isText(script.mood)) errors.push('mood must be a text')
   if (script.bars !== undefined && !(script.bars > 0)) errors.push('bars must be a number > 0')
+  if (script.take !== undefined) errors.push(...checkTake(script.take))
   if (script.sections === undefined) return errors
   if (!Array.isArray(script.sections)) return [...errors, 'sections is not a list']
   script.sections.forEach((section, i) => {
@@ -72,9 +92,10 @@ const checkLaunchkeyStep = (step, at) => {
     if (step.velocity !== undefined && !(step.velocity > 0 && step.velocity <= 1)) errors.push(`${at}: velocity 0..1`)
     if (step.length !== undefined && !(step.length > 0)) errors.push(`${at}: length must be > 0 bars`)
   } else if (step.pad !== undefined) {
-    if (!hasOnly(step, ['bar', 'pad'])) errors.push(`${at}: a pad step has only bar and pad`)
+    if (!hasOnly(step, ['bar', 'pad'], ['velocity'])) errors.push(`${at}: needs bar, pad (velocity)`)
     if (!(Number.isInteger(step.pad) && step.pad >= PADS[0] && step.pad <= PADS[1]))
       errors.push(`${at}: pad must be a note ${PADS[0]}-${PADS[1]}`)
+    if (step.velocity !== undefined && !(step.velocity > 0 && step.velocity <= 1)) errors.push(`${at}: velocity 0..1`)
   } else {
     if (!hasOnly(step, ['bar', 'lk', 'value'], ['ramp'])) errors.push(`${at}: needs bar, lk, value (ramp)`)
     if (!LK_CCS.includes(step.lk)) errors.push(`${at}: lk ${step.lk} is not the mod wheel (1) or a knob (31-38)`)
@@ -114,11 +135,11 @@ export const checkScript = (script, controls, trackId) => {
 }
 
 const trackIdOf = file => path.basename(file, '.strudel')
-export const scriptFiles = trackId => {
-  const dir = path.join(PERFORM, trackId)
-  if (!fs.existsSync(dir)) return []
-  return fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort().map(f => path.join(dir, f))
-}
+const jsonFiles = dir => fs.existsSync(dir)
+  ? fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort().map(f => path.join(dir, f))
+  : []
+export const scriptFiles = trackId => jsonFiles(path.join(PERFORM, trackId))
+const takeFiles = trackId => jsonFiles(path.join(PERFORM, trackId, 'takes'))
 
 export const trackFileOf = trackId => {
   const tracks = path.join(repo, 'tracks')
@@ -128,10 +149,10 @@ export const trackFileOf = trackId => {
   return files.find(file => fs.existsSync(file)) ?? null
 }
 
-// { file: errors[] } for every script of the track
+// { file: errors[] } for every script and take of the track
 export const checkTrack = file => {
   const controls = controlsOf(fs.readFileSync(file, 'utf8'))
-  return Object.fromEntries(scriptFiles(trackIdOf(file)).map(script => {
+  return Object.fromEntries([...scriptFiles(trackIdOf(file)), ...takeFiles(trackIdOf(file))].map(script => {
     try { return [script, checkScript(JSON.parse(fs.readFileSync(script, 'utf8')), controls, trackIdOf(file))] }
     catch (error) { return [script, [error.message]] }
   }))

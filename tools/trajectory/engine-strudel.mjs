@@ -39,9 +39,12 @@ export const createEngine = midi => {
 
   return {
     ready,
-    // The track's LC view reads the control names from strudel.cc's editor text; here the track itself stands in
+    // The track's LC view reads the control names from strudel.cc's editor text; here the track itself stands in.
+    // A fresh start: evaluate alone swaps the pattern on the running clock; hush first restarts it at cycle 0, so
+    // alternations and slow patterns start in the same phase on every load and bar 0 of a script is cycle 0.
     load: async code => {
       globalThis.strudelMirror = { code }
+      hush()
       await evaluate(code)
     },
     stop: () => hush(),
