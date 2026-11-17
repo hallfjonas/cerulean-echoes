@@ -27,6 +27,11 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #drawer.open { transform: none; visibility: visible }
 #drawer h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600 }
 #drawer section { border-top: 1px solid var(--line); padding-top: 14px }
+#drawer .script-info { margin-top: 12px; font-size: 13px }
+#drawer .script-title { font-weight: 600 }
+#drawer .script-mood { color: var(--dim); margin-top: 2px }
+#drawer .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
+#drawer .script-sections li.now { color: var(--fg); font-weight: 600 }
 #help { position: fixed; top: 0; right: 0; bottom: 0; width: 320px; box-sizing: border-box; padding: 16px;
   background: var(--panel); border-left: 1px solid var(--line); z-index: 2; overflow-y: auto; font-size: 14px }
 #help[hidden] { display: none }

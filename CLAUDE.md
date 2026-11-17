@@ -85,6 +85,8 @@ Use them instead of redoing the steps by hand:
 - New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
+- Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
+  performance"): `/auto-perform`.
 
 Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,
 syx and single regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit

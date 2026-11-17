@@ -1,0 +1,751 @@
+{
+  "track": "008-groove-techno",
+  "title": "Techno night",
+  "bars": 336,
+  "mood": "dark, hypnotic, driving",
+  "sections": [
+    {
+      "name": "Kick",
+      "from": 0,
+      "to": 16,
+      "intent": "Kick, hats and percussion arrive within the first bars"
+    },
+    {
+      "name": "Bass",
+      "from": 16,
+      "to": 32,
+      "intent": "Foundation joins, pads fade in"
+    },
+    {
+      "name": "Colour",
+      "from": 32,
+      "to": 48,
+      "intent": "Pads, percussion and brighter hats colour the groove"
+    },
+    {
+      "name": "Build 1",
+      "from": 48,
+      "to": 64,
+      "intent": "Lift into the first drop, quiet bram just before it"
+    },
+    {
+      "name": "Drop 1",
+      "from": 64,
+      "to": 96,
+      "intent": "Release: full clap, tense chapter, stab and loop"
+    },
+    {
+      "name": "Break 1",
+      "from": 96,
+      "to": 112,
+      "intent": "Low end out, hats and percussion keep going, back on the one"
+    },
+    {
+      "name": "Drop 2",
+      "from": 112,
+      "to": 144,
+      "intent": "Second drop, same chapter, more rhythm"
+    },
+    {
+      "name": "Dip",
+      "from": 144,
+      "to": 160,
+      "intent": "Gentle muffled breather, beat keeps going"
+    },
+    {
+      "name": "Build 2",
+      "from": 160,
+      "to": 176,
+      "intent": "Bigger lift, double-time kick at the end"
+    },
+    {
+      "name": "Peak 1",
+      "from": 176,
+      "to": 208,
+      "intent": "Full dark groove, most stems on"
+    },
+    {
+      "name": "Break 2",
+      "from": 208,
+      "to": 224,
+      "intent": "Long, airy pause before the last run"
+    },
+    {
+      "name": "Peak 2",
+      "from": 224,
+      "to": 256,
+      "intent": "Last peak, new chords at the halfway mark"
+    },
+    {
+      "name": "Strip",
+      "from": 256,
+      "to": 304,
+      "intent": "The colour leaves slowly, the beat stays"
+    },
+    {
+      "name": "Out",
+      "from": 304,
+      "to": 336,
+      "intent": "Rhythm layers fade, kick last, then silence"
+    }
+  ],
+  "steps": [
+    {
+      "bar": 0,
+      "cc": 5,
+      "value": 0.7
+    },
+    {
+      "bar": 2,
+      "cc": 10,
+      "value": 0.5
+    },
+    {
+      "bar": 2,
+      "cc": 18,
+      "value": 0.7,
+      "ramp": 14
+    },
+    {
+      "bar": 6,
+      "press": 42
+    },
+    {
+      "bar": 4,
+      "cc": 11,
+      "value": 0.45
+    },
+    {
+      "bar": 4,
+      "cc": 19,
+      "value": 0.7,
+      "ramp": 12
+    },
+    {
+      "bar": 8,
+      "cc": 9,
+      "value": 0.55
+    },
+    {
+      "bar": 8,
+      "cc": 6,
+      "value": 0.5
+    },
+    {
+      "bar": 12,
+      "cc": 7,
+      "value": 0.55
+    },
+    {
+      "bar": 16,
+      "cc": 8,
+      "value": 0.55
+    },
+    {
+      "bar": 16,
+      "cc": 53,
+      "value": 0.4,
+      "ramp": 8
+    },
+    {
+      "bar": 20,
+      "cc": 54,
+      "value": 0.3,
+      "ramp": 8
+    },
+    {
+      "bar": 24,
+      "cc": 53,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 32,
+      "cc": 61,
+      "value": 0.6,
+      "ramp": 16
+    },
+    {
+      "bar": 32,
+      "cc": 34,
+      "value": 0.3
+    },
+    {
+      "bar": 36,
+      "cc": 35,
+      "value": 0.3
+    },
+    {
+      "bar": 40,
+      "cc": 58,
+      "value": 0.3
+    },
+    {
+      "bar": 48,
+      "cc": 36,
+      "value": 1,
+      "ramp": 16
+    },
+    {
+      "bar": 48,
+      "cc": 28,
+      "value": 0.5,
+      "ramp": 8
+    },
+    {
+      "bar": 48,
+      "cc": 11,
+      "value": 0.5
+    },
+    {
+      "bar": 48,
+      "cc": 35,
+      "value": 0
+    },
+    {
+      "bar": 48,
+      "cc": 18,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 48,
+      "cc": 19,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 48,
+      "cc": 61,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 62,
+      "cc": 46,
+      "value": 1
+    },
+    {
+      "bar": 64,
+      "cc": 46,
+      "value": 0
+    },
+    {
+      "bar": 60,
+      "cc": 49,
+      "value": 1
+    },
+    {
+      "bar": 64,
+      "cc": 49,
+      "value": 0
+    },
+    {
+      "bar": 62,
+      "press": 41
+    },
+    {
+      "bar": 63,
+      "press": 41
+    },
+    {
+      "bar": 63,
+      "press": 44
+    },
+    {
+      "bar": 62.5,
+      "pad": 48
+    },
+    {
+      "bar": 63.25,
+      "lk": 38,
+      "value": 0.85
+    },
+    {
+      "bar": 63.5,
+      "pad": 46
+    },
+    {
+      "bar": 65,
+      "lk": 38,
+      "value": 0
+    },
+    {
+      "bar": 64,
+      "cc": 36,
+      "value": 0
+    },
+    {
+      "bar": 64,
+      "cc": 28,
+      "value": 0
+    },
+    {
+      "bar": 64,
+      "cc": 12,
+      "value": 0.5
+    },
+    {
+      "bar": 64,
+      "cc": 53,
+      "value": 0.4
+    },
+    {
+      "bar": 64,
+      "cc": 34,
+      "value": 0
+    },
+    {
+      "bar": 64,
+      "cc": 58,
+      "value": 0
+    },
+    {
+      "bar": 72,
+      "cc": 56,
+      "value": 0.5
+    },
+    {
+      "bar": 80,
+      "cc": 55,
+      "value": 0.4
+    },
+    {
+      "bar": 88,
+      "press": 40
+    },
+    {
+      "bar": 95,
+      "press": 52
+    },
+    {
+      "bar": 96,
+      "cc": 20,
+      "value": 0.5,
+      "ramp": 8
+    },
+    {
+      "bar": 96,
+      "cc": 53,
+      "value": 0.7
+    },
+    {
+      "bar": 96,
+      "press": 85
+    },
+    {
+      "bar": 96,
+      "cc": 54,
+      "value": 0.5
+    },
+    {
+      "bar": 96,
+      "cc": 59,
+      "value": 0.4
+    },
+    {
+      "bar": 104,
+      "cc": 36,
+      "value": 0.6,
+      "ramp": 8
+    },
+    {
+      "bar": 111,
+      "press": 52
+    },
+    {
+      "bar": 96,
+      "pad": 51
+    },
+    {
+      "bar": 96,
+      "lk": 1,
+      "value": 0.6
+    },
+    {
+      "bar": 98,
+      "keys": "f3 ab3 c4",
+      "velocity": 0.7,
+      "length": 4
+    },
+    {
+      "bar": 102,
+      "keys": "db3 f3 ab3",
+      "velocity": 0.7,
+      "length": 4
+    },
+    {
+      "bar": 106,
+      "keys": "eb3 ab3 c4",
+      "velocity": 0.7,
+      "length": 4
+    },
+    {
+      "bar": 110,
+      "keys": "f3 ab3 c4",
+      "velocity": 0.7,
+      "length": 2
+    },
+    {
+      "bar": 112,
+      "cc": 20,
+      "value": 0
+    },
+    {
+      "bar": 112,
+      "cc": 36,
+      "value": 0
+    },
+    {
+      "bar": 112,
+      "cc": 12,
+      "value": 0.7
+    },
+    {
+      "bar": 112,
+      "pad": 46
+    },
+    {
+      "bar": 120,
+      "cc": 34,
+      "value": 0.5
+    },
+    {
+      "bar": 120,
+      "cc": 32,
+      "value": 0.5
+    },
+    {
+      "bar": 128,
+      "cc": 57,
+      "value": 0.35
+    },
+    {
+      "bar": 136,
+      "press": 87
+    },
+    {
+      "bar": 144,
+      "cc": 20,
+      "value": 0.5,
+      "ramp": 12
+    },
+    {
+      "bar": 154,
+      "cc": 20,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 144,
+      "cc": 8,
+      "value": 0.45,
+      "ramp": 8
+    },
+    {
+      "bar": 148,
+      "cc": 55,
+      "value": 0.6,
+      "ramp": 8
+    },
+    {
+      "bar": 152,
+      "cc": 59,
+      "value": 0.5,
+      "ramp": 8
+    },
+    {
+      "bar": 160,
+      "cc": 36,
+      "value": 1,
+      "ramp": 16
+    },
+    {
+      "bar": 160,
+      "cc": 28,
+      "value": 0.6,
+      "ramp": 12
+    },
+    {
+      "bar": 160,
+      "cc": 8,
+      "value": 0.7,
+      "ramp": 4
+    },
+    {
+      "bar": 172,
+      "cc": 37,
+      "value": 1
+    },
+    {
+      "bar": 176,
+      "cc": 37,
+      "value": 0
+    },
+    {
+      "bar": 174,
+      "cc": 46,
+      "value": 1
+    },
+    {
+      "bar": 176,
+      "cc": 46,
+      "value": 0
+    },
+    {
+      "bar": 174,
+      "press": 44
+    },
+    {
+      "bar": 174.5,
+      "press": 44
+    },
+    {
+      "bar": 174.5,
+      "pad": 48
+    },
+    {
+      "bar": 176,
+      "cc": 36,
+      "value": 0
+    },
+    {
+      "bar": 176,
+      "cc": 28,
+      "value": 0
+    },
+    {
+      "bar": 176,
+      "cc": 12,
+      "value": 0.9
+    },
+    {
+      "bar": 184,
+      "cc": 56,
+      "value": 0.6
+    },
+    {
+      "bar": 192,
+      "cc": 58,
+      "value": 0.5
+    },
+    {
+      "bar": 192,
+      "press": 42
+    },
+    {
+      "bar": 200,
+      "cc": 80,
+      "value": 0.5
+    },
+    {
+      "bar": 207,
+      "press": 52
+    },
+    {
+      "bar": 208,
+      "cc": 10,
+      "value": 0.4
+    },
+    {
+      "bar": 208,
+      "cc": 11,
+      "value": 0.4
+    },
+    {
+      "bar": 208,
+      "cc": 53,
+      "value": 0.7
+    },
+    {
+      "bar": 208,
+      "cc": 54,
+      "value": 0.6
+    },
+    {
+      "bar": 208,
+      "cc": 59,
+      "value": 0.6
+    },
+    {
+      "bar": 216,
+      "cc": 99,
+      "value": 1
+    },
+    {
+      "bar": 220,
+      "cc": 99,
+      "value": 0
+    },
+    {
+      "bar": 208,
+      "cc": 20,
+      "value": 0.4,
+      "ramp": 8
+    },
+    {
+      "bar": 223,
+      "press": 52
+    },
+    {
+      "bar": 208,
+      "pad": 43
+    },
+    {
+      "bar": 210,
+      "keys": "ab3 c4 eb4",
+      "velocity": 0.7,
+      "length": 4
+    },
+    {
+      "bar": 214,
+      "keys": "f3 ab3 c4",
+      "velocity": 0.7,
+      "length": 4
+    },
+    {
+      "bar": 218,
+      "keys": "db3 f3 ab3",
+      "velocity": 0.7,
+      "length": 4
+    },
+    {
+      "bar": 223,
+      "press": 44
+    },
+    {
+      "bar": 224,
+      "cc": 20,
+      "value": 0
+    },
+    {
+      "bar": 224,
+      "cc": 12,
+      "value": 0.9
+    },
+    {
+      "bar": 224,
+      "cc": 10,
+      "value": 0.5
+    },
+    {
+      "bar": 224,
+      "cc": 11,
+      "value": 0.5
+    },
+    {
+      "bar": 224,
+      "pad": 46
+    },
+    {
+      "bar": 232,
+      "cc": 57,
+      "value": 0.4
+    },
+    {
+      "bar": 244,
+      "press": 85
+    },
+    {
+      "bar": 248,
+      "cc": 79,
+      "value": 0.6
+    },
+    {
+      "bar": 256,
+      "cc": 12,
+      "value": 0.5,
+      "ramp": 32
+    },
+    {
+      "bar": 288,
+      "cc": 12,
+      "value": 0,
+      "ramp": 24
+    },
+    {
+      "bar": 256,
+      "cc": 57,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 262,
+      "cc": 56,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 268,
+      "cc": 58,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 274,
+      "cc": 55,
+      "value": 0,
+      "ramp": 12
+    },
+    {
+      "bar": 280,
+      "cc": 59,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 286,
+      "cc": 54,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 292,
+      "cc": 53,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 298,
+      "cc": 8,
+      "value": 0,
+      "ramp": 16
+    },
+    {
+      "bar": 306,
+      "cc": 9,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 312,
+      "cc": 7,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 318,
+      "cc": 6,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 318,
+      "cc": 11,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 324,
+      "cc": 10,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 328,
+      "cc": 5,
+      "value": 0,
+      "ramp": 8
+    }
+  ]
+}
