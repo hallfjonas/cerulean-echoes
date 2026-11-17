@@ -81,8 +81,7 @@ code) — run 3 and 4 one after another or merge carefully.
 
 - Physical access to the Launchkey for task 1 (the player measures, Claude reads the console).
 - Lab round for the Pads knob jobs (separate, after this epic).
-- Other epics: `drop-buildup` and `player-hub` also change the LC view; `english-repo` renames
-  `midi-layouts/devices.md` and touches every track. Merge one at a time.
+- Other epics: `drop-buildup` also changes the LC view. Merge one at a time.
 
 ## Success Criteria (Technical)
 
