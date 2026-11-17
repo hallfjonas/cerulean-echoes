@@ -1,9 +1,9 @@
 ---
 name: recording-replay
-status: backlog
+status: done-pending-merge
 created: 2026-11-17T20:30:00Z
 updated: 2026-11-17T20:30:00Z
-progress: 0%
+progress: 100%
 prd: (none, scoped from the request "recording in the player, for human and auto sets, and replay of a human set")
 github: (will be set on sync)
 ---

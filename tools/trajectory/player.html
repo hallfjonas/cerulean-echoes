@@ -72,13 +72,17 @@ mountHelp([
   { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
   { heading: 'Output', text: 'Sound and visuals. Save take (in Settings) writes what the controllers did since the last '
-    + 'Play to tools/trajectory/perform/<track>/takes/, uncommitted.' },
+    + 'load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
   { heading: 'How to use', text: ['Pick a track and press Play.', 'Play the controllers, or open Settings (S) and start '
     + 'Auto-perform (P) to try the track without hardware.', 'Settings holds the visual controls; F is fullscreen.',
     'The top bar hides after 3 s without the mouse.'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
     'Save take in Settings writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
-    'Start plays it back from a fresh load; what you play on top during a replay is captured too.',
+    'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
+    + 'captured too.',
+    'Save take after a replay names its original and shows the replay check; the Tools page lists every differing bar '
+    + '(Check replay fidelity).',
+    'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
     'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
     + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
   { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
