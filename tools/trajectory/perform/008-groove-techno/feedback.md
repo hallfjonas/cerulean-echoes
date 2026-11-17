@@ -159,4 +159,13 @@
   - Length stays 208 bars = 5 min 57 s.
 - Decision: again
 
+## Loop 2 / Round 5 - warehouse.json (2026-11-17)
+- User: "You directly start with open high hat now; what I meant: when hi-hat comes in (as in prev version) start only
+  with open hi-hat; then eventuall slowly add fast one"
+- Changed (bars 1-based): the hats no longer start at bar 3. Curious (1-24) has no hats again. Hats Level 0.5 (CC 10)
+  at 25 with Pattern 1 (open off-beat) and Hats Complexity (CC 34) 0, then Complexity 0.1 at 29, 0.2 at 33, 0.3 at 37,
+  0.4 at 45, 0.5 at 53, 0.6 at 61; Hats Pattern presses (CC 42) landing on 41 (adds closed 16ths) and 57 (driving). The
+  earlier presses at 33 and 41 and the Complexity 0.25 / 0.6 steps are gone. Everything else from Round 4 stays.
+- Decision: again
+
 ## Lessons

@@ -8,13 +8,13 @@
       "name": "Curious",
       "from": 0,
       "to": 24,
-      "intent": "A dark, curious melody and sequence, a soft sub, open hats, no kick"
+      "intent": "A dark, curious melody and sequence over a soft sub, no hats, no kick"
     },
     {
       "name": "Hats",
       "from": 24,
       "to": 48,
-      "intent": "Hats get busier, the bassline joins, still no kick"
+      "intent": "Open hats arrive, then slowly busier; the bassline joins, still no kick"
     },
     {
       "name": "Build",
@@ -84,11 +84,6 @@
       "ramp": 18
     },
     {
-      "bar": 2,
-      "cc": 10,
-      "value": 0.5
-    },
-    {
       "bar": 4,
       "cc": 57,
       "value": 0.45
@@ -111,23 +106,51 @@
     },
     {
       "bar": 24,
+      "cc": 10,
+      "value": 0.5
+    },
+    {
+      "bar": 24,
       "cc": 34,
-      "value": 0.25,
-      "ramp": 8
+      "value": 0
+    },
+    {
+      "bar": 28,
+      "cc": 34,
+      "value": 0.1
     },
     {
       "bar": 32,
-      "press": 42
-    },
-    {
-      "bar": 32,
       "cc": 34,
-      "value": 0.6,
-      "ramp": 12
+      "value": 0.2
     },
     {
-      "bar": 40,
+      "bar": 36,
+      "cc": 34,
+      "value": 0.3
+    },
+    {
+      "bar": 39,
       "press": 42
+    },
+    {
+      "bar": 44,
+      "cc": 34,
+      "value": 0.4
+    },
+    {
+      "bar": 52,
+      "cc": 34,
+      "value": 0.5
+    },
+    {
+      "bar": 55,
+      "press": 42
+    },
+    {
+      "bar": 60,
+      "cc": 34,
+      "value": 0.6
     },
     {
       "bar": 36,

@@ -8,8 +8,8 @@ approved `techno-night`.
 - Track: 008-groove-techno
 - Length: 208 bars = 5 min 57 s at 140 BPM (1 bar = 4 beats = 1.714 s; 208 x 240 / 140 = 357 s)
 - Mood: dark from the first bar, curious, then driving and hypnotic
-- Story: No kick at the start: a curious melody (Answer, Sequence, Pads) over a soft sub and open hats, in a dark
-  chapter. The hats get busier and the bassline joins. A short build releases into a drop that brings in the full beat
+- Story: No kick at the start: a curious melody (Answer, Sequence, Pads) over a soft sub, in a dark chapter. Open
+  hats enter alone, then get busier in small steps (more 16ths, then the driving pattern) while the bassline joins. A short build releases into a drop that brings in the full beat
   at once. The groove runs in three blocks with their own bass, percussion and stab patterns and a bass break into
   double time in two of them; the bassline opens and closes in long sweeps. A drift lets the energy sink: kick and clap
   leave first. The peak drops in on the one, the rhythm first and the melody half a beat later, in two blocks of its
@@ -35,9 +35,9 @@ approved `techno-night`.
 ## Sections
 | Section | Bars | LC controls (by @ctl name) | Launchkey | Intent |
 |---|---|---|---|---|
-| Curious | 1-24 | Pads Level at 1, Hats Level at 3 (open off-beat), Answer Level at 5, Sequence Level at 9 over 4, Answer Pattern press at 13, Sub Level at 17 over 4; Fog 0.5 -> 0 over 18 | - | A curious melody and sequence over a soft sub and open hats, no kick, no Dark perc |
-| Hats | 25-48 | Hats Complexity 0.25 over 8 at 25; Hats Pattern pressed at 33 and 41 (fast and driving) with Complexity 0.6 at 33; Bassline Level at 37 over 6 | - | Hats get busier, the bassline joins, still no kick |
-| Build | 49-64 | Tension 0 -> 0.9 over 15; Thin 0 -> 0.5 over 12; Rumble Level 0.5 and Riser hold in the last 2 bars | - | Short build into the drop |
+| Curious | 1-24 | Pads Level at 1, Answer Level at 5, Sequence Level at 9 over 4, Answer Pattern press at 13, Sub Level at 17 over 4; Fog 0.5 -> 0 over 18 | - | A curious melody and sequence over a soft sub, no hats, no kick, no Dark perc |
+| Hats | 25-48 | Hats Level at 25 with Pattern 1 (open off-beat only) and Complexity 0, then Complexity 0.1 at 29, 0.2 at 33, 0.3 at 37, 0.4 at 45; Hats Pattern press at 41 (adds closed 16ths); Bassline Level at 37 over 6 | - | Open hats alone, then slowly busier; the bassline joins, still no kick |
+| Build | 49-64 | Tension 0 -> 0.9 over 15; Thin 0 -> 0.5 over 12; Rumble Level 0.5 and Riser hold in the last 2 bars; Hats Complexity 0.5 at 53, Hats Pattern press at 57 (driving), Complexity 0.6 at 61 | - | Short build into the drop, the fast hats fully there |
 | Groove | 65-88 | Tension and Thin to 0 at 65 (one bar after the ramp end); Kick, Clap, Percussion Level and Wumms 0.85 at 65 (the full beat in at once), Rumble stays; Dark perc Level at 73; Bassline Brightness 0.1 at 65, up to 0.95 over 16 from 73 | - | The full beat, the bass opens slowly |
 | Bounce | 89-112 | Bassline, Percussion, Sequence Pattern presses; Stab Level at 89; Hats Complexity 0.8; Bassline Brightness down to 0.05 over 8 from 97, up to 0.6 over 8 from 105; Bass break (1 bar) at 96 then Double time (1 bar) at 97 | - | Rolling bass, gallop percussion, a stab and a new loop |
 | Roll | 113-128 | Bassline (acid), Clap (pickup), Stab, Answer, Percussion, Dark perc Pattern presses; Hats Complexity 0.4; Bassline Brightness 0.1 over 4 from 113, 0.95 over 8 from 117, 0.3 over 4 from 125; Bass break at 120 then Double time at 121 | - | Acid bass, new stab and answer, lighter hats |
