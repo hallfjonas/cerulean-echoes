@@ -61,4 +61,22 @@
 - Decision: approved
 - Approval: Design approved by the user on 2026-11-17 ("Yes, approved").
 
+## Loop 2 / Round 1 - warehouse.json (2026-11-17)
+- User: "Bring it all in a bit quicker; remove all drum pad usages --> they don't work so well; when using double time
+  or a simple bass break use 4 beats instead of 8; use them in direct combination;"
+- Mapping: "quicker" = the way in; "4 beats" = every Double time hold and every Break one bar long; "direct
+  combination" = a one-bar Break, then a one-bar Double time on the return.
+- Changed (bars 1-based):
+  - Way in compressed by a third: Curious 1-24 (was 1-32): Answer at 4, Dark perc at 7, Answer Pattern press at 13,
+    Fog ramp 18. Hats 25-48 (was 33-64): Rumble from 31 over 12, Bassline at 37, Sequence at 43, ramps of 6, Hats
+    Complexity over 18. Everything after shifts 16 bars earlier. Length 240 bars = 6 min 51 s (was 256 bars, 7 min
+    19 s).
+  - All drum pads removed (crash reverse, both Braaams, Rim echo, Open hat, Shaker) and the Pad Fog steps (CC 38); the
+    script has no Launchkey steps.
+  - Breaks and Double times are one bar each. Drop: Break pair (CC 52) at 95 and 96 (low end out in bar 96), Double
+    time (CC 37) held in bar 97; same at 119 / 120 and 121. Peak: Break pair at 191 / 192, Double time in bar 193.
+    Proper build: Double time one bar at 175 (was 3 bars), before the Drop out bar 176.
+  - Percussion Fill holds at 184, 200, 208 (the middle one moved off the break bar).
+- Decision: again
+
 ## Lessons
