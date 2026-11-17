@@ -168,4 +168,13 @@
   earlier presses at 33 and 41 and the Complexity 0.25 / 0.6 steps are gone. Everything else from Round 4 stays.
 - Decision: again
 
+## Loop 2 / Round 6 - warehouse.json (2026-11-17)
+- User: "Almost perfect. Just a tiny modification: the change from groove to bounce is too harsh/sudden"
+- Changed (bars 1-based): the five changes that all flipped on bar 89 are staggered over the last 12 bars of Groove.
+  Hats Complexity (CC 34) 0.65 at 77, 0.7 at 86, 0.8 over 4 from 89 (was 0.8 over 4 at 89 only); Percussion Pattern
+  (CC 43, gallop) lands at 79 (was 89); Sequence Pattern (CC 87) lands at 83 (was 89); Stab (CC 56) fades in 0 -> 0.5
+  over 4 from 85 (was a step to 0.5 at 89); Bassline Pattern (CC 40, rolling) stays at 89, now the last change. The
+  Bounce block, the bass break at 96 and the Double time at 97 are unchanged.
+- Decision: again
+
 ## Lessons
