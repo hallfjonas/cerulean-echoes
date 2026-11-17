@@ -28,6 +28,8 @@
      The visual settings live in the Settings drawer (key S, generated from settings.mjs, kept in localStorage).
      Auto-perform (in the drawer, key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start
      reloads the track so the script begins from silence.
+     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" in the
+     drawer posts it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
      The track's status box (bottom right) hides while its LC view is open in another window. -->
 <canvas id="view"></canvas>
 <header>
@@ -47,6 +49,7 @@ import { createEngine } from './engine-strudel.mjs'
 import { mountSettings } from './settings.mjs'
 import { mountHelp } from './help.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
+import { createRecorder } from './take.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -54,10 +57,16 @@ mountHelp([
     + 'name, and the tempo from Strudel\'s clock. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound and visuals. Nothing is written to disk.' },
+  { heading: 'Output', text: 'Sound and visuals. Save take (in Settings) writes what the controllers did since the last '
+    + 'Play to tools/trajectory/perform/<track>/takes/, uncommitted.' },
   { heading: 'How to use', text: ['Pick a track and press Play.', 'Play the controllers, or open Settings (S) and start '
     + 'Auto-perform (P) to try the track without hardware.', 'Settings holds the visual controls; F is fullscreen.',
-    'The top bar hides after 3 s without the mouse.'] }
+    'The top bar hides after 3 s without the mouse.'] },
+  { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
+    'Save take in Settings writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
+    'Start plays it back from a fresh load; what you play on top during a replay is captured too.',
+    'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
+    + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] }
 ], { title: 'About this page' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
@@ -65,6 +74,7 @@ let label = 'loading Strudel …', visuals = '', autoLabel = ''
 createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
 
 const engine = createEngine(midi)
+const recorder = createRecorder({ midi, engine })
 engine.ready.then(() => { label = 'ready' })
 let catalogue = []
 const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
@@ -93,21 +103,25 @@ const performer = createPerformer({ midi, engine, onChange: progress => {
   autoPerform.show(!!progress, barText, progress)
 } })
 
-const play = async () => {
+const play = async script => {
   performer.stop()
   await Promise.all([engine.ready, midi.ready])
   label = 'loading track …'
-  const code = await fetch('track/' + encodeURIComponent($('track').value), { cache: 'no-store' }).then(r => r.text())
+  const track = $('track').value
+  const response = await fetch('track/' + encodeURIComponent(track), { cache: 'no-store' })
+  const code = await response.text()
   try {
     await engine.load(code)
-    label = 'playing: ' + $('track').value
+    const trackHash = response.headers.get('X-Track-Hash')
+    recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
+    label = 'playing: ' + track
   } catch (error) {
     label = 'Error: ' + error.message
     return false
   }
   return true
 }
-$('play').onclick = play
+$('play').onclick = () => play()
 $('stop').onclick = () => { performer.stop(); engine.stop(); label = 'stopped' }
 
 const startScript = async id => {
@@ -117,12 +131,34 @@ const startScript = async id => {
   const script = await response.json()
   if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
   midi.addAuto({ launchkey: usesLaunchkey(script) })
-  if (await play()) performer.start(script)
+  if (await play(id)) performer.start(script)
 }
 
 const settings = mountSettings($('drawer'), { renderer, smoother })
 $('settingsToggle').onclick = settings.toggle
 const autoPerform = mountAutoPerform(settings.autoPerformContainer, { onStart: startScript, onStop: performer.stop })
+
+const saveTake = async () => {
+  const session = recorder.session()
+  if (!session) return void ($('takeState').textContent = 'press Play first')
+  $('takeState').textContent = 'saving …'
+  const response = await fetch('take/' + encodeURIComponent(session.track), { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(session) })
+  const result = await response.json()
+  if (!response.ok) return void ($('takeState').textContent = 'Error: ' + result.error)
+  const scripts = catalogue.find(entry => entry.id === session.track)?.scripts
+  if (scripts) {
+    const firstTake = scripts.findIndex(id => id.startsWith('takes/'))
+    scripts.splice(firstTake < 0 ? scripts.length : firstTake, 0, result.id)
+    if ($('track').value === session.track) showScripts()
+  }
+  $('takeState').textContent = `${result.id} (${result.steps} steps)`
+    + (result.problems.length ? ` · check: ${result.problems.join('; ')}` : '')
+}
+const takeSection = document.createElement('section')
+takeSection.innerHTML = '<h2>Take</h2><button id="saveTake">Save take</button> <output id="takeState"></output>'
+$('drawer').append(takeSection)
+$('saveTake').onclick = saveTake
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement

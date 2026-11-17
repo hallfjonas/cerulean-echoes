@@ -1,7 +1,7 @@
 // The player's audio engine: everything Strudel lives here (initStrudel, sample banks and gm_* soundfonts, evaluate,
 // hush, the midin / midikeys shims and the WebMidi / strudelMirror globals the tracks read). The page talks to it only
-// through { ready, load(code), stop(), cycle() }; controller input comes from midi.mjs, so another engine can take
-// the same input.
+// through { ready, load(code), stop(), cycle(), cps() }; controller input comes from midi.mjs, so another engine can
+// take the same input.
 import { initStrudel, evaluate, samples, hush, signal, reify, Pattern, Hap, TimeSpan }
   from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
 import { BANKS, SOUNDFONTS } from './banks.mjs'
@@ -51,5 +51,6 @@ export const createEngine = midi => {
     // The cycle the scheduler's next query starts at, not now(): it queries ahead, so a control set or a key queued
     // now is heard from this cycle on (with now() every scripted step came about a tenth of a bar late)
     cycle: () => repl?.scheduler.lastEnd ?? repl?.scheduler.now() ?? 0,
+    cps: () => repl?.scheduler.cps ?? 0.5,
   }
 }

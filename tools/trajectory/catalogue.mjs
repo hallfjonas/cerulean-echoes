@@ -37,11 +37,13 @@ const liveFiles = () => {
     .sort((a, b) => path.basename(a).localeCompare(path.basename(b)))
 }
 
-const scriptsOf = id => {
-  const dir = path.join(PERFORM, id)
-  if (!fs.existsSync(dir)) return []
-  return fs.readdirSync(dir).filter(f => /^[\w-]+\.json$/.test(f)).map(f => f.slice(0, -'.json'.length)).sort()
-}
+const jsonNames = dir => fs.existsSync(dir)
+  ? fs.readdirSync(dir).filter(f => /^[\w-]+\.json$/.test(f)).map(f => f.slice(0, -'.json'.length)).sort()
+  : []
+
+// The scripts of a live track, then its takes (perform/<id>/takes/, newest first) as 'takes/<name>'
+const scriptsOf = id => [...jsonNames(path.join(PERFORM, id)),
+  ...jsonNames(path.join(PERFORM, id, 'takes')).reverse().map(name => `takes/${name}`)]
 
 const tapProblem = (source, name) => {
   try {

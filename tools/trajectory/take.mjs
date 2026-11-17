@@ -1,14 +1,14 @@
 // Performance capture: every MIDI message the player hears during a play, kept with its bar, and turned into an
 // auto-perform script v2 with `take` meta (.claude/epics/recording-replay/step-format-v2.md). Pure: runs in the page
 // and in Node; the page hands in midi.mjs and the engine (createRecorder), a test hands in messages (createSession).
-// Bar of a message = engine.cycle() at its arrival minus the cycle of the load: the start of the scheduler's next
+// Bar of a message = engine.cycle() at its arrival minus the load's bar line: the start of the scheduler's next
 // query, which is where midikeys places a key and from where a midin signal reads a new value.
 // Conversion: the CC values the real inputs hold at the load become bar-0 steps; a Launch Control button CC becomes a
 // `press` at each value > 0; other Launch Control CCs and the Launchkey's mod wheel and knobs become `cc` / `lk` steps,
 // cut into gestures where messages pause and thinned with Ramer-Douglas-Peucker (tolerance 1 MIDI step) into `ramp`
 // steps; Launchkey note-ons become `pad` (channel 10, notes 36-51) or `keys` steps, with the note-off as `length`.
 // Launch Control CCs that are not controls of the track, other Launchkey CCs and Launch Control notes are dropped.
-import { LK_CCS, PADS, PAD_CHANNEL } from './autoperform.mjs'
+import { LK_CCS, PADS, PAD_CHANNEL, startBarOf } from './autoperform.mjs'
 
 const VIRTUAL_PORTS = ['LCXL3 Auto', 'Launchkey MK4 25 Auto']
 export const GESTURE_GAP_MS = 100
@@ -26,14 +26,16 @@ export const noteName = note => `${NOTE_NAMES[note % 12]}${Math.floor(note / 12)
 export const createSession = meta => ({ ...meta, snapshot: meta.snapshot ?? [], messages: [] })
 export const addMessage = (session, message, bar) => session.messages.push({ ...message, bar: roundBar(bar) })
 
-// Captures every play: start() at each track load opens a new session (the previous one is dropped)
+// Captures every play: start() at each track load opens a new session (the previous one is dropped). Bar 0 is the
+// bar line the performer starts a script on (startBarOf): the clock has already run a query or two after the load, and
+// counting from that raw cycle put every replayed step a tenth of a bar early
 export const createRecorder = ({ midi, engine }) => {
   let session = null
   let startCycle = 0
   midi.onMessage(message => { if (session) addMessage(session, message, engine.cycle() - startCycle) })
   return {
     start: meta => {
-      startCycle = engine.cycle()
+      startCycle = startBarOf(engine.cycle())
       session = createSession({ ...meta, recordedAt: new Date().toISOString(), snapshot: midi.heldCcs() })
       return session
     },

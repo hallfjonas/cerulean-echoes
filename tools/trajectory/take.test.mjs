@@ -1,9 +1,10 @@
 // Tests for take.mjs with hand-made message lists. usage (in tools/): npm test
 import assert from 'node:assert/strict'
 import fs from 'fs'
+import path from 'path'
 import test from 'node:test'
 import { compile } from './autoperform.mjs'
-import { checkScript, controlsOf, trackFileOf } from './check-perform.mjs'
+import { PERFORM, checkScript, controlsOf, trackFileOf } from './check-perform.mjs'
 import { addMessage, createRecorder, createSession, noteName, thin, toScript } from './take.mjs'
 
 const LC = 'LCXL3 1 MIDI In'
@@ -140,4 +141,27 @@ test('a take on a live track passes check-perform (take meta and pad velocity le
   script.steps = script.steps.map(step => step.pad === undefined ? step : { bar: step.bar, pad: step.pad })
   assert.ok(take)
   assert.deepEqual(checkScript(script, real, track), [])
+})
+
+test('POST /take: a live track gets a take in perform/<track>/takes/ that the catalogue lists', async () => {
+  const { saveTake } = await import('./take-save.mjs')
+  const { find } = await import('./catalogue.mjs')
+  const track = '010-ambient-house'
+  const real = controlsOf(fs.readFileSync(trackFileOf(track), 'utf8'))
+  const button = [...real].find(([, c]) => c.button)[0]
+  const s = session([[LC, 0xbf, button, 127, 3], [LK, 0x99, 40, 100, 5], [LK, 0x90, 62, 90, 6]])
+  s.trackHash = 'a'.repeat(40)
+  assert.equal(saveTake('lab-kick-kick-lab', s).status, 404)
+  assert.equal(saveTake(track, { messages: [] }).status, 400)
+  const { status, body } = saveTake(track, s)
+  assert.equal(status, 200)
+  assert.match(body.id, /^takes\/\d{4}-\d\d-\d\d-\d{6}-human(-\d+)?$/)
+  const file = path.join(PERFORM, track, body.id + '.json')
+  try {
+    assert.deepEqual(body.problems, [])
+    assert.equal(JSON.parse(fs.readFileSync(file, 'utf8')).steps.length, 3)
+    assert.ok(find(track).scripts.includes(body.id))
+  } finally {
+    fs.rmSync(file)
+  }
 })
