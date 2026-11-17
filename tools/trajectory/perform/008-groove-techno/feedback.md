@@ -102,4 +102,26 @@
   - Everything after the first drift shifts 8 bars later; length stays 240 bars = 6 min 51 s.
 - Decision: again
 
+## Loop 2 / Round 3 - warehouse.json (2026-11-17)
+- User: "You repalced the wrong build up. The first one was perfect before. You should replace the second one by the
+  drift."
+- Mapping: my Round 2 reading was wrong (I replaced the first build). The first Build (49-64) and the drop at 65 are
+  restored step for step from the Round 1 version; the second build (Slow down plus Proper build) is replaced by the
+  drift.
+- Changed (bars 1-based):
+  - Build 49-64 restored (Tension 0 -> 0.9 over 15, Thin 0 -> 0.5 over 12, Riser hold 63-64, drop at 65 with the full
+    beat at once); the quicker intro (Curious 1-24, Hats 25-48) stays. No pre-drop drift.
+  - Kept from Round 2: Bassline Brightness (CC 16) sweeps in the Drop (now 0.3 at 65, 0.8 over 12 from 69, 0.3 over 8
+    from 85, 0.85 over 12 from 101, 0.4 over 8 from 117) and in the Peak (0.5 at 153, 0.9 over 12 from 157, 0.4 over 8
+    from 173); the 24-bar outro drift (Drift 2, 185-208) with the warm twist.
+  - Slow down (was 129-144) and Proper build (145-176) replaced by Drift 1 (129-152, 24 bars): the same drift function as
+    the outro, beat alive (Stab, Sequence, Bassline, Rumble, Sub out in turn, Wumms 0.85 -> 0.5, Thin and Fog up, Pads and
+    Dark perc thinning, Kick, Clap, Percussion, Hats stay). Left out of it: the warm Chapter twist, the Answer echo and
+    the final beat fade (end only). No Tension rise, Riser, Clap Swell or double-time build.
+  - Peak (153-184): a one-bar Kick Drop out (CC 45) on bar 152, then everything in at once on 153: Thin and Fog 0, Wumms
+    0.95, Pads, Dark perc, Rumble, Bassline, Sequence, Sub, Kick, Clap, Percussion, Stab up. Bass break at 168 then
+    Double time at 169 (1 bar each), Percussion Fill at 160, 176, 184.
+  - Length 208 bars = 5 min 57 s (was 240 bars, 6 min 51 s).
+- Decision: again
+
 ## Lessons
