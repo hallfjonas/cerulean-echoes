@@ -1,9 +1,9 @@
 ---
 name: auto-performances
-status: in-progress
+status: completed
 created: 2026-11-16T16:13:34Z
-updated: 2026-11-16T22:00:00Z
-progress: 85%
+updated: 2026-11-17T09:00:00Z
+progress: 100%
 prd: .claude/prds/auto-performances.md
 github: https://github.com/hallfjonas/cerulean-echoes/pull/26 (single PR, no per-task issues)
 ---
@@ -92,7 +92,7 @@ About 33 agent hours plus the user's listening time; the review loops set the ca
 - [x] 005.md - 007 ambient performance, "drift" (approved; the wind cue on "air" was dropped, time unknown)
 - [x] 006.md - 008 groove techno performance, "techno-night" (approved)
 - [x] 007.md - 009 house performance, "dance-floor" (approved)
-- [ ] 008.md - Skill auto-perform from what we learned (next; all four performances approved)
+- [x] 008.md - Skill auto-perform from what we learned (`.claude/skills/auto-perform/SKILL.md`; dry run on 009 reached a design proposal unaided)
 
 Delivered together in PR #26. `[x]` done.
 
