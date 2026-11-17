@@ -1,13 +1,17 @@
 // POST /take/<track>: the page sends the capture of its current play (take.mjs createRecorder session: meta, bar-0
 // snapshot, messages) and the server turns it into a take with the track's controls as they are in the track file now,
 // checks it like check-perform and writes perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<source>.json (uncommitted,
-// gitignored). The track id must be a live track of the catalogue; the file name is made here, never by the page.
-// Answers { id: 'takes/<name>', steps, problems: check-perform's errors (the take is written anyway) }.
+// gitignored), and the tapped events of the play next to it as <name>.events.jsonl (one batch per line, named by the
+// take's `events` field). The track id must be a live track of the catalogue; the file name is made here, never by the
+// page. Answers { id: 'takes/<name>', steps, problems: check-perform's errors (the take is written anyway), replay?:
+// the verdict of check-replay when the play was the replay of a take with events }.
 import fs from 'fs'
 import path from 'path'
 import { find } from './catalogue.mjs'
 import { PERFORM, checkScript, controlsOf } from './check-perform.mjs'
 import { toScript } from './take.mjs'
+import { checkReplay, isReplay } from './check-replay.mjs'
+import { summaryLine } from './replay-check.mjs'
 
 const MAX_BODY = 64 * 1024 * 1024
 const pad2 = n => String(n).padStart(2, '0')
@@ -32,9 +36,16 @@ export const saveTake = (id, session) => {
   const dir = path.join(PERFORM, id, 'takes')
   fs.mkdirSync(dir, { recursive: true })
   const name = nameOf(dir, script.take.source)
+  const events = Array.isArray(session.events) ? session.events.filter(Array.isArray) : []
+  if (events.length) {
+    script.take.events = name + '.events.jsonl'
+    fs.writeFileSync(path.join(dir, script.take.events), events.map(batch => JSON.stringify(batch) + '\n').join(''))
+  }
   fs.writeFileSync(path.join(dir, name + '.json'), JSON.stringify(script, null, 2) + '\n')
+  const replay = isReplay(script) && checkReplay(id, `takes/${name}`)
+  const verdict = replay && (replay.error ? `cannot check: ${replay.error}` : summaryLine(replay.result))
   return { status: 200, body: { id: `takes/${name}`, steps: script.steps.length,
-    problems: checkScript(script, controls, id) } }
+    problems: checkScript(script, controls, id), ...verdict && { replay: verdict } } }
 }
 
 export const handleTake = (request, response, id) => {
