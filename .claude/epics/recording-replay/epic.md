@@ -76,6 +76,19 @@ CC moves follow the same rule (`midin` signals read the value at query time).
 **Format.** The script format v2 is fixed in `step-format-v2.md`: the existing steps, `velocity` on pads, the `take`
 meta field, a 1e-6 bar tolerance in the performer, take and recording file names and the audio sidecar.
 
+**Audio recorder (task 2, 2026-11-17).** `engine-strudel.mjs` wraps `AudioNode.prototype.connect`/`disconnect`
+(a destination target goes to the context's master bus) and exposes `output()` and `cps()`. `recorder.mjs` +
+`recorder-worklet.js` stream 1 s chunks of 16-bit stereo PCM; `recording.mjs` (server) writes the WAV and the sidecar
+and rewrites both after every chunk, so a crash leaves a valid file. Start is `POST /recording/<track>` (the server
+names the file and returns it), then `PUT …/<name>` and `POST …/<name>/finish`. Closing the page finishes with
+`endedBy: 'unload'` (`sendBeacon`, measured: the last partial second is lost). `node trajectory/check-recording.mjs`
+tests the endpoints with a WAV roundtrip.
+Measured in the player pane (port 8791, auto-perform `warehouse` on 008 and `journey` on 010, 25 s phases
+alternating without and with recording, two pairs per track): no underrun (`AudioContext.playbackStats`
+`underrunEvents` 0 in every phase), main-thread timer lateness 3-12 ms in both, no long frames with the pane visible,
+renderer CPU 43-48 % (008) and 25-41 % (010) with no difference between phases beyond what the script sections move.
+Every WAV has as many samples as the wall time (25.00 s for 25 s) and no silent gap (`silencedetect` -80 dB / 10 ms).
+
 **Plan changes.** Task 5 is small (pad velocity, `take` meta in `check-perform`, bar tolerance, fresh-start load).
 Tasks 2, 4 and 5 can start now. The risk "replay waits for the recorded phase" is gone once loads hush first.
 
