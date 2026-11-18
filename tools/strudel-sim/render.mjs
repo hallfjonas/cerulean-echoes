@@ -2,7 +2,8 @@
 // usage: node render.mjs <track.strudel> <stemVariable> '<json cc values>'  → prints {"lufs":…, "peak":…}
 //   The stem may be any expression in the track's scope (e.g. one LK_SHOTS pad). Plays the banks of strudel.cc
 //   (trajectory/banks.mjs), the track's own samples() and the gm_* soundfonts. Queried tick by tick like the scheduler
-//   (midikeys only answers from the second query on). Env: BPM (default 140), CYC measured cycles (default 4).
+//   (midikeys only answers from the second query on). Env: BPM (default 140), CYC measured cycles (default 4),
+//   FROM the first measured cycle (default 0; a song-form track rests in its intro).
 import * as wa from 'node-web-audio-api'
 import { noteToMidi, freqToMidi } from '@strudel/core'
 import { load, run } from './harness.mjs'
@@ -19,6 +20,7 @@ console.warn = () => {}
 
 const [file, stem, json] = process.argv.slice(2)
 const cps = Number(process.env.BPM ?? 140) / 4 / 60, CYC = Number(process.env.CYC ?? 4), TAIL = 2, sr = 48000
+const FROM = Number(process.env.FROM ?? 0)
 const ctx = new wa.OfflineAudioContext(2, Math.ceil(sr * (CYC / cps + TAIL)), sr)
 sd.setAudioContext(ctx)
 await sd.initAudio({})
@@ -61,9 +63,9 @@ for (const [, name, body] of gm.matchAll(/(gm_\w+):\s*\[([^\]]*)\]/g)) {
 
 globalThis.samples = sd.samples
 const pat = (await load(file, JSON.parse(json), stem)).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)
-for (const h of run(pat, 0, CYC)) {
+for (const h of run(pat, FROM, FROM + CYC)) {
   const b = h.whole.begin.valueOf()
-  await sd.superdough(h.value, b / cps + 0.05, h.duration / cps, cps, b)
+  await sd.superdough(h.value, (b - FROM) / cps + 0.05, h.duration / cps, cps, b)
 }
 const buf = await ctx.startRendering()
 

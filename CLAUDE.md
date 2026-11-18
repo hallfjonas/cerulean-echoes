@@ -107,7 +107,8 @@ Tools (run in `tools/`):
   no args = all changed tracks; `--online` checks sounds online)
 - Old vs new, event by event: `npm run compare -- <old.strudel> <new.strudel> [--stem <name>]`
 - Levels are measured, not guessed: `npm run audibility -- <track>` (mix, every stem, Launchkey keys and pads at the
-  default state; flags SILENT / LOW / CLIPS); per-stem fader ranges: `npm run measure -- <track> stem=faderCC[,charCC] …`
+  default state, from cycle `--from <n>` on for a song whose parts rest at its start; flags SILENT / LOW / CLIPS);
+  per-stem fader ranges: `npm run measure -- <track> stem=faderCC[,charCC] …`
   (for 007-010 pass `--base '{"12":1,"60":1}'`)
 - Sounds load? `node strudel-sim/check-sounds.mjs [--offline] <track…>`; broken bank sound:
   `node strudel-sim/mirror-sound.mjs <sound>`
