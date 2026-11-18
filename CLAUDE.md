@@ -26,6 +26,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
   column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in
   the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
+- `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
+  to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git

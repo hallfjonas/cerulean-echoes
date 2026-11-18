@@ -14,7 +14,7 @@ watch it play itself in the player.
 
 ## How to use it
 1. In Guitar Pro: File, Export, MIDI. Name the file `gp-<song>.mid` and put it in the track folder
-   `tracks/<genre>/NNN-<name>/`.
+   `tracks/<genre>/NNN-<name>/`. The genre is defined in [genres.md](../reference/genres.md).
 2. Look at the file first: `node producer/midi-read.mjs <file.mid>` (in `tools/`) prints tempo, bars, markers and the
    parts of the song, plus warnings.
 3. Generate the track: `npm run producer -- <file.mid>` (in `tools/`). It writes the track, a design stub, a map file
