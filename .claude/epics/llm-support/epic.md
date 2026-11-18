@@ -53,8 +53,8 @@ Two limits that shape the plan:
   knob (not measured yet; task 1 measures it). Fine for iterating, not for a set.
 
 Out of this epic, on purpose:
-- **Compose** ("play Rudolph", a Guitar Pro file) belongs to `producer-mode-guitar-pro` and later epics. The bridge is
-  built to carry it.
+- **Compose** ("play Rudolph", a Guitar Pro file) is the producer mode (`npm run producer`, `/producer`: Guitar
+  Pro MIDI → live track) and later epics. The bridge is built to carry it.
 - **Live use during a set**: an agent steering controls or swapping code while the audience listens, and a gapless
   `swap(code)`. Iterating on a track that plays is in scope; acting on stage is not.
 
@@ -160,7 +160,7 @@ belong where. See Open Questions.
   `check-perform.mjs`, `npm run verify`, `tools.mjs` guard pattern, `catalogue.mjs`, the Settings drawer.
 - External: the `claude` CLI on the machine that runs the player.
 - Other epics: `vis-live-mapping`, `drop-buildup` and `launchkey-knob-target` also change the player or the LC view;
-  merge one at a time. `producer-mode-guitar-pro` is the first Compose input and will use the bridge once it exists.
+  merge one at a time. The producer mode (merged) is the first Compose input and can use the bridge once it exists.
 
 ## Risks
 
