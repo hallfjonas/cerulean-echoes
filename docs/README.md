@@ -19,6 +19,5 @@ Start here. For how to contribute, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Dev
 
-- [dev/skills.typ](dev/skills.typ) - source of the overview of the Claude Code setup (skills, tools)
-- [dev/skills.pdf](dev/skills.pdf) - the compiled overview
+- [dev/skills.md](dev/skills.md) - overview of the Claude Code setup (skills, tools)
 - [dev/workflow-review.md](dev/workflow-review.md) - the first review of Claude Code sessions, the model for later reviews
