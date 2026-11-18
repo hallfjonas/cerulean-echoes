@@ -65,6 +65,8 @@ if (flag !== '--no-wav') {
   await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json')
   // strudel.cc's built-in VCSL instruments (vibraphone …)
   await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/vcsl.json')
+  // strudel.cc's default sample pack (Dirt-Samples: metal, space, wind … — 008's Launchkey pads)
+  await sd.samples('https://raw.githubusercontent.com/tidalcycles/dirt-samples/main/strudel.json')
   // strudel.cc's General MIDI soundfonts (gm_*), as @strudel/soundfonts plays them, from the zones that
   // soundfont-extract.py wrote (sc/samples/gm): the same decoded audio SuperCollider plays; only the first preset
   const GM = { gm_vibraphone: '0110_JCLive_sf2_file', gm_marimba: '0120_JCLive_sf2_file', gm_drawbar_organ: '0160_JCLive_sf2_file',

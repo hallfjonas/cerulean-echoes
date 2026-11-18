@@ -32,7 +32,7 @@ sc/
     ui.scd                 Zustand für die LC-Ansicht (OSC an die Brücke)
     setup.scd / score.scd  Busse, Gruppen, Buffer; Offline-Rendern
   sounds/                  ein Klang = eine Datei im festen Format (sounds/README.md)
-  tracks/009-house/        der Track: Spalten, Muster, Harmonie — verweist auf Klänge per Name
+  tracks/009-house/ und 008-groove-techno/   die Tracks: Spalten, Muster, Harmonie — verweist auf Klänge per Name
   samples/                 Samples und Hall-Impulsantworten (CREDITS.md)
   tools/render.scd         Offline-Render eines Szenarios (für die Vergleiche)
 ```

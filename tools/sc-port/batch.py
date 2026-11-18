@@ -13,7 +13,11 @@ import compare
 from compare import load, audio, events
 
 here = os.path.dirname(os.path.abspath(__file__))
-track_strudel = os.path.join(here, '..', '..', 'tracks', '009-house', '009-house.strudel')
+# the track: CE_TRACK=<folder>/<name> under tracks/ and sc/tracks/ (default 009-house/009-house), e.g.
+# CE_TRACK=008-groove-techno/008-groove-techno python3 batch.py scenarios/008-kick.json /tmp/cmp-008-kick
+track = os.environ.get('CE_TRACK', '009-house/009-house')
+os.environ['CE_TRACK'] = track   # for sc-render.sh
+track_strudel = os.path.join(here, '..', '..', 'tracks', track + '.strudel')
 sc_render = os.environ.get('SC_RENDER', os.path.join(here, 'sc-render.sh'))
 
 scens = json.load(open(sys.argv[1])); work = sys.argv[2]; filt = sys.argv[3] if len(sys.argv) > 3 else ''

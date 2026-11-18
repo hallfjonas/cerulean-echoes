@@ -1,0 +1,374 @@
+[
+ {
+  "name": "rumble-base",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-bright0",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "14": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-bright05",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "14": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-bright1",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "14": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-char05",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "30": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-char1",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "30": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-char03",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "30": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-char08",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "30": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-space05",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "22": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-patterns",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 38,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 38,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 38,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 38,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "rumble-btn2",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 46,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 46,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "rumble-chapter",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "rumble-break",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "rumble-fogtension",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-tension1",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-thin",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "rumble-prog",
+  "strudel": "stemJ2_rumble",
+  "sc": "rumble",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 24,
+   "cc": {
+    "6": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 8.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 8.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 16.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 16.6,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ }
+]

@@ -24,3 +24,11 @@
 - `voice/brace.wav`, `voice/lw.wav` — the repository's own spoken samples (`samples/voice/*.m4a`), decoded to WAV
   (SuperCollider cannot read m4a). Browsers drop the AAC encoder delay when decoding; so does this decode.
 - Files with `repo:` in the track (keys piano, flute phrases) are read from the repository's own `samples/` folder.
+- `ir/orbit-1.6.wav`, `ir/orbit-2.6.wav`, `ir/orbit-4.wav` (+ `-44100`) — the same measurement for room sizes 1.6, 2.6
+  and 4 (track 008: orbit 1 drums and bass, orbit 3 rumble, orbit 2 Jonas' colour).
+- `tr808/sh-00.wav`, `tr909/ht-00.wav`, `sergemodular/perc-00.wav`, `emumodular/perc-00.wav`,
+  `viscospacedrum/misc-00.wav` — more tidal-drum-machines one-shots (n 0 of `RolandTR808_sh`, `RolandTR909_ht`,
+  `SergeModular_perc`, `EmuModular_perc`, `ViscoSpaceDrum_misc`): track 008's Launchkey pads.
+- `dirt/metal-00.wav`, `dirt/space-00.wav`, `dirt/wind-00.wav` — from [tidalcycles/Dirt-Samples](https://github.com/tidalcycles/Dirt-Samples)
+  (`metal/000_0.wav`, `space/000_0.wav`, `wind/000_wind1.wav`), strudel.cc's default sample pack (n 0 of `metal`,
+  `space`, `wind`): track 008's Launchkey pads.

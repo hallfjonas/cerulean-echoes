@@ -4,6 +4,8 @@ Stand 18.11.2026. **Alle Spalten sind portiert**: Jojo 1–7, Jonas 1–7, die g
 Jede Spur wurde automatisch gegen den Strudel-Track verglichen (dieselben Noten, Lautheit meist auf 0,2 dB gleich;
 Details in `sc/PORTING.md`). Optimiert (CPU, Pegel, Klang) wird erst danach.
 
+**Track 008 (Groove Techno)** ist auch portiert: Unterschiede und Belegung in `sc/ANLEITUNG-008.md`.
+
 ## 1. Einmal einrichten
 
 0. **Repo holen** (nur beim ersten Mal): Der SC-Teil liegt auf dem Branch `sc`, getrennt von den Strudel-Tracks.
@@ -13,7 +15,7 @@ Details in `sc/PORTING.md`). Optimiert (CPU, Pegel, Klang) wird erst danach.
 1. **SuperCollider** installieren (Version 3.13 oder neuer, https://supercollider.github.io). Zusatz-Plugins
    (sc3-plugins) sind nicht nötig.
 2. **Launch Control XL 3:** dieselben Custom Modes wie für den Strudel-Track laden
-   (`tracks/009-house/009-house-mode1.syx` auf Slot 1, `…-mode2.syx` auf Slot 2, mit Novation Components).
+   (`tracks/house/009-house/009-house-mode1.syx` auf Slot 1, `…-mode2.syx` auf Slot 2, mit Novation Components).
    Es ändert sich nichts an der Belegung.
 3. **Audio-Ausgang:** SuperCollider nimmt den Standard-Ausgang von macOS. Für die Scarlett vor dem Start in
    den Systemeinstellungen → Ton die Scarlett als Ausgang wählen.
