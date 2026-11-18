@@ -42,7 +42,8 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 - **Must have**: four-on-the-floor kick; bass line with groove; house piano chords (also 8-bar progressions); a lighter,
   playful melody on flute-like or bright sounds; a dry sound (little reverb on the drums).
 - **Must not have**: long pads and no bass groove (ambient house); a dark, minimal loop at 130+ BPM (techno).
-- **Tracks here**: [009-house](../../tracks/house/009-house/) (A minor, 124 BPM).
+- **Tracks here**: [009-house](../../tracks/house/009-house/) (A minor, 124 BPM); [001-groove](../../tracks/house/80s/001-groove/) (80s groove house: disco / boogie and
+  rave colours, D dorian, 124 BPM).
 - **Listen**: Sarah Wild, Fusion 2025 (the main reference for 009, with its tracklist).
 
 ## Techno

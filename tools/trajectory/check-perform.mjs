@@ -141,13 +141,16 @@ const jsonFiles = dir => fs.existsSync(dir)
 export const scriptFiles = trackId => jsonFiles(path.join(PERFORM, trackId))
 const takeFiles = trackId => jsonFiles(path.join(PERFORM, trackId, 'takes'))
 
-export const trackFileOf = trackId => {
-  const tracks = path.join(repo, 'tracks')
-  const files = fs.readdirSync(tracks).flatMap(genre => fs.statSync(path.join(tracks, genre)).isDirectory()
-    ? fs.readdirSync(path.join(tracks, genre)).map(folder => path.join(tracks, genre, folder, trackId + '.strudel'))
-    : [])
-  return files.find(file => fs.existsSync(file)) ?? null
+const findFile = (dir, name) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name)
+    const found = entry.isDirectory() ? findFile(full, name) : entry.name === name ? full : null
+    if (found) return found
+  }
+  return null
 }
+
+export const trackFileOf = trackId => findFile(path.join(repo, 'tracks'), trackId + '.strudel')
 
 // { file: errors[] } for every script and take of the track
 export const checkTrack = file => {
