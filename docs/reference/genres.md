@@ -57,16 +57,40 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 
 ## Groove Techno
 
-- **Definition**: techno whose main draw is the groove: a rolling, syncopated bass and percussion pattern that makes the
-  body move, with warm harmonic colour (keys, mallets) over dark drums. Mood: driving, warm, funky.
+- **Definition**: techno that moves the body rather than hits it. Smooth, bouncy and warm, with a raving lift: a steady
+  kick, a fast groovy hat and wooden rhythm instruments that bounce, a stab as the theme, and an answer that drifts off.
+  Mood: cool, curious, peaceful, raving.
 - **Tempo**: about 130–140 BPM (to agree; 008 is 140).
-- **Must have**: a four-on-the-floor kick; a syncopated groove layer (offbeat hats, shakers, rim or percussion with a
-  swing feel); a rolling bass line or looping bass pattern that carries the groove; warm keys or mallets (Rhodes, piano,
-  organ, vibes) used sparingly, mixed into a dark drum sound; slow change over the loop, with the groove as the hook.
-- **Must not have**: no harmonic colour at all and only a bare, minimal loop (techno); a playful house piano or a light
-  flute-like melody over a bass groove (house); no hard kick (ambient house, ambient).
-- **Tracks here**: [008-groove-techno](../../tracks/techno/008-groove-techno/) (F, 140 BPM; piano, Rhodes, organs, mallets
-  on its keys; dark one-shots on the pads).
+- **Scoring**: each stem below is scored 0–100% against its line. Reference: [008-groove-techno](../../tracks/techno/008-groove-techno/),
+  scored at 50% overall.
+
+### Stems
+
+- **Kick, rumble, sub**: a steady four-on-the-floor kick with a soft, round attack and a sub that fills the body, not the
+  ear. Motion is smooth. Must not be hard, in-your-face or dark (the duffi-techno kick). Reference: 90%.
+- **Bass**: a short, sparse bass figure in the same register and position as Mode 2 (the bass that the player moves with),
+  with a slightly nicer sound. Played less often: a seasoning, not a constant line. Reference: 30%.
+- **Clap / wooden rhythm**: no clap. A fast, warm, wooden rhythm (wood blocks, rims, marimba-like pulses) that bounces
+  and sounds cool and raving. Must be clearly separable from the hats in rhythm and stereo position. Reference: 0%.
+- **Hats**: two layers. A fast, groovy closed hat and an open hat, each in its own rhythm and position. Never both
+  overwhelming at once. Reference: 50% (the rhythm is good; the open hat and the groovy fast hat are missing).
+- **Percussion**: a syncopated percussion pattern that drives the groove. The pattern is right. The sound that lands on
+  every third step (the `~ ~ x ~` hit) does not sound good and must change. Reference: 90%.
+- **Pads and strings**: warm, slow, consolidated into one pad and one strings layer. They come in with the density (the
+  more the track builds, the more they enter), not from the start. Reference: nice as they are, to consolidate.
+- **Stab**: the main instrument and the theme of the track. The stab decides what comes in, what stays and what varies.
+  It vanishes and surprises, so the listener remembers it. Must be playable live with knobs. Reference: 100%, needs live
+  performance attention.
+- **Answer**: enters where the stab leaves. Curious and peaceful: it makes you stretch and come back, then drifts off.
+  Reference: 100%.
+- **Accent percussion**: short, random, high-pitched one-shots that support the groove but run in a much slower period
+  than the groove. They surprise now and then and barely repeat (think Yanamaste). Reference: 10%, a full remake.
+- **FX**: risers, sweeps and tails at the points of change. The concept is good; the current sounds are poor. Needs a
+  good cue in the track. Reference: 50%.
+
+- **Must not have**: a bare, minimal loop with no harmonic colour (techno); a playful house piano or flute-like melody over
+  a bass groove (house); a dark, heavy kick as the main drive.
+- **Tracks here**: [008-groove-techno](../../tracks/techno/008-groove-techno/) (F, 140 BPM).
 - **Listen**: add references here when agreed (the Groove Techno section of [listening-list.md](listening-list.md) is
   still empty).
 
@@ -111,7 +135,7 @@ Check in this order and stop at the first match:
 
 1. Classical: the source is a composed score and there is no dance beat.
 2. Rock: guitars and a live drum kit drive the piece, no four-on-the-floor kick.
-3. Groove techno: driving kick, a rolling syncopated groove, warm keys or mallets over dark drums, 130–140 BPM.
+3. Groove techno: smooth steady kick, fast groovy hats and wooden rhythm, a stab as theme, 130–140 BPM.
 4. Techno: a driving kick, a repeating dark loop, 130 BPM or more, with no warm harmonic colour.
 5. EDM: a build that resolves in a drop, with bright leads.
 6. House: four-on-the-floor kick, bass groove, piano chords, 118–128 BPM.
@@ -126,6 +150,8 @@ If a track fits two genres, name the one that matches the first rule above and s
 - Tempo ranges: are 118–128 for house and 115–125 for ambient house the right bands, or should they overlap less?
 - EDM tempo: 120–130, or 128–140?
 - Groove techno tempo: 130–140, or wider up to 145 (techno's range)?
+- Groove techno stem targets: are the reference percentages (kick 90%, clap replaced, hats 50%, stab 100%) the right starting
+  scores, and is the clap-to-wooden-rhythm swap the agreed direction?
 - Does groove techno need a listening reference of its own? The Groove Techno section of the listening list is empty.
 - Does rock need a separate "heavy" or "ballad" label, or is slow rock enough?
 - Is "ambient house" one word or two in the folder names (`ambient-house` stays unless agreed otherwise)?
