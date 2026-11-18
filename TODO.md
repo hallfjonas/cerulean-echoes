@@ -7,8 +7,8 @@
 # Player
 
 ## Features
-- Live-player recording button
-- auto-perform: jump to a certain chapter by clicking on it
+- auto-perform playback control: jump to a certain chapter by clicking on it; play / pause
+- reset to track's default settings (a button, or when a track or an auto-perform starts)
 
 ## UI
 - About this page: the hide/expand button should be inside that page
@@ -21,7 +21,7 @@ Long text of each idea: `git show 1bd1438:docs/player-future.md`.
 - Meta-steering: `meta.mjs`, curve view, control-map sweep, open and closed loop are in epic `auto-perform-steering`.
   Not planned: an LLM agent per phrase that reads the curve and the measured state and replans when a human grabs a
   control.
-- Producer inputs beyond Guitar Pro (epic `producer-mode-guitar-pro`): song form plus genre, note sheet (MusicXML, MIDI,
+- Producer inputs beyond Guitar Pro (see `tools/producer/` and `.claude/prds/producer-slow-rock.md`): song form plus genre, note sheet (MusicXML, MIDI,
   ABC; scans need music recognition), song name recalled by an LLM. Needs a written song model, a generator from
   that model to a one-file track, and a timeline that moves Chapter and Tension per section.
 - Trajectory score: a per-bar separation number (stems apart in pan and pitch) from the Strudel path, a "good
