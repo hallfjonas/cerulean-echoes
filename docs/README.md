@@ -16,8 +16,3 @@ Start here. For how to contribute, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 - [../midi-layouts/devices.md](../midi-layouts/devices.md) - the MIDI devices and their ports
 - [reference/casio-gp310-midi.md](reference/casio-gp310-midi.md) - using the Casio GP-310 piano with Strudel over MIDI
 - [reference/listening-list.md](reference/listening-list.md) - tracks and sets to listen to, by genre
-
-## Dev
-
-- [dev/skills.md](dev/skills.md) - overview of the Claude Code setup (skills, tools)
-- [dev/workflow-review.md](dev/workflow-review.md) - the first review of Claude Code sessions, the model for later reviews

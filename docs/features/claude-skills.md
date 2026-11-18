@@ -23,7 +23,7 @@ When you work with Claude Code in this repo and the job is one of the ones below
 - A skill only guides Claude. The real work is done by the tools in `tools/` (see [checks](checks.md)).
 - Claude asks before it changes sound, effects or the controller layout, unless that is the task.
 - Hooks run on their own after every edit: they regenerate the sheet and `.syx` files of a changed track.
-- An overview of the whole setup: `docs/dev/skills.md`.
+- Project rules Claude always reads: `CLAUDE.md`.
 
 ## Related
 - [Checks](checks.md)

@@ -6,12 +6,14 @@ description: Review past Claude Code sessions of this project for a date or date
 # Workflow review
 
 Script first, reading second: transcripts are never read raw. The digest script condenses them, subagents read the
-digests, you synthesise. The first full review is `docs/dev/workflow-review.md`; follow its structure.
+digests, you synthesise. Reports hold private chat content, so they live outside the repo and are never committed:
+`~/.claude/projects/-Users-jonas-hall-Documents-GitHub-cerulean-echoes/workflow-reviews/` (the reports folder). The
+oldest report there is the model to follow.
 
 ## 1. Range
 Take `--since` / `--until` (YYYY-MM-DD, inclusive; a session counts on the day it started) from the request. One
-date: same value for both. No date: since the end of the last report in `docs/workflow-reviews/` (or
-`docs/dev/workflow-review.md`) until today. Say the range in one line before starting.
+date: same value for both. No date: since the end of the last report in the reports folder until today. Say the
+range in one line before starting.
 
 ## 2. Digest
 ```sh
@@ -51,7 +53,7 @@ Maintainability counts too: duplicated blocks patched in several tracks, generat
 drifted from code, dead tools or skills.
 
 ## 5. Report
-Write `docs/workflow-reviews/<from>_<to>.md` (one date: `<date>.md`), in English:
+Write `<reports folder>/<from>_<to>.md` (one date: `<date>.md`), in English, never inside the repo:
 1. Method: range, session count, excluded sessions and why.
 2. Inventory table: item, what it covers, used in this range.
 3. Themes ranked by sessions affected, merged across batches, each with sessions, evidence, friction.
