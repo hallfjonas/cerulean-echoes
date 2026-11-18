@@ -2,8 +2,8 @@
 name: vis-live-mapping
 status: backlog
 created: 2026-11-16T16:05:25Z
-updated: 2026-11-16T16:05:25Z
-progress: 0%
+updated: 2026-11-18T12:00:00Z
+progress: 14%
 prd: .claude/prds/vis-live-mapping.md
 github: (will be set on sync)
 ---
@@ -26,7 +26,7 @@ brightness, space and drive. Proven by a Node check that plays a track with scri
   new fields; the renderer falls back to today's colour when they are missing.
 - **Loudness scale.** e = clamp((20·log10(gain·postgain·velocity) + 36) / 42): −36 dB → 0, +6 dB → 1 (to be tuned
   against `npm run audibility` levels). Level 0 → e = 0 → hidden; no per-stem peak.
-- **Filter on y.** `yHz = base`; if `lpf < base·2` pull down towards `lpf`; if `hpf > base/2` push up towards `hpf`
+- **Filter on y.** `yHz = base`; if `cutoff < base·2` pull down towards `cutoff`; if `hcutoff > base/2` push up towards `hcutoff` (Strudel stores `lpf`/`hpf` as `cutoff`/`hcutoff`, see audit.md)
   (geometric blend), so a closed low-pass on hats sinks them and opening it lifts them.
 - **Layers.** Per stem keep the last events of a ~50 ms window; position from the loudest one, so octave layers do not
   flicker.
@@ -40,8 +40,7 @@ brightness, space and drive. Proven by a Node check that plays a track with scri
 - `strudel-source.mjs`: uses `mapping.mjs`; emits `gone` and tint fields; no per-stem peak.
 - `render.mjs`: no glow floor; skip comets with `gone` or e below threshold (all three looks); radius and glow from
   absolute e; `tint()` helper; legend in labels mode.
-- `make-tapped.mjs`: `trajectoryKeys` gains `delay`, `delaytime`, `size`, `shape`, `distort`, `crush`, `coarse`,
-  `orbit`.
+- `make-tapped.mjs`: `trajectoryKeys` drops `lpf`/`hpf` and gains `hcutoff`, `delay`, `shape`, `distort`, `crush` (audit.md; `orbit`, `roomsize`, `delaytime`, `coarse` not needed).
 
 ### Backend Services
 - None. `server.mjs` relays lines unchanged.
@@ -54,8 +53,8 @@ brightness, space and drive. Proven by a Node check that plays a track with scri
 
 ## Implementation Strategy
 
-1. Audit first: confirm what Brightness, Space and Level write into the events in 007–010 (`npm run scenario --
-   --events`). If Space is on a bus, decide how the tap reads it (bus value tagged on the stem, or orbit lookup).
+1. Audit first (done, see `audit.md`): Brightness, Space and Level write `cutoff`, per-event `room`/`delay`, and `postgain`.
+   Space is read from each event, not from the orbit.
 2. Extract the mapper and build the check against today's behaviour (it fails on Brightness/fader → the target).
 3. Change mapping (y, e, layers), then the renderer (hide, size, colour) — the two can run in parallel once the line
    fields are fixed.
@@ -65,7 +64,7 @@ brightness, space and drive. Proven by a Node check that plays a track with scri
 
 | # | Task | Depends | Parallel |
 |---|---|---|---|
-| 1 | Audit: what Brightness / Space / Level / Drive set in the events of 007–010; decide tap source for Space; fix line fields | — | — |
+| 1 | Audit: what Brightness / Space / Level / Drive set in the events of 007–010; decide tap source for Space; fix line fields. **Done**: `audit.md` | — | — |
 | 2 | Extract `mapping.mjs` + `check-mapping.mjs` (Node, scenario-driven), wired into `npm run verify` | 1 | — |
 | 3 | Tap more keys in `make-tapped.mjs` (and Space source from task 1) | 1 | with 2 |
 | 4 | Mapping: y = pitch shifted by filter, absolute e, layer window, `gone`, tint inputs | 2, 3 | — |
