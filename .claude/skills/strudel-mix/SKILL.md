@@ -14,7 +14,8 @@ node strudel-sim/audibility.mjs ../tracks/<genre>/NNN-<name>/<track>.strudel
 ```
 Default state: every LC fader (CC 5-12, Mode 2 CC 53-60) at 1, every knob and button at 0, plus the track's
 `KNOB_DEFAULTS` / `LK_DEFAULTS`. Options: `--cc '<json>'` overrides controls (Launchkey as `lk<cc>`, `lk1` = mod wheel;
-e.g. a Launchkey sound knob to hear another keys sound), `--keys '<mini-notation>'` the test chords for the keys.
+e.g. a Launchkey sound knob to hear another keys sound), `--keys '<mini-notation>'` the test chords for the keys,
+`--from <cycle>` measures from that cycle on (default 0; a song-form track rests in its intro, so a measure from 0 reads SILENT).
 It renders one process after another (~1 min for 30 layers): the whole mix, every stem of the master solo, the Launchkey
 keys (`stemLK`, mod wheel 1), every `LK_SHOTS` pad once (dry, no room/delay). BPM is read from `const bpm`.
 

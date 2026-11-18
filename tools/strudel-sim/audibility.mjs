@@ -1,10 +1,12 @@
 // Audibility check: is every layer of a track heard at the default state, and does anything clip?
 // usage (in tools/): node strudel-sim/audibility.mjs <track.strudel> [--cc '<json cc values>'] [--keys '<notes>']
+//   [--from <cycle>]
 // Default state: every LC fader (CC 5-12, Mode 2 CC 53-60) at 1, every knob and button at 0, plus the track's
 // KNOB_DEFAULTS / LK_DEFAULTS. --cc overrides it (Launchkey controls as lk<cc>, e.g. lk1 = mod wheel).
 // Renders, one process after another (render.mjs): the whole mix; every stem of the master solo; the Launchkey keys
 // (stemLK) playing --keys with the mod wheel up; every LK_SHOTS pad once, dry. Flags: SILENT (no sound), LOW (loudest
 // moment more than 12 dB below the median of the stems), CLIPS (sample peak above 1).
+// --from: mix, stems and keys are measured from this cycle on (default 0), for a song whose parts rest at its start.
 import { execFileSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
@@ -18,7 +20,7 @@ const args = process.argv.slice(2)
 const opt = name => args.includes(name) ? args[args.indexOf(name) + 1] : undefined
 const file = args[0]
 if (!file || !fs.existsSync(file)) {
-  console.error(`usage: node audibility.mjs <track.strudel> [--cc '<json>'] [--keys '<notes>']`)
+  console.error(`usage: node audibility.mjs <track.strudel> [--cc '<json>'] [--keys '<notes>'] [--from <cycle>]`)
   process.exit(1)
 }
 const src = fs.readFileSync(file, 'utf8')
@@ -40,9 +42,10 @@ for (const [n, v] of Object.entries(lkDefaults ?? {})) base['lk' + ((lkKnob1 ?? 
 Object.assign(base, JSON.parse(opt('--cc') ?? '{}'))
 const keys = opt('--keys') ?? '<[d3,f3,a3] [c3,e3,g3] [bb2,d3,f3] [a2,c3,e3]>*2'
 
-const render = (expr, vals, cycles = 4) => JSON.parse(execFileSync('node',
+const from = Number(opt('--from') ?? 0)
+const render = (expr, vals, cycles = 4, start = 0) => JSON.parse(execFileSync('node',
   [path.join(here, 'render.mjs'), file, expr, JSON.stringify(vals)],
-  { env: { ...process.env, BPM: String(bpm), CYC: String(cycles) }, maxBuffer: 1 << 24 })
+  { env: { ...process.env, BPM: String(bpm), CYC: String(cycles), FROM: String(start) }, maxBuffer: 1 << 24 })
   .toString().trim().split('\n').pop())
 
 const padCycles = Math.ceil(PAD_SECONDS * bpm / 240)
@@ -55,8 +58,8 @@ for (const [i, shot] of (shots ?? []).entries()) layers.push({ name: `pad ${i + 
 
 log(`${path.basename(file)} at ${bpm} BPM. State: faders 1, knobs/buttons 0` +
   (knobDefaults || lkDefaults ? ' + KNOB_DEFAULTS/LK_DEFAULTS' : '') + (opt('--cc') ? ' + --cc' : '') +
-  `. Keys: ${keys}. Rendering ${layers.length} layers…`)
-for (const l of layers) l.r = render(l.expr, { ...base, ...l.vals }, l.cycles)
+  (from ? `. From cycle ${from}` : '') + `. Keys: ${keys}. Rendering ${layers.length} layers…`)
+for (const l of layers) l.r = render(l.expr, { ...base, ...l.vals }, l.cycles, l.cycles ? 0 : from)
 
 const sorted = layers.filter(l => l.stem && l.r.mmax !== null).map(l => l.r.mmax).sort((a, b) => a - b)
 const median = sorted.length ? sorted[Math.floor((sorted.length - 1) / 2)] : null
