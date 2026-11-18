@@ -109,7 +109,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   | `{ bar, cc, value, ramp? }` | a Launch Control CC (Mode 1 CC 5-51, Mode 2 = CC + 48) |
   | `{ bar, press }` | a momentary Launch Control button (its CC), held for two scheduler ticks |
   | `{ bar, keys, velocity?, length? }` | Launchkey keys played together: note names as in Strudel (`c4` = 60, `eb3`, `f#2`) or MIDI numbers, space-separated (`"c3 e3 g3"` = chord); velocity 0…1 (default 0.8); length in bars (default 1) |
-  | `{ bar, pad }` | a Launchkey drum pad: note 36-51 (drum C1 = 36), channel 10 |
+  | `{ bar, pad, velocity? }` | a Launchkey drum pad: note 36-51 (drum C1 = 36), channel 10; velocity 0…1 (default 0.8) |
   | `{ bar, lk, value, ramp? }` | a Launchkey CC: mod wheel `1` (keys level) or knob `31`-`38` |
 
   The tracks' `midikeys` has no note-off: how long a key sounds is the track's own (LK knob 5 Length in 009/010);
@@ -117,27 +117,84 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   keys or pads at bar 0 are dropped (the tracks drop what waits in the queue on their first query): start them later.
 - Steps follow the engine's cycle clock, not a timer, so they stay on the bar whatever the tempo; a press is held for
   two scheduler ticks so the tracks' `cycleButton` sees it. The clock is the cycle the scheduler queries next (it
-  runs ahead of what sounds), so a step is heard within one scheduler tick of its bar, and bar 0 is the bar line
-  nearest the start.
+  runs ahead of what sounds), so a step is heard within one scheduler tick of its bar. A step fires once the clock is
+  within 1e-6 bar of its bar, which absorbs the 4-decimal rounding of takes.
+- **Every load restarts the clock.** `engine.load` calls `hush()` before it evaluates, so the scheduler starts at
+  cycle 0: bar 0 of a script is cycle 0, alternations (`<a b>`) and slow patterns start in the same phase on every
+  Play and Start, and the query grid is the same on every run. Values set before a load survive it (the ports keep
+  their last value per CC), which is why a script is primed before the load (see Takes).
 - Pick a script in the drawer, **Start** (or **P**) reloads the track so the script begins from silence; **Stop** (or
   **P**) ends it and releases held keys (the controls keep their values). The next Start sets every control of both
-  virtual inputs back to 0.
+  virtual inputs back to 0 before the track loads, then sets the script's bar-0 values.
+- Takes you saved (below) are listed with the scripts as `takes/<name>` and play the same way.
 - While a script plays, the drawer shows its title, mood and sections (the current one in bold, `intent` on hover),
   and the top bar the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
-  step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 31-38, keys that parse.
-  `npm run verify` runs it.
+  step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 31-38, keys that parse,
+  and the `take` meta field of a take. `npm run verify` runs it.
 - Levels without a browser: `npm run scenario -- <track> --script <file> [--stems]` plays the whole script (LC and
   Launchkey steps) and prints, per section, the audible events and the loudest event gain per stem in dB, with
   `SILENT` for a section without sound. These are event gains, not rendered audio: peaks and clipping need
   `npm run audibility`.
+
+### Recording audio
+
+**Record** (button in the top bar and the drawer, key **R**) writes what you hear, the master output, as a WAV file.
+
+- Human recording: from Record to **Stop rec** (or Stop, or another track). Auto-perform with **Record audio** ticked
+  records from Start to the end of the script plus 4 s; Stop, another track or a new Start ends it earlier.
+- Files: `recordings/<track>/<YYYY-MM-DD>-<HHMMSS>-<human|auto>.wav` (16-bit PCM, stereo, the audio context's sample
+  rate, 48 kHz in Chrome) and a `.json` sidecar of the same name (track, track hash, script, take, start cycle, cps,
+  sample rate, length, how it ended). `recordings/` is outside git. The server makes every name; the page sends only
+  the track id and the source. Recording is refused below 2 GB of free disk.
+- How: the engine wraps `AudioNode.prototype.connect` so that everything that connects to the context's destination
+  goes through one master bus that also feeds the recorder worklet (`recorder-worklet.js`, `recorder.mjs`). The
+  worklet streams 1 s chunks to `PUT /recording/<track>/<name>` (`recording.mjs`); the file and the sidecar are
+  rewritten after every chunk, so a crash leaves a valid file. Closing the tab ends the recording with `endedBy:
+  'unload'` and loses the last partial second.
+- `node trajectory/check-recording.mjs` tests the endpoints with a WAV roundtrip.
+
+### Takes and replay
+
+Every load (Play, auto-perform Start) opens a capture of all MIDI input: controllers, virtual inputs and Launchkey
+keys, pads, knobs and mod wheel (`take.mjs`). The capture before it is dropped. **Save take** (drawer, section Take)
+turns the current capture into an auto-perform script and writes it, uncommitted (`tools/trajectory/perform/*/takes/`
+is gitignored):
+
+- `perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<human|auto|mixed>.json`: a script v2 with a `take` field (source:
+  real ports, virtual ports or both; recording time; sha1 of the track text it was played on; cps; ports heard; the
+  auto-perform script that played). It is listed with the track's scripts as `takes/<name>`.
+- `…/<same name>.events.jsonl`: the tapped Strudel events of that play, one batch per line.
+
+How a capture becomes steps: the CC values the ports hold at the load become bar-0 steps; a message's bar is the
+engine's clock at its arrival, which is the start of the scheduler's next query, exactly where a key is placed and
+from where a control reads its new value, so a replay lands in the same place. A Launch Control button becomes a
+`press` at each press; other controls and the Launchkey mod wheel and knobs become `cc` / `lk` steps, cut into gestures
+and thinned with Ramer-Douglas-Peucker (tolerance 1 MIDI step) into `ramp` steps; keys become one `keys` step per
+note (note-off as `length`), drum pads 36-51 `pad` steps with their `velocity`. Controls the track does not have and
+other Launchkey CCs are dropped.
+
+**Replay:** pick the take in the Auto-perform list and Start. The performer sets the take's bar-0 values before the
+load, the load restarts the clock, and the steps play into the virtual inputs, so the track does what your hands did.
+What you play on top is captured as well (last moved wins). A tab in the background throttles its timers to 1 s and
+spoils a capture or a replay; keep the player visible.
+
+**Keeping a take:** move it from `takes/` up to `perform/<track>/`, give it a name and a title, run `check-perform`
+and commit it.
+
+**Replay fidelity.** Save the replay as a take as well: it names its original (`take.script`), and saving answers
+with the verdict in the drawer. `node trajectory/check-replay.mjs <track> [takes/<replay take>]` (Tools: Check replay
+fidelity) compares the events of every replay take with those of its original, bar by bar, and lists each differing
+bar with a reason: `value` (a control read another value, one MIDI step off is expected on thinned ramps), `timing`
+(a key, press or move landed one query off) or `only` (an event of one play with no partner: button state, level or
+randomness). Takes with no events, no replay or no original are listed as such. Exit code 1 when a replay differs.
 
 ### Tools page
 
 **http://localhost:8766/tools.html** runs the Node checks from the browser: pick a command, pick a track or board
 from the catalogue (filtered by what the command accepts), **Run** (live log) or **Stop**. One job runs at a time
 (a second request gets 409). The commands are a fixed list in `tools.mjs`: check sounds, loudness of every stem, layout
-sheet + syx, stem lab sync and check (boards), build set 011. Paths never come from the page: a target is a catalogue
+sheet + syx, stem lab sync and check (boards), check replay fidelity (takes), build set 011. Paths never come from the page: a target is a catalogue
 id. **Analysis** (`analyse.html`) is a tool on the same page: the audio analysis from a file or input, with recording.
 
 ### Help panel
@@ -198,11 +255,15 @@ Both inputs write **the same format**; the renderer does not know where the musi
 | `smoothing.mjs` | slider Raw ↔ Smooth: moving average, window grows exponentially up to 2^53 lines |
 | `strudel-source.mjs` | Strudel events → lines, each event appears when it sounds (`delay`) |
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
-| `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/tools` and `/run` (Tools page), relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
+| `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, `/tools` and `/run` (Tools page), relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
 | `player.html` | the player page: loads a track through the engine, shows it with `render.mjs`, top bar and drawer |
 | `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
-| `autoperform.mjs` | the script player and the drawer section |
+| `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the drawer section |
+| `take.mjs`, `take-save.mjs` | the capture of a play's MIDI input and its conversion to a take script; `POST /take/<track>` writes the take and its events |
+| `recorder.mjs`, `recorder-worklet.js`, `recording.mjs` | the audio recorder in the page (master bus tap, PCM worklet) and the server side that writes the WAV and sidecar |
+| `replay-check.mjs`, `check-replay.mjs` | replay fidelity: the pure event comparison and its CLI |
+| `check-recording.mjs` | end-to-end test of the recording endpoints |
 | `settings.mjs` | every visual setting as data; builds the drawer and the keys |
 | `catalogue.mjs` | scans live tracks and lab boards, their auto-perform scripts |
 | `tools.mjs` | the Tools page commands (whitelist), job runner |

@@ -66,6 +66,19 @@ export const COMMANDS = {
       use: ['Pick a board.', 'Run.', 'Use it to see that every column plays rhythm and not just held notes.']
     },
     steps: file => [['stem-lab/check.mjs', file, ALL_FADERS_UP]] },
+  'check-replay': { label: 'Check replay fidelity (takes)', kinds: ['live'],
+    help: {
+      does: 'Compares the Strudel events of every replayed take with the events of its original play, bar by bar, '
+        + 'and names the reason for each bar that differs.',
+      input: 'A live track whose takes (tools/trajectory/perform/<track>/takes/) include a replay: Start a take in the '
+        + 'player, then Save take.',
+      output: 'Per replay the bars that differ with the reason (a control value, a key or press one query off, a stem '
+        + 'or pattern state), then the verdict. Takes without a replay or events are listed. Exit code 1 when a '
+        + 'replay differs.',
+      use: ['Play and Save take in the player.', 'Start that take in Auto-perform, let it run, Save take again.',
+        'Pick the track and run.']
+    },
+    steps: file => [['trajectory/check-replay.mjs', file]] },
   set: { label: 'Build set 011', kinds: [],
     help: {
       does: 'Builds the set (007 → 010 → 009 → 008 as one performance) from the frozen dual tracks and the set frame, '
