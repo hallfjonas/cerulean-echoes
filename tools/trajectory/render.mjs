@@ -203,10 +203,10 @@ export function createRenderer(canvas) {
     g.font = `${14 * scale}px system-ui, sans-serif`
     g.fillStyle = 'rgba(184, 207, 214, 0.8)'
     if (axes) {
-      g.fillText('links', W * 0.05, H * 0.92)
-      g.fillText('rechts', W * 0.92, H * 0.92)
-      g.fillText('hoch', W / 2 + 10 * scale, H * 0.06)
-      g.fillText('tief', W / 2 + 10 * scale, H * 0.93)
+      g.fillText('left', W * 0.05, H * 0.92)
+      g.fillText('right', W * 0.92, H * 0.92)
+      g.fillText('high', W / 2 + 10 * scale, H * 0.06)
+      g.fillText('low', W / 2 + 10 * scale, H * 0.93)
     }
     for (const [stem, comet] of comets) {
       if (comet.e < 0.03) continue
@@ -437,6 +437,8 @@ export function createRenderer(canvas) {
     setAxes: on => { axes = on },
     setRings: on => { rings = on; clearTrail() },
     toggleWiden: () => { widen = !widen },
+    setWiden: on => { widen = on },
+    setLook: name => { look = name },
     toggleLook: () => { look = { deck: 'ocean', ocean: 'clean', clean: 'deck' }[look] },
     setCharacter: value => { character = clamp(value) },
     setSmoothing: value => { motion = (1 - clamp(value)) ** 2 },

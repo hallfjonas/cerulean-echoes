@@ -1,9 +1,9 @@
 // Handbook for effects-tutorial.strudel (every Strudel effect, by ear, with its role in techno and house).
 // Compile: typst compile effects-tutorial.typ
 
-#set document(title: "Effekte-Tutorial: Handbuch")
+#set document(title: "Effects Tutorial: Handbook")
 #set page(paper: "a4", margin: (x: 20mm, y: 18mm), numbering: "1")
-#set text(font: "Helvetica", size: 9.8pt, lang: "de")
+#set text(font: "Helvetica", size: 9.8pt, lang: "en")
 #set par(leading: 0.68em, spacing: 1em, justify: false)
 #set heading(numbering: none)
 #show heading.where(level: 1): set text(size: 15pt)
@@ -25,10 +25,10 @@
 #let box-of(color, title, body) = block(breakable: false,
   width: 100%, inset: 8pt, radius: 3pt, fill: color.lighten(85%), stroke: 0.5pt + color.lighten(30%),
 )[#text(weight: "bold", fill: color.darken(20%))[#title] #h(0.4em) #body]
-#let merke(body) = box-of(blue, "Merke:", body)
-#let hoeren(body) = box-of(orange, "Hören:", body)
-#let szene(body) = box-of(green, "In Techno und House:", body)
-#let falle(body) = box-of(red, "Stolperfalle in Strudel:", body)
+#let remember(body) = box-of(blue, "Remember:", body)
+#let listen(body) = box-of(orange, "Listen:", body)
+#let scene(body) = box-of(green, "In techno and house:", body)
+#let pitfall(body) = box-of(red, "Strudel pitfall:", body)
 
 // ---------- small plots: points are (x, y) in 0..1 ----------
 #let plot(w: 52mm, h: 24mm, curves: (), vlines: (), bars: (), xl: none, yl: none) = {
@@ -67,611 +67,611 @@
 
 // ============================================================
 #align(left)[
-  #text(size: 22pt, weight: "bold")[Effekte-Tutorial]
+  #text(size: 22pt, weight: "bold")[Effects Tutorial]
   #v(-0.5em)
-  #text(size: 12pt, fill: luma(90))[Was jeder Strudel-Effekt macht, wie er klingt und welche Rolle er in Techno und House spielt]
+  #text(size: 12pt, fill: luma(90))[What every Strudel effect does, how it sounds and what role it plays in techno and house]
   #v(-0.3em)
-  #text(size: 9pt, fill: luma(110))[Handbuch zu `lab/tutorials/effects-tutorial.strudel`]
+  #text(size: 9pt, fill: luma(110))[Handbook for `lab/tutorials/effects-tutorial.strudel`]
 ]
 
 #v(0.5em)
-#outline(title: [Inhalt], depth: 2, indent: 1em)
+#outline(title: [Contents], depth: 2, indent: 1em)
 
-= So arbeitest du mit dem Tutorial
+= How to work with the tutorial
 
-== Bedienung
+== Controls
 
-+ Öffne `effects-tutorial.strudel` in Strudel und stelle oben `const CHAPTER = 0` auf das gewünschte Kapitel (0 bis 16). Einmal auswerten (Strg+Enter).
-+ Danach nur die *Slider dieses Kapitels* bewegen. Die Slider der anderen Kapitel sind sichtbar, tun aber nichts.
-+ Unter der letzten Zeile zeigt ein *Spektrum*, welche Frequenzen gerade klingen: links tief (Bass), rechts hoch (Hi-Hats). Bei Filtern und Verzerrung siehst du dort direkt, was passiert.
-+ Jedes Kapitel bringt seine eigenen Drums mit. Wer sie stummschalten will, kommentiert die Drum-Zeile des Kapitels aus.
++ Open `effects-tutorial.strudel` in Strudel and set `const CHAPTER = 0` at the top to the chapter you want (0 to 16). Evaluate once (Ctrl+Enter).
++ Then move only *this chapter's sliders*. The sliders of the other chapters are visible but do nothing.
++ Below the last line a *spectrum* shows which frequencies are sounding right now: low on the left (bass), high on the right (hi-hats). With filters and distortion you see there directly what happens.
++ Every chapter brings its own drums. To mute them, comment out the chapter's drum line.
 
-Alle Kapitel benutzen denselben trockenen Groove (Kick, Hats, Clap, Bass, Akkord-Stab, Lead in A-Moll, 122 BPM). So hörst du jeden Effekt auf bekanntem Material.
+All chapters use the same dry groove (kick, hats, clap, bass, chord stab, lead in A minor, 122 BPM). So you hear every effect on familiar material.
 
-== Wie man Effekte hören lernt
+== How to learn to hear effects
 
-- *Immer hin und zurück.* Effekte hört man im Vergleich, nicht im Zustand. Also: Effekt an, vier Takte, aus, vier Takte.
-- *Langsam bewegen.* Viele Effekte wirken erst, wenn man den Regler über mehrere Takte fährt (Filter, Delay-Feedback, Hall).
-- *Leise hören.* Lauter klingt immer „besser“. Vergleiche Effekte bei gleicher Lautstärke, sonst täuscht dich das Ohr. Einige Kapitel gleichen die Lautstärke dafür automatisch aus.
-- *Kopfhörer und Lautsprecher.* Stereo (Kapitel 15) und Sub-Bass (Kapitel 0, 6) hört man auf Laptop-Lautsprechern gar nicht.
-- *Fragen stellen:* Was ändert sich: Lautstärke, Helligkeit, Länge, Raum, Bewegung? Dieses Raster ordnet jeden Effekt ein.
+- *Always back and forth.* You hear effects by comparison, not as a state. So: effect on, four bars, off, four bars.
+- *Move slowly.* Many effects only show when you sweep the slider over several bars (filter, delay feedback, reverb).
+- *Listen quietly.* Louder always sounds "better". Compare effects at the same level, otherwise your ear fools you. Some chapters even out the level automatically for this.
+- *Headphones and speakers.* You cannot hear stereo (chapter 15) and sub bass (chapters 0, 6) on laptop speakers at all.
+- *Ask questions:* What changes: level, brightness, length, space, movement? This grid places every effect.
 
-= Grundbegriffe
+= Basics
 
-== Was ein Klang ist
+== What a sound is
 
-Ein Klang ist eine Schwingung der Luft. Wie schnell sie schwingt, ist die *Frequenz*, gemessen in Hertz (Hz, Schwingungen pro Sekunde). Wir hören etwa 20 Hz bis 20.000 Hz (20 kHz). Tief = langsam, hoch = schnell. Eine Verdopplung der Frequenz ist eine *Oktave*. Das Ohr hört in Oktaven, nicht in Hz: Der Schritt von 100 auf 200 Hz klingt so groß wie der von 5000 auf 10000 Hz. Deshalb sind alle Frequenz-Slider im Tutorial exponentiell skaliert.
+A sound is a vibration of the air. How fast it vibrates is the *frequency*, measured in hertz (Hz, vibrations per second). We hear roughly 20 Hz to 20,000 Hz (20 kHz). Low = slow, high = fast. Doubling the frequency is an *octave*. The ear hears in octaves, not in Hz: the step from 100 to 200 Hz sounds as big as the step from 5000 to 10000 Hz. That is why all frequency sliders in the tutorial are scaled exponentially.
 
-Ein Ton besteht fast nie aus nur einer Frequenz. Über dem *Grundton* liegen *Obertöne* (Vielfache der Grundfrequenz). Ihre Mischung macht die *Klangfarbe*: Eine Sinuswelle hat keine Obertöne (rund, dumpf), eine Sägezahnwelle sehr viele (hell, sägend). Fast alle Effekte arbeiten mit diesen Obertönen: Filter nehmen welche weg, Verzerrung fügt welche hinzu.
+A tone almost never consists of just one frequency. Above the *fundamental* lie *overtones* (multiples of the fundamental frequency). Their mix makes the *timbre*: a sine wave has no overtones (round, dull), a sawtooth wave has very many (bright, buzzing). Almost all effects work on these overtones: filters take some away, distortion adds new ones.
 
 #grid(columns: (1fr, 1fr, 1fr), column-gutter: 3mm,
-  plot(w: 46mm, h: 18mm, curves: ((wave(v => v), blue),), xl: [Sinus: nur der Grundton]),
-  plot(w: 46mm, h: 18mm, curves: ((sample(x => 0.5 + 0.45 * (2 * calc.rem(2 * x, 1) - 1)), blue),), xl: [Sägezahn: alle Obertöne, hell]),
-  plot(w: 46mm, h: 18mm, curves: ((sample(x => if calc.rem(2 * x, 1) < 0.5 { 0.92 } else { 0.08 }), blue),), xl: [Rechteck: ungerade Obertöne, hohl]),
+  plot(w: 46mm, h: 18mm, curves: ((wave(v => v), blue),), xl: [Sine: only the fundamental]),
+  plot(w: 46mm, h: 18mm, curves: ((sample(x => 0.5 + 0.45 * (2 * calc.rem(2 * x, 1) - 1)), blue),), xl: [Sawtooth: all overtones, bright]),
+  plot(w: 46mm, h: 18mm, curves: ((sample(x => if calc.rem(2 * x, 1) < 0.5 { 0.92 } else { 0.08 }), blue),), xl: [Square: odd overtones, hollow]),
 )
 
-== Frequenzbereiche
+== Frequency ranges
 
 #tbl(
   (auto, auto, 1fr),
-  [*Bereich*], [*ungefähr*], [*Was dort lebt*],
-  [Sub], [20–60 Hz], [Kick-Körper, Sub-Bass. Mehr gefühlt als gehört; kleine Lautsprecher können es nicht],
-  [Bass], [60–250 Hz], [Kick-Punch, Basstöne, Wärme],
-  [Untere Mitten], [250–800 Hz], [Körper von Akkorden und Bass; zu viel davon = „Matsch“],
-  [Mitten], [0,8–2,5 kHz], [Akkorde, Leads, Clap, Stimme: das, was ein Handy-Lautsprecher spielt],
-  [Präsenz], [2,5–6 kHz], [Anschlag, Clap-Schnalzen, Hats: macht Klänge „nah“],
-  [Luft], [6–20 kHz], [Hat-Zischen, Glanz, Atem],
+  [*Range*], [*roughly*], [*What lives there*],
+  [Sub], [20–60 Hz], [Kick body, sub bass. Felt more than heard; small speakers cannot play it],
+  [Bass], [60–250 Hz], [Kick punch, bass notes, warmth],
+  [Low mids], [250–800 Hz], [Body of chords and bass; too much of it = "mud"],
+  [Mids], [0.8–2.5 kHz], [Chords, leads, clap, voice: what a phone speaker plays],
+  [Presence], [2.5–6 kHz], [Attack, clap snap, hats: makes sounds "close"],
+  [Air], [6–20 kHz], [Hat hiss, shine, breath],
 )
 
-== Lautstärke und Dezibel
+== Level and decibels
 
-Lautstärke misst man in *Dezibel (dB)*. Auch das ist eine Verhältnisskala: +6 dB ist etwa doppelte Amplitude, +10 dB klingt etwa doppelt so laut. 0 dB ist in der digitalen Welt die Obergrenze; darüber wird das Signal abgeschnitten (*Clipping*, hässliche Verzerrung).
+Level is measured in *decibels (dB)*. This too is a ratio scale: +6 dB is about double the amplitude, +10 dB sounds about twice as loud. In the digital world 0 dB is the ceiling; above it the signal gets cut off (*clipping*, ugly distortion).
 
-== Trocken und nass, lokal und global
+== Dry and wet, local and global
 
-- *Dry/Wet:* Das unbearbeitete Signal heißt *dry* (trocken), der Anteil eines Effekts *wet* (nass). Bei Delay und Hall stellst du in Strudel nur den Wet-Anteil ein (`delay`, `room`); das trockene Signal bleibt immer.
-- *Lokal:* Die meisten Effekte bekommt jede Note einzeln (eigener Filter, eigene Verzerrung, eigene Hüllkurve).
-- *Global:* Delay, Hall und Ducking gibt es nur einmal pro *Orbit* (eine Art Mischpult-Kanal). Alle Klänge auf demselben Orbit teilen sie sich (Kapitel 12).
+- *Dry/wet:* The unprocessed signal is called *dry*, the effect's share *wet*. For delay and reverb you set only the wet share in Strudel (`delay`, `room`); the dry signal always stays.
+- *Local:* Most effects are applied to each note on its own (own filter, own distortion, own envelope).
+- *Global:* Delay, reverb and ducking exist only once per *orbit* (a kind of mixer channel). All sounds on the same orbit share them (chapter 12).
 
-== Die Signalkette in Strudel
+== The signal chain in Strudel
 
-Strudel schickt jede Note durch eine feste Reihenfolge. Jeder Effekt kommt darin genau *einmal* vor, auch wenn du ihn zweimal aufrufst (der zweite Aufruf überschreibt den ersten).
+Strudel sends every note through a fixed order. Each effect appears in it exactly *once*, even if you call it twice (the second call overwrites the first).
 
 #block(width: 100%, inset: 6pt, radius: 3pt, stroke: 0.4pt + luma(180))[
-  #chain-box[Klangquelle (Sample/Synth, Pitch-Hüllkurve)] #arr #chain-box[gain + ADSR] #arr #chain-box[lpf] #arr #chain-box[hpf] #arr #chain-box[bpf] #arr #chain-box[vowel] #arr #chain-box[coarse] #arr #chain-box[crush] #arr #chain-box[shape / distort] #arr #chain-box[tremolo] #arr #chain-box[compressor] #arr #chain-box[pan] #arr #chain-box[phaser] #arr #chain-box[postgain]
+  #chain-box[Sound source (sample/synth, pitch envelope)] #arr #chain-box[gain + ADSR] #arr #chain-box[lpf] #arr #chain-box[hpf] #arr #chain-box[bpf] #arr #chain-box[vowel] #arr #chain-box[coarse] #arr #chain-box[crush] #arr #chain-box[shape / distort] #arr #chain-box[tremolo] #arr #chain-box[compressor] #arr #chain-box[pan] #arr #chain-box[phaser] #arr #chain-box[postgain]
   #v(0.3em)
-  #arr #chain-box(c: blue.lighten(80%))[Orbit: dry + delay + reverb] #arr #chain-box(c: blue.lighten(80%))[duck] #arr #chain-box(c: blue.lighten(80%))[Mischpult / Ausgang]
+  #arr #chain-box(c: blue.lighten(80%))[Orbit: dry + delay + reverb] #arr #chain-box(c: blue.lighten(80%))[duck] #arr #chain-box(c: blue.lighten(80%))[Mixer / output]
 ]
 
-Wichtig daraus:
-- *Die Reihenfolge ist fest.* Der Filter kommt immer *vor* der Verzerrung. „Erst verzerren, dann filtern“ geht in Strudel nicht in einer Kette.
-- *Werte werden beim Notenstart gelesen.* Ein Slider oder ein LFO auf `lpf` wirkt erst ab der nächsten Note. Bei langen Noten (Pads) springt der Wert deshalb nur einmal pro Note. Kontinuierlich *innerhalb* einer Note laufen nur: ADSR, Filter- und Pitch-Hüllkurven, Tremolo, Phaser, Vibrato und Ducking.
+What follows from it:
+- *The order is fixed.* The filter always comes *before* the distortion. "Distort first, then filter" is not possible in one chain in Strudel.
+- *Values are read when a note starts.* A slider or an LFO on `lpf` only takes effect from the next note on. With long notes (pads) the value therefore jumps only once per note. Only these run continuously *within* a note: ADSR, filter and pitch envelopes, tremolo, phaser, vibrato and ducking.
 
 // ============================================================
-= Teil A: Hören lernen
+= Part A: Learning to listen
 
-== Kapitel 0: Frequenzen – wo jeder Klang wohnt
+== Chapter 0: Frequencies – where every sound lives
 
-*Was passiert.* Der ganze Groove läuft durch einen schmalen Bandpass (Kapitel 4), der nur einen Bereich durchlässt. So hörst du nacheinander, welches Instrument in welchem Bereich lebt.
+*What happens.* The whole groove runs through a narrow band-pass (chapter 4) that lets only one range through. So you hear, one after another, which instrument lives in which range.
 
-*Slider:* `BAND` 0 = alles, 1 = Sub 50 Hz, 2 = Bass 120 Hz, 3 = untere Mitten 400 Hz, 4 = Mitten 1,2 kHz, 5 = Präsenz 4 kHz, 6 = Luft 10 kHz.
+*Slider:* `BAND` 0 = everything, 1 = sub 50 Hz, 2 = bass 120 Hz, 3 = low mids 400 Hz, 4 = mids 1.2 kHz, 5 = presence 4 kHz, 6 = air 10 kHz.
 
-#hoeren[
-  + Schritt für Schritt von 1 bis 6, je vier Takte. Wo ist die Kick? Wo der Bass? Wo die Hats? Wo der Stab?
-  + Die Kick taucht in mehreren Bändern auf: unten ihr Körper, oben ihr Klick. Fast jeder Klang hat mehrere Bereiche.
-  + Zurück zu 0: Jetzt hörst du die Schichten im vollen Mix leichter heraus.
+#listen[
+  + Step by step from 1 to 6, four bars each. Where is the kick? Where the bass? Where the hats? Where the stab?
+  + The kick shows up in several bands: its body below, its click above. Almost every sound has several ranges.
+  + Back to 0: now you pick out the layers in the full mix more easily.
 ]
 
-#szene[Ein Techno-Mix funktioniert, wenn jeder Bereich *einem* Hauptdarsteller gehört: Sub und Bass der Kick und dem Bass (die sich abwechseln oder per Ducking Platz machen), die Mitten den Stabs und Leads, die Höhen den Hats. Fast alle Filter-Entscheidungen später folgen aus dieser Aufteilung.]
+#scene[A techno mix works when each range belongs to *one* lead actor: sub and bass to the kick and the bass (which take turns or make room through ducking), the mids to the stabs and leads, the highs to the hats. Almost all filter decisions later follow from this split.]
 
-== Kapitel 1: Lautstärke und Akzente – gain, velocity, postgain
+== Chapter 1: Level and accents – gain, velocity, postgain
 
-*Was es macht.* Drei Lautstärke-Regler an verschiedenen Stellen der Kette:
+*What it does.* Three level controls at different points of the chain:
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`gain`], [0–1 (mehr geht, wird lauter)], [Lautstärke der Note, vor allen Effekten. Auf einer Kurve: 0,5 ist deutlich leiser, nicht „halb“],
-  [`velocity`], [0–1], [wird mit `gain` multipliziert. Gedacht für Akzente: wie hart ein Schlag gespielt ist],
-  [`postgain`], [0–… (1 = unverändert)], [Lautstärke *nach* allen Effekten],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`gain`], [0–1 (more is possible, gets louder)], [Level of the note, before all effects. On a curve: 0.5 is clearly quieter, not "half"],
+  [`velocity`], [0–1], [is multiplied with `gain`. Meant for accents: how hard a hit is played],
+  [`postgain`], [0–… (1 = unchanged)], [Level *after* all effects],
 )
 
-Der Unterschied zwischen `gain` und `postgain` ist wichtig, sobald Verzerrung im Spiel ist: Mehr `gain` vor einer Verzerrung macht sie *stärker*, mehr `postgain` macht sie nur *lauter*.
+The difference between `gain` and `postgain` matters as soon as distortion is involved: more `gain` before a distortion makes it *stronger*, more `postgain` only makes it *louder*.
 
-*Slider:* `ACCENT` (wie viel leiser die Off-Beat-16tel der Hats sind), `BASSLEVEL` (gain des Basses).
+*Sliders:* `ACCENT` (how much quieter the off-beat 16ths of the hats are), `BASSLEVEL` (gain of the bass).
 
-#hoeren[
-  + `ACCENT` 0 → 0,6 → 1. Der Rhythmus bleibt gleich, aber der Groove ändert sich. Bei 0 klingt es wie eine Maschine, bei 0,6 „läuft“ es.
-  + `BASSLEVEL` hoch und runter: Ab wann wirkt der Bass so groß wie die Kick? Ab wann verdeckt er sie?
+#listen[
+  + `ACCENT` 0 → 0.6 → 1. The rhythm stays the same, but the groove changes. At 0 it sounds like a machine, at 0.6 it "rolls".
+  + `BASSLEVEL` up and down: from when does the bass feel as big as the kick? From when does it cover it?
 ]
 
-#szene[Akzente sind das wichtigste Werkzeug für Groove bei Hats und Percussion: Eine 16tel-Hat mit Akzent auf jeder zweiten oder vierten Note treibt, eine ohne wirkt steif. Lautstärke-Balance (Leveling) ist die halbe Arbeit an einem Mix; dafür gibt es im Projekt auch `/strudel-mix`.]
+#scene[Accents are the most important groove tool for hats and percussion: a 16th hat with an accent on every second or fourth note drives, one without feels stiff. Level balance (leveling) is half the work on a mix; the project also has `/strudel-mix` for that.]
 
-== Kapitel 2: Hüllkurve – attack, decay, sustain, release
+== Chapter 2: Envelope – attack, decay, sustain, release
 
-*Was es macht.* Eine *Hüllkurve* (ADSR) formt die Lautstärke *einer einzelnen Note* über die Zeit:
+*What it does.* An *envelope* (ADSR) shapes the level of *a single note* over time:
 
 #fig(
-  plot(w: 60mm, h: 24mm, curves: ((adsr(0.08, 0.25, 0.55, 0.9, 0.5, 1.6), blue),), vlines: (0.9 / 1.6,), xl: [A · D · S (solange gehalten) · R ab Notenende (gestrichelt)]),
-  [*Attack:* Zeit von Stille bis voll. *Decay:* Zeit bis zum Sustain-Pegel. *Sustain:* Pegel, solange die Note gehalten wird (0–1). *Release:* Ausklingzeit nach dem Ende der Note.],
+  plot(w: 60mm, h: 24mm, curves: ((adsr(0.08, 0.25, 0.55, 0.9, 0.5, 1.6), blue),), vlines: (0.9 / 1.6,), xl: [A · D · S (while held) · R from note end (dashed)]),
+  [*Attack:* time from silence to full. *Decay:* time to the sustain level. *Sustain:* level while the note is held (0–1). *Release:* fade-out time after the note ends.],
 )
 
 #tbl(
   (auto, auto, auto, auto, auto, 1fr),
-  [*Preset*], [*A*], [*D*], [*S*], [*R*], [*Klang*],
-  [Pluck], [0], [0,15], [0], [0,1], [gezupft, kurz],
-  [Techno-Stab], [0], [0,25], [0], [0,3], [kurz mit etwas Schwanz],
-  [Orgel], [0], [0], [1], [0,05], [an/aus, wie eine Taste],
-  [Pad], [0,5], [0,5], [0,7], [1,5], [weich ein- und ausblendend (LEN 4)],
-  [Swell], [1], [0], [1], [0,5], [schwillt an (LEN 4)],
+  [*Preset*], [*A*], [*D*], [*S*], [*R*], [*Sound*],
+  [Pluck], [0], [0.15], [0], [0.1], [plucked, short],
+  [Techno stab], [0], [0.25], [0], [0.3], [short with a bit of tail],
+  [Organ], [0], [0], [1], [0.05], [on/off, like a key],
+  [Pad], [0.5], [0.5], [0.7], [1.5], [fades in and out softly (LEN 4)],
+  [Swell], [1], [0], [1], [0.5], [swells up (LEN 4)],
 )
 
-*Slider:* `ATT`, `DEC`, `SUS`, `REL` (Sekunden bzw. Pegel), `LEN` = wie lange jede Note gehalten wird (`clip`: 1 = ganzer Platz, 4 = überlappend).
+*Sliders:* `ATT`, `DEC`, `SUS`, `REL` (seconds or level), `LEN` = how long each note is held (`clip`: 1 = its full slot, 4 = overlapping).
 
-#hoeren[
-  + Mit dem Stab-Preset starten und nur `SUS` von 0 auf 1 fahren: vom Stab zur Orgel.
-  + `ATT` hochziehen: Der Anschlag (Punch) verschwindet, der Klang rückt nach hinten.
-  + `ATT` = 0,5 bei `LEN` = 1, dann `LEN` = 4: Die Note muss lang genug sein, sonst erreicht der Attack nie die volle Lautstärke.
+#listen[
+  + Start with the stab preset and move only `SUS` from 0 to 1: from stab to organ.
+  + Pull `ATT` up: the attack (punch) disappears, the sound moves back.
+  + `ATT` = 0.5 with `LEN` = 1, then `LEN` = 4: the note must be long enough, otherwise the attack never reaches full level.
 ]
 
-#szene[Kurze Hüllkurven (Attack 0, Sustain 0) sind die Sprache von Techno: Stabs, Plucks, Percussion. Lange Attacks und Releases machen Pads und Flächen (Deep House, Ambient-Breaks). Der *Decay* ist dein Regler für „Länge“ eines Stabs: Live gefahren macht er einen Stab von trocken zu ausladend.]
+#scene[Short envelopes (attack 0, sustain 0) are the language of techno: stabs, plucks, percussion. Long attacks and releases make pads and textures (deep house, ambient breaks). The *decay* is your control for a stab's "length": played live it turns a stab from dry to sweeping.]
 
-#falle[`release` wirkt erst *nach* dem Notenende. Ein langer Release bei vielen kurzen Noten lässt sie überlappen und kostet Rechenleistung.]
+#pitfall[`release` only acts *after* the note ends. A long release on many short notes makes them overlap and costs CPU.]
 
 // ============================================================
-= Teil B: Filter
+= Part B: Filters
 
-== Kapitel 3: Tiefpass – lpf, lpq, ftype
+== Chapter 3: Low-pass – lpf, lpq, ftype
 
-*Was es macht.* Ein *Tiefpass* (Low-Pass) lässt die tiefen Frequenzen durch und nimmt alles über der *Cutoff-Frequenz* weg. Zu: dunkel, dumpf, weit weg. Offen: hell, nah, aggressiv. Die *Resonanz* (Q) hebt die Frequenzen genau am Cutoff an: von weich bis „pfeifend“ oder „quietschend“.
+*What it does.* A *low-pass* filter lets the low frequencies through and removes everything above the *cutoff frequency*. Closed: dark, dull, far away. Open: bright, close, aggressive. The *resonance* (Q) boosts the frequencies right at the cutoff: from soft to "whistling" or "squealing".
 
 #fig(
-  plot(w: 60mm, h: 26mm, curves: ((sample(resp("lp", 800, 0.7)), blue), (sample(resp("lp", 800, 6)), orange)), vlines: (fx(800),), xl: [20 Hz … 20 kHz; Cutoff 800 Hz]),
-  [Blau: Tiefpass ohne Resonanz (Q 0,7). Orange: mit Resonanz (Q 6): Spitze am Cutoff. Rechts vom Cutoff fällt alles ab.],
+  plot(w: 60mm, h: 26mm, curves: ((sample(resp("lp", 800, 0.7)), blue), (sample(resp("lp", 800, 6)), orange)), vlines: (fx(800),), xl: [20 Hz … 20 kHz; cutoff 800 Hz]),
+  [Blue: low-pass without resonance (Q 0.7). Orange: with resonance (Q 6): a peak at the cutoff. Right of the cutoff everything falls away.],
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`lpf` (cutoff, lp)], [20–20000 Hz], [Cutoff-Frequenz],
-  [`lpq` (resonance)], [0–50, sinnvoll 0–25], [Resonanz am Cutoff],
-  [`ftype`], [`12db`, `ladder`, `24db`], [Steilheit: 12db sanft, 24db steil, ladder = Moog-artig, fett, aggressiver],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`lpf` (cutoff, lp)], [20–20000 Hz], [Cutoff frequency],
+  [`lpq` (resonance)], [0–50, useful 0–25], [Resonance at the cutoff],
+  [`ftype`], [`12db`, `ladder`, `24db`], [Steepness: 12db gentle, 24db steep, ladder = Moog-like, fat, more aggressive],
 )
 
-*Slider:* `CUT` (0 = 60 Hz, 0,5 = 775 Hz, 1 = 10 kHz), `RES`, `FTYPE`. Der Filter liegt auf Bass, Stab und Lead; die Drums bleiben trocken.
+*Sliders:* `CUT` (0 = 60 Hz, 0.5 = 775 Hz, 1 = 10 kHz), `RES`, `FTYPE`. The filter sits on bass, stab and lead; the drums stay dry.
 
-#hoeren[
-  + `CUT` langsam von 1 auf 0,2 und zurück, über acht Takte. Das ist der klassische Filter-Sweep.
-  + `RES` auf 15, noch einmal sweepen: Jetzt „singt“ der Cutoff.
-  + Bei `RES` 10 die drei `FTYPE`s vergleichen.
+#listen[
+  + `CUT` slowly from 1 to 0.2 and back, over eight bars. That is the classic filter sweep.
+  + `RES` to 15, sweep again: now the cutoff "sings".
+  + At `RES` 10 compare the three `FTYPE`s.
 ]
 
-#szene[Der Tiefpass ist *der* Live-Regler in Techno und House. Ein langsamer Sweep über 16 oder 32 Takte ist eine eigene Spannungskurve: Der Track baut sich auf, ohne dass ein neuer Ton dazukommt. Auf Pads und Stabs hält ein halb geschlossener Filter Platz für Hats und Vocals frei.]
+#scene[The low-pass is *the* live control in techno and house. A slow sweep over 16 or 32 bars is a tension curve of its own: the track builds up without a single new note. On pads and stabs a half-closed filter keeps room free for hats and vocals.]
 
-#falle[Ein LFO oder Slider auf `lpf` wird nur beim Notenstart gelesen (siehe Kapitel 9). Für Bewegung *innerhalb* einer langen Note nimm die Filterhüllkurve (Kapitel 5).]
+#pitfall[An LFO or slider on `lpf` is only read when a note starts (see chapter 9). For movement *within* a long note use the filter envelope (chapter 5).]
 
-== Kapitel 4: Hochpass und Bandpass – hpf, bpf
+== Chapter 4: High-pass and band-pass – hpf, bpf
 
-*Was es macht.* Der *Hochpass* (High-Pass) ist das Gegenstück: Er nimmt alles *unter* dem Cutoff weg. Der *Bandpass* lässt nur ein Band um eine Mittenfrequenz durch („Telefon“- oder „Radio“-Klang).
+*What it does.* The *high-pass* is the counterpart: it removes everything *below* the cutoff. The *band-pass* lets only a band around a center frequency through ("telephone" or "radio" sound).
 
 #grid(columns: (1fr, 1fr), column-gutter: 4mm,
-  plot(w: 70mm, h: 22mm, curves: ((sample(resp("hp", 400, 0.7)), blue),), vlines: (fx(400),), xl: [Hochpass 400 Hz: Bässe weg]),
-  plot(w: 70mm, h: 22mm, curves: ((sample(resp("bp", 1000, 4)), blue),), vlines: (fx(1000),), xl: [Bandpass 1 kHz, Q 4: nur ein Band bleibt]),
+  plot(w: 70mm, h: 22mm, curves: ((sample(resp("hp", 400, 0.7)), blue),), vlines: (fx(400),), xl: [High-pass 400 Hz: bass gone]),
+  plot(w: 70mm, h: 22mm, curves: ((sample(resp("bp", 1000, 4)), blue),), vlines: (fx(1000),), xl: [Band-pass 1 kHz, Q 4: only one band remains]),
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`hpf` (hp, hcutoff)], [20–20000 Hz], [Hochpass-Cutoff],
-  [`hpq` (hresonance)], [0–50], [Resonanz des Hochpasses],
-  [`bpf` (bandf, bp)], [Hz], [Mittenfrequenz des Bandpasses],
-  [`bpq` (bandq)], [0–…], [Breite: hoch = schmal],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`hpf` (hp, hcutoff)], [20–20000 Hz], [High-pass cutoff],
+  [`hpq` (hresonance)], [0–50], [Resonance of the high-pass],
+  [`bpf` (bandf, bp)], [Hz], [Center frequency of the band-pass],
+  [`bpq` (bandq)], [0–…], [Width: high = narrow],
 )
 
-*Slider:* `MODE4` 0 = Hochpass auf dem ganzen Groove, 1 = nur auf Stab und Lead (Aufräumen), 2 = Bandpass auf dem Stab. `FREQ4` 0 = 20 Hz, 0,5 = 400 Hz, 1 = 8 kHz.
+*Sliders:* `MODE4` 0 = high-pass on the whole groove, 1 = only on stab and lead (cleaning up), 2 = band-pass on the stab. `FREQ4` 0 = 20 Hz, 0.5 = 400 Hz, 1 = 8 kHz.
 
-#hoeren[
-  + `MODE4` 0: `FREQ4` vier Takte lang auf 0,6 schieben, dann auf einem Taktanfang schlagartig auf 0. Das ist ein Drop.
-  + `MODE4` 1, `FREQ4` um 0,5: Der Mix wird klarer, der Bass wirkt größer, obwohl am Bass nichts geändert wurde.
-  + `MODE4` 2: Der Stab wird dünn und nasal, sticht aber heraus, ohne lauter zu sein.
+#listen[
+  + `MODE4` 0: push `FREQ4` to 0.6 over four bars, then drop it to 0 at once on a bar start. That is a drop.
+  + `MODE4` 1, `FREQ4` around 0.5: the mix gets clearer, the bass feels bigger, although nothing on the bass changed.
+  + `MODE4` 2: the stab gets thin and nasal, but cuts through without being louder.
 ]
 
-#szene[Der Hochpass ist das Werkzeug für *Build-ups*: Kick und Bass verschwinden langsam, die Spannung steigt, beim Drop kommen sie zurück. DJ-Mixer haben genau diesen Regler. Im Mix räumt ein Hochpass auf Pads, Stabs, Hats und Hall die Bässe frei, damit Kick und Bass den Platz unten allein haben. Bandpässe machen Klänge „klein“: Breaks, Radio-Effekte, Percussion.]
+#scene[The high-pass is the tool for *build-ups*: kick and bass slowly disappear, tension rises, at the drop they come back. DJ mixers have exactly this control. In the mix a high-pass on pads, stabs, hats and reverb clears out the low end so kick and bass have the bottom to themselves. Band-passes make sounds "small": breaks, radio effects, percussion.]
 
-== Kapitel 5: Filterhüllkurve und Acid – lpenv, lpattack, lpdecay
+== Chapter 5: Filter envelope and acid – lpenv, lpattack, lpdecay
 
-*Was es macht.* Eine *Filterhüllkurve* öffnet den Filter am Anfang jeder Note und schließt ihn wieder. Wie eine Hand, die bei jeder Note blitzschnell am Cutoff-Regler dreht. Jede Note bekommt dadurch ein „Wau“ oder „Pjuu“.
+*What it does.* A *filter envelope* opens the filter at the start of every note and closes it again. Like a hand turning the cutoff knob in a flash on every note. Each note gets a "wow" or "pew".
 
 #fig(
-  plot(w: 60mm, h: 24mm, curves: ((sample(x => 0.15 + 0.75 * calc.exp(-calc.rem(x * 4, 1) * 7)), orange),), xl: [Cutoff über vier Noten: Sprung hoch, Abfall mit lpdecay]),
-  [Der Cutoff ruht bei `lpf` und springt bei jedem Notenstart um `lpenv` Oktaven nach oben, dann fällt er mit `lpdecay` zurück.],
+  plot(w: 60mm, h: 24mm, curves: ((sample(x => 0.15 + 0.75 * calc.exp(-calc.rem(x * 4, 1) * 7)), orange),), xl: [Cutoff over four notes: jump up, fall with lpdecay]),
+  [The cutoff rests at `lpf` and jumps up by `lpenv` octaves at every note start, then falls back with `lpdecay`.],
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`lpenv` (lpe)], [0–8, auch negativ], [Hub in Oktaven über dem Cutoff (negativ: nach unten)],
-  [`lpattack` (lpa)], [Sekunden], [wie schnell der Filter aufgeht],
-  [`lpdecay` (lpd)], [Sekunden], [wie schnell er wieder zugeht],
-  [`lpsustain` (lps)], [0–1], [wie weit offen er während der Note bleibt],
-  [`lprelease` (lpr)], [Sekunden], [Schließen nach Notenende],
-  [`fanchor`], [0–1], [wo der Cutoff im Hub liegt: 0 = Cutoff ist der geschlossene Wert (so im Tutorial)],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`lpenv` (lpe)], [0–8, negative too], [Amount in octaves above the cutoff (negative: downwards)],
+  [`lpattack` (lpa)], [seconds], [how fast the filter opens],
+  [`lpdecay` (lpd)], [seconds], [how fast it closes again],
+  [`lpsustain` (lps)], [0–1], [how far open it stays during the note],
+  [`lprelease` (lpr)], [seconds], [closing after the note ends],
+  [`fanchor`], [0–1], [where the cutoff sits within the sweep: 0 = cutoff is the closed value (as in the tutorial)],
 )
 
-Dasselbe gibt es für Hochpass (`hpenv`, `hpa` …) und Bandpass (`bpenv`, `bpa` …).
+The same exists for high-pass (`hpenv`, `hpa` …) and band-pass (`bpenv`, `bpa` …).
 
-*Acid.* Tiefpass + Filterhüllkurve + viel Resonanz auf einer Sägezahn-Bassline in 16teln: das ist der Klang der Roland TB-303. Die Akzente (`velocity`) lassen manche Noten weiter aufgehen, wie der Accent-Knopf der 303.
+*Acid.* Low-pass + filter envelope + lots of resonance on a sawtooth bassline in 16ths: that is the sound of the Roland TB-303. The accents (`velocity`) let some notes open further, like the 303's accent button.
 
-*Slider:* `CUT5` (Ruhe-Cutoff, 40 Hz–4 kHz), `ENV` (Hub in Oktaven), `DECAY5`, `RES5`.
+*Sliders:* `CUT5` (resting cutoff, 40 Hz–4 kHz), `ENV` (amount in octaves), `DECAY5`, `RES5`.
 
-#hoeren[
-  + `ENV` 0 → 4: Die Linie erwacht zum Leben.
-  + `DECAY5` 0,05 (Ticken) gegen 0,4 (Wauen).
-  + `RES5` 0 gegen 20: von weich zu quietschend.
-  + Der Acid-Live-Move: `CUT5` und `RES5` über 16 Takte langsam gemeinsam hochfahren.
+#listen[
+  + `ENV` 0 → 4: the line comes alive.
+  + `DECAY5` 0.05 (ticking) against 0.4 (wowing).
+  + `RES5` 0 against 20: from soft to squealing.
+  + The acid live move: raise `CUT5` and `RES5` slowly together over 16 bars.
 ]
 
-#szene[Acid ist ein eigenes Genre (Acid House, Acid Techno), aber die Technik steckt überall: Plucks, Stabs und Basslines bekommen durch eine kurze Filterhüllkurve Biss. Live gespielt sind Cutoff, Resonanz und Decay die drei Regler, mit denen eine einzige Bassline einen ganzen Track trägt.]
+#scene[Acid is a genre of its own (acid house, acid techno), but the technique is everywhere: plucks, stabs and basslines get bite from a short filter envelope. Played live, cutoff, resonance and decay are the three controls with which a single bassline carries a whole track.]
 
-== Kapitel 6: Pitch-Hüllkurve – eine Kick aus einem Sinus bauen
+== Chapter 6: Pitch envelope – building a kick from a sine
 
-*Was es macht.* Eine *Pitch-Hüllkurve* biegt die Tonhöhe jeder Note: Sie startet höher und fällt auf den eigentlichen Ton. Eine Kick ist genau das: ein tiefer Sinus (hier A1 = 55 Hz), der viel höher beginnt und schnell abfällt.
+*What it does.* A *pitch envelope* bends the pitch of every note: it starts higher and falls to the actual note. A kick is exactly that: a low sine (here A1 = 55 Hz) that starts much higher and falls fast.
 
 #fig(
-  plot(w: 60mm, h: 24mm, curves: ((sample(x => 0.1 + 0.85 * calc.exp(-x * 14)), blue), (sample(x => 0.1 + 0.85 * (1 - calc.min(x * 5, 1))), orange)), xl: [Tonhöhe über 0,3 s: blau exponentiell, orange linear]),
-  [Mit `pcurve` = 1 (blau) fällt die Tonhöhe erst schnell, dann langsam: das klingt nach echter Kick. Linear (orange) klingt nach „Laser“.],
+  plot(w: 60mm, h: 24mm, curves: ((sample(x => 0.1 + 0.85 * calc.exp(-x * 14)), blue), (sample(x => 0.1 + 0.85 * (1 - calc.min(x * 5, 1))), orange)), xl: [Pitch over 0.3 s: blue exponential, orange linear]),
+  [With `pcurve` = 1 (blue) the pitch falls fast first, then slowly: that sounds like a real kick. Linear (orange) sounds like a "laser".],
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`penv`], [Halbtöne, auch negativ], [um wie viel die Tonhöhe verbogen wird (36 = drei Oktaven)],
-  [`pattack` (patt)], [Sekunden], [Zeit bis zum Höhepunkt der Biegung],
-  [`pdecay` (pdec)], [Sekunden], [wie schnell die Tonhöhe fällt],
-  [`prelease` (prel)], [Sekunden], [Biegung nach Notenende],
-  [`pcurve`], [0 / 1], [linear oder exponentiell],
-  [`panchor`], [0–1], [0 = Biegung über dem Ton, 1 = darunter],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`penv`], [semitones, negative too], [how far the pitch is bent (36 = three octaves)],
+  [`pattack` (patt)], [seconds], [time to the peak of the bend],
+  [`pdecay` (pdec)], [seconds], [how fast the pitch falls],
+  [`prelease` (prel)], [seconds], [bend after the note ends],
+  [`pcurve`], [0 / 1], [linear or exponential],
+  [`panchor`], [0–1], [0 = bend above the note, 1 = below],
 )
 
-*Slider:* `PENV`, `PDEC`, `PCURVE`, `KDEC` (Länge der Kick, Amplituden-Decay), `SOURCE` (0 = Synth-Kick, 1 = 909-Sample zum Vergleich).
+*Sliders:* `PENV`, `PDEC`, `PCURVE`, `KDEC` (length of the kick, amplitude decay), `SOURCE` (0 = synth kick, 1 = 909 sample for comparison).
 
-#hoeren[
-  + `PENV` 0: nur ein Sinus, ein dumpfes „Bup“. Dann 12, 24, 36.
-  + `PDEC` 0,02 (kurzer Klick) gegen 0,3 („Boing“, Tom).
-  + `KDEC` 0,15 (trocken) gegen 0,8 (dröhnender Techno-„Rumble“).
-  + Die Kick ist auf A gestimmt, die Tonart des Basses. Hör, wie Kick und Bass verschmelzen.
+#listen[
+  + `PENV` 0: just a sine, a dull "boop". Then 12, 24, 36.
+  + `PDEC` 0.02 (short click) against 0.3 ("boing", tom).
+  + `KDEC` 0.15 (dry) against 0.8 (droning techno "rumble").
+  + The kick is tuned to A, the key of the bass. Listen to how kick and bass merge.
 ]
 
-#szene[Fast jede elektronische Kick ist ein Sinus mit Pitch-Hüllkurve (die 808 und 909 auch). Lange Kicks mit Verzerrung (Kapitel 7) und Hall sind der „Rumble“ von hartem und Hypno-Techno. Gestimmte Kicks (auf den Grundton) sind üblich. Dieselbe Technik macht Toms, Laser-Zaps und Riser.]
+#scene[Almost every electronic kick is a sine with a pitch envelope (the 808 and 909 too). Long kicks with distortion (chapter 7) and reverb are the "rumble" of hard and hypnotic techno. Tuned kicks (to the root) are common. The same technique makes toms, laser zaps and risers.]
 
 // ============================================================
-= Teil C: Sättigung, Verzerrung, Farbe
+= Part C: Saturation, distortion, colour
 
-== Kapitel 7: Drive – distort, crush, coarse
+== Chapter 7: Drive – distort, crush, coarse
 
-*Was es macht.* Verzerrung drückt eine Welle über ihre Grenze und biegt ihre Form. Eine verbogene Welle hat *neue Obertöne*: Der Klang wirkt lauter, heller, rauer, präsenter.
+*What it does.* Distortion pushes a wave past its limit and bends its shape. A bent wave has *new overtones*: the sound feels louder, brighter, rougher, more present.
 
 #grid(columns: (1fr, 1fr, 1fr, 1fr), column-gutter: 2mm,
   plot(w: 36mm, h: 16mm, curves: ((wave(v => v), blue),), xl: [Original]),
-  plot(w: 36mm, h: 16mm, curves: ((wave(v => tanh(3 * v) / tanh(3)), blue),), xl: [soft: rund gesättigt]),
-  plot(w: 36mm, h: 16mm, curves: ((wave(v => calc.clamp(2.5 * v, -1, 1)), blue),), xl: [hard: abgeschnitten]),
-  plot(w: 36mm, h: 16mm, curves: ((wave(v => calc.sin(2.6 * v * calc.pi / 2)), blue),), xl: [fold: zurückgefaltet]),
+  plot(w: 36mm, h: 16mm, curves: ((wave(v => tanh(3 * v) / tanh(3)), blue),), xl: [soft: roundly saturated]),
+  plot(w: 36mm, h: 16mm, curves: ((wave(v => calc.clamp(2.5 * v, -1, 1)), blue),), xl: [hard: cut off]),
+  plot(w: 36mm, h: 16mm, curves: ((wave(v => calc.sin(2.6 * v * calc.pi / 2)), blue),), xl: [fold: folded back]),
 )
 
 #tbl(
   (auto, auto, 1fr, 1fr),
-  [*TYPE7*], [*Effekt*], [*Was passiert*], [*Klang*],
-  [0], [`distort` soft], [weiche Sättigung], [Band, Röhre: wärmer, fetter, „Kleber“],
-  [1], [`distort` hard], [hartes Abschneiden], [aggressiv, schnarrend],
-  [2], [`distort` diode], [wie eine übersteuerte Analogschaltung], [körnig; typisch für Acid- und Techno-Bässe],
-  [3], [`distort` fold], [Welle wird zurückgefaltet], [metallisch, synthetisch, stark vom Amount abhängig],
-  [4], [`crush`], [weniger Lautstärkestufen (16 Bit → 2 Bit)], [digital, körnig, Lo-Fi],
-  [5], [`coarse`], [niedrigere Abtastrate], [Aliasing, robotisch, metallisches Pfeifen (am besten in Chrome)],
+  [*TYPE7*], [*Effect*], [*What happens*], [*Sound*],
+  [0], [`distort` soft], [soft saturation], [tape, tube: warmer, fatter, "glue"],
+  [1], [`distort` hard], [hard clipping], [aggressive, buzzing],
+  [2], [`distort` diode], [like an overdriven analog circuit], [grainy; typical for acid and techno basses],
+  [3], [`distort` fold], [wave is folded back], [metallic, synthetic, depends strongly on the amount],
+  [4], [`crush`], [fewer level steps (16 bit → 2 bit)], [digital, grainy, lo-fi],
+  [5], [`coarse`], [lower sample rate], [aliasing, robotic, metallic whistling (best in Chrome)],
 )
 
-Weitere Typen für `distorttype`: `scurve`, `cubic`, `asym`, `sinefold`, `chebyshev`. Die Kurzschreibweise `distort("3:0.5:diode")` heißt: Menge 3, Lautstärke 0,5, Typ diode. Der ältere Effekt `shape` ist veraltet; `distort` ist berechenbarer.
+More types for `distorttype`: `scurve`, `cubic`, `asym`, `sinefold`, `chebyshev`. The shorthand `distort("3:0.5:diode")` means: amount 3, level 0.5, type diode. The older effect `shape` is deprecated; `distort` is more predictable.
 
-*Slider:* `TYPE7`, `AMOUNT` (0–1, pro Typ skaliert), `TARGET` 0 = Bass, 1 = Drums, 2 = alles. Die Lautstärke wird ausgeglichen (`postgain`).
+*Sliders:* `TYPE7`, `AMOUNT` (0–1, scaled per type), `TARGET` 0 = bass, 1 = drums, 2 = everything. The level is evened out (`postgain`).
 
-#hoeren[
-  + `TARGET` 0, `TYPE7` 0, `AMOUNT` langsam hoch: Erst wird der Bass nur „größer“, später rau.
-  + `TARGET` 1, `TYPE7` 2 oder 4: Die Drums werden hart und industriell.
-  + `TYPE7` 4 und 5 mit `AMOUNT` 1: Lo-Fi bis kaputt.
+#listen[
+  + `TARGET` 0, `TYPE7` 0, `AMOUNT` slowly up: at first the bass only gets "bigger", later rough.
+  + `TARGET` 1, `TYPE7` 2 or 4: the drums get hard and industrial.
+  + `TYPE7` 4 and 5 with `AMOUNT` 1: lo-fi to broken.
 ]
 
-#szene[Sättigung in kleinen Mengen liegt in Techno auf fast allem: Sie macht Klänge dichter und lässt sie auf kleinen Lautsprechern hörbar werden (die neuen Obertöne liegen höher als der Bass). Starke Verzerrung auf der Kick ist das Fundament von Hard Techno, Industrial und Schranz; verzerrte, gefilterte Kick-Fahnen sind der „Rumble“. Bitcrush und Coarse sind Farbe für Breaks, Percussion und Lo-Fi-House.]
+#scene[In small amounts saturation sits on almost everything in techno: it makes sounds denser and lets them be heard on small speakers (the new overtones lie higher than the bass). Heavy distortion on the kick is the foundation of hard techno, industrial and schranz; distorted, filtered kick tails are the "rumble". Bitcrush and coarse are colour for breaks, percussion and lo-fi house.]
 
-#falle[Verzerrung kann *sehr laut* werden. Immer mit `postgain` oder dem zweiten Wert (`distort("4:0.5")`) ausgleichen. Und: Der Filter kommt in Strudel *vor* der Verzerrung; den rauen Klang hinterher wieder zu filtern geht nur auf einem anderen Weg (z. B. per Orbit-Hall mit `roomlp`).]
+#pitfall[Distortion can get *very loud*. Always compensate with `postgain` or the second value (`distort("4:0.5")`). And: in Strudel the filter comes *before* the distortion; filtering the rough sound again afterwards only works another way (e.g. via orbit reverb with `roomlp`).]
 
-== Kapitel 8: Vowel – ein Formantfilter, der Synths „sprechen“ lässt
+== Chapter 8: Vowel – a formant filter that makes synths "talk"
 
-*Was es macht.* Unser Mund ist ein Filter: Die Vokale a, e, i, o, u unterscheiden sich nur darin, welche Frequenzen der Mundraum anhebt (die *Formanten*). `vowel` bildet diesen Filter nach, sodass ein Synth klingt, als würde er den Vokal sagen.
+*What it does.* Our mouth is a filter: the vowels a, e, i, o, u differ only in which frequencies the mouth cavity boosts (the *formants*). `vowel` models this filter, so a synth sounds as if it were saying the vowel.
 
-*Werte:* `a e i o u` und weitere (`ae aa oe ue y uh un en an on`). Wirkt am stärksten auf hellen Klängen (Sägezahn).
+*Values:* `a e i o u` and more (`ae aa oe ue y uh un en an on`). Works most strongly on bright sounds (sawtooth).
 
-*Slider:* `VOWEL` 0 aus, 1–5 = a e i o u, 6 = wechselnde Vokale auf jeder Achtel („sprechen“).
+*Slider:* `VOWEL` 0 off, 1–5 = a e i o u, 6 = changing vowels on every 8th ("talking").
 
-#hoeren[
-  + 0 → 1 → 5: von offen zu geschlossen.
-  + 6: der „sprechende“ Bass.
+#listen[
+  + 0 → 1 → 5: from open to closed.
+  + 6: the "talking" bass.
 ]
 
-#szene[Formant- und Vowel-Filter machen die „Yoi“- und „Wah“-Bässe in Techno, Electro und Tech House. Auf Stabs geben sie einen menschlichen, fast vokalen Charakter, ohne Vocal-Sample.]
+#scene[Formant and vowel filters make the "yoi" and "wah" basses in techno, electro and tech house. On stabs they give a human, almost vocal character, without a vocal sample.]
 
 // ============================================================
-= Teil D: Bewegung
+= Part D: Movement
 
-== Kapitel 9: Modulation – Filter-LFO, Tremolo, Gate, Phaser
+== Chapter 9: Modulation – filter LFO, tremolo, gate, phaser
 
-*Was es macht.* Ein *LFO* (Low Frequency Oscillator) ist eine langsame Welle, die für dich an einem Regler dreht, immer wieder.
+*What it does.* An *LFO* (low frequency oscillator) is a slow wave that turns a knob for you, again and again.
 
 #tbl(
   (auto, auto, 1fr, 1fr),
-  [*MOD*], [*Effekt*], [*Was passiert*], [*Einsatz*],
-  [1], [Filter-LFO], [eine Sinuswelle bewegt den Cutoff], [Wah über mehrere Takte, lebendige Basslines],
-  [2], [`tremolo` sinus], [Lautstärke geht auf und ab], [schwebende Pads, Vintage-Keys],
-  [3], [`tremolo` square], [Lautstärke wird zerhackt], [Trance-Gate, rhythmische Pads],
-  [4], [`phaser`], [kreisende Kerbfilter], [70er, Disco, psychedelisch, Hats und Pads],
+  [*MOD*], [*Effect*], [*What happens*], [*Use*],
+  [1], [Filter LFO], [a sine wave moves the cutoff], [wah over several bars, lively basslines],
+  [2], [`tremolo` sine], [level goes up and down], [floating pads, vintage keys],
+  [3], [`tremolo` square], [level gets chopped], [trance gate, rhythmic pads],
+  [4], [`phaser`], [sweeping notch filters], [70s, disco, psychedelic, hats and pads],
 )
 
 #tbl(
   (auto, 1fr),
-  [*Parameter*], [*Wirkung*],
-  [`tremolosync`], [Geschwindigkeit pro Takt (Zyklus): 4 = viermal pro Takt],
-  [`tremolo`], [Geschwindigkeit in Hz (nicht an das Tempo gebunden)],
-  [`tremolodepth`, `tremoloshape`, `tremoloskew`, `tremolophase`], [Tiefe; Form (`sine tri square saw ramp`); Schiefe; Startpunkt],
-  [`phaser`, `phaserdepth`, `phasercenter`, `phasersweep`], [Geschwindigkeit (Hz); Tiefe (Standard 0,75); Mittenfrequenz (1000 Hz); Hub (2000 Hz)],
+  [*Parameter*], [*Effect*],
+  [`tremolosync`], [speed per bar (cycle): 4 = four times per bar],
+  [`tremolo`], [speed in Hz (not tied to the tempo)],
+  [`tremolodepth`, `tremoloshape`, `tremoloskew`, `tremolophase`], [depth; shape (`sine tri square saw ramp`); skew; start point],
+  [`phaser`, `phaserdepth`, `phasercenter`, `phasersweep`], [speed (Hz); depth (default 0.75); center frequency (1000 Hz); sweep (2000 Hz)],
 )
 
-*Slider:* `MOD` (0–4), `SPEED` (0–4: 1, 2, 4, 8, 16 pro Takt; beim Filter-LFO ein Sweep alle 16, 8, 4, 2, 1 Takte; beim Phaser 0,25–4 Hz), `DEPTH`.
+*Sliders:* `MOD` (0–4), `SPEED` (0–4: 1, 2, 4, 8, 16 per bar; with the filter LFO one sweep every 16, 8, 4, 2, 1 bars; with the phaser 0.25–4 Hz), `DEPTH`.
 
-#falle[*Der wichtigste Strudel-Unterschied:* Werte wie `lpf` werden nur beim *Notenstart* gelesen. Der Filter-LFO (MOD 1) bewegt deshalb den Pad (ein Akkord = eine Note pro Takt) nur einmal pro Takt, den 16tel-Bass dagegen fließend. Tremolo, Phaser und alle Hüllkurven laufen dagegen *innerhalb* einer Note. Abhilfe für lange Noten: die Note mit `.seg(16)` in 16 Stücke schneiden, oder eine Filterhüllkurve benutzen.]
+#pitfall[*The most important Strudel difference:* values like `lpf` are read only at *note start*. The filter LFO (MOD 1) therefore moves the pad (one chord = one note per bar) only once per bar, but the 16th bass smoothly. Tremolo, phaser and all envelopes, on the other hand, run *within* a note. Remedy for long notes: cut the note into 16 pieces with `.seg(16)`, or use a filter envelope.]
 
-#hoeren[
-  + `MOD` 1, `SPEED` 2: Achte darauf, dass der Bass fließt, der Pad aber springt.
-  + `MOD` 3, `SPEED` 3 und 4: Rhythmus aus einem gehaltenen Akkord.
-  + `MOD` 4, `SPEED` 0: der langsame Phaser-Schwung.
+#listen[
+  + `MOD` 1, `SPEED` 2: notice that the bass flows but the pad jumps.
+  + `MOD` 3, `SPEED` 3 and 4: rhythm from a held chord.
+  + `MOD` 4, `SPEED` 0: the slow phaser swirl.
 ]
 
-#szene[Bewegung ist in repetitiver Musik alles: Ein Loop, der sich nie ändert, ermüdet. LFOs auf Filter, Lautstärke oder Phaser lassen Loops atmen, ohne dass ein Ton dazukommt. Das Trance-Gate (Square-Tremolo in 16teln) ist ein eigener Klassiker; Phaser auf Hats und Pads ist typisch für Disco- und Deep House.]
+#scene[In repetitive music movement is everything: a loop that never changes gets tiring. LFOs on filter, level or phaser let loops breathe without a single new note. The trance gate (square tremolo in 16ths) is a classic of its own; phaser on hats and pads is typical of disco and deep house.]
 
 // ============================================================
-= Teil E: Raum
+= Part E: Space
 
-== Kapitel 10: Delay – Echos im Takt
+== Chapter 10: Delay – echoes in time
 
-*Was es macht.* Ein *Delay* nimmt den Klang auf und spielt ihn später wieder ab, immer wieder, jedes Mal leiser.
+*What it does.* A *delay* records the sound and plays it back later, again and again, each time quieter.
 
 #fig(
-  plot(w: 64mm, h: 22mm, bars: ((0.04, 0.95, blue),) + range(1, 7).map(i => (0.04 + i * 0.15, 0.95 * calc.pow(0.55, i), orange)), xl: [Original (blau) und Echos mit Feedback 0,55]),
-  [Jedes Echo kommt nach `delaytime` und hat `delayfeedback` mal die Lautstärke des vorigen.],
+  plot(w: 64mm, h: 22mm, bars: ((0.04, 0.95, blue),) + range(1, 7).map(i => (0.04 + i * 0.15, 0.95 * calc.pow(0.55, i), orange)), xl: [Original (blue) and echoes with feedback 0.55]),
+  [Each echo comes after `delaytime` and has `delayfeedback` times the level of the previous one.],
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`delay`], [0–1], [Lautstärke der Echos (Wet-Anteil)],
-  [`delaytime` (delayt, dt)], [Sekunden], [Abstand der Echos],
-  [`delayfeedback` (delayfb, dfb)], [0–0,95], [wie viel jedes Echo wiederholt wird. Nie 1 oder mehr: wird immer lauter],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`delay`], [0–1], [Level of the echoes (wet share)],
+  [`delaytime` (delayt, dt)], [seconds], [Spacing of the echoes],
+  [`delayfeedback` (delayfb, dfb)], [0–0.95], [how much of each echo is repeated. Never 1 or more: keeps getting louder],
 )
 
-*Echo-Zeiten im Takt* (bei 122 BPM ist ein Schlag 0,49 s): 1/16 = 0,12 s, 1/8 = 0,25 s, *punktierte 1/8 = 0,37 s*, 1/4 = 0,49 s, Achteltriole = 0,16 s. In Strudel allgemein: `delaytime(60 / BPM * 0.75)` für eine punktierte Achtel.
+*Echo times in tempo* (at 122 BPM one beat is 0.49 s): 1/16 = 0.12 s, 1/8 = 0.25 s, *dotted 1/8 = 0.37 s*, 1/4 = 0.49 s, 8th triplet = 0.16 s. In Strudel in general: `delaytime(60 / BPM * 0.75)` for a dotted 8th.
 
-*Slider:* `LEVEL10`, `TIME10` (0 = 1/16, 1 = 1/8, 2 = punktierte 1/8, 3 = 1/4, 4 = Achteltriole), `FEEDBACK`. Das Delay liegt nur auf dem sparsamen Stab und der Lead, auf Orbit 2.
+*Sliders:* `LEVEL10`, `TIME10` (0 = 1/16, 1 = 1/8, 2 = dotted 1/8, 3 = 1/4, 4 = 8th triplet), `FEEDBACK`. The delay sits only on the sparse stab and the lead, on orbit 2.
 
-#hoeren[
-  + `TIME10` 2: Die Echos fallen zwischen die Schläge und erzeugen einen neuen, rollenden Rhythmus.
-  + `TIME10` 3: Die Echos verstecken sich hinter der Kick.
-  + `FEEDBACK` für einen Takt auf 0,8, dann zurück: ein „Delay-Throw“, ein klassischer Live-Move.
+#listen[
+  + `TIME10` 2: the echoes fall between the beats and create a new, rolling rhythm.
+  + `TIME10` 3: the echoes hide behind the kick.
+  + `FEEDBACK` to 0.8 for one bar, then back: a "delay throw", a classic live move.
 ]
 
-#szene[Die punktierte Achtel ist *das* Delay von Dub Techno und Deep House: Aus einem einzigen Akkord-Stab pro Takt wird eine ganze rhythmische Fläche (Basic Channel). In Techno sind Delays auf Percussion und Stabs ein Groove-Werkzeug; im Live-Set sind Delay-Throws (kurz viel Feedback auf ein einzelnes Element) ein Übergangs-Trick.]
+#scene[The dotted 8th is *the* delay of dub techno and deep house: a single chord stab per bar becomes a whole rhythmic texture (Basic Channel). In techno, delays on percussion and stabs are a groove tool; in a live set, delay throws (a burst of feedback on a single element) are a transition trick.]
 
-== Kapitel 11: Hall – room, roomsize, roomlp
+== Chapter 11: Reverb – room, roomsize, roomlp
 
-*Was es macht.* Hall (Reverb) ahmt einen Raum nach: Tausende winziger Echos verschmelzen zu einer Fahne. Hall setzt einen Klang in den Raum: trocken = nah und direkt, nass = weit weg und groß.
+*What it does.* Reverb imitates a room: thousands of tiny echoes merge into a tail. Reverb places a sound in space: dry = close and direct, wet = far away and big.
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`room`], [0–1], [Menge des Halls (Wet-Anteil)],
-  [`roomsize` (size, sz, rsize)], [0–10], [Raumgröße: kleiner Raum … riesige Halle],
-  [`roomfade` (rfade)], [Sekunden], [Ausklingzeit],
-  [`roomlp` (rlp)], [Hz], [Helligkeit der Fahne: tiefer Wert = dunkler Hall],
-  [`roomdim` (rdim)], [Hz], [wie dunkel die Fahne am Ende wird],
-  [`iresponse` (ir)], [Sample], [ein aufgenommener echter Raum als Hall (Faltungshall)],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`room`], [0–1], [Amount of reverb (wet share)],
+  [`roomsize` (size, sz, rsize)], [0–10], [Room size: small room … huge hall],
+  [`roomfade` (rfade)], [seconds], [Decay time],
+  [`roomlp` (rlp)], [Hz], [Brightness of the tail: low value = dark reverb],
+  [`roomdim` (rdim)], [Hz], [how dark the tail gets at the end],
+  [`iresponse` (ir)], [sample], [a recorded real room as reverb (convolution reverb)],
 )
 
-*Slider:* `LEVEL11`, `SIZE11` (0,5 / 2 / 4 / 8), `DARK` (16 / 5 / 1,5 kHz), `ONKICK` (0 = Hall nur auf Clap und Stab, 1 = auch auf der Kick).
+*Sliders:* `LEVEL11`, `SIZE11` (0.5 / 2 / 4 / 8), `DARK` (16 / 5 / 1.5 kHz), `ONKICK` (0 = reverb only on clap and stab, 1 = on the kick too).
 
-#hoeren[
-  + `LEVEL11` 0 → 0,6 bei `SIZE11` 2: Der Stab rückt nach hinten.
-  + `DARK` 0 gegen 2 bei viel Hall: Ein dunkler Hall ist da, stört aber nicht.
-  + `ONKICK` 1: Der Bassbereich wird verwaschen, die Kick verliert ihren Punch.
+#listen[
+  + `LEVEL11` 0 → 0.6 at `SIZE11` 2: the stab moves back.
+  + `DARK` 0 against 2 with lots of reverb: a dark reverb is there but does not get in the way.
+  + `ONKICK` 1: the low end gets washed out, the kick loses its punch.
 ]
 
-#szene[Techno hält die Kick fast immer trocken; Hall gehört auf Clap, Stabs, Percussion und Pads, meist abgedunkelt und mit Hochpass (der Bassbereich im Hall ist Matsch). Ausnahme: Hypno- und Dub-Techno legen bewusst gefilterten Hall auf die Kick, um den „Rumble“ zu erzeugen. In House sind kurze Räume auf Drums und lange Fahnen auf Vocals und Pads typisch.]
+#scene[Techno almost always keeps the kick dry; reverb belongs on clap, stabs, percussion and pads, usually darkened and high-passed (the low end in a reverb is mud). Exception: hypnotic and dub techno deliberately put filtered reverb on the kick to create the "rumble". In house, short rooms on drums and long tails on vocals and pads are typical.]
 
-#falle[`roomsize`, `roomlp`, `roomfade` und `roomdim` *bauen den Hall neu*, wenn sich ihr Wert ändert. Das kostet Rechenleistung und kann knacksen. Nicht wie einen Regler fahren, sondern feste Werte pro Orbit setzen. Und: Hall ist global pro Orbit (Kapitel 12).]
+#pitfall[`roomsize`, `roomlp`, `roomfade` and `roomdim` *rebuild the reverb* when their value changes. That costs CPU and can click. Do not ride them like a knob; set fixed values per orbit instead. And: reverb is global per orbit (chapter 12).]
 
 // ============================================================
-= Teil F: Routing und Dynamik
+= Part F: Routing and dynamics
 
-== Kapitel 12: Orbits – warum Effekte sich gegenseitig bestehlen
+== Chapter 12: Orbits – why effects steal from each other
 
-*Was es macht.* Die meisten Effekte sind *lokal*: Jede Note bekommt ihren eigenen Filter, ihre eigene Verzerrung. Delay und Hall sind *global*: Es gibt nur *ein* Delay und *einen* Hall pro *Orbit*, und alle Klänge auf diesem Orbit teilen ihn sich. Benutzen zwei Klänge auf demselben Orbit unterschiedliche Raumgrößen oder Delay-Zeiten, bestimmt die jeweils letzte Note für alle.
+*What it does.* Most effects are *local*: every note gets its own filter, its own distortion. Delay and reverb are *global*: there is only *one* delay and *one* reverb per *orbit*, and all sounds on this orbit share it. If two sounds on the same orbit use different room sizes or delay times, the latest note decides for all of them.
 
-*Slider:* `FIX` 0 = alles auf Orbit 1: Der Stab will eine riesige Halle (Größe 8) und ein punktiertes Delay, die Hats einen winzigen Raum und ein 1/16-Delay. Sie überschreiben sich gegenseitig. `FIX` 1 = der Stab bekommt Orbit 2, beide behalten ihre Einstellungen.
+*Slider:* `FIX` 0 = everything on orbit 1: the stab wants a huge hall (size 8) and a dotted delay, the hats a tiny room and a 1/16 delay. They overwrite each other. `FIX` 1 = the stab gets orbit 2, both keep their settings.
 
-#hoeren[
-  + `FIX` 0 / 1 umschalten und auf die Fahne des Stabs achten: Bei 0 bricht die Halle immer wieder zusammen, die Echos springen.
+#listen[
+  + Switch `FIX` 0 / 1 and listen to the stab's tail: at 0 the hall keeps collapsing, the echoes jump.
 ]
 
-#merke[Ein Orbit pro *Art von Raum*: zum Beispiel 1 = trockene Drums, 2 = Stabs und Pads mit Hall, 3 = Delays. Innerhalb eines Orbits überall dieselbe `roomsize`, `roomlp` und `delaytime`. Das spart auch Rechenleistung, weil der Hall nicht ständig neu gebaut wird.]
+#remember[One orbit per *kind of space*: for example 1 = dry drums, 2 = stabs and pads with reverb, 3 = delays. Within an orbit use the same `roomsize`, `roomlp` and `delaytime` everywhere. This also saves CPU, because the reverb is not rebuilt all the time.]
 
-#szene[Das entspricht den *Send-Effekten* eines Mischpults oder einer DAW: ein Hall-Bus und ein Delay-Bus, zu denen man von jedem Kanal mehr oder weniger hinschickt. So arbeiten praktisch alle Techno- und House-Produktionen und Live-Setups.]
+#scene[This matches the *send effects* of a mixer or a DAW: a reverb bus and a delay bus that every channel sends more or less to. Practically all techno and house productions and live setups work this way.]
 
-== Kapitel 13: Sidechain und Ducking – der pumpende House-Sound
+== Chapter 13: Sidechain and ducking – the pumping house sound
 
-*Was es macht.* Beim *Ducking* drückt jeder Kick-Schlag einen ganzen Orbit leiser, der dann wieder hochkommt. Ursprünglich ein Trick, damit Kick und Bass sich nicht stören (*Sidechain-Kompression*); dann wurde es ein eigener Klang: das Pumpen.
+*What it does.* With *ducking* every kick hit pushes a whole orbit down in level, and it then comes back up. Originally a trick so kick and bass do not get in each other's way (*sidechain compression*); then it became a sound of its own: the pumping.
 
 #fig(
-  plot(w: 64mm, h: 22mm, curves: ((sample(x => 0.92 - 0.75 * calc.exp(-calc.rem(x * 4, 1) * 9)), blue),), bars: range(4).map(i => (i / 4 + 0.005, 0.98, orange)), xl: [Lautstärke des Pads über einen Takt; orange = Kick]),
-  [Jede Kick drückt die Lautstärke herunter (`duckdepth`); wie schnell sie zurückkommt, bestimmt `duckattack`.],
+  plot(w: 64mm, h: 22mm, curves: ((sample(x => 0.92 - 0.75 * calc.exp(-calc.rem(x * 4, 1) * 9)), blue),), bars: range(4).map(i => (i / 4 + 0.005, 0.98, orange)), xl: [Level of the pad over one bar; orange = kick]),
+  [Each kick pushes the level down (`duckdepth`); how fast it comes back is set by `duckattack`.],
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`duckorbit` (duck)], [Orbit-Nummer(n), z. B. `2` oder `"2:3"`], [welcher Orbit geduckt wird. Steht auf der *Kick*],
-  [`duckdepth`], [0–1], [wie tief es runtergeht],
-  [`duckattack` (duckatt, datt)], [Sekunden], [wie schnell es wieder hochkommt],
-  [`duckonset`], [Sekunden], [wie schnell es runtergeht],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`duckorbit` (duck)], [orbit number(s), e.g. `2` or `"2:3"`], [which orbit gets ducked. Goes on the *kick*],
+  [`duckdepth`], [0–1], [how deep it goes down],
+  [`duckattack` (duckatt, datt)], [seconds], [how fast it comes back up],
+  [`duckonset`], [seconds], [how fast it goes down],
 )
 
-*Slider:* `DEPTH13`, `RETURN` (Rückkehrzeit). Die Kick (Orbit 1) duckt Orbit 2, auf dem Pad und Bass spielen.
+*Sliders:* `DEPTH13`, `RETURN` (return time). The kick (orbit 1) ducks orbit 2, where pad and bass play.
 
-#hoeren[
-  + `DEPTH13` 0 gegen 0,8.
-  + `RETURN` 0,05 (straff) gegen 0,3: Bei 0,3 „atmet“ der Pad in Vierteln.
+#listen[
+  + `DEPTH13` 0 against 0.8.
+  + `RETURN` 0.05 (tight) against 0.3: at 0.3 the pad "breathes" in quarters.
 ]
 
-#szene[Starkes Pumpen ist der Sound von French House (Daft Punk, Stardust) und vielen modernen House-Tracks. In Techno ist Ducking subtiler: Es schafft der Kick Platz im Bass, sodass Kick und Bass laut sein können, ohne sich zu verdecken.]
+#scene[Strong pumping is the sound of French house (Daft Punk, Stardust) and many modern house tracks. In techno ducking is subtler: it makes room for the kick in the bass, so kick and bass can both be loud without covering each other.]
 
-== Kapitel 14: Kompressor – Punch und Sustain einzelner Schläge
+== Chapter 14: Compressor – punch and sustain of single hits
 
-*Was es macht.* Ein Kompressor macht laute Stellen leiser: Alles über der *Schwelle* (Threshold, in dB) wird um das *Verhältnis* (Ratio) reduziert. Bei Ratio 4 werden aus 4 dB über der Schwelle 1 dB. Leise Stellen bleiben, der Klang wird gleichmäßiger und dichter.
+*What it does.* A compressor makes loud parts quieter: everything above the *threshold* (in dB) is reduced by the *ratio*. At ratio 4, 4 dB above the threshold become 1 dB. Quiet parts stay, the sound gets more even and denser.
 
 #fig(
-  plot(w: 46mm, h: 30mm, curves: ((((0, 0), (1, 1)), luma(170)), (((0, 0), (0.6, 0.6), (1, 0.7)), blue)), vlines: (0.6,), xl: [Eingang (dB) → Ausgang (dB)]),
-  [Grau: ohne Kompressor. Blau: Threshold bei der gestrichelten Linie, Ratio 4. Über der Schwelle wächst der Ausgang nur noch ein Viertel so schnell.],
+  plot(w: 46mm, h: 30mm, curves: ((((0, 0), (1, 1)), luma(170)), (((0, 0), (0.6, 0.6), (1, 0.7)), blue)), vlines: (0.6,), xl: [Input (dB) → output (dB)]),
+  [Grey: without compressor. Blue: threshold at the dashed line, ratio 4. Above the threshold the output grows only a quarter as fast.],
 )
 
 #tbl(
   (auto, auto, 1fr),
-  [*Parameter*], [*Bereich*], [*Wirkung*],
-  [`compressor`], [dB, z. B. −20], [Schwelle (Threshold)],
-  [`compressorRatio`], [1–20], [Stärke],
-  [`compressorKnee`], [dB], [weicher Übergang an der Schwelle],
-  [`compressorAttack`], [Sekunden], [wie schnell er zugreift. *Langsam = mehr Punch* (der Anschlag rutscht durch)],
-  [`compressorRelease`], [Sekunden], [wie schnell er loslässt],
+  [*Parameter*], [*Range*], [*Effect*],
+  [`compressor`], [dB, e.g. −20], [Threshold],
+  [`compressorRatio`], [1–20], [Strength],
+  [`compressorKnee`], [dB], [soft transition at the threshold],
+  [`compressorAttack`], [seconds], [how fast it grabs. *Slow = more punch* (the attack slips through)],
+  [`compressorRelease`], [seconds], [how fast it lets go],
 )
 
-Kurzschreibweise: `compressor("-20:4:6:.01:.1")` = Threshold, Ratio, Knee, Attack, Release.
+Shorthand: `compressor("-20:4:6:.01:.1")` = threshold, ratio, knee, attack, release.
 
-*Slider:* `THRESH`, `RATIO`, `ATTACK14`, `RELEASE14`, `MAKEUP` (Lautstärke danach, `postgain`). Der Kompressor liegt auf den Drums.
+*Sliders:* `THRESH`, `RATIO`, `ATTACK14`, `RELEASE14`, `MAKEUP` (level afterwards, `postgain`). The compressor sits on the drums.
 
-#hoeren[
-  + `THRESH` −40, `RATIO` 10, dann `ATTACK14` 0,001 gegen 0,03: flach gegen knackig.
-  + `MAKEUP` hoch: Die Fahnen von Hats und Clap werden lauter, die Drums klingen dichter.
+#listen[
+  + `THRESH` −40, `RATIO` 10, then `ATTACK14` 0.001 against 0.03: flat against snappy.
+  + `MAKEUP` up: the tails of hats and clap get louder, the drums sound denser.
 ]
 
-#falle[In Strudel arbeitet der Kompressor *pro Note* (lokal), nicht auf dem ganzen Mix. Er formt also jeden Schlag einzeln (Punch, Sustain), ist aber kein „Kleber“ für den Mix. Den Platz im Mix schafft in Strudel das Ducking (Kapitel 13).]
+#pitfall[In Strudel the compressor works *per note* (local), not on the whole mix. So it shapes each hit on its own (punch, sustain), but it is no "glue" for the mix. In Strudel, ducking makes room in the mix (chapter 13).]
 
-#szene[Kompression ist in Techno und House allgegenwärtig: auf Kicks für Punch, auf Drum-Bussen für Dichte, auf dem Master für Lautheit. In Strudel nutzt du sie vor allem, um einzelne Drums knackiger oder voller zu machen.]
+#scene[Compression is everywhere in techno and house: on kicks for punch, on drum buses for density, on the master for loudness. In Strudel you mostly use it to make single drums snappier or fuller.]
 
-== Kapitel 15: Stereo – pan, jux
+== Chapter 15: Stereo – pan, jux
 
-*Was es macht.* `pan` setzt einen Klang zwischen links (0), Mitte (0,5) und rechts (1). `jux` spielt eine veränderte Kopie nur rechts; `juxBy` stellt ein, wie weit die beiden Seiten auseinanderliegen.
+*What it does.* `pan` places a sound between left (0), center (0.5) and right (1). `jux` plays a changed copy on the right only; `juxBy` sets how far apart the two sides are.
 
-*Slider:* `MOVE` (Hats wandern von links nach rechts, Auto-Pan), `WIDTH` (der Stab bekommt auf einer Seite eine um ein paar Millisekunden spätere Kopie: er klingt breit, *Haas-Effekt*).
+*Sliders:* `MOVE` (hats wander from left to right, auto-pan), `WIDTH` (the stab gets a copy a few milliseconds later on one side: it sounds wide, *Haas effect*).
 
-#hoeren[
-  + Mit Kopfhörern: `MOVE` 0 → 1, `WIDTH` 0 → 1.
+#listen[
+  + With headphones: `MOVE` 0 → 1, `WIDTH` 0 → 1.
 ]
 
-#szene[Clubanlagen spielen oft (fast) mono, und tiefe Frequenzen sind ohnehin nicht ortbar. Deshalb gilt: *Kick, Bass und Clap in die Mitte*, nur Hats, Percussion, Pads und Effekte in die Breite. Breite Klänge können in Mono dünner werden. Auto-Pan auf Percussion ist ein typisches Mittel für Bewegung in Minimal und Tech House.]
+#scene[Club systems often play (almost) mono, and low frequencies cannot be located anyway. So the rule is: *kick, bass and clap in the center*, only hats, percussion, pads and effects go wide. Wide sounds can get thinner in mono. Auto-pan on percussion is a typical means of movement in minimal and tech house.]
 
-== Kapitel 16: Performance-Kette – die Effekte, die du live fährst
+== Chapter 16: Performance chain – the effects you ride live
 
-*Was es macht.* Live bewegt man selten zwanzig Parameter. Diese fünf Makros decken die meisten Techno- und House-Moves ab und passen zu den Reglern eines Stems in deinen Tracks (`col(n)`: hpf, lpf, char, level):
+*What it does.* Live you rarely move twenty parameters. These five macros cover most techno and house moves and match the controls of a stem in your tracks (`col(n)`: hpf, lpf, char, level):
 
 #tbl(
   (auto, 1fr, 1fr),
-  [*Slider*], [*Wirkung*], [*Live-Einsatz*],
-  [`HP`], [Hochpass auf der Musik], [Build-up, ausdünnen],
-  [`LP`], [Tiefpass auf Stab und Lead (der Bass behält seinen eigenen)], [Sweeps, Dunkelheit],
-  [`CHAR`], [Verzerrung auf dem Bass + Resonanz am Filter], [„Charakter“, Druck],
-  [`SPACE`], [Hall und Delay auf dem Stab], [Weite, Übergänge],
-  [`PUMP`], [Ducking-Tiefe von der Kick], [Groove, Platz für die Kick],
+  [*Slider*], [*Effect*], [*Live use*],
+  [`HP`], [high-pass on the music], [build-up, thinning out],
+  [`LP`], [low-pass on stab and lead (the bass keeps its own)], [sweeps, darkness],
+  [`CHAR`], [distortion on the bass + resonance on the filter], ["character", drive],
+  [`SPACE`], [reverb and delay on the stab], [width, transitions],
+  [`PUMP`], [ducking depth from the kick], [groove, room for the kick],
 )
 
-#hoeren[
-  Einen 32-Takt-Bogen bauen: Start mit `LP` 0,3 und `SPACE` 0,2. `LP` über 16 Takte öffnen, `CHAR` dazu. Dann `HP` vier Takte hoch und mit hohem `PUMP` zurückfallen lassen. Danach überlegen, welches Makro auf welchen Regler gehört.
+#listen[
+  Build a 32-bar arc: start with `LP` 0.3 and `SPACE` 0.2. Open `LP` over 16 bars, add `CHAR`. Then raise `HP` for four bars and let it fall back with high `PUMP`. Afterwards think about which macro belongs on which control.
 ]
 
 // ============================================================
-= Anhang
+= Appendix
 
-== Rezepte
+== Recipes
 
 #tbl(
   (auto, 1fr),
-  [*Klang*], [*Zutaten*],
-  [Acid-Bass], [`s('sawtooth')`, 16tel, `.lpf(300).fanchor(0).lpenv(4).lpd(.15).lps(0).lpq(15).ftype('ladder')`, Akzente mit `velocity`, etwas `distort` (diode)],
-  [Dub-Techno-Akkord], [m7/m9 oder Quartenstapel, sehr kurz (`decay(.2).sustain(0)`), `lpf` 800–1500, `delay(.5).delaytime(punktierte 1/8).delayfeedback(.6)`, eigener Orbit mit dunklem Hall],
-  [Rumble-Kick], [Kick + `distort` + eigener Orbit mit viel Hall, `roomlp` tief (300–600 Hz), Hall per Ducking von der trockenen Kick pumpen lassen],
-  [Synth-Kick], [`note('a1').s('sine').penv(36).pdecay(.08).pcurve(1).decay(.35).sustain(0)`],
-  [Pumpendes Pad], [Pad auf eigenem Orbit, Kick mit `duckorbit(n).duckdepth(.8).duckattack(.25)`],
-  [Trance-Gate], [gehaltener Akkord, `tremolosync(16).tremoloshape('square').tremolodepth(1)`],
-  [Build-up], [`hpf` über 8–16 Takte von 20 auf 1000–2000 Hz, dazu `room` hoch, am Drop alles schlagartig zurück],
-  [Telefon/Radio], [`bpf(1500).bpq(4)`, etwas `crush(8)`],
+  [*Sound*], [*Ingredients*],
+  [Acid bass], [`s('sawtooth')`, 16ths, `.lpf(300).fanchor(0).lpenv(4).lpd(.15).lps(0).lpq(15).ftype('ladder')`, accents with `velocity`, a bit of `distort` (diode)],
+  [Dub techno chord], [m7/m9 or stacked fourths, very short (`decay(.2).sustain(0)`), `lpf` 800–1500, `delay(.5).delaytime(dotted 1/8).delayfeedback(.6)`, own orbit with dark reverb],
+  [Rumble kick], [kick + `distort` + own orbit with lots of reverb, `roomlp` low (300–600 Hz), let the reverb pump via ducking from the dry kick],
+  [Synth kick], [`note('a1').s('sine').penv(36).pdecay(.08).pcurve(1).decay(.35).sustain(0)`],
+  [Pumping pad], [pad on its own orbit, kick with `duckorbit(n).duckdepth(.8).duckattack(.25)`],
+  [Trance gate], [held chord, `tremolosync(16).tremoloshape('square').tremolodepth(1)`],
+  [Build-up], [`hpf` over 8–16 bars from 20 to 1000–2000 Hz, raise `room` with it, at the drop everything back at once],
+  [Telephone/radio], [`bpf(1500).bpq(4)`, a bit of `crush(8)`],
 )
 
-== Übungsplan
+== Practice plan
 
 #tbl(
   (auto, auto, 1fr),
-  [*Einheit*], [*Kapitel*], [*Ziel*],
-  [1], [0, 1, 2], [Frequenzbereiche hören; Akzente; Hüllkurven erkennen],
-  [2], [3, 4], [Filter-Sweeps, Build-up mit Hochpass],
-  [3], [5, 6], [Acid und Kick-Bau: Hüllkurven auf Filter und Tonhöhe],
-  [4], [7, 8], [Sättigung bis Zerstörung; Vowel],
-  [5], [9, 10, 11], [Bewegung und Raum],
-  [6], [12, 13, 14, 15], [Routing, Ducking, Kompression, Stereo],
-  [danach], [16], [Performance-Bögen üben, dann auf eigene Tracks übertragen],
+  [*Session*], [*Chapters*], [*Goal*],
+  [1], [0, 1, 2], [hear frequency ranges; accents; recognise envelopes],
+  [2], [3, 4], [filter sweeps, build-up with high-pass],
+  [3], [5, 6], [acid and kick building: envelopes on filter and pitch],
+  [4], [7, 8], [saturation to destruction; vowel],
+  [5], [9, 10, 11], [movement and space],
+  [6], [12, 13, 14, 15], [routing, ducking, compression, stereo],
+  [after that], [16], [practise performance arcs, then carry them over to your own tracks],
 )
 
-Danach: In einem eigenen Track für jeden Stem überlegen, *in welchem Frequenzbereich* er lebt, *welchen Raum* er bekommt (Orbit) und *welcher Effekt* live auf den Regler gehört.
+After that: in a track of your own, think for each stem about *which frequency range* it lives in, *which space* it gets (orbit) and *which effect* belongs on its live control.
 
-== Effekt-Referenz (alle Parameter der Strudel-Effektseite)
+== Effect reference (all parameters of the Strudel effects page)
 
 #tbl(
   (auto, 1fr),
-  [*Gruppe*], [*Parameter (Aliase in Klammern)*],
-  [Filter], [`lpf` (cutoff, ctf, lp), `lpq` (resonance), `hpf` (hp, hcutoff), `hpq` (hresonance), `bpf` (bandf, bp), `bpq` (bandq), `ftype` (12db, ladder, 24db), `vowel`],
-  [Filter-Hüllkurven], [`lpattack lpdecay lpsustain lprelease lpenv` (lpa lpd lps lpr lpe), dasselbe mit `hp…` und `bp…`, `fanchor`],
-  [Lautstärke-Hüllkurve], [`attack` (att), `decay` (dec), `sustain` (sus), `release` (rel), `adsr("a:d:s:r")`, `clip`],
-  [Pitch-Hüllkurve], [`penv`, `pattack` (patt), `pdecay` (pdec), `prelease` (prel), `pcurve`, `panchor`],
-  [Amplitudenmodulation], [`tremolo` (trem), `tremolosync`, `tremolodepth`, `tremoloskew`, `tremolophase`, `tremoloshape`],
-  [Dynamik], [`gain`, `velocity` (vel), `postgain`, `compressor` (+ `compressorRatio Knee Attack Release`), `xfade`],
+  [*Group*], [*Parameters (aliases in brackets)*],
+  [Filters], [`lpf` (cutoff, ctf, lp), `lpq` (resonance), `hpf` (hp, hcutoff), `hpq` (hresonance), `bpf` (bandf, bp), `bpq` (bandq), `ftype` (12db, ladder, 24db), `vowel`],
+  [Filter envelopes], [`lpattack lpdecay lpsustain lprelease lpenv` (lpa lpd lps lpr lpe), the same with `hp…` and `bp…`, `fanchor`],
+  [Amplitude envelope], [`attack` (att), `decay` (dec), `sustain` (sus), `release` (rel), `adsr("a:d:s:r")`, `clip`],
+  [Pitch envelope], [`penv`, `pattack` (patt), `pdecay` (pdec), `prelease` (prel), `pcurve`, `panchor`],
+  [Amplitude modulation], [`tremolo` (trem), `tremolosync`, `tremolodepth`, `tremoloskew`, `tremolophase`, `tremoloshape`],
+  [Dynamics], [`gain`, `velocity` (vel), `postgain`, `compressor` (+ `compressorRatio Knee Attack Release`), `xfade`],
   [Stereo], [`pan`, `jux`, `juxBy`],
-  [Waveshaping], [`distort` (dist; + `distorttype`, `distortvol`), `crush`, `coarse`, `shape` (veraltet)],
-  [Global (pro Orbit)], [`orbit` (o), `delay`, `delaytime` (delayt, dt), `delayfeedback` (delayfb, dfb), `room`, `roomsize` (rsize, sz, size), `roomfade` (rfade), `roomlp` (rlp), `roomdim` (rdim), `iresponse` (ir), `phaser` (ph), `phaserdepth`, `phasercenter`, `phasersweep`, `duckorbit` (duck), `duckattack`, `duckdepth`, `duckonset`],
+  [Waveshaping], [`distort` (dist; + `distorttype`, `distortvol`), `crush`, `coarse`, `shape` (deprecated)],
+  [Global (per orbit)], [`orbit` (o), `delay`, `delaytime` (delayt, dt), `delayfeedback` (delayfb, dfb), `room`, `roomsize` (rsize, sz, size), `roomfade` (rfade), `roomlp` (rlp), `roomdim` (rdim), `iresponse` (ir), `phaser` (ph), `phaserdepth`, `phasercenter`, `phasersweep`, `duckorbit` (duck), `duckattack`, `duckdepth`, `duckonset`],
 )
 
-Kurzschreibweisen mit Doppelpunkt: `lpf("1000:10")` = Cutoff und Resonanz, `delay(".5:.375:.6")` = Menge, Zeit, Feedback, `room(".6:4")` = Menge, Größe.
+Shorthands with a colon: `lpf("1000:10")` = cutoff and resonance, `delay(".5:.375:.6")` = amount, time, feedback, `room(".6:4")` = amount, size.
 
-== Glossar
+== Glossary
 
 #tbl(
-  (auto, auto, 1fr),
-  [*Deutsch*], [*Englisch*], [*Erklärung*],
-  [Frequenz], [frequency], [Schwingungen pro Sekunde (Hz); bestimmt die Tonhöhe],
-  [Obertöne], [overtones, harmonics], [Vielfache des Grundtons, machen die Klangfarbe],
-  [Dezibel], [decibel (dB)], [Maß für Lautstärkeverhältnisse; +6 dB ≈ doppelte Amplitude],
-  [Hüllkurve], [envelope (ADSR)], [Verlauf eines Werts über eine Note: Attack, Decay, Sustain, Release],
-  [Tiefpass, Hochpass, Bandpass], [low-pass, high-pass, band-pass], [Filter, die Höhen, Tiefen oder alles außer einem Band entfernen],
-  [Cutoff], [cutoff], [Grenzfrequenz eines Filters],
-  [Resonanz], [resonance, Q], [Anhebung am Cutoff],
-  [Sättigung, Verzerrung], [saturation, distortion], [Verbiegen der Welle, erzeugt neue Obertöne],
-  [Formant], [formant], [Resonanzbereich, der einen Vokal ausmacht],
-  [LFO], [low frequency oscillator], [langsame Welle, die einen Parameter bewegt],
-  [Hall, Delay], [reverb, delay], [Raum aus vielen Echos; einzelne Echos im Takt],
-  [trocken, nass], [dry, wet], [Original- und Effektanteil],
-  [Orbit, Send/Bus], [orbit, send/bus], [gemeinsamer Effektkanal für mehrere Klänge],
-  [Ducking, Sidechain], [ducking, sidechain], [ein Signal (Kick) drückt ein anderes leiser],
-  [Kompressor], [compressor], [macht laute Stellen leiser, den Klang dichter],
-  [Clipping], [clipping], [Abschneiden über 0 dB],
-  [Aliasing], [aliasing], [falsche, metallische Töne durch zu niedrige Abtastrate],
+  (auto, 1fr),
+  [*Term*], [*Meaning*],
+  [frequency], [vibrations per second (Hz); sets the pitch],
+  [overtones, harmonics], [multiples of the fundamental, they make the timbre],
+  [decibel (dB)], [measure of level ratios; +6 dB ≈ double amplitude],
+  [envelope (ADSR)], [course of a value over one note: attack, decay, sustain, release],
+  [low-pass, high-pass, band-pass], [filters that remove the highs, the lows, or everything except one band],
+  [cutoff], [corner frequency of a filter],
+  [resonance, Q], [boost at the cutoff],
+  [saturation, distortion], [bending the wave, creates new overtones],
+  [formant], [resonance range that makes up a vowel],
+  [LFO], [low frequency oscillator: slow wave that moves a parameter],
+  [reverb, delay], [space made of many echoes; single echoes in time],
+  [dry, wet], [original and effect share],
+  [orbit, send/bus], [shared effect channel for several sounds],
+  [ducking, sidechain], [one signal (kick) pushes another one down in level],
+  [compressor], [makes loud parts quieter, the sound denser],
+  [clipping], [cutting off above 0 dB],
+  [aliasing], [false, metallic tones from too low a sample rate],
 )

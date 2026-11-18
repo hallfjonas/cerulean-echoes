@@ -1,4 +1,5 @@
-// Build the set (tracks/011-combining-all/011-set-dual.strudel) from the four dual tracks and set-frame.strudel.
+// Build the set (tracks/sets/011-combining-all/011-set-dual.strudel) from set-frame.strudel and the four frozen dual
+// tracks in tracks/sets/011-combining-all/sources/.
 // usage: node make-set.mjs   (also: npm run set in tools/) — run it again after changing one of the tracks.
 //
 // Each track's code (helpers, harmony, stems) goes into its own function scope, unchanged except for a few patches:
@@ -17,15 +18,15 @@ import { generate } from '../lcxl-layout/gen-layout.mjs'
 import { generate as makeSyx } from '../lcxl-layout/make-syx.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUT = path.join(ROOT, 'tracks/011-combining-all/011-set-dual.strudel')
+const OUT = path.join(ROOT, 'tracks/sets/011-combining-all/011-set-dual.strudel')
 // grid = BPM of the clock on its plateau; slow = how many clock bars make one bar of the track; phrase = chapter
 // latch length in the set (orig = in the track); orbit0 = added to the track's orbits; transpose in semitones
 const TRACKS = [
-  { id: '007', name: 'Ambient',       file: 'tracks/007-ambient-soundscape/old/007-ambient-dual.strudel',       grid: 140, slow: 2, phrase: 4, orig: 1, orbit0: 0, transpose: 0 },
-  { id: '010', name: 'Ambient House', file: 'tracks/010-ambient-house/old/010-ambient-house-dual.strudel', grid: 120, slow: 1, phrase: 8, orig: 4, orbit0: 3, transpose: 0 },
-  { id: '009', name: 'Cool House',    file: 'tracks/009-house/old/009-house-dual.strudel',    grid: 122, slow: 1, phrase: 8, orig: 4, orbit0: 0, transpose: 0 },
-  { id: '008', name: 'Groove Techno', file: 'tracks/008-groove-techno/old/008-groove-techno-multi.strudel', grid: 140, slow: 1, phrase: 4, orig: 1, orbit0: 3, transpose: 4,
-    text: [[/'F ' \+ MOODS/g, "'A ' + MOODS"], [/'Kapitel {5}F '/g, "'Kapitel     A '"]] },
+  { id: '007', name: 'Ambient',       file: 'tracks/sets/011-combining-all/sources/007-ambient-dual.strudel',       grid: 140, slow: 2, phrase: 4, orig: 1, orbit0: 0, transpose: 0 },
+  { id: '010', name: 'Ambient House', file: 'tracks/sets/011-combining-all/sources/010-ambient-house-dual.strudel', grid: 120, slow: 1, phrase: 8, orig: 4, orbit0: 3, transpose: 0 },
+  { id: '009', name: 'Cool House',    file: 'tracks/sets/011-combining-all/sources/009-house-dual.strudel',    grid: 122, slow: 1, phrase: 8, orig: 4, orbit0: 0, transpose: 0 },
+  { id: '008', name: 'Groove Techno', file: 'tracks/sets/011-combining-all/sources/008-groove-techno-multi.strudel', grid: 140, slow: 1, phrase: 4, orig: 1, orbit0: 3, transpose: 4,
+    text: [[/'F ' \+ MOODS/g, "'A ' + MOODS"], [/'Chapter {5}F '/g, "'Chapter     A '"]] },
 ]
 const TAG = /^\/\/ @(layout|note|mode|col|row|ctl|guide|recipe|globalcc)\b/
 
@@ -99,7 +100,7 @@ function setTags(parts) {
     '// @note One continuous set through four tracks: 007 ambient (70 BPM) → 010 ambient house (120) → 009 cool house (122) → 008 groove techno (140, here in A). Every column keeps its role; the sounds behind it change with the track.',
     '// @note Jonas’ column 8 button 2 switches the Fog knob between Fog and the set position. In set mode, turning it moves through the set: each track has a plateau, between two plateaus a slow transformation: column by column the old sound turns into the new one (hits move to their new place, pitch, decay and filters glide; what has no partner thins out or fades). Air and pad first, then the low end, drums, melodies last. Leave it anywhere: a halfway position is its own sound.',
     '// @note Chapter, the buttons and the LC view belong to the track in focus (the nearer one in a transition). Chapters change at the next 8-bar phrase (007, 008: 4 bars). No Break / Drop in the set.',
-    '// @note The status box at the bottom right of the Strudel page shows the set position, chapter and each stem\'s pattern. Its button “als Fenster” opens it as a small window that stays on top (Chrome/Edge).',
+    '// @note The status box at the bottom right of the Strudel page shows the set position, chapter and each stem\'s pattern. Its button “as window” opens it as a small window that stays on top (Chrome/Edge).',
     '// @mode B16 Jojo — Foundation (beat + bass)',
     ...[1, 2, 3, 4, 5, 6, 7, 8].map(c => `// @col B16:${c} ${c} ${tplCol['B16:' + c]}`),
     '// @row B16:k1 Row 1 \\ Brightness', '// @row B16:k2 Row 2 \\ Space', '// @row B16:k3 Row 3 \\ Character',
@@ -170,11 +171,11 @@ view = must(view, 'STATUS[page]', 'SET.track().STATUS[page]', V, 1)
 view = must(view, 'lcChapter()', 'SET.track().lcChapter()', V)
 view = must(view, 'lcHead()', 'SET.track().lcHead()', V, 1)
 view = must(view, 'breakLatch.pending === 1', 'setState.mode', V, 1)
-view = must(view, "pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an')\n", "esc(setState.mode ? 'Set' : 'Fog')\n", V, 1)
-view = must(view, "'<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat aus' : 'Beat an', breakLatch.pending ? 'Beat aus' : 'Beat an') + '</div>'",
+view = must(view, "pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on')\n", "esc(setState.mode ? 'Set' : 'Fog')\n", V, 1)
+view = must(view, "'<div><span class=k>Break</span>' + pending(breakLatch.now ? 'Beat off' : 'Beat on', breakLatch.pending ? 'Beat off' : 'Beat on') + '</div>'",
   'SET.headHtml(esc)', V, 1)
 // The track's own bar/beat line goes: the set shows its own (SET.headHtml, phrase of the set position)
-view = must(view, "      '<div><span class=k>Takt</span>' + beatHtml() + '</div>' +\n", '', V, 1)
+view = must(view, "      '<div><span class=k>Bar</span>' + beatHtml() + '</div>' +\n", '', V, 1)
 if (/breakLatch/.test(view)) throw new Error('LC view: breakLatch left')
 
 const trackCode = parts.map((p, k) => {

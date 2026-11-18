@@ -1,176 +1,309 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trajectory Player</title>
+<link rel="stylesheet" href="ui.css">
 <style>
-  :root { --bg: #0a1a26; --fg: #eef4f2; --dim: #7fa3b2; --line: #2c4e63 }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px system-ui, sans-serif; overflow: hidden }
   #view { position: fixed; inset: 0; display: block }
-  header { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 10px 16px;
-    align-items: center; padding: 10px 16px; background: rgba(4, 6, 13, 0.8); z-index: 1; transition: opacity 0.6s }
-  body.idle header { opacity: 0; pointer-events: none }
-  body.idle { cursor: none }
-  button, select { background: #163449; color: var(--fg); border: 1px solid var(--line); border-radius: 6px;
-    padding: 6px 10px; font: inherit; cursor: pointer }
-  label { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: 13px }
-  input[type=range] { width: 140px; accent-color: #4fb3e0 }
-  output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em }
-  #status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px }
+  #drawer label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
+  #drawer label input[type=range] { grid-column: 1 / 3; width: 100% }
+  #drawer label output { grid-row: 1; grid-column: 2 }
+  #drawer label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
+  #drawer label select { grid-column: 1 / 3 }
+  #drawer label.inline { display: inline-flex; margin: 0 0 0 10px }
+  #record.recording { background: #a3262a; border-color: #ff5a5f }
+  #recInfo { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-variant-numeric: tabular-nums }
+  #recInfo[hidden] { display: none }
+  #recMeter { width: 60px; height: 6px; background: var(--control); border-radius: 3px; overflow: hidden }
+  #recMeter span { display: block; height: 100%; width: 0; background: #ff5a5f }
+  #recError { color: var(--err); font-size: 13px }
 </style>
+<script type="module" src="nav.mjs"></script>
+<script type="importmap">
+{ "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
+</script>
 </head>
-<body>
-<!-- Plays a tapped track (make-tapped.mjs) right here and shows it: no strudel.cc needed. Every control the track
-     reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
+<body class="overlay">
+<!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here and shows it: no strudel.cc needed.
+     Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
      last per number); a control not moved yet reads 0. Two homotopy controls:
-     "Hart ↔ Weich" sets the character of the visuals (render.mjs setCharacter).
-     "Roh ↔ Glatt" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
+     "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
+     "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
-     Axes, labels and beat rings can be switched off. The track's status box (bottom right) hides while its LC view
-     is open in another window. -->
+     The visual settings live in the Settings drawer (key S, generated from settings.mjs, kept in localStorage).
+     Auto-perform (in the drawer, key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start
+     reloads the track so the script begins from silence.
+     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" in the
+     drawer posts it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
+     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
+     from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
+     tail. Stop, a track change or a new auto-perform run ends a recording.
+     The track's status box (bottom right) hides while its LC view is open in another window. -->
 <canvas id="view"></canvas>
 <header>
   <select id="track"></select>
   <button id="play">Play</button>
   <button id="stop">Stop</button>
-  <label title="0 = hart, scharf, wild · 1 = weich, verschmiert, träge">Hart
-    <input id="character" type="range" min="0" max="1" step="0.01" value="0"> Weich <output id="characterValue">0.00</output></label>
-  <label title="0 = rohe Signale · 1 = gleitender Mittelwert über 2^53 Zeilen (max_int): eingefroren">Roh
-    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0.06"> Glatt <output id="smoothingValue">302 ms</output></label>
-  <label title="Taste A"><input id="axes" type="checkbox"> Achsen</label>
-  <label title="Taste L"><input id="labels" type="checkbox"> Beschriftung</label>
-  <label title="Taste B: Ringe von der Kick auf jedem Beat"><input id="rings" type="checkbox" checked> Beat-Ringe</label>
-  <span id="status">lädt Strudel …</span>
+  <button id="record" title="Key R">Record</button>
+  <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
+  <span id="recError"></span>
+  <span id="status">loading Strudel …</span>
+  <button id="settingsToggle" title="Key S">Settings</button>
 </header>
+<aside id="drawer"></aside>
 <script type="module">
-import { initStrudel, evaluate, samples, hush, signal, reify, Pattern, Hap, TimeSpan } from 'https://unpkg.com/@strudel/web@1.2.6/dist/index.mjs'
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
-import { createSmoother, describeWindow } from './smoothing.mjs'
+import { createSmoother } from './smoothing.mjs'
+import * as midi from './midi.mjs'
+import { createEngine } from './engine-strudel.mjs'
+import { mountSettings } from './settings.mjs'
+import { mountHelp } from './help.mjs'
+import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
+import { createRecorder } from './take.mjs'
+import { createRecorder as createAudioRecorder } from './recorder.mjs'
 
 const $ = id => document.getElementById(id)
+mountHelp([
+  { heading: 'What it does', text: 'Plays a live track or lab board right here and shows its visuals: every stem with its '
+    + 'name, and the tempo from Strudel\'s clock. No strudel.cc needed.' },
+  { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
+    + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
+  { heading: 'Output', text: 'Sound and visuals. Save take (in Settings) writes what the controllers did since the last '
+    + 'load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
+  { heading: 'How to use', text: ['Pick a track and press Play.', 'Play the controllers, or open Settings (S) and start '
+    + 'Auto-perform (P) to try the track without hardware.', 'Settings holds the visual controls; F is fullscreen.',
+    'The top bar hides after 3 s without the mouse.'] },
+  { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
+    'Save take in Settings writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
+    'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
+    + 'captured too.',
+    'Save take after a replay names its original and shows the replay check; the Tools page lists every differing bar '
+    + '(Check replay fidelity).',
+    'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
+    'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
+    + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
+  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
+    'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
+    'Stop or another track ends a recording. Recordings stay out of git.'] }
+], { title: 'About this page' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
-let label = 'lädt Strudel …', visuals = '', midiInputs = 0
-createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text } })
+let label = 'loading Strudel …', visuals = '', autoLabel = ''
+createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text },
+  onBatch: batch => recorder.addEvents(batch) })
 
-// Web MIDI per input, as in strudel.cc: each input keeps the last value of every CC (with the time it came) and the
-// keys pressed since the last query. DAW ports are left out.
-let midiAccess = null
-const ports = new Map()
-const listen = () => {
-  midiInputs = 0
-  for (const input of midiAccess.inputs.values()) {
-    if (/DAW/.test(input.name)) continue
-    midiInputs++
-    const port = ports.get(input.name) ?? { cc: new Map(), keys: [] }
-    ports.set(input.name, port)
-    input.onmidimessage = ({ data: [status, a, b] }) => {
-      const kind = status & 0xf0
-      if (kind === 0xb0) port.cc.set(a, { value: b / 127, time: performance.now() })
-      else if (kind === 0x90 && b > 0) port.keys.push({ note: a, velocity: b / 127, midichan: (status & 0x0f) + 1 })
-    }
+const engine = createEngine(midi)
+const recorder = createRecorder({ midi, engine })
+engine.ready.then(() => { label = 'ready' })
+let catalogue = []
+const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
+fetch('catalogue').then(r => r.json()).then(entries => {
+  catalogue = entries
+  const group = (label, kind) => {
+    const optgroup = document.createElement('optgroup')
+    optgroup.label = label
+    optgroup.append(...entries.filter(entry => entry.kind === kind).map(({ id, label: text, taps, noTapReason }) => {
+      const option = new Option(taps ? text : `${text} (no tap)`, id)
+      option.disabled = !taps
+      option.title = noTapReason ?? ''
+      return option
+    }))
+    return optgroup
   }
-}
-const midiReady = (navigator.requestMIDIAccess?.() ?? Promise.reject())
-  .then(access => { midiAccess = access; listen(); access.onstatechange = listen })
-  .catch(() => {})
-// The one-file tracks find their Launch Controls by port name through WebMidi.inputs
-globalThis.WebMidi = {
-  get inputs() { return midiAccess ? [...midiAccess.inputs.values()] : [] },
-  get outputs() { return midiAccess ? [...midiAccess.outputs.values()] : [] },
-}
-// Inputs whose name contains `name`; without a name every input but the Launchkey (its knobs send the same CC
-// numbers as the Launch Controls' second knob row)
-const matching = name => [...ports].filter(([n]) => name ? n.includes(name) : !n.includes('Launchkey')).map(([, p]) => p)
-// midin(name): one input (an error if it is missing, so a track can fall back), per CC the input moved last wins
-globalThis.midin = async name => {
-  if (name && !matching(name).length) throw new Error('MIDI input not found: ' + name)
-  return cc => signal(() => {
-    let last = null
-    for (const port of matching(name)) {
-      const v = port.cc.get(cc)
-      if (v && (!last || v.time > last.time)) last = v
-    }
-    return last?.value ?? 0
-  })
-}
-// midikeys(name)(length): every key pressed since the last query as a note of `length` cycles from the start of
-// that query (no note-off, as in strudel.cc). Each query empties the queue, so a track reads it through one query.
-globalThis.midikeys = async name => {
-  if (!matching(name).length) throw new Error('MIDI input not found: ' + name)
-  return length => new Pattern(state => {
-    const keys = matching(name).flatMap(port => port.keys.splice(0))
-    if (!keys.length) return []
-    const begin = state.span.begin
-    const cycles = reify(length).query(state.setSpan(new TimeSpan(begin, begin.add(1 / 64))))[0]?.value ?? 0.5
-    const whole = new TimeSpan(begin, begin.add(cycles))
-    return keys.map(key => new Hap(whole, state.span.intersection(whole), key))
-  })
-}
-
-const ready = initStrudel({
-  prebake: () => Promise.all([
-    samples('github:tidalcycles/dirt-samples'),
-    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json'),
-    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/vcsl.json'),
-    samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/piano.json'),
-  ]),
+  $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
+  $('track').value = ['010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
+  showScripts()
 })
-ready.then(() => { label = 'bereit' })
-fetch('tapped/').then(r => r.json()).then(files => $('track').replaceChildren(...files.map(f => new Option(f, f))))
+$('track').onchange = () => {
+  showScripts()
+  stopRecording()
+}
 
-$('play').onclick = async () => {
-  await Promise.all([ready, midiReady])
-  label = 'lädt Track …'
-  const code = await fetch('tapped/' + $('track').value, { cache: 'no-store' }).then(r => r.text())
+const TAIL_SECONDS = 4
+let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecording = false, tailTimer = null
+let performing = null
+const queueRecord = task => (recordQueue = recordQueue.then(task))
+const audio = createAudioRecorder({ engine, onError: error => {
+  recordError = error.message
+  stopRecording()
+} })
+const startRecording = (source, script = null) => queueRecord(async () => {
+  if (audio.recording) return
+  recordError = ''
   try {
-    await evaluate(code)
-    label = 'spielt: ' + $('track').value.replace(/-tapped\.strudel$/, '')
+    await engine.ready
+    await audio.start({ track: $('track').value, source, script })
+    autoRecording = source === 'auto'
   } catch (error) {
-    label = 'Fehler: ' + error.message
+    recordError = error.message
   }
+})
+const stopRecording = (endedBy = 'stop') => {
+  clearTimeout(tailTimer)
+  tailTimer = null
+  return queueRecord(async () => {
+    if (!audio.recording) return
+    const file = audio.name + '.wav'
+    autoRecording = false
+    try {
+      await audio.stop(endedBy)
+      lastFile = file
+    } catch (error) {
+      recordError = error.message
+    }
+  })
 }
-$('stop').onclick = () => { hush(); label = 'gestoppt' }
+const toggleRecord = () => audio.recording ? stopRecording() : startRecording(performing ? 'auto' : 'human', performing)
+$('record').onclick = toggleRecord
 
-const slider = (id, apply, show = v => v.toFixed(2)) => {
-  const update = () => { apply(Number($(id).value)); $(id + 'Value').textContent = show(Number($(id).value)) }
-  $(id).oninput = update
-  update()
+let running = false, stoppedByPage = false
+const performer = createPerformer({ midi, engine, onChange: progress => {
+  if (!progress && running && autoRecording) {
+    if (stoppedByPage) stopRecording()
+    else tailTimer = setTimeout(() => stopRecording('script-end'), TAIL_SECONDS * 1000)
+  }
+  running = !!progress
+  performing = progress ? performing : null
+  const barText = progress ? `auto bar ${Math.floor(progress.bar) + 1} / ${Math.ceil(progress.end)}` : ''
+  autoLabel = [barText, progress && sectionLabel(progress.section, progress.bar)].filter(Boolean).join(' · ')
+  autoPerform.show(!!progress, barText, progress)
+} })
+const stopPerformer = () => {
+  stoppedByPage = true
+  performer.stop()
+  stoppedByPage = false
 }
-slider('character', v => renderer.setCharacter(v))
-slider('smoothing', v => { smoother.setAmount(v); renderer.setSmoothing(v) }, describeWindow)
 
-const checkbox = (id, apply) => {
-  $(id).onchange = () => apply($(id).checked)
-  apply($(id).checked)
+const play = async script => {
+  stopPerformer()
+  await Promise.all([engine.ready, midi.ready])
+  label = 'loading track …'
+  const track = $('track').value
+  const response = await fetch('track/' + encodeURIComponent(track), { cache: 'no-store' })
+  const code = await response.text()
+  try {
+    await engine.load(code)
+    const trackHash = response.headers.get('X-Track-Hash')
+    recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
+    label = 'playing: ' + track
+  } catch (error) {
+    label = 'Error: ' + error.message
+    return false
+  }
+  return true
 }
-checkbox('axes', renderer.setAxes)
-checkbox('labels', renderer.setLabels)
-checkbox('rings', renderer.setRings)
+$('play').onclick = () => play()
+$('stop').onclick = () => { stopPerformer(); engine.stop(); stopRecording(); label = 'stopped' }
+
+const startScript = async id => {
+  const track = $('track').value
+  const response = await fetch(`perform/${encodeURIComponent(track)}/${encodeURIComponent(id)}`, { cache: 'no-store' })
+  if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
+  const script = await response.json()
+  if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
+  midi.addAuto({ launchkey: usesLaunchkey(script) })
+  performer.prime(script)
+  const recordAudio = $('recordAuto').checked
+  if (recordAudio) await stopRecording()
+  if (!await play(id)) return
+  if (recordAudio) await startRecording('auto', id)
+  performing = id
+  performer.start(script)
+}
+
+const settings = mountSettings($('drawer'), { renderer, smoother })
+$('settingsToggle').onclick = settings.toggle
+const autoPerform = mountAutoPerform(settings.autoPerformContainer, { onStart: startScript, onStop: stopPerformer })
+const recordAutoLabel = document.createElement('label')
+recordAutoLabel.className = 'inline'
+recordAutoLabel.title = 'Records from Start to the end of the script plus 4 s'
+recordAutoLabel.innerHTML = '<input type="checkbox" id="recordAuto"> Record audio'
+settings.autoPerformContainer.querySelector('button').after(recordAutoLabel)
+
+const saveTake = async () => {
+  const session = recorder.session()
+  if (!session) return void ($('takeState').textContent = 'press Play first')
+  $('takeState').textContent = 'saving …'
+  const response = await fetch('take/' + encodeURIComponent(session.track), { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(session) })
+  const result = await response.json()
+  if (!response.ok) return void ($('takeState').textContent = 'Error: ' + result.error)
+  const scripts = catalogue.find(entry => entry.id === session.track)?.scripts
+  if (scripts) {
+    const firstTake = scripts.findIndex(id => id.startsWith('takes/'))
+    scripts.splice(firstTake < 0 ? scripts.length : firstTake, 0, result.id)
+    if ($('track').value === session.track) showScripts()
+  }
+  $('takeState').textContent = `${result.id} (${result.steps} steps)`
+    + (result.problems.length ? ` · check: ${result.problems.join('; ')}` : '')
+    + (result.replay ? ` · replay: ${result.replay}` : '')
+}
+const takeSection = document.createElement('section')
+takeSection.innerHTML = '<h2>Take</h2><button id="saveTake">Save take</button> <output id="takeState"></output>'
+$('drawer').append(takeSection)
+$('saveTake').onclick = saveTake
+const recordSection = document.createElement('section')
+recordSection.innerHTML = '<h2>Recording</h2><button id="recordDrawer" title="Key R">Record</button> '
+  + '<output id="recFile"></output>'
+$('drawer').append(recordSection)
+$('recordDrawer').onclick = toggleRecord
+
+const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
+const meterWidth = peak => Math.max(0, Math.min(1, 1 + Math.log10(Math.max(peak, 1e-6)) / 3)) * 100
+const setText = (element, text) => { if (element.textContent !== text) element.textContent = text }
+const showRecording = () => {
+  const on = audio.recording
+  for (const button of [$('record'), $('recordDrawer')]) {
+    button.classList.toggle('recording', on)
+    setText(button, on ? 'Stop rec' : 'Record')
+  }
+  $('recInfo').hidden = !on
+  setText($('recError'), recordError && 'Rec error: ' + recordError)
+  if (on) {
+    const seconds = audio.elapsed()
+    setText($('recTime'), clock(seconds))
+    $('recMeter').firstChild.style.width = meterWidth(audio.level()) + '%'
+    const megabytes = (seconds * engine.output().context.sampleRate * 4 / 1e6).toFixed(1)
+    setText($('recFile'), `${audio.name}.wav · ${megabytes} MB` + (tailTimer ? ' · tail' : ''))
+  } else setText($('recFile'), lastFile ? 'Last: ' + lastFile : '')
+}
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement
   if (box && box !== document.body) box.hidden = !!view.win && !view.win.closed
 }
 
+const NO_FRAME_CSS = '.page.live{border-color:#222 !important}'
+const applyLcFrame = () => {
+  const view = globalThis.lcxlView, doc = view?.win && !view.win.closed ? view.win.document : null
+  if (!doc) return
+  const style = doc.getElementById('noFrame')
+  if (settings.get('lcFrame')) style?.remove()
+  else if (!style) doc.head.append(Object.assign(doc.createElement('style'), { id: 'noFrame', textContent: NO_FRAME_CSS }))
+}
+
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
-  $('status').textContent = `${label} · MIDI: ${midiInputs} Eingänge${visuals ? ' · ' + visuals : ''}`
+  applyLcFrame()
+  showRecording()
+  const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
+  $('status').textContent = [label, midiText, autoLabel, visuals].filter(Boolean).join(' · ')
   requestAnimationFrame(showStatus)
 }
 showStatus()
 
 const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
 addEventListener('keydown', event => {
-  if (['SELECT', 'INPUT'].includes(event.target.tagName)) return
+  const { tagName, type } = event.target
+  if (tagName === 'SELECT' || (tagName === 'INPUT' && !['checkbox', 'range'].includes(type))) return
   if (event.key === 'f') toggleFullscreen()
-  if (event.key === 'v') renderer.toggleLook()
-  if (event.key === 'a') $('axes').click()
-  if (event.key === 'l') $('labels').click()
-  if (event.key === 'b') $('rings').click()
-  if (event.key === 'w') renderer.toggleWiden()
+  if (event.key === 's') settings.toggle()
+  else if (event.key === 'p') autoPerform.toggle()
+  else if (event.key === 'r') toggleRecord()
+  else settings.handleKey(event.key)
 })
 let idleTimer
 const wake = () => {

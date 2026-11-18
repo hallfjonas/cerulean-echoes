@@ -36,11 +36,11 @@ const BASSLINES = [
   "[a1 a2]*4",                                          // 3  octave eighths: root and octave alternate
   "<[a1 ~ ~ a1 ~ ~ a2 ~ ~ ~ a1 ~ c2 ~ g1 ~] [a1 ~ ~ a1 ~ ~ a2 ~ ~ ~ f1 ~ e1 ~ g1 ~]>",  // 4  syncopated groove
 ]
-const OCTAVES = ['normal', '+1 Okt.']   // single quotes: Strudel parses double-quoted strings as mini notation
+const OCTAVES = ['normal', '+1 oct.']   // single quotes: Strudel parses double-quoted strings as mini notation
 
 // Status box at the bottom right of the page: which bassline and octave each column plays.
 // The drum board uses the same box and listener, so switching tracks on one page replaces them.
-const SOUNDS = ['Sinus', 'Dreieck', 'Saw warm', 'Square', 'Supersaw', 'FM', 'Sub+Okt.', 'Pluck']
+const SOUNDS = ['Sine', 'Triangle', 'Saw warm', 'Square', 'Supersaw', 'FM', 'Sub+oct.', 'Pluck']
 const status = SOUNDS.map(() => ({ line: 0, octave: 0 }))
 let statusBox = document.getElementById('board-status')
 if (!statusBox) {

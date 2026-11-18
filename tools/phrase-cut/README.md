@@ -1,4 +1,4 @@
-# phrase-cut — cut calm phrases from long solo recordings (lab/melodie/melodie-3, samples/horn-phrases)
+# phrase-cut — cut calm phrases from long solo recordings (lab/melody/melody-3, samples/horn-phrases)
 
 Python 3 with numpy + scipy, ffmpeg. Run with `python3 -I` (downloads are untrusted data).
 1. Download the Freesound HQ previews, decode to mono 44.1 kHz float WAV, one file per sound id:

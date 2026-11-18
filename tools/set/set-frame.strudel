@@ -179,15 +179,15 @@ const SET = {
     return x === 0 ? a.id + ' ' + a.name + ' · ' + bpm + ' BPM'
       : a.id + ' → ' + b.id + ' · ' + Math.round(x * 100) + ' % · ' + Math.round(bpmAt(setState.smooth)) + ' BPM'
   },
-  knob: () => setState.mode ? 'Set (Fog bleibt bei ' + Math.round(setState.fog * 100) + ')' : 'Fog',
-  statusLines: () => ['Set         ' + SET.where(), 'Fog-Knopf   ' + SET.knob()],
+  knob: () => setState.mode ? 'Set (Fog stays at ' + Math.round(setState.fog * 100) + ')' : 'Fog',
+  statusLines: () => ['Set         ' + SET.where(), 'Fog knob    ' + SET.knob()],
   // Header of the LC view: set position, bar in the phrase with the four beats, what the Fog knob does
   headHtml: esc => {
     const b = setState.beat
     const dots = [0, 1, 2, 3].map(k => '<i' + (b && b.beat === k ? ' class=on' : '') + '></i>').join('')
     return '<div><span class=k>Set</span>' + esc(SET.where()) + '</div>' +
-      '<div><span class=k>Takt</span>' + (b ? (b.bar % b.phrase + 1) + ' / ' + b.phrase : '–') + '<span class=beats>' + dots + '</span></div>' +
-      '<div><span class=k>Fog-Knopf</span>' + (setState.mode ? '<span class=next>' + esc(SET.knob()) + '</span>' : 'Fog') + '</div>'
+      '<div><span class=k>Bar</span>' + (b ? (b.bar % b.phrase + 1) + ' / ' + b.phrase : '–') + '<span class=beats>' + dots + '</span></div>' +
+      '<div><span class=k>Fog knob</span>' + (setState.mode ? '<span class=next>' + esc(SET.knob()) + '</span>' : 'Fog') + '</div>'
   },
 }
 

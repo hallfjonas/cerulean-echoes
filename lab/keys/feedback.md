@@ -225,12 +225,12 @@
 - Levels (offline, Brightness 0.6): single sounds −18.8 ±0.6 LUFS, blends −18.9 / −17.9 (B3 −1.4 dB, piano-Rhodes
   blend lifted 1.3 dB mid-way); GM sounds not measurable offline. Feedback: open.
 - Round 19 decision: Steinway is crisper than the grand (liked), the Rhodes Mark I sounds good → column 2 (Steinway +
-  Mark I) went 1:1 into track 009 (Jonas 1). Shift renamed: "Sound" (sheets, display) / "Klang" (dashboard).
+  Mark I) went 1:1 into track 009 (Jonas 1). Shift renamed: "Sound" (sheets, display, dashboard).
 
 ## Round 20 — house-keys-lab-20.strudel (2026-11-06): the free button in sound mode
 - In sound mode button 1 had no job. Four times the 009 keys, only that button differs: 1 nothing (status quo),
   2 echo throw (held: dotted-8th echo, feedback 0.62, own orbit 3, tail keeps going; about +3 dB while held),
-  3 push on / off (Kerri's push; harmony "Wechsel" Am9 ↔ D9 added to hear it), 4 stutter (held: chord on every 16th,
+  3 push on / off (Kerri's push; harmony "Change" Am9 ↔ D9 added to hear it), 4 stutter (held: chord on every 16th,
   brighter over 2 s). Not taken: octave (gimmicky), sustain pedal (= Length knob), mute (= fader). Feedback: open.
 
 ## Round 21 — feedback (2026-11-08)
@@ -250,7 +250,7 @@
   on the other rhythms. The progressions (3–8) are not what was meant (though they work); maybe couple the keys to the
   harmony column and add a button for it instead. Wanted: riffs that do NOT change chord every bar, playful ones where
   the rhythm is not the same every bar but fitted to the chord changes (rhythm and chords composed together). Find real
-  ones rather than invent („finden immer besser als ausdenken“).
+  ones rather than invent (“finding is always better than inventing”).
 
 ## Round 23 — house-keys-lab-23.strudel (2026-11-08 night)
 - Every column = one riff with its own rhythm written for its chord changes, from analyses (Attack: Kerri Chandler chords
@@ -288,7 +288,7 @@
 ## Round 25 — house-keys-lab-25.strudel (2026-11-12)
 - Round 24 + one switch, Mode 2 column 7 button 1 (CC 91), at the next 4-bar phrase: what bass and pad do while a RIFF
   leads: 1 follow (= round 24) → 2 pedal (bass A, pad holds Am9 in the track's voicing) → 3 bass follows, no pad →
-  4 pedal A, no pad. Progression leading (monotone keys): unchanged. Status box and LC view show “Unter Riff”.
+  4 pedal A, no pad. Progression leading (monotone keys): unchanged. Status box and LC view show “Under riff”.
 - Node: Kerri video in all four (bass 33/38/43 ↔ 33 only; pad riff chords / Am9 every phrase / none), Checkmate on the
   pedal, progression unchanged; transpile ok, ~3 ms/tick. Not heard.
 
@@ -296,9 +296,9 @@
 - User: round 25 mixed rhythms and chord sequences (column 2 monotone keys with 8 rhythms, Kerri video with its rhythm + the 8). Wanted: one riff per
   column, rhythm and chords fixed; the button under the slider tries the options for bass and harmony.
 - Built: six columns (Kerri video, Checkmate, Turn Off The Lights, Atmosphere, Chicago Spread, Retro disco), each with its one rhythm. Button 1 per
-  column = Folgen / Orgelpunkt A + Am9 / Bass folgt ohne Fläche / Orgelpunkt ohne Fläche (kept per column, takes over at the next 4-bar phrase).
+  column = Follow / Pedal A + Am9 / Bass follows, no pad / Pedal, no pad (kept per column, takes over at the next 4-bar phrase).
   Sources of the options as in round 25 (Attack Magazine, Kerri Chandler). All faders at 0: the progression leads.
-- Out: column 2 monotone keys, the 8 rhythms of 009, the global “Unter Riff” switch (Mode 2 column 7 button 1). Round 25 is in old/.
+- Out: column 2 monotone keys, the 8 rhythms of 009, the global “Under riff” switch (Mode 2 column 7 button 1). Round 25 is in old/.
 - Checked: syntax / transpile only. Open: do four options per riff suffice; riff 7 (empty column) for a new riff?
 - Round 26, same day: bass and pad were barely audible. Bass: an octave and a bit up (F2–E3, as the track) plus a quiet saw, gain ×2.7;
   pad HARM_LEVEL ×2. Both by ear, not measured (the offline renderer does not run lab boards).

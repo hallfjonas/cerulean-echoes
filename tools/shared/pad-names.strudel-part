@@ -1,0 +1,6 @@
+const shotOf = note => LK_SHOTS[((note - LK_PAD_NOTE_1) % 16 + 16) % 16]
+if (lcView) {
+  lcView.padNames = LK_SHOTS.map(shot => shot.name)
+  lcView.padVoice = LK_SHOTS.map(shot => shot.s in VOICE_SAMPLES)
+  lcView.update()
+}

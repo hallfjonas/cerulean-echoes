@@ -1,0 +1,12 @@
+// Stands in for '@strudel/core' and '@strudel/webaudio' in player.html's import map, so @strudel/soundfonts'
+// fontloader registers its sounds in the one Strudel that @strudel/web set up (its functions are on window)
+const fromWindow = name => (...args) => window[name](...args)
+export const noteToMidi = fromWindow('noteToMidi')
+export const freqToMidi = fromWindow('freqToMidi')
+export const getSoundIndex = fromWindow('getSoundIndex')
+export const getAudioContext = fromWindow('getAudioContext')
+export const registerSound = fromWindow('registerSound')
+export const getParamADSR = fromWindow('getParamADSR')
+export const getADSRValues = fromWindow('getADSRValues')
+export const getPitchEnvelope = fromWindow('getPitchEnvelope')
+export const getVibratoOscillator = fromWindow('getVibratoOscillator')

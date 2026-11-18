@@ -1,0 +1,414 @@
+{
+  "track": "007-ambient",
+  "title": "Drift",
+  "bars": 160,
+  "mood": "slow, dreamy, spacious, a little strange in the middle",
+  "sections": [
+    {
+      "name": "Voice in",
+      "from": 0,
+      "to": 16,
+      "intent": "David opens over the waves, then steps back"
+    },
+    {
+      "name": "Pad",
+      "from": 16,
+      "to": 28,
+      "intent": "Chords and low fifths grow"
+    },
+    {
+      "name": "Heartbeat",
+      "from": 28,
+      "to": 40,
+      "intent": "The floor arrives, soft"
+    },
+    {
+      "name": "Colour",
+      "from": 40,
+      "to": 60,
+      "intent": "Bowed shimmer, choir, first sparkles"
+    },
+    {
+      "name": "Motion",
+      "from": 60,
+      "to": 76,
+      "intent": "Small percussion, darker colour"
+    },
+    {
+      "name": "Break",
+      "from": 76,
+      "to": 92,
+      "intent": "Beat out, keys over the drone, David drifts through, return"
+    },
+    {
+      "name": "Peak",
+      "from": 92,
+      "to": 120,
+      "intent": "Fullest, strangest, builds"
+    },
+    {
+      "name": "Release",
+      "from": 120,
+      "to": 136,
+      "intent": "Calm down, back to floating"
+    },
+    {
+      "name": "Voice out",
+      "from": 136,
+      "to": 160,
+      "intent": "Thin out, David closes, fade"
+    }
+  ],
+  "steps": [
+    {
+      "bar": 0,
+      "cc": 12,
+      "value": 0.8,
+      "ramp": 8
+    },
+    {
+      "bar": 0,
+      "cc": 59,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 0,
+      "cc": 83,
+      "value": 0.3
+    },
+    {
+      "bar": 0,
+      "cc": 75,
+      "value": 0.5
+    },
+    {
+      "bar": 0,
+      "cc": 67,
+      "value": 0.5
+    },
+    {
+      "bar": 0,
+      "cc": 6,
+      "value": 0.4,
+      "ramp": 10
+    },
+    {
+      "bar": 0,
+      "cc": 22,
+      "value": 0.6
+    },
+    {
+      "bar": 4,
+      "cc": 53,
+      "value": 0.6,
+      "ramp": 16
+    },
+    {
+      "bar": 4,
+      "cc": 69,
+      "value": 0.5
+    },
+    {
+      "bar": 8,
+      "cc": 7,
+      "value": 0.3,
+      "ramp": 16
+    },
+    {
+      "bar": 12,
+      "cc": 59,
+      "value": 0,
+      "ramp": 4
+    },
+    {
+      "bar": 28,
+      "cc": 5,
+      "value": 0.35,
+      "ramp": 4
+    },
+    {
+      "bar": 28,
+      "cc": 8,
+      "value": 0.3,
+      "ramp": 4
+    },
+    {
+      "bar": 32,
+      "press": 39
+    },
+    {
+      "bar": 40,
+      "cc": 54,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 40,
+      "press": 94
+    },
+    {
+      "bar": 48,
+      "cc": 57,
+      "value": 0.4
+    },
+    {
+      "bar": 52,
+      "cc": 58,
+      "value": 0.3
+    },
+    {
+      "bar": 52,
+      "cc": 82,
+      "value": 0.2
+    },
+    {
+      "bar": 60,
+      "cc": 9,
+      "value": 0.3
+    },
+    {
+      "bar": 64,
+      "cc": 10,
+      "value": 0.3
+    },
+    {
+      "bar": 68,
+      "cc": 55,
+      "value": 0.4
+    },
+    {
+      "bar": 68,
+      "cc": 79,
+      "value": 0.3
+    },
+    {
+      "bar": 68,
+      "press": 44
+    },
+    {
+      "bar": 76,
+      "lk": 1,
+      "value": 0.6,
+      "ramp": 2
+    },
+    {
+      "bar": 76,
+      "press": 52
+    },
+    {
+      "bar": 76,
+      "cc": 20,
+      "value": 0.5,
+      "ramp": 4
+    },
+    {
+      "bar": 76,
+      "cc": 6,
+      "value": 0.4,
+      "ramp": 4
+    },
+    {
+      "bar": 78,
+      "keys": "d3 a3 e4",
+      "velocity": 0.6,
+      "length": 4
+    },
+    {
+      "bar": 80,
+      "cc": 59,
+      "value": 0.35,
+      "ramp": 4
+    },
+    {
+      "bar": 80,
+      "cc": 75,
+      "value": 0.9
+    },
+    {
+      "bar": 84,
+      "cc": 59,
+      "value": 0,
+      "ramp": 3
+    },
+    {
+      "bar": 84,
+      "keys": "f#3 a3 c#4",
+      "velocity": 0.6,
+      "length": 4
+    },
+    {
+      "bar": 87,
+      "cc": 75,
+      "value": 0.5
+    },
+    {
+      "bar": 88,
+      "press": 52
+    },
+    {
+      "bar": 88,
+      "cc": 20,
+      "value": 0,
+      "ramp": 2
+    },
+    {
+      "bar": 92,
+      "cc": 36,
+      "value": 0.7,
+      "ramp": 24
+    },
+    {
+      "bar": 92,
+      "cc": 81,
+      "value": 0.5
+    },
+    {
+      "bar": 92,
+      "cc": 61,
+      "value": 0.7
+    },
+    {
+      "bar": 96,
+      "cc": 56,
+      "value": 0.5
+    },
+    {
+      "bar": 100,
+      "cc": 82,
+      "value": 0.6
+    },
+    {
+      "bar": 100,
+      "pad": 44
+    },
+    {
+      "bar": 104,
+      "keys": "b2 d3 a3",
+      "velocity": 0.6,
+      "length": 4
+    },
+    {
+      "bar": 108,
+      "press": 44
+    },
+    {
+      "bar": 112,
+      "pad": 44
+    },
+    {
+      "bar": 120,
+      "cc": 36,
+      "value": 0,
+      "ramp": 8
+    },
+    {
+      "bar": 120,
+      "press": 44
+    },
+    {
+      "bar": 120,
+      "cc": 82,
+      "value": 0.2
+    },
+    {
+      "bar": 124,
+      "cc": 56,
+      "value": 0,
+      "ramp": 4
+    },
+    {
+      "bar": 128,
+      "cc": 55,
+      "value": 0,
+      "ramp": 4
+    },
+    {
+      "bar": 128,
+      "pad": 48
+    },
+    {
+      "bar": 128,
+      "lk": 38,
+      "value": 0.4,
+      "ramp": 8
+    },
+    {
+      "bar": 136,
+      "cc": 10,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 136,
+      "cc": 9,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 136,
+      "cc": 6,
+      "value": 0.4,
+      "ramp": 8
+    },
+    {
+      "bar": 136,
+      "cc": 53,
+      "value": 0.7,
+      "ramp": 8
+    },
+    {
+      "bar": 140,
+      "cc": 5,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 140,
+      "cc": 8,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 140,
+      "lk": 1,
+      "value": 0,
+      "ramp": 4
+    },
+    {
+      "bar": 140,
+      "cc": 59,
+      "value": 0.5,
+      "ramp": 6
+    },
+    {
+      "bar": 140,
+      "cc": 83,
+      "value": 0.3
+    },
+    {
+      "bar": 142,
+      "cc": 57,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 142,
+      "cc": 58,
+      "value": 0,
+      "ramp": 6
+    },
+    {
+      "bar": 144,
+      "cc": 20,
+      "value": 0.4,
+      "ramp": 12
+    },
+    {
+      "bar": 152,
+      "cc": 12,
+      "value": 0,
+      "ramp": 8
+    }
+  ]
+}

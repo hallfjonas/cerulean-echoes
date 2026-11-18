@@ -1,17 +1,17 @@
 ---
 name: lab-board
-description: Create or run a new round of a lab board (lab/<instrument or role>/<name>-N.strudel) - candidate columns on the stem-lab engine, layout sheet, feedback.md, old/ rotation. Use when the user wants candidates for an instrument or track role ("build a board for X", "next round", "new lab for 008 chords").
+description: Build or run a new round of a lab board (candidate columns for an instrument or track role), layout sheet, feedback.md, round rotation. Use for 'board', 'candidates', 'next round', 'new lab', 'candidates for chords/bass/keys', 'compare sounds', 'build a board'.
 ---
 
 # Lab board: candidate columns, played on the LC XL 3
 
 A board is NOT a track with columns swapped. It is a comparison of candidates (or one sound tuned on its own),
 each column built like a track column, played live; the user picks by ear and the next round narrows down. The winners
-go into the tracks (see `lab-to-track`). Folder names say what the board is (`lab/harmonie/`, `lab/drums/`), file names
+go into the tracks (see `lab-to-track`). Folder names say what the board is (`lab/harmony/`, `lab/drums/`), file names
 `<name>-N.strudel` without a redundant "-lab".
 
 ## Before building (order matters)
-1. Read the folder's `feedback.md` and, for house, the "✗ Verworfen" list in `tracks/009-house/stems-ideen.md`.
+1. Read the folder's `feedback.md` and, for house, the "✗ Verworfen" list in `tracks/house/009-house/stem-ideas.md`.
    Nothing rejected comes back. After new feedback, update the reject list FIRST.
 2. Find out which track/column the board serves and read that track's `feedback.md`.
 3. **Research before sound ideas**: how producers make this sound (Attack Magazine, MusicRadar, Sound on Sound,
@@ -40,7 +40,8 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
 - Labels (control names, `@ctl`, option names, the live view, the status box): English and short, as in CLAUDE.md "Labels".
 
 ## Rounds
-- Current round in the folder, older rounds in `old/` (move the .strudel and its layout pdf), the result of each round
+- Current round in the folder, older rounds deleted once committed (no `old/`, git history keeps them; delete the
+  .strudel and its layout pdf), the result of each round
   in the folder's `feedback.md`, rejected whole series in `lab/archive/`.
 - Per round: keep only columns graded good (≈2 or better), replace the rest with NEW proposals instead of tweaking
   weak ones; offer clearly more options/complexity per round. An explicit "remove X" applies to every board that has X
@@ -54,7 +55,7 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
 3. Cost per scheduler tick in the Node harness (`strudel-sim/harness.mjs`), aim ≲ 8 ms; gate silent columns/layers.
 4. New samples: fetch/decode in headless Chrome, read levels (VCSL is not normalized), do not renormalize on my own.
 5. Layout sheet: the hook writes `<board>-layout.pdf` after each edit; look at the PNG, no text overflow.
-6. Live view: when in doubt give the board the big "▣ LC groß" window like the tracks (copy from harmonie-5).
+6. Live view: when in doubt give the board the big "▣ LC big" window like the tracks (copy from harmony-5).
 7. Log the build in `feedback.md` (date, columns, sources, "not heard", open questions).
 
 ## Don'ts

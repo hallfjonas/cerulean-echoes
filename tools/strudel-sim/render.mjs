@@ -1,7 +1,13 @@
 // Render one stem offline with superdough and measure its loudness.
 // usage: node render.mjs <track.strudel> <stemVariable> '<json cc values>'  → prints {"lufs":…, "peak":…}
+//   The stem may be any expression in the track's scope (e.g. one LK_SHOTS pad). Plays the banks of strudel.cc
+//   (trajectory/banks.mjs), the track's own samples() and the gm_* soundfonts. Queried tick by tick like the scheduler
+//   (midikeys only answers from the second query on). Env: BPM (default 140), CYC measured cycles (default 4),
+//   FROM the first measured cycle (default 0; a song-form track rests in its intro).
 import * as wa from 'node-web-audio-api'
-import { load } from './harness.mjs'
+import { noteToMidi, freqToMidi } from '@strudel/core'
+import { load, run } from './harness.mjs'
+import { BANKS, SOUNDFONTS, SOUNDFONT_FILES } from '../trajectory/banks.mjs'
 
 Object.assign(globalThis, wa)
 globalThis.window = globalThis
@@ -10,19 +16,56 @@ globalThis.document = { addEventListener() {} }
 const sd = await import('superdough')
 const out = console.log
 console.log = () => {}   // superdough logs every sample load
+console.warn = () => {}
 
 const [file, stem, json] = process.argv.slice(2)
-const pat = (await load(file, JSON.parse(json), stem)).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)
-
-const cps = Number(process.env.BPM ?? 140) / 4 / 60, CYC = 4, TAIL = 2, sr = 48000   // BPM=70 node measure.mjs … for slower tracks
+const cps = Number(process.env.BPM ?? 140) / 4 / 60, CYC = Number(process.env.CYC ?? 4), TAIL = 2, sr = 48000
+const FROM = Number(process.env.FROM ?? 0)
 const ctx = new wa.OfflineAudioContext(2, Math.ceil(sr * (CYC / cps + TAIL)), sr)
 sd.setAudioContext(ctx)
 await sd.initAudio({})
 sd.registerSynthSounds()
-await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json')
-for (const h of pat.queryArc(0, CYC)) if (h.hasOnset()) {
+for (const url of BANKS) await sd.samples(url)
+
+// gm_* soundfonts as @strudel/soundfonts plays them: the zone for the note, resampled, ADSR peaking at 0.3
+const gm = (await fetch(SOUNDFONTS + 'gm.mjs').then(r => r.text())).replace(/\/\/.*$/gm, '')
+const fontZones = {}
+const zonesOf = font => fontZones[font] ??= fetch(SOUNDFONT_FILES + font + '.js').then(r => r.text())
+  .then(js => js.match(/zones:\s*\[([\s\S]*)\]/)[1].match(/\{[^{}]*\}/g).map(z => Object.fromEntries(
+    [...z.matchAll(/(\w+)\s*:\s*('[^']*'|[-\d.]+)/g)]
+      .map(([, k, v]) => [k, v[0] === "'" ? v.slice(1, -1) : Number(v)]))))
+const bufferOf = zone => zone.buffer ??= ctx.decodeAudioData(Uint8Array.from(Buffer.from(zone.file, 'base64')).buffer)
+for (const [, name, body] of gm.matchAll(/(gm_\w+):\s*\[([^\]]*)\]/g)) {
+  const fonts = [...body.matchAll(/'([^']+)'/g)].map(m => m[1])
+  sd.registerSound(name, async (time, value, onended) => {
+    const [attack, decay, sustain, release] =
+      sd.getADSRValues([value.attack, value.decay, value.sustain, value.release])
+    const { note = 'c3', freq, n = 0 } = value
+    const midi = freq ? freqToMidi(freq) : typeof note === 'string' ? noteToMidi(note) : note
+    const zone = (await zonesOf(fonts[(n % fonts.length + fonts.length) % fonts.length]))
+      .find(z => z.keyRangeLow <= midi && z.keyRangeHigh + 1 >= midi)
+    const src = ctx.createBufferSource()
+    src.buffer = await bufferOf(zone)
+    const baseDetune = zone.originalPitch - 100 * zone.coarseTune - zone.fineTune
+    src.playbackRate.value = Math.pow(2, (100 * midi - baseDetune) / 1200)
+    const { loopStart, loopEnd, sampleRate } = zone
+    if (loopStart > 1 && loopStart < loopEnd)
+      Object.assign(src, { loop: true, loopStart: loopStart / sampleRate, loopEnd: loopEnd / sampleRate })
+    const node = src.connect(ctx.createGain())
+    const holdEnd = time + value.duration
+    sd.getParamADSR(node.gain, attack, decay, sustain, release, 0, 0.3, time, holdEnd, 'linear')
+    src.start(time)
+    src.stop(holdEnd + release + 0.01)
+    src.onended = () => { src.disconnect(); node.disconnect(); onended() }
+    return { node, stop: () => {} }
+  }, { type: 'soundfont', prebake: true, fonts })
+}
+
+globalThis.samples = sd.samples
+const pat = (await load(file, JSON.parse(json), stem)).filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)
+for (const h of run(pat, FROM, FROM + CYC)) {
   const b = h.whole.begin.valueOf()
-  await sd.superdough(h.value, b / cps + 0.05, h.duration / cps, cps, b)
+  await sd.superdough(h.value, (b - FROM) / cps + 0.05, h.duration / cps, cps, b)
 }
 const buf = await ctx.startRendering()
 

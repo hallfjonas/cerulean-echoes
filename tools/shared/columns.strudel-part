@@ -1,0 +1,12 @@
+// Mapping of column n (1-8): brightness, space, character (knob rows 1-3), fader, button rows 1-2
+const colMap = (read, n) => ({ bright: read(12 + n), space: read(20 + n), char: read(28 + n), level: read(4 + n), btn: read(36 + n), btn2: read(44 + n) })
+const off = () => signal(() => 0)
+// One CC across all Launch Controls: the one moved last wins. Made once per CC (lastMoved is stateful).
+const lcMemo = {}
+const lcCc = c => lcMemo[c] ??= !lcInputs.length ? off()
+  : lcInputs.slice(1).reduce((v, cc) => lastMoved(v, cc(c)), lcInputs[0](c))
+// Column 8 (global) is read from both its Mode 1 and Mode 2 CCs, last moved wins: it works on both pages even on a
+// controller whose column 8 sends CC + 48 in Mode 2. Jojo on the plain CCs (Mode 1), Jonas on CC + 48 (Mode 2).
+const alone    = true
+const colJonas = n => colMap(n === 8 ? c => lastMoved(lcCc(c), lcCc(c + 48)) : c => lcCc(c + 48), n)
+const colJojo  = n => n === 8 ? colMap(off, n) : colMap(lcCc, n)
