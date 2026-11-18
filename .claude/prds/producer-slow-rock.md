@@ -77,7 +77,7 @@ the tempo change at bar 100, triplets in time, guitars switching to overdrive wh
 
 ## Constraints & Assumptions
 
-- Builds on the merged producer epic (`producer-mode-guitar-pro`): map format, `--perform`, the `/producer` skill.
+- Builds on the merged producer mode (epic `producer-mode-guitar-pro`, removed; see git history): map format, `--perform`, the `/producer` skill.
 - Ask before sound, naming or layout choices beyond the approved design (CLAUDE.md rules).
 
 ## Out of Scope
