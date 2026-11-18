@@ -16,7 +16,7 @@ rests on the `@ctl` tags and the track code.
   bass, colour and small percussion follow. A break leaves the keys alone over the drone. The peak turns the key colour
   twice and builds tension. It calms back to floating, thins out, and David's voice returns for the last minute while
   the master fades.
-- References: no ambient-genre links in `docs/references.md` yet. Closest: Kiasmos live on KEXP (long, slow build, calm
+- References: no ambient-genre links in `docs/reference/listening-list.md` yet. Closest: Kiasmos live on KEXP (long, slow build, calm
   dynamics); the track's own `feedback.md` favourites (shimmer, choir, glitter, pad) lead the colour parts.
 
 ## How the voice plays

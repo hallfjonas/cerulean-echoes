@@ -6,12 +6,12 @@ description: Review past Claude Code sessions of this project for a date or date
 # Workflow review
 
 Script first, reading second: transcripts are never read raw. The digest script condenses them, subagents read the
-digests, you synthesise. The first full review is `docs/workflow-review.md`; follow its structure.
+digests, you synthesise. The first full review is `docs/dev/workflow-review.md`; follow its structure.
 
 ## 1. Range
 Take `--since` / `--until` (YYYY-MM-DD, inclusive; a session counts on the day it started) from the request. One
 date: same value for both. No date: since the end of the last report in `docs/workflow-reviews/` (or
-`docs/workflow-review.md`) until today. Say the range in one line before starting.
+`docs/dev/workflow-review.md`) until today. Say the range in one line before starting.
 
 ## 2. Digest
 ```sh

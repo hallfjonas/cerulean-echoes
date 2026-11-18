@@ -136,5 +136,5 @@ const hatsCol = col(4)
   [`.claude/settings.json`], [hook for the layout sheets],
   [`tools/strudel-sim/`], [`harness` (evaluate a track in Node), `compare` (equality + CPU), `render` + `measure` (loudness)],
   [`tools/lcxl-layout/`], [`gen-layout` (tags → PDF), `lcxl3.typ` (template), `hook`, `watch`],
-  [`docs/skills.typ`], [this document],
+  [`docs/dev/skills.typ`], [this document],
 )

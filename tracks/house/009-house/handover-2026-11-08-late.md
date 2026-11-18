@@ -30,7 +30,7 @@ Feedback entries: `lab/{bass,keys,melody,acid}/feedback.md`.
   Including the files from the previous handover (harmony-5, keys-21, references.md …). Renames via `mv`, not `git mv`.
 - Harmony proposals A–C from the previous handover: done in keys-22 (voicings by hand, C♯m7, "Mommy" parallel progression);
   harmony-5 / engine 3 itself unchanged (progression 13 there still D9) → harmony-6 only after OK.
-- The Sarah Wild tracklist is now in `docs/references.md`.
+- The Sarah Wild tracklist is now in `docs/reference/listening-list.md`.
 - After listening: winners via `lab-to-track` into Jojo 4 / Jonas 4–6; vocal hook (Jonas 7) only with good samples.
 - Tool note: `typst` is missing on the device; layout PDFs were generated in the cloud environment (gen-layout.mjs unchanged).
   `tools/render-offline.tmp.mjs` = render.mjs without network samples (synths only), for level measurements of boards:

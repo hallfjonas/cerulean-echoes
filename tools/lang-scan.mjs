@@ -12,7 +12,7 @@ const filesOnly = args.includes('--files')
 const prefixes = args.filter(a => !a.startsWith('--'))
 
 const textExt = /\.(md|typ|strudel|strudel-part|str|mjs|js|py|json|html|txt|yml|yaml|sh|css)$/
-const skipPath = new RegExp('(^|/)(node_modules|package-lock\\.json)|^samples/sounds\\.json$|^docs/glossary\\.md$'
+const skipPath = new RegExp('(^|/)(node_modules|package-lock\\.json)|^samples/sounds\\.json$|^docs/reference/glossary\\.md$'
   + '|^tools/lang-scan(-allow\\.txt|\\.mjs)$|^\\.claude/(prds|epics)/english-repo')
 
 const words = [
