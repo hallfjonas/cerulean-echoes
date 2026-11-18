@@ -15,6 +15,8 @@ const AsyncFunction = (async () => {}).constructor
 // LC); its keys play vals.keys (mini-notation of notes, e.g. '<[f3,ab3,c4] [db3,f3,ab3]>'), else nothing.
 // vals.midiQueue (optional array of { note, velocity, midichan }): notes that arrived since the last query, as
 // midikeys' queue in the browser; each query of the keys pattern takes them all, starting at the query's begin.
+// vals.keyEvents (optional, used by tools/sc-port): [{ t, note, vel, chan }] (t in cycles, chan 1-16) = notes as
+// midikeys delivers them ({ note, velocity, midichan }), each as long as the note-length pattern says at its time.
 // opts.ports: the MIDI input names a fake WebMidi lists while the track loads (as in the browser). The k-th LC port
 // ('LCXL3', not 'DAW') reads vals[n] for k = 1, else vals['lc' + k + '.' + n]; midin of a name not listed throws.
 // opts.tap(stem, hap): every onset of each stem the master names (stemXxx), audible or not, while the master runs;
@@ -48,7 +50,13 @@ export async function load(file, vals, expr, opts = {}) {
     },
     midikeys: async name => {
       if (name !== undefined) findPort(name)
-      return len => vals.midiQueue ? core.stack(vals.keys ? core.note(vals.keys) : core.silence, queued(len))
+      return len => vals.keyEvents ? new core.Pattern(state => vals.keyEvents.flatMap(e => {
+          if (e.t < state.span.begin.valueOf() || e.t >= state.span.end.valueOf()) return []
+          const l = core.reify(len ?? 0.5).queryArc(e.t, e.t)[0]?.value ?? 0.5
+          const span = new core.TimeSpan(core.Fraction(e.t), core.Fraction(e.t).add(l))
+          return [new core.Hap(span, span, { note: e.note, velocity: (e.vel ?? 100) / 127, midichan: e.chan ?? 1 }, {})]
+        }))
+        : vals.midiQueue ? core.stack(vals.keys ? core.note(vals.keys) : core.silence, queued(len))
         : vals.keys ? core.note(vals.keys) : core.silence
     },
     slider: v => core.pure(v),
