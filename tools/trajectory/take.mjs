@@ -1,5 +1,5 @@
 // Performance capture: every MIDI message the player hears during a play, kept with its bar, and turned into an
-// auto-perform script v2 with `take` meta (.claude/epics/recording-replay/step-format-v2.md). Pure: runs in the page
+// auto-perform script v2 with `take` meta (tools/trajectory/perform/script-format-v2.md). Pure: runs in the page
 // and in Node; the page hands in midi.mjs and the engine (createRecorder), a test hands in messages (createSession).
 // Bar of a message = engine.cycle() at its arrival minus the load's bar line: the start of the scheduler's next
 // query, which is where midikeys places a key and from where a midin signal reads a new value.
