@@ -15,9 +15,9 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 
 ## Layout
 - `tracks/<genre>/NNN-<name>/` — one folder per track, grouped by genre (`ambient`, `ambient-house`, `house`,
-  `techno`; `sets/` for 011, `historic/` for 000-006): the track (`NNN-<name>.strudel`), its layout sheets, custom
-  modes (`.syx`) and feedback notes. No `old/` folders: superseded variants are deleted once committed, git history
-  keeps them.
+  `techno`, `edm`, `classical`, `rock`; `sets/` for 011, `historic/` for 000-006): the track (`NNN-<name>.strudel`),
+  its layout sheets, custom modes (`.syx`) and feedback notes; a Guitar Pro song also its `.mid`, `<track>-map.json`
+  and `<track>-design.md`. No `old/` folders: superseded variants are deleted once committed, git history keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
   `harmony/`, `melody/`, `stab/`, `brass/`, `guitar/`, `strings/`, `samples/`, `tools/`
@@ -30,7 +30,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
-- `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness, layout sheets
+- `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness, layout sheets,
+  Guitar Pro MIDI → live track (`producer/`)
 
 ## Rules
 - **Non-destructive:** a new version of a track goes into a new file; never overwrite an existing track unless asked.
@@ -46,9 +47,14 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   take either side and regenerate (hook, `npm run layouts`/`syx`/`set`).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
-## Live tracks (007, 008, 009, 010): one file each
+## Live tracks (007-010, 012, 013): one file each
 The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-ambient`, `008-groove-techno`,
-`009-house`, `010-ambient-house`), every controller optional. Edit these files.
+`009-house`, `010-ambient-house`, `012-edm-snippet`, `013-hope-for-niklas`), every controller optional. Edit these
+files.
+- 012 and 013 are Guitar Pro songs: every part plays its notes as written (song bar 1 = cycle 0), re-voiced; the
+  decisions live in `<track>-map.json` beside the `.mid`. 013 is generated: change the map (or `tools/producer/`) and
+  re-run `npm run producer`, not the track. 012 is the hand-built pilot the producer reproduces event by event. See
+  `/producer`.
 - Rows and columns after `midi-layouts/templates/dual-lc.strudel`: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour
   on columns 1-7, column 8 global. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0
   must already sound good.
@@ -89,6 +95,8 @@ Use them instead of redoing the steps by hand:
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
 - Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
   performance"): `/auto-perform`.
+- A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song", "new Guitar Pro
+  song"): `/producer`.
 
 Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,
 syx and single regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit
@@ -107,6 +115,9 @@ Tools (run in `tools/`):
   --lk 31=0.7 --keys '<c3 e3>' --lc 2 --cc2 … [--before 0-4 --after 4-8] [--stems|--events|--view]` (`--view` = LC view
   as text)
 - Syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
+- Guitar Pro MIDI → track, design stub, perform script: `npm run producer -- <file.mid> [--map <map.json>]
+  [--out <dir>] [--force]`; `--perform` writes only the script from the map's `performance`; notes per bar:
+  `node producer/midi-read.mjs <file.mid> --dump` (`tools/producer/README.md`)
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
 - Layout sheets / `.syx`: `npm run layouts`, `npm run syx`; on save: `npm run watch`
 - The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
@@ -146,10 +157,11 @@ Strudel computes every event of every layer even when it is silent; dense tracks
 - Keep the safety net at the end of the master: `.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)`.
 - Prove a restructuring is inaudible with `/strudel-optimize` (compares old and new event by event).
 
-## Shared code in 007-010
-Blocks the four live tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
-`tools/shared/<name>.strudel-part`. Edit the block in one track, then `npm run shared -- --from <track> <name>` (in
-`tools/`); never hand-patch four copies. `npm run shared -- --check` shows drift.
+## Shared code in the live tracks
+Blocks the live tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
+`tools/shared/<name>.strudel-part` (the producer copies it into the tracks it writes). Edit the block in one track,
+then `npm run shared -- --from <track> <name>` (in `tools/`); never hand-patch the copies. `npm run shared -- --check`
+shows drift.
 
 ## Sounds that load (samples/sounds.json)
 Every sound a track plays must load in a browser, on strudel.cc and in the player (`tools/trajectory/player.html`

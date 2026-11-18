@@ -100,8 +100,8 @@ chords); one generator writes the track from that model.
 
 **What exists.** Chapters per track; the set frame plays sections in sequence; Tension and Break; lab boards per
 role (bass, harmony, melody, guitar …) to pick sounds from; the template `midi-layouts/templates/dual-lc.strudel`.
-The `producer-mode-guitar-pro` epic builds the Guitar Pro path by hand first (MIDI reader, pilot 012, then a
-converter); it is the first real source of the song model.
+The producer mode builds the Guitar Pro path: a MIDI reader, the hand-built pilot 012 and a converter (`npm run producer`,
+`tools/producer/`, `/producer`) that generated 013. Its map file is the first real source of the song model.
 
 **What is missing.** The song model as a written format; the generator (song model → playable layout, not just
 notes); a timeline that moves Chapter and Tension per section.
@@ -162,7 +162,7 @@ on the existing 010 performance. It is the base of auto-perform steering and of 
 LLM and no new endpoint, and it lets us judge the `auto-performances` scripts by eye.
 
 Leave out for now: closed-loop and agent steering, scanned note sheets, the SuperCollider engine, and LLM edits
-beyond the click-to-inspect panel. Producer mode grows through the `producer-mode-guitar-pro` epic, not a second path.
+beyond the click-to-inspect panel. Producer mode grows through `tools/producer` and its map file, not a second path.
 
 This pick depends on the questions below.
 
