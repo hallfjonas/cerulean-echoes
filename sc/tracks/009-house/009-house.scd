@@ -282,7 +282,7 @@ orbits: (1: (ir: "ir/orbit-0.6.wav", delay: [0.75 * 60 / bpm, 0.2]), 2: (ir: "ir
 	// them their own orbit so the noise riser keeps orbit 2's small room
 	4: (ir: "ir/orbit-2.0.wav", delay: [30 / bpm, 0.15])),
 // state buses of the lab columns (Jonas): level (fader × gain × brightness ±2 dB), room amount, echo send
-states: (harmLevel: 0, harmRoom: 0, harmEcho: 0, keysLevel: 0, keysRoom: 0, keysEcho: 0, vibLevel: 0, vibRoom: 0, vibEcho: 0, fluLevel: 0, fluRoom: 0, fluEcho: 0, brsLevel: 0, brsRoom: 0, brsEcho: 0,
+states: (harmLevel: 0, harmRoom: 0, harmEcho: 0, harmCut: 1000, harmJx: 0, harmB3: 0, keysLevel: 0, keysRoom: 0, keysEcho: 0, vibLevel: 0, vibRoom: 0, vibEcho: 0, fluLevel: 0, fluRoom: 0, fluEcho: 0, brsLevel: 0, brsRoom: 0, brsEcho: 0,
 	strLevel: 0, strRoom: 0, strEcho0: 0, strEcho3: 0, strEcho5: 0, gtrLevel: 0, gtrRoom: 0, gtrEcho: 0,
 	lkLevel: 0, lkRoom: 0, lkEcho: 0),
 // samples the drum stems play (the files Strudel plays: tidal-drum-machines, see sc/samples/CREDITS.md)
@@ -378,6 +378,9 @@ lkCtl: { |ce, num, v, send|
 		26, { ce.setState(\lkRoom, 0.9 * 0.8 * v, send) },   // roomOf(knob 6 × 0.8)
 		27, { ce.setState(\lkEcho, 0.6 * v, send) })
 },
+// the pads' names in the web UI (pad 1 = note 36)
+lkPadNames: ["brace", "Clap", "Open hat", "Rim", "lw", "Bongo", "Cowbell", "Tom", "Organ", "Brass", "Ooh", "Crash rev",
+	"Ride", "Tamb", "Vibes", "Snare"],
 lkNote: { |ce, note, vel, chan|
 	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(4));   // note length in bars
 	var tone = ("c" ++ ce.toneBus).asSymbol, thin = ("c" ++ ce.thinBus).asSymbol;
@@ -692,6 +695,10 @@ build: { |self, ce|
 			ce.setState(\harmLevel, st.val[3] * (4 * (st.val[0] - 0.5)).dbamp, send);
 			ce.setState(\harmRoom, self.labRoom(st.val[1]), send);
 			ce.setState(\harmEcho, if(st.held) { 0.65 } { 0.6 * self.labEcho(st.val[1]) }, send);
+			// long chords: the low-pass (row 1) and the strings ↔ organ blend (row 3) act on the sounding chord
+			ce.setState(\harmCut, (400 * (15 ** st.val[0])).min(18000), send);
+			ce.setState(\harmJx, cos(st.val[2] * 0.5pi) * (st.val[2] < 0.999).binaryValue, send);
+			ce.setState(\harmB3, sin(st.val[2] * 0.5pi) * (st.val[2] > 0.001).binaryValue, send);
 		});
 		self.hs = hs;
 		stem.(\harm).notes = { |k|
@@ -705,24 +712,21 @@ build: { |self, ce|
 				while { (e - k) < 64 and: { nameAt.(e) == name } } { e = e + 1 };
 				v = hs.val[2]; jx = cos(v * 0.5pi) * (v < 0.999).binaryValue; b3 = sin(v * 0.5pi) * (v > 0.001).binaryValue;
 				vel = 0.85 + (0.15 * ce.perlin(t)); at = if(k.odd) { 0.12 } { 0 };
-				cut = (400 * (15 ** hs.val[0])).min(18000);
+				// both layers always: their blend (row 3) and the low-pass follow the knobs while the chord sounds
+				cut = ce.stateMap(\harmCut);
 				harmNotes.(name).do { |m|
 					var lp = (lpOn: 1, lo: cut, hi: cut, tone: tone, thinF: thin, at: at, hold: e - k);
-					if(jx > 0) {
-						env = (a: 0.35, d: 0.1, s: 1, r: 0.8);
-						[[m, 0.08, 0.6, 0.5], [m + 0.1, 0.05, 0.9, 0.3]].do { |x|
-							out.add(ce.note(\sdSupersaw, (freq: x[0].midicps, unison: 2, detune: x[1], spread: x[2], amp: x[3] * 0.24 * jx * vel,
-								tag: "supersaw", g: x[3] * 0.24 * jx * vel, midi: x[0]) ++ lp ++ env))
-						}
+					env = (a: 0.35, d: 0.1, s: 1, r: 0.8);
+					[[m, 0.08, 0.6, 0.5], [m + 0.1, 0.05, 0.9, 0.3]].do { |x|
+						out.add(ce.note(\sdSupersaw, (freq: x[0].midicps, unison: 2, detune: x[1], spread: x[2], amp: x[3] * 0.24 * vel,
+							mix: ce.stateMap(\harmJx), nolog: jx <= 0, tag: "supersaw", g: x[3] * 0.24 * jx * vel, midi: x[0]) ++ lp ++ env))
 					};
-					if(b3 > 0) {
-						env = (a: 0.06, d: 0.001, s: 1, r: 0.25);
-						[[0, 0.14], [12, 0.11]].do { |dg| [[-0.04, 0.3], [0.04, 0.7]].do { |dp|
-							var mm = m + dg[0] + dp[0], g = dg[1] * 0.47 * b3 * vel;
-							out.add(ce.note(\sdSynth, (wave: 0, freq: mm.midicps, vib: 0.8, vibmod: 0.08, pan: dp[1], amp: g,
-								tag: "sine", g: g, midi: mm) ++ lp ++ env))
-						} }
-					};
+					env = (a: 0.06, d: 0.001, s: 1, r: 0.25);
+					[[0, 0.14], [12, 0.11]].do { |dg| [[-0.04, 0.3], [0.04, 0.7]].do { |dp|
+						var mm = m + dg[0] + dp[0], g = dg[1] * 0.47 * vel;
+						out.add(ce.note(\sdSynth, (wave: 0, freq: mm.midicps, vib: 0.8, vibmod: 0.08, pan: dp[1], amp: g,
+							mix: ce.stateMap(\harmB3), nolog: b3 <= 0, tag: "sine", g: g * b3, midi: mm) ++ lp ++ env))
+					} };
 				};
 				out ++ self.labEchoMsg(hs, at, \harm)
 			}

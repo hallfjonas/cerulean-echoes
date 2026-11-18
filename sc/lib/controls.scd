@@ -87,16 +87,33 @@
 	)
 };
 // A Launchkey control: kept in lkCC; the track may turn it into state buses (lkCtl: level, room, echo)
-~ce.setLkCC = { |self, num, v, send| self.lkCC[num] = v; self.track !? { |t| t[\lkCtl] !? { |f| f.(self, num, v, send) } } };
-// A Launchkey key or pad (chan 0-based: 9 = MIDI channel 10, the drum pads): the track's notes, played at once on the
-// track's clock (live) — offline renders play them as \ceKey events
+~ce.setLkCC = { |self, num, v, send| self.lkCC[num] = v; self.track !? { |t| t[\lkCtl] !? { |f| f.(self, num, v, send) } };
+	self.uiSend('/ce/lkcc', num, v) };
+// A Launchkey key or pad (chan 0-based: 9 = MIDI channel 10, the drum pads): the track's notes, played at once —
+// sent without a time stamp, so the server starts them on arrival (a few ms: audio buffer + MIDI), not with the
+// patterns' look-ahead (s.latency). Offline renders play them as \ceLk events.
 ~ce.midiNote = { |self, note, vel, chan, uid|
-	if(self.midiPorts[uid] !? { |p| p.kind } == \launchkey and: { vel > 0 }) {
-		var notes = self.track !? { |t| t[\lkNote] !? { |f| f.(self, note, vel / 127, chan) } } ? [];
-		if(notes.notEmpty) { (TempoClock.default).sched(0, {
-			(type: \ceMulti, notes: notes.reject { |n| n[\msg].notNil }, msgs: notes.select { |n| n[\msg].notNil },
-				lanes: self.stemBus[\lk], group: self.groups.src, server: self.server, stem: \lk).play; nil }) }
-	}
+	if(self.midiPorts[uid] !? { |p| p.kind } == \launchkey and: { vel > 0 }) { self.lkPlay(note, vel / 127, chan) } { [] }
+};
+// A Launchkey key / pad from the device or the web UI: the track's notes at once; the UI lights the key / pad
+~ce.lkPlay = { |self, note, vel, chan|
+	var notes = self.track !? { |t| t[\lkNote] !? { |f| f.(self, note, vel, chan) } } ? [];
+	self.uiSend('/ce/lknote', note, chan);
+	self.playNow(notes, self.stemBus[\lk], self.groups.src)
+};
+// Notes as the tracks make them (ce.note …, \lane, \hold in 16ths, \msg entries), started immediately
+~ce.playNow = { |self, notes, lanes, group|
+	var bps = TempoClock.default.tempo, srv = self.server;
+	// returns the node ids of the started synths
+	notes.collect { |n|
+		if(n[\msg].notNil) { srv.sendMsg(*n[\msg]); nil } {
+			var desc = SynthDescLib.global[n[\instrument]], args = List[], id = srv.nextNodeID;
+			var e = n.copy.putAll((out: lanes[n[\lane] ? \main], hold: (n[\hold] ? 1) / 4 / bps));
+			desc !? { desc.controlNames.do { |k| e[k] !? { |v| args.add(k).add(v) } } };
+			srv.sendMsg(\s_new, n[\instrument], id, 0, group.asNodeID, *args);
+			id
+		}
+	}.reject(_.isNil)
 };
 // Connect every port not yet connected; report what is new or gone
 ~ce.scanMidi = { |self|

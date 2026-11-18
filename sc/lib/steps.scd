@@ -20,7 +20,8 @@ Event.addEventType(\ceMulti, { |server|
 		e[\schedBundleArray] = parent[\schedBundleArray];
 		e[\schedBundle] = parent[\schedBundle];
 		e[\dur] = 0; e[\delta] = 0;
-		topEnvironment[\ce].log !? { |log| log.add([beats + at, parent[\stem], e]) };
+		// nolog: a layer that is silent right now (live mix at 0, Strudel would not play it): not in the event log
+		if(e.removeAt(\nolog) != true) { topEnvironment[\ce].log !? { |log| log.add([beats + at, parent[\stem], e]) } };
 		e.play;
 	};
 });

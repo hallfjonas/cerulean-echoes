@@ -1,5 +1,6 @@
 // Bridge between the web UI and SuperCollider. No packages needed: node bridge.mjs [httpPort]
-//   browser ⇄ bridge: HTTP. GET / = the LC view, GET /events = live state (Server-Sent Events), POST /cc = a click
+//   browser ⇄ bridge: HTTP. GET / = the LC view, GET /events = live state (Server-Sent Events), POST /cc = a click,
+//   POST /lk = the Launchkey row ({ cc: [[num, value]] } or { note: [note, velocity, chan] })
 //   bridge ⇄ SC: OSC over UDP. The bridge listens on 57130; SC (sclang) listens on its language port (57120).
 // The Launch Controls never go through here (MIDI goes straight to SC): if the bridge or the browser stops, the
 // music and the controllers go on. Reachable from a phone or tablet in the same network (address printed at start).
@@ -42,7 +43,7 @@ const decode = buf => {
 }
 
 // --- state cache (a browser that connects gets everything at once) ---
-const state = { layout: null, ccs: null, state: null, beat: null, midi: null, sc: false }
+const state = { layout: null, ccs: null, state: null, beat: null, midi: null, lk: null, sc: false }
 const clients = new Set()
 const broadcast = (type, data) => {
   const msg = 'data: ' + JSON.stringify({ type, data }) + '\n\n'
@@ -71,6 +72,9 @@ udp.on('message', (buf, rinfo) => {
     case '/ce/state': state.state = json(); broadcast('state', state.state); break
     case '/ce/beat': state.beat = { bar: m.args[0], beat: m.args[1], chord: m.args[2] }; broadcast('beat', state.beat); break
     case '/ce/midi': state.midi = json(); broadcast('midi', state.midi); break
+    case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
+    case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
+    case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
   }
 })
 udp.on('error', e => { console.error('OSC port ' + OSC_PORT + ': ' + e.message); process.exit(1) })
@@ -83,7 +87,7 @@ const server = http.createServer((req, res) => {
   } else if (req.method === 'GET' && req.url === '/events') {
     res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-store', connection: 'keep-alive' })
     res.write('retry: 1000\n\n')
-    for (const k of ['layout', 'ccs', 'state', 'beat', 'midi']) if (state[k]) res.write('data: ' + JSON.stringify({ type: k, data: state[k] }) + '\n\n')
+    for (const k of ['layout', 'ccs', 'state', 'beat', 'midi', 'lk']) if (state[k]) res.write('data: ' + JSON.stringify({ type: k, data: state[k] }) + '\n\n')
     res.write('data: ' + JSON.stringify({ type: 'sc', data: state.sc }) + '\n\n')
     clients.add(res)
     req.on('close', () => clients.delete(res))
@@ -94,6 +98,17 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         for (const [cc, v] of JSON.parse(body)) toSc('/ce/cc', { i: cc | 0 }, { f: Math.min(1, Math.max(0, +v)) })
+        res.writeHead(204); res.end()
+      } catch (e) { res.writeHead(400); res.end(String(e)) }
+    })
+  } else if (req.method === 'POST' && req.url === '/lk') {
+    let body = ''
+    req.on('data', d => { body += d })
+    req.on('end', () => {
+      try {
+        const b = JSON.parse(body)
+        for (const [n, v] of b.cc ?? []) toSc('/ce/lkcc', { i: n | 0 }, { f: Math.min(1, Math.max(0, +v)) })
+        if (b.note) toSc('/ce/lknote', { i: b.note[0] | 0 }, { i: b.note[1] | 0 }, { i: b.note[2] | 0 })
         res.writeHead(204); res.end()
       } catch (e) { res.writeHead(400); res.end(String(e)) }
     })

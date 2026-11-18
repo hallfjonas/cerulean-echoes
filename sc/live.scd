@@ -32,6 +32,10 @@ s.latency = 0.2;                        // only the patterns run ahead; controll
 	var node = ["/opt/homebrew/bin/node", "/usr/local/bin/node", "/usr/bin/node"].detect { |p| File.exists(p) }
 		?? { "/bin/zsh -lc 'command -v node'".unixCmdGetStdOut.stripWhiteSpace };
 	if(node.isNil or: { node.isEmpty }) { "Node.js not found: no LC view (the track plays anyway)".warn } {
+		// a bridge left over from an earlier start (SC quit without stopping it) would keep the port and serve old
+		// code: end it first (only bridges of this folder), then give the port a moment
+		("pkill -f" + (here +/+ "ui/bridge.mjs").quote).systemCmd;
+		0.3.wait;
 		self.bridgePid = ("exec" + node.quote + (here +/+ "ui/bridge.mjs").quote).unixCmd({ |code|
 			if(code != 0) { "LC view bridge stopped (code %): already running, or see the post window".format(code).postln } });
 		if(openBrowser) { SystemClock.sched(1.5, { "open http://localhost:7770".unixCmd; nil }) };

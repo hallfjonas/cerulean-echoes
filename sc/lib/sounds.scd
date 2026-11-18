@@ -50,8 +50,9 @@
 };
 // Low-pass cutoff of a sound: brightness 0..1 over lo..hi (exponential), × the global tone (fog / tension),
 // kept within 80 Hz .. 18 kHz like the Strudel tracks; lag against zipper noise
-~ce.cutoff = { |self, bright, lo, hi, tone|
-	(lo * ((hi / lo) ** Lag.kr(bright, 0.02)) * Lag.kr(tone, 0.02)).clip(80, 18000)
+~ce.cutoff = { |self, bright, lo, hi, tone, mul = 1|
+	var l = Lag.kr(lo, 0.02), h = Lag.kr(hi, 0.02);
+	(l * ((h / l) ** Lag.kr(bright, 0.02)) * Lag.kr(tone, 0.02) * mul).clip(80, 18000)
 };
 // WebAudio biquad Q is in dB: rq for the filters below
 ~ce.rq = { |self, qDb = 1| 1 / (10 ** (qDb / 20)) };
@@ -136,8 +137,8 @@
 // sig: [left, right] (a mono voice passes [x, x] with stereoIn 0). c: the voice's controls (see sounds/sdSample.scd).
 (
 ~ce.sdFx = { |self, sig, c|
-	var cut = self.cutoff(c.bright, c.lo, c.hi, c.tone) * c.cutMul;
-	sig = Select.ar(c.lpOn > 0, [sig, self.lpf(sig, cut, self.rq(c.lpq))]);
+	var cut = self.cutoff(c.bright, c.lo, c.hi, c.tone, c.cutMul);   // lo / hi / bright may be mapped buses (live)
+	sig = Select.ar(c.lpOn > 0, [sig, self.lpf(sig, cut, self.rq(Lag.kr(c.lpq, 0.02)))]);
 	sig = self.thinHpf(sig, c.hp, c.thinF, c.hpq);
 	sig = Select.ar(c.bp > 0, [sig, self.bpf(sig, c.bp.max(10), c.bpq)]);
 	Select.ar(c.pan >= 0, [sig, self.webPan(sig, c.pan, c.stereoIn)])

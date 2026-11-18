@@ -43,7 +43,8 @@ mehreren gilt der zuletzt bewegte Regler.
 
 Andere Controller:
 - **Launchkey MK4 25:** eigene Spur wie in Strudel (Tabelle unten): Tasten = Rhodes, Drum-Pads (Drum-Modus,
-  Kanal 10) = 16 One-Shots. Jede Taste spielt eine Note fester Länge (Regler 4), wie in Strudel.
+  Kanal 10) = 16 One-Shots. Jede Taste spielt eine Note fester Länge (Regler 4), wie in Strudel. Anders als in
+  Strudel klingen Tasten und Pads **sofort** (wenige Millisekunden statt des Vorlaufs des Schedulers).
 - **Alle anderen Controller** werden erkannt und im Post-Fenster aufgelistet, aber ignoriert. Ihre CC-Nummern
   würden sonst die Regler des Tracks verstellen. Ein neuer Controller-Typ bekommt einen Eintrag in `midiKinds`
   (`sc/lib/controls.scd`).
@@ -129,6 +130,13 @@ Ohne Launch Control (oder zusätzlich) lässt sich alles mit Maus oder Touch spi
 | Taste | klicken = drücken und loslassen; Maustaste festhalten = Taste halten |
 | Taste halten, ohne die Maus festzuhalten | **Shift-Klick**: bleibt gedrückt (gestrichelter Rahmen), der nächste Klick lässt los (z. B. Drop, Oktave) |
 
+Darunter die **Launchkey-Zeile** (immer da, auch ohne Gerät): 8 Regler und das Modulationsrad wie oben bedienbar,
+**Pads** anklicken (mit Namen), **Tasten** anklicken oder über die Computertastatur spielen: die Reihe A–K sind die
+weißen Tasten ab C, die Reihe darüber die schwarzen; die zwei Tasten links unten (Z/Y und X) oder ◀ / ▶ schieben die
+Oktave. Gespielte Tasten und Pads leuchten kurz auf, auch die eines echten Launchkeys. Über Maus und Tastatur kommt
+der Ton etwa 10–20 ms später als vom Gerät (Weg über Browser und Brücke) – zum Testen von Klang und Belegung reicht
+das, die Spielbarkeit nur am echten Launchkey beurteilen.
+
 Ein Klick wirkt genau wie dieselbe Bewegung am Launch Control; mit Controller gilt der zuletzt bewegte Regler.
 **Handy/Tablet:** im selben WLAN die Adresse öffnen, die beim Start im Post-Fenster steht
 (`phone/tablet: http://…:7770`).
@@ -143,6 +151,8 @@ SuperCollider). Ansicht wieder öffnen: http://localhost:7770 im Browser.
 - **Lautstärke:** SuperCollider spielt 9 dB leiser als Strudel (Master-Trim), damit auch alle Fader oben mit
   Tension nicht übersteuern; am Interface bzw. an den Boxen entsprechend lauter drehen. Der Limiter (−1 dBFS) ist
   nur Notbremse. Anderer Wert: in `sc/lib/ce.scd` die Zeile `trimDb: -9` ändern (0 = so laut wie Strudel).
+- **Harmonie live:** Brightness und Reihe 3 (Streicher ↔ B3-Orgel) verändern auch den gerade klingenden Akkord
+  (in Strudel erst den nächsten). Die anderen Spalten von Jonas behalten den Klang vom Anschlag, wie in Strudel.
 - **Echo:** Jede Spalte von Jonas hat ihr eigenes Echo (in Strudel teilen sie sich eines, das bei jeder Note
   umgestellt wird und dann knackt). Einzeln klingt jede Spalte gleich.
 - Ein Regler, der auf denselben Wert bewegt wird, zählt nicht als Bewegung (wie in Strudel): Jonas' Spalten behalten

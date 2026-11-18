@@ -64,6 +64,12 @@ Bekannte Abweichungen, die an der **Referenz** liegen (Strudel in Node, nicht im
   (Knacken, Echos im falschen Takt). Hier hat jede dieser Spalten ihr eigenes Echo (`ownDelay`). Ändert sich eine
   Echozeit (Echo-Wurf), springt sie nicht: zwei Verzögerungsleitungen, die neue wird in 60 ms eingeblendet.
   Einzeln gespielt klingt jede Spalte wie in Strudel.
+- **Harmonie live, bewusst anders als Strudel:** Brightness (Tiefpass) und die Überblendung Streicher ↔ B3 wirken
+  auf den klingenden Akkord (State-Busse `harmCut`, `harmJx`, `harmB3`; beide Schichten laufen dafür immer mit,
+  die gerade stumme nicht im Event-Log). Bei festen Reglern gleich wie Strudel (alle 12 Harmonie-Szenarien).
+  Grundsatz: live bei langen, gehaltenen Klängen; kurze Töne behalten den Klang vom Anschlag.
+- **Launchkey ohne Vorlauf:** Anschläge gehen sofort an den Server (`ce.playNow`), nicht mit `s.latency`
+  (0,2 s) wie die Patterns. Gemessen 3–4 ms bis zum Start der Synth.
 - **Echo pro Note** (Strings: 0 / 0,3 / 0,5 × Space; Launchkey-Rim): eine „Lane“ pro Echo-Menge, jede mit eigenem
   Kanalzug am selben Fader. Gitarre: Echo-Menge als State-Bus, pro 16tel gesetzt.
 - **Launchkey:** In Strudel liefert `midikeys` (npm 1.3.0) keinen MIDI-Kanal, dort würden die Pads also Rhodes

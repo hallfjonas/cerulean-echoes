@@ -1,7 +1,9 @@
 // Web UI link (sc/ui/bridge.mjs, see sc/ui/README.md). The controllers never go through it: MIDI goes straight to
 // SuperCollider; if the browser or the bridge stops, the music and the controllers go on.
 // SC → bridge (UDP 57130): /ce/layout json · /ce/cc cc value · /ce/state json · /ce/beat bar beat chord · /ce/midi json
+//                  /ce/lkcc num value · /ce/lkccs json · /ce/lknote note chan (Launchkey: controls, a key / pad played)
 // bridge → SC: /ce/hello (send everything again) · /ce/cc cc value (a click in the UI: the same as a MIDI message)
+//              /ce/lkcc num value · /ce/lknote note velocity chan (the Launchkey row: as the device would send)
 (
 ~ce.uiAddr = NetAddr("127.0.0.1", 57130);
 ~ce.uiOn = false;
@@ -25,13 +27,15 @@
 	var tags = ();
 	if(self.trackFile.notNil) {
 		File.readAllString(self.trackFile).split($\n).do { |line|
-			var m = line.findRegexp("^// @(layout|mode|col|ctl) ([^ ]+) (.*)$");
-			if(m.notEmpty) { tags[m[2][1]] = m[3][1] };
+			var m = line.findRegexp("^// @(layout|mode|col|ctl|lk) ([^ ]+) (.*)$");
+			// @lk lines (the Launchkey row) as lk.<key>, as the Strudel view reads them
+			if(m.notEmpty) { tags[if(m[1][1] == "lk") { "lk." ++ m[2][1] } { m[2][1] }] = m[3][1] };
 		}
 	};
 	tags
 };
-~ce.uiLayout = { |self| self.uiSend('/ce/layout', self.toJSON((name: self.track.name, bpm: self.track.bpm, tags: self.uiTags))) };
+~ce.uiLayout = { |self| self.uiSend('/ce/layout', self.toJSON((name: self.track.name, bpm: self.track.bpm, tags: self.uiTags,
+	lkPads: self.track[\lkPadNames]))) };
 
 // State: what each pattern button has chosen (now, next) per column, plus the track's head line (chapter, chords,
 // break). ce.change registers the column rows; the track adds its head with uiHead.
@@ -53,6 +57,9 @@
 	self.uiOn = true;
 	OSCdef(\ce_ui_cc, { |msg| self.setCC(msg[1].asInteger, msg[2].asFloat.clip(0, 1), { |m| self.server.sendMsg(*m) }) }, '/ce/cc').permanent_(true);
 	OSCdef(\ce_ui_hello, { self.uiHello }, '/ce/hello').permanent_(true);
+	// the Launchkey row: a knob / the mod wheel, a key or pad (velocity 0-127, chan 0-based: 9 = pads)
+	OSCdef(\ce_ui_lkcc, { |msg| self.setLkCC(msg[1].asInteger, msg[2].asFloat.clip(0, 1), { |m| self.server.sendMsg(*m) }) }, '/ce/lkcc').permanent_(true);
+	OSCdef(\ce_ui_lknote, { |msg| self.lkPlay(msg[1].asInteger, msg[2].asInteger.clip(1, 127) / 127, msg[3].asInteger) }, '/ce/lknote').permanent_(true);
 	self.uiHello;
 	// bar and beat, sent when they sound (the patterns run s.latency ahead)
 	self.uiBeat !? (_.stop);
@@ -65,8 +72,10 @@
 ~ce.uiHello = { |self|
 	self.uiLayout;
 	self.uiSend('/ce/ccs', self.toJSON(self.cc));
+	self.uiSend('/ce/lkccs', self.toJSON(([1] ++ (21..28)).collect { |n| n -> self.lkCC[n] }.asDict));
 	self.uiPush;
 	self.uiPorts;
 };
-~ce.stopUI = { |self| self.uiOn = false; self.uiBeat !? (_.stop); OSCdef(\ce_ui_cc).free; OSCdef(\ce_ui_hello).free };
+~ce.stopUI = { |self| self.uiOn = false; self.uiBeat !? (_.stop);
+	[\ce_ui_cc, \ce_ui_hello, \ce_ui_lkcc, \ce_ui_lknote].do { |k| OSCdef(k).free } };
 );
