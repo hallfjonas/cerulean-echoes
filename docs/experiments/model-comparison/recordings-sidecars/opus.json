@@ -1,0 +1,15 @@
+{
+  "track": "016-grroove-opus",
+  "trackHash": "2344afd1ea3dc410007b0cba66526e9b90ab3066",
+  "source": "human",
+  "script": null,
+  "take": null,
+  "startCycle": 0,
+  "cps": 0.5833333333333334,
+  "sampleRate": 44100,
+  "channels": 2,
+  "bitDepth": 16,
+  "startedAt": "2026-11-18T17:49:02.566Z",
+  "seconds": 459.314,
+  "endedBy": "stop"
+}

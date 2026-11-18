@@ -1,0 +1,15 @@
+{
+  "track": "016-grroove-sonnet",
+  "trackHash": "4ddde572d2a55b2a686c1b40d83a0dcd8a2117c0",
+  "source": "human",
+  "script": null,
+  "take": null,
+  "startCycle": 0,
+  "cps": 0.5833333333333334,
+  "sampleRate": 44100,
+  "channels": 2,
+  "bitDepth": 16,
+  "startedAt": "2026-11-18T17:47:11.862Z",
+  "seconds": 104.171,
+  "endedBy": "stop"
+}

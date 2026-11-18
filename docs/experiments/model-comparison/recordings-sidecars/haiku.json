@@ -1,0 +1,15 @@
+{
+  "track": "016-grroove-haiku",
+  "trackHash": "daa1d91d7afc971f6cac17ee21c3a8f63d91b9a6",
+  "source": "human",
+  "script": null,
+  "take": null,
+  "startCycle": 61.3375,
+  "cps": 0.5833333333333334,
+  "sampleRate": 44100,
+  "channels": 2,
+  "bitDepth": 16,
+  "startedAt": "2026-11-18T17:45:21.263Z",
+  "seconds": 100.124,
+  "endedBy": "stop"
+}

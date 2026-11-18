@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Drake meme: Haiku and Sonnet tracks get 100 seconds of listening, the Opus track gets 459 seconds">
+  <rect width="640" height="640" fill="#ffffff"/>
+  <rect x="0" y="0" width="240" height="320" fill="#f2c94c"/>
+  <rect x="0" y="320" width="240" height="320" fill="#4fb3a5"/>
+  <line x1="0" y1="320" x2="640" y2="320" stroke="#111" stroke-width="4"/>
+  <line x1="240" y1="0" x2="240" y2="640" stroke="#111" stroke-width="4"/>
+  <text x="120" y="150" font-size="120" text-anchor="middle">🙅</text>
+  <text x="120" y="215" font-size="26" font-family="Impact, Arial Black, sans-serif" text-anchor="middle" fill="#111">NOPE</text>
+  <text x="120" y="470" font-size="120" text-anchor="middle">🕺</text>
+  <text x="120" y="535" font-size="26" font-family="Impact, Arial Black, sans-serif" text-anchor="middle" fill="#111">YEP</text>
+  <g font-family="Impact, Arial Black, sans-serif" fill="#111" text-anchor="middle">
+    <text x="440" y="120" font-size="34">HAIKU TRACK</text>
+    <text x="440" y="160" font-size="34">SONNET TRACK</text>
+    <text x="440" y="215" font-size="26" font-family="Arial, sans-serif" font-weight="700">"ok, stop recording"</text>
+    <text x="440" y="255" font-size="48" fill="#b3261e">~100 s</text>
+    <text x="440" y="420" font-size="34">OPUS TRACK</text>
+    <text x="440" y="475" font-size="26" font-family="Arial, sans-serif" font-weight="700">"wait, one more chapter"</text>
+    <text x="440" y="545" font-size="64" fill="#0b6b5f">459 s</text>
+    <text x="440" y="590" font-size="22" font-family="Arial, sans-serif" font-weight="700">(n = 1, play with it yourself)</text>
+  </g>
+</svg>
