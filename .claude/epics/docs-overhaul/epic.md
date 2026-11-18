@@ -25,6 +25,9 @@ Write user-facing feature docs, add `CONTRIBUTING.md`, give `docs/` an index and
   skills hold the detail and are linked, never copied.
 - **One page shape:** What it is · When to use it · How · Good to know · Related.
 - **Facts from the repo.** Each page is checked against the code or a tool run before it is written down.
+- **Method-agnostic docs.** PRDs and epics are optional. `CONTRIBUTING.md` says so and holds the CCPM how in one
+  section ("Planning larger work (optional)"); `CLAUDE.md` keeps a pointer plus "only when the user asks", so agents
+  that use CCPM follow the same rules as people. No other page describes the flow.
 - **Only shipped features.** No page for `llm-support`, `recording-replay`, `drop-buildup`, `produce-perform-split`.
 - **Moves keep history:** `git mv`, then fix inbound paths with `npm run path-lint`.
 
@@ -46,8 +49,7 @@ Write user-facing feature docs, add `CONTRIBUTING.md`, give `docs/` an index and
 
 ## Implementation Strategy
 
-Task 1 and 2 first and in order (they move files and set the tree). Then 3 to 6 write pages in parallel (disjoint
-files). Task 7 (`CONTRIBUTING.md`) is independent of 3 to 6 and can start after 2. Task 8 closes.
+Task 1 and 2 first and in order (they move files and set the tree). Then 3 to 6 run in parallel (disjoint files). Task 6 (`CONTRIBUTING.md`) is independent of 3 to 5 and can start after 2. Task 7 closes.
 
 Pre-work: `git status` and `gh pr list` for open work on `docs/`, `TODO.md`, `tools/trajectory/README.md`. Branch from
 a fresh `origin/main`, one PR. This epic lives on its feature branch while open and is removed from main after merge.
@@ -65,7 +67,7 @@ a fresh `origin/main`, one PR. This epic lives on its feature branch while open 
 4. **Feature pages: auto-perform, lab-boards, sets, samples-and-sounds.** Depends on: 2. Parallel.
 5. **Feature pages: layout-sheets, checks, visuals, producer-mode, claude-skills, strudel-cc, `features/README.md`.**
    Depends on: 2. Parallel.
-6. **`CONTRIBUTING.md`** plus pointer lines in `CLAUDE.md`. Depends on: 2. Parallel.
+6. **`CONTRIBUTING.md`** (with the optional CCPM section) plus pointer lines in `CLAUDE.md`. Depends on: 2. Parallel.
 7. **Review pass.** Read all pages as a newcomer: vocabulary, English, 1 to 2 screens, five headings, glossary
    links; fix dead links; `docs/README.md` lists every file; `npm run path-lint`; remove the Documentation block
    from `TODO.md`. Depends on: 3, 4, 5, 6.

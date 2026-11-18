@@ -77,10 +77,26 @@ Pages (simple English, audience: users): `README.md` (list), `player`, `live-tra
 ### FR4: `CONTRIBUTING.md` (repo root)
 Branch and PR flow (never push to main, fresh `origin/main`, one PR per feature), non-destructive track rule, one file
 per live track, generated files and the regenerate commands, `npm run verify` before a PR, label and glossary rules,
-sample and sound rules, CCPM epics and PRDs, link to `docs/README.md`. Written for humans, not a copy of `CLAUDE.md`.
+sample and sound rules, link to `docs/README.md`. Written for humans, not a copy of `CLAUDE.md`.
+
+The docs are method-agnostic: a contributor needs no PRD or epic. `CONTRIBUTING.md` has one section, "Planning larger
+work (optional)", that says so and holds the how for those who plan with CCPM (or a similar PRD → epic flow). It is the
+single place for those rules; `CLAUDE.md` and the feature pages only point to it. Content of the section:
+- When not to: a fix, a small change, a docs edit, one track tweak → branch and PR, nothing else.
+- Where files live: PRD `.claude/prds/<name>.md`, epic `.claude/epics/<name>/` (`epic.md` + numbered tasks),
+  kebab-case name.
+- Plan PR: branch `plan/<name>`, planning files only, merged before work starts.
+- Build PRs: branch `epic/<name>` (or one branch per task group), one PR per epic or group; task status and epic
+  `status`/`progress` updated in the same PR.
+- Closing: when the epic is done and merged, a removal PR (`chore/remove-<name>-epic`) deletes the epic folder and the
+  PRD; anything worth keeping (a spec, a decision) moves first to `docs/` or the tool's README. Git history keeps the rest.
+- GitHub issue sync is optional and off by default.
+- Agents: use CCPM only when the user asks for it; follow these rules when they do.
 
 ### FR5: Keep docs from rotting
-- `CLAUDE.md` gets a short pointer to `docs/README.md` and `CONTRIBUTING.md`; no duplicated content.
+- `CLAUDE.md` gets a short pointer to `docs/README.md` and `CONTRIBUTING.md`; no duplicated content. Its section
+  "CCPM epics and PRDs" shrinks to: optional, only when the user asks, rules in `CONTRIBUTING.md`. The link to the
+  personal skill path (`/Users/.../ccpm/SKILL.md`) is dropped.
 - `npm run path-lint` covers paths cited in the new docs.
 
 ## Non-Functional Requirements
@@ -98,6 +114,8 @@ sample and sound rules, CCPM epics and PRDs, link to `docs/README.md`. Written f
 - `docs/README.md` lists 100% of files under `docs/`.
 - `npm run path-lint` passes.
 - `CONTRIBUTING.md` exists; a reader can open a correct PR using only it and the pages it links.
+- `CONTRIBUTING.md` states that PRDs and epics are optional and holds the CCPM rules once; `grep -n 'plan/<name>'`
+  finds them there and nowhere else in the docs; `CLAUDE.md` has no machine-specific path.
 - The Documentation block in `TODO.md` is removed.
 
 ## Constraints & Assumptions
