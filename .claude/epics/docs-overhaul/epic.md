@@ -1,9 +1,9 @@
 ---
 name: docs-overhaul
-status: backlog
+status: completed
 created: 2026-11-18T06:24:40Z
-updated: 2026-11-18T06:24:40Z
-progress: 0%
+updated: 2026-11-18T12:00:00Z
+progress: 100%
 prd: .claude/prds/docs-overhaul.md
 github: (will be set on sync)
 ---

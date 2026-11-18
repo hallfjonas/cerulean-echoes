@@ -2,6 +2,10 @@
 
 Start here. For how to contribute, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
+## Getting started
+
+- [getting-started.md](getting-started.md) - first steps: run the player and play a track
+
 ## Features
 
 - [features/README.md](features/README.md) - one page per feature (player, live tracks, controllers and more)

@@ -16,7 +16,7 @@ you move something. Every control sends a number from 0 to 127.
 **Launch Control XL 3**
 - Plug in one or two. The track finds every port with `LCXL3` in its name (not `DAW`). No renaming is needed.
 - Every LC gets the full layout. Mode 1 = the foundation (beat and bass), Mode 2 = the colour (chords and melodies).
-  Switch between them with the custom mode slot on the controller. Column 8 is global in both modes.
+  Mode 1 is custom mode slot 1 and Mode 2 is slot 2: pick the slot on the controller to switch. Column 8 is global in both modes.
 - Load the control names once per track: take `NNN-<name>-mode1.syx` and `-mode2.syx` from the track folder
   (for example `tracks/house/009-house/`) into Novation Components, slot 1 and slot 2. A layout sheet PDF sits next to
   them. See [layout sheets](layout-sheets.md).
