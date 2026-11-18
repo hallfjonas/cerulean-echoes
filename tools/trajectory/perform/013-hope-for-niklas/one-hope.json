@@ -1,0 +1,202 @@
+{
+  "track": "013-hope-for-niklas",
+  "title": "One Hope",
+  "bars": 57,
+  "mood": "a classical piece in A minor that grows from a cello and a piano into a march, played once",
+  "sections": [
+    {
+      "name": "Dawn",
+      "from": 0,
+      "to": 12,
+      "intent": "Song bars 1-12: cello and piano, violin and pizzicato at 7, the fog clears"
+    },
+    {
+      "name": "Groove",
+      "from": 12,
+      "to": 18,
+      "intent": "Song bars 13-18: timpani, fretless and strings bring the pulse"
+    },
+    {
+      "name": "Rise",
+      "from": 18,
+      "to": 30,
+      "intent": "Song bars 19-30: brass joins, one long crescendo into the cymbals"
+    },
+    {
+      "name": "Drive",
+      "from": 30,
+      "to": 46,
+      "intent": "Song bars 31-46: Part 2, everything in, violin arpeggio on top"
+    },
+    {
+      "name": "March",
+      "from": 46,
+      "to": 54,
+      "intent": "Song bars 47-54: Part 3, bells, bass drum and contrabass"
+    },
+    {
+      "name": "Ending",
+      "from": 54,
+      "to": 57,
+      "intent": "Song bars 55-56: violin E alone, two final hits, then silence"
+    }
+  ],
+  "steps": [
+    {
+      "bar": 0,
+      "cc": 12,
+      "value": 0.9
+    },
+    {
+      "bar": 0,
+      "cc": 20,
+      "value": 0.4
+    },
+    {
+      "bar": 0,
+      "cc": 21,
+      "value": 0.3
+    },
+    {
+      "bar": 0,
+      "cc": 22,
+      "value": 0.3
+    },
+    {
+      "bar": 0,
+      "cc": 23,
+      "value": 0.3
+    },
+    {
+      "bar": 0,
+      "cc": 24,
+      "value": 0.35
+    },
+    {
+      "bar": 0,
+      "cc": 25,
+      "value": 0.4
+    },
+    {
+      "bar": 0,
+      "cc": 26,
+      "value": 0.4
+    },
+    {
+      "bar": 0,
+      "cc": 27,
+      "value": 0.45
+    },
+    {
+      "bar": 0,
+      "cc": 6,
+      "value": 0.7
+    },
+    {
+      "bar": 0,
+      "cc": 8,
+      "value": 0.8
+    },
+    {
+      "bar": 1,
+      "press": 44
+    },
+    {
+      "bar": 1,
+      "cc": 20,
+      "value": 0,
+      "ramp": 11
+    },
+    {
+      "bar": 5.5,
+      "cc": 11,
+      "value": 0.45
+    },
+    {
+      "bar": 5.5,
+      "cc": 7,
+      "value": 0.5
+    },
+    {
+      "bar": 11.5,
+      "cc": 5,
+      "value": 0.5
+    },
+    {
+      "bar": 11.5,
+      "cc": 9,
+      "value": 0.5
+    },
+    {
+      "bar": 11.5,
+      "cc": 6,
+      "value": 0.55
+    },
+    {
+      "bar": 11.5,
+      "cc": 8,
+      "value": 0.7
+    },
+    {
+      "bar": 17.5,
+      "cc": 10,
+      "value": 0.45
+    },
+    {
+      "bar": 24,
+      "cc": 12,
+      "value": 1,
+      "ramp": 6
+    },
+    {
+      "bar": 24,
+      "cc": 9,
+      "value": 0.6,
+      "ramp": 6
+    },
+    {
+      "bar": 24,
+      "cc": 10,
+      "value": 0.55,
+      "ramp": 6
+    },
+    {
+      "bar": 28,
+      "press": 44
+    },
+    {
+      "bar": 29.5,
+      "cc": 11,
+      "value": 0.7
+    },
+    {
+      "bar": 30,
+      "cc": 5,
+      "value": 0.55
+    },
+    {
+      "bar": 38,
+      "cc": 10,
+      "value": 0.65,
+      "ramp": 7
+    },
+    {
+      "bar": 44,
+      "press": 44
+    },
+    {
+      "bar": 45.5,
+      "cc": 5,
+      "value": 0.6
+    },
+    {
+      "bar": 55,
+      "pad": 48
+    },
+    {
+      "bar": 55.5,
+      "cc": 12,
+      "value": 0
+    }
+  ]
+}
