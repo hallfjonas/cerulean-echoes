@@ -4,7 +4,7 @@ status: backlog
 created: 2026-11-17T10:59:43Z
 updated: 2026-11-17T12:00:00Z
 progress: 0%
-prd: (none, scoped from docs/player-future.md ideas 1 and 2)
+prd: (none, scoped from the player vision draft, ideas 1 and 2, in git history)
 github: (will be set on sync)
 ---
 
@@ -29,7 +29,7 @@ a fader that is harsh at the top, a Pattern button with one pattern too many. Th
 6. Next round on the same copy, or "reset" to start from the original again.
 
 This happens while the track plays, so it looks like performing, but it is producing: you decide when to reload, a gap
-at reload is fine, and the original file is never touched. It is the use case `docs/player-future.md` idea 1 describes,
+at reload is fine, and the original file is never touched. It is the use case the player vision draft (idea 1) describes,
 and it is the first one this epic delivers end to end.
 
 ### What else the same bridge carries
@@ -105,7 +105,7 @@ belong where. See Open Questions.
   so a reload should not reset knobs; task 5 checks it.
 - **The agent only writes new files.** The Modify working copy and scripts under `perform/<track>/`. Scripts play
   through the virtual `LCXL3 Auto` port (a human still wins by moving a control last). The agent never touches the port.
-- **Measured state comes later.** When `meta.mjs` (player-future idea 2) exists, `state` gets energy and density per
+- **Measured state comes later.** When `meta.mjs` (player vision idea 2) exists, `state` gets energy and density per
   bar. This epic leaves a slot for it, nothing more.
 
 ## Technical Approach
