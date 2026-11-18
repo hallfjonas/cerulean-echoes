@@ -1,7 +1,8 @@
 // Turns Strudel events (from a tapped track, relayed by server.mjs) into trajectory lines, the same format the audio
 // analysis writes (analyse.mjs), so the renderer does not care where the music comes from. Unlike the audio analysis,
 // every stem is exact: pan, pitch, reverb share and level come from the events themselves, the pulse from Strudel's
-// clock. Each event is played out when it sounds (its `delay`), not when the scheduler sends it.
+// clock. Each event is played out when it sounds (its `delay`), not when the scheduler sends it. onBatch gets every
+// batch as it arrives (the player keeps them with a take, take.mjs).
 
 const DRUM_HZ = [[/^(bd|kick|tr\d*_bd)/i, 60], [/^(sd|cp|clap|rim|snare)/i, 1800], [/^(hh|oh|hat|ride|rd|cr|cy)/i, 8000]]
 const NOTE_STEPS = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }
@@ -27,7 +28,8 @@ function frequencyOf({ freq, note, n, s, lpf, cutoff, hpf }) {
   return Math.max(lpf ?? cutoff ?? 1000, hpf ?? 0)
 }
 
-export function createStrudelSource({ onLine, onStatus = () => {}, url = '/stream', fps = 30, beatsPerCycle = 4 }) {
+export function createStrudelSource({ onLine, onStatus = () => {}, onBatch = () => {}, url = '/stream', fps = 30,
+  beatsPerCycle = 4 }) {
   const stems = new Map()
   const onsets = []
   const t0 = performance.now() / 1000
@@ -59,7 +61,9 @@ export function createStrudelSource({ onLine, onStatus = () => {}, url = '/strea
   stream.onerror = () => onStatus('no connection to the server (node trajectory/server.mjs)')
   stream.onmessage = ({ data }) => {
     batches++
-    for (const event of JSON.parse(data)) setTimeout(() => hit(event), Math.max(0, event.delay * 1000 - 5))
+    const batch = JSON.parse(data)
+    onBatch(batch)
+    for (const event of batch) setTimeout(() => hit(event), Math.max(0, event.delay * 1000 - 5))
   }
 
   const timer = setInterval(() => {

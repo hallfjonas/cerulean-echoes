@@ -5,16 +5,22 @@
 //   { bar, cc, value, ramp? }            a Launch Control CC (value 0..1, sent as MIDI 0..127)
 //   { bar, press }                       a momentary Launch Control button (its CC)
 //   { bar, keys, velocity?, length? }    Launchkey keys: note names played together ('c3 e3 g3' = chord)
-//   { bar, pad }                         a Launchkey drum pad (note 36-51, channel 10)
+//   { bar, pad, velocity? }              a Launchkey drum pad (note 36-51, channel 10)
 //   { bar, lk, value, ramp? }            a Launchkey CC: mod wheel 1 (keys level) or knob 31-38
 // Bars of the playing track (1 cycle = 1 bar in every live track), counted from the start; ramp = bars to move from
 // the control's value at `bar` to `value`. A control the script never sets stays at 0. velocity 0..1 (default 0.8);
 // length = bars a key is held (default 1): the tracks' midikeys has no note-off, so the sound's length is the track's
 // (knob 5 Length in 009/010); length only sets when the note-off reaches the LC view. Sections: bar ranges [from, to).
-// Steps follow the engine's cycle clock, read every scheduler tick, so they stay on the bar whatever the tempo; a press
-// is held for two scheduler ticks, or the tracks' cycleButton can miss it.
+// Steps follow the engine's cycle clock, read every scheduler tick, so they stay on the bar whatever the tempo; a step
+// fires once the clock is within BAR_TOLERANCE of its bar (takes round bars to 4 decimals); a press is held for two
+// scheduler ticks, or the tracks' cycleButton can miss it. A take (a recorded script) adds the meta field `take`,
+// which playing ignores.
+// prime(script) before the track loads, then start(script) after it: the last run's values are reset and the script's
+// bar-0 values set before the load, so the first query already reads them (and a capture of the play sees neither
+// the reset nor a late bar-0 step). start alone does both just after the load, a query or two late.
 export const TICK_MS = 50
 export const HOLD_TICKS = 2
+export const BAR_TOLERANCE = 1e-6
 export const PADS = [36, 51]
 export const LK_CCS = [1, 31, 32, 33, 34, 35, 36, 37, 38]
 export const PAD_CHANNEL = 10
@@ -48,10 +54,10 @@ export const usesLaunchkey = script => (script.steps ?? []).some(isLaunchkeyStep
 // The section that holds `bar`, or null
 export const sectionAt = (script, bar) => (script.sections ?? []).find(s => s.from <= bar && bar < s.to) ?? null
 
-const valueOn = (curve, bar) => {
-  const segment = curve.findLast(s => s.bar <= bar)
+const valueOn = (curve, bar, tolerance = 0) => {
+  const segment = curve.findLast(s => s.bar <= bar + tolerance)
   if (!segment) return undefined
-  const progress = segment.ramp ? Math.min(1, (bar - segment.bar) / segment.ramp) : 1
+  const progress = segment.ramp ? Math.min(1, Math.max(0, bar - segment.bar) / segment.ramp) : 1
   return midiValue(segment.from + (segment.to - segment.from) * progress)
 }
 
@@ -70,8 +76,8 @@ export const compile = script => {
     if (step.press !== undefined) presses.push({ bar: step.bar, cc: step.press })
     else if (step.keys !== undefined) notes.push({ bar: step.bar, notes: keyNotes(step.keys) ?? [],
       velocity: step.velocity ?? DEFAULT_VELOCITY, length: step.length ?? DEFAULT_LENGTH, midichan: KEYS_CHANNEL })
-    else if (step.pad !== undefined) notes.push({ bar: step.bar, notes: [step.pad], velocity: DEFAULT_VELOCITY,
-      length: 0, midichan: PAD_CHANNEL })
+    else if (step.pad !== undefined) notes.push({ bar: step.bar, notes: [step.pad],
+      velocity: step.velocity ?? DEFAULT_VELOCITY, length: 0, midichan: PAD_CHANNEL })
     else if (step.lk !== undefined) addSegment(lkCurves, step.lk, step)
     else addSegment(curves, step.cc, step)
   }
@@ -106,7 +112,8 @@ export const valueChanges = (script, stepBars) => {
 export const startBarOf = cycle => Math.max(0, Math.round(cycle))
 
 export const createPerformer =({ midi, engine, onChange = () => {} }) => {
-  let timer = null, script = null, compiled = null, startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
+  let timer = null, script = null, compiled = null, primed = null
+  let startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
   const written = new Map(), lkWritten = new Map()
 
   const release = () => {
@@ -123,14 +130,26 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
   }
   const write = (curves, cache, send, bar) => {
     for (const [cc, curve] of curves) {
-      const value = valueOn(curve, bar)
+      const value = valueOn(curve, bar, BAR_TOLERANCE)
       if (value === undefined || cache.get(cc) === value) continue
       cache.set(cc, value)
       send(cc, value)
     }
   }
+  const prepare = next => {
+    script = next
+    compiled = compile(script)
+    midi.resetAuto()
+    written.clear()
+    lkWritten.clear()
+    fired = 0
+    firedNotes = 0
+    write(compiled.curves, written, midi.setAuto, 0)
+    write(compiled.lkCurves, lkWritten, midi.setAutoLk, 0)
+  }
   const tick = () => {
     const bar = engine.cycle() - startBar
+    const reached = bar + BAR_TOLERANCE
     write(compiled.curves, written, midi.setAuto, bar)
     write(compiled.lkCurves, lkWritten, midi.setAutoLk, bar)
     held = held.filter(press => {
@@ -143,12 +162,12 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
       midi.noteOffAuto(note.note, note.midichan)
       return false
     })
-    for (; fired < compiled.presses.length && compiled.presses[fired].bar <= bar; fired++) {
+    for (; fired < compiled.presses.length && compiled.presses[fired].bar <= reached; fired++) {
       const { cc } = compiled.presses[fired]
       midi.setAuto(cc, 1)
       held.push({ cc, ticks: HOLD_TICKS })
     }
-    for (; firedNotes < compiled.notes.length && compiled.notes[firedNotes].bar <= bar; firedNotes++) {
+    for (; firedNotes < compiled.notes.length && compiled.notes[firedNotes].bar <= reached; firedNotes++) {
       const { notes, velocity, length, midichan } = compiled.notes[firedNotes]
       for (const note of notes) {
         midi.noteAuto(note, velocity, midichan)
@@ -162,16 +181,16 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
   return {
     start: next => {
       if (timer) stop()
-      script = next
-      compiled = compile(script)
-      midi.resetAuto()
-      written.clear()
-      lkWritten.clear()
-      fired = 0
-      firedNotes = 0
+      if (next !== primed) prepare(next)
+      primed = null
       startBar = startBarOf(engine.cycle())
       timer = setInterval(tick, TICK_MS)
       tick()
+    },
+    prime: next => {
+      if (timer) stop()
+      prepare(next)
+      primed = next
     },
     stop: () => { if (timer) stop() },
     running: () => timer !== null,

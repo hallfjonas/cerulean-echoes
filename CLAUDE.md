@@ -27,6 +27,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
 - `docs/references.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
 - `samples/` — audio recordings
+- `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
+- `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
 - `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness, layout sheets
 
@@ -122,9 +124,15 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Settings drawer (key S) holds the visual settings; the Tools page (`/tools.html`) runs the Node checks (check
   sounds, loudness, layouts, stem lab, set build) against a catalogue entry, one job at a time; Analysis
   (`/analyse.html`) is a tool there.
-- Auto-perform (drawer, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars) into the virtual
-  controller `LCXL3 Auto`: use it to try a track or the player without controllers. A new control or a changed `@ctl`
-  needs the script checked (`node trajectory/check-perform.mjs`, part of `npm run verify`).
+- Auto-perform (drawer, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
+  controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
+  use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
+  (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).
+- Record (key R) writes the master output to `recordings/<track>/` as a WAV (human set, or auto-perform with Record
+  audio ticked); `node trajectory/check-recording.mjs` tests the endpoints.
+- Takes: every load captures all MIDI input; Save take writes it as a script v2 to `perform/<track>/takes/` (gitignored,
+  with the play's tapped events). Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
+  replay fidelity) compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
 
 ## Writing efficient Strudel (CPU)

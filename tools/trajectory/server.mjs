@@ -5,10 +5,16 @@
 //   GET  /catalogue   the tracks the player can load, as a JSON list of { id, kind, label, taps, noTapReason?, scripts }
 //                    (live tracks and lab boards, see catalogue.mjs; the file path is never sent)
 //   GET  /track/<id>  the track's code, tapped on request from the track file as it is now (make-tapped.mjs)
-//   GET  /perform/<track>/<script>   an auto-perform script (perform/<track>/<script>.json, see autoperform.mjs);
-//                                    only for this server's own pages (Origin / Host checked, no CORS)
+//   GET  /perform/<track>/<script>   an auto-perform script (perform/<track>/<script>.json, see autoperform.mjs) or a
+//                                    take (<script> = takes/<name>); only for this server's own pages (Origin / Host
+//                                    checked, no CORS)
+//   POST /take/<track>   the page's capture of its play, written as a take (take-save.mjs); own pages only
+//   GET  /track/<id> also sends X-Track-Hash: sha1 of the track file text, kept in a take
 //   GET /tools, POST /run/<command>[/<id>], DELETE /run   the Tools page's whitelisted commands (see tools.mjs)
+//   POST /recording/<track>, PUT /recording/<track>/<name>, POST …/finish   audio recordings into recordings/, only
+//                                    for this server's own pages (see recording.mjs)
 // strudel.cc is a public https page; Chrome lets it reach localhost only with the CORS and private-network headers.
+import crypto from 'crypto'
 import http from 'http'
 import fs from 'fs'
 import path from 'path'
@@ -16,6 +22,8 @@ import { fileURLToPath } from 'url'
 import { tapSource } from './make-tapped.mjs'
 import { find, scan, toPublic } from './catalogue.mjs'
 import { handleTools } from './tools.mjs'
+import { handleTake } from './take-save.mjs'
+import { handleRecording } from './recording.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const port = Number(process.argv[2] ?? 8766)
@@ -32,10 +40,15 @@ let received = 0
 
 http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`)
+  if (url.pathname.startsWith('/take/')) {
+    if (!fromOwnPage(request) || request.method !== 'POST') return response.writeHead(403).end('forbidden')
+    return handleTake(request, response, decodeURIComponent(url.pathname.slice('/take/'.length)))
+  }
   if (url.pathname.startsWith('/perform/')) {
     if (!fromOwnPage(request) || request.method !== 'GET') return response.writeHead(403).end('forbidden')
-    const [id, script, ...rest] = url.pathname.slice('/perform/'.length).split('/')
-    if (rest.length || !find(id)?.scripts.includes(script)) {
+    const [id, ...rest] = decodeURIComponent(url.pathname.slice('/perform/'.length)).split('/')
+    const script = rest.join('/')
+    if (!find(id)?.scripts.includes(script)) {
       return response.writeHead(404).end('not found')
     }
     return response.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
@@ -44,6 +57,7 @@ http.createServer((request, response) => {
   if (url.pathname === '/tools' || url.pathname === '/run' || url.pathname.startsWith('/run/')) {
     return handleTools(request, response, url, fromOwnPage)
   }
+  if (url.pathname.startsWith('/recording/')) return handleRecording(request, response, url, fromOwnPage)
   if (request.method === 'OPTIONS') return response.writeHead(204, CORS).end()
   if (request.method === 'POST' && url.pathname === '/events') {
     let body = ''
@@ -66,8 +80,10 @@ http.createServer((request, response) => {
     if (!entry.taps) return response.writeHead(409, CORS).end('this entry has no master stack to tap')
     const file = entry.path
     try {
-      const { code } = tapSource(fs.readFileSync(file, 'utf8'), path.basename(file), String(port))
-      return response.writeHead(200, { ...CORS, 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' }).end(code)
+      const source = fs.readFileSync(file, 'utf8')
+      const { code } = tapSource(source, path.basename(file), String(port))
+      return response.writeHead(200, { ...CORS, 'Content-Type': 'text/plain', 'Cache-Control': 'no-store',
+        'X-Track-Hash': crypto.createHash('sha1').update(source).digest('hex') }).end(code)
     } catch (error) {
       return response.writeHead(500, CORS).end(error.message)
     }
