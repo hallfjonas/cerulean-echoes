@@ -1,0 +1,62 @@
+[
+ {
+  "midi": 53.0,
+  "originalPitch": 6000.0,
+  "keyRangeLow": 0.0,
+  "keyRangeHigh": 47.0,
+  "loopStart": 3777.0,
+  "loopEnd": 4454.0,
+  "coarseTune": 0.0,
+  "fineTune": 19.0,
+  "sampleRate": 25000.0,
+  "file": "gm/0530_Aspirin_sf2_file/z0.wav"
+ },
+ {
+  "midi": 53.0,
+  "originalPitch": 6000.0,
+  "keyRangeLow": 48.0,
+  "keyRangeHigh": 56.0,
+  "loopStart": 3777.0,
+  "loopEnd": 4454.0,
+  "coarseTune": 0.0,
+  "fineTune": 19.0,
+  "sampleRate": 25000.0,
+  "file": "gm/0530_Aspirin_sf2_file/z1.wav"
+ },
+ {
+  "midi": 53.0,
+  "originalPitch": 6700.0,
+  "keyRangeLow": 57.0,
+  "keyRangeHigh": 61.0,
+  "loopStart": 2876.0,
+  "loopEnd": 4470.0,
+  "coarseTune": 0.0,
+  "fineTune": 19.0,
+  "sampleRate": 44100.0,
+  "file": "gm/0530_Aspirin_sf2_file/z2.wav"
+ },
+ {
+  "midi": 53.0,
+  "originalPitch": 7100.0,
+  "keyRangeLow": 62.0,
+  "keyRangeHigh": 68.0,
+  "loopStart": 4190.0,
+  "loopEnd": 4823.0,
+  "coarseTune": 0.0,
+  "fineTune": 19.0,
+  "sampleRate": 44100.0,
+  "file": "gm/0530_Aspirin_sf2_file/z3.wav"
+ },
+ {
+  "midi": 53.0,
+  "originalPitch": 7800.0,
+  "keyRangeLow": 69.0,
+  "keyRangeHigh": 127.0,
+  "loopStart": 3242.0,
+  "loopEnd": 4569.0,
+  "coarseTune": 0.0,
+  "fineTune": 19.0,
+  "sampleRate": 44100.0,
+  "file": "gm/0530_Aspirin_sf2_file/z4.wav"
+ }
+]

@@ -1,0 +1,26 @@
+# Samples
+
+- `tr909/bd-01.wav` — Roland TR-909 bass drum, from [ritchse/tidal-drum-machines](https://github.com/ritchse/tidal-drum-machines)
+  (`machines/RolandTR909/rolandtr909-bd/Bassdrum-01.wav`), the same file Strudel plays for `s("bd").bank("RolandTR909")`.
+- `ir/orbit-0.6.wav`, `ir/orbit-1.2.wav` — impulse responses of Strudel's orbit reverb (superdough, room size 0.6 and 1.2),
+  measured with `tools/sc-port/reverb-ir.mjs`. superdough generates noise for its reverb, so every browser session has a
+  slightly different one; these are one such reverb, measured including the browser's normalisation.
+- `tr909/*`, `tr727/*`, `tr808/*`, `tr707/*` — further drum-machine one-shots from the same collection
+  (tidal-drum-machines, via strudel.cc's `felixroos/dough-samples` map), each the file Strudel plays for that sound
+  and number (`cp-00` = `RolandTR909_cp` n 0, …). Used by the drum stems and the Launchkey pads.
+- `ir/orbit-2.0.wav` (+ `-44100`) — the same measurement for room size 2 (Jonas' lab columns, orbit 3; keys orbit 4).
+- `noise/` — superdough's noise buffers (pink, white, brown), as `tools/sc-port/noise-buffers.py` writes them.
+- `jrhodes/` — jRhodes3d (Rhodes Mark I), the keys' Rhodes as the Strudel track loads it.
+- `vibraphone/` (FLAC, lossless) — VCSL vibraphone, hard mallets ([sgossner/VCSL](https://github.com/sgossner/VCSL), CC0): strudel.cc's
+  built-in `vibraphone`, the files of its sample map.
+- `sso/` (FLAC, lossless from the WAV files) — Sonatina Symphonic Orchestra ([peastman/sso](https://github.com/peastman/sso), CC Sampling Plus 1.0):
+  trumpets, horns, trombones (brass), violins, violas, celli (strings) — the files the Strudel track loads.
+- `vsco/` (FLAC, lossless) — VSCO 2 Community Edition string sections, spiccato ([sgossner/VSCO-2-CE](https://github.com/sgossner/VSCO-2-CE), CC0).
+- `strat/` — Stratocaster single notes ([nyanshell/nyanshell.strat](https://github.com/nyanshell/nyanshell.strat), MIT),
+  cut to the first 1.5 s and stored as FLAC (the guitar plays short notes; the track compensates the start offset).
+- `gm/<preset>/` — General MIDI soundfont zones as strudel.cc plays its `gm_*` sounds (WebAudioFont presets,
+  [felixroos/webaudiofontdata](https://github.com/felixroos/webaudiofontdata)), decoded with
+  `tools/sc-port/soundfont-extract.py` (zones.json = the zone data: key range, pitch, loop points).
+- `voice/brace.wav`, `voice/lw.wav` — the repository's own spoken samples (`samples/voice/*.m4a`), decoded to WAV
+  (SuperCollider cannot read m4a). Browsers drop the AAC encoder delay when decoding; so does this decode.
+- Files with `repo:` in the track (keys piano, flute phrases) are read from the repository's own `samples/` folder.

@@ -1,0 +1,62 @@
+[
+ {
+  "midi": 11.0,
+  "originalPitch": 6400.0,
+  "keyRangeLow": 21.0,
+  "keyRangeHigh": 71.0,
+  "loopStart": 15661.0,
+  "loopEnd": 17249.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0110_JCLive_sf2_file/z0.wav"
+ },
+ {
+  "midi": 11.0,
+  "originalPitch": 7600.0,
+  "keyRangeLow": 21.0,
+  "keyRangeHigh": 83.0,
+  "loopStart": 66.0,
+  "loopEnd": 132.0,
+  "coarseTune": 0.0,
+  "fineTune": -13.0,
+  "sampleRate": 44053.0,
+  "file": "gm/0110_JCLive_sf2_file/z1.wav"
+ },
+ {
+  "midi": 11.0,
+  "originalPitch": 6400.0,
+  "keyRangeLow": 72.0,
+  "keyRangeHigh": 84.0,
+  "loopStart": 15661.0,
+  "loopEnd": 17249.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0110_JCLive_sf2_file/z2.wav"
+ },
+ {
+  "midi": 11.0,
+  "originalPitch": 10000.0,
+  "keyRangeLow": 84.0,
+  "keyRangeHigh": 108.0,
+  "loopStart": 4.0,
+  "loopEnd": 15.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 29008.0,
+  "file": null
+ },
+ {
+  "midi": 11.0,
+  "originalPitch": 8400.0,
+  "keyRangeLow": 85.0,
+  "keyRangeHigh": 108.0,
+  "loopStart": 1740.0,
+  "loopEnd": 1988.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 15750.0,
+  "file": "gm/0110_JCLive_sf2_file/z4.wav"
+ }
+]

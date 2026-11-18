@@ -1,0 +1,414 @@
+[
+ {
+  "name": "kick-base",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-punch05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "29": 0.5
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-punch1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "29": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-bright05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "13": 0.5
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-bright1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "13": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-fog05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "20": 0.5
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-fog1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "68": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-tension05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "36": 0.5,
+    "13": 0.3
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-thin05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "28": 0.5
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-thin1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "76": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-level05-master07",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 0.5,
+    "12": 0.7,
+    "60": 0.7
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-gap4",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 0.52,
+     "cc": 37,
+     "v": 0
+    }
+   ]
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-gap8",
+  "scen": {
+   "bpm": 124,
+   "cycles": 16,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 0.52,
+     "cc": 37,
+     "v": 0
+    },
+    {
+     "t": 1.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 1.52,
+     "cc": 37,
+     "v": 0
+    }
+   ]
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-gap-back",
+  "scen": {
+   "bpm": 124,
+   "cycles": 16,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 0.52,
+     "cc": 37,
+     "v": 0
+    },
+    {
+     "t": 1.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 1.52,
+     "cc": 37,
+     "v": 0
+    },
+    {
+     "t": 9.3,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 9.32,
+     "cc": 37,
+     "v": 0
+    }
+   ]
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-drop-held",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 2.3,
+     "cc": 45,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 45,
+     "v": 0
+    }
+   ]
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-break",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.7,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.72,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 4.2,
+     "cc": 100,
+     "v": 1
+    },
+    {
+     "t": 4.22,
+     "cc": 100,
+     "v": 0
+    }
+   ]
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-space05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "21": 0.5
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-space1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "21": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ },
+ {
+  "name": "kick-tension1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "60": 1,
+    "84": 1
+   },
+   "events": []
+  },
+  "strudel": "stemJ1_kick",
+  "sc": "kick",
+  "events": "kick"
+ }
+]

@@ -1,0 +1,308 @@
+[
+ {
+  "name": "harm-base",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-b3",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "77": 1
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-mix05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "77": 0.5
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-bright02",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "61": 0.2
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-bright1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "61": 1
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-space05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "69": 0.5
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-space1",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "69": 1
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-throw",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 93,
+     "v": 1
+    },
+    {
+     "t": 3.5,
+     "cc": 93,
+     "v": 0
+    }
+   ],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-prog",
+  "scen": {
+   "bpm": 124,
+   "cycles": 16,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 0.55,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 0.3,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 85,
+     "v": 0
+    }
+   ],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-prog-fast",
+  "scen": {
+   "bpm": 124,
+   "cycles": 16,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 0.25,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 0.3,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.55,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 0.6000000000000001,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6500000000000001,
+     "cc": 85,
+     "v": 0
+    }
+   ],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-fog-tension",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "20": 0.5,
+    "36": 0.6
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ },
+ {
+  "name": "harm-thin05",
+  "scen": {
+   "bpm": 124,
+   "cycles": 12,
+   "cc": {
+    "12": 1,
+    "60": 1,
+    "53": 1,
+    "28": 0.5
+   },
+   "events": [],
+   "from": 4
+  },
+  "strudel": "stemN1_harm",
+  "sc": "harm",
+  "events": "generic"
+ }
+]
