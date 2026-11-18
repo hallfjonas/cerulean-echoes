@@ -53,8 +53,8 @@ def yin(x):
             tau = t + tmin
             if 1 <= tau < tmax:
                 y0, y1, y2 = row[tau - 1], row[tau], row[tau + 1]
-                den = y0 - 2 * y1 + y2
-                tau = tau + (0.5 * (y0 - y2) / den if abs(den) > 1e-9 else 0)
+                denom = y0 - 2 * y1 + y2
+                tau = tau + (0.5 * (y0 - y2) / denom if abs(denom) > 1e-9 else 0)
             f0[idx[k]] = SR / tau
             conf[idx[k]] = r[t]
     return f0, conf, rms

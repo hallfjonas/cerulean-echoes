@@ -1,0 +1,8 @@
+*.pdf binary linguist-generated
+*.syx binary linguist-generated
+*.wav binary
+*.flac binary
+*.mp3 binary
+*.m4a binary
+tracks/**/*-single.strudel linguist-generated
+tracks/sets/011-combining-all/011-set-dual.strudel linguist-generated

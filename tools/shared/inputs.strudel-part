@@ -1,0 +1,28 @@
+// Every Launch Control XL 3 that is connected (by the port name, whatever it is renamed to; not its DAW port).
+// Without Web MIDI (the Node tools) one plain midin() stands in.
+const LC_PORT = 'LCXL3'
+if (globalThis.enableWebMidi) await enableWebMidi()
+const lcPorts = globalThis.WebMidi
+  ? WebMidi.inputs.map(i => i.name).filter(n => n.includes(LC_PORT) && !n.includes('DAW'))
+  : null
+const lcInputs = []
+if (lcPorts) for (const name of lcPorts) lcInputs.push(await midin(name))
+else lcInputs.push(await midin())
+if (!lcInputs.length) console.warn('No Launch Control XL 3 found')
+
+// Launchkey MK4 25: keys + drum pads via midikeys, knobs and mod wheel via midin; silent if missing
+const LK_NAME   = 'Launchkey MK4 25'
+const LK_KNOB_1 = 31
+let lkCc = null
+let lkKeys = null
+try {
+  lkCc   = await midin(LK_NAME)
+  lkKeys = await midikeys(LK_NAME)
+} catch (e) { console.warn('Launchkey not found: ' + e.message) }
+
+const ramp = (sig, from, to) => sig.fmap(v => Math.min(1, Math.max(0, (v - from) / (to - from))))
+// Row-3 crossfade: 0..0.5 brings the extra layer in, 0.5..1 fades the main layer out
+const fadeMain  = knob => ramp(knob, 1, 0.5)
+const fadeExtra = knob => ramp(knob, 0, 0.5)
+// Exponential knob range for filters (Hz), so every part of the knob travel is audible
+const expRange = (knob, lo, hi) => knob.fmap(v => lo * Math.pow(hi / lo, v))

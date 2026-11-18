@@ -4,8 +4,8 @@
 // Question behind this board: how wide may the low end of 008 be? A wide sub feels big on headphones, but club
 // systems play the lows in mono (left + right summed). This board makes each of the three low sounds wide in three
 // ways and lets you hear at once what is left when the mix is summed to mono.
-// Sounds as in tracks/008-groove-techno/008-groove-techno.strudel (round 9): kick at Punch 0.5, sub "Pumpe", bassline
-// "rollend" with the filter floor of the space plan (350 Hz). Chords 1–6 (F, then D♭), 140 BPM, no reverb.
+// Sounds as in tracks/008-groove-techno/008-groove-techno.strudel (round 9): kick at Punch 0.5, sub "pump", bassline
+// "rolling" with the filter floor of the space plan (350 Hz). Chords 1–6 (F, then D♭), 140 BPM, no reverb.
 //
 // Launch Control XL 3 in Custom Mode 16 (channel 16). Columns 1-3: fader = level, knob 1 = width, knob 2 = the
 // method's amount, knob 3 = crossover (below it the sound stays mono), button 1 = method, button 2 = solo.
@@ -84,14 +84,14 @@ const PARTS = [
 ]
 const METHODS = ['Detune', 'Haas', 'Auto-Pan']
 const KNOBS = [
-  ['Breite', 0, lin(0, 1), x => x.toFixed(2)],
-  ['Menge', 0.5, null, null],
+  ['Width', 0, lin(0, 1), x => x.toFixed(2)],
+  ['Amount', 0.5, null, null],
   ['Crossover', 0, exp(40, 300), hz],
 ]
 const AMOUNT = [
   [lin(0, 25), x => x.toFixed(0) + ' ct'],
   [lin(0, 20), x => x.toFixed(1) + ' ms'],
-  [exp(0.25, 4), x => x.toFixed(2) + '/Takt'],
+  [exp(0.25, 4), x => x.toFixed(2) + '/bar'],
 ]
 
 const S = globalThis.lowEndLab ??= { val: {}, method: PARTS.map(() => 0), solo: -1, mono: false, bypass: false }
@@ -144,12 +144,12 @@ if (hasPage && !statusBox) {
 const showStatus = () => {
   if (!statusBox) return
   statusBox.textContent = [
-    (S.mono ? 'MONO-CHECK AN' : 'Stereo') + ' · ' + (S.bypass ? 'BYPASS (alles mono)' : 'Breite aktiv') + ' · Master ' +
+    (S.mono ? 'MONO CHECK ON' : 'Stereo') + ' · ' + (S.bypass ? 'BYPASS (all mono)' : 'Width active') + ' · Master ' +
       Math.round(S.val[12] * 100) + ' · ' + BPM + ' BPM',
     ...PARTS.map((p, i) => (i + 1) + (S.solo === i ? ' SOLO ' : S.solo >= 0 ? '  --  ' : '      ') + p.name.padEnd(9) +
-      ('Pegel ' + Math.round(S.val[5 + i] * 100)).padEnd(10) + ('Breite ' + width(i).toFixed(2)).padEnd(13) +
+      ('Level ' + Math.round(S.val[5 + i] * 100)).padEnd(10) + ('Width ' + width(i).toFixed(2)).padEnd(13) +
       (METHODS[S.method[i]] + ' ' + AMOUNT[S.method[i]][1](amount(i))).padEnd(20) +
-      'mono unter ' + (crossover(i) ? hz(crossover(i)) : '–')),
+      'mono below ' + (crossover(i) ? hz(crossover(i)) : '–')),
   ].join('\n')
 }
 const onMidi = e => {

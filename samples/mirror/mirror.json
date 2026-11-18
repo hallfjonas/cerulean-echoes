@@ -1,0 +1,21 @@
+{
+  "_base": "https://raw.githubusercontent.com/hallfjonas/cerulean-echoes/main/samples/mirror/",
+  "shaker_small": [
+    "shaker_small/Mid_ShakerDouble_Down_rr1.wav",
+    "shaker_small/Mid_ShakerDouble_Down_rr2.wav",
+    "shaker_small/Mid_ShakerDouble_Up_rr1.wav",
+    "shaker_small/Mid_ShakerDouble_Up_rr2.wav",
+    "shaker_small/Mid_ShakerHighFaster_Down_rr1.wav",
+    "shaker_small/Mid_ShakerHighFaster_Down_rr2.wav",
+    "shaker_small/Mid_ShakerHighFaster_Up_rr1.wav",
+    "shaker_small/Mid_ShakerHighFaster_Up_rr2.wav",
+    "shaker_small/Mid_ShakerLowFaster_Down_rr1.wav",
+    "shaker_small/Mid_ShakerLowFaster_Down_rr2.wav",
+    "shaker_small/Mid_ShakerLowFaster_Up_rr1.wav",
+    "shaker_small/Mid_ShakerLowFaster_Up_rr2.wav",
+    "shaker_small/Mid_Shaker_Roll_Fast_rr1.wav",
+    "shaker_small/Mid_Shaker_Roll_Fast_rr2.wav",
+    "shaker_small/Mid_Shaker_Slap_rr1.wav",
+    "shaker_small/Mid_Shaker_Slap_rr2.wav"
+  ]
+}

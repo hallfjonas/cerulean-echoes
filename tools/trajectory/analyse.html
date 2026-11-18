@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trajectory</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+  input[type=file] { display: none }
+  .meter { display: flex; flex-direction: column; gap: 3px; width: 90px }
+  .meter span { display: block; height: 5px; background: #4fb3e0; border-radius: 3px; width: 0; transition: width 0.1s }
+  label.switch { display: flex; gap: 6px; align-items: center; color: var(--dim); font-size: 13px }
+  canvas { display: block }
+</style>
+<script type="module" src="nav.mjs"></script>
+</head>
+<body class="overlay">
+<header>
+  <label class="file">File …<input id="file" type="file" accept="audio/*"></label>
+  <select id="device"><option value="">Choose input …</option></select>
+  <select id="pair" title="Which two channels of the input: 3/4 = loopback of a Scarlett (what the computer plays)">
+    <option value="0">Channel 1/2</option><option value="2">Channel 3/4</option>
+  </select>
+  <button id="live">Start live</button>
+  <button id="strudel" title="Events from the tapped track in strudel.cc (node trajectory/server.mjs)">Strudel</button>
+  <div class="meter" title="Level left / right"><span id="meterL"></span><span id="meterR"></span></div>
+  <button id="record">Record</button>
+  <button id="download" disabled>Download JSONL</button>
+  <button id="fullscreen" title="Key F">Fullscreen</button>
+  <label title="0 = hard, sharp, wild · 1 = soft, smeared, sluggish" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Hard
+    <input id="character" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px;accent-color:#4fb3e0"> Soft</label>
+  <label title="0 = raw signals · 1 = moving average over 2^53 lines (max_int); the recording stays raw" style="display:flex;gap:6px;align-items:center;color:#7fa3b2;font-size:13px">Raw
+    <input id="smoothing" type="range" min="0" max="1" step="0.005" value="0" style="width:120px;accent-color:#4fb3e0"> Smooth
+    <output id="smoothingValue" style="color:#eef4f2;min-width:4em">raw</output></label>
+  <label class="switch" title="Key A"><input id="axes" type="checkbox" checked> Axes</label>
+  <label class="switch" title="Key L"><input id="labels" type="checkbox" checked> Labels</label>
+  <label class="switch" title="Key B: rings from the kick on every beat"><input id="rings" type="checkbox" checked> Beat rings</label>
+  <span id="status">ready · F fullscreen · V look · A axes · L labels · B beat rings · W pan width</span>
+</header>
+<canvas id="view"></canvas>
+<script type="module">
+import { mountHelp } from './help.mjs'
+import { createAnalyser } from './analyse.mjs'
+import { createRenderer } from './render.mjs'
+import { createStrudelSource } from './strudel-source.mjs'
+import { createSmoother, describeWindow } from './smoothing.mjs'
+
+const $ = id => document.getElementById(id)
+mountHelp([
+  { heading: 'What it does', text: 'Draws the trajectory of a sound: where each voice sits left/right (pan), low/high '
+    + '(frequency) and in time. It listens to a file, a live audio input or the events of a track playing on strudel.cc.' },
+  { heading: 'Input', text: 'An audio file, an audio input (channels 1/2, or 3/4 for the loopback of a Scarlett) '
+    + 'or the Strudel relay (node trajectory/server.mjs).' },
+  { heading: 'Output', text: 'The live picture, and with Record a JSONL file of the analysed lines that Download JSONL saves.' },
+  { heading: 'How to use', text: ['Pick File …, or choose an input and press Start live, or press Strudel.',
+    'Shape the picture with the Hard / Soft and Raw / Smooth sliders; the recording stays raw.',
+    'Keys: F fullscreen, V look, A axes, L labels, B beat rings, W pan width.'] }
+], { title: 'About this page' })
+const renderer = createRenderer($('view'))
+const smoother = createSmoother(renderer.push)
+
+const TAP = `registerProcessor('tap', class extends AudioWorkletProcessor {
+  process([input]) {
+    if (input.length) this.port.postMessage(input.map(channel => channel.slice()))
+    return true
+  }
+})`
+
+let context, source, stream, strudel, analyser, left, right, filled = 0, sinceHop = 0, samples = 0, firstChannel = 0
+let levelL = 0, levelR = 0, oneSided = false, recording = false, recorded = [], label = 'ready'
+
+async function start(connect, { channels = 2, first = 0 } = {}) {
+  stop()
+  context = new AudioContext({ latencyHint: 'interactive' })
+  await context.audioWorklet.addModule(URL.createObjectURL(new Blob([TAP], { type: 'text/javascript' })))
+  analyser = createAnalyser({ sampleRate: context.sampleRate })
+  left = new Float32Array(analyser.size); right = new Float32Array(analyser.size)
+  filled = sinceHop = samples = levelL = levelR = 0
+  firstChannel = first
+  const tap = new AudioWorkletNode(context, 'tap', { numberOfInputs: 1, numberOfOutputs: 0, channelCount: channels,
+    channelCountMode: 'explicit', channelInterpretation: 'discrete' })
+  const silence = new Float32Array(128)
+  tap.port.onmessage = ({ data }) => feed(data[firstChannel] ?? silence, data[firstChannel + 1] ?? data[firstChannel] ?? silence)
+  await connect(tap)
+}
+
+function stop() {
+  source?.stop?.()
+  stream?.getTracks().forEach(track => track.stop())
+  context?.close()
+  strudel?.close()
+  context = source = stream = strudel = null
+  levelL = levelR = 0
+  oneSided = false
+}
+
+function emit(line) {
+  smoother.push(line)
+  if (recording) recorded.push(line)
+}
+
+// A mic on one input of a stereo interface arrives on one side only; it is analysed as mono instead of hard left.
+function balance(l, r) {
+  let sumL = 0, sumR = 0
+  for (let i = 0; i < l.length; i++) { sumL += l[i] * l[i]; sumR += r[i] * r[i] }
+  levelL = 0.998 * levelL + 0.002 * sumL / l.length
+  levelR = 0.998 * levelR + 0.002 * sumR / r.length
+  oneSided = Math.max(levelL, levelR) > 1e-8 && Math.min(levelL, levelR) < 0.001 * Math.max(levelL, levelR)
+  return oneSided ? (levelL > levelR ? [l, l] : [r, r]) : [l, r]
+}
+
+function feed(rawLeft, rawRight) {
+  const [l, r] = balance(rawLeft, rawRight), n = l.length
+  left.copyWithin(0, n); right.copyWithin(0, n)
+  left.set(l, left.length - n); right.set(r, right.length - n)
+  filled = Math.min(left.length, filled + n)
+  samples += n; sinceHop += n
+  if (filled < left.length || sinceHop < analyser.hop) return
+  sinceHop -= analyser.hop
+  analyser.analyse(left, right, samples / context.sampleRate).forEach(emit)
+}
+
+function showStatus() {
+  const width = level => `${Math.max(0, Math.min(100, (10 * Math.log10(level + 1e-12) + 60) / 60 * 100))}%`
+  $('meterL').style.width = width(levelL)
+  $('meterR').style.width = width(levelR)
+  $('status').textContent = label + (oneSided ? ' · one-sided → mono' : '') + (recording ? ` · ● ${recorded.length}` : '')
+  requestAnimationFrame(showStatus)
+}
+showStatus()
+
+$('file').onchange = async ({ target }) => {
+  const file = target.files[0]
+  if (!file) return
+  await start(async tap => {
+    const buffer = await context.decodeAudioData(await file.arrayBuffer())
+    source = context.createBufferSource()
+    source.buffer = buffer
+    source.connect(tap); source.connect(context.destination)
+    source.start()
+  })
+  label = file.name
+}
+
+async function listDevices() {
+  const devices = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput')
+  const chosen = $('device').value
+  $('device').replaceChildren(new Option('Choose input …', ''),
+    ...devices.map(d => new Option(d.label || `Input ${d.deviceId.slice(0, 6)}`, d.deviceId)))
+  $('device').value = chosen
+}
+listDevices()
+
+$('live').onclick = async () => {
+  const deviceId = $('device').value, first = Number($('pair').value)
+  await start(async tap => {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: deviceId ? { exact: deviceId } : undefined,
+      channelCount: { ideal: first + 2 }, echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+    context.createMediaStreamSource(stream).connect(tap)
+  }, { channels: first + 2, first })
+  await listDevices()
+  const track = stream.getAudioTracks()[0], delivered = track?.getSettings().channelCount
+  label = `live: ${track?.label ?? 'input'} · ${delivered ?? '?'} channels from the browser`
+    + (delivered && delivered < first + 2 ? ` – channel ${first + 1}/${first + 2} missing` : ` · measuring ${first + 1}/${first + 2}`)
+}
+
+$('strudel').onclick = () => {
+  stop()
+  strudel = createStrudelSource({ onLine: emit, onStatus: text => { label = text } })
+}
+
+$('record').onclick = () => {
+  recording = !recording
+  if (recording) recorded = []
+  $('record').classList.toggle('on', recording)
+  $('record').textContent = recording ? 'Stop' : 'Record'
+  $('download').disabled = recording || !recorded.length
+}
+
+$('download').onclick = () => {
+  const blob = new Blob([recorded.map(line => JSON.stringify(line)).join('\n') + '\n'], { type: 'application/x-ndjson' })
+  const link = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob),
+    download: `trajectory-${new Date().toISOString().slice(0, 19).replaceAll(':', '-')}.jsonl` })
+  link.click()
+}
+
+$('character').oninput = () => renderer.setCharacter(Number($('character').value))
+$('smoothing').oninput = () => {
+  smoother.setAmount(Number($('smoothing').value))
+  renderer.setSmoothing(Number($('smoothing').value))
+  $('smoothingValue').textContent = describeWindow(Number($('smoothing').value))
+}
+
+for (const [id, apply] of [['axes', renderer.setAxes], ['labels', renderer.setLabels], ['rings', renderer.setRings]]) {
+  $(id).onchange = () => apply($(id).checked)
+}
+
+const toggleFullscreen =() => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
+$('fullscreen').onclick = toggleFullscreen
+addEventListener('keydown', event => {
+  if (['SELECT', 'INPUT'].includes(event.target.tagName)) return
+  if (event.key === 'f') toggleFullscreen()
+  if (event.key === 'a') $('axes').click()
+  if (event.key === 'l') $('labels').click()
+  if (event.key === 'b') $('rings').click()
+  if (event.key === 'w') renderer.toggleWiden()
+  if (event.key === 'v') renderer.toggleLook()
+})
+
+let idleTimer
+const wake = () => {
+  document.body.classList.remove('idle')
+  clearTimeout(idleTimer)
+  idleTimer = setTimeout(() => document.body.classList.add('idle'), 3000)
+}
+addEventListener('mousemove', wake)
+wake()
+</script>
+</body>
+</html>

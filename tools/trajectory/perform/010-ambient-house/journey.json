@@ -1,0 +1,203 @@
+{
+  "track": "010-ambient-house",
+  "title": "Journey",
+  "bars": 130,
+  "mood": "warm, floating, slowly lifting",
+  "sections": [
+    {
+      "name": "Pad",
+      "from": 0,
+      "to": 4,
+      "intent": "Fade in the pad alone"
+    },
+    {
+      "name": "Layers",
+      "from": 4,
+      "to": 20,
+      "intent": "Beat and bass join, one stem at a time"
+    },
+    {
+      "name": "Chords",
+      "from": 20,
+      "to": 28,
+      "intent": "Deep chords colour the groove"
+    },
+    {
+      "name": "Build",
+      "from": 28,
+      "to": 36,
+      "intent": "Lift into the drop"
+    },
+    {
+      "name": "Drop",
+      "from": 36,
+      "to": 44,
+      "intent": "New chords, release"
+    },
+    {
+      "name": "Break",
+      "from": 44,
+      "to": 60,
+      "intent": "Pull the bottom away, bring it back"
+    },
+    {
+      "name": "Groove",
+      "from": 60,
+      "to": 68,
+      "intent": "Busier rhythm"
+    },
+    {
+      "name": "Fog",
+      "from": 68,
+      "to": 85,
+      "intent": "Muffled dip, then clear"
+    },
+    {
+      "name": "Chapter 2",
+      "from": 85,
+      "to": 100,
+      "intent": "Rolling bass under new chords"
+    },
+    {
+      "name": "Peak",
+      "from": 100,
+      "to": 120,
+      "intent": "Percussion on top"
+    },
+    {
+      "name": "Fade",
+      "from": 120,
+      "to": 130,
+      "intent": "Out"
+    }
+  ],
+  "steps": [
+    {
+      "bar": 0,
+      "cc": 12,
+      "value": 0.8
+    },
+    {
+      "bar": 0,
+      "cc": 69,
+      "value": 0.5
+    },
+    {
+      "bar": 0,
+      "cc": 53,
+      "value": 0.7,
+      "ramp": 4
+    },
+    {
+      "bar": 4,
+      "cc": 5,
+      "value": 0.8,
+      "ramp": 2
+    },
+    {
+      "bar": 8,
+      "cc": 7,
+      "value": 0.7,
+      "ramp": 2
+    },
+    {
+      "bar": 12,
+      "cc": 10,
+      "value": 0.6,
+      "ramp": 2
+    },
+    {
+      "bar": 16,
+      "cc": 9,
+      "value": 0.6,
+      "ramp": 2
+    },
+    {
+      "bar": 16,
+      "cc": 11,
+      "value": 0.6,
+      "ramp": 2
+    },
+    {
+      "bar": 20,
+      "cc": 54,
+      "value": 0.6,
+      "ramp": 2
+    },
+    {
+      "bar": 28,
+      "cc": 36,
+      "value": 0.9,
+      "ramp": 8
+    },
+    {
+      "bar": 28,
+      "cc": 6,
+      "value": 0.5,
+      "ramp": 8
+    },
+    {
+      "bar": 36,
+      "cc": 36,
+      "value": 0
+    },
+    {
+      "bar": 36,
+      "press": 44
+    },
+    {
+      "bar": 44,
+      "press": 52
+    },
+    {
+      "bar": 52,
+      "press": 52
+    },
+    {
+      "bar": 60,
+      "press": 37
+    },
+    {
+      "bar": 60,
+      "cc": 34,
+      "value": 0.6
+    },
+    {
+      "bar": 68,
+      "cc": 20,
+      "value": 0.7,
+      "ramp": 4
+    },
+    {
+      "bar": 76,
+      "cc": 20,
+      "value": 0,
+      "ramp": 4
+    },
+    {
+      "bar": 85,
+      "press": 44
+    },
+    {
+      "bar": 85,
+      "cc": 8,
+      "value": 0.7,
+      "ramp": 2
+    },
+    {
+      "bar": 100,
+      "press": 43
+    },
+    {
+      "bar": 100,
+      "cc": 35,
+      "value": 0.6
+    },
+    {
+      "bar": 120,
+      "cc": 12,
+      "value": 0,
+      "ramp": 10
+    }
+  ]
+}

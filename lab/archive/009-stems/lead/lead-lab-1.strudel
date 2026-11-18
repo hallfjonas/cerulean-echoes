@@ -1,10 +1,10 @@
 // ============================================================
 // LEAD LAB 1: the hook for track 009, Jonas column 3 (the melody to hum along, some randomness against boredom)
 // ============================================================
-// Round 1. Four sources with the same hooks; button 1 = two written hooks, a call, then Zufall 1 and 2: a riff rolled
+// Round 1. Four sources with the same hooks; button 1 = two written hooks, a call, then Random 1 and 2: a riff rolled
 // when the button reaches it (one rhythm cell per beat, a contour that lands on a chord tone on every beat), which then
 // loops unchanged for 2 bars. Pressing on and around again rolls new ones: randomness between loops, never inside.
-// Research (tracks/009-house/stems-ideen.md, “Recherche”): St Germain “Tourist” uses live sax and flute; Earth Trax &
+// Research (tracks/009-house/stem-ideas.md, “Research”): St Germain “Tourist” uses live sax and flute; Earth Trax &
 // Newborn Jr have a “Flute Track” and a “Sax Track” (Ron Trent lineage); EDMProd: the melody stays soft and little.
 // Notes: the pentatonic of the chord (A minor pentatonic over Am9, D major pentatonic over D9), as PENTA in the track.
 //   1 Flute: General MIDI soundfont, from A4
@@ -15,10 +15,10 @@
 //
 // Launch Control XL 3: candidates in Custom Mode 16 (channel 16), drums, bass and keys in Mode 2 (CC + 48).
 // @layout Lead Lab 1 (lab/lead, round 1 for 009 column 3: the hook)
-// @note Four lead sounds, the same hooks; button 1 = hook A → hook B → call → Zufall 1 → Zufall 2 (rolled on arrival, then constant).
+// @note Four lead sounds, the same hooks; button 1 = hook A → hook B → call → Random 1 → Random 2 (rolled on arrival, then constant).
 // @note Mode 2: fader 6 = drums (knob 1 = swing, button 2 = drums out), fader 7 = bass, fader 8 = keys of 009; column 5 button 1 = harmony (one chord ↔ Am9/D9).
 // @guide What to listen for | Which sound carries a hook without sounding cheap? Do the rolled riffs stay hummable, or do they fall apart?
-// @guide Harmony | Ein Akkord: Am9, A minor pentatonic. Wechsel: Am9 2 bars, D9 2 bars (D major pentatonic), as in track 009.
+// @guide Harmony | One chord: Am9, A minor pentatonic. Change: Am9 2 bars, D9 2 bars (D major pentatonic), as in track 009.
 // @mode 16 Mode 16 — Candidates
 // @col 16:1 1 Flute
 // @col 16:2 2 Tenor sax
@@ -34,14 +34,14 @@
 // @ctl 16:1-4.k2 Space | 0 = dry; a 1/8 echo from the first turn (full at half), the room joins from a third on.
 // @ctl 16:1-4.k3 Length | 0 = short notes ↔ four times longer.
 // @ctl 16:1-4.fader Level | 0 = off.
-// @ctl 16:1-4.b1 Change | 3 figures → Zufall 1 / 2 (new riff on arrival), next bar.
+// @ctl 16:1-4.b1 Change | 3 figures → Random 1 / 2 (new riff on arrival), next bar.
 // @ctl 16:1-4.b2 Echo throw | held: long dotted-8th echo, the tail rings on.
 // @mode 2 Mode 2 — Context
 // @col 2:5 5 Harmony
 // @col 2:6 6 Drums
 // @col 2:7 7 Bass
 // @col 2:8 8 Keys
-// @ctl 2:5.b1 Harmony | Ein Akkord ↔ Wechsel, at the next 4-bar phrase.
+// @ctl 2:5.b1 Harmony | One chord ↔ Change, at the next 4-bar phrase.
 // @ctl 2:6.fader Drums | 909 kick, off-beat hat, clap, shaker.
 // @ctl 2:6.k1 Swing | 50 % straight ↔ 70 %; 55–58 % = house.
 // @ctl 2:6.b2 Drums out | lead, keys and bass alone while held.
@@ -55,14 +55,14 @@ const bpm = 124
 const HOOKS = [
   ['Hook A', '..3...2-1.......' + '..3...4-5---....'],
   ['Hook B', '5-..4.3...1-....' + '..2.3.....1-----'],
-  ['Ruf',    '........3.5.4-..' + '................'],
+  ['Call',    '........3.5.4-..' + '................'],
 ]
 // Rhythm cells for the rolled riffs (n = note, - = held, . = rest): sparse, so the riff stays a hook
 const CELLS = ['n-..', '..n.', 'n.n.', '.n..', '....', 'n---', '..n-', '.n.n']
 const COLS = [
-  { name: 'Flöte', src: n => [{ s: 'gm_flute', note: n, gain: 0.7 }], lo: 69, len: 1.5, range: [600, 10000], pats: HOOKS, cells: CELLS },
+  { name: 'Flute', src: n => [{ s: 'gm_flute', note: n, gain: 0.7 }], lo: 69, len: 1.5, range: [600, 10000], pats: HOOKS, cells: CELLS },
   { name: 'Tenorsax', src: n => [{ s: 'sax_vib', note: n, gain: 0.6 }], lo: 57, len: 2, range: [400, 8000], pats: HOOKS, cells: CELLS },
-  { name: 'Panflöte', src: n => [{ s: 'gm_pan_flute', note: n, gain: 0.7 }], lo: 69, len: 1.5, range: [600, 10000], pats: HOOKS, cells: CELLS },
+  { name: 'Pan flute', src: n => [{ s: 'gm_pan_flute', note: n, gain: 0.7 }], lo: 69, len: 1.5, range: [600, 10000], pats: HOOKS, cells: CELLS },
   { name: 'Rhodes-Linie', src: n => [{ s: 'jrh', note: n, gain: 0.6 * 0.292 / 0.955 * 0.902 * 1.6 }], lo: 64, len: 1.5, range: [250, 2500], pats: HOOKS, cells: CELLS },
 ]
 
@@ -84,7 +84,7 @@ const CH = {
   Am9: { name: 'Am9', bass: 33, keys: [55, 59, 60, 64], tones: [9, 0, 4, 7, 11], penta: [9, 0, 2, 4, 7] },
   D9: { name: 'D9', bass: 38, keys: [54, 57, 60, 64], tones: [2, 6, 9, 0, 4], penta: [2, 4, 6, 9, 11] },
 }
-const HARMONIES = [['Ein Akkord', ['Am9', 'Am9', 'Am9', 'Am9']], ['Wechsel', ['Am9', 'Am9', 'D9', 'D9']]]
+const HARMONIES = [['One chord', ['Am9', 'Am9', 'Am9', 'Am9']], ['Change', ['Am9', 'Am9', 'D9', 'D9']]]
 const POOL = {}
 const inRange = (pcs, lo, hi) => POOL[pcs.join() + ':' + lo + ':' + hi] ??= (() => {
   const o = []; for (let m = lo; m <= hi; m++) if (pcs.includes(md(m, 12))) o.push(m); return o })()
@@ -96,7 +96,7 @@ const melodyOf = (c, lo, hi) => inRange(c.penta, lo, hi)
 //   . rest · - the note before is held one more 16th · x stab (the column's chord notes) · X accented stab
 //   1-9 melody note: the n-th note of the chord's pentatonic from the column's lowest note up (1 = lowest)
 //   o soft ghost (the pentatonic note under the last note played)
-// Zufall entries: a riff rolled from the column's rhythm cells (one cell per beat) and a melodic contour that lands
+// Random entries: a riff rolled from the column's rhythm cells (one cell per beat) and a melodic contour that lands
 // on a chord tone on every beat. It is rolled when button 1 reaches the entry and then loops unchanged.
 const VEL = { x: 0.8, X: 1, o: 0.45 }
 const rollRiff = (cells, seed, bars = 2) => {
@@ -120,8 +120,8 @@ COLS.forEach((c, i) => { S.val[5 + i] ??= i === 0 ? 0.8 : 0; S.val[13 + i] ??= 0
 S.val[58] ??= 0.6; S.val[66] ??= 0.3; S.val[59] ??= 0.6; S.val[60] ??= 0.5   // drums, swing, bass, keys
 const swingPct = () => 0.5 + 0.2 * S.val[66]
 const drumsLevel = () => S.held[98] ? 0 : S.val[58]
-// A column's pattern list: the written ones, then Zufall 1 and 2 (rolled riffs) if it has rhythm cells
-const patsOf = i => [...COLS[i].pats, ...(COLS[i].cells ? [['Zufall 1'], ['Zufall 2']] : [])]
+// A column's pattern list: the written ones, then Random 1 and 2 (rolled riffs) if it has rhythm cells
+const patsOf = i => [...COLS[i].pats, ...(COLS[i].cells ? [['Random 1'], ['Random 2']] : [])]
 // A choice made now takes over at the next bar (len 4: at the next 4-bar phrase); fixed once a bar is first asked
 const latch = (key, bar, len = 1) => {
   const b = Math.floor(bar / len), m = S.at[key] ??= {}
@@ -129,7 +129,7 @@ const latch = (key, bar, len = 1) => {
   return m[b]
 }
 const latchNow = key => { const m = S.at[key] ?? {}, ks = Object.keys(m).map(Number); return ks.length ? m[Math.max(...ks)] : 0 }
-// The loop a column plays: the written string, or the riff rolled for the Zufall slot (cached per seed)
+// The loop a column plays: the written string, or the riff rolled for the Random slot (cached per seed)
 const ROLLED = {}
 const loopOf = (i, p) => { const e = patsOf(i)[p]
   if (e[1]) return e[1]
@@ -202,17 +202,17 @@ const drawView = () => {
   const cells = COLS.map((c, i) => {
     const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
     return {
-      k1: knob(S.val[13 + i], 'Hell'), k2: knob(S.val[21 + i], 'Raum'), k3: knob(S.val[29 + i], 'Länge'),
+      k1: knob(S.val[13 + i], 'Brightness'), k2: knob(S.val[21 + i], 'Space'), k3: knob(S.val[29 + i], 'Length'),
       fader: '<div class="cell fader"><div class=bar style="--v:' + (S.val[5 + i] ?? 0) + '"><i></i></div><b>' +
-        pct(S.val[5 + i]) + '</b><span>Pegel</span></div>',
+        pct(S.val[5 + i]) + '</b><span>Level</span></div>',
       b1: '<div class="cell btn"><b>' + pending(pats[now][0], pats[next][0]) + '</b><div class=pat>' + esc(loopOf(i, now)) + '</div></div>',
-      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>Echo-Wurf</b></div>',
+      b2: '<div class="cell btn' + (S.held[45 + i] ? ' on' : '') + '"><b>Echo throw</b></div>',
     }
   })
   root.innerHTML = '<div class=head><h1>' + esc(BOARD.title) + '</h1>' +
-    '<div><span class=k>Harmonie</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
-    '<div><span class=k>Takt</span>' + where + '</div>' +
-    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>AUS</b>' : pct(drumsLevel())) + '</div>' +
+    '<div><span class=k>Harmony</span>' + pending(HARMONIES[h][0], HARMONIES[hp][0]) + '</div>' +
+    '<div><span class=k>Bar</span>' + where + '</div>' +
+    '<div><span class=k>Drums</span>' + (S.held[98] ? '<b class=acc>OFF</b>' : pct(drumsLevel())) + '</div>' +
     '<div><span class=k>Swing</span>' + pct(swingPct()) + ' %</div><div><span class=k>Bass</span>' + pct(S.val[59]) +
     '</div><div><span class=k>Keys</span>' + pct(S.val[60]) + '</div></div>' +
     '<div class=grid>' +
@@ -223,7 +223,7 @@ if (view) {
   for (const old of document.querySelectorAll('a')) if (old.target === 'stem-lab-view' || old.target === 'keys-lab-view') old.remove()
   view.opener ??= (() => { const f = document.createElement('iframe'); f.style.display = 'none'; document.body.append(f); return f })()
   const link = document.createElement('a')
-  link.textContent = '▣ LC groß'
+  link.textContent = '▣ LC big'
   link.href = 'about:blank'
   link.target = 'stem-lab-view'
   link.style.cssText = 'display:inline-block;margin-top:6px;padding:1px 6px;font:12px sans-serif;color:#000;' +
@@ -231,13 +231,13 @@ if (view) {
   link.onclick = () => setTimeout(() => {
     try {
       const w = view.opener.contentWindow.open('', 'stem-lab-view')
-      if (!w) { link.textContent = '▣ LC groß (Tab nicht gefunden)'; return }
+      if (!w) { link.textContent = '▣ LC big (tab not found)'; return }
       view.win = w
       w.document.title = BOARD.title
       w.document.head.innerHTML = '<style>' + VIEW_CSS + '</style>'
       w.document.body.innerHTML = '<div id=lc></div>'
       drawView()
-    } catch (e) { link.textContent = '▣ LC groß: ' + e.message; console.error(e) }
+    } catch (e) { link.textContent = '▣ LC big: ' + e.message; console.error(e) }
   }, 100)
   statusBox.append(link)
   if (view.win && !view.win.closed) {
@@ -250,13 +250,13 @@ const showStatus = () => {
   if (statusText) {
     const h = harmNow(), hp = S.pend.harm ?? 0
     statusText.textContent = [
-      BOARD.title + ' · Harmonie ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
-      'Drums ' + (S.held[98] ? 'AUS' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
+      BOARD.title + ' · Harmony ' + HARMONIES[h][0] + (hp !== h ? ' → ' + HARMONIES[hp][0] : ''),
+      'Drums ' + (S.held[98] ? 'OFF' : pct(drumsLevel())) + ' · Swing ' + pct(swingPct()) + ' % · Bass ' + pct(S.val[59]) +
         ' · Keys ' + pct(S.val[60]) + ' · ' + bpm + ' BPM',
       '',
       ...COLS.map((c, i) => {
         const now = latchNow(i), next = S.pend[i] ?? 0, pats = patsOf(i)
-        return (i + 1) + ' ' + c.name.padEnd(18) + ('Pegel ' + pct(S.val[5 + i])).padEnd(10) +
+        return (i + 1) + ' ' + c.name.padEnd(18) + ('Level ' + pct(S.val[5 + i])).padEnd(10) +
           pats[now][0] + (next !== now ? ' → ' + pats[next][0] : '')
       }),
     ].join('\n')
@@ -273,7 +273,7 @@ const onMidi = e => {
     const i = cc - 37
     if (!COLS[i]) return
     const p = ((S.pend[i] ?? 0) + 1) % patsOf(i).length
-    // arriving at a Zufall slot rolls a new riff for it
+    // arriving at a Random slot rolls a new riff for it
     if (!patsOf(i)[p][1]) S.seed[i + ':' + p] = Math.floor(Math.random() * 1e6)
     S.pend[i] = p
   }

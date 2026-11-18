@@ -1,0 +1,67 @@
+const gate  = (cond, pat) => cond.fmap(on => on ? pat : silence).innerJoin()
+const above = (sig, x) => sig.fmap(v => v > x)
+const and   = (a, b) => a.fmap(x => y => x && y).appLeft(b)
+const held  = button => button.fmap(v => v > 0.5)
+
+// Stateful controls, collected so the master can query them every tick (see stateTaps)
+const taps = []
+
+// Two inputs for one control: the value follows whichever moved last (stateful, so it is queried via stateTaps)
+const lastMoved = (a, b) => {
+  let pa = null, pb = null, v = 0
+  const pat = a.fmap(x => y => {
+    if (pa === null) v = Math.max(x, y)
+    else if (y !== pb) v = y
+    else if (x !== pa) v = x
+    pa = x; pb = y
+    return v
+  }).appLeft(b)
+  taps.push(pat)
+  return pat
+}
+
+// Momentary button that steps through n states, one step per press (counts presses, not the held value).
+// onChange(state) runs on every step (for the status box). Re-evaluating the code starts again at 0.
+const cycleButton = (button, n, onChange = () => {}) => {
+  let prev = 0, state = 0
+  const pat = button.fmap(v => {
+    if (v > 0.5 && prev <= 0.5) { state = (state + 1) % n; onChange(state) }
+    prev = v
+    return state
+  })
+  taps.push(pat)
+  return pat
+}
+
+// A value that a button sets now but that takes over only at the next bar line, or with len = 4 at the next
+// 4-bar phrase (chapter). at(t) is asked with bar starts in real time (outside any reseed shift); it remembers the
+// previous value for queries that still reach back into the old bar. pat = the value per bar.
+const barLatch = (len = 1) => {
+  const l = { pending: 0, now: 0, prev: 0, bar: -Infinity, wall: -Infinity }
+  l.at = t => {
+    const bar = Math.floor(Number(t) / len), wall = Date.now()
+    if (wall - l.wall > 1000) l.bar = -Infinity   // not asked for a second: the track was stopped, its bars start again
+    l.wall = wall
+    if (bar > l.bar) {
+      if (l.pending !== l.now) { l.prev = l.now; l.now = l.pending; showStatus() }
+      else l.prev = l.now
+      l.bar = bar
+    }
+    return bar >= l.bar ? l.now : l.prev
+  }
+  l.pat = signal(t => l.at(t)).segment(1)
+  taps.push(l.pat)
+  return l
+}
+
+// 0 → 1 over `cycles` while a button is held, back to 0 on release (for risers)
+const heldRamp = (button, cycles) => {
+  let start = null
+  const pat = button.fmap(v => t => {
+    if (v <= 0.5) { start = null; return 0 }
+    start ??= t
+    return Math.min(1, Math.max(0, (t - start) / cycles))
+  }).appLeft(signal(t => Number(t)))
+  taps.push(pat)
+  return pat
+}

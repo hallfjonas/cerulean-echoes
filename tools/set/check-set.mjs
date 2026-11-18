@@ -7,12 +7,12 @@ import { fileURLToPath } from 'url'
 import { load, run } from '../strudel-sim/harness.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
-const SET = path.join(ROOT, 'tracks/011-combining-all/011-set-dual.strudel')
+const SET = path.join(ROOT, 'tracks/sets/011-combining-all/011-set-dual.strudel')
 const TRACKS = [
-  { file: 'tracks/007-ambient-soundscape/old/007-ambient-dual.strudel', slow: 2, orbit0: 0, transpose: 0 },
-  { file: 'tracks/010-ambient-house/old/010-ambient-house-dual.strudel', slow: 1, orbit0: 3, transpose: 0 },
-  { file: 'tracks/009-house/old/009-house-dual.strudel', slow: 1, orbit0: 0, transpose: 0 },
-  { file: 'tracks/008-groove-techno/old/008-groove-techno-multi.strudel', slow: 1, orbit0: 3, transpose: 4 },
+  { file: 'tracks/sets/011-combining-all/sources/007-ambient-dual.strudel', slow: 2, orbit0: 0, transpose: 0 },
+  { file: 'tracks/sets/011-combining-all/sources/010-ambient-house-dual.strudel', slow: 1, orbit0: 3, transpose: 0 },
+  { file: 'tracks/sets/011-combining-all/sources/009-house-dual.strudel', slow: 1, orbit0: 0, transpose: 0 },
+  { file: 'tracks/sets/011-combining-all/sources/008-groove-techno-multi.strudel', slow: 1, orbit0: 3, transpose: 4 },
 ]
 const CYC = +(process.argv[2] ?? 4)
 const plateau = k => k * 0.3 + 0.05

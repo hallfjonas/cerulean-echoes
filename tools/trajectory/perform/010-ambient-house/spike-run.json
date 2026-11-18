@@ -1,0 +1,29 @@
+{
+  "track": "010-ambient-house",
+  "steps": [
+    { "bar": 0, "cc": 12, "value": 0.8 },
+    { "bar": 0, "cc": 69, "value": 0.5 },
+    { "bar": 0, "cc": 53, "value": 0.7, "ramp": 4 },
+    { "bar": 4, "cc": 5, "value": 0.8, "ramp": 2 },
+    { "bar": 8, "cc": 7, "value": 0.7, "ramp": 2 },
+    { "bar": 12, "cc": 10, "value": 0.6, "ramp": 2 },
+    { "bar": 16, "cc": 9, "value": 0.6, "ramp": 2 },
+    { "bar": 16, "cc": 11, "value": 0.6, "ramp": 2 },
+    { "bar": 20, "cc": 54, "value": 0.6, "ramp": 2 },
+    { "bar": 28, "cc": 36, "value": 0.9, "ramp": 8 },
+    { "bar": 28, "cc": 6, "value": 0.5, "ramp": 8 },
+    { "bar": 36, "cc": 36, "value": 0 },
+    { "bar": 36, "press": 44 },
+    { "bar": 44, "press": 52 },
+    { "bar": 52, "press": 52 },
+    { "bar": 60, "press": 37 },
+    { "bar": 60, "cc": 34, "value": 0.6 },
+    { "bar": 68, "cc": 20, "value": 0.7, "ramp": 4 },
+    { "bar": 76, "cc": 20, "value": 0, "ramp": 4 },
+    { "bar": 85, "press": 44 },
+    { "bar": 85, "cc": 8, "value": 0.7, "ramp": 2 },
+    { "bar": 100, "press": 43 },
+    { "bar": 100, "cc": 35, "value": 0.6 },
+    { "bar": 120, "cc": 12, "value": 0, "ramp": 10 }
+  ]
+}

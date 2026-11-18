@@ -5,4 +5,16 @@ node_modules/
 !.claude/
 .claude/*
 !.claude/skills/
-tools/trajectory/tapped/
+!.claude/epics/
+!.claude/prds/
+!.claude/settings.json
+!.claude/launch.json
+!.gitattributes
+Scarlett*
+*.band
+
+tools/session-digest/out/
+docs/workflow-reviews/
+
+tools/trajectory/perform/*/takes/
+recordings/
