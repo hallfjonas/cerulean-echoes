@@ -16,7 +16,7 @@ Language with the user: German, code comments English. Read first: `CLAUDE.md`, 
     Other engine-3 boards were NOT re-synced (they do not need it).
   - `lab/keys/house-keys-lab-21.strudel` (+ PDF): 8 columns = 1-bar chord riffs with the keys groove (RIFFS +
     PEDAL, the bass follows the riff of the leftmost open column); lab-20 to `old/` (git mv).
-  - `docs/references.md`: Sarah Wild set as the main reference; feedback entries in the feedback.md files.
+  - `docs/reference/listening-list.md`: Sarah Wild set as the main reference; feedback entries in the feedback.md files.
 
 ## User feedback this round (all already entered in the feedback.md files, except the last two points)
 - Stabs: ALL nonsense (rejected, in stem-ideas.md). If at all: more iconic vocal samples.
@@ -24,7 +24,7 @@ Language with the user: German, code comments English. Read first: `CLAUDE.md`, 
   has to build up. Proposal (not built yet): melody-4 with a build-up fader (row 3: 1 phrase/8 bars →
   call + answer → phrases right after each other; at the top also livelier phrases; merge columns per instrument).
 - Chord progressions: classic house, NOT progressive house (vi IV V I …).
-- Main reference: Sarah Wild, Fusion 2025 (SoundCloud link in docs/references.md). Tracklist (1001tracklists, pasted by
+- Main reference: Sarah Wild, Fusion 2025 (SoundCloud link in docs/reference/listening-list.md). Tracklist (1001tracklists, pasted by
   the user; the site blocks bots — do not circumvent): Pink Floyd – Is There Anybody Out There · Sarah Wild – Fly With
   Me To The Moon · Maltitz – Yepiyano · Hot Since 82 & Tomaz vs. Filterheadz – Sunshine 2025 · Krystal Klear – Deathlagg ·
   Freddie Mercury – Living On My Own · Baron Von Trax – If I Only Knew · Arpeggio – The Fighter · Austher – Expectations ·
@@ -33,7 +33,7 @@ Language with the user: German, code comments English. Read first: `CLAUDE.md`, 
   (Piano House Original) · Laroze – Pure Water · Sarah Wild – Drum Extase · Austher – Memory Code · Herr Krank & Deborah
   Aime La Bagarre – Eurogenic · Miguel De Bois – Is Everything Cool? · Demi Riquísimo & Clint – Love State · JOVE – Don't
   Let Me Go · Doctr ft. Daniella – Training (French Version) · Narciss & Gerd Janson – Chicco's Chips. Genre: House, Tech House.
-  → add to docs/references.md.
+  → add to docs/reference/listening-list.md.
 - What the user hears in the set and wants for 009:
   1. Lots of house piano: not only monotonous, also 8-bar progressions, but always with a groovy rhythm.
   2. House basslines with lots of groove (Jojo column 4) — "needs work, more options and better ones".

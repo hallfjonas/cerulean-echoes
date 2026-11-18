@@ -2,7 +2,7 @@
 
 Phase 1, prototype
 
-The idea is in [player-future.md](../../docs/player-future.md#4-music-architecture-trajectory): every voice of a track has, at every
+The idea: every voice of a track has, at every
 moment, a place in space – left/right (pan), low/high (frequency) – and a place in the dialogue over time (tempo,
 rhythm, groove). This path (trajectory) is measured, saved as a file and animated live. Phase 2 (later):
 emotions through audience feedback.

@@ -30,7 +30,7 @@ Then: winners from melody-3 / stab-1 via `lab-to-track` into Jonas 4–6; fine-t
 
 Goal: happy / jazzy house, dry. Jonas 1 = keys (done, from the keys lab). The other columns should be colourful,
 playful and melodic without changing the bar (consistency over 8 bars is important, see feedback.md).
-Before building: listen to reference tracks (docs/references.md) and read up which roles really occur there;
+Before building: listen to reference tracks (docs/reference/listening-list.md) and read up which roles really occur there;
 every stem gets its own lab, the winner goes 1:1 into the track (skill lab-to-track).
 
 | Column | Stem | Role | Open questions |

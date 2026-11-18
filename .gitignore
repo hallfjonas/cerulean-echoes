@@ -14,6 +14,7 @@ Scarlett*
 *.band
 
 tools/session-digest/out/
+docs/workflow-reviews/
 
 tools/trajectory/perform/*/takes/
 recordings/

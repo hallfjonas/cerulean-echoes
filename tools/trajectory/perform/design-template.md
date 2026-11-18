@@ -13,7 +13,7 @@ Before the first draft the agent reads, in this order:
 1. `cd tools && npm run track-map -- <track>`: outline of the track; then `sed -n` ranges for the parts that matter.
 2. The layout PDF (`<track>-layout.pdf`) and the `// @ctl` tags in the track: which control does what, per column.
 3. `npm run scenario -- <track> --view`: the LC view as text, to see what a control change does at the default state.
-4. The track folder's `feedback.md` (what the user liked or rejected) and `docs/references.md` for the genre.
+4. The track folder's `feedback.md` (what the user liked or rejected) and `docs/reference/listening-list.md` for the genre.
 
 Every control in a design must exist in the `@ctl` tags; `node trajectory/check-perform.mjs <track>` checks this once
 the script exists.
@@ -28,7 +28,7 @@ the script exists.
 - Length: <N> bars = <M> min at <BPM> BPM
 - Mood: <a few words>
 - Story: <two lines: where it starts, where it goes, how it ends>
-- References: <links from docs/references.md, with what to listen for>
+- References: <links from docs/reference/listening-list.md, with what to listen for>
 
 ## Sections
 | Section | Bars | LC controls (by @ctl name) | Launchkey | Intent |

@@ -10,7 +10,7 @@ Design for `perform/009-house/dance-floor.json`. Status: proposal, waiting for t
   from the Launchkey, a build runs into a break, and the whole beat lands on the one with the chord progression
   (first drop). A busier groove with flute and vibraphone leads to a second, deeper break in Vamp, then the peak with
   everything on. The colour leaves first, the bass goes next, the master fades the kick out.
-- References (docs/references.md): Sarah Wild, Fusion 2025 Bachstelzen opening (the user's main reference: long steady
+- References (docs/reference/listening-list.md): Sarah Wild, Fusion 2025 Bachstelzen opening (the user's main reference: long steady
   grooves, piano chords, bass groove, playful top voice); Zombies in Miami, Nation of Gondwana 2023 (patient builds,
   drops that return on the one)
 - Why 192 bars: house is played in 8-bar phrases (the Chords button changes at 8 bars, Chapter at 4), and a club

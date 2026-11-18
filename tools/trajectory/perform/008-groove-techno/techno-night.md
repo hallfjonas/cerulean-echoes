@@ -11,7 +11,7 @@ Loop 2, round 1 changes applied (see `feedback.md`). The rows below match the sc
   long build drops into the first peak, a break pulls the low end out and brings it back on the one, a muffled dip
   and a second, bigger build lead to the two full peaks. The colour then drifts out slowly, stem by stem over long ramps, the rhythm layers next and the kick last.
 - References: Yanamaste live set at KHIDI Tbilisi (layering over a long slot), Marie Montexier at Nation of Gondwana
-  2025 (hypnotic loop, slow filter moves). The genre section of `docs/references.md` has no notes; the "listen for"
+  2025 (hypnotic loop, slow filter moves). The genre section of `docs/reference/listening-list.md` has no notes; the "listen for"
   here is the agent's guess, not heard.
 - Basis: `@ctl` tags of the track. Mode 1 (Jojo): Kick 1 .. Percussion 7 (fader CC 5-11, knobs 13-19 / 21-27 /
   29-35, buttons 37-43 / 45-51). Mode 2 (Jonas), CC + 48: Pads, Strings, Sequence, Stab, Answer, Dark perc, FX

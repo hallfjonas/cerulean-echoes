@@ -7,7 +7,7 @@ created: 2026-11-18T05:50:44Z
 
 # PRD: auto-perform-steering
 
-Source: `docs/player-future.md`, idea 2 (levels 1 and 2). Level 3 (an LLM agent per phrase) is out of scope.
+Source: the player vision draft (`git show 1bd1438:docs/player-future.md`), idea 2 (levels 1 and 2). Level 3 (an LLM agent per phrase) is out of scope.
 
 ## Executive Summary
 

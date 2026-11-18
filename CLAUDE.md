@@ -3,6 +3,7 @@
 Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control XL 3s via `midin()` and a
 Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/devices.md`).
 Talk to the user in English; code comments are English too. Explain audio basics plainly.
+Docs for people: `docs/README.md`; contribution rules: `CONTRIBUTING.md`.
 
 ## Labels
 Everything the player reads is English and short: `@ctl` texts, control and option names, the live view (`▣ LC big`), the status box.
@@ -25,7 +26,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
   column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in
   the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
-- `docs/references.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
+- `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
@@ -186,10 +187,7 @@ all buttons momentary): dual → `-jojo.syx` / `-jonas.syx` (slot 16 on each LC)
 and 2 on every LC). Load them with Novation Components. Hand-written `*-layout.typ` files are older sheets; the lab boards keep theirs on purpose (they add pages the generator cannot make: sound descriptions, variant tables).
 
 ## CCPM epics and PRDs
-Larger work is planned with [CCPM](/Users/jonas.hall/.claude/skills/ccpm/SKILL.md): a PRD (`.claude/prds/<name>.md`) is
-parsed into an epic (`.claude/epics/<name>/`) of numbered task files.
-- Track epics and PRDs locally, on the feature branch, while the work is open.
-- Once the epic is implemented and merged, remove its epic folder and PRD from main; git history keeps them.
+Optional: use CCPM only when the user asks. The rules are in `CONTRIBUTING.md` ("Planning larger work (optional)").
 
 ## Machine
 M2 Air, 16 GB, shared with other agents: the global resource rules apply (one heavy job at a time, test small first).
