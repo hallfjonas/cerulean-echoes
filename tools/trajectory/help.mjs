@@ -1,7 +1,8 @@
 // Collapsible help panel on the right of every page: what the page or tool does, its inputs and outputs, how to use it.
 // mountHelp(sections) adds a Help button (key ?) to the header and returns { setSections } to swap the content, as the
 // Tools page does when another command is picked. A section is { heading, text } with text a string or a list of
-// strings (shown as numbered steps). Open by default; closing it is remembered across pages.
+// strings (shown as numbered steps). Open by default and opening or closing it is remembered across pages; a page that
+// passes startOpen: false always starts with it closed.
 const STORAGE_KEY = 'trajectory-help-open'
 
 const readOpen = () => {
@@ -33,21 +34,21 @@ const renderSection = ({ heading, text }) => {
   return section
 }
 
-export const mountHelp = (sections, { title = 'Help' } = {}) => {
+export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen = readOpen() } = {}) => {
   const panel = document.createElement('aside')
   panel.id = 'help'
   const heading = Object.assign(document.createElement('h2'), { textContent: title })
   const body = document.createElement('div')
   panel.append(heading, body)
 
-  const toggle = Object.assign(document.createElement('button'), { id: 'helpToggle', textContent: 'Help' })
-  toggle.title = 'Key ?'
+  const toggle = Object.assign(document.createElement('button'), { id: 'helpToggle', textContent: button })
+  toggle.title = title + ' (key ?)'
 
-  const setOpen = open => {
+  const setOpen = (open, remember = true) => {
     document.body.classList.toggle('help-open', open)
     panel.hidden = !open
     toggle.classList.toggle('on', open)
-    writeOpen(open)
+    if (remember) writeOpen(open)
   }
   const setSections = next => body.replaceChildren(...next.map(renderSection))
 
@@ -59,6 +60,6 @@ export const mountHelp = (sections, { title = 'Help' } = {}) => {
   setSections(sections)
   document.body.append(panel)
   document.querySelector('header')?.append(toggle)
-  setOpen(readOpen())
+  setOpen(startOpen, false)
   return { setSections }
 }
