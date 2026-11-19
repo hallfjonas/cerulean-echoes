@@ -1,0 +1,4 @@
+- Hook should already be introduced in the intro; then give space to other things; then come back with hook; then fade; in outro bring it back --> theme
+- chords in intro are too monotonous; sounds are fine
+- overall the track is too monotonous
+- peak is good
