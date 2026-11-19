@@ -23,13 +23,15 @@ const listFiles = dir => {
 
 const NOT_LIVE_GENRES = ['historic', 'sets']
 
+const trackFolders = dir => fs.readdirSync(dir, { withFileTypes: true })
+  .filter(entry => entry.isDirectory())
+  .flatMap(entry => /^\d{3}-/.test(entry.name) ? [path.join(dir, entry.name)] : trackFolders(path.join(dir, entry.name)))
+
 const liveFiles = () => {
   const tracks = path.join(repo, 'tracks')
   const folders = fs.readdirSync(tracks, { withFileTypes: true })
     .filter(genre => genre.isDirectory() && !NOT_LIVE_GENRES.includes(genre.name))
-    .flatMap(genre => fs.readdirSync(path.join(tracks, genre.name), { withFileTypes: true })
-      .filter(folder => folder.isDirectory() && /^\d{3}-/.test(folder.name))
-      .map(folder => path.join(tracks, genre.name, folder.name)))
+    .flatMap(genre => trackFolders(path.join(tracks, genre.name)))
   return folders.flatMap(folder => fs.readdirSync(folder).sort()
     .filter(name => /^\d{3}-[\w-]+\.strudel$/.test(name))
     .map(name => path.join(folder, name))
