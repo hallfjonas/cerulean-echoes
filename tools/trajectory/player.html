@@ -258,6 +258,8 @@ const play = async script => {
     attachPanel()
     label = 'playing: ' + track
   } catch (error) {
+    hasLcView = false
+    attachPanel()
     label = 'Error: ' + error.message
     return false
   }
@@ -329,19 +331,19 @@ const showRecording = () => {
 }
 
 const panelWindow = $('lcPanel').contentWindow
-const keyedWindows = new WeakSet()
+panelWindow.addEventListener('keydown', event => dispatchEvent(new KeyboardEvent('keydown', { key: event.key })))
 let hasLcView = false, currentView = 'panel'
+const detachPanel = () => {
+  const view = globalThis.lcxlView
+  if (view?.win === panelWindow) view.win = null
+}
 const attachPanel = () => {
   const view = globalThis.lcxlView
   $('panelEmpty').hidden = hasLcView && !!view
-  if (!hasLcView || !view) return
+  if (!hasLcView || !view || currentView !== 'panel') return detachPanel()
   const doc = panelWindow.document
   doc.head.innerHTML = '<style>' + view.css + '</style>'
   if (!doc.getElementById('lc')) doc.body.innerHTML = '<div id=lc></div>'
-  if (!keyedWindows.has(panelWindow)) {
-    keyedWindows.add(panelWindow)
-    panelWindow.addEventListener('keydown', onKey)
-  }
   view.win = panelWindow
   view.draw()
 }
@@ -350,7 +352,7 @@ const showView = name => {
   document.body.classList.toggle('visuals', name === 'visuals')
   renderer.setPaused(name !== 'visuals')
   for (const link of document.querySelectorAll('[data-view]')) link.classList.toggle('here', link.dataset.view === name)
-  if (name === 'panel') attachPanel()
+  attachPanel()
   wake()
 }
 for (const link of document.querySelectorAll('[data-view]')) link.onclick = event => {

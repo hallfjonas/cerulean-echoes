@@ -102,7 +102,7 @@ export function createRenderer(canvas) {
   function push(line) {
     const now = performance.now() / 1000
     if (line.pulse) {
-      if (line.pulse.bpm && line.pulse.phase < lastPhase - 0.5) beatRings.push({ born: now, strength: 0.4 + (kickComet()?.e ?? 0.5) })
+      if (!paused && line.pulse.bpm && line.pulse.phase < lastPhase - 0.5) beatRings.push({ born: now, strength: 0.4 + (kickComet()?.e ?? 0.5) })
       lastPhase = line.pulse.phase
       pulse = line.pulse
       return
@@ -115,7 +115,7 @@ export function createRenderer(canvas) {
     }
     comet.target = line
     comet.seen = now
-    if (line.on) sparks.push({ comet, x: line.x, y: line.y, born: now, e: line.e })
+    if (line.on && !paused) sparks.push({ comet, x: line.x, y: line.y, born: now, e: line.e })
   }
 
   function step(now, dt) {
