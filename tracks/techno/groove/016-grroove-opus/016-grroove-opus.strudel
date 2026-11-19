@@ -1056,9 +1056,17 @@ if (lcView) {
   const padIdx = n => ((n - LK_PAD_NOTE_1) % 16 + 16) % 16
   const padLit = n => [...lcView.pads].some(p => padIdx(p) === padIdx(n)) ||
     Object.entries(lcView.padAt ?? {}).some(([p, t]) => padIdx(p) === padIdx(n) && performance.now() - t < 250)
+  // Keys drawn as on the instrument (the window starts on a C): black keys narrower and shorter, between their white keys
+  const WHITE_COUNT = [...Array(25).keys()].filter(i => !BLACK.includes(i % 12)).length
+  const keyPlace = i => {
+    const whitesBefore = [...Array(i).keys()].filter(k => !BLACK.includes(k % 12)).length
+    const [left, width] = BLACK.includes(i % 12) ? [whitesBefore - .3, .6] : [whitesBefore, 1]
+    return 'left:' + left / WHITE_COUNT * 100 + '%;width:' + width / WHITE_COUNT * 100 + '%'
+  }
   const lkPlay = () => '<div class=lkplay><div class=lkkeys>' + [...Array(25).keys()].map(i => {
     const m = lcView.base + i
-    return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (inKey(m) ? ' in' : '') + (lcView.keys.has(m) ? ' on' : '') + '"></i>'
+    return '<i class="' + (BLACK.includes(m % 12) ? 'blk' : 'wht') + (inKey(m) ? ' in' : '') + (lcView.keys.has(m) ? ' on' : '') +
+      '" style="' + keyPlace(i) + '"></i>'
   }).join('') + '</div><div class=lkpads>' + [40, 36].flatMap(b => [0, 1, 2, 3, 8, 9, 10, 11].map(i =>
     '<i class="' + (lcView.padVoice?.[b + i - 36] ? 'voice' : '') + (padLit(b + i) ? ' on' : '') + '">' +
     esc(lcView.padNames?.[b + i - 36] ?? '') + '</i>')).join('') + '</div></div>'
@@ -1095,9 +1103,11 @@ if (lcView) {
     '.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}',
     '.lk{flex:none;display:flex;flex-direction:column;gap:.5vh}.lkrow{display:grid;grid-template-columns:repeat(8,1fr);gap:.8vw;height:14vh}',
     '.lkbody{display:flex;gap:1vw}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5vh}.lkbody>.fader{flex:none;width:5vw;justify-content:flex-start}',
-    '.lkplay{display:flex;gap:2vw;height:7vh}.lkkeys{flex:3;display:grid;grid-template-columns:repeat(25,1fr);gap:2px}',
+    '.lkplay{display:flex;gap:2vw;height:7vh}.lkkeys{flex:3;position:relative}',
     // Keys: green = in the track's scale now, red = off key; pressed = bright
-    '.lkkeys i{border-radius:3px;background:#5a2a2a}.lkkeys i.blk{background:#3a1a1a;border:1px solid #6a3434}',
+    '.lkkeys i{position:absolute;top:0;bottom:0;box-sizing:border-box;border-right:2px solid transparent;background-clip:padding-box;',
+    'border-radius:0 0 3px 3px;background:#5a2a2a}',
+    '.lkkeys i.blk{bottom:38%;z-index:1;border:1px solid #6a3434;box-shadow:0 0 0 2px #111;background:#3a1a1a}',
     '.lkkeys i.in{background:#2f6a3c}.lkkeys i.blk.in{background:#1f4a2a;border-color:#3f8a50}',
     '.lkkeys i.on{background:#ff5050}.lkkeys i.in.on{background:#6ff08a}',
     '.lkpads{flex:2;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:1fr 1fr;gap:4px}',
