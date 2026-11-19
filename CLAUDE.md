@@ -136,10 +136,12 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
-- Settings drawer (key S) holds the visual settings; the Tools page (`/tools.html`) runs the Node checks (check
+- Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
+  Visualization), the page links, track, Play/Stop/Record/Save take, auto-perform and the visual settings; **?** opens
+  the help. The Tools page (`/tools.html`) runs the Node checks (check
   sounds, loudness, layouts, stem lab, set build) against a catalogue entry, one job at a time; Analysis
   (`/analyse.html`) is a tool there.
-- Auto-perform (drawer, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
+- Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
   (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).

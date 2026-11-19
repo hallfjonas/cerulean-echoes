@@ -6,13 +6,48 @@
 <title>Trajectory Player</title>
 <link rel="stylesheet" href="ui.css">
 <style>
+  :root { --side: 300px; --top: 46px }
+  body { overflow: hidden }
   #view { position: fixed; inset: 0; display: block }
-  #drawer label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
-  #drawer label input[type=range] { grid-column: 1 / 3; width: 100% }
-  #drawer label output { grid-row: 1; grid-column: 2 }
-  #drawer label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
-  #drawer label select { grid-column: 1 / 3 }
-  #drawer label.inline { display: inline-flex; margin: 0 0 0 10px }
+  #sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--side); box-sizing: border-box; padding: 14px 16px;
+    background: var(--panel); border-right: 1px solid var(--line); z-index: 2; overflow-y: auto }
+  body.side-closed #sidebar { display: none }
+  #sidebar nav { flex-direction: column; gap: 2px; margin: 0 0 14px }
+  #sidebar nav a { padding: 6px 8px; border-radius: 6px; font-size: 15px }
+  #sidebar nav a.here { background: var(--control) }
+  #sidebar section { border-top: 1px solid var(--line); padding: 14px 0 }
+  #sidebar h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--dim); text-transform: uppercase;
+    letter-spacing: 0.04em }
+  #sidebar .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px }
+  #sidebar output { display: block; margin-top: 6px; font-size: 13px; color: var(--dim) }
+  #track { width: 100% }
+  #sidebar label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
+  #sidebar label input[type=range] { grid-column: 1 / 3; width: 100% }
+  #sidebar label output { grid-row: 1; grid-column: 2; margin: 0 }
+  #sidebar label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
+  #sidebar label select { grid-column: 1 / 3 }
+  #sidebar label.inline { display: inline-flex; margin: 0 0 0 10px }
+  #autoPerform label output { color: var(--fg) }
+  #sidebar details summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--dim);
+    text-transform: uppercase; letter-spacing: 0.04em }
+  #settings { margin-top: 12px }
+  .script-info { margin-top: 12px; font-size: 13px }
+  .script-title { font-weight: 600 }
+  .script-mood { color: var(--dim); margin-top: 2px }
+  .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
+  .script-sections li.now { color: var(--fg); font-weight: 600 }
+  header { position: fixed; top: 0; left: var(--side); right: 0; height: var(--top); box-sizing: border-box;
+    flex-wrap: nowrap; padding: 0 12px; background: var(--panel); border-bottom: 0; z-index: 1; transition: opacity 0.6s }
+  body.side-closed header, body.side-closed #stage { left: 0 }
+  body.help-open header, body.help-open #stage { right: 320px }
+  #status { overflow: hidden; white-space: nowrap; text-overflow: ellipsis }
+  #helpToggle { width: 34px; padding: 6px 0; border-radius: 50%; font-weight: 600 }
+  #stage { position: fixed; top: var(--top); left: var(--side); right: 0; bottom: 0; background: #111 }
+  body.visuals #stage { display: none }
+  #lcPanel { width: 100%; height: 100%; border: 0; display: block }
+  #panelEmpty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: var(--dim); text-align: center; padding: 24px; background: #111 }
+  #panelEmpty[hidden] { display: none }
   #record.recording { background: #a3262a; border-color: #ff5a5f }
   #recInfo { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-variant-numeric: tabular-nums }
   #recInfo[hidden] { display: none }
@@ -20,39 +55,67 @@
   #recMeter span { display: block; height: 100%; width: 0; background: #ff5a5f }
   #recError { color: var(--err); font-size: 13px }
 </style>
-<script type="module" src="nav.mjs"></script>
 <script type="importmap">
 { "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
 </script>
 </head>
-<body class="overlay">
-<!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here and shows it: no strudel.cc needed.
-     Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except DAW ports; the CC moved
-     last per number); a control not moved yet reads 0. Two homotopy controls:
+<body>
+<!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here: no strudel.cc needed.
+     Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
+     DAW ports; the CC moved last per number); a control not moved yet reads 0.
+     Two views share the page, so the sound keeps playing when switching: the MIDI panel (the track's LC view, drawn
+     into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on the canvas).
+     The sidebar (key S) holds the page links, the track, Play / Stop / Record / Save take, auto-perform and the visual
+     settings (generated from settings.mjs, kept in localStorage). Two homotopy controls among them:
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
-     The visual settings live in the Settings drawer (key S, generated from settings.mjs, kept in localStorage).
-     Auto-perform (in the drawer, key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start
-     reloads the track so the script begins from silence.
-     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" in the
-     drawer posts it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
+     Auto-perform (key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start reloads the
+     track so the script begins from silence.
+     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" posts
+     it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
      Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
      tail. Stop, a track change or a new auto-perform run ends a recording.
-     The track's status box (bottom right) hides while its LC view is open in another window. -->
+     The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window. -->
 <canvas id="view"></canvas>
+<aside id="sidebar">
+  <nav>
+    <a href="#panel" data-view="panel">MIDI panel</a>
+    <a href="#visuals" data-view="visuals">Visualization</a>
+    <a href="tools.html">Tools</a>
+    <a href="analyse.html">Analysis</a>
+  </nav>
+  <section>
+    <h2>Track</h2>
+    <select id="track"></select>
+    <div class="row">
+      <button id="play">Play</button>
+      <button id="stop">Stop</button>
+      <button id="record" title="Key R">Record</button>
+      <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
+    </div>
+    <output id="recFile"></output>
+    <span id="recError"></span>
+    <div class="row"><button id="saveTake">Save take</button></div>
+    <output id="takeState"></output>
+  </section>
+  <section id="autoPerform"></section>
+  <section>
+    <details>
+      <summary>Visual settings</summary>
+      <div id="settings"></div>
+    </details>
+  </section>
+</aside>
 <header>
-  <select id="track"></select>
-  <button id="play">Play</button>
-  <button id="stop">Stop</button>
-  <button id="record" title="Key R">Record</button>
-  <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
-  <span id="recError"></span>
+  <button id="sidebarToggle" title="Sidebar (key S)">☰</button>
   <span id="status">loading Strudel …</span>
-  <button id="settingsToggle" title="Key S">Settings</button>
 </header>
-<aside id="drawer"></aside>
+<main id="stage">
+  <iframe id="lcPanel" title="MIDI panel"></iframe>
+  <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
+</main>
 <script type="module">
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
@@ -67,17 +130,19 @@ import { createRecorder as createAudioRecorder } from './recorder.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
-  { heading: 'What it does', text: 'Plays a live track or lab board right here and shows its visuals: every stem with its '
-    + 'name, and the tempo from Strudel\'s clock. No strudel.cc needed.' },
+  { heading: 'What it does', text: 'Plays a live track or lab board right here. The MIDI panel shows both controller '
+    + 'pages and the Launchkey row with every control\'s name and value; Visualization draws every stem with its name '
+    + 'and the tempo from Strudel\'s clock. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound and visuals. Save take (in Settings) writes what the controllers did since the last '
-    + 'load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
-  { heading: 'How to use', text: ['Pick a track and press Play.', 'Play the controllers, or open Settings (S) and start '
-    + 'Auto-perform (P) to try the track without hardware.', 'Settings holds the visual controls; F is fullscreen.',
-    'The top bar hides after 3 s without the mouse.'] },
+  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. Save take writes what the controllers did since the '
+    + 'last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
+  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play.', 'Play the controllers, or start '
+    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visualization switch the view; the sound '
+    + 'keeps playing. Tools and Analysis are pages of their own.', 'S hides the sidebar, F is fullscreen; Visual '
+    + 'settings hold the visual controls.', 'In the visuals the top bar hides after 3 s without the mouse.'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
-    'Save take in Settings writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
+    'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
     'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
     + 'captured too.',
     'Save take after a replay names its original and shows the replay check; the Tools page lists every differing bar '
@@ -88,7 +153,7 @@ mountHelp([
   { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
     'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
     'Stop or another track ends a recording. Recordings stay out of git.'] }
-], { title: 'About this page' })
+], { title: 'About this page', button: '?', startOpen: false })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
@@ -188,8 +253,13 @@ const play = async script => {
     await engine.load(code)
     const trackHash = response.headers.get('X-Track-Hash')
     recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
+    hasLcView = code.includes('globalThis.lcxlView')
+    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visualization.'
+    attachPanel()
     label = 'playing: ' + track
   } catch (error) {
+    hasLcView = false
+    attachPanel()
     label = 'Error: ' + error.message
     return false
   }
@@ -214,14 +284,13 @@ const startScript = async id => {
   performer.start(script)
 }
 
-const settings = mountSettings($('drawer'), { renderer, smoother })
-$('settingsToggle').onclick = settings.toggle
-const autoPerform = mountAutoPerform(settings.autoPerformContainer, { onStart: startScript, onStop: stopPerformer })
+const settings = mountSettings($('settings'), { renderer, smoother })
+const autoPerform = mountAutoPerform($('autoPerform'), { onStart: startScript, onStop: stopPerformer })
 const recordAutoLabel = document.createElement('label')
 recordAutoLabel.className = 'inline'
 recordAutoLabel.title = 'Records from Start to the end of the script plus 4 s'
 recordAutoLabel.innerHTML = '<input type="checkbox" id="recordAuto"> Record audio'
-settings.autoPerformContainer.querySelector('button').after(recordAutoLabel)
+$('autoPerform').querySelector('button').after(recordAutoLabel)
 
 const saveTake = async () => {
   const session = recorder.session()
@@ -241,25 +310,15 @@ const saveTake = async () => {
     + (result.problems.length ? ` · check: ${result.problems.join('; ')}` : '')
     + (result.replay ? ` · replay: ${result.replay}` : '')
 }
-const takeSection = document.createElement('section')
-takeSection.innerHTML = '<h2>Take</h2><button id="saveTake">Save take</button> <output id="takeState"></output>'
-$('drawer').append(takeSection)
 $('saveTake').onclick = saveTake
-const recordSection = document.createElement('section')
-recordSection.innerHTML = '<h2>Recording</h2><button id="recordDrawer" title="Key R">Record</button> '
-  + '<output id="recFile"></output>'
-$('drawer').append(recordSection)
-$('recordDrawer').onclick = toggleRecord
 
 const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
 const meterWidth = peak => Math.max(0, Math.min(1, 1 + Math.log10(Math.max(peak, 1e-6)) / 3)) * 100
 const setText = (element, text) => { if (element.textContent !== text) element.textContent = text }
 const showRecording = () => {
   const on = audio.recording
-  for (const button of [$('record'), $('recordDrawer')]) {
-    button.classList.toggle('recording', on)
-    setText(button, on ? 'Stop rec' : 'Record')
-  }
+  $('record').classList.toggle('recording', on)
+  setText($('record'), on ? 'Stop rec' : 'Record')
   $('recInfo').hidden = !on
   setText($('recError'), recordError && 'Rec error: ' + recordError)
   if (on) {
@@ -271,9 +330,42 @@ const showRecording = () => {
   } else setText($('recFile'), lastFile ? 'Last: ' + lastFile : '')
 }
 
+const panelWindow = $('lcPanel').contentWindow
+panelWindow.addEventListener('keydown', event => dispatchEvent(new KeyboardEvent('keydown', { key: event.key })))
+let hasLcView = false, currentView = 'panel'
+const detachPanel = () => {
+  const view = globalThis.lcxlView
+  if (view?.win === panelWindow) view.win = null
+}
+const attachPanel = () => {
+  const view = globalThis.lcxlView
+  $('panelEmpty').hidden = hasLcView && !!view
+  if (!hasLcView || !view || currentView !== 'panel') return detachPanel()
+  const doc = panelWindow.document
+  doc.head.innerHTML = '<style>' + view.css + '</style>'
+  if (!doc.getElementById('lc')) doc.body.innerHTML = '<div id=lc></div>'
+  view.win = panelWindow
+  view.draw()
+}
+const showView = name => {
+  currentView = name
+  document.body.classList.toggle('visuals', name === 'visuals')
+  renderer.setPaused(name !== 'visuals')
+  for (const link of document.querySelectorAll('[data-view]')) link.classList.toggle('here', link.dataset.view === name)
+  attachPanel()
+  wake()
+}
+for (const link of document.querySelectorAll('[data-view]')) link.onclick = event => {
+  event.preventDefault()
+  showView(link.dataset.view)
+}
+const toggleSidebar = () => document.body.classList.toggle('side-closed')
+$('sidebarToggle').onclick = toggleSidebar
+
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement
-  if (box && box !== document.body) box.hidden = !!view.win && !view.win.closed
+  const ownWindowOpen = !!view?.win && view.win !== panelWindow && !view.win.closed
+  if (box && box !== document.body) box.hidden = currentView === 'panel' || ownWindowOpen
 }
 
 const NO_FRAME_CSS = '.page.live{border-color:#222 !important}'
@@ -296,23 +388,24 @@ const showStatus = () => {
 showStatus()
 
 const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : document.body.requestFullscreen()
-addEventListener('keydown', event => {
+function onKey(event) {
   const { tagName, type } = event.target
   if (tagName === 'SELECT' || (tagName === 'INPUT' && !['checkbox', 'range'].includes(type))) return
   if (event.key === 'f') toggleFullscreen()
-  if (event.key === 's') settings.toggle()
+  if (event.key === 's') toggleSidebar()
   else if (event.key === 'p') autoPerform.toggle()
   else if (event.key === 'r') toggleRecord()
   else settings.handleKey(event.key)
-})
+}
+addEventListener('keydown', onKey)
 let idleTimer
 const wake = () => {
   document.body.classList.remove('idle')
   clearTimeout(idleTimer)
-  idleTimer = setTimeout(() => document.body.classList.add('idle'), 3000)
+  idleTimer = setTimeout(() => document.body.classList.toggle('idle', currentView === 'visuals'), 3000)
 }
 addEventListener('mousemove', wake)
-wake()
+showView('panel')
 </script>
 </body>
 </html>

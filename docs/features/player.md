@@ -2,8 +2,9 @@
 
 ## What it is
 
-A web page on your own computer that plays any live track or lab board and draws the music: every part of the track
-is a moving shape with its name. It also holds a Tools page for the checks and a recorder.
+A web page on your own computer that plays any live track or lab board. It opens on the MIDI panel: both Launch
+Control pages and the Launchkey row with every control's name and value. Its second view draws the music: every part
+of the track is a moving shape with its name. It also holds a Tools page for the checks and a recorder.
 
 ## When to use it
 
@@ -16,19 +17,20 @@ is a moving shape with its name. It also holds a Tools page for the checks and a
 
 1. Start it: `cd tools && node trajectory/server.mjs`, then open http://localhost:8766 in Chrome. Steps in
    [getting started](../getting-started.md).
-2. Pick a track in the top list. **Live** = the live tracks, **Lab** = the [lab boards](lab-boards.md). Boards
+2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the [lab boards](lab-boards.md). Boards
    without a master `stack(` are greyed out.
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
-The top bar holds the track list, Play, Stop, Record, the status line, Settings and the page links (Player, Tools,
-Analysis). It hides after 3 seconds without the mouse.
+The sidebar holds the views (MIDI panel, Visualization), the pages (Tools, Analysis), the track list, Play, Stop,
+Record, Save take, Auto-perform and the visual settings. Switching views keeps the sound playing. The top bar holds the
+status line and **?** for help about the page.
 
 Keys:
 
 | Key | What it does |
 |---|---|
-| S | Settings drawer |
+| S | hide or show the sidebar |
 | P | start or stop auto-perform |
 | R | record the sound to a WAV file |
 | F | fullscreen |
@@ -40,7 +42,7 @@ Keys:
 - The player reads the track file again on every load. Edit a track, press Play, and you hear the edit. There is no
   extra step and no copy of the track on disk.
 - A track never needs the player. The same file plays pasted into [strudel.cc](strudel-cc.md).
-- The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Settings change the visuals, never the
+- The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Visual settings change the visuals, never the
   sound.
 - Recordings go to `recordings/<track>/` in the repo root and are not part of git.
 - The Tools page (http://localhost:8766/tools.html) runs the Node checks from the browser, one job at a time.
