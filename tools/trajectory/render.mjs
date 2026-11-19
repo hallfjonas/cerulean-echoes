@@ -74,7 +74,7 @@ export function createRenderer(canvas) {
   const scale = Math.min(devicePixelRatio, 2)
   let W = 0, H = 0, labels = true, axes = true, rings = true, look = 'deck', pulse = null, lastPhase = 0, energy = 0
   let character = 0.5, motion = 1
-  let previous = performance.now() / 1000, widen = true, panReach = 0.1, panGain = 1
+  let previous = performance.now() / 1000, paused = false, widen = true, panReach = 0.1, panGain = 1
   const comets = new Map()
   const beatRings = [], sparks = []
   const bubbles = Array.from({ length: 90 }, () => ({ x: Math.random() * 2 - 1, y: Math.random(), z: Math.random(),
@@ -102,7 +102,7 @@ export function createRenderer(canvas) {
   function push(line) {
     const now = performance.now() / 1000
     if (line.pulse) {
-      if (line.pulse.bpm && line.pulse.phase < lastPhase - 0.5) beatRings.push({ born: now, strength: 0.4 + (kickComet()?.e ?? 0.5) })
+      if (!paused && line.pulse.bpm && line.pulse.phase < lastPhase - 0.5) beatRings.push({ born: now, strength: 0.4 + (kickComet()?.e ?? 0.5) })
       lastPhase = line.pulse.phase
       pulse = line.pulse
       return
@@ -115,7 +115,7 @@ export function createRenderer(canvas) {
     }
     comet.target = line
     comet.seen = now
-    if (line.on) sparks.push({ comet, x: line.x, y: line.y, born: now, e: line.e })
+    if (line.on && !paused) sparks.push({ comet, x: line.x, y: line.y, born: now, e: line.e })
   }
 
   function step(now, dt) {
@@ -412,6 +412,7 @@ export function createRenderer(canvas) {
   function frame() {
     const now = performance.now() / 1000, dt = Math.min(0.1, now - previous)
     previous = now
+    if (paused) return void requestAnimationFrame(frame)
     step(now, dt)
     if (look === 'deck') {
       drawDeck(now)
@@ -442,5 +443,6 @@ export function createRenderer(canvas) {
     toggleLook: () => { look = { deck: 'ocean', ocean: 'clean', clean: 'deck' }[look] },
     setCharacter: value => { character = clamp(value) },
     setSmoothing: value => { motion = (1 - clamp(value)) ** 2 },
+    setPaused: on => { paused = on },
   }
 }

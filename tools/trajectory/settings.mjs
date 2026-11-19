@@ -1,6 +1,6 @@
 // Every visual setting of the player as data: id, label, kind, default, key, tip, apply(value, context).
 // kinds: 'slider' (min, max, step, show), 'toggle', 'choice' (options). A key toggles a toggle and cycles a choice.
-// mountSettings builds the drawer from this list, restores saved values and saves every change.
+// mountSettings builds the fields into a container from this list, restores saved values and saves every change.
 import { describeWindow } from './smoothing.mjs'
 
 export const SETTINGS = [
@@ -63,7 +63,7 @@ const field = (setting, value, onInput) => {
   return { row, input, output }
 }
 
-export const mountSettings = (drawer, context) => {
+export const mountSettings = (container, context) => {
   const values = {}
   const stored = load()
   const fields = {}
@@ -79,15 +79,11 @@ export const mountSettings = (drawer, context) => {
     save(values)
   }
 
-  const heading = Object.assign(document.createElement('h2'), { textContent: 'Settings' })
-  const body = document.createElement('div')
-  const autoPerform = Object.assign(document.createElement('section'), { id: 'autoPerform' })
   for (const setting of SETTINGS) {
     values[setting.id] = validOr(setting, stored[setting.id])
     fields[setting.id] = field(setting, values[setting.id], value => set(setting.id, value))
-    body.append(fields[setting.id].row)
   }
-  drawer.replaceChildren(heading, body, autoPerform)
+  container.replaceChildren(...SETTINGS.map(setting => fields[setting.id].row))
   for (const setting of SETTINGS) set(setting.id, values[setting.id])
 
   const handleKey = key => {
@@ -105,8 +101,5 @@ export const mountSettings = (drawer, context) => {
     get: id => values[id],
     set,
     handleKey,
-    autoPerformContainer: autoPerform,
-    toggle: () => drawer.classList.toggle('open'),
-    isOpen: () => drawer.classList.contains('open'),
   }
 }

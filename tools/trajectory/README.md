@@ -16,10 +16,12 @@ cd tools && node trajectory/server.mjs [port]
 ```
 
 Then open **http://localhost:8766** in Chrome. The player is the repo's main tool: it plays a track right on localhost
-(no strudel.cc needed) and shows the visuals right behind it: every stem with its name, tempo from Strudel's clock.
+(no strudel.cc needed) and shows its MIDI panel full size: both LC pages and the Launchkey row with every control's
+name and value (the track's LC view). The visuals (every stem with its name, tempo from Strudel's clock) are the
+second view of the same page.
 The server only answers to its own pages (Origin and Host are checked on the routes that run something).
 
-1. Pick a track in the list at the top: **Live** holds the one-file live tracks (007-010), **Lab** the boards from
+1. Pick a track in the sidebar: **Live** holds the one-file live tracks (007-010), **Lab** the boards from
    `lab/`. Boards without a master `stack(` cannot be tapped and are greyed out.
 2. **Play**. The player taps the track file in memory each time it loads it, so editing a track and pressing Play
    plays the edit; there is no tapped copy on disk and no extra step. Picking another track while one plays stops it
@@ -32,15 +34,21 @@ The server only answers to its own pages (Origin and Host are checked on the rou
 Play never waits on Web MIDI: if the browser does not answer within 2 s (or there is none, as in a built-in browser
 pane), the status line says "No MIDI" and the track plays with the virtual controller only.
 
-The track's status box (bottom right) hides while its LC view ("▣ LC big") is open in another window.
+### Layout
 
-The top bar holds the track list, Play, Stop, the status line, Settings and the page links (Player, Tools,
-Analysis). It hides after 3 s without the mouse.
+- **Sidebar** (left, **☰** or key **S** hides and shows it): the views and pages (MIDI panel, Visualization, Tools,
+  Analysis), the track list with Play, Stop, Record and Save take, Auto-perform, and Visual settings (folded).
+- **MIDI panel** (the start view): the track's LC view, drawn into the page instead of its own window. A board
+  without an LC view says so; its visuals still play.
+- **Visualization**: the visuals full screen behind the sidebar. Switching views keeps the sound playing; the visuals
+  pause while the MIDI panel shows. The top bar hides after 3 s without the mouse here. The track's status box
+  (bottom right) shows only in this view; its "▣ LC big" still opens the LC view in its own window, and the MIDI
+  panel takes it back when it shows again.
+- **Top bar**: ☰, the status line and **?**, which opens "About this page" (closed on every load).
 
-### Settings drawer
+### Visual settings
 
-**Settings** (or key **S**) opens a drawer; it is generated from `settings.mjs` and every value is kept in
-`localStorage`.
+The Visual settings in the sidebar are generated from `settings.mjs`; every value is kept in `localStorage`.
 
 - **Hard ↔ Soft** (0…1, start 0): character of the visuals. 0 = sawtooth crests, angular lines, every past time slice
   with an edge, instant response, camera pushed by the beat; 1 = round waves, thick soft crests, motion smear, sluggish
@@ -53,7 +61,7 @@ Analysis). It hides after 3 s without the mouse.
   used last in the LC view) · **V** look (deck / ocean / clean) · **W** pan width (stretches the range the music
   used).
 - **F** toggles fullscreen.
-- **Auto-perform** section, key **P**: see below.
+- **Auto-perform** (sidebar), key **P**: see below.
 
 ### Auto-perform
 
@@ -123,11 +131,11 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   cycle 0: bar 0 of a script is cycle 0, alternations (`<a b>`) and slow patterns start in the same phase on every
   Play and Start, and the query grid is the same on every run. Values set before a load survive it (the ports keep
   their last value per CC), which is why a script is primed before the load (see Takes).
-- Pick a script in the drawer, **Start** (or **P**) reloads the track so the script begins from silence; **Stop** (or
+- Pick a script in the sidebar, **Start** (or **P**) reloads the track so the script begins from silence; **Stop** (or
   **P**) ends it and releases held keys (the controls keep their values). The next Start sets every control of both
   virtual inputs back to 0 before the track loads, then sets the script's bar-0 values.
 - Takes you saved (below) are listed with the scripts as `takes/<name>` and play the same way.
-- While a script plays, the drawer shows its title, mood and sections (the current one in bold, `intent` on hover),
+- While a script plays, the sidebar shows its title, mood and sections (the current one in bold, `intent` on hover),
   and the top bar the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
   step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 31-38, keys that parse,
@@ -139,7 +147,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 
 ### Recording audio
 
-**Record** (button in the top bar and the drawer, key **R**) writes what you hear, the master output, as a WAV file.
+**Record** (button in the sidebar, key **R**) writes what you hear, the master output, as a WAV file.
 
 - Human recording: from Record to **Stop rec** (or Stop, or another track). Auto-perform with **Record audio** ticked
   records from Start to the end of the script plus 4 s; Stop, another track or a new Start ends it earlier.
@@ -157,7 +165,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 ### Takes and replay
 
 Every load (Play, auto-perform Start) opens a capture of all MIDI input: controllers, virtual inputs and Launchkey
-keys, pads, knobs and mod wheel (`take.mjs`). The capture before it is dropped. **Save take** (drawer, section Take)
+keys, pads, knobs and mod wheel (`take.mjs`). The capture before it is dropped. **Save take** (sidebar, under Play)
 turns the current capture into an auto-perform script and writes it, uncommitted (`tools/trajectory/perform/*/takes/`
 is gitignored):
 
@@ -183,7 +191,7 @@ spoils a capture or a replay; keep the player visible.
 and commit it.
 
 **Replay fidelity.** Save the replay as a take as well: it names its original (`take.script`), and saving answers
-with the verdict in the drawer. `node trajectory/check-replay.mjs <track> [takes/<replay take>]` (Tools: Check replay
+with the verdict in the sidebar. `node trajectory/check-replay.mjs <track> [takes/<replay take>]` (Tools: Check replay
 fidelity) compares the events of every replay take with those of its original, bar by bar, and lists each differing
 bar with a reason: `value` (a control read another value, one MIDI step off is expected on thinned ramps), `timing`
 (a key, press or move landed one query off) or `only` (an event of one play with no partner: button state, level or
@@ -256,15 +264,15 @@ Both inputs write **the same format**; the renderer does not know where the musi
 | `strudel-source.mjs` | Strudel events → lines, each event appears when it sounds (`delay`) |
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
 | `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, `/tools` and `/run` (Tools page), relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
-| `player.html` | the player page: loads a track through the engine, shows it with `render.mjs`, top bar and drawer |
+| `player.html` | the player page: loads a track through the engine, the sidebar, the MIDI panel (the track's LC view in an iframe) and the visuals (`render.mjs`) |
 | `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
-| `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the drawer section |
+| `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the sidebar section |
 | `take.mjs`, `take-save.mjs` | the capture of a play's MIDI input and its conversion to a take script; `POST /take/<track>` writes the take and its events |
 | `recorder.mjs`, `recorder-worklet.js`, `recording.mjs` | the audio recorder in the page (master bus tap, PCM worklet) and the server side that writes the WAV and sidecar |
 | `replay-check.mjs`, `check-replay.mjs` | replay fidelity: the pure event comparison and its CLI |
 | `check-recording.mjs` | end-to-end test of the recording endpoints |
-| `settings.mjs` | every visual setting as data; builds the drawer and the keys |
+| `settings.mjs` | every visual setting as data; builds the Visual settings and the keys |
 | `catalogue.mjs` | scans live tracks and lab boards, their auto-perform scripts |
 | `tools.mjs` | the Tools page commands (whitelist), job runner |
 | `tools.html`, `nav.mjs`, `help.mjs`, `ui.css` | the Tools page, the shared top navigation, the Help panel and look |
