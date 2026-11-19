@@ -1,0 +1,843 @@
+{
+ "track": "001-groove",
+ "title": "Sound Tour",
+ "bars": 176,
+ "mood": "sunny disco groove into a night-time rave and home",
+ "sections": [
+  {
+   "name": "Intro",
+   "from": 0,
+   "to": 8,
+   "intent": "Beat at once, no bare-kick intro"
+  },
+  {
+   "name": "Hats",
+   "from": 8,
+   "to": 16,
+   "intent": "All three hat patterns, swing, long open hats"
+  },
+  {
+   "name": "Snare",
+   "from": 16,
+   "to": 24,
+   "intent": "The gated 80s snare, its tail, the clap, a roll"
+  },
+  {
+   "name": "Bass",
+   "from": 24,
+   "to": 40,
+   "intent": "Disco octave bass, its three lines"
+  },
+  {
+   "name": "Chords",
+   "from": 40,
+   "to": 56,
+   "intent": "Juno chords, their rhythms, a new progression"
+  },
+  {
+   "name": "Hook",
+   "from": 56,
+   "to": 72,
+   "intent": "The playful top line, with and without vibrato"
+  },
+  {
+   "name": "Arp",
+   "from": 72,
+   "to": 88,
+   "intent": "Italo arpeggio, its four shapes"
+  },
+  {
+   "name": "Strings",
+   "from": 88,
+   "to": 104,
+   "intent": "Disco strings held, stabbed and swiped"
+  },
+  {
+   "name": "Break",
+   "from": 104,
+   "to": 120,
+   "intent": "The rave side: acid and breakbeat, Rhodes over the top"
+  },
+  {
+   "name": "Drop",
+   "from": 120,
+   "to": 136,
+   "intent": "Italo night: electro, the pad swelling, a roll"
+  },
+  {
+   "name": "Peak",
+   "from": 136,
+   "to": 152,
+   "intent": "Everything at once in the rave chapter"
+  },
+  {
+   "name": "Outro",
+   "from": 152,
+   "to": 176,
+   "intent": "Home to boogie, strip down, fade"
+  }
+ ],
+ "steps": [
+  {
+   "bar": 0,
+   "cc": 12,
+   "value": 0.65
+  },
+  {
+   "bar": 0,
+   "cc": 5,
+   "value": 0.8
+  },
+  {
+   "bar": 0,
+   "cc": 29,
+   "value": 1,
+   "ramp": 4
+  },
+  {
+   "bar": 0,
+   "cc": 10,
+   "value": 0.5
+  },
+  {
+   "bar": 0,
+   "cc": 18,
+   "value": 0.2
+  },
+  {
+   "bar": 1,
+   "cc": 18,
+   "value": 0.8,
+   "ramp": 7
+  },
+  {
+   "bar": 4,
+   "cc": 29,
+   "value": 0.4,
+   "ramp": 2
+  },
+  {
+   "bar": 7.5,
+   "press": 42
+  },
+  {
+   "bar": 8,
+   "cc": 34,
+   "value": 0.6,
+   "ramp": 4
+  },
+  {
+   "bar": 11.5,
+   "press": 42
+  },
+  {
+   "bar": 12,
+   "cc": 34,
+   "value": 0.2,
+   "ramp": 1
+  },
+  {
+   "bar": 14,
+   "cc": 50,
+   "value": 1
+  },
+  {
+   "bar": 15.5,
+   "press": 42
+  },
+  {
+   "bar": 16,
+   "cc": 50,
+   "value": 0
+  },
+  {
+   "bar": 16,
+   "cc": 6,
+   "value": 0.6
+  },
+  {
+   "bar": 16,
+   "cc": 30,
+   "value": 1,
+   "ramp": 4
+  },
+  {
+   "bar": 19.5,
+   "press": 38
+  },
+  {
+   "bar": 20,
+   "cc": 30,
+   "value": 0.4,
+   "ramp": 1
+  },
+  {
+   "bar": 23,
+   "cc": 46,
+   "value": 1
+  },
+  {
+   "bar": 24,
+   "cc": 46,
+   "value": 0
+  },
+  {
+   "bar": 24,
+   "cc": 7,
+   "value": 0.6
+  },
+  {
+   "bar": 24,
+   "cc": 31,
+   "value": 0.8,
+   "ramp": 4
+  },
+  {
+   "bar": 24,
+   "cc": 15,
+   "value": 0.3
+  },
+  {
+   "bar": 28,
+   "cc": 31,
+   "value": 0,
+   "ramp": 2
+  },
+  {
+   "bar": 31.5,
+   "press": 39
+  },
+  {
+   "bar": 32,
+   "cc": 15,
+   "value": 0.7,
+   "ramp": 8
+  },
+  {
+   "bar": 35.5,
+   "press": 39
+  },
+  {
+   "bar": 38,
+   "cc": 47,
+   "value": 1
+  },
+  {
+   "bar": 40,
+   "cc": 47,
+   "value": 0
+  },
+  {
+   "bar": 40,
+   "cc": 53,
+   "value": 0.55
+  },
+  {
+   "bar": 44,
+   "cc": 77,
+   "value": 0.7,
+   "ramp": 4
+  },
+  {
+   "bar": 47.5,
+   "press": 93
+  },
+  {
+   "bar": 51.5,
+   "press": 93
+  },
+  {
+   "bar": 55.5,
+   "press": 93
+  },
+  {
+   "bar": 55.5,
+   "press": 85
+  },
+  {
+   "bar": 56,
+   "cc": 77,
+   "value": 0.3,
+   "ramp": 1
+  },
+  {
+   "bar": 56,
+   "cc": 56,
+   "value": 0.6
+  },
+  {
+   "bar": 60,
+   "cc": 80,
+   "value": 0.8,
+   "ramp": 4
+  },
+  {
+   "bar": 63,
+   "cc": 96,
+   "value": 1
+  },
+  {
+   "bar": 63.5,
+   "press": 88
+  },
+  {
+   "bar": 64,
+   "cc": 96,
+   "value": 0
+  },
+  {
+   "bar": 71,
+   "cc": 96,
+   "value": 1
+  },
+  {
+   "bar": 72,
+   "cc": 96,
+   "value": 0
+  },
+  {
+   "bar": 72,
+   "cc": 56,
+   "value": 0,
+   "ramp": 2
+  },
+  {
+   "bar": 72,
+   "cc": 55,
+   "value": 0.5
+  },
+  {
+   "bar": 72,
+   "cc": 79,
+   "value": 0.6,
+   "ramp": 8
+  },
+  {
+   "bar": 75.5,
+   "press": 87
+  },
+  {
+   "bar": 79.5,
+   "press": 87
+  },
+  {
+   "bar": 83.5,
+   "press": 87
+  },
+  {
+   "bar": 86,
+   "cc": 95,
+   "value": 1
+  },
+  {
+   "bar": 87,
+   "cc": 45,
+   "value": 1
+  },
+  {
+   "bar": 88,
+   "cc": 95,
+   "value": 0
+  },
+  {
+   "bar": 88,
+   "cc": 45,
+   "value": 0
+  },
+  {
+   "bar": 88,
+   "cc": 55,
+   "value": 0.3,
+   "ramp": 2
+  },
+  {
+   "bar": 88,
+   "cc": 57,
+   "value": 0.5
+  },
+  {
+   "bar": 88,
+   "cc": 81,
+   "value": 0.3
+  },
+  {
+   "bar": 95.5,
+   "press": 89
+  },
+  {
+   "bar": 95.5,
+   "press": 85
+  },
+  {
+   "bar": 96,
+   "cc": 81,
+   "value": 0.8
+  },
+  {
+   "bar": 103,
+   "cc": 97,
+   "value": 1
+  },
+  {
+   "bar": 103.5,
+   "press": 52
+  },
+  {
+   "bar": 103.5,
+   "lk": 31,
+   "value": 0.6
+  },
+  {
+   "bar": 103.5,
+   "lk": 35,
+   "value": 0.6
+  },
+  {
+   "bar": 103.5,
+   "lk": 32,
+   "value": 0.66
+  },
+  {
+   "bar": 103.5,
+   "lk": 1,
+   "value": 0.5
+  },
+  {
+   "bar": 104,
+   "cc": 97,
+   "value": 0
+  },
+  {
+   "bar": 104,
+   "cc": 8,
+   "value": 0.55
+  },
+  {
+   "bar": 104,
+   "cc": 32,
+   "value": 1,
+   "ramp": 8
+  },
+  {
+   "bar": 104,
+   "cc": 20,
+   "value": 0.6,
+   "ramp": 2
+  },
+  {
+   "bar": 104,
+   "keys": "d3 f3 a3 c4",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 105,
+   "keys": "d3 f3 a3 c4",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 106,
+   "cc": 20,
+   "value": 0,
+   "ramp": 2
+  },
+  {
+   "bar": 106,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 107,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 107.5,
+   "press": 40
+  },
+  {
+   "bar": 108,
+   "cc": 11,
+   "value": 0.5
+  },
+  {
+   "bar": 108,
+   "keys": "b2 d3 f3 a3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 109,
+   "keys": "b2 d3 f3 a3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 110,
+   "cc": 48,
+   "value": 1
+  },
+  {
+   "bar": 110,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 111,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 111.5,
+   "press": 40
+  },
+  {
+   "bar": 111.5,
+   "press": 43
+  },
+  {
+   "bar": 112,
+   "cc": 48,
+   "value": 0
+  },
+  {
+   "bar": 112,
+   "cc": 35,
+   "value": 0.7,
+   "ramp": 4
+  },
+  {
+   "bar": 112,
+   "keys": "d3 f3 a3 c4",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 113,
+   "keys": "d3 f3 a3 c4",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 114,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 115,
+   "cc": 51,
+   "value": 1
+  },
+  {
+   "bar": 115,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 116,
+   "cc": 51,
+   "value": 0
+  },
+  {
+   "bar": 116,
+   "keys": "b2 d3 f3 a3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 117,
+   "keys": "b2 d3 f3 a3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 118,
+   "cc": 28,
+   "value": 0.7,
+   "ramp": 2
+  },
+  {
+   "bar": 118,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 119,
+   "keys": "c3 e3 g3 b3",
+   "velocity": 0.7,
+   "length": 1
+  },
+  {
+   "bar": 119,
+   "lk": 1,
+   "value": 0,
+   "ramp": 1
+  },
+  {
+   "bar": 119.5,
+   "press": 52
+  },
+  {
+   "bar": 119.5,
+   "press": 44
+  },
+  {
+   "bar": 120,
+   "cc": 28,
+   "value": 0
+  },
+  {
+   "bar": 120,
+   "cc": 9,
+   "value": 0.5
+  },
+  {
+   "bar": 120,
+   "cc": 33,
+   "value": 0.8,
+   "ramp": 4
+  },
+  {
+   "bar": 120,
+   "cc": 54,
+   "value": 0.5
+  },
+  {
+   "bar": 120,
+   "cc": 59,
+   "value": 0.6
+  },
+  {
+   "bar": 120,
+   "pad": 46,
+   "velocity": 0.9
+  },
+  {
+   "bar": 123.5,
+   "press": 41
+  },
+  {
+   "bar": 123.5,
+   "press": 86
+  },
+  {
+   "bar": 127,
+   "cc": 49,
+   "value": 1
+  },
+  {
+   "bar": 127.5,
+   "press": 41
+  },
+  {
+   "bar": 127.5,
+   "press": 86
+  },
+  {
+   "bar": 128,
+   "cc": 49,
+   "value": 0
+  },
+  {
+   "bar": 128,
+   "cc": 36,
+   "value": 0.85,
+   "ramp": 8
+  },
+  {
+   "bar": 135,
+   "cc": 94,
+   "value": 1
+  },
+  {
+   "bar": 135.5,
+   "press": 44
+  },
+  {
+   "bar": 135.5,
+   "press": 88
+  },
+  {
+   "bar": 135.5,
+   "press": 37
+  },
+  {
+   "bar": 136,
+   "cc": 94,
+   "value": 0
+  },
+  {
+   "bar": 136,
+   "cc": 36,
+   "value": 0.3
+  },
+  {
+   "bar": 136,
+   "cc": 12,
+   "value": 0.75,
+   "ramp": 2
+  },
+  {
+   "bar": 136,
+   "cc": 58,
+   "value": 0.5
+  },
+  {
+   "bar": 136,
+   "cc": 82,
+   "value": 0.8,
+   "ramp": 4
+  },
+  {
+   "bar": 136,
+   "cc": 56,
+   "value": 0.5
+  },
+  {
+   "bar": 136,
+   "cc": 83,
+   "value": 0.8
+  },
+  {
+   "bar": 136,
+   "pad": 46,
+   "velocity": 0.9
+  },
+  {
+   "bar": 139.5,
+   "press": 90
+  },
+  {
+   "bar": 143,
+   "cc": 98,
+   "value": 1
+  },
+  {
+   "bar": 143.5,
+   "press": 90
+  },
+  {
+   "bar": 143.5,
+   "press": 88
+  },
+  {
+   "bar": 144,
+   "cc": 98,
+   "value": 0
+  },
+  {
+   "bar": 148,
+   "cc": 99,
+   "value": 1
+  },
+  {
+   "bar": 149.5,
+   "press": 37
+  },
+  {
+   "bar": 151.5,
+   "press": 44
+  },
+  {
+   "bar": 151.5,
+   "press": 37
+  },
+  {
+   "bar": 152,
+   "cc": 99,
+   "value": 0
+  },
+  {
+   "bar": 152,
+   "cc": 58,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 56,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 55,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 57,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 54,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 59,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 53,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 152,
+   "cc": 36,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 160,
+   "cc": 8,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 160,
+   "cc": 11,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 160,
+   "cc": 9,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 160,
+   "cc": 6,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 160,
+   "cc": 7,
+   "value": 0,
+   "ramp": 8
+  },
+  {
+   "bar": 164,
+   "cc": 12,
+   "value": 0,
+   "ramp": 12
+  }
+ ]
+}

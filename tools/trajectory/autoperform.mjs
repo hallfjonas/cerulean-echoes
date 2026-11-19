@@ -221,7 +221,7 @@ const scriptInfo = script => {
   return { nodes, items }
 }
 
-// The Auto-perform section of the settings drawer: script select, Start / Stop (key P in the player), and while a
+// The Auto-perform section of the player sidebar: script select, Start / Stop (key P in the player), and while a
 // script plays its title, mood and sections with the current one marked
 export const mountAutoPerform = (container, { onStart, onStop }) => {
   const heading = element('h2', { textContent: 'Auto-perform' })

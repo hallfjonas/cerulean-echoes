@@ -26,6 +26,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
   column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in
   the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
+- `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
+  to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
@@ -134,10 +136,12 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
-- Settings drawer (key S) holds the visual settings; the Tools page (`/tools.html`) runs the Node checks (check
+- Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
+  Visualization), the page links, track, Play/Stop/Record/Save take, auto-perform and the visual settings; **?** opens
+  the help. The Tools page (`/tools.html`) runs the Node checks (check
   sounds, loudness, layouts, stem lab, set build) against a catalogue entry, one job at a time; Analysis
   (`/analyse.html`) is a tool there.
-- Auto-perform (drawer, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
+- Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
   (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).
