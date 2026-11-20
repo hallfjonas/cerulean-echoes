@@ -294,4 +294,7 @@ The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternat
   separately); the -60…0 dB mapping may need a calibration by ear/eye. On a phone the 11 px floors do not fit the
   board (no special small-screen layout any more). With the SC server running in Bluetooth call mode (16 kHz) the
   spectrum arrives ~7×/s instead of 20×/s (control rate follows the device).
-
+- 2026-11-20, user feedback: the status strip is back to its old content (8 bar marks, 4 beat dots, the global knobs'
+  values once above 0), on two lines under the spectrum (spectrum canvas 160 units instead of 190); the keyboard
+  is back to its look before the rebuild (distinct white / black key colours, taller, `◀ oct` / `oct ▶` beside it);
+  faders 130 units high so the board stays within 900 units.

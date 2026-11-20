@@ -12,7 +12,7 @@
    Flat: no gradients, shadows, glow or blur. Nothing dims except button text. */
 :root{--W:1600;--H:900}
 body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;
-  --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:transparent;--keyB:#2C2C2A;
+  --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:#46463F;--keyB:#0b0b0b;
   --font:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
 body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;
   --edge:#B4B2A9;--frame:#2C2C2A;--hit:#D85A30;--keyW:#F1EFE8;--keyB:#2C2C2A;
@@ -55,7 +55,7 @@ body[data-theme=te] .knob{width:calc(52 * var(--px))}
 .r1 .kb-disc{fill:#378ADD;stroke:#378ADD}.r2 .kb-disc{fill:#1D9E75;stroke:#1D9E75}.r3 .kb-disc{fill:#F1EFE8;stroke:#888780}
 .r1 .kb-ptr,.r2 .kb-ptr{stroke:#F1EFE8}.r3 .kb-ptr{stroke:#2C2C2A}
 /* fader: 28 x 150 units, track max(2px, 4 units), handle 28 x 12 */
-.fader{position:relative;width:calc(28 * var(--px));height:calc(150 * var(--px));margin-top:calc(4 * var(--px));flex:none}
+.fader{position:relative;width:calc(28 * var(--px));height:calc(130 * var(--px));margin-top:calc(4 * var(--px));flex:none}
 .fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
 .fader .handle{position:absolute;left:0;width:100%;height:calc(12 * var(--px));border-radius:1px;background:var(--handle);
   bottom:calc(var(--v, 0) * (100% - 12 * var(--px)))}
@@ -76,11 +76,11 @@ body[data-theme=te] .knob{width:calc(52 * var(--px))}
 .pad.on{background:var(--text);border-color:var(--text)}
 body[data-theme=te] .pad{border:0;background:var(--track);border-radius:50%}
 body[data-theme=te] .pad.on{background:var(--hit)}
-.oct{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.oct{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:calc(8 * var(--px));min-width:0}
 .oct span{font-size:var(--fs-btn);color:var(--off);line-height:1.2}
 .oct div{display:flex;gap:calc(10 * var(--px))}
 .oct button{font:inherit;font-size:var(--fs-btn);line-height:1.2;background:none;border:0;padding:0;color:var(--text);cursor:pointer}
-.keys{position:relative;height:calc(44 * var(--px))}
+.keys{position:relative;height:calc(64 * var(--px))}
 .keys i{position:absolute;top:0;font-style:normal;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
 .keys i.wht{height:100%;width:calc(100% / 15 + 1px);border:1px solid var(--track);background:var(--keyW);color:var(--off);
   font-size:var(--fs-knob);line-height:1.2;z-index:1;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
@@ -90,15 +90,18 @@ body[data-theme=te] .pad.on{background:var(--hit)}
 body.no-lk .lkbox{visibility:hidden}
 /* spectrum and status strip under Mode 2 (the status strip ends level with the Launchkey box) */
 .spec{flex:1;display:flex;flex-direction:column;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid transparent;min-height:0}
-.spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
-.head{margin-top:auto;padding-top:calc(6 * var(--px));display:flex;gap:calc(18 * var(--px));align-items:baseline;white-space:nowrap;
-  overflow:hidden;font-size:var(--fs-lab);line-height:1.4}
-.head>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
-.head>div.keep{flex-shrink:0}
+.spec canvas{display:block;width:100%;height:calc(160 * var(--px));flex:none}
+.head{margin-top:auto;padding-top:calc(6 * var(--px));display:flex;flex-direction:column;gap:calc(2 * var(--px));
+  font-size:var(--fs-lab);line-height:1.4;min-width:0}
+/* two lines: chapter / chords / break / global knobs, then bar marks, beats, chord and the theme switch */
+.head .row{display:flex;gap:calc(18 * var(--px));align-items:baseline;white-space:nowrap;overflow:hidden;min-width:0}
+.head .row>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
+.head .row>div.keep{flex-shrink:0}
 .head .k{color:var(--off);margin-right:.5em;text-transform:lowercase}.head .next{color:var(--off)}
 .warn{color:var(--accent);font-weight:600}
 .marks i{display:inline-block;background:var(--track);margin-left:max(2px, calc(4 * var(--px)));vertical-align:middle}
 .marks.beats i{width:max(5px, calc(9 * var(--px)));height:max(5px, calc(9 * var(--px)));border-radius:50%}
+.marks.bars i{width:max(7px, calc(14 * var(--px)));height:max(3px, calc(6 * var(--px)));border-radius:1px}
 .marks i.on{background:var(--text)}
 .marks,.chord{margin-left:.5em}
 .theme{font:inherit;background:none;border:0;color:var(--off);cursor:pointer;padding:0}.theme b{color:var(--text);font-weight:500}
@@ -232,7 +235,7 @@ const lkHtml = () => {
     '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '"><span class=btn>mod</span>' +
     '<div class=fader><div class=bar></div><div class=handle></div></div></div>' +
     '<div class=gr>' + LK_KNOBS.map((k, i) => '<div class=lkc>' + knob(k) + '<div class=pads>' + pad(PADS_TOP[i]) + pad(PADS_BOTTOM[i]) + '</div></div>').join('') + '</div>' +
-    '<div class=oct><span>oct</span><div><button data-oct="-24" title="two octaves down (Z)">◀</button><button data-oct="24" title="two octaves up (X)">▶</button></div></div>' +
+    '<div class=oct><button data-oct="-24" title="two octaves down (Z)">◀ oct</button><button data-oct="24" title="two octaves up (X)">oct ▶</button></div>' +
     '<div class=keys>' + keys + '</div></div></section>'
 }
 const lkAttach = root => {
@@ -397,16 +400,19 @@ const draw = () => {
   // status strip: what SC is doing, the track's head line (chapter, chords, break), bar and beat, controllers, theme
   const marks = (cls, n, on) => '<span class="marks ' + cls + '">' + [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('') + '</span>'
   const bt = S.beat
-  const beat = !bt ? '–' : ((bt.bar % 8) + 1) + '/8' + marks('beats', 4, bt.beat) +
+  const beat = !bt ? '–' : ((bt.bar % 8) + 1) + ' / 8' + marks('bars', 8, bt.bar % 8) + marks('beats', 4, bt.beat) +
     (bt.chord ? '<span class=chord>' + esc(bt.chord) + '</span>' : '')
   setText(document.getElementById('ports'), lcs ? lcs + ' Launch Control' + (lcs > 1 ? 's' : '') : 'no Launch Control: mouse only')
   const head = document.getElementById('head')
   head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
   const html =
     (!S.bridge ? '<div class="warn keep">Bridge not reachable</div>' : !S.sc ? '<div class="warn keep">SuperCollider not running</div>' : '') +
-    (S.state?.head ?? []).map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
-    '<div class=keep><span class=k>bar</span>' + beat + '</div>' +
-    '<div class=keep><button class=theme id=theme title="Panel theme (also in the player: Visual settings, key T)">' + themeLabel() + '</button></div>'
+    '<div class=row>' + (S.state?.head ?? []).map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
+    // the global knobs once they are up (fog / thin / tension), as before the rebuild
+    ['k1', 'k2', 'k3'].map(rw => [(tags()['g.' + rw] ?? rw).split(' | ')[0], S.cc[CC_ROW[rw] + 8]]).filter(([, v]) => v > 0.01)
+      .map(([k, v]) => '<div class="next keep"><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') + '</div>' +
+    '<div class=row><div class=keep><span class=k>bar</span>' + beat + '</div>' +
+    '<div class=keep style="margin-left:auto"><button class=theme id=theme title="Panel theme (also in the player: Visual settings, key T)">' + themeLabel() + '</button></div></div>'
   if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
 
