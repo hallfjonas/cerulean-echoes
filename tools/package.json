@@ -15,7 +15,7 @@
     "scenario": "node strudel-sim/scenario.mjs",
     "audibility": "node strudel-sim/audibility.mjs",
     "shared": "node shared/sync.mjs",
-    "test": "node --test 'trajectory/*.test.mjs'",
+    "test": "node --test 'trajectory/*.test.mjs' 'producer/*.test.mjs' 'sc-test/*.test.mjs'",
     "producer": "node producer/make-track.mjs"
   },
   "dependencies": {

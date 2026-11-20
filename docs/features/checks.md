@@ -11,6 +11,7 @@ dropouts, a sound that does not load.
 ## How to use it
 | Question | Command |
 |---|---|
+| Does every feature still work (player, takes, producer, SuperCollider tracks)? | `npm test` |
 | Is the edited track still fine overall? | `npm run verify -- <track>` |
 | Is every stem loud enough, and does anything clip? | `npm run audibility -- <track>` |
 | Did my edit change the sound? | `npm run compare -- <old.strudel> <new.strudel>` |

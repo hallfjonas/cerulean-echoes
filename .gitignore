@@ -10,6 +10,7 @@ node_modules/
 !.claude/settings.json
 !.claude/launch.json
 !.gitattributes
+!.github/
 Scarlett*
 *.band
 

@@ -105,6 +105,9 @@ Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed 
 with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
 
 Tools (run in `tools/`):
+- Does every feature still work? `npm test` (player, takes, producer, and SuperCollider: building blocks + every
+  `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`). Runs in CI on every PR;
+  the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output identical".
 - After editing a track: `npm run verify -- <track…>` (transpile, compare vs HEAD, sounds, layout/syx, tap, auto-perform scripts;
   no args = all changed tracks; `--online` checks sounds online)
 - Old vs new, event by event: `npm run compare -- <old.strudel> <new.strudel> [--stem <name>]`
