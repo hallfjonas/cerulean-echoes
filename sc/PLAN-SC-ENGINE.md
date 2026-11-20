@@ -134,7 +134,6 @@ written), never "is the output identical". Each runs in seconds; the whole suite
 | Auto-perform | every script in `perform/` passes `check-perform` and plays to its end on the engine without errors |
 | Takes | a captured take saves as a valid script v2 and replays (`check-replay`, loose bar-by-bar check) |
 | Recording | Record writes a WAV with sound in it and a sidecar that matches the take (`check-recording`) |
-| Tools page | each job starts, finishes and reports |
 | Producer | the two fixtures still turn into a track that loads and plays (no exact comparison needed) |
 | SC core | the building blocks in `sc/lib/` (mini-notation, latches, last-moved-wins) do their job: a few `UnitTest` cases run headless by one `sclang` script |
 

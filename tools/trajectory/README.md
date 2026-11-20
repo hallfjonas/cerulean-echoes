@@ -36,8 +36,7 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 
 ### Layout
 
-- **Sidebar** (left, **☰** or key **S** hides and shows it): the views and pages (MIDI panel, Visualization, Tools,
-  Analysis), the track list with Play, Stop, Record and Save take, Auto-perform, and Visual settings (folded).
+- **Sidebar** (left, **☰** or key **S** hides and shows it): the views (MIDI panel, Visualization), the track list with Play, Stop, Record and Save take, Auto-perform, and Visual settings (folded).
 - **MIDI panel** (the start view): the track's LC view, drawn into the page instead of its own window. A board
   without an LC view says so; its visuals still play.
 - **Visualization**: the visuals full screen behind the sidebar. Switching views keeps the sound playing; the visuals
@@ -197,19 +196,10 @@ bar with a reason: `value` (a control read another value, one MIDI step off is e
 (a key, press or move landed one query off) or `only` (an event of one play with no partner: button state, level or
 randomness). Takes with no events, no replay or no original are listed as such. Exit code 1 when a replay differs.
 
-### Tools page
-
-**http://localhost:8766/tools.html** runs the Node checks from the browser: pick a command, pick a track or board
-from the catalogue (filtered by what the command accepts), **Run** (live log) or **Stop**. One job runs at a time
-(a second request gets 409). The commands are a fixed list in `tools.mjs`: check sounds, loudness of every stem, layout
-sheet + syx, stem lab sync and check (boards), check replay fidelity (takes), build set 011. Paths never come from the page: a target is a catalogue
-id. **Analysis** (`analyse.html`) is a tool on the same page: the audio analysis from a file or input, with recording.
-
 ### Help panel
 
 Every page has a **Help** button (key **?**) that opens a collapsible panel on the right (open by default): what the page does, its input
-and output, how to use it. On the Tools page it follows the chosen command; the text lives with the command in
-`tools.mjs` (`help`: `does`, `input`, `output`, `use`). Closing it is remembered. A new page calls
+and output, how to use it. Closing it is remembered. A new page calls
 `mountHelp(sections)` from `help.mjs`.
 
 ### Strudel.cc
@@ -239,13 +229,12 @@ Old dual versions are tapped through their single version (e.g.
 ## How it is built
 
 ```
- Audio (file / input) ──analyse.mjs──┐
-                                     ├─► trajectory (lines) ─► render.mjs ─► canvas
- strudel.cc / player ──server.mjs──┘   strudel-source.mjs              └► recording (JSONL)
+ strudel.cc / player ──server.mjs──► strudel-source.mjs ─► trajectory (lines) ─► render.mjs ─► canvas
         (tapped in memory, make-tapped.mjs)
 ```
 
-Both inputs write **the same format**; the renderer does not know where the music comes from:
+The lines have one format; the renderer does not know where the music comes from (the audio analysis that also wrote
+it was retired on 2026-11-20):
 
 ```
 {"t":12.533,"stem":"bass","x":-0.12,"y":0.31,"z":0.20,"e":0.72,"on":1}
@@ -257,13 +246,11 @@ Both inputs write **the same format**; the renderer does not know where the musi
 
 | File | Job |
 |---|---|
-| `analyse.mjs` | core of the audio analysis (browser + Node): FFT 2048 for level/pan/onsets, 8192 for the pitch of kick and bass, tempo by autocorrelation |
-| `analyse-file.mjs` | CLI: file → JSONL + summary (drift = movement within 8 bars) |
 | `render.mjs` | picture. "deck" (default, like slide 6 of the deck): glowing comets with tails, rings from the kick, axes. "ocean": stems as liquid layers, time into depth, floating camera. "clean": comets, rings |
 | `smoothing.mjs` | slider Raw ↔ Smooth: moving average, window grows exponentially up to 2^53 lines |
 | `strudel-source.mjs` | Strudel events → lines, each event appears when it sounds (`delay`) |
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
-| `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, `/tools` and `/run` (Tools page), relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
+| `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
 | `player.html` | the player page: loads a track through the engine, the sidebar, the MIDI panel (the track's LC view in an iframe) and the visuals (`render.mjs`) |
 | `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
@@ -274,10 +261,8 @@ Both inputs write **the same format**; the renderer does not know where the musi
 | `check-recording.mjs` | end-to-end test of the recording endpoints |
 | `settings.mjs` | every visual setting as data; builds the Visual settings and the keys |
 | `catalogue.mjs` | scans live tracks and lab boards, their auto-perform scripts |
-| `tools.mjs` | the Tools page commands (whitelist), job runner |
-| `tools.html`, `nav.mjs`, `help.mjs`, `ui.css` | the Tools page, the shared top navigation, the Help panel and look |
+| `help.mjs`, `ui.css` | the Help panel and the look |
 | `banks.mjs` | sample banks and soundfonts the player loads, as strudel.cc does |
-| `analyse.html` | the analysis page: sources, channel choice, recording, keys |
 
 ## What we learned
 

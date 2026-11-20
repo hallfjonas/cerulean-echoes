@@ -1,6 +1,5 @@
 // Collapsible help panel on the right of every page: what the page or tool does, its inputs and outputs, how to use it.
-// mountHelp(sections) adds a Help button (key ?) to the header and returns { setSections } to swap the content, as the
-// Tools page does when another command is picked. A section is { heading, text } with text a string or a list of
+// mountHelp(sections) adds a Help button (key ?) to the header and returns { setSections } to swap the content. A section is { heading, text } with text a string or a list of
 // strings (shown as numbered steps). Open by default and opening or closing it is remembered across pages; a page that
 // passes startOpen: false always starts with it closed.
 const STORAGE_KEY = 'trajectory-help-open'

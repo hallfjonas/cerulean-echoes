@@ -32,7 +32,6 @@ dropouts, a sound that does not load.
 - These checks work on event data and a simulated renderer, not on a speaker: they find silence, clipping and drift,
   not taste.
 - A bad sound is reported as broken or unchecked; sounds from your own samples load only after a push to `main`.
-- The Tools page of the [player](player.md) (`/tools.html`) runs the same checks from the browser.
 - Run one heavy check at a time; the laptop is shared.
 - Skills that drive these tools: `strudel-optimize` (same sound, less CPU), `strudel-mix` (levels).
 
