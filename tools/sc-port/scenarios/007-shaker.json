@@ -1,0 +1,329 @@
+[
+ {
+  "name": "shaker-base",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-bright0",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "18": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-bright05",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "18": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-bright1",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "18": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-char03",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "34": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-char05",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "34": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-char08",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "34": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-char1",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "34": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-space05",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "26": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-patterns",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 42,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 42,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 42,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 42,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shaker-btn2",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 50,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 50,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shaker-chapter",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shaker-break",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shaker-fogtension",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-tension1",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "shaker-room",
+  "strudel": "stemJ6_shaker",
+  "sc": "shaker",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "28": 0.5,
+    "26": 0.3
+   },
+   "events": []
+  }
+ }
+]

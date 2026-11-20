@@ -1,0 +1,374 @@
+[
+ {
+  "name": "sub-base",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-bright0",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "15": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-bright05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "15": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-bright1",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "15": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-char05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "31": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-char1",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "31": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-char03",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "31": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-char08",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "31": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-space05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "23": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-patterns",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 39,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 39,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 39,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 39,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-btn2",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 47,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 47,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-chapter",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-break",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-fogtension",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-tension1",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-thin",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-prog",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 140,
+   "cycles": 24,
+   "cc": {
+    "7": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 8.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 8.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 16.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 16.6,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ }
+]

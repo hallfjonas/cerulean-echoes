@@ -1,0 +1,293 @@
+[
+ {
+  "name": "choir-base",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-bright0",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "65": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-bright05",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "65": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-bright1",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "65": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-char03",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "81": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-char05",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "81": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-char08",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "81": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-char1",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "81": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-space05",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "73": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-patterns",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 89,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 89,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 89,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 89,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "choir-btn2",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 97,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 97,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "choir-chapter",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "choir-fogtension",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-tension1",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "choir-room",
+  "strudel": "stemN5_choir",
+  "sc": "choir",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "57": 1,
+    "12": 1,
+    "28": 0.5,
+    "73": 0.3
+   },
+   "events": []
+  }
+ }
+]

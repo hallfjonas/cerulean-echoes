@@ -1,0 +1,359 @@
+[
+ {
+  "name": "keys-base",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-bright0",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "62": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-bright05",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "62": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-bright1",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "62": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-char03",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-char05",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-char08",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-char1",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-space05",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "70": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-patterns",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 18,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 7.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 7.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 9.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 9.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 11.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 11.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 13.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 13.6,
+     "cc": 86,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "keys-btn2",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "keys-chapter",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 12,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "keys-fogtension",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-tension1",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-thin",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "keys-roomt",
+  "strudel": "stemN2_keys",
+  "sc": "keys",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "36": 0.4,
+    "70": 0.3
+   },
+   "events": []
+  }
+ }
+]

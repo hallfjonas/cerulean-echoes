@@ -1,0 +1,1396 @@
+[
+ {
+  "name": "noise-base",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-bright05",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "14": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-bright1",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "14": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-space05",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "22": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-char05",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "30": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-char1",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "30": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-pat2",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 38,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 38,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "noise-pat3",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 38,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 38,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 38,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 38,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "noise-btn2",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.3,
+     "cc": 46,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 46,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "noise-fog-tension",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "20": 0.6,
+    "36": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-thin05",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "noise-break",
+  "strudel": "stemJ2_noise",
+  "sc": "noise",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "6": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6500000000000001,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.3,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.3499999999999996,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-base",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-bright05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "15": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-bright1",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "15": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-space05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "23": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-char05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "31": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-char1",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "31": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-pat2",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 39,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 39,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-pat3",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 39,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 39,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 39,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 39,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-btn2",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.3,
+     "cc": 47,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 47,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-fog-tension",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "20": 0.6,
+    "36": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-thin05",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "sub-break",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6500000000000001,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.3,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.3499999999999996,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-base",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-bright05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "17": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-bright1",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "17": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-space05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "25": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-char05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "33": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-char1",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "33": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-pat2",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 41,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 41,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-pat3",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 41,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 41,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 41,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 41,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-btn2",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.3,
+     "cc": 49,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 49,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-fog-tension",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "20": 0.6,
+    "36": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-thin05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-break",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6500000000000001,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.3,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.3499999999999996,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "hats-base",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-bright05",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "18": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-bright1",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "18": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-space05",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "26": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-char05",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "34": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-char1",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "34": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-pat2",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 42,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 42,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "hats-pat3",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 42,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 42,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 42,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 42,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "hats-btn2",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.3,
+     "cc": 50,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 50,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "hats-fog-tension",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "20": 0.6,
+    "36": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-thin05",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "hats-break",
+  "strudel": "stemJ6_hats",
+  "sc": "hats",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "10": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6500000000000001,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.3,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.3499999999999996,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-base",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-bright05",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "19": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-bright1",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "19": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-space05",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "27": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-char05",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "35": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-char1",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "35": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-pat2",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 43,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-pat3",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.3,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 43,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 43,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-btn2",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.3,
+     "cc": 51,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 51,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-fog-tension",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "20": 0.6,
+    "36": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-thin05",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-break",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6500000000000001,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.3,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.3499999999999996,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-chapter",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 16,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 0.55,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 0.3,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.35,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 0.4,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.45,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "sub-drop",
+  "strudel": "stemJ3_sub",
+  "sc": "sub",
+  "events": "generic",
+  "scen": {
+   "bpm": 124,
+   "cycles": 6,
+   "cc": {
+    "7": 1,
+    "12": 1,
+    "60": 1
+   },
+   "events": [
+    {
+     "t": 1.3,
+     "cc": 45,
+     "v": 1
+    },
+    {
+     "t": 2.6,
+     "cc": 45,
+     "v": 0
+    }
+   ]
+  }
+ }
+]

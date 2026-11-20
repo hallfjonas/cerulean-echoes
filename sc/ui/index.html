@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>LC XL 3</title>
+<style>
+:root{--acc:#ddd}html,body{margin:0;height:100%;background:#111;color:#eee;font:clamp(10px,.8vw,18px)/1.25 system-ui,sans-serif;user-select:none;-webkit-user-select:none}
+.pages{flex:1;display:flex;gap:1vw;min-height:0}
+.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:.4vh;min-height:0;padding:.6vh .8vw;border:2px solid #222;border-radius:8px}
+.page.live{border-color:var(--acc)}.page h2{margin:0;font-size:1.15em;color:var(--acc)}
+#lc{display:flex;flex-direction:column;gap:1vh;padding:1.5vh 1.5vw;box-sizing:border-box;height:100%;overflow:hidden}
+.head{display:flex;gap:2.5vw;align-items:baseline;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;height:1.9em;flex:none}
+.head>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}.head>div.ports,.head>div.help{flex-shrink:2}.head h1{margin:0;font-size:1.6em;color:var(--acc)}
+.head .k{opacity:.6;margin-right:.4em}.next{color:var(--acc)}.warn{color:#f66;font-weight:600}.ports{opacity:.55;font-size:.85em}
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:2.9em repeat(3,minmax(0,1fr)) minmax(0,1.4fr) 3.3em 3.3em;gap:.8vh .5vw}
+.col{text-align:center;font-weight:600;padding:.3em;border-bottom:2px solid #333;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}.col.g{color:var(--acc)}
+.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.1em;min-width:0;min-height:0}
+.cell span{opacity:.7;font-size:.85em;overflow-wrap:anywhere}.cell b{font-variant-numeric:tabular-nums}
+.dial{width:min(3vw,6.5vh);aspect-ratio:1;border-radius:50%;
+background:conic-gradient(from -135deg,var(--acc) 0 calc(var(--v)*270deg),#333 0 270deg,transparent 0);
+-webkit-mask:radial-gradient(circle,transparent 52%,#000 54%);mask:radial-gradient(circle,transparent 52%,#000 54%)}
+.bar{position:relative;width:1vw;min-width:12px;flex:1;min-height:30px;background:#333;border-radius:4px;overflow:hidden}
+.bar i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v)*100%);background:var(--acc)}
+.btn{background:#222;border-radius:6px;padding:.4em .3em;justify-content:flex-start;overflow:hidden;box-sizing:border-box}
+.btn b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.btn .next{display:block;overflow:hidden;text-overflow:ellipsis}.btn.on{background:var(--acc);color:#111}
+.btn.on span{opacity:.8}.btn b{font-size:1.05em}.btn.hold{outline:2px dashed var(--acc);outline-offset:-4px}
+.beats{margin-left:.6em}.beats i{display:inline-block;width:.75em;height:.75em;border-radius:50%;background:#333;margin-left:.3em}
+.beats i:first-child{outline:2px solid #555}.beats i.on{background:var(--acc)}
+.bars{margin-left:.6em}.bars i{display:inline-block;width:1.1em;height:.55em;border-radius:2px;background:#333;margin-left:.15em}
+.bars i.on{background:var(--acc)}.chord{margin-left:.6em;font-weight:600;color:var(--acc)}
+/* Launchkey row (as the Strudel view), playable: knobs, mod wheel, 25 keys, 16 pads */
+.lk{flex:none;display:flex;flex-direction:column;gap:.5vh;padding:.6vh .8vw;border:2px solid #222;border-radius:8px;--acc:#8fd18f}
+.lk.live{border-color:var(--acc)}.lk h2{margin:0;font-size:1.15em;color:var(--acc)}
+.lkbody{display:flex;gap:1vw}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:.5vh}
+.lkrow{display:grid;grid-template-columns:repeat(8,1fr);gap:.8vw;height:11vh}.lkbody>.fader{flex:none;width:5vw;justify-content:flex-start}
+.lkplay{display:flex;gap:2vw;height:9vh}.lkoct{display:flex;flex-direction:column;justify-content:center;gap:.3em;font-size:.85em}
+.lkoct button{background:#222;color:#eee;border:0;border-radius:4px;padding:.2em .5em;cursor:pointer}
+.lkkeys{flex:3;display:grid;grid-template-columns:repeat(25,1fr);gap:2px}
+.lkkeys i{border-radius:3px;background:#3a3a3a;cursor:pointer;font-style:normal;font-size:.7em;display:flex;align-items:flex-end;justify-content:center;color:#888}
+.lkkeys i.blk{background:#1c1c1c;border:1px solid #444}.lkkeys i.on{background:var(--acc);color:#111}
+.lkpads{flex:2;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:1fr 1fr;gap:4px}
+.lkpads i{border-radius:4px;background:#2a2a2a;cursor:pointer;font-style:normal;font-size:.72em;display:flex;align-items:center;justify-content:center;text-align:center;color:#aaa;overflow:hidden}
+.lkpads i.on{background:#f0a040;color:#111}.lkkeys i:hover,.lkpads i:hover{filter:brightness(1.4)}
+/* interactive */
+.ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.cell.off{opacity:.18;pointer-events:none}
+.ctl:hover .dial,.ctl:hover .bar{filter:brightness(1.3)}.btn.ctl:hover{background:#2c2c2c}.btn.ctl.on:hover{background:var(--acc)}
+.help{opacity:.45;font-size:.8em;margin-left:auto}
+@media (max-width:900px){#lc{height:auto;overflow:visible}.pages{flex-direction:column}.page{min-height:92vh}html,body{font-size:12px}
+ .dial{width:9vw}.bar{width:4vw}.help{display:none}}
+</style>
+</head>
+<body>
+<div id=lc><div class=head><span class=warn>Waiting for the bridge …</span></div></div>
+<script>
+// LC view for the SuperCollider version, interactive: drag knobs (up/down; Shift = fine; double-click = 0), click or
+// drag faders, press buttons (Shift-click = keep the button held until the next click). Same look as the ▣ LC big
+// view of the Strudel tracks. Values come from SuperCollider (also every move on a Launch Control); a click sends the
+// same CC a Launch Control would send, so for the track it makes no difference where a move comes from.
+const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
+const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 1)
+const PAGES = ['jojo', 'jonas'], PREFIX = { jojo: '16', jonas: '2' }, ACC = { jojo: '#f0a040', jonas: '#50c8e8' }
+const S = { layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
+  lk: {}, lkBase: 48, lkLit: new Map(), lkLive: 0 }   // Launchkey: control values, keyboard window, lit keys/pads
+const held = new Set()   // CCs kept held by Shift-click
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const tags = () => S.layout?.tags ?? {}
+const isGlobal = n => n === 8
+// CC of a control: Jojo plain, Jonas + 48 (column 8: plain on both pages, SC maps the Mode 2 CCs onto them)
+const ccOf = (page, n, row) => CC_ROW[row] + n + (page === 'jonas' && n < 8 ? 48 : 0)
+const tagOf = (page, n, row) => tags()[isGlobal(n) ? 'g.' + row : PREFIX[page] + ':' + n + '.' + row]
+const ported = (page, n) => isGlobal(n) || ROWS.some(r => tagOf(page, n, r))
+const pageOfCc = cc => cc > 52 ? 'jonas' : (cc - 4) % 8 === 0 ? S.page : 'jojo'
+const shortTitle = t => {
+  const m = (t ?? '').match(/^(.*?) — .*?\((.+?)\)/)
+  if (!m) return (t ?? '').split(' · ')[0]
+  return m[1] + ' — ' + m[2][0].toUpperCase() + m[2].slice(1)
+}
+
+// ---- sending: coalesced per frame, one POST per batch ----
+// knob/fader moves of one control collapse to the latest value; button presses are all sent (press + release)
+const isBtn = cc => (cc >= 37 && cc <= 52) || (cc >= 85 && cc <= 100)
+let outbox = [], flushing = false
+const mine = {}   // cc → time of the last own move: SC's echo of an older value must not pull a dragged control back
+const send = (cc, v) => {
+  S.cc[cc] = v
+  mine[cc] = performance.now()
+  S.page = pageOfCc(cc)
+  const last = outbox[outbox.length - 1]
+  if (last && last[0] === cc && !isBtn(cc)) last[1] = v; else outbox.push([cc, v])
+  update()
+  if (!flushing) { flushing = true; requestAnimationFrame(flush) }
+}
+const flush = async () => {
+  const batch = outbox; outbox = []
+  try { await fetch('/cc', { method: 'POST', body: JSON.stringify(batch), keepalive: true }) } catch (e) {}
+  flushing = false
+  if (outbox.length) { flushing = true; requestAnimationFrame(flush) }
+}
+
+// ---- the Launchkey row sends as the device would: controls (coalesced per frame) and keys / pads ----
+let lkOut = {}, lkFlushing = false
+const lkMine = {}
+const lkSend = (n, v) => {
+  S.lk[n] = v; lkMine[n] = performance.now(); lkOut[n] = v; S.lkLive = performance.now(); update()
+  if (!lkFlushing) { lkFlushing = true; requestAnimationFrame(async () => {
+    const cc = Object.entries(lkOut).map(([k, x]) => [+k, x]); lkOut = {}
+    try { await fetch('/lk', { method: 'POST', body: JSON.stringify({ cc }), keepalive: true }) } catch (e) {}
+    lkFlushing = false
+  }) }
+}
+const lkNote = (note, chan) => {   // chan 0-based: 9 = drum pads; velocity 100
+  fetch('/lk', { method: 'POST', body: JSON.stringify({ note: [note, 100, chan] }), keepalive: true }).catch(() => {})
+}
+const hasLk = () => Object.keys(tags()).some(k => k.startsWith('lk.'))
+const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, 30 + n])]
+const BLACK = [1, 3, 6, 8, 10]
+const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+// computer keyboard (physical keys, any layout): the A row = white keys from C, the row above = black keys
+const KEYMAP = { KeyA: 0, KeyW: 1, KeyS: 2, KeyE: 3, KeyD: 4, KeyF: 5, KeyT: 6, KeyG: 7, KeyY: 8, KeyH: 9, KeyU: 10, KeyJ: 11,
+  KeyK: 12, KeyO: 13, KeyL: 14, KeyP: 15, Semicolon: 16 }
+const lkLight = key => { S.lkLit.set(key, performance.now()); update(); setTimeout(update, 220) }
+const lkHtml = () => {
+  if (!hasLk()) return ''
+  const knob = ([key, n]) => {
+    const [name, desc] = (tags()['lk.' + key] ?? key).split(' | ')
+    const kind = key === 'level' ? 'fader' : 'knob'
+    return '<div class="cell ' + kind + ' ctl" data-lk="' + n + '" title="' + esc(desc ?? '') + '">' +
+      (kind === 'fader' ? '<div class=bar><i></i></div>' : '<div class=dial></div>') + '<b></b><span>' + esc(name) + '</span></div>'
+  }
+  const keys = [...Array(25).keys()].map(i => '<i data-key="' + i + '"></i>').join('')
+  const pads = [44, 36].flatMap(b => [...Array(8).keys()].map(i => '<i data-pad="' + (b + i) + '">' +
+    esc(S.layout?.lkPads?.[b + i - 36] ?? (b + i - 35)) + '</i>')).join('')
+  return '<section class=lk id=lk><h2>Launchkey</h2><div class=lkbody><div class=lkmain><div class=lkrow>' +
+    LK_CTLS.slice(1).map(knob).join('') + '</div><div class=lkplay><div class=lkoct><button data-oct="-12">◀ oct</button>' +
+    '<button data-oct="12">oct ▶</button></div><div class=lkkeys>' + keys + '</div><div class=lkpads>' + pads + '</div></div></div>' +
+    knob(LK_CTLS[0]) + '</div></section>'
+}
+const lkAttach = root => {
+  for (const el of root.querySelectorAll('[data-lk]')) {
+    const n = +el.dataset.lk, isFader = n === 1
+    if (isFader) {
+      const bar = el.querySelector('.bar')
+      const at = e => { const r = bar.getBoundingClientRect(); return Math.min(1, Math.max(0, (r.bottom - e.clientY) / r.height)) }
+      el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); lkSend(n, at(e)) })
+      el.addEventListener('pointermove', e => { if (el.hasPointerCapture(e.pointerId)) lkSend(n, at(e)) })
+    } else {
+      let y0 = 0, v0 = 0
+      el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = S.lk[n] ?? 0 })
+      el.addEventListener('pointermove', e => {
+        if (!el.hasPointerCapture(e.pointerId)) return
+        lkSend(n, Math.min(1, Math.max(0, v0 + (y0 - e.clientY) / (e.shiftKey ? 800 : 200))))
+      })
+      el.addEventListener('dblclick', () => lkSend(n, 0))
+    }
+    el.addEventListener('wheel', e => { e.preventDefault(); lkSend(n, Math.min(1, Math.max(0, (S.lk[n] ?? 0) - Math.sign(e.deltaY) * (e.shiftKey ? 0.005 : 0.02)))) }, { passive: false })
+  }
+  for (const el of root.querySelectorAll('[data-key]')) el.addEventListener('pointerdown', e => { e.preventDefault(); lkNote(S.lkBase + +el.dataset.key, 0) })
+  for (const el of root.querySelectorAll('[data-pad]')) el.addEventListener('pointerdown', e => { e.preventDefault(); lkNote(+el.dataset.pad, 9) })
+  for (const el of root.querySelectorAll('[data-oct]')) el.addEventListener('click', () => { S.lkBase = Math.min(96, Math.max(24, S.lkBase + +el.dataset.oct)); update() })
+}
+document.addEventListener('keydown', e => {
+  if (!hasLk() || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return
+  if (e.code === 'KeyZ' || e.code === 'KeyX') { S.lkBase = Math.min(96, Math.max(24, S.lkBase + (e.code === 'KeyX' ? 12 : -12))); update(); return }
+  if (e.code in KEYMAP) { e.preventDefault(); lkNote(S.lkBase + KEYMAP[e.code], 0) }
+})
+
+// ---- building the page once per layout; values are updated in place (a drag keeps its element) ----
+const cells = []   // { el, page, n, row, cc }
+const build = () => {
+  const root = document.getElementById('lc')
+  cells.length = 0
+  root.innerHTML = '<div class=head id=head></div><div class=pages>' + PAGES.map(page => {
+    const title = tags()[PREFIX[page]] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2')
+    const cols = [1, 2, 3, 4, 5, 6, 7, 8]
+    return '<section class=page data-page=' + page + ' style="--acc:' + ACC[page] + '"><h2>' + esc(shortTitle(title)) + '</h2><div class=grid>' +
+      cols.map(n => '<div class="col' + (isGlobal(n) ? ' g' : '') + '" style="' + (ported(page, n) ? '' : 'opacity:.35') + '">' +
+        esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? '8 Global' : String(n))).replace(/^\d+\s*/, n + ' ')) + '</div>').join('') +
+      ROWS.map(row => cols.map(n => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>').join('')).join('') + '</div></section>'
+  }).join('') + '</div>' + lkHtml()
+  lkAttach(root)
+  for (const div of root.querySelectorAll('[data-cell]')) {
+    const [page, n0, row] = div.dataset.cell.split(':'), n = +n0
+    const [name, desc] = (tagOf(page, n, row) ?? '').split(' | ')
+    const c = { el: div, page, n, row, cc: ccOf(page, n, row), on: ported(page, n) && !!tagOf(page, n, row) }
+    div.title = desc ?? ''
+    const kind = row === 'fader' ? 'fader' : row[0] === 'k' ? 'knob' : 'btn'
+    div.className = 'cell ' + kind + (c.on ? ' ctl' : ' off')
+    div.innerHTML = kind === 'fader' ? '<div class=bar><i></i></div><b></b><span>' + esc(name) + '</span>'
+      : kind === 'knob' ? '<div class=dial></div><b></b><span>' + esc(name) + '</span>'
+      : '<span>' + esc(name) + '</span><b></b>'
+    c.name = name ?? ''
+    if (c.on) attach(c, kind)
+    cells.push(c)
+  }
+  update()
+}
+
+// ---- interaction ----
+const attach = (c, kind) => {
+  const el = c.el
+  if (kind === 'btn') {
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      if (e.shiftKey || held.has(c.cc)) {   // Shift-click: keep held; the next click lets go
+        if (held.has(c.cc)) { held.delete(c.cc); send(c.cc, 0) } else { held.add(c.cc); send(c.cc, 1) }
+        return
+      }
+      el.setPointerCapture(e.pointerId)
+      send(c.cc, 1)
+    })
+    const up = () => { if (!held.has(c.cc) && S.cc[c.cc] > 0.5) send(c.cc, 0) }
+    el.addEventListener('pointerup', up)
+    el.addEventListener('pointercancel', up)
+    el.addEventListener('lostpointercapture', up)
+    return
+  }
+  if (kind === 'fader') {
+    const bar = el.querySelector('.bar')
+    const at = e => { const r = bar.getBoundingClientRect(); return Math.min(1, Math.max(0, (r.bottom - e.clientY) / r.height)) }
+    el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); send(c.cc, at(e)) })
+    el.addEventListener('pointermove', e => { if (el.hasPointerCapture(e.pointerId)) send(c.cc, at(e)) })
+  } else {
+    let y0 = 0, v0 = 0
+    el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = shownOf(c.cc) })
+    el.addEventListener('pointermove', e => {
+      if (!el.hasPointerCapture(e.pointerId)) return
+      const range = e.shiftKey ? 800 : 200   // pixels for the whole knob travel
+      send(c.cc, Math.min(1, Math.max(0, v0 + (y0 - e.clientY) / range)))
+    })
+    el.addEventListener('dblclick', () => send(c.cc, 0))
+  }
+  el.addEventListener('wheel', e => { e.preventDefault(); send(c.cc, Math.min(1, Math.max(0, shownOf(c.cc) - Math.sign(e.deltaY) * (e.shiftKey ? 0.005 : 0.02)))) }, { passive: false })
+}
+
+// the value a control shows: what the track really uses (a lab column keeps its start values until moved: state.shown),
+// except right after an own move (then the dragged value)
+const shownOf = cc => (performance.now() - (mine[cc] ?? -1e9) < 300) ? (S.cc[cc] ?? 0) : (S.state?.shown?.[cc] ?? S.cc[cc] ?? 0)
+
+// ---- drawing values ----
+let timer = null
+const update = () => { timer ??= requestAnimationFrame(() => { timer = null; draw() }) }
+const pending = (now, next) => esc(now) + (next !== undefined && next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
+const draw = () => {
+  if (!S.layout) return
+  // frame on the page last moved: only with at most one Launch Control (with two, each board has its own page)
+  const lcs = S.midi.filter(p => p[1] === 'lc').length
+  for (const p of document.querySelectorAll('.page')) p.classList.toggle('live', lcs < 2 && p.dataset.page === S.page)
+  for (const c of cells) {
+    if (!c.on) continue
+    const v = S.cc[c.cc] ?? 0, b = c.el.querySelector('b')
+    // the track may rename a control or show its own value text (keys with Sound on: the sound mix) or dim it (unused)
+    const name = S.state?.names?.[c.cc], text = S.state?.texts?.[c.cc]
+    c.el.style.opacity = S.state?.dim?.[c.cc] ? 0.25 : ''
+    if (c.row === 'b1' || c.row === 'b2') {
+      let now, next, on = v > 0.5
+      if (isGlobal(c.n)) {
+        const g = S.state?.global ?? {}
+        ;[now, next] = g[c.row] ?? ['', '']
+        if (c.row === 'b2') on = on || !!g.b2on
+      } else if (c.row === 'b1') [now, next] = S.state?.rows?.[c.page + ':' + c.n] ?? ['', '']
+      else {   // button 2: the track's text (Lift 40 %, Sound on …) or 'held'
+        now = S.state?.labels?.[c.cc] ?? (v > 0.5 ? 'held' : '')
+        on = on || !!S.state?.on?.[c.cc]
+      }
+      c.el.classList.toggle('on', on)
+      c.el.classList.toggle('hold', held.has(c.cc))
+      const span = c.el.querySelector('span')
+      if (next !== undefined && next !== now) { span.textContent = now; b.innerHTML = '<span class=next>→ ' + esc(next) + '</span>' }
+      else { span.textContent = name ?? c.name; b.textContent = now ?? '' }
+      continue
+    }
+    const sv = shownOf(c.cc)
+    c.el.style.setProperty('--v', sv)
+    b.textContent = text ?? Math.round(sv * 100)
+    c.el.querySelector('span').textContent = name ?? c.name
+  }
+  // Launchkey row: values, the keyboard window, lit keys / pads, frame while it is the last thing moved
+  const lk = document.getElementById('lk')
+  if (lk) {
+    const now = performance.now(), lit = k => now - (S.lkLit.get(k) ?? -1e9) < 200
+    lk.classList.toggle('live', now - S.lkLive < 4000)
+    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk]; el.style.setProperty('--v', v ?? 0); el.querySelector('b').textContent = v === undefined ? '–' : Math.round(v * 100) }
+    for (const el of lk.querySelectorAll('[data-key]')) {
+      const m = S.lkBase + +el.dataset.key
+      el.className = (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lit('k' + m) ? ' on' : '')
+      el.textContent = m % 12 === 0 ? 'C' + (m / 12 - 1) : ''
+    }
+    for (const el of lk.querySelectorAll('[data-pad]')) el.classList.toggle('on', lit('p' + el.dataset.pad))
+  }
+  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  const bt = S.beat
+  const beat = !bt ? '–' : ((bt.bar % 8) + 1) + ' / 8<span class=bars>' + marks(8, bt.bar % 8) + '</span><span class=beats>' +
+    marks(4, bt.beat) + '</span>' + (bt.chord ? '<span class=chord>' + esc(bt.chord) + '</span>' : '')
+  const gk = ['k1', 'k2', 'k3'].map(r => [(tags()['g.' + r] ?? r).split(' | ')[0], S.cc[CC_ROW[r] + 8]]).filter(([, v]) => v > 0.01)
+  document.getElementById('head').innerHTML =
+    (!S.bridge ? '<span class=warn>Bridge not reachable</span>' : !S.sc ? '<span class=warn>SuperCollider not running</span>' : '') +
+    (S.state?.head ?? []).map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
+    '<div><span class=k>Bar</span>' + beat + '</div>' +
+    gk.map(([k, v]) => '<div class=next><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
+    '<div class=ports>' + (lcs ? lcs + ' Launch Control' + (lcs > 1 ? 's' : '') : 'no Launch Control: mouse only') + '</div>' +
+    '<div class=help>drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · keys: A–K row (black: row above), octave: the two keys bottom left' : '') + '</div>'
+}
+
+// ---- live state from the bridge ----
+const connect = () => {
+  const es = new EventSource('/events')
+  es.onopen = () => { S.bridge = true; update() }
+  es.onerror = () => { S.bridge = false; update() }
+  es.onmessage = e => {
+    const { type, data } = JSON.parse(e.data)
+    if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) build() }
+    else if (type === 'ccs') { data.forEach((v, i) => { if (!(performance.now() - (mine[i] ?? -1e9) < 300)) S.cc[i] = v }) }
+    else if (type === 'cc') {
+      for (const [cc, v] of Object.entries(data)) if (!(performance.now() - (mine[cc] ?? -1e9) < 300)) { S.cc[+cc] = v; S.page = pageOfCc(+cc) }
+    }
+    else if (type === 'state') S.state = data
+    else if (type === 'beat') S.beat = data
+    else if (type === 'midi') S.midi = data
+    else if (type === 'sc') S.sc = data
+    else if (type === 'lk') { for (const [k, v] of Object.entries(data)) if (!(performance.now() - (lkMine[k] ?? -1e9) < 300)) S.lk[k] = v }
+    else if (type === 'lkcc') { const [k, v] = data; if (!(performance.now() - (lkMine[k] ?? -1e9) < 300)) { S.lk[k] = v; S.lkLive = performance.now() } }
+    else if (type === 'lknote') {   // a key or pad played (device or UI): light it; a key outside the window moves it
+      const [note, chan] = data
+      if (chan === 9) lkLight('p' + note)
+      else { if (note < S.lkBase || note > S.lkBase + 24) S.lkBase = 12 * Math.floor(note / 12); lkLight('k' + note) }
+      S.lkLive = performance.now()
+    }
+    update()
+  }
+}
+connect()
+</script>
+</body>
+</html>
