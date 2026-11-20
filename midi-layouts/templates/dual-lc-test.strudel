@@ -63,13 +63,13 @@
 // @ctl 16:5.fader Level | A: soft rim click · T: clap on 2 and 4 · H: clap + snare.
 // @ctl 16:6.fader Level | A: clock ticks · T: 16th hats · H: off-beat open hat.
 // @ctl 16:7.fader Level | A: wood clicks, drops · T: tuned bongos, rimshot · H: congas, bongos.
-// @ctl 16:1.b1 Change | next of at most 3 patterns, at the next bar.
-// @ctl 16:2.b1 Change | next of at most 3 patterns.
-// @ctl 16:3.b1 Change | next of at most 3 patterns.
-// @ctl 16:4.b1 Change | next of at most 3 patterns.
-// @ctl 16:5.b1 Change | next of at most 3 patterns.
-// @ctl 16:6.b1 Change | next of at most 3 patterns.
-// @ctl 16:7.b1 Change | next of at most 3 patterns.
+// @ctl 16:1.b1 Pattern | next of at most 3 patterns, at the next bar.
+// @ctl 16:2.b1 Pattern | next of at most 3 patterns.
+// @ctl 16:3.b1 Pattern | next of at most 3 patterns.
+// @ctl 16:4.b1 Pattern | next of at most 3 patterns.
+// @ctl 16:5.b1 Pattern | next of at most 3 patterns.
+// @ctl 16:6.b1 Pattern | next of at most 3 patterns.
+// @ctl 16:7.b1 Pattern | next of at most 3 patterns.
 // @ctl 16:1.b2 Drop out | kick pauses while held.
 // @ctl 16:2.b2 Riser | noise rises while held.
 // @ctl 16:3.b2 Slide | notes glide into each other while held.
@@ -120,13 +120,13 @@
 // @ctl 2:5.fader Level | A: second choir voice · T: counter blips · H: melody that answers the lead.
 // @ctl 2:6.fader Level | A: glitter drops · T: metallic pings · H: bells, plucks.
 // @ctl 2:7.fader Level | A: shimmer swells · T: slowly breathing noise · H: risers, vocal chops.
-// @ctl 2:1.b1 Change | next pattern / melody, at the next bar.
-// @ctl 2:2.b1 Change | next pattern / melody.
-// @ctl 2:3.b1 Change | next pattern / melody.
-// @ctl 2:4.b1 Change | next pattern / melody.
-// @ctl 2:5.b1 Change | next pattern / melody.
-// @ctl 2:6.b1 Change | next pattern / melody.
-// @ctl 2:7.b1 Change | next pattern / melody.
+// @ctl 2:1.b1 Pattern | next pattern / melody, at the next bar.
+// @ctl 2:2.b1 Pattern | next pattern / melody.
+// @ctl 2:3.b1 Pattern | next pattern / melody.
+// @ctl 2:4.b1 Pattern | next pattern / melody.
+// @ctl 2:5.b1 Pattern | next pattern / melody.
+// @ctl 2:6.b1 Pattern | next pattern / melody.
+// @ctl 2:7.b1 Pattern | next pattern / melody.
 // @ctl 2:1.b2 Freeze | holds the current chord while held.
 // @ctl 2:2.b2 Stab | one accent chord, now.
 // @ctl 2:3.b2 Octave | one octave up while held.

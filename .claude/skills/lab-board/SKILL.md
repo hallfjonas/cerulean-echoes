@@ -1,6 +1,6 @@
 ---
 name: lab-board
-description: Build or run a new round of a lab board (candidate columns for an instrument or track role), layout sheet, feedback.md, round rotation. Use for 'board', 'candidates', 'next round', 'new lab', 'candidates for chords/bass/keys', 'compare sounds', 'build a board'.
+description: Build or run a new round of a lab board (candidate columns for an instrument or track role), feedback.md, round rotation. Use for 'board', 'candidates', 'next round', 'new lab', 'candidates for chords/bass/keys', 'compare sounds', 'build a board'.
 ---
 
 # Lab board: candidate columns, played on the LC XL 3
@@ -27,7 +27,7 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
   no marker + `BOARD`/`COLS` = engine 1; `makeCols` = engine 2; `// @engine 3` = + chord progressions, fire buttons;
   `// @engine techno` = 008 (F dorian, 140 BPM, techno context). A track whose key/tempo differs (house, ambient):
   an adapted engine copy WITHOUT `@engine`, and say so in the head (then do not run sync.mjs on it).
-- Above the engine: `@layout/@note/@guide/@mode/@col/@row/@ctl` comments (English, source of the layout sheet),
+- Above the engine: `@layout/@note/@guide/@mode/@col/@row/@ctl` comments (English, the control texts the LC view shows),
   `const BOARD = { id, title }`, `const bpm`, `const makeCols = h => { ... }` returning the 8 columns.
 - Mode 16 = candidate columns (all 8 may hold candidates); Mode 2 = the track's context (a few faders: drums, bass,
   pad, progression button) so the candidate is judged in place.
@@ -54,9 +54,8 @@ go into the tracks (see `lab-to-track`). Folder names say what the board is (`la
 2. `node stem-lab/check.mjs <board> '{"5":1}' [pattern idx]`: what each column plays over 8 bars.
 3. Cost per scheduler tick in the Node harness (`strudel-sim/harness.mjs`), aim ≲ 8 ms; gate silent columns/layers.
 4. New samples: fetch/decode in headless Chrome, read levels (VCSL is not normalized), do not renormalize on my own.
-5. Layout sheet: the hook writes `<board>-layout.pdf` after each edit; look at the PNG, no text overflow.
-6. Live view: when in doubt give the board the big "▣ LC big" window like the tracks (copy from harmony-5).
-7. Log the build in `feedback.md` (date, columns, sources, "not heard", open questions).
+5. Live view: when in doubt give the board the big "▣ LC big" window like the tracks (copy from harmony-5).
+6. Log the build in `feedback.md` (date, columns, sources, "not heard", open questions).
 
 ## Don'ts
 - No shared-code change (engine, layer function, voicing) that alters other sounds without asking.

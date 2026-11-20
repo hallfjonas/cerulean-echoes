@@ -25,7 +25,6 @@ and `tools/producer/fixtures/013-hope-for-niklas/` (generated), each with its ma
    with every default, both design stubs and a first-pass script into one folder. Read the map and the design stub;
    `node strudel-sim/transpile-check.mjs <track>`.
 2. Then for real (same command without `--out`): `tracks/<genre>/NNN-<name>/` and `trajectory/perform/NNN-<name>/`.
-   The hook writes the layout sheet and `.syx`.
 3. Checks before showing anything: `npm run verify -- <track>`, `node strudel-sim/check-sounds.mjs <track>` (new
    samples show "not checked yet" until it runs), `npm run audibility -- <track>`.
 

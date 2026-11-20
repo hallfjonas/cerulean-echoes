@@ -7,7 +7,7 @@ verglichen (dieselben Noten, Details in `sc/PORTING.md`, Abschnitt 010). Optimie
 Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unterschiede:
 
 - **Track wählen:** in `sc/live.scd` die Zeile `var trackName = …;` auf `"010-ambient-house"` ändern.
-- **Custom Modes:** dieselben wie für den Strudel-Track (`…-mode1.syx`, `…-mode2.syx`, Slots 1 und 2).
+- **Custom Modes:** die gemeinsamen (`midi-layouts/lcxl3-mode1.syx` / `-mode2.syx`, Slots 1 und 2).
 
 ## Was sofort wirkt
 

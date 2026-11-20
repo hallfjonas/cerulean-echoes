@@ -17,9 +17,8 @@ you move something. Every control sends a number from 0 to 127.
 - Plug in one or two. The track finds every port with `LCXL3` in its name (not `DAW`). No renaming is needed.
 - Every LC gets the full layout. Mode 1 = the foundation (beat and bass), Mode 2 = the colour (chords and melodies).
   Mode 1 is custom mode slot 1 and Mode 2 is slot 2: pick the slot on the controller to switch. Column 8 is global in both modes.
-- Load the control names once per track: take `NNN-<name>-mode1.syx` and `-mode2.syx` from the track folder
-  (for example `tracks/house/009-house/`) into Novation Components, slot 1 and slot 2. A layout sheet PDF sits next to
-  them. See [layout sheets](layout-sheets.md).
+- Set up each LC once: load `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` into Novation Components, slot 1 and slot 2. Every track uses
+  the same controls; what each one does in a track shows in the player's MIDI panel.
 
 **Launchkey MK4 25** (optional)
 - Keys play a sound that fits the track (a pad, a piano or a Rhodes).
@@ -48,5 +47,5 @@ Detail: [midi-layouts/devices.md](../../midi-layouts/devices.md).
 ## Related
 
 - [Live tracks](live-tracks.md): what the rows and columns mean
-- [Player](player.md), [auto-perform](auto-perform.md), [layout sheets](layout-sheets.md)
+- [Player](player.md), [auto-perform](auto-perform.md)
 - [Glossary](../reference/glossary.md)

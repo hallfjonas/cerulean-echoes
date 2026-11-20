@@ -9,13 +9,11 @@
 //     sharing a reverb, which would be rebuilt on every event with a different room size)
 //   - layout tags become per-track tags (// @007 ctl …) for the LC view; the set's own tags describe the columns
 // The status box, the LC view and the MIDI setup are taken once from the first track.
-// Afterwards the single version, the layout sheets and the .syx modes are written as the hook would.
+// Afterwards the single version is written as the hook would.
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { makeSingle } from '../lcxl-layout/make-single.mjs'
-import { generate } from '../lcxl-layout/gen-layout.mjs'
-import { generate as makeSyx } from '../lcxl-layout/make-syx.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUT = path.join(ROOT, 'tracks/sets/011-combining-all/011-set-dual.strudel')
@@ -216,8 +214,3 @@ fs.writeFileSync(OUT, out)
 console.log(path.relative(process.cwd(), OUT), out.split('\n').length, 'lines')
 const single = makeSingle(OUT)
 console.log(path.relative(process.cwd(), single))
-for (const f of [OUT, single]) {
-  const pdf = generate(f, ROOT)
-  if (pdf) console.log(path.relative(process.cwd(), pdf))
-  makeSyx(f)
-}

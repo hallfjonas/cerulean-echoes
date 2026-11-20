@@ -35,14 +35,11 @@ These files are generated. On a merge conflict take either side, then regenerate
 
 | Generated file | Regenerate with (in `tools/`) |
 |---|---|
-| Layout sheets `<track>-layout.pdf` | `npm run layouts` |
-| Controller modes `*.syx` | `npm run syx` |
 | `tracks/sets/011-combining-all/011-set-dual.strudel` | `npm run set` |
 | a Guitar Pro song track and its perform script | `npm run producer` (edit the map, not the track) |
 
-An editor hook regenerates sheets and `.syx` files after every save when you work with Claude Code. Without it, run
-`npm run watch` to do the same on save. The text of a control is the `// @ctl` comment in the track, so change it
-there and never in the PDF.
+An editor hook checks the `@`-tags and regenerates single versions after every save when you work with Claude Code.
+The text of a control is the `// @ctl` comment in the track.
 
 Code blocks that several tracks share are marked `@shared <name> begin` and `end`. Edit the block in one track, then
 run `npm run shared -- --from <track> <name>`. `npm run shared -- --check` shows drift.

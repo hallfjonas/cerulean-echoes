@@ -39,16 +39,6 @@ export const COMMANDS = {
         'Raise a LOW part or lower a CLIPS part in the track, then run again.']
     },
     steps: file => [['strudel-sim/audibility.mjs', file]] },
-  layouts: { label: 'Layout sheet + syx', kinds: ['live'],
-    help: {
-      does: 'Builds the printable controller layout sheet and the Launch Control XL 3 custom modes from the @ctl '
-        + 'comments of the track.',
-      input: 'A live track from the catalogue (its @ctl, @mode and @col comments are the source).',
-      output: 'Writes <track>-layout.pdf, <track>-mode1.syx and <track>-mode2.syx next to the track file.',
-      use: ['Pick a track.', 'Run.', 'Load the .syx files into the controller with Novation Components '
-        + '(slots 1 and 2); print or open the PDF.']
-    },
-    steps: file => [['lcxl-layout/gen-layout.mjs', file], ['lcxl-layout/make-syx.mjs', file]] },
   'stem-lab-sync': { label: 'Stem lab: sync engine', kinds: ['lab'], accepts: source => source.includes(ENGINE_BANNER),
     help: {
       does: 'Copies the shared engine over everything from the ENGINE banner on in a stem lab board, so every board '
@@ -84,7 +74,7 @@ export const COMMANDS = {
       does: 'Builds the set (007 → 010 → 009 → 008 as one performance) from the frozen dual tracks and the set frame, '
         + 'then proves that each track plays event by event on its plateau.',
       input: 'None. The sources are in tracks/sets/011-combining-all/sources and tools/set/set-frame.strudel.',
-      output: 'Writes 011-set-dual.strudel, its layout sheet and .syx modes; the log shows the check per track and '
+      output: 'Writes 011-set-dual.strudel and its single version; the log shows the check per track and '
         + 'the query time per cycle.',
       use: ['Run after changing a frozen source or the frame.', 'Read the check lines; every plateau must match.']
     },

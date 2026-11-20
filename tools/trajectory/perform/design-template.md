@@ -11,7 +11,7 @@ Feedback rounds go into `perform/<track>/feedback.md` (format at the end of this
 Before the first draft the agent reads, in this order:
 
 1. `cd tools && npm run track-map -- <track>`: outline of the track; then `sed -n` ranges for the parts that matter.
-2. The layout PDF (`<track>-layout.pdf`) and the `// @ctl` tags in the track: which control does what, per column.
+2. The `// @ctl` tags in the track: which control does what, per column.
 3. `npm run scenario -- <track> --view`: the LC view as text, to see what a control change does at the default state.
 4. The track folder's `feedback.md` (what the user liked or rejected) and `docs/reference/listening-list.md` for the genre.
 

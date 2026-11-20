@@ -1,5 +1,6 @@
-// Build the Launch Control XL 3 layout sheet (PDF) of a track from the @-tags in its comments.
-// usage: node gen-layout.mjs <file.strudel> ...   → writes <file>-layout.pdf next to each tagged file
+// Reads the Launch Control XL 3 @-tags in a track's comments (parse). Used by check-perform (which controls a track
+// has), the hooks and verify (a broken tag is an error). The layout sheets and .syx modes built from these tags were
+// retired on 2026-11-20; the tags stay as the description of every control.
 //
 // Tags (one per comment line, anywhere in the file):
 //   // @layout <title>
@@ -17,19 +18,10 @@
 // <pos>: <mode>:<col>.<row>, e.g. 16:1.k1 or B16:1.k1; a column range 2:1-7.k1 puts the description on the first column
 //        and "as <its heading>" on the others; g.<row> = global column 8, shown on every page (CC n / n + 48).
 // CC numbers are computed from the position: Mode 16 = fader 5-12, knobs 13-36, buttons 37-52; Mode 2 = +48.
-import fs from 'fs'
 import path from 'path'
-import { execFileSync } from 'child_process'
-import { fileURLToPath } from 'url'
 
-const template = path.join(path.dirname(fileURLToPath(import.meta.url)), 'lcxl3.typ')
 const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
-const BASE = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }
-const KIND = { k1: 'knob', k2: 'knob', k3: 'knob', fader: 'fader', b1: 'button', b2: 'button' }
-const LABEL = { k1: 'Row 1', k2: 'Row 2', k3: 'Row 3', fader: 'Fader \\ Level', b1: 'Buttons 1', b2: 'Buttons 2' }
 const MODE = '(B?(?:16|2))'   // B = second controller
-const cc = (mode, col, row) => BASE[row] + col + (/^B?2$/.test(mode) ? 48 : 0)
-const second = mode => mode.startsWith('B')
 
 export function parse(src, source) {
   const d = { title: path.basename(source), source, notes: [], modes: [], cols: {}, rows: {}, ctls: [], global: {}, globalSame: false, guide: [], recipes: [] }
@@ -60,53 +52,4 @@ export function parse(src, source) {
     }
   }
   return d
-}
-
-export function build(d) {
-  if (!d.ctls.length && !Object.keys(d.global).length) return null
-  const modes = d.modes.length ? d.modes : [...new Set(d.ctls.map(c => c.mode))].sort((a, b) => second(a) - second(b) || b.replace('B', '') - a.replace('B', '')).map(mode => ({ mode, title: `Mode ${mode}` }))
-  const both = modes.filter(m => !second(m.mode)).length > 1
-  const hasGlobal = Object.keys(d.global).length > 0
-  const pages = modes.map(({ mode, title }) => {
-    const withGlobal = hasGlobal && !second(mode)
-    const heads = [...Array(8).keys()].map(i => d.cols[`${mode}:${i + 1}`] ?? (i === 7 && withGlobal ? '8 Global' : String(i + 1)))
-    const grid = Object.fromEntries(ROWS.map(r => [r, [...Array(8).keys()].map(i => ({ cc: String(cc(i === 7 && d.globalSame ? '16' : mode, i + 1, r)), off: true }))]))
-    for (const c of d.ctls.filter(c => c.mode === mode)) {
-      for (let col = c.from; col <= c.to; col++) {
-        const desc = col === c.from ? c.desc : `as ${heads[c.from - 1]}`
-        grid[c.row][col - 1] = { cc: String(cc(mode, col, c.row)), name: c.name, desc, kind: KIND[c.row] }
-      }
-    }
-    for (const [row, g] of Object.entries(withGlobal ? d.global : {})) {
-      const n = cc('16', 8, row)
-      grid[row][7] = { cc: both && !d.globalSame ? `${n} / ${n + 48}` : String(n), name: g.name, desc: g.desc, kind: 'global' }
-    }
-    const rows = ROWS.map(r => ({ row: r, label: d.rows[`${mode}:${r}`] ?? LABEL[r], cells: grid[r] }))
-    return { title, heads, rows }
-  })
-  return { title: d.title, source: d.source, notes: d.notes, global: hasGlobal, pages, guide: d.guide, recipes: d.recipes }
-}
-
-export function generate(file, root = process.cwd()) {
-  const source = path.relative(root, path.resolve(file))
-  const data = build(parse(fs.readFileSync(file, 'utf8'), source))
-  if (!data) return null
-  const pdf = file.replace(/\.strudel$/, '') + '-layout.pdf'
-  execFileSync('typst', ['compile', template, pdf, '--creation-timestamp', '0', '--input', `data=${JSON.stringify(data)}`], { stdio: ['ignore', 'ignore', 'pipe'] })
-  return pdf
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
-  let failed = false
-  for (const f of process.argv.slice(2)) {
-    try {
-      const pdf = generate(f, root)
-      if (pdf) console.log('layout:', path.relative(process.cwd(), pdf))
-    } catch (e) {
-      failed = true
-      console.error(`${f}: ${e.stderr?.toString() || e.message}`)
-    }
-  }
-  process.exit(failed ? 1 : 0)
 }

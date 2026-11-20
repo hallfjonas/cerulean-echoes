@@ -15,7 +15,7 @@ Details in `sc/PORTING.md`). Optimiert (CPU, Pegel, Klang) wird erst danach.
 1. **SuperCollider** installieren (Version 3.13 oder neuer, https://supercollider.github.io). Zusatz-Plugins
    (sc3-plugins) sind nicht nötig.
 2. **Launch Control XL 3:** dieselben Custom Modes wie für den Strudel-Track laden
-   (`tracks/house/009-house/009-house-mode1.syx` auf Slot 1, `…-mode2.syx` auf Slot 2, mit Novation Components).
+   (`midi-layouts/lcxl3-mode1.syx` auf Slot 1, `-mode2.syx` auf Slot 2, mit Novation Components).
    Es ändert sich nichts an der Belegung.
 3. **Audio-Ausgang:** SuperCollider nimmt den Standard-Ausgang von macOS. Für die Scarlett vor dem Start in
    den Systemeinstellungen → Ton die Scarlett als Ausgang wählen.
