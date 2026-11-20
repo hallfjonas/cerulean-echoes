@@ -190,7 +190,7 @@ Designer), 007 (Stem Designer).
 - [x] 001.md - Stem architecture and file format (parallel: false)
 - [ ] 002.md - SC stem loader and add-on library (parallel: false)
 - [ ] 003.md - Pilot: 009-house as a stem track (parallel: false)
-- [ ] 004.md - Stem library index (parallel: true)
+- [x] 004.md - Stem library index (parallel: true)
 - [ ] 005.md - Sample Designer (parallel: true)
 - [ ] 006.md - /sample-designer skill (parallel: true)
 - [ ] 007.md - Stem Designer (parallel: false)

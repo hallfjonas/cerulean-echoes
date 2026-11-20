@@ -4,6 +4,7 @@
 //   GET  /stream      server-sent events: each POST body is passed on as one message
 //   GET  /catalogue   the tracks the player can load, as a JSON list of { id, kind, label, taps, noTapReason?, scripts }
 //                    (live tracks and lab boards, see catalogue.mjs; the file path is never sent)
+//   GET  /stems       the stem library as JSON (stems/stem-index.mjs); filters ?role=&genre=&energy=2-4&tag=
 //   GET  /track/<id>  the track's code, tapped on request from the track file as it is now (make-tapped.mjs)
 //   GET  /perform/<track>/<script>   an auto-perform script (perform/<track>/<script>.json, see autoperform.mjs) or a
 //                                    take (<script> = takes/<name>); only for this server's own pages (Origin / Host
@@ -26,6 +27,7 @@ import { handleTake } from './take-save.mjs'
 import { handleRecording } from './recording.mjs'
 import { createScLink } from './sc-link.mjs'
 import { repo } from './catalogue.mjs'
+import { stemIndex } from '../stems/stem-index.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const port = Number(process.argv[2] ?? 8766)
@@ -74,6 +76,17 @@ const server = http.createServer((request, response) => {
   if (url.pathname === '/catalogue') {
     return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json' })
       .end(JSON.stringify(scan().map(toPublic)))
+  }
+  if (url.pathname === '/stems') {
+    try {
+      const filters = Object.fromEntries(['role', 'genre', 'energy', 'tag']
+        .filter(key => url.searchParams.has(key)).map(key => [key, url.searchParams.get(key)]))
+      const body = JSON.stringify(stemIndex(filters))
+      return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
+        .end(body)
+    } catch (error) {
+      return response.writeHead(400, CORS).end(error.message)
+    }
   }
   if (url.pathname.startsWith('/track/')) {
     const id = decodeURIComponent(url.pathname.slice('/track/'.length))
