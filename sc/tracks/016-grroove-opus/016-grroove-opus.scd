@@ -225,7 +225,7 @@ stems: [
 	// MODE 2 / 5 ANSWER — 008's square blips at the end of every second bar, left and right, long echo; also in the
 	// bars the stab leaves
 	(name: \answer, sounds: [\sdSynthMod], level: jonas.(5).level, roomR: \ansRoom, echoSend: \ansEcho, orbit: 2, trim: 0.79, thin: false),
-	// MODE 2 / 6 ACCENTS — rare, short, high one-shots (FM glass, chirp, drop, pluck, metal tick) on the 16th grid
+	// MODE 2 / 6 ACCENTS — rare, short, high one-shots (sine, chirp, drop, pluck) on the 16th grid
 	(name: \acc, sounds: [\sdSynthMod], level: jonas.(6).level, roomR: \accRoom, orbit: 2, trim: 1.6, thin: false),
 	// MODE 2 / 7 FX — a pink-noise riser in the last bar of each phrase, a falling tail + low boom on the one after it
 	(name: \fx, sounds: [\sdNoise, \sdSynthMod], level: jonas.(7).level, roomR: \fxRoom, orbit: 2, trim: 0.4, thin: false),
@@ -486,15 +486,16 @@ build: { |self, ce|
 		stem.(\wood).notes = { |k|
 			var b = bar.(k), t = t16.(k), s16 = k % 16, out = List[], v = self.woodVar.atBar(b), c = ce.val(wc.char), lp, r, tr;
 			// the wood block: a short sine with inharmonic FM (ratio 3.47); the mallet: a short triangle
-			var block = { |m, g, pan, at = 0, len = 1| syn.(\sine, m, g * 1.4, lp ++ (fmi: 1.2, fmh: 3.47, modPhase: modPhase.(k, at, m.midicps * 3.47),
+			// gain × 1.4 (the column's), then × velocity, in Strudel's order (same float)
+			var block = { |m, g, pan, at = 0, len = 1, vel = 1| syn.(\sine, m, (g * 1.4) * vel, lp ++ (fmi: 1.2, fmh: 3.47, modPhase: modPhase.(k, at, m.midicps * 3.47),
 				pan: pan, at: at, hold: len) ++ adsr.(0.001, 0.045, 0, 0.03)) };
-			var mallet = { |m, g, pan, at = 0| syn.(\triangle, m, g * 1.4, lp ++ (pan: pan, at: at, hold: 1) ++ adsr.(0.002, 0.11, 0, 0.06)) };
+			var mallet = { |m, g, pan, at = 0, vel = 1| syn.(\triangle, m, (g * 1.4) * vel, lp ++ (pan: pan, at: at, hold: 1) ++ adsr.(0.002, 0.11, 0, 0.06)) };
 			// the low-pass: Brightness 1800 … 12000 Hz × Fog only (Tension does not open it, Strudel high: true)
 			lp = (lpOn: 1, bright: ce.val(wc.bright), lo: 1800, hi: 12000, tone: fog);
 			// the pattern, swung by Bounce (Strudel swingBy(0.1 + 0.4 × Bounce, 8): the odd 16ths come that much later)
 			woods[v].do { |x| if(x[1][s16]) {
-				var at = if(k.odd) { 0.1 + (0.4 * c) } { 0 }, m = x[2][b % x[2].size], g = x[3] * vels[s16 % 4];
-				out.add(if(x[0] == \block) { block.(m, g, x[4], at) } { mallet.(m, g, x[4], at) }) } };
+				var at = if(k.odd) { 0.1 + (0.4 * c) } { 0 }, m = x[2][b % x[2].size], vel = vels[s16 % 4];
+				out.add(if(x[0] == \block) { block.(m, x[3], x[4], at, 1, vel) } { mallet.(m, x[3], x[4], at, vel) }) } };
 			// roll (button 2): 32nds on C5 / G5 (alternate bars), filling in and getting louder over 2 bars
 			r = rise.(t);
 			r !? { 2.do { |j| if(ce.rand((k + (j / 2)) / 16) >= (0.85 - (0.75 * r))) {
@@ -726,7 +727,7 @@ build: { |self, ce|
 	{
 		var ac = jonas.(6);
 		var accNotes = [89, 92, 94, 96, 99, 101, 104];
-		// [wave, fm index, fm ratio, pitch envelope, its decay, decay, shift]
+		// [wave, fm on, fm index, fm ratio (both unused, see hit), pitch envelope, its decay, decay, shift]
 		var shots = [[\sine, 1, 3, 3.5, 0, 0, 0.05, 0], [\sine, 0, 0, 1, 12, 0.03, 0.06, 0], [\sine, 0, 0, 1, -24, 0.04, 0.07, -12],
 			[\triangle, 0, 0, 1, 0, 0, 0.09, -12], [\sine, 1, 6, 1.414, 0, 0, 0.03, 0]];
 		self.spaceState(ac.space, \accRoom, { |s| 0.9 * (0.2 + (0.8 * s)) });
@@ -736,7 +737,8 @@ build: { |self, ce|
 			// a hit of the random series at time u (its random number r): the shot, the pitch
 			var hit = { |r, u, g, at, len| var sh = shots[(r * 5).trunc.asInteger], m = accNotes[(r * 7).trunc.asInteger] + sh[7];
 				var args = lp ++ (pan: 0.1 + (0.8 * ce.rand(u)), at: at, hold: len) ++ adsr.(0.001, sh[6], 0, 0.04);
-				if(sh[1] > 0) { args = args ++ (fmi: sh[2], fmh: sh[3], modPhase: modPhase.(k, at, m.midicps * sh[3])) };
+				// (no FM: the shots carry it as a raw `fm` key, which superdough does not read — only the control .fm()
+				// becomes fmi; so the "glass" and "metal tick" play as plain sines, as in Strudel)
 				if(sh[4] != 0) { args = args ++ (penv: sh[4], pd: sh[5]) };
 				syn.(sh[0], m, g, args) };
 			var r0 = ce.rand(t + (1024 * v));   // the series (reseed: 1024 bars on per change)
