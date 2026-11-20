@@ -25,4 +25,8 @@ Die Launch Controls gehen nie über die Brücke: Stürzen Browser oder Brücke a
 - **Namen** der Spalten und Regler kommen aus den `// @col` / `// @ctl`-Zeilen der Track-Datei
   (`sc/tracks/…/….scd`), im selben Format wie in den Strudel-Tracks. Noch nicht portierte Regler bleiben leer.
 - **Spektrum** (unter Mode 2): der Master-Ausgang aus SuperCollider (`/ce/spectrum`, 48 Bänder, `lib/ui.scd`).
+- **Set-Ansicht** (rechts vom Spektrum): wie sich die Energie des Sets entwickelt hat, alle 10 s ein Wert aus SC
+  (`/ce/setsample`, `lib/ui.scd`), gehalten von der Brücke bzw. vom Player, solange sie laufen. Vier Ansichten: Ring
+  (`energy`, Standard), `map`, `energy · area`, `spectrogram`; Klick auf die Überschrift schaltet weiter (im Player:
+  Visual settings „Set view“, Taste C).
 - Brücke von Hand starten: `node sc/ui/bridge.mjs` (läuft weiter, wenn SC neu startet; sie holt sich alles neu).

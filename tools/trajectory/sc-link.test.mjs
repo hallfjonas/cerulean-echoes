@@ -31,6 +31,67 @@ test('track list: every SC track is a live track on engine sc; a ported track ke
   assert.equal(new Set(live.map(entry => entry.id)).size, live.length, 'ids are unique')
 })
 
+// the set view's data path without SuperCollider: OSC /ce/setsample (as sc/lib/ui.scd sends it every 10 s) → kept by
+// the link → SSE setsample to open pages, and the whole history as one sethistory event to a page that connects later
+test('set samples: passed on as they come, and a new page gets the history', { timeout: 30e3 }, async () => {
+  const port = 8792, osc = 57171
+  const server = spawn(process.execPath, [path.join(here, 'server.mjs'), String(port)],
+    { env: { ...process.env, CE_SC_PORT: String(osc), CE_SC_SERVER_PORT: '57172', SCLANG: 'none' }, stdio: 'ignore' })
+  const base = `http://localhost:${port}`
+  const streams = []
+  const listen = () => {
+    const events = [], abort = new AbortController()
+    streams.push(abort)
+    fetch(base + '/sc/events', { signal: abort.signal }).then(async response => {
+      const decoder = new TextDecoder()
+      let buffer = ''
+      for await (const chunk of response.body) {
+        buffer += decoder.decode(chunk, { stream: true })
+        let at
+        while ((at = buffer.indexOf('\n\n')) >= 0) {
+          const data = buffer.slice(0, at).split('\n').find(line => line.startsWith('data: '))
+          buffer = buffer.slice(at + 2)
+          if (data) events.push(JSON.parse(data.slice(6)))
+        }
+      }
+    }).catch(() => {})
+    return events
+  }
+  const until = async (test, ms = 5000) => {
+    for (const end = Date.now() + ms; Date.now() < end; await new Promise(resolve => setTimeout(resolve, 50))) { const hit = test(); if (hit) return hit }
+    return null
+  }
+  const udp = (await import('dgram')).default.createSocket('udp4')
+  const sample = (energy, punch, tension) => new Promise(resolve =>
+    udp.send(encode('/ce/setsample', [{ f: energy }, { f: punch }, { f: tension }, ...Array.from({ length: 64 }, (_, i) => ({ f: i / 63 }))]), osc, '127.0.0.1', resolve))
+  try {
+    for (let i = 0; i < 50; i++) {
+      try { if ((await fetch(base + '/catalogue')).ok) break } catch {}
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    const first = listen()
+    assert.deepEqual((await until(() => first.find(e => e.type === 'sethistory')))?.data, [], 'a fresh server has no history')
+    await sample(-20.5, 0.4, 0.25)
+    await sample(-18, 1.7, -1)
+    const live = await until(() => first.filter(e => e.type === 'setsample').length >= 2 && first.filter(e => e.type === 'setsample'))
+    assert.ok(live, 'both samples reach the open page')
+    assert.deepEqual(Object.keys(live[0].data).sort(), ['e', 'p', 's', 't', 'x'])
+    assert.equal(live[0].data.e, -20.5)
+    assert.equal(live[0].data.s.length, 64)
+    assert.equal(live[1].data.p, 1, 'punch is clamped to 0..1')
+    assert.equal(live[1].data.x, 0, 'tension is clamped to 0..1')
+    const later = listen()
+    const history = await until(() => later.find(e => e.type === 'sethistory'))
+    assert.deepEqual(history?.data, live.map(e => e.data), 'a page that connects later gets the whole history')
+  } finally {
+    udp.close()
+    for (const abort of streams) abort.abort()
+    const exited = new Promise(resolve => server.once('exit', resolve))
+    server.kill('SIGINT')
+    await exited
+  }
+})
+
 // a few ports away from a player that may be running (8766, 57131, 57140)
 const PORT = 8790, OSC = 57151, SERVER = 57152
 const engineProcesses = () => {
@@ -91,6 +152,11 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     const spectrum = await waitFor(e => e.type === 'spectrum', mark)
     assert.equal(spectrum?.data.length, 48, 'the spectrum arrives with 48 bands')
     assert.ok(spectrum.data.every(v => v >= 0 && v <= 1), 'bands are 0..1')
+    // the set view's sample (sc/lib/ui.scd uiSetFrame), every 10 s: energy in dB, punch, tension, 64 bands
+    const setsample = await waitFor(e => e.type === 'setsample', mark, 25000)
+    assert.ok(setsample, 'a set sample arrives within 10 s of the load')
+    assert.equal(setsample.data.s.length, 64)
+    assert.ok(setsample.data.e >= -70 && setsample.data.e <= 10, 'energy in dB')
 
     // a click in the LC view (the same as a MIDI message) reaches the track and comes back as its state
     mark = since()
