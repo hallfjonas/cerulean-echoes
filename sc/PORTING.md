@@ -237,3 +237,70 @@ erste Abfrage bei t = 0, wie bei 007). Trocken Null-Tests −21 bis −56 dB, La
 
 **Abweichungen (erklärbar):** Hall-Würfelung (s. 007); der Strudel-Offline-Render kam einige Male kaputt heraus
 (fast stumm ab einem Takt): neu gerendert passt er (Null −45 dB). Rauschen (Noise Pump) zufällig, Pegel ±0,9 dB.
+
+## 016 Groove Techno (Opus) (Stand 20.11.2026)
+
+Alle Spalten portiert (`sc/tracks/016-grroove-opus/016-grroove-opus.scd`), Szenarien
+`tools/sc-port/scenarios/016-*.json` (`CE_TRACK=016-grroove-opus/016-grroove-opus`, 134 BPM). Bedienung:
+`sc/ANLEITUNG-016.md`. **Noch nicht mit dem Ohr abgenommen.** Gebaut auf 008 (Rumble, Sub, Bongos, Pad, JX-Strings,
+Stab, Answer, Launchkey wie dort), neu: Kick, Bass, Wood, Hats, Conga-Slap, Stab Shape, Accents, FX.
+
+| Spalte | Szenarien | Ereignisse | Lautheit Δ (SC − Strudel) |
+|---|---|---|---|
+| Mode 1/1 Kick | 16 | gleich | trocken ≤ 0,04 dB (Null −38 … −51 dB); mit Space/Tension −0,7 … −1,0 dB (Hall) |
+| Mode 1/2 Rumble | 17 | gleich | −0,2 … +0,6 dB (immer Hall, Orbit 3) |
+| Mode 1/3 Sub | 17 | gleich | trocken 0,00 dB (Null −54 dB); mit Hall −0,7 dB |
+| Mode 1/4 Bass | 18 | gleich | trocken ≤ 0,03 dB (Null −27 … −33 dB); mit Hall +0,2 / +0,5 dB |
+| Mode 1/5 Wood | 17 | gleich¹ | ≤ 0,14 dB (Null −24 dB trocken) |
+| Mode 1/6 Hats | 14 | gleich | +1,1 dB (44,1-kHz-Samples, über 5 kHz bis 4 dB heller, wie 008) |
+| Mode 1/7 Percussion | 15 | gleich | ≤ 0,18 dB (Null −33 dB trocken) |
+| Mode 2/1 Pads | 17 | gleich | trocken 0,01 dB (Null −40 dB); mit Hall −0,5 … −3,4 dB² |
+| Mode 2/2 Strings | 16 | gleich | trocken ±0,4 dB (Supersaw-Zufallsphasen); mit Hall −0,7 … −1,7 dB² |
+| Mode 2/3+4 Stab Shape + Stab | 21 | gleich | −0,1 … −0,6 dB (Mindest-Hall) |
+| Mode 2/5 Answer | 19 | gleich (auch Füllung, Doppelnoten) | −0,5 … +0,1 dB; Tension 1: −1,4 dB (Hall + Echo) |
+| Mode 2/6 Accents | 16 | gleich (nach Korrektur: ohne FM, s. u.) | trocken 0,00 dB (Spektrum gleich; Null schlecht: reine 3,3-kHz-Sinustöne, Anschläge um Sample-Bruchteile versetzt); mit Hall −0,5 … −3,3 dB² |
+| Mode 2/7 FX | 16 | gleich¹ | trocken −0,05 / −0,16 dB; mit Hall bis −2,5 dB² |
+| Launchkey | 6 | gleich | Tasten ±0,1 dB, Hall −0,9 dB, Pads +0,5 dB (wie 008) |
+| Global (Fog, Thin, Tension, Wumms, Chapter, Break) | in allen | – | – |
+
+¹ Einzige Abweichung im Vergleich: der Log-Gain liegt genau auf einer Rundungsgrenze (0,4725 / 0,3375; SC schreibt
+6 Stellen, Strudel volle Länge) — kein hörbarer Unterschied. Wood bei Tension 1: eine Note mehr bei t = 0 (Strudel
+liest den Regler bei der ersten Abfrage noch nicht, wie bei 007/010).
+² Trocken identisch (`.room(0).delay(0)` gegen eine Kopie ohne Hall). Mit Hall ist SC bei gehaltenen Klängen auf
+Orbit 2 (Raum 4) leiser, je mehr Hall, desto mehr (Pads bei Tension 1: −3,4 dB; Strudel gegen sich selbst nur ±0,35 dB).
+Das liegt am gemeinsamen Hall (Impulsantwort `ir/orbit-4.wav` / Faltung), nicht an 016 — betrifft 008 genauso
+(dort nur trocken verglichen). Offen, s. u.
+
+**Entscheidungen**
+- **Kein Master:** Spalte 8 Fader ist in 016 Wumms (Kick, Rumble, Sub, Bass lauter, länger, gezerrt), kein Master.
+  Bibliothek: `global.master` darf fehlen, die Kanalzüge stehen dann auf 1 (`lib/setup.scd`). Wumms wirkt wie in
+  Strudel pro Note (beim Anschlag gelesen): kurze Klänge.
+- **Tension blendet Pads und Strings live** (Grundsatz „Tension wirkt live“): ihr Anteil (Pads 0,3 → 1, Strings
+  0 → 1 über 0,2 … 0,7) liegt als Map-Bus auf dem Trim des Kanalzugs (`maps: padIn, strIn`); im Log steht er im `g`
+  wie in Strudels Gain. Strings laufen dafür auch unter Tension 0,2 mit (stumm, nicht im Log).
+- **Live** außerdem Brightness bei Pads, Strings und Launchkey-Tasten; alles andere ab der nächsten Note (kurze Klänge),
+  auch die ganze Stab-Shape-Spalte und Strings-Swell (Attack).
+- **Stab Shape** (Mode 2, Spalte 3) ist keine Spur: ihre Regler setzen Filterhüllkurve, Länge, Resonanz, Drive (Fader)
+  des Stabs pro Note; Taste 1 = Latch „Stab in/out“, Taste 2 = Ratchet (`ply(2)`). Vanish (Stab Reihe 3) = `rand` am
+  Taktanfang; die Answer liest denselben Wert und spielt in den freien Takten (nur wenn der Stab-Fader > 0).
+- **Swing** (Wood `swingBy(0,1 + 0,4 × Bounce, 8)`, Hats 0,12 / 0,2): ungerade 16tel um den Betrag später (auf ganzen
+  16teln gibt es keine Doppel/Wegfall-Fälle).
+- **Übernommene Strudel-Eigenheiten** (1:1, nicht verbessert):
+  - Answer: die Schichten (jeder 2. Takt, Spill/Random, Füllung bei fehlendem Stab) sind ein `stack`: fallen zwei auf
+    dasselbe 16tel, spielt die Note doppelt (lauter).
+  - Accents: `irand(5)`, `irand(7)` und `degradeBy` lesen alle dieselbe Zufallszahl des 16tels; da nur Zahlen über
+    1 − 4^Rate/32 (≥ 0,875) durchkommen, spielt **immer Schuss 4 auf Note 104 (A♭7)** (bzw. bei Burst gelegentlich
+    andere). Und die Schüsse tragen ihr FM als rohen Schlüssel `fm`, den superdough nicht liest (nur die Funktion
+    `.fm()` wird zu `fmi`): kein FM, reiner Sinus. Gemeint war laut Kommentar „jedes Mal ein anderer Klang“.
+  - FX: der eigene Tiefpass des steigenden Saw (`.lpf(saw …)`) wird vom Spalten-Tiefpass überschrieben (`strip` setzt
+    `lpf` danach).
+- **Launchkey:** wie 008 (der Strudel-Abschnitt ist identisch); ohne Master wie Strudel (`postgain` = Modrad).
+- **Werkzeug:** `tools/sc-port/strudel-run.mjs` dekodiert jetzt den Repo-Pfad (Leerzeichen → `%20` in der URL):
+  vorher fand es die gm-Soundfonts (Launchkey-Vibraphon) und eigene Samples auf der Platte nicht, wenn der Pfad
+  Leerzeichen hat.
+
+**Offen (Fragen an die Spieler)**
+- Hall auf Orbit 2 bei gehaltenen Klängen in SC 1 … 3 dB leiser als in Strudel (s. ²): Impulsantwort neu messen /
+  Hall-Pegel prüfen? Betrifft auch 008.
+- Accents: so lassen (1:1) oder wie gemeint (verschiedene Schüsse/Tonhöhen, mit FM) — dann in Strudel und SC ändern?
+- Wumms pro Note (wie Strudel) oder live wie früher Master?
