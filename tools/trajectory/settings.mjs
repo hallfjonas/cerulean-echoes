@@ -20,6 +20,13 @@ export const SETTINGS = [
     tip: 'Key H: frame around the controller page used last in the LC view', apply: () => {} },
   { id: 'look', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',
     tip: 'Key V: cycles the looks', apply: (value, { renderer }) => renderer.setLook(value) },
+  // the look of the SuperCollider MIDI panel (sc/ui/index.html, UI-REDESIGN.md); one browser setting it reads too
+  { id: 'panelTheme', label: 'Panel theme', kind: 'choice', options: ['black', 'te'], default: 'black', key: 't',
+    tip: 'Key T: Black (Torso-like) or TE (Teenage Engineering-like), for SuperCollider tracks',
+    apply: value => {
+      try { localStorage.setItem('ce.panelTheme', value) } catch {}
+      document.getElementById('scPanel')?.contentWindow?.postMessage({ panelTheme: value }, location.origin)
+    } },
   { id: 'widen', label: 'Pan width', kind: 'toggle', default: true, key: 'w',
     tip: 'Key W: widen the pan range the music used', apply: (value, { renderer }) => renderer.setWiden(value) },
 ]
