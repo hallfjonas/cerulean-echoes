@@ -28,6 +28,6 @@ Mode 2 = Jonas (Pad, Deep Chords, Pluck Arp, Lead, Marimba, Glockenspiel, Birds)
 Tension, Master, Chapter (Dusk → Sunrise → Floating → Warmth), Break. Jojos Spalte 8 (Shaker / Ride) ist wie in
 Strudel aus.
 
-Launchkey MK4 25 (Regler CC 31–38): Tasten = Jonas' Keys (wie 008), Drum-Pads (Kanal 10) = 16 One-Shots
+Launchkey MK4 25 (Regler CC 21–28): Tasten = Jonas' Keys (wie 008), Drum-Pads (Kanal 10) = 16 One-Shots
 (Stimmen, Rim, Marimba, Glocken, Shaker, Wind …). Regler 1 Brightness, 2 Piano → Rhodes, 3 B3 → M1, 4 Vibes →
 Marimba, 5 Länge, 6 Hall, 7 Echo, 8 Pad-Fog.

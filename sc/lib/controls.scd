@@ -69,7 +69,7 @@
 //   lc        every Launch Control XL 3 gets the full layout (Mode 1 + Mode 2 + column 8); with several, the control
 //             moved last wins (every message writes the bus). Its DAW port is ignored.
 //   launchkey the Launchkey MK4 25: its own stem as in the Strudel tracks: keys and drum pads (channel 10) play at
-//             once (the track's lkNote), its mod wheel and knobs (CC 1, 31-38) go to ~ce.lkCC and the track's lkCtl
+//             once (the track's lkNote), its mod wheel and knobs (CC 1, 21-28) go to ~ce.lkCC and the track's lkCtl
 //             (its own controls, apart from the LC's: its knobs would collide with the LC knobs).
 //   (none)    any other controller: listed in the post window, ignored, so it cannot change the track by accident.
 ~ce.midiKinds = [

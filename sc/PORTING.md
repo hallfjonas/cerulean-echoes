@@ -199,7 +199,7 @@ coarse/crush/shape/distort in superdoughs Reihenfolge, alles als Bus: Voice live
   barLatch); SC nimmt die gemeinte Logik (gleiche Note bis auf diesen Fall).
 - **Erste Abfrage:** Shaker-Ghosts bei Reihe 3 = 1 hat SC eine Note mehr bei t = 0 (Strudel liest den Regler beim ersten
   Abfragen noch nicht).
-- **Launchkey:** Regler auf CC 31–38 wie die Strudel-Tracks (`lkCC[30 + n]`). Web-UI (`lib/ui.scd`) und 009 lesen noch 21–28.
+- **Launchkey:** Regler auf CC 21–28, der Voreinstellung des Geräts (`lkCC[20 + n]`; bis 2026-11-20: 31–38).
   Pads mit `once` sperren über die Sprachzeit.
 - **Launchkey-Pads 1 und 5** (m4a): Versatz in der Referenz wie bei 009; Rausch-Swell zufällig. Trocken sonst ±0,3 dB.
 - **Werkzeug:** `strudel-run.mjs` dekodiert WAVs, die node-web-audio-api ablehnt (VCSL-Shaker: „malformed fmt_pcm
@@ -211,7 +211,7 @@ coarse/crush/shape/distort in superdoughs Reihenfolge, alles als Bus: Voice live
 Der Strudel-008 hat einen neuen Launchkey: Tasten = Jonas' Keys aus 009 (Regler 2–4 je ein Paar: Piano → Rhodes,
 B3 → M1, Vibraphon → Marimba, Drittel-Überblendung; Regler 2 steht auf 0,5, bis er gedreht wird), Pads neu (Stimmen,
 Toms, „Braaam“-Drop). Portiert; die Tasten liegen als gemeinsames Stück in `sc/lib/lkkeys.scd` (`~ce.lkKeysNotes`,
-vom Track geladen, für 008 / 009 / 010). Regler auf CC 31–38. Vergleich `scenarios/008-lk.json`: Ereignisse gleich,
+vom Track geladen, für 008 / 009 / 010). Regler auf CC 21–28. Vergleich `scenarios/008-lk.json`: Ereignisse gleich,
 Lautheit ±0,4 dB. Abweichung: Strudel nimmt den Launchkey jetzt nicht mehr mal Master (`postgain(lkKeysLevel)`, Pads
 ohne postgain); SC behält Master (der Kanalzug multipliziert immer) — bei Master 1 gleich.
 
@@ -231,7 +231,7 @@ erste Abfrage bei t = 0, wie bei 007). Trocken Null-Tests −21 bis −56 dB, La
 - **Live:** Brightness bei Noise Pump, Pad, Lead und den Launchkey-Tasten; sonst ab der nächsten Note.
 - **Freeze** (Pad-Taste 2): wie Strudel der Grundton im Moment des Drückens, für alle (jede harmonische Spur fragt
   den Grundton jedes 16tel ab, wie Strudel bei jedem Tick).
-- **Launchkey:** Tasten aus `sc/lib/lkkeys.scd` (wie 008), Regler CC 31–38, Pads wie Strudel (Rim mit Echo 0,3,
+- **Launchkey:** Tasten aus `sc/lib/lkkeys.scd` (wie 008), Regler CC 21–28, Pads wie Strudel (Rim mit Echo 0,3,
   Räume 0,3 / 0,6 / 0,7 + 0,5 t).
 - Hats „Shuffle“: Strudels swingBy(0,4, 8) = jede zweite 16tel 0,4 16tel später.
 

@@ -85,7 +85,7 @@ test('buttons, keys, pads, Launchkey knobs, snapshot and dropped messages', () =
     [LC, 0x90, 60, 100, 2.2],
     [LK, 0x90, 60, 127, 3], [LK, 0x90, 64, 64, 3.25], [LK, 0x90, 64, 0, 3.3], [LK, 0x80, 60, 0, 3.5],
     [LK, 0x99, 36, 100, 4], [LK, 0x89, 36, 0, 4.1], [LK, 0x99, 60, 90, 4.2],
-    [LK, 0xb0, 34, 127, 6], [LK, 0xb0, 105, 127, 6],
+    [LK, 0xb0, 24, 127, 6], [LK, 0xb0, 105, 127, 6],
   ], snapshot), controls)
   assert.deepEqual(script.steps, [
     { bar: 0, cc: KNOB, value: 0.2362 },
@@ -95,7 +95,7 @@ test('buttons, keys, pads, Launchkey knobs, snapshot and dropped messages', () =
     { bar: 3.25, keys: 'e4', velocity: 0.504, length: 0.05 },
     { bar: 4, pad: 36, velocity: 0.787 },
     { bar: 4.2, keys: 'c4', velocity: 0.709 },
-    { bar: 6, lk: 34, value: 1 },
+    { bar: 6, lk: 24, value: 1 },
   ])
   assert.equal(script.bars, 6)
   assert.deepEqual(script.take, { source: 'human', recordedAt: '2026-11-17T20:00:00Z', trackHash: 'abc', cps: 0.5,
@@ -134,7 +134,7 @@ test('a take on a live track passes check-perform (take meta and pad velocity le
   const knob = [...real].find(([, c]) => !c.button)[0]
   const s = session([
     ...Array.from({ length: 30 }, (_, i) => [LC, 0xbf, knob, i * 4, 1 + i / 20, 2000 + i * 20]),
-    [LC, 0xbf, button, 127, 3], [LK, 0x90, 62, 100, 4], [LK, 0x99, 40, 100, 5], [LK, 0xb0, 31, 90, 6],
+    [LC, 0xbf, button, 127, 3], [LK, 0x90, 62, 100, 4], [LK, 0x99, 40, 100, 5], [LK, 0xb0, 21, 90, 6],
   ], [{ port: LC, cc: knob, value: 0.25, time: 1 }])
   s.track = track
   const { take, ...script } = toScript(s, real)

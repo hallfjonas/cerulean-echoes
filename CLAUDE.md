@@ -66,7 +66,7 @@ files.
   wins (`lcCc`, built on `lastMoved`, made once per CC). No LC found: a warning, silence. Without Web MIDI (the Node
   tools) one plain `midin()` stands in, so `/strudel-optimize` and `tools/strudel-sim` still work.
 - Launchkey MK4 25 (optional, its own stem `stemLK`): keys = a pad, drum pads (channel 10) = 16 one-shots, mod wheel
-  CC 1 = keys level × master, knobs CC 31-38 = sound (same meaning in every track; the sounds fit each track).
+  CC 1 = keys level × master, knobs CC 21-28 = sound (same meaning in every track; the sounds fit each track).
 - The LC view (`▣ LC big`) shows Mode 1 and Mode 2 side by side, the page moved last framed, and the Launchkey row. `midikeys` has no note-off (fixed note length) and its queue is
   emptied by the scheduler's first query: read it through `shareQuery` when more than one layer uses it.
 - The old dual/multi and generated single versions are in git history. `-dual`/`-single` files and
@@ -118,7 +118,7 @@ Tools (run in `tools/`):
 - Sounds load? `node strudel-sim/check-sounds.mjs [--offline] <track…>`; broken bank sound:
   `node strudel-sim/mirror-sound.mjs <sound>`
 - Controller scenario without a throwaway script: `npm run scenario -- <track> --cc 13=0.5@1 --press 37@2 --pad 36@1
-  --lk 31=0.7 --keys '<c3 e3>' --lc 2 --cc2 … [--before 0-4 --after 4-8] [--stems|--events|--view]` (`--view` = LC view
+  --lk 21=0.7 --keys '<c3 e3>' --lc 2 --cc2 … [--before 0-4 --after 4-8] [--stems|--events|--view]` (`--view` = LC view
   as text)
 - Syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
 - Guitar Pro MIDI → track, design stub, perform script: `npm run producer -- <file.mid> [--map <map.json>]

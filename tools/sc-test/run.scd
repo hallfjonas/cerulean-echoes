@@ -71,6 +71,9 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		var name = file.basename.splitext[0], log, pressed;
 		check.("% loads and plays notes with the faders up".format(name), {
 			log = play.(file, 4); log.size > 0 });
+		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
+		check.("% Launchkey knob 1 (CC 21) reaches the track".format(name), {
+			var ce = ~lastCe; ce.setLkCC(21, 0.7, {}); ce.stateVal[\lkBright] == 0.7 });
 		check.("% every sample file it loads exists".format(name), {
 			var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
 		check.("% several stems play".format(name), {

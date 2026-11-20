@@ -69,7 +69,7 @@ if (!lcInputs.length) console.warn('No Launch Control XL 3 found')
 
 // Launchkey MK4 25: keys + drum pads via midikeys, knobs and mod wheel via midin; silent if missing
 const LK_NAME   = 'Launchkey MK4 25'
-const LK_KNOB_1 = 31
+const LK_KNOB_1 = 21   // the Launchkey's 8 knobs send CC 21-28 (its default)
 let lkCc = null
 let lkKeys = null
 try {

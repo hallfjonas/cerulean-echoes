@@ -33,8 +33,8 @@ const FLAT_NOTES = ['c', 'db', 'd', 'eb', 'e', 'f', 'gb', 'g', 'ab', 'a', 'bb', 
 const SCALES = { minor: [0, 2, 3, 5, 7, 8, 10], major: [0, 2, 4, 5, 7, 9, 11] }
 const BASE = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }
 const GLOBAL_NAMES = { k1: 'Fog', k2: 'Thin', k3: 'Tension', fader: 'Master', b1: 'Chapter', b2: 'Break' }
-const LK_NAMES = { 'Keys Level': 1, Brightness: 31, 'Piano → Rhodes': 32, 'B3 → M1': 33, 'Vibes → Marimba': 34,
-  Length: 35, Space: 36, Echo: 37, 'Pad Fog': 38 }
+const LK_NAMES = { 'Keys Level': 1, Brightness: 21, 'Piano → Rhodes': 22, 'B3 → M1': 23, 'Vibes → Marimba': 24,
+  Length: 25, Space: 26, Echo: 27, 'Pad Fog': 28 }
 const PAD_NOTE_1 = 36
 const VOICE_PADS = ['Brace', 'Paper', 'Wine', 'Plaenterwald', 'Wiese', 'Creatures', 'No end', 'Vast']
 const EXTRA_COLUMNS = {

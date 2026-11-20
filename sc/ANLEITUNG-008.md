@@ -29,6 +29,6 @@ Mode 1 = Jojo (Kick, Rumble, Sub, Bassline, Clap, Hats, Percussion), Mode 2 = Jo
 Stab, Answer, Dark Perc, FX / Breath), Spalte 8 global: Fog, Thin, Tension, Master, Chapter (dunkel → gespannt →
 warm), Break. Jojos Spalte 8 (Ride) ist wie in Strudel aus.
 
-Launchkey MK4 25 (Regler CC 31–38): Tasten = Jonas' Keys aus 009 (Modrad = Lautstärke), Drum-Pads (Kanal 10) = 16
+Launchkey MK4 25 (Regler CC 21–28): Tasten = Jonas' Keys aus 009 (Modrad = Lautstärke), Drum-Pads (Kanal 10) = 16
 One-Shots (Stimmen, Toms, Braaam …). Regler 1 Brightness, 2 Piano → Rhodes, 3 B3 → M1, 4 Vibes → Marimba, 5 Länge,
 6 Hall, 7 Echo, 8 Pad-Fog. Regler 2 steht auf Piano + Rhodes, bis man ihn dreht.

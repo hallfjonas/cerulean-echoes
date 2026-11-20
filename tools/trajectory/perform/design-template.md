@@ -46,7 +46,7 @@ the script exists.
 ```
 
 Rules for the table: bar ranges are contiguous and cover the whole length; a control the design never names stays at
-0; Launchkey column says keys (notes or chords), pads (note names, drum C1 = 36) or knobs (CC 31-38, mod wheel CC 1),
+0; Launchkey column says keys (notes or chords), pads (note names, drum C1 = 36) or knobs (CC 21-28, mod wheel CC 1),
 or `-`; intent is one short phrase.
 
 ## Feedback log format
