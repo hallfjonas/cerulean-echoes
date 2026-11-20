@@ -1,8 +1,8 @@
 ---
 name: panel-video
-status: backlog
+status: in-progress
 created: 2026-11-20T18:48:28Z
-updated: 2026-11-20T18:48:28Z
+updated: 2026-11-20T19:30:00Z
 progress: 0%
 prd: (none, scoped from the request "record the MIDI panel in parallel with the audio recording, toggle, export as video")
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
@@ -144,3 +144,13 @@ Based on `ui/sc-themes` (the SC MIDI panel, PR 63): the panel to film is the one
 
 6 tasks (a seventh only on spike failure), about 2-3 working sessions. Critical path: 1 → 2 and 3 → 4 → 5 → 6.
 The spike decides the schedule risk (cost and sync of live capture).
+
+## Spike findings (task 001, 2026-11-20, partial)
+
+Throwaway Chrome 157 (own profile, flags `--auto-accept-this-tab-capture`), driven over CDP; harness was not kept.
+
+- **Crop works.** `CropTarget.fromElement(iframe)` + `cropTo` films only the panel iframe, about 30 fps. Output size is not controllable (1280×720 or 2560×1440 for a 640×360 iframe at DPR 2), so the mux must scale to even dims.
+- **Codec.** `video/mp4;codecs=avc1` and WebM VP9 are both supported. The MP4 stream decodes with one warning at the first frame (`left block unavailable`); re-encoding with x264 `veryfast` is fast (8 s clip in 0.25 s) and removes it. Plan: re-encode, not copy.
+- **Sync.** Panel events show up in the video 57-103 ms after the page's own clock (MP4: mean 84, sd 15; VP9: mean 65, sd 19). The audio mark (worklet start mapped through `getOutputTimestamp`) was accurate to about 15 ms. Gate: pass with a constant video advance of about 75 ms in the mux, leaving about ±30 ms (one frame). Not yet tested under load.
+- **Cost, 008 Strudel with auto-perform:** Chrome total CPU about 50% (audio recorder included) rises to about 67% with video capture, one run of 20 s per phase. `playoutStats` is not available, so dropouts were not measured, and the WAV check was not done.
+- **Not done:** 010 and an SC track (016 or 008 SC panel), underrun or dropout check, flash-and-click under load. Task 001 stays open for these; the gate leans to PASS (live capture, tasks 002-006; task 007 not needed).

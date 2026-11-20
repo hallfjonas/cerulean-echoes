@@ -1,6 +1,52 @@
 
 ## Action Items
 
+## Decisions
+- We need SC for live performance
+
+## Open questions
+- decide whether to fully switch to SC or keep Strudel alive somehwow
+  - how portable
+  - power of the language (sound quality and feature support)
+
+## Next Steps
+- integrate SC
+  - decide whether to fully switch to SC or keep Strudel alive somehwow;
+    - think of use-cases (Strudel might be more approachable, no technical hurdle)
+    - will SC eventually be better in terms of sound quality?
+    - anything else we might be missing
+  - launch SC from our UI
+  - can SC directly translate or play .strudel files (wihtout latency)
+  - data management of samples with SC (should they live in a separate palce outside of repo?)
+
+- sound lab
+  - define what a stem is
+    - a stem is a fixed full column set up in LC XL 3 including: sample, pattern, three knobs + slider, two buttons for add-ons --> document this
+    - a stem can have multiple versions: if two stems are very similar they should be different versions of the same stem (e.g., just one knob replaced)
+    - stems should be named as: <sample-name>-<knob-1>-<knob-2>-<knob-3>-<btn1>-<btn2>.stem
+    - disgn a stem file format for this (based on json)
+    - think if supporting the following makes sense: tags, hierarchical categories, genres, tracks, moods, ...?
+  - how to utilize shared stems across tracks
+  - stem lab as a full feature in the current software
+  - how to design the sound lab in our software
+    - Sample Designer (Synthesizer): Build and export a new sample by taking one or multiple sounds and filling up the full LC controls with various filters, patterns, and add-ons.
+    - Stem Designer: The 8 (or 16) columns of the LCs should represent different stem versions where each column has a unique set of filters, patterns, and add-ons.
+
+  - Sample Designer, two versions:
+    - fixed setup: drum machine, synthesizer
+    - LLM support (skill) to arrange something freely
+  - Stem Designer:
+    - Should be easy to use and set up with LLM support (maybe a skill). For example "I need to re-design the piano stem of the house track", "the flute in the house track is a bit boring and too repetitive, I want to explore a replacement".
+
+  - UI support to swap a stem in a track:
+    - click a stem
+    - choose from a list of the stem library
+
+  - preliminary definitons of tracks and sets:
+    - a track is a unique assignment of stems to the LCs
+    - a unique collection of tracks
+
+
 # Backend
 + Switch to Supercollider to minimize latency
 

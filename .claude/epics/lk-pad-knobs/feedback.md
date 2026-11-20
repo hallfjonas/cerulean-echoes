@@ -1,0 +1,3 @@
+- proceed with low priority
+- relativeness of LC knobs more important than LKs
+- scope feasibility; perhaps LC requires us to change the MIDI Mapping of the device first?

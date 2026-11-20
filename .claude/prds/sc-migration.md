@@ -60,8 +60,8 @@ Strudel parts that need upkeep are retired. Background and earlier decisions: `S
 5. Recording: SC records its master output; `recording.mjs` keeps file names and the sidecar format.
 6. Launcher: one macOS double-click start for SC (headless) + player + browser, clean shutdown.
 7. Port 001-groove, 002-groove and 016-grroove-opus to SC (`sc/tracks/`), same controls and `@ctl` texts.
-8. SC lab: machine lab and options lab after `sc/PLAN-STEM-LIBRARY.md`, with a promote step into the sound/stem
-   library; the Strudel boards in `lab/` move to git history once it exists.
+8. SC lab: moved to the `sound-lab` epic (Sample Designer, Stem Designer, promote; decided 2026-11-20); here only the
+   Strudel boards in `lab/` move to git history once it exists.
 9. Feature tests (`npm test`) for every feature above plus SC core (`UnitTest`, headless `sclang`); `verify-sc` for one
    changed SC track (loads without errors, tags parse, perform scripts valid).
 10. Retire: set 011 (`tracks/sets/`) and historic 000-006 (`tracks/historic/`); Strudel-only checks and skills

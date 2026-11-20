@@ -1,0 +1,2 @@
+- sc migration is not done yet?
+- might make sense to fold panel-video into the sc-migration then (or at least assume it is done?)

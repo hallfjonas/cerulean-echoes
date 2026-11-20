@@ -2,7 +2,7 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-20T13:20:08Z
+updated: 2026-11-20T18:11:25Z
 progress: 27%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
@@ -68,7 +68,7 @@ not the audio thread); the take ↔ WAV alignment once SC records.
 | 006 | Launcher (one double-click start) | after 002 (005 nice to have) |
 | 007 | Port 001-groove and 002-groove | after 001, parallel to everything |
 | 008 | Port 016-grroove-opus | after 001, parallel to everything |
-| 009 | SC lab (machine lab, options lab, promote) and archive the Strudel lab | after 002 |
+| 009 | Archive the Strudel lab (SC lab moved to the `sound-lab` epic) | after sound-lab 005, 007 |
 | 011 | Retire the Tools page and the Analysis page | now, parallel to everything |
 | 010 | Tools, skills and docs for SC; retire set 011, historic, Strudel checks and skills | last |
 
@@ -101,7 +101,7 @@ Biggest items: 002 (engine) and the ports (007, 008).
 - [ ] 006.md - Launcher (parallel: true)
 - [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true)
 - [ ] 008.md - Port 016-grroove-opus to SC (parallel: true)
-- [ ] 009.md - SC lab and archive of the Strudel lab (parallel: true)
+- [ ] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
 - [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
 - [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
 

@@ -1,0 +1,4 @@
+- keep UI simple for now and leave beautification to another collaborator (leave as a clear follow up effort)
+- add two more designer types:
+    - track designer (in which you can pick, choose and assign stems (+ multiple versions) to the columns of the LCs; you can modify knobs, drum pad and keys of LK)
+    - set designer (in which you can pick a set of tracks which should be built into a playable set using the existing set progression functionalities; IDEALLY, sequence of tracks is relatively free and live-decidable).
