@@ -121,9 +121,18 @@ job) and the mode one of the add-on's modes.
 
 ### Escape hatch
 What JSON cannot say (009's Complexity steps, a knob that cross-fades three sounds, multi-sound keys) lives in an SC
-file next to the stem: the stem's `code` (makes the events), or `code` on `k1`-`k3`, `b1`, `b2`. The SC file returns
-the same event shape as the JSON parts (task 002 fixes the SC side). The JSON still carries every label, `about` and
-the metadata. Prefer JSON; with a stem `code`, a pattern needs only its `label`.
+file next to the stem: the stem's `code` (makes the events), or `code` on `k1`-`k3`, `b1`, `b2`. The JSON still
+carries every label, `about` and the metadata. Prefer JSON; with a stem `code`, a pattern needs only its `label`.
+Each file returns a Function (b2: an Event):
+
+| File | Returns | Used |
+|---|---|---|
+| stem `code` | `{ \|col, k\| hits }`: Events `(at, dur, note, vel)` of 16th `k` | instead of the patterns |
+| knob `code` | `{ \|v, col\| (param: value, …) }` (`v` = the knob, 0..1) | merged into every note from the next note on |
+| `b1` `code` | `{ \|col\| … }` | called on each press instead of "next pattern at the next bar" |
+| `b2` `code` | an add-on Event, the shape of `sc/lib/addons.scd` | as a library add-on |
+
+`at` and `dur` are in 16ths, `note` is read through `pitch`; button 1 still steps `col[\patLatch]` for a stem `code`.
 
 ## Label rules
 `check-stems` enforces the project's label rules:
@@ -224,8 +233,14 @@ A stem track is `sc/tracks/<id>/<id>.track`, JSON, schema `sc/stems/track.schema
 - `slots`: `1:1`-`1:7` are Mode 1 (foundation), `2:1`-`2:7` Mode 2 (colour). Each names an exact stem version under
   `sc/stems/`. An empty slot is a silent column.
 - `frame`: the SC file next to the track with everything that is not a stem: chords, progressions and chapters, the
-  global column 8 (Fog, Thin, Tension, Master, Chapter, Break) and the Launchkey. `chapters` repeats the chapter names
-  for the tools.
+  global column 8 texts and the Launchkey. `chapters` names the chapters Chapter (column 8 button 1) steps through.
+  The file returns an Event: `chordAt: { |frame, track, bar| chord }` (required; `track.chapterAt(bar)` is the
+  chapter, a chord is made with `~ce.chordOf("Am9", "a1", "c4 e4 g4 b4", "a b c d e f# g")`), optional
+  `chapterBars` (Chapter switches at the next phrase of that many bars, default 4), `orbits`, `states`, `samples`,
+  `maps`, `stems` (e.g. the Launchkey's own stem), `lkNote`, `lkCtl`, `lkPadNames`, `build: { |frame, track, ce| }`.
+  Its `// @` comment lines (`@ctl g.…`, `@col 16:8`, `@lk …`) join the `@ctl` lines made from the stems.
+- Fog, Thin, Tension, Master and Break are the same in every stem track (CC 20, 28, 36, 12, 52; Mode 2 + 48).
+  `swing` is how far the off 16ths come late, as a fraction of a 16th.
 - A stem track is never overwritten by a swap or the designers: they write a new track file ("Save as").
 
 This definition is preliminary: the 009 pilot (task 003) may change the frame part.
@@ -241,9 +256,28 @@ would name the tracks in order and the length of each change. There is no set fi
   from sample + labels, the sample, preset keys, parameters, code files, add-on, parent and the stems a track names
   exist, label rules, mini-notation brackets, at most 3 patterns on a Mode 1 slot.
 - The schemas' genre list must match the `##` headings of [genres.md](../reference/genres.md); `npm test` checks it.
-- Feature tests: `tools/stems/check-stems.test.mjs` (a broken copy of an example per rule).
-- Not built yet: the SC loader and add-on library (task 002), `npm run stems` (task 004), Sample Designer, Stem
-  Designer and the stem swap (`.claude/epics/sound-lab/epic.md`).
+- Feature tests: `tools/stems/check-stems.test.mjs` (a broken copy of an example per rule),
+  `tools/stems/stem-tags.test.mjs` (the `@ctl` lines of a stem track), and in `tools/sc-test/run.scd`: a stem loads,
+  Pattern cycles, a knob reaches its bus, every add-on fires, silent columns are gated, Break, the code hatch, the
+  swap, and SC makes the same `@ctl` lines as `tools/stems/stem-tags.mjs`.
+- Not built yet: `npm run stems` (task 004), Sample Designer, Stem Designer and the stem swap in the player
+  (`.claude/epics/sound-lab/epic.md`).
+
+## In SuperCollider
+- `sc/lib/stems.scd` makes a column of a `.stem`, `sc/lib/addons.scd` holds the add-ons, `sc/lib/stemtrack.scd`
+  loads a `.track`. `~ce.loadTrack(path)` takes a `.scd` or a `.track` (the player's engine, `sc/live.scd` and
+  `sc/tools/render.scd` use it); a stem track becomes the same track Event as a hand-written one.
+- The example stem track is `sc/tracks/090-stem-demo/` (the two example stems); the player lists stem tracks with
+  `engine: 'sc'` and `stems: true` (`<id>-stems` when an `.scd` of the same name exists).
+- A column's knobs write state buses (`s<mode>_<col>_<param>`, room and echo send included), so they act at once,
+  also on sounding notes; `hold` (seconds) and `amp` are read at each note's start. A column whose fader or the master
+  is at 0, or that sits out the Break, makes no hits at all (gated).
+- The `@ctl` lines of a stem track are made from its stems and frame (`~ce.stemTrackTags`, and the same in
+  `tools/stems/stem-tags.mjs` for `check-perform`), so the MIDI panel and the auto-perform scripts work unchanged.
+- Swap hook: `~ce.swapSlot(slot, ref, load)` puts the stem `ref` (path under `sc/stems/`) on `slot` (`'2:4'`) at the
+  next bar line; the other columns play on. `load.(msgs, done)` sends the new sounds, samples and state buses
+  (default: live, with `s.sync`) and then calls `done`. The slot must hold a stem already (an empty slot has no
+  strip: load the changed track instead). The swap changes only the running track, never the file.
 
 ## Related
 - [Samples and sounds](samples-and-sounds.md)

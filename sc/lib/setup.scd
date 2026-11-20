@@ -105,18 +105,19 @@
 		msgs.add([\s_new, \ce_delay, dnode, 1, self.groups.fx, \in, dbus, \out, self.masterIn, \time, d[0], \feedback, d[1]]) } };
 	// stems: an audio bus and a strip each; a stem with lanes (layers on other orbits or with another echo) gets
 	// one bus and strip per lane, all on the stem's fader. Notes pick their lane with \lane (default: the first).
-	self.stemBus = (); self.levelSrc = ();
+	self.stemBus = (); self.levelSrc = (); self.stripNode = ();
 	track.stems.do { |st|
 		var snd = self.sounds[st.sounds[0]], lanes = st.lanes ?? { [(name: \main)] };
 		var val = { |x| if(x.isKindOf(Symbol)) { ("c" ++ self.mapBus[x]).asSymbol } { x } };
-		self.stemBus[st.name] = (); self.levelSrc[st.name] = ();
+		self.stemBus[st.name] = (); self.levelSrc[st.name] = (); self.stripNode[st.name] = ();
 		lanes.do { |ln, i|
-			var bus = aud.(), orbit = ln.orbit ? st.orbit, space = ln.space ? st.space;
+			var bus = aud.(), orbit = ln.orbit ? st.orbit, space = ln.space ? st.space, id = node.();
 			self.stemBus[st.name][ln.name] = bus;
+			self.stripNode[st.name][ln.name] = id;
 			// the fader (a CC, a state bus or a number; a lane may have its own): read at each note's start (noteLevel)
 			self.levelSrc[st.name][ln.name] = ln[\level] ? st.level;
 			if(i == 0) { self.stemBus[st.name][\main] = bus; self.levelSrc[st.name][\main] = ln[\level] ? st.level };
-			msgs.add([\s_new, \ce_strip, node.(), 1, self.groups.strips,
+			msgs.add([\s_new, \ce_strip, id, 1, self.groups.strips,
 				\in, bus, \out, self.masterIn, \hpOwn, st.hpOwn ? snd.hpf, \thinOn, (st[\thin] != false).asInteger,
 				// the fader is not here (it acts per note, see noteLevel); fade: a lane's level that acts at once on
 				// sounding notes (a crossfade between layers): a state bus (symbol) or a number
@@ -131,7 +132,7 @@
 				\thinF, ("c" ++ self.thinBus).asSymbol,
 				// space: a CC, or a fixed number when given as (fixed: 0.3)
 				\space, if(space.isKindOf(Event)) { space.fixed } { if(space.isNil) { 0 } { self.ccMap(space) } },
-				\tension, self.ccMap(track.global.tension),
+				\tension, if(st[\tension] == false) { 0 } { self.ccMap(track.global.tension) },
 				\roomOut, self.orbitBus[orbit] ? 0, \roomOn, (self.orbitBus[orbit].notNil).asInteger,
 				\delayOut, self.stemDelayBus[st.name] ? self.orbitDelayBus[orbit] ? 0,
 				\delayOn, (((ln[\echo] ? st[\echo]).notNil or: { (ln[\echoSend] ? st[\echoSend]).notNil })

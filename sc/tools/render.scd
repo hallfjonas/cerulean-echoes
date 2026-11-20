@@ -1,5 +1,5 @@
 // Offline render of a track (or some of its stems) for a scenario, with an event log for the comparison.
-// usage: sclang render.scd <track.scd> <scenario.json> <out-prefix> [stem,stem,…]
+// usage: sclang render.scd <track.scd|track.track> <scenario.json> <out-prefix> [stem,stem,…]
 //   scenario (same file as for tools/sc-port/strudel-run.mjs): { "bpm": 124, "cycles": 8, "cc": { "5": 1 },
 //     "events": [ { "t": 2.5, "cc": 37, "v": 1 } ] }   — t in bars (cycles), cc values 0..1
 // Writes <out-prefix>.wav (48 kHz float stereo, the master without trim and limiter) and <out-prefix>.events.json.
@@ -17,7 +17,7 @@ ce = (here.dirname +/+ "lib/ce.scd").load;
 ce.quiet = true; ce.trimDb = 0; ce.limit = 0;
 // comparisons: the FM modulator starts where superdough's offline render has it; "livePhase": true = random as live
 ce.webaudioPhase = (scen["livePhase"] != true) and: { scen["livePhase"] != "true" };
-track = trackFile.load;
+track = ce.loadTrack(trackFile);
 if(only.notNil) { var names = only.split($,).collect(_.asSymbol); track.stems = track.stems.select { |s| names.includes(s.name) } };
 server = ScoreStreamPlayer.new;
 bps = num.(scen["bpm"] ? track.bpm) / 60;

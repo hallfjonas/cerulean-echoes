@@ -7,6 +7,7 @@ import { execFileSync, spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { trackTags } from '../stems/stem-tags.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const findSclang = () => {
@@ -16,11 +17,14 @@ const findSclang = () => {
   try { return execFileSync('which', ['sclang'], { encoding: 'utf8' }).trim() || null } catch { return null }
 }
 const sclang = findSclang()
+const demoTrack = path.join(here, '..', '..', 'sc', 'tracks', '090-stem-demo', '090-stem-demo.track')
 
 test('SuperCollider: building blocks and every live track', { skip: sclang ? false : 'sclang not installed' }, () => {
   const run = spawnSync(sclang, [path.join(here, 'run.scd')], { encoding: 'utf8', timeout: 300e3 })
   const lines = `${run.stdout}\n${run.stderr}`.split('\n')
   const failed = lines.filter(line => /^FAIL|^  missing:/.test(line))
   const summary = lines.find(line => /passed, \d+ failed$/.test(line)) ?? 'no summary (sclang crashed?)'
+  const scTags = lines.filter(line => line.startsWith('TAG ')).map(line => line.slice(4))
+  assert.deepEqual(scTags, trackTags(demoTrack).split('\n'), 'SC and stem-tags.mjs make the same @ctl lines')
   assert.equal(run.status, 0, `${summary}\n${failed.join('\n')}`)
 })

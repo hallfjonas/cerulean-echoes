@@ -48,7 +48,7 @@ loadTrack = { |path|
 	ce = (here +/+ "lib/ce.scd").load;
 	ce.trackFile = path;
 	ce.uiAddr = toPlayer;
-	track = path.load;
+	track = ce.loadTrack(path);
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
 	old !? { ce.midiPorts = old.midiPorts; old.midiWatch !? (_.stop) };

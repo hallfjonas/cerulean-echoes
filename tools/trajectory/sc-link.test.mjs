@@ -23,12 +23,13 @@ test('track list: every SC track is a live track on engine sc; a ported track ke
   const sc = live.filter(entry => entry.engine === 'sc')
   assert.ok(sc.length >= 4, 'at least the four ported tracks')
   for (const entry of sc) {
-    assert.match(entry.path, /\.scd$/)
+    assert.match(entry.path, entry.stems ? /\.track$/ : /\.scd$/)
     assert.ok(entry.taps, `${entry.id} playable`)
     const copy = live.find(other => other.base === entry.id)
     if (copy) assert.equal(copy.engine, 'strudel')
   }
   assert.equal(new Set(live.map(entry => entry.id)).size, live.length, 'ids are unique')
+  assert.ok(sc.some(entry => entry.stems && entry.id === '090-stem-demo'), 'the stem demo track is listed')
 })
 
 // a few ports away from a player that may be running (8766, 57131, 57140)
@@ -100,6 +101,14 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     assert.equal((await waitFor(e => e.type === 'layout', mark))?.data.bpm, 140)
     assert.ok(await waitFor(e => e.type === 'beat', mark), 'the new track plays')
     assert.equal(bars(mark)[0], 0, 'a switch starts at bar 0')
+
+    // a stem track: its @ctl texts come from its stems
+    mark = since()
+    response = await post('load', { id: '090-stem-demo' })
+    assert.equal(response.status, 200, await response.clone().text())
+    const layout = await waitFor(e => e.type === 'layout', mark)
+    assert.equal(layout?.data.tags['16:4.k3'], 'Length | short ↔ long.', 'the stem track shows its stems')
+    assert.ok(await waitFor(e => e.type === 'beat', mark), 'the stem track plays')
 
     // stop: no more bars
     assert.equal((await post('stop')).status, 200)
