@@ -49,6 +49,8 @@ udp.on('message', (buf, rinfo) => {
     case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
     case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
     case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
+    // the master output's spectrum, ~20 frames a second: passed on, not kept for new browsers
+    case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
   }
 })
 udp.on('error', e => { console.error('OSC port ' + OSC_PORT + ': ' + e.message); process.exit(1) })

@@ -23,5 +23,6 @@ Die Launch Controls gehen nie über die Brücke: Stürzen Browser oder Brücke a
   sie wieder anklickt. Ein Klick schickt dieselbe CC wie ein Launch Control: Für den Track ist es egal, woher er
   kommt; mit LC gilt der zuletzt bewegte Regler.
 - **Namen** der Spalten und Regler kommen aus den `// @col` / `// @ctl`-Zeilen der Track-Datei
-  (`sc/tracks/…/….scd`), im selben Format wie in den Strudel-Tracks. Noch nicht portierte Spalten sind grau.
+  (`sc/tracks/…/….scd`), im selben Format wie in den Strudel-Tracks. Noch nicht portierte Regler bleiben leer.
+- **Spektrum** (unter Mode 2): der Master-Ausgang aus SuperCollider (`/ce/spectrum`, 48 Bänder, `lib/ui.scd`).
 - Brücke von Hand starten: `node sc/ui/bridge.mjs` (läuft weiter, wenn SC neu startet; sie holt sich alles neu).

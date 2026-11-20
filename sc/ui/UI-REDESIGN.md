@@ -1,6 +1,7 @@
 # UI redesign: controller mirror (brief for the implementing agent)
 
-Status: design decided in conversation on 2026-11-20 from sketches and a rendered mockup. Not implemented.
+Status: design decided in conversation on 2026-11-20 from sketches and a rendered mockup. **Implemented** 2026-11-20
+(`sc/ui/index.html`), see "Implementation notes" at the end.
 Belongs to the SuperCollider move (`SC-MIGRATION.md`, `sc/PLAN-UI.md`). The UI lives in `sc/ui/`.
 
 **Reference mockup:** `sc/ui/reference/layout-mockup.html` (open it in a browser). It is the agreed look and
@@ -232,3 +233,64 @@ The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternat
   active, fader at 0 and 1, knob at 0 and 1, the "moved last" frame on each panel, a pad hit.
 - The view still plays a track end to end with real controllers and without them (auto-perform).
 - Open points listed: tracks without pattern names, data the view was missing.
+
+## Implementation notes (2026-11-20)
+
+- **Where things went.** Board 1600 × 900 units as in the mockup (`--px`, clamped fonts). The Launchkey box holds the
+  mod wheel (`mod`, 28 × 130) left of the 8-column grid (knob over two pads per column, pads in device order: top
+  40-43 + 48-51, bottom 36-39 + 44-47), and under the pads the **keys**: two octaves from C laid out like a keyboard
+  (black keys shorter, between the whites), 44 units high, the octave buttons (`oct ◀ ▶`) under the mod wheel. The
+  **status strip** is one line under the spectrum, bottom-aligned with the Launchkey box (a full-width line under the
+  board would push it past 900 units): chapter / chords / break from the track, bar `n/8` with 4 beat dots and the
+  bar's chord, the `Black / TE` switch. The controller count moved to the right end of the `mode 1` label line
+  (`no Launch Control: mouse only`), the computer-keyboard hint to the right of the `launchkey` label, the mouse help
+  into the status strip's tooltip. The name of the pad hit last shows for 2 s after `launchkey ·`.
+- **Spectrum data path.** `sc/lib/ui.scd` (`uiSpecStart`, called by `startUI`, freed by `stopUI`): a synth at the tail
+  of the server's root group reads `In.ar(0, 2)` (mono sum), 48 `BPF` + `Amplitude.kr` bands log 20 Hz-20 kHz, level
+  mapped -60…0 dB → 0..1 (0 dB = a full-scale sine in the band; bands above 0.45 × sample rate read 0), `SendReply` 20×/s
+  → `OSCdef` → `/ce/spectrum` (48 floats) to the UI address. The engine frees all nodes on a load and calls
+  `startUI` again, so it comes back after every switch (asserted in `tools/trajectory/sc-link.test.mjs`).
+  `sc-link.mjs` and `bridge.mjs` pass it on as SSE `spectrum` (rounded to 3 decimals, not cached for new pages).
+  The panel draws the latest frame (falls to 0 without frames), peaks fall back 0.6 % per frame; only the defaults
+  are built (Black dots 32 × 12, TE segments 24 × 12).
+- **Deviations from brief / mockup.**
+  - Every controller panel (both LCs, the Launchkey) has a subtle 1 px edge (`track` colour) always; the "moved last"
+  frame is `text` colour in both themes (brief: `track` in Black, which would equal the edge) and shows only while
+  the player's LC frame setting is on.
+  - Launchkey knobs are CC 21-28 (the brief's 31-38 is outdated). Launchkey box: inner gaps 10 / 6 (mockup 12) and keys
+  44 units, so the board stays under 900 units with the brief's 14-unit column gap (the mockup uses 10).
+  - Labels are clipped with an ellipsis (visible, not silent) when over their width; names, knob labels and button 2
+  are shown in lower case, button 1 (pattern / chapter / chord names from the track) as the track writes them.
+  - Fader names (Level, Master, Overtones) are not drawn (as in the mockup), they are in the tooltip. Pad sample
+  names are in the pad tooltip and after `launchkey ·` when hit, not under the pads (no room on the board).
+  - Unported cells are hidden (as before), not greyed.
+  - Button 1 dims (`off`) only where the track marks it unused (`state.dim`, 009 keys with Sound on).
+- **How button 1 works.** In all SC tracks (007-010, 016) button 1 cycles patterns (`ce.change`) and has no off
+  state, so "column off" never applies; a switch waiting for its bar / phrase blinks with the coming name. 008's
+  kick button 1 is a hold (one name `4/4 (held: 8/4)`).
+- **Fonts at small sizes.** In the player at 1280 × 800 with the sidebar open the panel gets 980 × 754 px
+  (`--px` 0.59): the 11-13 px floors then make knob labels like `brightness` and 7-character names clip with an
+  ellipsis (the board still fits, no scrollbars). With the sidebar closed, or at 1920 and up, only the labels over
+  their limits below clip.
+- **Labels over the limits** (column ≤ 7, pattern ≤ 6, button 2 ≤ 6, knob ≤ 10). Runtime = loaded in SC (the state
+  at load), static = from the track file.
+  - 007: columns `Sea / Wind`, `Wood / Drops`, `Eno / Shimmer`; button 2 `Drop out`, `Echo throw` (×3), `Full choir`,
+  `Stutter`; patterns `Heartbeat`, `Quarters`, `Very high`, `Rocking 3-3-2`, `I–iii–IV–ii`, `I–vi–IV–vii`; chapter
+  `D Floating` (and the other `D …` moods). Without names: jojo 2, 4, 5, 7.
+  - 008: columns `Bassline`, `Percussion`, `Sequence`, `Dark Perc`, `FX / Breath`; button 2 `Drop out`, `Echo throw`
+  (×2); patterns `4/4 (held: 8/4)`, `Fm → D♭`, `Driving`, `Open + 16ths`, `Rolling`, `Syncopated`. Without names:
+  jonas 1, 3, 4, 5, 6.
+  - 009: columns `Noise Pump`, `Hats / Shaker`, `Vibraphone`; knobs `Hats ↔ Shaker`, `Strings ↔ B3`; button 2
+  `Echo throw` (×3), texts `Lift 0 %` (cols 5-7, Mode 2); patterns `Off-beat`, `Echo stab`, `Stardust`, `+ 16ths`,
+  `Driving`, `Rolling`; knob renames with Sound on `Piano → Rhodes` etc.
+  - 010: columns `Noise Pump`, `Bassline`, `Clap / Rim`, `Deep Chords`, `Pluck Arp`, `Glockenspiel`; button 2
+  `Drop out`, `Echo throw`; patterns `Straight`, `Rolling`, `Off-beat`, `Melodic`, `Shuffle`. Without names: jonas 2-7.
+  - 016 (static only, not on this branch): columns `Percussion`, `Stab Shape`; button 2 `Drop out`, `Echo throw` (×2),
+  `Ratchet`; patterns `Syncopated`, `Stab in`, `Stab out`, `16 bars`. Without names: Stab, Answer, Accents.
+  - Launchkey knobs (008, 009, 010, 016): `Piano → Rhodes`, `Vibes → Marimba`.
+- **Open points.** Shorter names for the labels above (and names for the unnamed patterns). The live spectrum with
+  sound was not looked at (tests ran with the master fader at 0; the data path and the drawing were checked
+  separately); the -60…0 dB mapping may need a calibration by ear/eye. On a phone the 11 px floors do not fit the
+  board (no special small-screen layout any more). With the SC server running in Bluetooth call mode (16 kHz) the
+  spectrum arrives ~7×/s instead of 20×/s (control rate follows the device).
+

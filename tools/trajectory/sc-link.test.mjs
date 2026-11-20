@@ -87,6 +87,10 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     assert.equal((await waitFor(e => e.type === 'layout', mark))?.data.bpm, 124, 'the LC view gets the track')
     assert.ok(await waitFor(e => e.type === 'beat' && e.data.bar >= 1, mark), 'bars count from the load')
     assert.equal(bars(mark)[0], 0, 'the first bar is bar 0')
+    // the master output's spectrum (sc/lib/ui.scd): 48 bands 0..1, several frames a second
+    const spectrum = await waitFor(e => e.type === 'spectrum', mark)
+    assert.equal(spectrum?.data.length, 48, 'the spectrum arrives with 48 bands')
+    assert.ok(spectrum.data.every(v => v >= 0 && v <= 1), 'bands are 0..1')
 
     // a click in the LC view (the same as a MIDI message) reaches the track and comes back as its state
     mark = since()
@@ -100,6 +104,7 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     assert.equal((await waitFor(e => e.type === 'layout', mark))?.data.bpm, 140)
     assert.ok(await waitFor(e => e.type === 'beat', mark), 'the new track plays')
     assert.equal(bars(mark)[0], 0, 'a switch starts at bar 0')
+    assert.ok(await waitFor(e => e.type === 'spectrum', mark), 'the spectrum comes back after a switch (all nodes were freed)')
 
     // stop: no more bars
     assert.equal((await post('stop')).status, 200)

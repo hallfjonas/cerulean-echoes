@@ -5,87 +5,122 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <title>LC XL 3</title>
 <style>
-/* Two themes from UI-REDESIGN.md: "black" (Torso-like, default) and "te" (Teenage Engineering-like). Only tokens and
-   the knob component differ; the layout is the same. Flat: no gradients, shadows or glow. */
-body:not([data-theme=te]) .cell span,body:not([data-theme=te]) .col{letter-spacing:-.04em}
-body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;--frame:#F1EFE8;--panel:#151514;--edge:#3A3A37;--keyW:#46463F;--keyB:#0b0b0b;
-  --font:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;--frame:#2C2C2A;--panel:#DEDCD3;--edge:#A9A79E;--keyW:#F1EFE8;--keyB:#2C2C2A;
-  --font:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px/1.25 var(--font);user-select:none;-webkit-user-select:none}
-#lc{display:flex;flex-direction:column;gap:8px;padding:10px 10px;box-sizing:border-box;height:100%;overflow:hidden}
-.pages{flex:none;display:flex;gap:8px}
-.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;min-height:0;padding:6px 4px;border:1px solid var(--edge);border-radius:4px;background:var(--panel)}
-/* each controller is its own panel; the one moved last gets the frame (off when the player's LC frame is off) */
-body:not(.noframe) .page.live,body:not(.noframe) .lk.live{border-color:var(--frame);box-shadow:inset 0 0 0 1px var(--frame)}
-.page h2,.lk h2{margin:0;font-size:11px;font-weight:400;color:var(--off);white-space:nowrap;overflow:hidden}
-.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));
-  grid-template-rows:20px repeat(3,48px) clamp(90px,22vh,150px) 18px 18px;align-content:start;column-gap:2px;row-gap:6px}
-.g{border-left:1px solid var(--track)}
-.col{font-size:13px;font-weight:500;text-align:center;white-space:nowrap;overflow:hidden;align-self:end}
-.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:0}
-.cell span{font-size:11px;white-space:nowrap;overflow:hidden;max-width:100%}
-.cell.off{visibility:hidden}
-/* knob: an SVG with both components; the theme shows one */
-.knob svg{width:26px;height:26px;flex:none;overflow:visible}
+/* Controller mirror after UI-REDESIGN.md and reference/layout-mockup.html: two LC panels (Mode 1, Mode 2), the Launchkey
+   under Mode 1, the spectrum and the status strip under Mode 2. Everything is laid out on a design board of 1600 x 900
+   units and scaled as one piece (--px = one unit in CSS px); only text has a floor and a ceiling. Two themes, "black"
+   (Torso-like, default) and "te" (Teenage Engineering-like): only tokens and the knob component differ.
+   Flat: no gradients, shadows, glow or blur. Nothing dims except button text. */
+:root{--W:1600;--H:900}
+body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;
+  --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:transparent;--keyB:#2C2C2A;
+  --font:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
+body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;
+  --edge:#B4B2A9;--frame:#2C2C2A;--hit:#D85A30;--keyW:#F1EFE8;--keyB:#2C2C2A;
+  --font:-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,"DejaVu Sans",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;color:var(--text);font-family:var(--font);line-height:1.4;
+  user-select:none;-webkit-user-select:none;
+  --px:min(calc(96vw / var(--W)), calc(94vh / var(--H)));
+  --fs-name:clamp(13px, calc(20 * var(--px)), 32px);
+  --fs-btn:clamp(11px, calc(18 * var(--px)), 28px);
+  --fs-lab:clamp(11px, calc(16 * var(--px)), 24px);
+  --fs-knob:clamp(11px, calc(14 * var(--px)), 21px)}
+.wait{font-size:var(--fs-lab);color:var(--accent)}
+.board{width:calc(var(--W) * var(--px));display:flex;flex-direction:column;gap:calc(32 * var(--px))}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(40 * var(--px))}
+.pair>section{min-width:0;display:flex;flex-direction:column}
+.lab{display:flex;gap:.6em;font-size:var(--fs-lab);color:var(--off);margin:0 calc(12 * var(--px)) calc(8 * var(--px));
+  white-space:nowrap;overflow:hidden;text-transform:lowercase}
+.lab .hint{margin-left:auto;overflow:hidden;text-overflow:ellipsis;text-transform:none}
+.lab .pad-name{color:var(--text);text-transform:none}
+/* each controller is its own panel with a subtle edge; the one moved last is framed (off with the player's LC frame off) */
+.pn{padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px))}
+body:not(.noframe) .pn.live{border-color:var(--frame)}
+.gr{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:calc(4 * var(--px));align-items:start}
+.cl{display:flex;flex-direction:column;align-items:center;min-width:0;gap:calc(14 * var(--px))}
+.cl.global{box-shadow:-1px 0 0 0 var(--track)}
+.name{font-size:var(--fs-name);font-weight:500;color:var(--text);max-width:100%}
+.name,.kl,.btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.name,.kl,.b2{text-transform:lowercase}
+.kw{display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--px));min-width:0;max-width:100%}
+.kl{font-size:var(--fs-knob);line-height:1.2;color:var(--off);max-width:100%}
+/* knob: Black = arc (viewBox 24), TE = disc with pointer (viewBox 26) */
+.knob{width:calc(48 * var(--px));aspect-ratio:1;display:block;flex:none}
+body[data-theme=te] .knob{width:calc(52 * var(--px))}
 .kb-track,.kb-val{fill:none;stroke-width:3;stroke-linecap:round}.kb-track{stroke:var(--track)}.kb-val{stroke:var(--text)}
-.kb-ptr{stroke-width:2.5;stroke-linecap:round}
-body[data-theme=te] .kb-arc{display:none}body:not([data-theme=te]) .kb-disc{display:none}
-.r1 .kb-disc circle{fill:#378ADD;stroke:#378ADD}.r2 .kb-disc circle{fill:#1D9E75;stroke:#1D9E75}
-.r3 .kb-disc circle{fill:#F1EFE8;stroke:#888780}.kb-disc circle{stroke-width:1}
+.kb-ptr{stroke-width:2.5;stroke-linecap:round}.kb-disc{stroke-width:1}
+.r1 .kb-disc{fill:#378ADD;stroke:#378ADD}.r2 .kb-disc{fill:#1D9E75;stroke:#1D9E75}.r3 .kb-disc{fill:#F1EFE8;stroke:#888780}
 .r1 .kb-ptr,.r2 .kb-ptr{stroke:#F1EFE8}.r3 .kb-ptr{stroke:#2C2C2A}
-/* fader: 2 px track, 14 x 6 px handle */
-.bar{position:relative;width:26px;flex:1;min-height:30px}
-.bar::before{content:'';position:absolute;left:11px;width:4px;top:0;bottom:0;background:var(--track);border-radius:1px}
-.bar i{position:absolute;left:0;width:26px;height:8px;border-radius:1px;background:var(--handle);bottom:calc(var(--v,0) * (100% - 8px))}
-/* buttons: text only; only the button text dims (UI-REDESIGN.md "States") */
-.btn{font-size:11px;justify-content:center}.btn span{font-size:11px}
-.b1 span{color:var(--text)}.b1.off-col span{color:var(--off)}
-.b2 span{color:var(--off)}.b2.on span{color:var(--accent)}
-.blink span{animation:blink 1s steps(1,end) infinite}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
-/* status strip (bottom) */
-.head{flex:none;margin-top:auto;display:flex;gap:18px;align-items:baseline;white-space:nowrap;overflow:hidden;font-size:11px}
-.head>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}.head>div.ports{flex-shrink:2}.head>div.help{flex-shrink:20}.head .k{color:var(--off);margin-right:.5em}
-.warn{color:var(--accent);font-weight:600}.ports,.help{color:var(--off)}.help{flex-shrink:3;margin-left:auto}
-.beats i,.bars i{display:inline-block;background:var(--track);margin-left:3px;vertical-align:middle}
-.beats i{width:7px;height:7px;border-radius:50%}.bars i{width:10px;height:4px}.beats i.on,.bars i.on{background:var(--text)}
-.beats,.bars,.chord{margin-left:6px}.next{color:var(--off)}
-.theme{font:inherit;font-size:11px;background:none;border:0;color:var(--off);cursor:pointer;padding:0}.theme b{color:var(--text);font-weight:500}
-/* Launchkey row */
-.lk{flex:none;display:flex;flex-direction:column;gap:6px;padding:6px 4px;border:1px solid var(--edge);border-radius:4px;background:var(--panel)}
-.lkbody{display:flex;gap:10px}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
-.lkrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;height:48px}.lkbody>.fader{flex:none;width:72px;justify-content:flex-start}
-.lkplay{display:flex;gap:16px;height:72px}.lkoct{display:flex;flex-direction:column;justify-content:center;gap:6px}
-.lkoct button{font:inherit;font-size:11px;background:none;border:0;color:var(--text);cursor:pointer;padding:0;white-space:nowrap}
-.lkkeys{flex:2;position:relative;min-width:0}
-.lkkeys i{position:absolute;top:0;box-sizing:border-box;font-style:normal;font-size:11px;display:flex;align-items:flex-end;justify-content:center;cursor:pointer;overflow:hidden}
-.lkkeys i.wht{height:100%;width:calc(100% / 15);border:1px solid var(--panel);background:var(--keyW);color:var(--off);z-index:1}
-.lkkeys i.blk{height:60%;width:calc(100% / 15 * .6);background:var(--keyB);border:1px solid var(--panel);border-top:0;z-index:2;border-radius:0 0 2px 2px}
-.lkkeys i.wht.on{background:var(--accent);color:var(--bg)}.lkkeys i.blk.on{background:var(--accent)}
-.lkpads{flex:3;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:2px 6px;min-width:0}
-.lkpads i{font-style:normal;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-width:0}
-.lkpads i::before{content:'';width:12px;height:12px;border-radius:50%;background:var(--track);flex:none}
-.lkpads i.on::before{background:var(--text)}
-.lkpads i span{font-size:11px;color:var(--off);white-space:nowrap;overflow:hidden;max-width:100%}
-.lk .knob svg{width:26px;height:26px}
-/* interactive */
-.ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}
-@media (max-width:900px){#lc{height:auto;overflow:visible}.pages{flex-direction:column}.page{min-height:80vh}.help{display:none}}
+/* fader: 28 x 150 units, track max(2px, 4 units), handle 28 x 12 */
+.fader{position:relative;width:calc(28 * var(--px));height:calc(150 * var(--px));margin-top:calc(4 * var(--px));flex:none}
+.fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
+.fader .handle{position:absolute;left:0;width:100%;height:calc(12 * var(--px));border-radius:1px;background:var(--handle);
+  bottom:calc(var(--v, 0) * (100% - 12 * var(--px)))}
+/* buttons: text only; button 1 = the active pattern, button 2 = its function */
+.btns{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--px));min-width:0;max-width:100%}
+.btn{font-size:var(--fs-btn);max-width:100%;color:var(--off)}
+.b1{color:var(--text)}.b1.dim{color:var(--off)}.b2.on{color:var(--accent)}
+.blink{animation:blink 1s steps(1,end) infinite}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
+.off{visibility:hidden}
+/* Launchkey: mod wheel left of the 8-column grid (knob over 2 pads per column), the keys under the pads */
+.lk{display:grid;grid-template-columns:calc(60 * var(--px)) minmax(0,1fr);column-gap:calc(24 * var(--px));row-gap:calc(10 * var(--px))}
+.wheel{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:calc(10 * var(--px))}
+.wheel .btn{color:var(--text)}
+.wheel .fader{height:calc(130 * var(--px));margin:0}
+.lkc{display:flex;flex-direction:column;align-items:center;gap:calc(10 * var(--px));min-width:0}
+.lkc .pads{display:flex;flex-direction:column;gap:calc(6 * var(--px))}
+.pad{width:calc(36 * var(--px));aspect-ratio:1;border:1px solid var(--off);border-radius:calc(4 * var(--px));cursor:pointer}
+.pad.on{background:var(--text);border-color:var(--text)}
+body[data-theme=te] .pad{border:0;background:var(--track);border-radius:50%}
+body[data-theme=te] .pad.on{background:var(--hit)}
+.oct{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.oct span{font-size:var(--fs-btn);color:var(--off);line-height:1.2}
+.oct div{display:flex;gap:calc(10 * var(--px))}
+.oct button{font:inherit;font-size:var(--fs-btn);line-height:1.2;background:none;border:0;padding:0;color:var(--text);cursor:pointer}
+.keys{position:relative;height:calc(44 * var(--px))}
+.keys i{position:absolute;top:0;font-style:normal;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.keys i.wht{height:100%;width:calc(100% / 15 + 1px);border:1px solid var(--track);background:var(--keyW);color:var(--off);
+  font-size:var(--fs-knob);line-height:1.2;z-index:1;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
+.keys i.blk{height:60%;width:calc(100% / 15 * .6);background:var(--keyB);border:1px solid var(--bg);border-top:0;z-index:2;
+  border-radius:0 0 calc(2 * var(--px)) calc(2 * var(--px))}
+.keys i.on{background:var(--hit)}.keys i.wht.on{color:var(--bg)}
+body.no-lk .lkbox{visibility:hidden}
+/* spectrum and status strip under Mode 2 (the status strip ends level with the Launchkey box) */
+.spec{flex:1;display:flex;flex-direction:column;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid transparent;min-height:0}
+.spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
+.head{margin-top:auto;padding-top:calc(6 * var(--px));display:flex;gap:calc(18 * var(--px));align-items:baseline;white-space:nowrap;
+  overflow:hidden;font-size:var(--fs-lab);line-height:1.4}
+.head>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
+.head>div.keep{flex-shrink:0}
+.head .k{color:var(--off);margin-right:.5em;text-transform:lowercase}.head .next{color:var(--off)}
+.warn{color:var(--accent);font-weight:600}
+.marks i{display:inline-block;background:var(--track);margin-left:max(2px, calc(4 * var(--px)));vertical-align:middle}
+.marks.beats i{width:max(5px, calc(9 * var(--px)));height:max(5px, calc(9 * var(--px)));border-radius:50%}
+.marks i.on{background:var(--text)}
+.marks,.chord{margin-left:.5em}
+.theme{font:inherit;background:none;border:0;color:var(--off);cursor:pointer;padding:0}.theme b{color:var(--text);font-weight:500}
+.ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.fader.ctl,.wheel.ctl{cursor:pointer}
 </style>
 </head>
 <body>
-<div id=lc><div class=head><span class=warn>Waiting for the bridge …</span></div></div>
+<div id=lc><div class=wait>Waiting for the bridge …</div></div>
 <script>
 // LC view for the SuperCollider version, interactive: drag knobs (up/down; Shift = fine; double-click = 0), click or
-// drag faders, press buttons (Shift-click = keep the button held until the next click). Same look as the ▣ LC big
-// view of the Strudel tracks. Values come from SuperCollider (also every move on a Launch Control); a click sends the
-// same CC a Launch Control would send, so for the track it makes no difference where a move comes from.
+// drag faders, press buttons (Shift-click = keep the button held until the next click). Values come from SuperCollider
+// (also every move on a Launch Control); a click sends the same CC a Launch Control would send, so for the track it
+// makes no difference where a move comes from. Layout and look: UI-REDESIGN.md.
 // ---- theme (UI-REDESIGN.md): 'black' (default) or 'te'; one browser setting shared with the player's Panel theme ----
 const THEME_KEY = 'ce.panelTheme', THEMES = ['black', 'te']
 const readTheme = () => { try { return THEMES.includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : 'black' } catch (e) { return 'black' } }
-const applyTheme = t => { document.body.dataset.theme = t; const b = document.getElementById('theme'); if (b) b.innerHTML = themeLabel() }
-const setTheme = t => { try { localStorage.setItem(THEME_KEY, t) } catch (e) {} applyTheme(t) }
 const themeLabel = () => THEMES.map(t => t === document.body.dataset.theme ? '<b>' + (t === 'te' ? 'TE' : 'Black') + '</b>' : (t === 'te' ? 'TE' : 'Black')).join(' / ')
+const applyTheme = t => {
+  const changed = document.body.dataset.theme !== t
+  document.body.dataset.theme = t
+  const b = document.getElementById('theme'); if (b) b.innerHTML = themeLabel()
+  if (changed && S.layout) build()   // the knob component differs per theme
+}
+const setTheme = t => { try { localStorage.setItem(THEME_KEY, t) } catch (e) {} applyTheme(t) }
 addEventListener('storage', e => { if (e.key === THEME_KEY) applyTheme(readTheme()) })
 addEventListener('message', e => {
   if (e.origin !== location.origin) return
@@ -93,26 +128,30 @@ addEventListener('message', e => {
   // the player's "LC frame" setting (key H): frame the controller moved last, or not
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
 })
-applyTheme(readTheme())
+const te = () => document.body.dataset.theme === 'te'
 
-// ---- knob: one SVG with both components (arc for Black, disc with pointer for TE); the theme shows one ----
-const polar = (r, deg) => { const a = deg * Math.PI / 180; return [13 + r * Math.cos(a), 13 + r * Math.sin(a)] }
-const arc = (r, a0, a1) => { const [x0, y0] = polar(r, a0), [x1, y1] = polar(r, a1)
-  return 'M' + x0.toFixed(2) + ' ' + y0.toFixed(2) + 'A' + r + ' ' + r + ' 0 ' + (a1 - a0 > 180 ? 1 : 0) + ' 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) }
-const knobSvg = () => '<svg viewBox="0 0 26 26" aria-hidden="true"><g class=kb-arc><path class=kb-track d="' + arc(9, 135, 405) + '"/><path class=kb-val d=""/></g>' +
-  '<g class=kb-disc><circle cx=13 cy=13 r=12 /><line class=kb-ptr x1=13 y1=13 x2=13 y2=13 /></g></svg>'
+// ---- knob: Black = arc (viewBox 24, radius 9, 135° → 405°), TE = disc with pointer (viewBox 26, radius 12) ----
+const polar = (c, r, deg) => { const a = deg * Math.PI / 180; return [c + r * Math.cos(a), c + r * Math.sin(a)] }
+const arc = (a0, a1) => { const [x0, y0] = polar(12, 9, a0), [x1, y1] = polar(12, 9, a1)
+  return 'M' + x0.toFixed(2) + ' ' + y0.toFixed(2) + 'A9 9 0 ' + (a1 - a0 > 180 ? 1 : 0) + ' 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) }
+const knobSvg = () => te()
+  ? '<svg class=knob viewBox="0 0 26 26" aria-hidden="true"><circle class=kb-disc cx=13 cy=13 r=12 /><line class=kb-ptr x1=13 y1=13 x2=13 y2=13 /></svg>'
+  : '<svg class=knob viewBox="0 0 24 24" aria-hidden="true"><path class=kb-track d="' + arc(135, 405) + '"/><path class=kb-val d=""/></svg>'
 const setKnob = (el, v) => {
   v = Math.min(1, Math.max(0, +v || 0))
+  if (el._v === v) return
+  el._v = v
   const a = 135 + 270 * v, val = el.querySelector('.kb-val'), ptr = el.querySelector('.kb-ptr')
-  if (val) val.setAttribute('d', v > 0.001 ? arc(9, 135, a) : '')
-  if (ptr) { const [x1, y1] = polar(4, a), [x2, y2] = polar(10, a); ptr.setAttribute('x1', x1); ptr.setAttribute('y1', y1); ptr.setAttribute('x2', x2); ptr.setAttribute('y2', y2) }
+  if (val) val.setAttribute('d', v > 0.001 ? arc(135, a) : '')
+  if (ptr) { const [x1, y1] = polar(13, 4, a), [x2, y2] = polar(13, 10, a); ptr.setAttribute('x1', x1); ptr.setAttribute('y1', y1); ptr.setAttribute('x2', x2); ptr.setAttribute('y2', y2) }
 }
 
 const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
 const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 1)
 const PAGES = ['jojo', 'jonas'], PREFIX = { jojo: '16', jonas: '2' }
 const S = { layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
-  lk: {}, lkBase: 48, lkLit: new Map(), lkLive: -1e9 }   // Launchkey: control values, keyboard window, lit keys/pads
+  lk: {}, lkBase: 48, lkLit: new Map(), lkLive: -1e9, lkPad: null,   // Launchkey: control values, keyboard window, lit keys/pads
+  spec: new Float32Array(48), specAt: -1e9 }                          // the latest spectrum frame and when it came
 const held = new Set()   // CCs kept held by Shift-click
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const tags = () => S.layout?.tags ?? {}
@@ -122,11 +161,14 @@ const ccOf = (page, n, row) => CC_ROW[row] + n + (page === 'jonas' && n < 8 ? 48
 const tagOf = (page, n, row) => tags()[isGlobal(n) ? 'g.' + row : PREFIX[page] + ':' + n + '.' + row]
 const ported = (page, n) => isGlobal(n) || ROWS.some(r => tagOf(page, n, r))
 const pageOfCc = cc => cc > 52 ? 'jonas' : (cc - 4) % 8 === 0 ? S.page : 'jojo'
-const shortTitle = t => {
-  const m = (t ?? '').match(/^(.*?) — .*?\((.+?)\)/)
-  if (!m) return (t ?? '').split(' · ')[0]
-  return m[1] + ' — ' + m[2][0].toUpperCase() + m[2].slice(1)
+// panel label from the @mode tag: 'Mode 1 — Jojo: Foundation (beat + bass) · …' → 'mode 1 · foundation'
+const modeLabel = page => {
+  const t = tags()[PREFIX[page]] ?? '', n = page === 'jojo' ? 1 : 2
+  const m = t.match(/^Mode\s*(\d+)\s*—\s*(?:[^:]*:\s*)?([^(·]+)/)
+  return m ? 'mode ' + m[1] + ' · ' + m[2].trim() : 'mode ' + n
 }
+// a pattern without a name (SC sends its number) shows as 'pat N' (UI-REDESIGN.md "One LC column")
+const patName = s => /^\d+$/.test(String(s ?? '')) ? 'pat ' + s : s
 
 // ---- sending: coalesced per frame, one POST per batch ----
 // knob/fader moves of one control collapse to the latest value; button presses are all sent (press + release)
@@ -164,39 +206,40 @@ const lkNote = (note, chan) => {   // chan 0-based: 9 = drum pads; velocity 100
   fetch('lk', { method: 'POST', body: JSON.stringify({ note: [note, 100, chan] }), keepalive: true }).catch(() => {})
 }
 const hasLk = () => Object.keys(tags()).some(k => k.startsWith('lk.'))
-const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, 20 + n])]   // knobs: CC 21-28 (the Launchkey's default)
+const LK_KNOBS = [1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, 20 + n])   // knobs: CC 21-28 (the Launchkey's default)
 const BLACK = [1, 3, 6, 8, 10]
-const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 // computer keyboard (physical keys, any layout): the A row = white keys from C, the row above = black keys
 const KEYMAP = { KeyA: 0, KeyW: 1, KeyS: 2, KeyE: 3, KeyD: 4, KeyF: 5, KeyT: 6, KeyG: 7, KeyY: 8, KeyH: 9, KeyU: 10, KeyJ: 11,
   KeyK: 12, KeyO: 13, KeyL: 14, KeyP: 15, Semicolon: 16 }
+// pads as on the device: top row 40-43 + 48-51, bottom row 36-39 + 44-47; column i holds top[i] over bottom[i]
+const PADS_TOP = [40, 41, 42, 43, 48, 49, 50, 51], PADS_BOTTOM = [36, 37, 38, 39, 44, 45, 46, 47]
+const padName = n => S.layout?.lkPads?.[n - 36] ?? 'pad ' + (n - 35)
 const lkLight = key => { S.lkLit.set(key, performance.now()); update(); setTimeout(update, 220) }
 const lkHtml = () => {
-  if (!hasLk()) return ''
-  const knob = ([key, n]) => {
-    const [name, desc] = (tags()['lk.' + key] ?? key).split(' | ')
-    const kind = key === 'level' ? 'fader' : 'knob'
-    return '<div class="cell ' + kind + ' r3 ctl" data-lk="' + n + '" title="' + esc(desc ?? '') + '">' +
-      (kind === 'fader' ? '<div class=bar><i></i></div>' : knobSvg()) + '<span>' + esc(name) + '</span></div>'
-  }
-  // a two-octave keyboard from C (the window always starts on a C): 15 white keys, black keys between them
+  const tag = key => (tags()['lk.' + key] ?? key).split(' | ')
+  const knob = ([key, n]) => { const [name, desc] = tag(key)
+    return '<div class="kw r3 ctl" data-lk="' + n + '" title="' + esc(name + (desc ? ': ' + desc : '')) + '">' + knobSvg() + '<span class=kl>' + esc(name) + '</span></div>' }
+  const pad = n => '<div class=pad data-pad="' + n + '" title="' + esc(padName(n)) + ' (note ' + n + ')"></div>'
+  // a two-octave keyboard from C (the window always starts on a C): 15 white keys, the black keys shorter, between them
   const WHITE = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24], w = 100 / 15
   const keys = WHITE.map((k, i) => '<i class=wht data-key="' + k + '" style="left:' + (i * w) + '%"></i>').join('') +
     WHITE.slice(0, -1).flatMap((k, i) => BLACK.includes((k + 1) % 12) ? ['<i class=blk data-key="' + (k + 1) + '" style="left:' + ((i + 1) * w - w * 0.3) + '%"></i>'] : []).join('')
-  // pads as on the device: top row 40-43 + 48-51, bottom row 36-39 + 44-47
-  const pads = [[40, 41, 42, 43, 48, 49, 50, 51], [36, 37, 38, 39, 44, 45, 46, 47]].flat().map(n => '<i data-pad="' + n + '"><span>' +
-    esc(S.layout?.lkPads?.[n - 36] ?? (n - 35)) + '</span></i>').join('')
-  return '<section class=lk id=lk><h2>Launchkey</h2><div class=lkbody><div class=lkmain><div class=lkrow>' +
-    LK_CTLS.slice(1).map(knob).join('') + '</div><div class=lkplay><div class=lkoct><button data-oct="-24">◀ oct</button>' +
-    '<button data-oct="24">oct ▶</button></div><div class=lkkeys>' + keys + '</div><div class=lkpads>' + pads + '</div></div></div>' +
-    knob(LK_CTLS[0]) + '</div></section>'
+  const [wheelName, wheelDesc] = tag('level')
+  return '<section class=lkbox><p class=lab><span>launchkey</span><span class=pad-name id=lkPad></span>' +
+    '<span class=hint>computer keys A–K · octave Z / X</span></p><div class="pn lk" id=lk>' +
+    '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '"><span class=btn>mod</span>' +
+    '<div class=fader><div class=bar></div><div class=handle></div></div></div>' +
+    '<div class=gr>' + LK_KNOBS.map((k, i) => '<div class=lkc>' + knob(k) + '<div class=pads>' + pad(PADS_TOP[i]) + pad(PADS_BOTTOM[i]) + '</div></div>').join('') + '</div>' +
+    '<div class=oct><span>oct</span><div><button data-oct="-24" title="two octaves down (Z)">◀</button><button data-oct="24" title="two octaves up (X)">▶</button></div></div>' +
+    '<div class=keys>' + keys + '</div></div></section>'
 }
 const lkAttach = root => {
   for (const el of root.querySelectorAll('[data-lk]')) {
-    const n = +el.dataset.lk, isFader = n === 1
-    if (isFader) {
-      const bar = el.querySelector('.bar')
-      const at = e => { const r = bar.getBoundingClientRect(); return Math.min(1, Math.max(0, (r.bottom - e.clientY) / r.height)) }
+    const n = +el.dataset.lk
+    if (n === 1) {   // the mod wheel: a fader
+      const bar = el.querySelector('.fader')
+      const at = e => { const r = bar.getBoundingClientRect(), h = r.width * 12 / 28
+        return Math.min(1, Math.max(0, (r.bottom - h / 2 - e.clientY) / (r.height - h))) }
       el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); lkSend(n, at(e)) })
       el.addEventListener('pointermove', e => { if (el.hasPointerCapture(e.pointerId)) lkSend(n, at(e)) })
     } else {
@@ -220,34 +263,36 @@ document.addEventListener('keydown', e => {
   if (e.code in KEYMAP) { e.preventDefault(); lkNote(S.lkBase + KEYMAP[e.code], 0) }
 })
 
-// ---- building the page once per layout; values are updated in place (a drag keeps its element) ----
-const cells = []   // { el, page, n, row, cc }
+// ---- building the board once per layout (and theme); values are updated in place (a drag keeps its element) ----
+const cells = []   // { el, page, n, row, cc, on, name }
 const build = () => {
   const root = document.getElementById('lc')
   cells.length = 0
-  root.innerHTML = '<div class=pages>' + PAGES.map(page => {
-    const title = tags()[PREFIX[page]] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2')
-    const cols = [1, 2, 3, 4, 5, 6, 7, 8]
-    return '<section class=page data-page=' + page + '><h2>' + esc(shortTitle(title)) + '</h2><div class=grid>' +
-      cols.map(n => '<div class="col' + (isGlobal(n) ? ' g' : '') + '">' +
-        esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</div>').join('') +
-      ROWS.map(row => cols.map(n => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>').join('')).join('') + '</div></section>'
-  }).join('') + '</div>' + lkHtml() + '<div class=head id=head></div>'
+  const cols = [1, 2, 3, 4, 5, 6, 7, 8]
+  const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
+  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jojo' ? '<span class=hint id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
+    cols.map(n => '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name>' +
+      esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</span>' +
+      cell(page, n, 'k1') + cell(page, n, 'k2') + cell(page, n, 'k3') + cell(page, n, 'fader') +
+      '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>').join('') + '</div></div></section>').join('')
+  root.className = 'board'
+  root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
+    '<section><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas><div class=head id=head></div></div></section></div>'
+  document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
   for (const div of root.querySelectorAll('[data-cell]')) {
     const [page, n0, row] = div.dataset.cell.split(':'), n = +n0
     const [name, desc] = (tagOf(page, n, row) ?? '').split(' | ')
-    const c = { el: div, page, n, row, cc: ccOf(page, n, row), on: ported(page, n) && !!tagOf(page, n, row) }
-    div.title = desc ?? ''
+    const c = { el: div, page, n, row, cc: ccOf(page, n, row), on: ported(page, n) && !!tagOf(page, n, row), name: name ?? '' }
+    div.title = name ? name + (desc ? ': ' + desc : '') : ''
     const kind = row === 'fader' ? 'fader' : row[0] === 'k' ? 'knob' : 'btn'
-    div.className = 'cell ' + kind + (kind === 'knob' ? ' r' + row[1] : kind === 'btn' ? ' ' + row : '') + (isGlobal(n) ? ' g' : '') + (c.on ? ' ctl' : ' off')
-    div.innerHTML = kind === 'fader' ? '<div class=bar><i></i></div><span>' + esc(name) + '</span>'
-      : kind === 'knob' ? knobSvg() + '<span>' + esc(name) + '</span>'
-      : '<span>' + esc(name) + '</span>'
-    c.name = name ?? ''
+    div.className = (kind === 'knob' ? 'kw r' + row[1] : kind === 'btn' ? 'btn ' + row : 'fader') + (c.on ? ' ctl' : ' off')
+    div.innerHTML = kind === 'fader' ? '<div class=bar></div><div class=handle></div>'
+      : kind === 'knob' ? knobSvg() + '<span class=kl>' + esc(name) + '</span>' : esc(name)
     if (c.on) attach(c, kind)
     cells.push(c)
   }
+  spectrumResize()
   update()
 }
 
@@ -271,8 +316,9 @@ const attach = (c, kind) => {
     return
   }
   if (kind === 'fader') {
-    const bar = el.querySelector('.bar')
-    const at = e => { const r = bar.getBoundingClientRect(); return Math.min(1, Math.max(0, (r.bottom - e.clientY) / r.height)) }
+    // the handle's centre follows the pointer: 0 = handle at the bottom, 1 = at the top
+    const at = e => { const r = el.getBoundingClientRect(), h = r.width * 12 / 28
+      return Math.min(1, Math.max(0, (r.bottom - h / 2 - e.clientY) / (r.height - h))) }
     el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); send(c.cc, at(e)) })
     el.addEventListener('pointermove', e => { if (el.hasPointerCapture(e.pointerId)) send(c.cc, at(e)) })
   } else {
@@ -292,9 +338,10 @@ const attach = (c, kind) => {
 // except right after an own move (then the dragged value)
 const shownOf = cc => (performance.now() - (mine[cc] ?? -1e9) < 300) ? (S.cc[cc] ?? 0) : (S.state?.shown?.[cc] ?? S.cc[cc] ?? 0)
 
-// ---- drawing values ----
+// ---- drawing values (in a requestAnimationFrame, not on every message) ----
 let timer = null
 const update = () => { timer ??= requestAnimationFrame(() => { timer = null; draw() }) }
+const setText = (el, t) => { if (el && el.textContent !== t) el.textContent = t }
 const pending = (now, next) => esc(now) + (next !== undefined && next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
 const draw = () => {
   if (!S.layout) return
@@ -304,7 +351,7 @@ const draw = () => {
   for (const c of cells) {
     if (!c.on) continue
     const v = S.cc[c.cc] ?? 0
-    // the track may rename a control or show its own value text (keys with Sound on: the sound mix) or dim it (unused)
+    // the track may rename a control (keys with Sound on: the sound mix) or mark a button unused (state.dim)
     const name = S.state?.names?.[c.cc]
     if (c.row === 'b1' || c.row === 'b2') {
       let now, next, on = v > 0.5
@@ -313,52 +360,105 @@ const draw = () => {
         ;[now, next] = g[c.row] ?? ['', '']
         if (c.row === 'b2') on = on || !!g.b2on
       } else if (c.row === 'b1') [now, next] = S.state?.rows?.[c.page + ':' + c.n] ?? ['', '']
-      else {   // button 2: the track's text (Lift 40 %, Sound on …) or 'held'
-        now = S.state?.labels?.[c.cc] ?? (v > 0.5 ? 'held' : '')
-        on = on || !!S.state?.on?.[c.cc]
-      }
-      // button 1 (and Chapter): the active pattern's name, blinking while a switch waits for the bar / phrase;
-      // button 2: its function name (or the track's text), in accent while active
-      const waiting = next !== undefined && next !== '' && next !== now
-      const text = c.row === 'b1' ? (waiting ? next : now) || name || c.name : (S.state?.labels?.[c.cc] ?? name ?? c.name)
-      c.el.classList.toggle('on', on || held.has(c.cc))
-      c.el.classList.toggle('blink', c.row === 'b1' && waiting)
-      const span = c.el.querySelector('span')
-      if (span.textContent !== text) span.textContent = text
+      else on = on || !!S.state?.on?.[c.cc]
+      // button 1 (and Chapter): the active pattern's name, blinking while a switch waits for the bar / phrase (then
+      // the coming one); button 2: its function name (or the track's text: Sound on, Lift 40 %), in accent while active
+      const waiting = c.row === 'b1' && next !== undefined && next !== '' && next !== now
+      const text = c.row === 'b1' ? patName(waiting ? next : now) || name || c.name : (S.state?.labels?.[c.cc] ?? name ?? c.name)
+      if (c.row === 'b2') c.el.classList.toggle('on', on || held.has(c.cc))
+      else c.el.classList.toggle('dim', !!S.state?.dim?.[c.cc])
+      c.el.classList.toggle('blink', waiting)
+      setText(c.el, text)
       continue
     }
     const sv = shownOf(c.cc)
-    if (c.row === 'fader') c.el.style.setProperty('--v', sv); else setKnob(c.el, sv)
-    const label = name ?? c.name, span = c.el.querySelector('span')
-    if (span.textContent !== label) span.textContent = label
+    if (c.row === 'fader') c.el.style.setProperty('--v', sv)
+    else { setKnob(c.el, sv); setText(c.el.querySelector('.kl'), name ?? c.name) }
   }
-  // Launchkey row: values, the keyboard window, lit keys / pads, frame while it is the last thing moved
+  // Launchkey: values, the keyboard window, lit keys / pads, frame while it is the last thing moved
   const lk = document.getElementById('lk')
-  if (lk) {
+  if (lk && hasLk()) {
     const now = performance.now(), lit = k => now - (S.lkLit.get(k) ?? -1e9) < 200
     lk.classList.toggle('live', now - S.lkLive < 4000)
-    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.classList.contains('fader')) el.style.setProperty('--v', v); else setKnob(el, v) }
+    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.dataset.lk === '1') el.querySelector('.fader').style.setProperty('--v', v); else setKnob(el, v) }
     for (const el of lk.querySelectorAll('[data-key]')) {
       const m = S.lkBase + +el.dataset.key
       el.className = (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lit('k' + m) ? ' on' : '')
-      el.textContent = m % 12 === 0 ? 'C' + (m / 12 - 1) : ''
+      setText(el, m % 12 === 0 ? 'C' + (m / 12 - 1) : '')
     }
     for (const el of lk.querySelectorAll('[data-pad]')) el.classList.toggle('on', lit('p' + el.dataset.pad))
+    // the name of the pad hit last, for 2 s, in the label line
+    const pad = S.lkPad && now - S.lkPad[1] < 2000 ? S.lkPad[0] : null
+    setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
+    if (pad) setTimeout(update, 2050)
   }
-  const marks = (n, on) => [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('')
+  // status strip: what SC is doing, the track's head line (chapter, chords, break), bar and beat, controllers, theme
+  const marks = (cls, n, on) => '<span class="marks ' + cls + '">' + [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('') + '</span>'
   const bt = S.beat
-  const beat = !bt ? '–' : ((bt.bar % 8) + 1) + ' / 8<span class=bars>' + marks(8, bt.bar % 8) + '</span><span class=beats>' +
-    marks(4, bt.beat) + '</span>' + (bt.chord ? '<span class=chord>' + esc(bt.chord) + '</span>' : '')
-  const gk = ['k1', 'k2', 'k3'].map(r => [(tags()['g.' + r] ?? r).split(' | ')[0], S.cc[CC_ROW[r] + 8]]).filter(([, v]) => v > 0.01)
-  document.getElementById('head').innerHTML =
-    (!S.bridge ? '<span class=warn>Bridge not reachable</span>' : !S.sc ? '<span class=warn>SuperCollider not running</span>' : '') +
+  const beat = !bt ? '–' : ((bt.bar % 8) + 1) + '/8' + marks('beats', 4, bt.beat) +
+    (bt.chord ? '<span class=chord>' + esc(bt.chord) + '</span>' : '')
+  setText(document.getElementById('ports'), lcs ? lcs + ' Launch Control' + (lcs > 1 ? 's' : '') : 'no Launch Control: mouse only')
+  const head = document.getElementById('head')
+  head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
+  const html =
+    (!S.bridge ? '<div class="warn keep">Bridge not reachable</div>' : !S.sc ? '<div class="warn keep">SuperCollider not running</div>' : '') +
     (S.state?.head ?? []).map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
-    '<div><span class=k>Bar</span>' + beat + '</div>' +
-    gk.map(([k, v]) => '<div class=next><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
-    '<div class=ports>' + (lcs ? lcs + ' Launch Control' + (lcs > 1 ? 's' : '') : 'no Launch Control: mouse only') + '</div>' +
-    '<div><button class=theme id=theme title="Panel theme (also in the player: Visual settings, key T)">' + themeLabel() + '</button></div>' +
-    '<div class=help>drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · keys A–K, octave Z / X' : '') + '</div>'
+    '<div class=keep><span class=k>bar</span>' + beat + '</div>' +
+    '<div class=keep><button class=theme id=theme title="Panel theme (also in the player: Visual settings, key T)">' + themeLabel() + '</button></div>'
+  if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
+
+// ---- spectrum: the master output from SC (/ce/spectrum, 48 bands 0..1), drawn on a canvas sized with devicePixelRatio
+// Black = LED dots (32 x 12), TE = segments (24 x 12, coloured by range). Peaks fall back 0.6 % of full scale per frame;
+// without frames (SC stopped, no data) the bands fall to 0.
+const N = 48, FMIN = 20, FMAX = 20000
+const fAt = i => FMIN * Math.pow(FMAX / FMIN, (i + .5) / N)
+const peaks = new Float32Array(N)
+let cv = null, ctx = null
+const spectrumResize = () => {
+  cv = document.getElementById('spec'); if (!cv) return
+  ctx = cv.getContext('2d')
+  const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect()
+  cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr))
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+}
+addEventListener('resize', spectrumResize)
+const colors = () => te()
+  ? { dim: '#B4B2A9', lab: '#888780', low: '#D85A30', mid: '#1D9E75', high: '#378ADD' }
+  : { fg: '#F1EFE8', dim: '#2C2C2A', lab: '#5F5E5A' }
+const drawSpectrum = () => {
+  if (!cv || !ctx || !cv.isConnected) return
+  const r = cv.getBoundingClientRect(), w = r.width, h = r.height, C = colors(), dots = !te()
+  if (!w || !h) return
+  if (Math.abs(cv.width - Math.round(w * (window.devicePixelRatio || 1))) > 1) spectrumResize()
+  ctx.clearRect(0, 0, w, h)
+  // frequency labels under the display, at --fs-lab in 'off'
+  const fs = parseFloat(getComputedStyle(document.querySelector('.lab')).fontSize)
+  ctx.font = fs + 'px ' + getComputedStyle(document.body).fontFamily; ctx.fillStyle = C.lab; ctx.textBaseline = 'bottom'; ctx.textAlign = 'center'
+  for (const [f, s] of [[60, '60'], [250, '250'], [1000, '1k'], [4000, '4k'], [12000, '12k']]) ctx.fillText(s, w * Math.log(f / FMIN) / Math.log(FMAX / FMIN), h)
+  const H = h - fs * 1.6
+  const fresh = performance.now() - S.specAt < 200
+  for (let i = 0; i < N; i++) {
+    if (!fresh) S.spec[i] *= 0.9   // no data: fall to 0
+    peaks[i] = Math.max(S.spec[i], peaks[i] - 0.006)
+  }
+  const rows = 12, ncol = dots ? 32 : 24, cw = w / ncol, rh = H / rows
+  for (let c = 0; c < ncol; c++) {
+    const i0 = Math.floor(c * N / ncol), i1 = Math.floor((c + 1) * N / ncol); let v = 0
+    for (let i = i0; i < i1; i++) v = Math.max(v, peaks[i])
+    const on = Math.round(v * rows), f = fAt(i0), col = dots ? C.fg : f < 250 ? C.low : f < 4000 ? C.mid : C.high
+    for (let rr = 0; rr < rows; rr++) {
+      ctx.fillStyle = rr < on ? col : C.dim
+      const y = H - (rr + 1) * rh
+      ctx.beginPath()
+      if (dots) ctx.arc(c * cw + cw / 2, y + rh / 2, Math.min(cw, rh) * .3, 0, Math.PI * 2)
+      else ctx.roundRect(c * cw + cw * .12, y + rh * .18, cw * .76, rh * .64, Math.min(cw, rh) * .2)
+      ctx.fill()
+    }
+  }
+}
+const loop = () => { drawSpectrum(); requestAnimationFrame(loop) }
+requestAnimationFrame(loop)
 
 // ---- live state from the bridge ----
 const connect = () => {
@@ -367,6 +467,7 @@ const connect = () => {
   es.onerror = () => { S.bridge = false; update() }
   es.onmessage = e => {
     const { type, data } = JSON.parse(e.data)
+    if (type === 'spectrum') { if (Array.isArray(data)) { S.spec.set(data.slice(0, N)); S.specAt = performance.now() } return }
     if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) build() }
     else if (type === 'ccs') { data.forEach((v, i) => { if (!(performance.now() - (mine[i] ?? -1e9) < 300)) S.cc[i] = v }) }
     else if (type === 'cc') {
@@ -380,14 +481,15 @@ const connect = () => {
     else if (type === 'lkcc') { const [k, v] = data; if (!(performance.now() - (lkMine[k] ?? -1e9) < 300)) { S.lk[k] = v; S.lkLive = performance.now() } }
     else if (type === 'lknote') {   // a key or pad played (device or UI): light it; a key outside the window moves it
       const [note, chan] = data
-      if (chan === 9) lkLight('p' + note)
+      if (chan === 9) { lkLight('p' + note); S.lkPad = [note, performance.now()] }
       else { if (note < S.lkBase || note > S.lkBase + 24) S.lkBase = 12 * Math.floor(note / 12); lkLight('k' + note) }
       S.lkLive = performance.now()
     }
     update()
   }
 }
-document.addEventListener('click', e => { if (e.target.closest?.('#theme')) setTheme(document.body.dataset.theme === 'te' ? 'black' : 'te') })
+document.addEventListener('click', e => { if (e.target.closest?.('#theme')) setTheme(te() ? 'black' : 'te') })
+applyTheme(readTheme())
 connect()
 </script>
 </body>

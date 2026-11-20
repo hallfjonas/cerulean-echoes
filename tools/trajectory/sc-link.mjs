@@ -5,7 +5,7 @@
 // The controllers never go through here: MIDI goes straight to SC, so a crash of Node or the browser stops neither
 // the music nor the controllers.
 //   GET  /sc/         the LC view of the SC track (sc/ui/index.html), shown in the player's MIDI panel
-//   GET  /sc/events   live state: layout, ccs, cc, state, beat, midi, lk, lkcc, lknote, plus host
+//   GET  /sc/events   live state: layout, ccs, cc, state, beat, midi, lk, lkcc, lknote, spectrum (48 bands 0..1), plus host
 //                     ({ running, ready, track, error })
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
@@ -89,6 +89,8 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
+      // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
+      case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
     }
     for (const waiter of [...waiters]) if (waiter.test(m)) {
       clearTimeout(waiter.timer)
