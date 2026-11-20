@@ -19,8 +19,10 @@ var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack;
 // SuperCollider IDE session (live.scd) can run side by side without taking over each other's server
 s = Server(\ceEngine, NetAddr("127.0.0.1", serverPort));
 Server.default = s;
-// the server settings of live.scd, except the input device
-s.options.sampleRate = 48000;
+// the server settings of live.scd, except the input device and the sample rate: the device's own rate (asking for
+// 48 kHz makes the server quit when the device offers 44.1 kHz, or 16 kHz for a Bluetooth headset in call mode);
+// samples and reverbs follow the rate, the warning below says when it is too low
+s.options.sampleRate = nil;
 s.options.numInputBusChannels = 0;
 // no input device pinned (live.scd pins the built-in mic): started headless, opening that device waits for a
 // microphone permission that never comes, and the boot hangs. A Bluetooth headset may then drop to call quality:
