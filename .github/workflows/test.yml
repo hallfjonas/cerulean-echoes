@@ -1,0 +1,22 @@
+# Feature tests on every pull request: the Node part of `npm test` (the SuperCollider part skips without sclang).
+name: test
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci
+      - run: npm test
