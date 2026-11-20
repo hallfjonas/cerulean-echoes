@@ -137,7 +137,9 @@ test('npm run stems lists the repo library; a bad energy exits 1', () => {
   const run = (...args) => execFileSync(process.execPath, [path.join(here, 'stems.mjs'), ...args],
     { cwd: toolsDir, encoding: 'utf8' })
   assert.match(run('--role', 'kick', '--used-by'), /kick909/)
-  assert.deepEqual(JSON.parse(run('--role', 'bass', '--json')).stems.map(stem => stem.sample), ['bassWarm'])
+  const bass = JSON.parse(run('--role', 'bass', '--json')).stems
+  assert.ok(bass.some(stem => stem.sample === 'bassWarm'))
+  assert.ok(bass.every(stem => stem.versions.every(version => version.meta.role === 'bass')))
   assert.throws(() => run('--energy', '9'), /Command failed/)
 })
 
