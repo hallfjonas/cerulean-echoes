@@ -281,20 +281,20 @@ stems: [
 ],
 
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level (× master, up to
-// × 2, from the next key), knobs CC 31-38: 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 one-shot darkness. Every key
+// × 2, from the next key), knobs CC 21-28: 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 one-shot darkness. Every key
 // plays a note of fixed length (Strudel's midikeys has no note-off: the length is knob 4). Brightness, Resonance and
 // Detune act at once on sounding keys (state buses), the rest from the next key.
 lkCtl: { |ce, num, v, send|
 	switch(num,
 		1, { ce.setState(\lkLevel, 2 * v, send) },
-		31, { ce.setState(\lkBright, v, send) },
-		32, { ce.setState(\lkRes, 12 * v, send) },
-		35, { ce.setState(\lkDet, 100 * (0.04 + (0.26 * v)), send); ce.setState(\lkDetN, -100 * (0.04 + (0.26 * v)), send) },
-		36, { ce.setState(\lkRoom, 0.9 * (0.5 + (0.5 * v)), send) },   // roomOf(0.5 … 1)
-		37, { ce.setState(\lkEcho, 0.6 * v, send) })
+		21, { ce.setState(\lkBright, v, send) },
+		22, { ce.setState(\lkRes, 12 * v, send) },
+		25, { ce.setState(\lkDet, 100 * (0.04 + (0.26 * v)), send); ce.setState(\lkDetN, -100 * (0.04 + (0.26 * v)), send) },
+		26, { ce.setState(\lkRoom, 0.9 * (0.5 + (0.5 * v)), send) },   // roomOf(0.5 … 1)
+		27, { ce.setState(\lkEcho, 0.6 * v, send) })
 },
 lkNote: { |ce, note, vel, chan|
-	var k = { |n| ce.lkCC[30 + n] }, nl = 0.25 + (1.75 * k.(4));   // note length in bars
+	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(4));   // note length in bars
 	var tone = ("c" ++ ce.mapBus[\tone]).asSymbol;
 	if(chan != 9) {
 		// keys: a soft glass pad, a triangle with two quiet saws detuned up and down (sdSynthFx: the detune is live)

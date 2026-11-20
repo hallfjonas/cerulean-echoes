@@ -31,7 +31,7 @@ Every v1 script stays valid and plays exactly as before.
 | LC button | `{ bar, press }` | `LCXL3 Auto` | `press` a button CC of the track; held 2 scheduler ticks |
 | Keys | `{ bar, keys, velocity?, length? }` | `Launchkey MK4 25 Auto`, channel 1 | `keys` note names or MIDI numbers, space-separated ('c3 e3 g3', '60'); `velocity` (0..1], default 0.8; `length` > 0 bars, default 1 |
 | Pad | `{ bar, pad, velocity? }` | `Launchkey MK4 25 Auto`, channel 10 | `pad` note 36-51; `velocity` (0..1], default 0.8 (**new in v2**) |
-| LK control | `{ bar, lk, value, ramp? }` | `Launchkey MK4 25 Auto`, channel 1 | `lk` 1 (mod wheel) or 31-38 (knobs); `value` 0..1; `ramp` as above |
+| LK control | `{ bar, lk, value, ramp? }` | `Launchkey MK4 25 Auto`, channel 1 | `lk` 1 (mod wheel) or 21-28 (knobs); `value` 0..1; `ramp` as above |
 
 A step has exactly the fields of its row (check-perform refuses others). The kind is decided by the field present, in
 this order: `keys`, `pad`, `lk`, `press`, else `cc`.
@@ -78,7 +78,7 @@ take: {
   scheduler's `lastEnd`, the start of the next query, which is exactly where `midikeys` places the key and from where
   a `midin` signal reads the new value; replaying at that bar lands the same place.
 - CC on a button (`controlsOf(...).button`) → `press` at the value-127 message (value 0 dropped); other LC CCs → `cc`
-  steps thinned with Ramer-Douglas-Peucker (tolerance 1/127) into `ramp` steps; LK CC 1 / 31-38 → `lk` steps, same
+  steps thinned with Ramer-Douglas-Peucker (tolerance 1/127) into `ramp` steps; LK CC 1 / 21-28 → `lk` steps, same
   thinning; other LK CCs dropped. Note-on channel 10, notes 36-51 → `pad`; other note-ons → `keys`.
 
 ## Files

@@ -113,7 +113,7 @@ const lkNote = (note, chan) => {   // chan 0-based: 9 = drum pads; velocity 100
   fetch('lk', { method: 'POST', body: JSON.stringify({ note: [note, 100, chan] }), keepalive: true }).catch(() => {})
 }
 const hasLk = () => Object.keys(tags()).some(k => k.startsWith('lk.'))
-const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, 30 + n])]
+const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, 20 + n])]   // knobs: CC 21-28 (the Launchkey's default)
 const BLACK = [1, 3, 6, 8, 10]
 const NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 // computer keyboard (physical keys, any layout): the A row = white keys from C, the row above = black keys
@@ -129,11 +129,12 @@ const lkHtml = () => {
       (kind === 'fader' ? '<div class=bar><i></i></div>' : '<div class=dial></div>') + '<b></b><span>' + esc(name) + '</span></div>'
   }
   const keys = [...Array(25).keys()].map(i => '<i data-key="' + i + '"></i>').join('')
-  const pads = [44, 36].flatMap(b => [...Array(8).keys()].map(i => '<i data-pad="' + (b + i) + '">' +
-    esc(S.layout?.lkPads?.[b + i - 36] ?? (b + i - 35)) + '</i>')).join('')
+  // pads as on the device: top row 40-43 + 48-51, bottom row 36-39 + 44-47
+  const pads = [[40, 41, 42, 43, 48, 49, 50, 51], [36, 37, 38, 39, 44, 45, 46, 47]].flat().map(n => '<i data-pad="' + n + '">' +
+    esc(S.layout?.lkPads?.[n - 36] ?? (n - 35)) + '</i>').join('')
   return '<section class=lk id=lk><h2>Launchkey</h2><div class=lkbody><div class=lkmain><div class=lkrow>' +
-    LK_CTLS.slice(1).map(knob).join('') + '</div><div class=lkplay><div class=lkoct><button data-oct="-12">◀ oct</button>' +
-    '<button data-oct="12">oct ▶</button></div><div class=lkkeys>' + keys + '</div><div class=lkpads>' + pads + '</div></div></div>' +
+    LK_CTLS.slice(1).map(knob).join('') + '</div><div class=lkplay><div class=lkoct><button data-oct="-24">◀ oct</button>' +
+    '<button data-oct="24">oct ▶</button></div><div class=lkkeys>' + keys + '</div><div class=lkpads>' + pads + '</div></div></div>' +
     knob(LK_CTLS[0]) + '</div></section>'
 }
 const lkAttach = root => {
@@ -161,7 +162,7 @@ const lkAttach = root => {
 }
 document.addEventListener('keydown', e => {
   if (!hasLk() || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return
-  if (e.code === 'KeyZ' || e.code === 'KeyX') { S.lkBase = Math.min(96, Math.max(24, S.lkBase + (e.code === 'KeyX' ? 12 : -12))); update(); return }
+  if (e.code === 'KeyZ' || e.code === 'KeyX') { S.lkBase = Math.min(96, Math.max(24, S.lkBase + (e.code === 'KeyX' ? 24 : -24))); update(); return }
   if (e.code in KEYMAP) { e.preventDefault(); lkNote(S.lkBase + KEYMAP[e.code], 0) }
 })
 

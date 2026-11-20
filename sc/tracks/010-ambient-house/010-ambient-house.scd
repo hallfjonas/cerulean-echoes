@@ -243,21 +243,21 @@ stems: [
 			(name: \r06, orbit: 1, level: 1.0, roomR: \lk06), (name: \r07, orbit: 1, level: 1.0, roomR: \lk07)]),
 ],
 
-// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level, knobs CC 31-38:
+// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level, knobs CC 21-28:
 // 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 one-shot darkness. Every key plays a note of
 // fixed length (Strudel's midikeys has no note-off: the length is knob 5). Brightness, Space and Echo act at once.
 lkCtl: { |ce, num, v, send|
-	if(num == 32) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
+	if(num == 22) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
 	switch(num,
 		1, { ce.setState(\lkLevel, v, send) },
-		31, { ce.setState(\lkBright, v, send) },
-		36, { ce.track[\lkRoomUpd].(ce, send) },
-		37, { ce.setState(\lkEcho, 0.6 * v, send) })
+		21, { ce.setState(\lkBright, v, send) },
+		26, { ce.track[\lkRoomUpd].(ce, send) },
+		27, { ce.setState(\lkEcho, 0.6 * v, send) })
 },
 // the keys' room: roomOf(0.1 … 0.8), raised by Tension × 0.5 (also called when Tension moves)
-lkRoomUpd: { |ce, send| var r = 0.9 * (0.1 + (0.7 * ce.lkCC[36])); ce.setState(\lkRoom, r + ((0.95 - r) * 0.5 * ce.val(36)), send) },
+lkRoomUpd: { |ce, send| var r = 0.9 * (0.1 + (0.7 * ce.lkCC[26])); ce.setState(\lkRoom, r + ((0.95 - r) * 0.5 * ce.val(36)), send) },
 lkNote: { |ce, note, vel, chan|
-	var k = { |n| ce.lkCC[30 + n] }, nl = 0.25 + (1.75 * k.(5));   // note length in bars
+	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(5));   // note length in bars
 	var tone = ("c" ++ ce.mapBus[\tone]).asSymbol, thin = ("c" ++ ce.thinBus).asSymbol;
 	if(chan != 9) {
 		ce.lkKeysNotes(note, vel, [if(ce.lkTurned2 == true) { k.(2) } { 0.5 }, k.(3), k.(4)],

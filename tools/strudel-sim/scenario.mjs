@@ -15,7 +15,7 @@ steps (values 0..1, sent as MIDI 0..127; @c = at cycle c, default 0; lists with 
   --cc2 …  --press2 …    the same for LC 2 (--cc3 for LC 3 …); per CC the one moved last wins, as in the tracks
   --faders 1             every fader of LC 1 (CC 5-12 and 53-60) to this value at cycle 0
   --pad 36@1,40@2        Launchkey drum pads (channel 10, notes 36-51)
-  --lk 31=0.7@1          Launchkey knobs (CC 31-38)       --wheel 0.8@1   mod wheel (CC 1)
+  --lk 21=0.7@1          Launchkey knobs (CC 21-28)       --wheel 0.8@1   mod wheel (CC 1)
   --keys '<c3 e3>'       Launchkey keys play this mini-notation all along
   --no-lk                no Launchkey connected
 window: --from 0 --to 4 (cycles; the run always starts at 0, so earlier presses count)

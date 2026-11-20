@@ -24,7 +24,7 @@ Everything is logged in `perform/<track>/feedback.md`. Formats and the design sk
    minutes (1 bar = 1 cycle = 240 / BPM seconds).
 2. CC numbers: `CLAUDE.md` "Controller mapping" (Mode 1 fader CC 5-11, knob rows 13-19 / 21-27 / 29-35, buttons
    37-43 / 45-51; Mode 2 = CC + 48). Column 8 is global in every track: Master fader 12 (Mode 2 copy 60), Fog 20, Thin
-   28, Tension 36, Chapter 44, Break 52. Launchkey: keys, mod wheel CC 1, knobs CC 31-38 (the `@lk` tags name them),
+   28, Tension 36, Chapter 44, Break 52. Launchkey: keys, mod wheel CC 1, knobs CC 21-28 (the `@lk` tags name them),
    pads 36-51; which sound each pad plays is in the track code (search `LK_SHOTS`), not in the tags. The `@ctl` tags win
    over a header comment that says a column is empty.
 3. `docs/reference/genres.md` (what the genre is, per stem for groove techno) and `docs/reference/listening-list.md` for the genre, the track folder's `feedback.md`, existing scripts in `perform/<track>/` (an

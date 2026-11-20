@@ -141,7 +141,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 - While a script plays, the sidebar shows its title, mood and sections (the current one in bold, `intent` on hover),
   and the top bar the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
-  step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 31-38, keys that parse,
+  step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 21-28, keys that parse,
   and the `take` meta field of a take. `npm run verify` runs it.
 - Levels without a browser: `npm run scenario -- <track> --script <file> [--stems]` plays the whole script (LC and
   Launchkey steps) and prints, per section, the audible events and the loudest event gain per stem in dB, with
