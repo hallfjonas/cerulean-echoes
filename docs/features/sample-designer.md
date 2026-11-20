@@ -8,7 +8,7 @@ project file, `sc/lab/samples/<name>.sample.json`: save it, copy it, export it a
 ## When to use it
 - You want a new kick, snare, bass or lead sound that no library sound gives you.
 - You want to try a variation of a sound you designed before (Save as, then change it).
-- Claude arranges a free sound for you (`/sample-designer`, task 006): the project file has the same format.
+- Claude arranges a free sound for you (`/sample-designer`): the project file has the same format.
 
 ## How to use it
 1. Start the player (`cd tools && node trajectory/server.mjs`, then http://localhost:8766).
