@@ -4,10 +4,10 @@ import { mini } from '@strudel/mini'
 import { readMidi, dumpTrack, distinctNotes, noteName, drumName } from './midi-read.mjs'
 
 const SOURCES = [
-  { file: '../../tracks/edm/012-edm-snippet/gp-edm-snippet.mid', tempo: 120, bars: 24, markers: [],
+  { file: './fixtures/012-edm-snippet/gp-edm-snippet.mid', tempo: 120, bars: 24, markers: [],
     parts: [[30, 198], [30, 140], [0, 522], [38, 13], [120, 64], [34, 58], [29, 139]],
     grids: [8, 32, 64, 8, 64, 8, 8] },
-  { file: '../../tracks/classical/013-hope-for-niklas/gp-classical.mid', tempo: 110, bars: 56, markers: [1, 31, 47],
+  { file: './fixtures/013-hope-for-niklas/gp-classical.mid', tempo: 110, bars: 56, markers: [1, 31, 47],
     parts: [[0, 800], [42, 296], [40, 430], [45, 484], [14, 204], [116, 1346], [61, 360], [49, 416], [0, 158]],
     grids: [8, 16, 16, 16, 8, 32, 8, 8, 16] },
 ]
