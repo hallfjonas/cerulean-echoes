@@ -8,18 +8,19 @@
 /* Two themes from UI-REDESIGN.md: "black" (Torso-like, default) and "te" (Teenage Engineering-like). Only tokens and
    the knob component differ; the layout is the same. Flat: no gradients, shadows or glow. */
 body:not([data-theme=te]) .cell span,body:not([data-theme=te]) .col{letter-spacing:-.04em}
-body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;--frame:#F1EFE8;
+body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;--frame:#F1EFE8;--panel:#151514;--edge:#3A3A37;--keyW:#46463F;--keyB:#0b0b0b;
   --font:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;--frame:#2C2C2A;
+body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;--frame:#2C2C2A;--panel:#DEDCD3;--edge:#A9A79E;--keyW:#F1EFE8;--keyB:#2C2C2A;
   --font:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px/1.25 var(--font);user-select:none;-webkit-user-select:none}
 #lc{display:flex;flex-direction:column;gap:8px;padding:10px 10px;box-sizing:border-box;height:100%;overflow:hidden}
-.pages{flex:1;display:flex;gap:8px;min-height:0}
-.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;min-height:0;padding:6px 4px;border:1px solid transparent}
-.page.live,.lk.live{border-color:var(--frame)}
+.pages{flex:none;display:flex;gap:8px}
+.page{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;min-height:0;padding:6px 4px;border:1px solid var(--edge);border-radius:4px;background:var(--panel)}
+/* each controller is its own panel; the one moved last gets the frame (off when the player's LC frame is off) */
+body:not(.noframe) .page.live,body:not(.noframe) .lk.live{border-color:var(--frame);box-shadow:inset 0 0 0 1px var(--frame)}
 .page h2,.lk h2{margin:0;font-size:11px;font-weight:400;color:var(--off);white-space:nowrap;overflow:hidden}
 .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));
-  grid-template-rows:20px repeat(3,48px) minmax(60px,1fr) 18px 18px;column-gap:2px;row-gap:6px}
+  grid-template-rows:20px repeat(3,48px) clamp(90px,22vh,150px) 18px 18px;align-content:start;column-gap:2px;row-gap:6px}
 .g{border-left:1px solid var(--track)}
 .col{font-size:13px;font-weight:500;text-align:center;white-space:nowrap;overflow:hidden;align-self:end}
 .cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:0}
@@ -34,16 +35,16 @@ body[data-theme=te] .kb-arc{display:none}body:not([data-theme=te]) .kb-disc{disp
 .r3 .kb-disc circle{fill:#F1EFE8;stroke:#888780}.kb-disc circle{stroke-width:1}
 .r1 .kb-ptr,.r2 .kb-ptr{stroke:#F1EFE8}.r3 .kb-ptr{stroke:#2C2C2A}
 /* fader: 2 px track, 14 x 6 px handle */
-.bar{position:relative;width:14px;flex:1;min-height:30px}
-.bar::before{content:'';position:absolute;left:6px;width:2px;top:0;bottom:0;background:var(--track)}
-.bar i{position:absolute;left:0;width:14px;height:6px;border-radius:1px;background:var(--handle);bottom:calc(var(--v,0) * (100% - 6px))}
+.bar{position:relative;width:26px;flex:1;min-height:30px}
+.bar::before{content:'';position:absolute;left:11px;width:4px;top:0;bottom:0;background:var(--track);border-radius:1px}
+.bar i{position:absolute;left:0;width:26px;height:8px;border-radius:1px;background:var(--handle);bottom:calc(var(--v,0) * (100% - 8px))}
 /* buttons: text only; only the button text dims (UI-REDESIGN.md "States") */
 .btn{font-size:11px;justify-content:center}.btn span{font-size:11px}
 .b1 span{color:var(--text)}.b1.off-col span{color:var(--off)}
 .b2 span{color:var(--off)}.b2.on span{color:var(--accent)}
 .blink span{animation:blink 1s steps(1,end) infinite}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
 /* status strip (bottom) */
-.head{flex:none;display:flex;gap:18px;align-items:baseline;white-space:nowrap;overflow:hidden;font-size:11px}
+.head{flex:none;margin-top:auto;display:flex;gap:18px;align-items:baseline;white-space:nowrap;overflow:hidden;font-size:11px}
 .head>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}.head>div.ports{flex-shrink:2}.head>div.help{flex-shrink:20}.head .k{color:var(--off);margin-right:.5em}
 .warn{color:var(--accent);font-weight:600}.ports,.help{color:var(--off)}.help{flex-shrink:3;margin-left:auto}
 .beats i,.bars i{display:inline-block;background:var(--track);margin-left:3px;vertical-align:middle}
@@ -51,14 +52,16 @@ body[data-theme=te] .kb-arc{display:none}body:not([data-theme=te]) .kb-disc{disp
 .beats,.bars,.chord{margin-left:6px}.next{color:var(--off)}
 .theme{font:inherit;font-size:11px;background:none;border:0;color:var(--off);cursor:pointer;padding:0}.theme b{color:var(--text);font-weight:500}
 /* Launchkey row */
-.lk{flex:none;display:flex;flex-direction:column;gap:6px;padding:6px 4px;border:1px solid transparent}
+.lk{flex:none;display:flex;flex-direction:column;gap:6px;padding:6px 4px;border:1px solid var(--edge);border-radius:4px;background:var(--panel)}
 .lkbody{display:flex;gap:10px}.lkmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .lkrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;height:48px}.lkbody>.fader{flex:none;width:72px;justify-content:flex-start}
-.lkplay{display:flex;gap:16px;height:64px}.lkoct{display:flex;flex-direction:column;justify-content:center;gap:6px}
+.lkplay{display:flex;gap:16px;height:72px}.lkoct{display:flex;flex-direction:column;justify-content:center;gap:6px}
 .lkoct button{font:inherit;font-size:11px;background:none;border:0;color:var(--text);cursor:pointer;padding:0;white-space:nowrap}
-.lkkeys{flex:2;display:grid;grid-template-columns:repeat(25,1fr);gap:2px;min-width:0}
-.lkkeys i{border:1px solid var(--track);font-style:normal;font-size:11px;display:flex;align-items:flex-end;justify-content:center;color:var(--off);cursor:pointer;overflow:hidden}
-.lkkeys i.blk{background:var(--track)}.lkkeys i.on{background:var(--text);color:var(--bg)}
+.lkkeys{flex:2;position:relative;min-width:0}
+.lkkeys i{position:absolute;top:0;box-sizing:border-box;font-style:normal;font-size:11px;display:flex;align-items:flex-end;justify-content:center;cursor:pointer;overflow:hidden}
+.lkkeys i.wht{height:100%;width:calc(100% / 15);border:1px solid var(--panel);background:var(--keyW);color:var(--off);z-index:1}
+.lkkeys i.blk{height:60%;width:calc(100% / 15 * .6);background:var(--keyB);border:1px solid var(--panel);border-top:0;z-index:2;border-radius:0 0 2px 2px}
+.lkkeys i.wht.on{background:var(--accent);color:var(--bg)}.lkkeys i.blk.on{background:var(--accent)}
 .lkpads{flex:3;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:2px 6px;min-width:0}
 .lkpads i{font-style:normal;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-width:0}
 .lkpads i::before{content:'';width:12px;height:12px;border-radius:50%;background:var(--track);flex:none}
@@ -84,7 +87,12 @@ const applyTheme = t => { document.body.dataset.theme = t; const b = document.ge
 const setTheme = t => { try { localStorage.setItem(THEME_KEY, t) } catch (e) {} applyTheme(t) }
 const themeLabel = () => THEMES.map(t => t === document.body.dataset.theme ? '<b>' + (t === 'te' ? 'TE' : 'Black') + '</b>' : (t === 'te' ? 'TE' : 'Black')).join(' / ')
 addEventListener('storage', e => { if (e.key === THEME_KEY) applyTheme(readTheme()) })
-addEventListener('message', e => { if (e.origin === location.origin && THEMES.includes(e.data?.panelTheme)) applyTheme(e.data.panelTheme) })
+addEventListener('message', e => {
+  if (e.origin !== location.origin) return
+  if (THEMES.includes(e.data?.panelTheme)) applyTheme(e.data.panelTheme)
+  // the player's "LC frame" setting (key H): frame the controller moved last, or not
+  if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
+})
 applyTheme(readTheme())
 
 // ---- knob: one SVG with both components (arc for Black, disc with pointer for TE); the theme shows one ----
@@ -104,7 +112,7 @@ const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
 const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 1)
 const PAGES = ['jojo', 'jonas'], PREFIX = { jojo: '16', jonas: '2' }
 const S = { layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
-  lk: {}, lkBase: 48, lkLit: new Map(), lkLive: 0 }   // Launchkey: control values, keyboard window, lit keys/pads
+  lk: {}, lkBase: 48, lkLit: new Map(), lkLive: -1e9 }   // Launchkey: control values, keyboard window, lit keys/pads
 const held = new Set()   // CCs kept held by Shift-click
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const tags = () => S.layout?.tags ?? {}
@@ -171,7 +179,10 @@ const lkHtml = () => {
     return '<div class="cell ' + kind + ' r3 ctl" data-lk="' + n + '" title="' + esc(desc ?? '') + '">' +
       (kind === 'fader' ? '<div class=bar><i></i></div>' : knobSvg()) + '<span>' + esc(name) + '</span></div>'
   }
-  const keys = [...Array(25).keys()].map(i => '<i data-key="' + i + '"></i>').join('')
+  // a two-octave keyboard from C (the window always starts on a C): 15 white keys, black keys between them
+  const WHITE = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24], w = 100 / 15
+  const keys = WHITE.map((k, i) => '<i class=wht data-key="' + k + '" style="left:' + (i * w) + '%"></i>').join('') +
+    WHITE.slice(0, -1).flatMap((k, i) => BLACK.includes((k + 1) % 12) ? ['<i class=blk data-key="' + (k + 1) + '" style="left:' + ((i + 1) * w - w * 0.3) + '%"></i>'] : []).join('')
   // pads as on the device: top row 40-43 + 48-51, bottom row 36-39 + 44-47
   const pads = [[40, 41, 42, 43, 48, 49, 50, 51], [36, 37, 38, 39, 44, 45, 46, 47]].flat().map(n => '<i data-pad="' + n + '"><span>' +
     esc(S.layout?.lkPads?.[n - 36] ?? (n - 35)) + '</span></i>').join('')

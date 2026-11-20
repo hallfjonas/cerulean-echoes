@@ -421,9 +421,14 @@ const applyLcFrame = () => {
   else if (!style) doc.head.append(Object.assign(doc.createElement('style'), { id: 'noFrame', textContent: NO_FRAME_CSS }))
 }
 
+// the SuperCollider panel follows the LC frame setting too (sent on change and whenever the panel (re)loads)
+let sentLcFrame = null
+const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
+$('scPanel').addEventListener('load', sendLcFrame)
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
+  if (settings.get('lcFrame') !== sentLcFrame) sendLcFrame()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
   $('status').textContent = [label, midiText, autoLabel, onSc() ? '' : visuals].filter(Boolean).join(' · ')

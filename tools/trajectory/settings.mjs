@@ -17,7 +17,7 @@ export const SETTINGS = [
   { id: 'rings', label: 'Beat rings', kind: 'toggle', default: true, key: 'b', tip: 'Key B: rings from the kick on every beat',
     apply: (value, { renderer }) => renderer.setRings(value) },
   { id: 'lcFrame', label: 'LC frame', kind: 'toggle', default: true, key: 'h',
-    tip: 'Key H: frame around the controller page used last in the LC view', apply: () => {} },
+    tip: 'Key H: frame around the controller used last in the LC view / MIDI panel', apply: () => {} },
   { id: 'look', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',
     tip: 'Key V: cycles the looks', apply: (value, { renderer }) => renderer.setLook(value) },
   // the look of the SuperCollider MIDI panel (sc/ui/index.html, UI-REDESIGN.md); one browser setting it reads too
