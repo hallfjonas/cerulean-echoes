@@ -7,5 +7,7 @@ root="$here/../.."
 SCLANG="${SCLANG:-/Applications/SuperCollider.app/Contents/MacOS/sclang}"
 [ -x "$SCLANG" ] || SCLANG="$(command -v sclang)"
 TO=""; command -v timeout >/dev/null && TO="timeout 180"   # macOS has no timeout unless coreutils are installed
-$TO "$SCLANG" "$root/sc/tools/render.scd" "$root/sc/tracks/${CE_TRACK:-009-house/009-house}.scd" "$@" > "$2.log" 2>&1
+track="$root/sc/tracks/${CE_TRACK:-009-house/009-house}"   # CE_TRACK ending in .track: a stem track
+[[ "$track" == *.track ]] || track="$track.scd"
+$TO "$SCLANG" "$root/sc/tools/render.scd" "$track" "$@" > "$2.log" 2>&1
 grep -q "^rendered" "$2.log" || { grep -A12 "ERROR" "$2.log" | head -30; echo "RENDER FAILED: $2"; exit 1; }

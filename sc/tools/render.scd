@@ -58,6 +58,13 @@ ce.log.do { |l, i|
 	f.write("}}");
 };
 f.write("]\n"); f.close;
+// buffer number → sample file, so two renders of the same notes compare by file (<out-prefix>.buffers.json)
+f = File(prefix ++ ".buffers.json", "w");
+f.write("{" ++ ce.sampleBuffers.keys.asArray.sort.collect { |rel|
+	"\"%\":\"%\"".format(ce.sampleBuffers[rel], rel) }.join(",") ++ "}\n");
+f.close;
+// CE_NO_AUDIO=1: the event log only, no audio render
+if("CE_NO_AUDIO".getenv.notNil) { "rendered % (events only)".format(prefix).postln; 0.exit };
 // the command file next to the output (recordNRT's default temp name is the same in every sclang process: two
 // renders at once would overwrite each other's); kept with env CE_OSC=1, for debugging
 score.recordNRT(prefix ++ ".nrt.osc", prefix ++ ".wav", sampleRate: 48000, headerFormat: "WAV", sampleFormat: "float",

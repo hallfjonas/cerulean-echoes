@@ -89,6 +89,26 @@ test('add-ons, code files, parameters and parents must exist', () => {
   assert.match(brokenStem(stem => { delete stem.controls.k3.range }), /"param" needs a "range"/)
   assert.match(brokenStem(stem => { stem.parent = 'kick909/kick909-gone.stem' }), /parent .* not found/)
   assert.match(brokenStem(stem => { stem.parent = BASS }), /same sample/)
+  assert.match(brokenStem(stem => { stem.sample.extra = ['sdGone'] }), /"sdGone" not found/)
+})
+
+test('only a stem with column code may leave knobs and button 2 to the code', () => {
+  const open = stem => { stem.controls.k3 = { label: 'Punch', about: 'x.' }; delete stem.controls.b2.addon }
+  assert.match(brokenStem(open), /k3: needs exactly one/)
+  assert.match(brokenStem(open), /b2: needs exactly one/)
+  const root = sandbox()
+  const stem = readStem(root, KICK)
+  open(stem)
+  stem.code = 'kick.scd'
+  fs.writeFileSync(path.join(root, 'sc', 'stems', 'kick909', 'kick.scd'), '(notes: { |col, k| [] })\n')
+  const file = writeJson(path.join(root, 'sc', 'stems', KICK), stem)
+  assert.deepEqual(checkFiles([file], root)[0].errors, [])
+})
+
+test('a wrapper sound has the parameters of the voice it wraps', () => {
+  const errors = brokenStem(stem => { stem.controls.k3 = { label: 'Punch', about: 'x.', param: 'rate', range: [1, 2] } },
+    'clap909/clap909-brightness-space-complexity-pattern-roll.stem')
+  assert.doesNotMatch(errors, /"rate" is not a parameter/)
 })
 
 test('schema and patterns', () => {

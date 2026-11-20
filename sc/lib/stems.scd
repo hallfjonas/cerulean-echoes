@@ -12,6 +12,18 @@
 //   knob code   { |v, col| (param: value, …) }  merged into every note from the next note on (v = the knob 0..1)
 //   b1 code     { |col| }                       called on each press instead of "next pattern at the next bar"
 //   b2 code     returns an add-on Event (see addons.scd)
+// Column code: a stem code file may return an Event instead of a Function, for a column JSON cannot describe at all
+// (009's lab columns). It plays finished notes and owns its controls; every key is optional except notes:
+//   notes: { |col, k| notes }      the notes (~ce.note Events, `\lane`, `\hold` in 16ths) and control messages of 16th k
+//   start: { |col, ce| }           after the server set-up: latches, own hooks (col.st holds the column's state)
+//   update: { |col, send| }        on every move of a knob, the fader or button 2: set the column's state buses
+//   b1: { |col| }                  button 1 instead of "next pattern at the next bar"
+//   gate: false                    asked at fader 0 too (state that moves every 16th: lifts, look-ahead)
+//   states: (name: start value)    the column's state buses (col.setState, col.stateMapOf)
+//   maps: (name: (ccs: [\k1 …], fn: { |v …| ugen }))   server-side values of the column's controls (col.mapBusOf)
+//   strip: (orbit, ownDelay, level, roomR, echoSend, space, echo, trim, lanes)   the column's strip; a Symbol names one
+//          of its states, maps or controls (\k2 = its knob 2 CC)
+// The sample's `extra` sounds (stem file) are the further sounds the code plays.
 (
 // JSON → Events with Symbol keys. sclang's parseJSON keeps every scalar a String: numbers are read where used.
 ~ce.jsonEvent = { |self, x|
@@ -47,7 +59,14 @@
 	var stemName = ("s" ++ slot.asString.replace(":", "_")).asSymbol;
 	var targets = (), knobCode = (), preset = (), args = ();
 	var mini = { |str| str !? { self.mini(str.asString) } };
-	(addon[\sounds] ? []).do { |name| if(self.sounds[name].isNil) { self.loadSound(name) } };
+	var code = stem[\code] !? { |c| (stem[\dir] +/+ c).load }, colCode = if(code.isKindOf(Event)) { code };
+	var extra = (stem[\sample][\extra] ? []).collect(_.asSymbol);
+	var ccs = self.slotCCs(slot), maps = (), gain = self.numOf(stem[\gain] ? 1);
+	// a column's map named trim is its strip trim: the stem's gain multiplies it
+	(colCode !? { |c| c[\maps] } ? ()).keysValuesDo { |name, m|
+		maps[(stemName ++ "_" ++ name).asSymbol] = (ccs: m[\ccs].collect { |c| ccs[c] ? c },
+			fn: if(name == \trim) { { |...in| m[\fn].valueArray(in) * gain } } { m[\fn] }) };
+	(extra ++ (addon[\sounds] ? [])).do { |name| if(self.sounds[name].isNil) { self.loadSound(name) } };
 	(stem[\sample][\preset] ? ()).keysValuesDo { |k, v| preset[k] = self.numOf(v) };
 	(b2[\args] ? ()).keysValuesDo { |k, v|
 		args[k] = if(v.isString and: { "^-?[0-9.]+$".matchRegexp(v) }) { v.asFloat } { v } };
@@ -60,9 +79,11 @@
 		{ knob[\code].notNil } { knobCode[kk] = (stem[\dir] +/+ knob[\code]).load }
 	};
 	(
-		ce: ce, track: track, stem: stem, slot: slot.asSymbol, stemName: stemName, ccs: self.slotCCs(slot),
-		sample: sample, sounds: [sample] ++ (addon[\sounds] ? []), pitch: stem[\pitch].asSymbol,
-		gain: self.numOf(stem[\gain] ? 1), preset: preset, inputs: inputs, hpOwn: snd.hpf,
+		ce: ce, track: track, stem: stem, slot: slot.asSymbol, stemName: stemName, ccs: ccs,
+		sample: sample, sounds: [sample] ++ extra ++ (addon[\sounds] ? []), pitch: stem[\pitch].asSymbol,
+		colCode: colCode, maps: maps, st: (),
+		echoOn: targets.values.flatten(1).any { |t| t[\param] == \echo } or: { addon === self.addons[\echoThrow] },
+		gain: gain, preset: preset, inputs: inputs, hpOwn: snd.hpf,
 		orbit: if(self.lowRoles.includes(stem[\meta][\role].asSymbol)) { 1 } { 2 },
 		fog: opt.(\fog), thin: opt.(\thin), tension: opt.(\tension), swing: opt.(\swing), breakOut: frame[\break] == "out",
 		targets: targets, knobCode: knobCode,
@@ -71,7 +92,7 @@
 			.select { |p| inputs.includes(p) and: { [\hold, \amp].includes(p).not } },
 		pats: stem[\patterns].collect { |p| (label: p[\label], rhythm: mini.(p[\rhythm]), notes: mini.(p[\notes]),
 			vel: mini.(p[\velocity])) },
-		stemCode: stem[\code] !? { |c| (stem[\dir] +/+ c).load },
+		stemCode: if(colCode.isNil) { code },
 		b1Code: controls[\b1][\code] !? { |c| (stem[\dir] +/+ c).load },
 		addon: addon, addonMode: b2[\mode].asSymbol, addonState: (args: args, since: nil,
 			argNum: { |a, key, default| a[\args][key] ? default }),
@@ -81,7 +102,28 @@
 		thinOnStrip: { |col| col[\thin] and: { col[\inputs].includes(\thinF).not } },
 		stateName: { |col, param| (col[\stemName] ++ "_" ++ param).asSymbol },
 		knob: { |col, kk| col[\ce].val(col[\ccs][kk]) },
+		held: { |col, kk| col[\ce].held(col[\ccs][kk]) },
 		chordAt: { |col, bar| col[\track].chordAt(bar) },
+		// the chord at 16th k; push: the next bar's chord two 16ths early (the frame's chordAtK, else the bar's chord)
+		chordAtK: { |col, k, push = false| col[\track].chordAtK(k, push) },
+		// column code: its state buses and maps by short name
+		setState: { |col, name, v, send| col[\ce].setState(col.stateName(name), v, send) },
+		stateMapOf: { |col, name| col[\ce].stateMap(col.stateName(name)) },
+		mapName: { |col, name| (col[\stemName] ++ "_" ++ name).asSymbol },
+		mapBusOf: { |col, name| ("c" ++ col[\ce].mapBus[col.mapName(name)]).asSymbol },
+		delayNode: { |col| col[\ce].stemDelayNode[col[\stemName]] },
+		// Tension's echo send (0 → 0.45 over the first half of the knob), as the strips compute it
+		tensionEcho: { |col| (col[\ce].val(col[\track].global.tension) / 0.5).clip(0, 1) * 0.45 },
+		// a strip value of column code: a Symbol names one of its states, maps or controls
+		stripRef: { |col, x|
+			var cc = col[\colCode];
+			case
+			{ x.isKindOf(Symbol).not } { x }
+			{ (cc[\states] ? ()).includesKey(x) } { col.stateName(x) }
+			{ (cc[\maps] ? ()).includesKey(x) } { col.mapName(x) }
+			{ col[\ccs].includesKey(x) } { col[\ccs][x] }
+			{ x }
+		},
 		// after the server set-up (buses exist), before the first note: latches, the add-on's state, the global inputs
 		startCol: { |col, ce|
 			var names = col[\pats].collect { |p| p[\label] };
@@ -90,14 +132,21 @@
 			col[\toneArg] = if(col[\fog] and: { col[\inputs].includes(\tone) }) {
 				("c" ++ if(col[\tension]) { ce.toneBus } { ce.fogBus }).asSymbol };
 			col[\thinArg] = if(col[\thin] and: { col[\inputs].includes(\thinF) }) { ("c" ++ ce.thinBus).asSymbol };
+			col[\colCode] !? { |c| c[\start] !? { |f| f.(col, ce) } };
 		},
 		// the MIDI panel shows the pattern of button 1 (Mode 1: jojo:<n>, Mode 2: jonas:<n>)
 		showRow: { |col| var s = col[\slot].asString;
 			col[\ce].uiRows[((if(s[0] == $1) { "jojo:" } { "jonas:" }) ++ s[2]).asSymbol] =
 				(latch: col[\patLatch], names: col[\pats].collect { |p| p[\label] }) },
 		pressB1: { |col|
-			var l = col[\patLatch];
-			if(col[\b1Code].notNil) { col[\b1Code].(col) } {
+			var l = col[\patLatch], frame = col[\track][\frame] ? ();
+			var b1 = col[\b1Code] ?? { col[\colCode] !? { |c| c[\b1] } };
+			// Chords on a chords stem steps the frame's progressions when the frame has them
+			var chords = (col[\stem][\controls][\b1][\label] == "Chords") and: { frame[\nextChords].notNil };
+			case
+			{ b1.notNil } { b1.(col) }
+			{ chords } { frame[\nextChords].(frame, col[\track]) }
+			{
 				l.pending = (l.pending + 1) % col[\pats].size;
 				col[\ce].status(col[\slot].asString ++ " (next)", col[\pats][l.pending][\label]) }
 		},
@@ -133,14 +182,20 @@
 		},
 		// the state buses of the column: its knob parameters, room and echo send
 		stateValues: { |col|
-			var p = col.knobValues(col.addonOn(nil)), out = ();
-			(col[\busParams] ++ [\room, \echo]).do { |param| out[col.stateName(param)] = p[param] };
+			var p, out = (), now = col[\ce][\stateVal] ? ();
+			if(col[\colCode].notNil) {
+				(col[\colCode][\states] ? ()).keysValuesDo { |k, v| var n = col.stateName(k); out[n] = now[n] ? v } } {
+				p = col.knobValues(col.addonOn(nil));
+				(col[\busParams] ++ [\room, \echo]).do { |param| out[col.stateName(param)] = p[param] } };
 			out
 		},
-		refreshStates: { |col, send| col.stateValues.keysValuesDo { |name, v| col[\ce].setState(name, v, send) } },
+		refreshStates: { |col, send|
+			if(col[\colCode].notNil) { col[\colCode][\update] !? { |f| f.(col, send) } } {
+				col.stateValues.keysValuesDo { |name, v| col[\ce].setState(name, v, send) } } },
+		// column code with gate: false is asked at fader 0 too (its state moves on; notes at level 0 are not played)
 		gated: { |col, bar|
-			var ce = col[\ce];
-			(ce.val(col[\ccs][\fader]) <= 0) or: { ce.val(col[\track].global.master) <= 0 }
+			var ce = col[\ce], always = col[\colCode] !? { |c| c[\gate] == false } ? false;
+			(always.not and: { (ce.val(col[\ccs][\fader]) <= 0) or: { ce.val(col[\track].global.master) <= 0 } })
 				or: { col[\breakOut] and: { col[\track].breakAt(bar) } }
 		},
 		miniOf: { |col, str| var key = str.asSymbol, cache = col[\miniCache];
@@ -203,9 +258,13 @@
 		},
 		// the notes of 16th k (asked by the step engine through the stem track's slot)
 		stepNotes: { |col, k|
-			var bar = (k / 16).floor, on = col.addonOn(bar), a = col[\addonState], ad = col[\addon], hits, out = [], p;
+			var bar = (k / 16).floor, on, a = col[\addonState], ad = col[\addon], hits, out = [], p;
+			on = col[\colCode].isNil and: { col.addonOn(bar) };
 			if(on) { a[\since] = a[\since] ? k } { a[\since] = nil };
-			if(col.gated(bar) or: { on and: { ad[\mute] == true } }) { [] } {
+			case
+			{ col.gated(bar) or: { on and: { ad[\mute] == true } } } { [] }
+			{ col[\colCode].notNil } { col[\colCode][\notes].(col, k) ? [] }
+			{
 				hits = col.patternHits(k);
 				if(on) { ad[\hits] !? { |f| hits = f.(a, col, k, hits) } };
 				if(hits.notEmpty) {

@@ -18,6 +18,6 @@ var dir = thisProcess.nowExecutingPath.dirname;
 	limit: 1,                     // 1 = limiter on the master (ceiling -1 dBFS), 0 = off (comparisons)
 );
 ["sounds.scd", "controls.scd", "mixer.scd", "steps.scd", "score.scd", "setup.scd", "ui.scd", "strudel.scd", "mini.scd",
-	"addons.scd", "stems.scd", "stemtrack.scd"].do { |f| (dir +/+ f).load };
+	"addons.scd", "stems.scd", "stemtrack.scd", "stemkit.scd"].do { |f| (dir +/+ f).load };
 ~ce
 )

@@ -41,6 +41,9 @@
 		samples: frame[\samples], maps: frame[\maps],
 		chapterAt: { |self, bar| self.chapter.atBar(bar) },
 		chordAt: { |self, bar| self[\frame].chordAt(self, bar) },
+		chordAtK: { |self, k, push = false|
+			if(self[\frame][\chordAtK].notNil) { self[\frame].chordAtK(self, k, push) } {
+				self.chordAt(((k + if(push) { 2 } { 0 }) / 16).floor) } },
 		breakAt: { |self, bar| self.breakL.atBar(bar) == 1 },
 		uiHead: { |self, ce|
 			var pend = { |now, next| if(now == next) { [now] } { [now, next] } }, onOff = ["Beat on", "Beat off"];
@@ -84,7 +87,7 @@
 			self.columns.do { |col| col.startCol(ce); col.showRow };
 			// the controls reach whatever column the slot holds now (a swap replaces the column, not the hooks)
 			self.columns.keysDo { |slot| var cc = ce.slotCCs(slot);
-				[\k1, \k2, \k3].do { |kk| ce.onCC(cc[kk], { |v, send| self.columns[slot].refreshStates(send) }) };
+				[\k1, \k2, \k3, \fader].do { |kk| ce.onCC(cc[kk], { |v, send| self.columns[slot].refreshStates(send) }) };
 				ce.onCC(cc[\b2], { |v, send| self.columns[slot].b2Change(v, send) });
 				ce.onPress(cc[\b1], { self.columns[slot].pressB1 });
 			};
@@ -98,17 +101,33 @@
 		self.columnStem(track.columns[slot], track) } ++ (frame[\stems] ? []);
 	track.states = (frame[\states] ? ()).copy;
 	track.columns.do { |col| track.states.putAll(col.stateValues) };
+	track.maps = (frame[\maps] ? ()).copy;
+	track.columns.do { |col| track.maps.putAll(col[\maps]) };
 	track.tagLines = self.stemTrackTags(track);
 	track
 };
 
 // The stem entry of a column for ~ce.prepare: its strip (fader, room and echo send on the column's state buses, the
 // stem's gain as trim, Thin and Tension unless the stem opts out) and its notes through the slot
+// A stem without echo (no knob, add-on or column code sends to it) gets no echo send, so Tension's echo leaves it dry.
+// Column code gives its own strip (stems.scd): its Symbols name the column's states, maps or controls.
 ~ce.columnStem = { |self, col, track|
-	var slot = col[\slot];
-	(name: col[\stemName], sounds: col[\sounds], level: col[\ccs][\fader], orbit: col[\orbit], hpOwn: col[\hpOwn],
-		roomR: col.stateName(\room), echoSend: col.stateName(\echo), thin: col.thinOnStrip, trim: col[\gain],
-		tension: col[\tension], tensionEcho: col[\tension], notes: { |k| track.slotStep(slot, k) })
+	var slot = col[\slot], strip = col[\colCode] !? { |c| c[\strip] }, ref = { |x| col.stripRef(x) };
+	var entry = (name: col[\stemName], sounds: col[\sounds], level: col[\ccs][\fader], orbit: col[\orbit],
+		hpOwn: col[\hpOwn], roomR: col.stateName(\room), echoSend: if(col[\echoOn]) { col.stateName(\echo) },
+		thin: col.thinOnStrip, trim: col[\gain], tension: col[\tension], tensionEcho: col[\tension],
+		notes: { |k| track.slotStep(slot, k) });
+	strip !? {
+		entry.removeAt(\roomR); entry.removeAt(\echoSend);
+		[\level, \orbit, \roomR, \echoSend, \space, \echo, \trim].do { |key|
+			strip[key] !? { |x| entry[key] = ref.(x) } };
+		// ownDelay: [time in beats, feedback], so the stem keeps its echo in beats at any tempo
+		strip[\ownDelay] !? { |d| entry[\ownDelay] = [d[0] * 60 / track.bpm, d[1]] };
+		strip[\lanes] !? { |lanes| entry[\lanes] = lanes.collect { |ln|
+			var out = ln.copy; [\level, \roomR, \echoSend, \space, \echo].do { |key| ln[key] !? { |x| out[key] = ref.(x) } };
+			out } };
+	};
+	entry
 };
 
 // The @ tags of a stem track (read by the web UI instead of the file's comments): modes, a heading and six @ctl
@@ -149,7 +168,7 @@
 	names.do { |name| var snd = self.sounds[name];
 		snd.def.add;
 		msgs.add([\d_recv, snd.def.asBytes]);
-		(snd.samples ? ()).do { |rel| if(self.sampleBuffers[rel].isNil) {
+		((snd.samples ? ()).values ++ (snd[\files] ? [])).do { |rel| if(self.sampleBuffers[rel].isNil) {
 			var path = if(rel.beginsWith("repo:")) { self.root.dirname +/+ "samples" +/+ rel.drop(5) } {
 				self.root +/+ "samples" +/+ rel };
 			var b = srv.bufferAllocator.alloc(1), ch = SoundFile.use(path, { |f| f.numChannels });

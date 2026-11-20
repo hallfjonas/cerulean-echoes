@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "name": "clap909-brightness-space-complexity-pattern-roll",
+  "parent": null,
+  "about": "909 clap on 2 and 4, rim ghosts, snare rolls.",
+  "meta": {
+    "role": "clap",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "909",
+      "rim"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "clap909"
+  },
+  "gain": 1.57,
+  "pitch": "none",
+  "code": "clap909-ghosts.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "2 + 4"
+    },
+    {
+      "label": "Pickup"
+    },
+    {
+      "label": "Fill 4"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "soft ↔ sharp."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "plain → rim → double taps."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "clap on 2 and 4."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "2 + 4 → pickup → fill every 4th bar."
+    },
+    "b2": {
+      "label": "Roll",
+      "about": "snare roll while held.",
+      "mode": "hold"
+    }
+  }
+}

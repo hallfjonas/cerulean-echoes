@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "name": "sub-sine-brightness-space-length-pattern-octave",
+  "parent": null,
+  "about": "Sine sub on the chord's root, a 16th after the kick.",
+  "meta": {
+    "role": "sub",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "sine",
+      "pump"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "subSine"
+  },
+  "gain": 1.24,
+  "pitch": "root",
+  "code": "sub-sine-pump.scd",
+  "frame": {
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "Pump"
+    },
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "Half"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "sine ↔ full."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "long ↔ short."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "sub on the chord's root."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pump → off-beat → half bars."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "up while held.",
+      "mode": "hold"
+    }
+  }
+}

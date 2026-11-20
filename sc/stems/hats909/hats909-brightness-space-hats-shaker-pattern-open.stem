@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "name": "hats909-brightness-space-hats-shaker-pattern-open",
+  "parent": null,
+  "about": "House off-beat hat and swung 16ths, or shakers.",
+  "meta": {
+    "role": "hats",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "909",
+      "727",
+      "swung"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "hats909"
+  },
+  "gain": 1.36,
+  "pitch": "none",
+  "code": "hats909-shaker.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "+ 16ths"
+    },
+    {
+      "label": "Driving"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "soft ↔ crisp."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Hats ↔ Shaker",
+      "about": "hats → both → shaker."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "off-beat hat + 16ths."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "off-beat → + 16ths → driving."
+    },
+    "b2": {
+      "label": "Open",
+      "about": "open hats while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "name": "sd-supersaw-brightness-space-strings-b3-chords-echo-throw",
+  "parent": null,
+  "about": "Held chords: JX-10 strings ↔ soft Hammond B3.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "house"
+    ],
+    "energy": 2,
+    "tags": [
+      "jx10",
+      "b3",
+      "warm",
+      "held"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSupersaw",
+    "extra": [
+      "sdSynth"
+    ]
+  },
+  "gain": 3.2,
+  "pitch": "chord",
+  "code": "supersaw-held-chords.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Held"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Strings ↔ B3",
+      "about": "strings → both → B3."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "held chords."
+    },
+    "b1": {
+      "label": "Chords",
+      "about": "next of 10 (at the next 8 bars)."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo while held.",
+      "mode": "hold"
+    }
+  }
+}

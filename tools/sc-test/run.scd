@@ -151,6 +151,19 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 			lines.do { |l| ("TAG " ++ l).postln };
 			lines.includesEqual("// @ctl 16:4.k3 Length | short ↔ long.")
 				and: { lines.includesEqual("// @ctl g.k1 Fog | clear ↔ muffled (all low-passes down).") } });
+		// the 009 pilot: 14 stems, 13 of them column code (sc/stems/*/*.scd), the frame's harmony
+		{
+			var house = root +/+ "sc/tracks/009-house/009-house.track";
+			check.("009 stem track: 14 stems load, every column makes notes", {
+				var ce = loadCe.value, track = ce.loadTrack(house);
+				ce.prepare(ScoreStreamPlayer.new, track); ce.patterns;
+				((5..12) ++ (53..59)).do { |c| ce.cc[c] = 1 };
+				(track.columns.size == 14) and: {
+					track.columns.every { |col| (0..127).any { |k| col.stepNotes(k).reject { |n| n[\msg].notNil }.notEmpty } } } });
+			check.("009 stem track: Chords on the chords column steps the frame's progressions", {
+				var log = play.(house, 12, [[1.5, 85], [1.7, 44]]), track = ~lastCe.track;
+				(track.prog.now == 1) and: { track.chordAt(8).name == "Am7" } and: { track.chordAt(0).name == "Am9" } });
+		}.value;
 	}.value;
 
 	// --- every live track ---

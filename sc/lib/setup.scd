@@ -32,7 +32,8 @@
 		};
 		self.sampleBuffers[rel]
 	};
-	self.sounds.do { |snd| (snd.samples ? ()).do { |rel| self.loadSample(rel) } };
+	// samples: buffer args of the sound; files: the files a sound's notes pick by name (a wrapper sound, sounds/README.md)
+	self.sounds.do { |snd| ((snd.samples ? ()).values ++ (snd[\files] ? [])).do { |rel| self.loadSample(rel) } };
 	(track.samples ? []).do { |rel| self.loadSample(rel) };
 	// wavetables (sounds with `wavetables: (arg: \shape)`): 4 consecutive buffers per shape
 	self.wavetableBase = ();

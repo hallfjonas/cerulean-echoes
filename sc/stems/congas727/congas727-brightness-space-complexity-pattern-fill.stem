@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "name": "congas727-brightness-space-complexity-pattern-fill",
+  "parent": null,
+  "about": "Quiet TR-727 congas and bongos, latin lines.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "house"
+    ],
+    "energy": 2,
+    "tags": [
+      "727",
+      "latin"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "congas727"
+  },
+  "gain": 0.85,
+  "pitch": "none",
+  "code": "congas727-ghosts.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Pillow"
+    },
+    {
+      "label": "Rolling"
+    },
+    {
+      "label": "Latin"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "woody ↔ crisp."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "steady → + ghost notes."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "congas and bongos."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pillow → rolling → latin."
+    },
+    "b2": {
+      "label": "Fill",
+      "about": "conga run while held.",
+      "mode": "hold"
+    }
+  }
+}

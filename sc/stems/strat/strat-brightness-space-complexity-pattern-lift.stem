@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "name": "strat-brightness-space-complexity-pattern-lift",
+  "parent": null,
+  "about": "Plucked disco guitar lines on the chord tones.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "disco",
+      "guitar",
+      "plucked"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "strat",
+    "extra": [
+      "sdSamplePh"
+    ]
+  },
+  "gain": 0.93,
+  "pitch": "chord",
+  "code": "strat-lines.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Stardust"
+    },
+    {
+      "label": "e & a 4"
+    },
+    {
+      "label": "Call + answer"
+    },
+    {
+      "label": "Repeated note"
+    },
+    {
+      "label": "Lick"
+    },
+    {
+      "label": "Dead-note groove"
+    },
+    {
+      "label": "Off-beat pairs"
+    },
+    {
+      "label": "Pickup"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "line → dead notes → variation → motor + fill."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "plucked guitar."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "8 lines."
+    },
+    "b2": {
+      "label": "Lift",
+      "about": "phaser, brighter while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -34,7 +34,11 @@
       "additionalProperties": false,
       "properties": {
         "name": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]*$" },
-        "preset": { "type": "object", "additionalProperties": { "type": "number" } }
+        "preset": { "type": "object", "additionalProperties": { "type": "number" } },
+        "extra": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]*$" }
+        }
       }
     },
     "gain": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },

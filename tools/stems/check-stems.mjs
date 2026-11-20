@@ -89,10 +89,14 @@ export function soundInfo(root, name) {
   const file = path.join(root, 'sc', 'sounds', `${name}.scd`)
   if (!fs.existsSync(file)) return null
   const text = fs.readFileSync(file, 'utf8')
+  const base = text.match(/~ce\.loadSound\(\\(\w+)\)/)?.[1]
+  const baseInfo = base && base !== name ? soundInfo(root, base) : null
   const params = [...text.matchAll(/^\s*([A-Za-z]\w*):\s*\(default:/gm)].map(m => m[1])
   const argList = text.match(/SynthDef\([^{]*\{\s*\|([^|]*)\|/)?.[1] ?? ''
   const args = argList.split(',').map(arg => arg.trim().match(/^[A-Za-z]\w*/)?.[0]).filter(Boolean)
-  return { params, controllable: [...new Set([...params, ...args])].filter(p => !ENGINE_ARGS.includes(p)) }
+  const own = { params, controllable: [...new Set([...params, ...args])].filter(p => !ENGINE_ARGS.includes(p)) }
+  return baseInfo ? { params: [...baseInfo.params, ...own.params],
+    controllable: [...new Set([...baseInfo.controllable, ...own.controllable])] } : own
 }
 
 const readJson = (file, errors) => {
@@ -148,6 +152,9 @@ function referenceErrors(file, stem, context) {
   }
   const sound = soundInfo(context.root, stem.sample.name)
   if (!sound) errors.push(`sample "${stem.sample.name}" not found in sc/sounds/`)
+  for (const extra of stem.sample.extra ?? []) {
+    if (!soundInfo(context.root, extra)) errors.push(`sample.extra: "${extra}" not found in sc/sounds/`)
+  }
   for (const key of Object.keys(stem.sample.preset ?? {})) {
     if (sound && !sound.params.includes(key)) errors.push(`sample.preset: "${key}" is not a parameter of the sample`)
   }
@@ -166,7 +173,9 @@ function referenceErrors(file, stem, context) {
   for (const key of ['k1', 'k2', 'k3']) {
     const knob = stem.controls[key]
     const ways = ['param', 'targets', 'code'].filter(way => knob[way])
-    if (ways.length !== 1) errors.push(`${key}: needs exactly one of "param", "targets", "code"`)
+    if (ways.length > 1 || (!ways.length && !stem.code)) {
+      errors.push(`${key}: needs exactly one of "param", "targets", "code" (none only with a stem "code")`)
+    }
     if (knob.param && !knob.range) errors.push(`${key}: "param" needs a "range"`)
     if (knob.param) paramExists(key, knob.param)
     knob.targets?.forEach((target, i) => paramExists(`${key}.targets[${i}]`, target.param))
@@ -174,7 +183,9 @@ function referenceErrors(file, stem, context) {
   }
   codeExists('b1', stem.controls.b1.code)
   const b2 = stem.controls.b2
-  if (!!b2.addon === !!b2.code) errors.push('b2: needs exactly one of "addon", "code"')
+  if ((b2.addon && b2.code) || (!b2.addon && !b2.code && !stem.code)) {
+    errors.push('b2: needs exactly one of "addon", "code" (none only with a stem "code")')
+  }
   if (b2.addon) {
     const addon = context.addons[b2.addon]
     if (!addon) errors.push(`b2: add-on "${b2.addon}" not in sc/stems/addons.json`)

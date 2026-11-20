@@ -1,0 +1,71 @@
+{
+  "format": 1,
+  "name": "bass-fm-brightness-space-sound-pattern-octave",
+  "parent": null,
+  "about": "House bass lines on the chords: FM, M1 organ, analog.",
+  "meta": {
+    "role": "bass",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "fm",
+      "m1",
+      "analog",
+      "walking"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "bassFM",
+    "extra": [
+      "bassM1",
+      "bassWarm"
+    ]
+  },
+  "gain": 1.8,
+  "pitch": "scale",
+  "code": "bass-fm-lines.scd",
+  "frame": {
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "3-3-2"
+    },
+    {
+      "label": "Around 1 + dead"
+    },
+    {
+      "label": "Dead notes"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Sound",
+      "about": "FM → M1 organ → analog."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "bass line on the chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "3-3-2 → around 1 + dead → dead notes."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "up while held.",
+      "mode": "hold"
+    }
+  }
+}

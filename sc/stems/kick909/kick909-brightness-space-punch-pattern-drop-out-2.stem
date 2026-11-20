@@ -1,0 +1,87 @@
+{
+  "format": 1,
+  "name": "kick909-brightness-space-punch-pattern-drop-out-2",
+  "parent": "kick909/kick909-brightness-space-punch-pattern-drop-out.stem",
+  "about": "Tight 909 kick, four on the floor, body on A1.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "house",
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "909",
+      "tight"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "kick909",
+    "preset": {
+      "body": 33
+    }
+  },
+  "gain": 1,
+  "pitch": "none",
+  "frame": {
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "4/4",
+      "rhythm": "x x x x"
+    },
+    {
+      "label": "gap 4",
+      "rhythm": "<[x x x x]!3 [x x x ~]>"
+    },
+    {
+      "label": "gap 8",
+      "rhythm": "<[x x x x]!7 [x x ~ ~]>"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright.",
+      "param": "bright",
+      "range": [
+        0,
+        1
+      ]
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room.",
+      "param": "space",
+      "range": [
+        0,
+        1
+      ]
+    },
+    "k3": {
+      "label": "Punch",
+      "about": "tight ↔ hard.",
+      "param": "punch",
+      "range": [
+        0,
+        1
+      ]
+    },
+    "fader": {
+      "label": "Level",
+      "about": "four on the floor."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "4/4 → gap every 4th bar → every 8th bar."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "kick pauses while held.",
+      "addon": "dropOut",
+      "mode": "hold"
+    }
+  }
+}

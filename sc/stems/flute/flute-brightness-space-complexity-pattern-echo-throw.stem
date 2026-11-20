@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "name": "flute-brightness-space-complexity-pattern-echo-throw",
+  "parent": null,
+  "about": "Flute motifs on the chord tones, A A B A over 8 bars.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 2,
+    "tags": [
+      "airy",
+      "recorded"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "flute"
+  },
+  "gain": 1.32,
+  "pitch": "chord",
+  "code": "flute-motifs.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "3-3-2"
+    },
+    {
+      "label": "Call + answer"
+    },
+    {
+      "label": "Steady 8ths"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "core → + neighbours → + trill."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "flute."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "3-3-2 → call + answer → steady 8ths."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo while held.",
+      "mode": "hold"
+    }
+  }
+}
