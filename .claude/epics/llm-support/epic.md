@@ -2,7 +2,7 @@
 name: llm-support
 status: backlog
 created: 2026-11-17T10:59:43Z
-updated: 2026-11-17T12:00:00Z
+updated: 2026-11-20T18:11:25Z
 progress: 0%
 prd: (none, scoped from the player vision draft, ideas 1 and 2, in git history)
 github: (will be set on sync)
@@ -74,6 +74,18 @@ What this epic does about it, and nothing more: the Claude drawer is opt-in thro
 default). A real split (a Produce workspace and a Perform workspace in the player, the repo's folders and tools sorted
 by which one they serve) is a bigger question and gets its own epic, scoped after this one has shown which features
 belong where. See Open Questions.
+
+## Alignment with sound-lab (2026-11-20)
+
+The `sound-lab` epic makes stems JSON files and adds Sample Designer, Stem Designer and stem swap with two skills
+(`/sample-designer`, `/stem-designer`). Since then SC is the engine and ported `.strudel` tracks are frozen
+(sc-migration D1), so this epic needs a rescope before task 1:
+- Drawer modes call the sound-lab skills instead of repeating their rules: "Design stem" (`/stem-designer`), "Design
+  sample" (`/sample-designer`).
+- Modify on a stem track writes a new stem version (or a Stem Designer project), not `NNN-<name>-v2.strudel`;
+  Modify on SC code tracks targets the `.scd`.
+- `selection.mjs` is built by sound-lab task 009 (column click, kind `column`); this epic adds control-level targets.
+- Order: after sound-lab 008 for the stem modes.
 
 ## Architecture Decisions
 
