@@ -383,3 +383,47 @@ cross data (halo in background colour if it must sit on top).
 - Open (user's call): neutral greys for the whole black theme; neutral fader caps so only hits use the accent;
   shorter names for `piano → rhodes`, `vibes → marimba`.
 
+- 2026-11-20, **set view built** (all four views, switchable):
+  - **Where.** Right of the spectrum under Mode 2: a box 300 units wide (outer, same edge and padding as the spectrum
+    box, both stretched to the Launchkey's height), canvas 190 units high; 28 units between the boxes (mockup). The
+    spectrum box got narrower (452 units). The status strip is one line under both boxes, inside the right column,
+    ending level with the Launchkey box. The controller count (`no launch control: mouse only` / `n launch controls`)
+    moved to the top-right corner of the board (right end of the `mode 2` label line; user request).
+  - **Labels (user):** the default view is the ring, labelled `energy`; the others are labelled `energy · area` (the
+    energy strip), `map`, `spectrogram`. The label is the click target that cycles the views (ring → map → energy area →
+    spectrogram).
+  - **Data path.** `sc/lib/ui.scd`: the existing spectrum analyser (no new synth) also sends `/ce/lvl` 10×/s: loudness
+    power of both channels (roughly K-weighted: +4 dB shelf above 1.5 kHz, high-pass 40 Hz, ~100 ms window), peak and
+    RMS of the mono sum over the last 100 ms. `uiSetFrame` sums 100 such frames (10 s) plus the 20 spectrum frames a
+    second and sends `/ce/setsample energy punch tension b1..b64`: energy = mean power in dB (−0.691 as in LUFS, floor
+    −70), punch = mean crest factor (peak/RMS per 100 ms, frames above −60 dB) mapped 3…18 dB → 0..1, tension = the
+    Tension control (CC 36) averaged, bands = the 48 analyser bands averaged and resampled to 64 (same log range). The
+    running sums live in `topEnvironment[\ceSetAcc]`, so a track load does not lose the 10 s in progress (a pause > 5 s
+    starts afresh); the analyser comes back with `startUI` after every load like the spectrum. `sc-link.mjs` (and
+    `bridge.mjs` the same way) stamps each sample with its arrival time and keeps the whole history in memory for the
+    server session (track loads and SC restarts keep it; a server restart clears it): a page that connects gets one
+    `sethistory` event (all samples), then each `setsample`. Sample: `{ t ms, e dB, p, x, s[64] }` (~200 KB JSON for
+    2 hours). Tested in `tools/trajectory/sc-link.test.mjs` (without SC: fake OSC → live event + history for a later
+    page; with SC: a sample arrives within 10 s of a load).
+  - **On display.** Minutes count from the first sample (the ring's centre number); energy is normalised to the set's
+    range (top = loudest sample, bottom 3 dB under the quietest non-silent one, 6…36 dB below the top; silence = 0).
+    Ring minutes are the mean of the samples in that minute. Paths and areas break at gaps > 30 s (stopped).
+  - **Setting.** Player: Visual settings → `Set view` (ring / map / energy / spectrogram), **key C** (free in the
+    player and in the panel's computer keyboard), saved, sent to the panel by `postMessage({ setView })` like
+    `panelTheme`; the panel keeps `ce.setView` in `localStorage` and tells the player when its label is clicked.
+  - **Deviations from the mockup / brief.** Boxed like the spectrum (edge + padding), so the canvas is 274 × 190, not
+    300 × 190. TE ring bars are 0.425 × the tangential slot wide as drawn in the mockup (brief table: 0.85). The 64
+    spectrogram rows are interpolated from the 48 analyser bands (no extra filters, CPU); intensity is scaled in the
+    dB domain (0..1 = −60…0 dB) per row. Energy area and punch are smoothed over ±1 sample (30 s) on display, the map
+    over ±12 samples (2′) as in the mockup. Map corner labels sit on top of the trail with a background halo. Line
+    widths, dot and now line scale with the board unit.
+  - **Measured.** Switching the view moves nothing (0 px on every element at 1280×800, 1920×1080, 2560×1440,
+    3840×2160, both themes); switching the theme moves no box (≤ 0.02 px; text rows ≤ 1 px from font metrics, fader
+    track / handle differ by design inside the same fader box). No scrollbars at any size. The board is 900 units high
+    at 16:9 and 904 at 1280×800 (font floors), the same as before this change.
+  - **Open points.** Punch measure (crest factor chosen) and the energy weighting need a check on a real recorded set
+    (all tests ran with the master fader at 0: energy sat at the −70 dB floor, punch 0). Tension = the control until
+    the players decide. Controller combination to cycle the view live, proposed, not mapped: Launchkey **Shift + track
+    ▶** (not used by any track; check what the MK4 sends for it on its MIDI port, maybe only on the DAW port), else LC
+    XL 3 Shift + page ▶ if the custom mode leaves it free. Whether to keep map / energy area / spectrogram (user asked).
+    The ring's centre number counts minutes since the first sample of this server session, not since a set start.
