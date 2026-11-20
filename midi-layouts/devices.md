@@ -24,7 +24,7 @@ One file for every combination of controllers, all optional:
 
 - Every connected Launch Control XL 3 is found, whatever its name (port with `LCXL3` in the name, without `DAW`).
   No renaming needed for this. Each one gets the full layout: Mode 1 = foundation, Mode 2 = colour.
-  Every device gets both custom modes of the track (`NNN-…-mode1.syx` in slot 1, `-mode2.syx` in slot 2).
+  Every device gets the two custom modes once (`midi-layouts/lcxl3-mode1.syx` / `-mode2.syx`, slots 1 and 2); they are the same for every track.
 - Two LCs control the same sounds: per control, the controller moved last wins. Button presses count
   from both. Agree beforehand who plays which page.
 - No LC found: a warning in the console, everything stays silent.

@@ -7,8 +7,7 @@ verglichen (dieselben Noten, Details in `sc/PORTING.md`, Abschnitt 008). Optimie
 Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unterschiede:
 
 - **Track wählen:** in `sc/live.scd` die Zeile `var trackName = "009-house";` auf `"008-groove-techno"` ändern.
-- **Custom Modes:** dieselben wie für den Strudel-Track: `tracks/techno/008-groove-techno/008-groove-techno-mode1.syx`
-  (Slot 1) und `…-mode2.syx` (Slot 2). Die Belegung ändert sich nicht.
+- **Custom Modes:** die gemeinsamen: `midi-layouts/lcxl3-mode1.syx` (Slot 1) und `-mode2.syx` (Slot 2). Die Belegung ändert sich nicht.
 - **Startwerte wie in Strudel:** Jonas' Pad-Space steht beim Start auf 50 %, bis man den Regler bewegt.
 
 ## Was sofort wirkt
@@ -25,7 +24,7 @@ Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unter
 
 ## Belegung
 
-Dieselbe wie im Strudel-Track (Layout-Sheet `tracks/techno/008-groove-techno/008-groove-techno-layout.pdf`).
+Dieselbe wie im Strudel-Track (die `@ctl`-Texte im Track, in der LC-Ansicht).
 Mode 1 = Jojo (Kick, Rumble, Sub, Bassline, Clap, Hats, Percussion), Mode 2 = Jonas (Pads, Strings, Sequence,
 Stab, Answer, Dark Perc, FX / Breath), Spalte 8 global: Fog, Thin, Tension, Master, Chapter (dunkel → gespannt →
 warm), Break. Jojos Spalte 8 (Ride) ist wie in Strudel aus.

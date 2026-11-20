@@ -87,6 +87,16 @@ Ziel: Der Klang im Raum soll näher an der Zielkurve liegen (Referenzkurve aus e
 - Im Club korrigieren wir nur unseren eigenen Ausgang, die Anlage gehört dem Haus-Techniker. Nicht gegen dessen EQ arbeiten, kurz absprechen.
 - Raumkorrektur und Mix-Abgleich sind zwei verschiedene Dinge. Weicht der Mix von der Referenzkurve ab, korrigieren wir das von Hand, nicht automatisch.
 
+## Lab-Ansicht: Vorbild (Referenz)
+
+Screenshot: `sc/ui/reference/oxi-coral-wavetable-editor.png` (OXI Coral, Wavetable-Editor). Was wir übernehmen wollen:
+- Links eine **Liste der Varianten** mit kleiner Vorschau (passt zu Behalten/Verwerfen im Würfel-Modus).
+- In der Mitte eine **große Ansicht des aktuellen Ergebnisses**, darunter Obertöne bzw. Spektrum.
+- **Werkzeuge zum Erzeugen:** zeichnen, Formen, Formel, Zufall; dazu Normalisieren und „Bake“ (Ergebnis festschreiben).
+- Unten links eine **Vorhör-Leiste** (Play, Tasten, Morph, MIDI).
+- Unten die **Effekte als Schieberegler** in einem Raster, mit Wert und Bypass.
+- **Stil:** dunkel, ruhig, eine Akzentfarbe.
+
 ## Offene Fragen
 
 - Wie viele freie Tasten bleiben nach dem bestehenden Mapping noch übrig?

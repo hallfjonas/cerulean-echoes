@@ -12,7 +12,6 @@ When you work with Claude Code in this repo and the job is one of the ones below
 |---|---|---|
 | `strudel-optimize` | Makes a track cheaper to compute without changing the sound, and proves it event by event | "it drops out", "compare old and new" |
 | `strudel-mix` | Measures levels and sets faders and gains in balance | "too quiet", "it clips", "balance the stems" |
-| `lcxl-layout` | Regenerates the layout sheet and `.syx` files | "regenerate the layout", "control names on the display" |
 | `lab-board` | Builds a lab board or the next round of one | "new board", "candidates for bass", "next round" |
 | `lab-to-track` | Moves a finished lab column into a track unchanged | "put the winner into 009" |
 | `add-sample` | Adds an audio file, puts it on a Launchkey pad, levels it and checks that it loads | "put this sample on pad E1" |
@@ -22,12 +21,11 @@ When you work with Claude Code in this repo and the job is one of the ones below
 ## Good to know
 - A skill only guides Claude. The real work is done by the tools in `tools/` (see [checks](checks.md)).
 - Claude asks before it changes sound, effects or the controller layout, unless that is the task.
-- Hooks run on their own after every edit: they regenerate the sheet and `.syx` files of a changed track.
+- Hooks run on their own after every edit: they check the `@ctl` tags of a changed track and regenerate single versions.
 - Project rules Claude always reads: `CLAUDE.md`.
 
 ## Related
 - [Checks](checks.md)
-- [Layout sheets](layout-sheets.md)
 - [Lab boards](lab-boards.md)
 - [Samples and sounds](samples-and-sounds.md)
 - [Auto-perform](auto-perform.md)

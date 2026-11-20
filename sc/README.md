@@ -12,7 +12,7 @@ verglichen. Bedienung: `ANLEITUNG.md`; Stand und Entscheidungen: `PORTING.md`.
    Master-Fader (Spalte 8).
 3. Stoppen: `~ce.stopTrack`.
 
-Controller-Belegung = die des Strudel-Tracks (dieselben Custom Modes / `.syx`). Unterschied: **Regler wirken
+Controller-Belegung = die des Strudel-Tracks (dieselben Custom Modes, `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx`). Unterschied: **Regler wirken
 sofort**, auch auf klingende Töne (Control-Busse, 20 ms Glättung); Fader wie in Strudel ab der nächsten Note, Master
 sofort. Pattern-Tasten schalten wie bisher auf
 den nächsten Takt bzw. die nächste Phrase.

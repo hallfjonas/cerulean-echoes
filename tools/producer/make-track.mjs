@@ -831,7 +831,7 @@ function launchkeyHeadSlot(map) {
     '// knob 2 is turned the keys play piano + Rhodes. Drum pads (Drum mode, channel 10, notes 36-51) ignore knobs ' +
       '1-7.',
     `// Same knobs and keys as in 008-010; only the pads differ. The song is in ${map.key.name}.`,
-    '// Names for the LC view (its Launchkey row); not read by the layout sheet tools.',
+    '// Names for the LC view (its Launchkey row).',
     '// @lk level Keys Level | mod wheel: volume of the keys (× master).',
     '// @lk k1 Brightness | dull ↔ bright; harder keys brighter.',
     '// @lk k2 Piano → Rhodes | off → piano → Rhodes → off.',

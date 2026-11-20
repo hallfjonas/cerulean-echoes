@@ -7,7 +7,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { parse } from '../lcxl-layout/gen-layout.mjs'
+import { parse } from '../lcxl-layout/ctl.mjs'
 import { LK_CCS, PADS, isLaunchkeyStep, keyNotes } from './autoperform.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))

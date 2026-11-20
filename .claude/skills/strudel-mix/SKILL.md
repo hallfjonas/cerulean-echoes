@@ -64,7 +64,7 @@ Use the loudest knob position of a stem. New fader maximum = old × 10^(ΔdB / 2
 ## Apply
 - Ask before changing sound or levels unless that is the task (CLAUDE.md). One-file tracks (007-010) are edited in
   place; other tracks get a new file. Change only `range(0, max)` of the faders, shot `gain`s or the keys' sound gains,
-  with a comment giving the old value and the reason. Update the `@ctl … fader` tag text (layout sheet).
+  with a comment giving the old value and the reason. Update the `@ctl … fader` tag text.
 - Run the audibility check again and show before/after.
 - Report, don't fix silently: peaks > 1 (clipping), big jumps across a knob's travel (e.g. an extra layer +9 dB).
 
