@@ -36,7 +36,7 @@
 // @col 2:3 3 Arp
 // @col 2:4 4 Hook
 // @col 2:5 5 Strings
-// @col 2:6 6 Rave Stab
+// @col 2:6 6 Rave
 // @col 2:7 7 FX
 // @col 2:8 8 Global
 // @row 2:k1 Row 1 \ Brightness
@@ -1120,8 +1120,8 @@ const LK_SHOTS = [
   { name: 'Brace', s: 'brace' },
   { name: 'Paper', s: 'paper', gain: 0.99 },
   { name: 'Wine', s: 'wine', gain: 0.98, once: 5.33 },
-  { name: 'Plaenterwald', s: 'plaenterwald', gain: 1.45 },
-  { name: 'Wiese', s: 'lw', gain: 0.56 },
+  { name: 'Forest', s: 'plaenterwald', gain: 1.45 },
+  { name: 'Meadow', s: 'lw', gain: 0.56 },
   { name: 'Creatures', s: 'creatures', once: 4.52 },
   { name: 'No end', s: 'noend', gain: 0.76, once: 10.19 },
   { name: 'Vast', s: 'vast', once: 14.6 },

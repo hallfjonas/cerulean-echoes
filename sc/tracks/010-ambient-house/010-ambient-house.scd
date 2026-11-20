@@ -10,20 +10,20 @@
 // @layout Track 010 — ambient house (SuperCollider)
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
 // @col 16:1 1 Kick
-// @col 16:2 2 Noise Pump
+// @col 16:2 2 Pump
 // @col 16:3 3 Sub
-// @col 16:4 4 Bassline
-// @col 16:5 5 Clap / Rim
+// @col 16:4 4 Bass
+// @col 16:5 5 Clap
 // @col 16:6 6 Hats
 // @col 16:7 7 Congas
 // @col 16:8 8 Global
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Pad
-// @col 2:2 2 Deep Chords
-// @col 2:3 3 Pluck Arp
+// @col 2:2 2 Chords
+// @col 2:3 3 Arp
 // @col 2:4 4 Lead
 // @col 2:5 5 Marimba
-// @col 2:6 6 Glockenspiel
+// @col 2:6 6 Glock
 // @col 2:7 7 Birds
 // @col 2:8 8 Global
 // @ctl g.k1 Fog | clear ↔ muffled (all low-passes down).
@@ -299,7 +299,7 @@ lkNote: { |ce, note, vel, chan|
 		}
 	}
 },
-lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Wiese", "Creatures", "No end", "Vast", "Rim echo", "Marimba D",
+lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Meadow", "Creatures", "No end", "Vast", "Rim echo", "Marimba D",
 	"Glockenspiel", "Shaker", "Vibraphone", "Wind", "Crash reverse", "Voice ooh"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)
