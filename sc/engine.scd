@@ -48,7 +48,8 @@ loadTrack = { |path|
 	ce = (here +/+ "lib/ce.scd").load;
 	ce.trackFile = path;
 	ce.uiAddr = toPlayer;
-	track = path.load;
+	// a Sample Designer project (sc/lab/samples/*.sample.json) plays as a track (lib/designer.scd)
+	track = if(path.endsWith(".sample.json")) { (here +/+ "lib/designer.scd").load; ce.sampleProject(path) } { path.load };
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
 	old !? { ce.midiPorts = old.midiPorts; old.midiWatch !? (_.stop) };

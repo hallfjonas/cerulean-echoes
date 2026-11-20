@@ -99,6 +99,7 @@
     <div class="row"><button id="saveTake">Save take</button></div>
     <output id="takeState"></output>
   </section>
+  <section id="sampleLab" hidden></section>
   <section id="autoPerform"></section>
   <section>
     <details>
@@ -128,6 +129,7 @@ import { mountHelp } from './help.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
+import { mountSampleLab } from './sample-lab-ui.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -178,8 +180,11 @@ const entryOf = id => catalogue.find(entry => entry.id === id)
 const recorder = createRecorder({ midi, engine })
 strudelEngine.ready.then(() => { label = 'ready' })
 let catalogue = []
-const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
-fetch('catalogue').then(r => r.json()).then(entries => {
+const showScripts = () => {
+  autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
+  sampleLab.show(entryOf($('track').value))
+}
+const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
   catalogue = entries
   const group = (label, kind) => {
     const optgroup = document.createElement('optgroup')
@@ -193,9 +198,13 @@ fetch('catalogue').then(r => r.json()).then(entries => {
     return optgroup
   }
   $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
-  $('track').value = ['010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
+  $('track').value = [selectId, '010-ambient-house', ...entries.map(entry => entry.id)]
+    .find(id => entries.some(entry => entry.id === id && entry.taps))
   showScripts()
 })
+loadCatalogue()
+const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entryOf($('track').value),
+  play: () => play(), refresh: loadCatalogue })
 $('track').onchange = () => {
   showScripts()
   stopRecording()

@@ -24,7 +24,7 @@
 
 // Layout tags from the track file: // @mode, @col, @ctl lines (same format as the Strudel tracks)
 ~ce.uiTags = { |self|
-	var tags = ();
+	var tags = (self.track !? { |t| t[\tags] } ? ()).copy;   // a track without a file of its own (Sample Designer)
 	if(self.trackFile.notNil) {
 		File.readAllString(self.trackFile).split($\n).do { |line|
 			var m = line.findRegexp("^// @(layout|mode|col|ctl|lk) ([^ ]+) (.*)$");

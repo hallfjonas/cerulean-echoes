@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sample Designer project (format 1)",
+  "description": "A sound built from blocks on the LC. Docs: docs/features/sample-designer.md; block kinds: blocks.json.",
+  "type": "object",
+  "required": ["format", "name", "parent", "about", "setup", "role", "sources", "chain", "audition"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": 1 },
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$", "maxLength": 40 },
+    "parent": { "type": ["string", "null"], "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
+    "about": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "setup": { "enum": ["drum", "synth", "free"] },
+    "role": {
+      "enum": ["kick", "perc", "hats", "clap", "sub", "bass", "keys", "chords", "pad", "lead", "texture", "fx"]
+    },
+    "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/block" } },
+    "chain": { "type": "array", "items": { "$ref": "#/$defs/block" } },
+    "audition": {
+      "type": "object",
+      "required": ["bpm", "pattern", "accent", "space", "length", "master", "patterns"],
+      "additionalProperties": false,
+      "properties": {
+        "bpm": { "type": "number", "minimum": 60, "maximum": 200 },
+        "pattern": { "type": "integer", "minimum": 0 },
+        "accent": { "$ref": "#/$defs/value" },
+        "space": { "$ref": "#/$defs/value" },
+        "length": { "$ref": "#/$defs/value" },
+        "master": { "$ref": "#/$defs/value" },
+        "patterns": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/pattern" } }
+      }
+    }
+  },
+  "$defs": {
+    "value": { "type": "number", "minimum": 0, "maximum": 1 },
+    "block": {
+      "type": "object",
+      "required": ["id", "kind", "on", "type", "k1", "k2", "k3", "level"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*$", "maxLength": 12 },
+        "kind": { "enum": ["tone", "noise", "click", "osc", "env", "lfo", "filter", "drive", "chorus"] },
+        "on": { "type": "boolean" },
+        "type": { "type": "string" },
+        "k1": { "$ref": "#/$defs/value" },
+        "k2": { "$ref": "#/$defs/value" },
+        "k3": { "$ref": "#/$defs/value" },
+        "level": { "$ref": "#/$defs/value" }
+      }
+    },
+    "pattern": {
+      "type": "object",
+      "required": ["label", "rhythm"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 20 },
+        "rhythm": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string", "minLength": 1 },
+        "velocity": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

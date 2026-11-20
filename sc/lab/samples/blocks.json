@@ -1,0 +1,112 @@
+{
+  "format": 1,
+  "kinds": {
+    "tone": {
+      "part": "source", "label": "Tone", "about": "drum oscillator with a pitch drop.",
+      "knobs": [
+        { "key": "pitch", "label": "Pitch", "about": "low ↔ high." },
+        { "key": "bend", "label": "Bend", "about": "no drop ↔ falls two octaves onto the note." },
+        { "key": "bendTime", "label": "Bend time", "about": "snappy ↔ slow drop." }
+      ],
+      "fader": { "label": "Level", "about": "tone level." },
+      "types": ["Sine", "Triangle", "Square", "Saw"]
+    },
+    "noise": {
+      "part": "source", "label": "Noise", "about": "noise through a band-pass, own decay.",
+      "knobs": [
+        { "key": "colour", "label": "Colour", "about": "dark ↔ bright noise." },
+        { "key": "decay", "label": "Decay", "about": "short tick ↔ long hiss." },
+        { "key": "width", "label": "Width", "about": "narrow, pitched ↔ wide, airy." }
+      ],
+      "fader": { "label": "Level", "about": "noise level." },
+      "types": ["White", "Pink", "Metal"]
+    },
+    "click": {
+      "part": "source", "label": "Click", "about": "short attack burst, repeats like a clap.",
+      "knobs": [
+        { "key": "tone", "label": "Tone", "about": "dull ↔ bright click." },
+        { "key": "length", "label": "Length", "about": "a tick ↔ a short burst." },
+        { "key": "repeat", "label": "Repeat", "about": "one burst ↔ four, like a clap." }
+      ],
+      "fader": { "label": "Level", "about": "click level." },
+      "types": ["Pulse", "Noise"]
+    },
+    "osc": {
+      "part": "source", "label": "Osc", "about": "synth oscillator on the played note.",
+      "knobs": [
+        { "key": "tune", "label": "Tune", "about": "two octaves down ↔ two up, in semitones." },
+        { "key": "fold", "label": "Fold", "about": "clean ↔ folded, more overtones." },
+        { "key": "detune", "label": "Detune", "about": "one voice ↔ two voices beating." }
+      ],
+      "fader": { "label": "Level", "about": "oscillator level." },
+      "types": ["Saw", "Square", "Triangle", "Sine"]
+    },
+    "env": {
+      "part": "mod", "label": "Envelope", "about": "volume over the note.",
+      "knobs": [
+        { "key": "attack", "label": "Attack", "about": "hard ↔ slow fade in." },
+        { "key": "decay", "label": "Decay", "about": "short ↔ long fall." },
+        { "key": "sustain", "label": "Sustain", "about": "falls to silence ↔ holds full level." }
+      ],
+      "fader": { "label": "Level", "about": "level of the whole voice." },
+      "types": ["One-shot", "Gate"]
+    },
+    "lfo": {
+      "part": "mod", "label": "LFO", "about": "slow wobble or a second envelope.",
+      "knobs": [
+        { "key": "rate", "label": "Rate", "about": "slow ↔ fast (Envelope: long ↔ short)." },
+        { "key": "pitch", "label": "Pitch", "about": "no vibrato ↔ wide vibrato." },
+        { "key": "cutoff", "label": "Cutoff", "about": "filter stays ↔ filter sweeps." }
+      ],
+      "fader": { "label": "Depth", "about": "how much the LFO moves anything." },
+      "types": ["Sine", "Triangle", "Square", "Random", "Envelope"]
+    },
+    "filter": {
+      "part": "fx", "label": "Filter", "about": "resonant filter, opens with the envelope.",
+      "knobs": [
+        { "key": "cutoff", "label": "Cutoff", "about": "closed ↔ open." },
+        { "key": "resonance", "label": "Resonance", "about": "smooth ↔ ringing peak." },
+        { "key": "envAmount", "label": "Env amount", "about": "static ↔ opens with each note." }
+      ],
+      "fader": { "label": "Mix", "about": "dry ↔ filtered." },
+      "types": ["Low-pass", "High-pass", "Band-pass"]
+    },
+    "drive": {
+      "part": "fx", "label": "Drive", "about": "distortion with its own tone control.",
+      "knobs": [
+        { "key": "amount", "label": "Amount", "about": "warm ↔ heavy distortion." },
+        { "key": "tone", "label": "Tone", "about": "dark ↔ bright after the drive." },
+        { "key": "bias", "label": "Bias", "about": "even ↔ lopsided, buzzier distortion." }
+      ],
+      "fader": { "label": "Mix", "about": "dry ↔ driven." },
+      "types": ["Soft", "Fold", "Crush"]
+    },
+    "chorus": {
+      "part": "fx", "label": "Chorus", "about": "moving delays that widen the sound.",
+      "knobs": [
+        { "key": "rate", "label": "Rate", "about": "slow ↔ fast movement." },
+        { "key": "depth", "label": "Depth", "about": "subtle ↔ deep wobble." },
+        { "key": "width", "label": "Width", "about": "centre ↔ wide stereo." }
+      ],
+      "fader": { "label": "Mix", "about": "dry ↔ chorused." },
+      "types": ["Chorus", "Flanger"]
+    }
+  },
+  "setups": {
+    "drum": {
+      "label": "Drum machine",
+      "blocks": [
+        { "id": "tone", "kind": "tone" }, { "id": "noise", "kind": "noise" }, { "id": "click", "kind": "click" },
+        { "id": "env", "kind": "env" }, { "id": "filter", "kind": "filter" }, { "id": "drive", "kind": "drive" }
+      ]
+    },
+    "synth": {
+      "label": "Synthesizer",
+      "blocks": [
+        { "id": "osc1", "kind": "osc" }, { "id": "osc2", "kind": "osc" }, { "id": "filter", "kind": "filter" },
+        { "id": "env", "kind": "env" }, { "id": "lfo", "kind": "lfo" }, { "id": "chorus", "kind": "chorus" },
+        { "id": "drive", "kind": "drive" }
+      ]
+    }
+  }
+}

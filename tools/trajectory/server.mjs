@@ -14,6 +14,7 @@
 //                                    for this server's own pages (see recording.mjs)
 //   /sc/…            SuperCollider tracks: their LC view, live state, load / stop (see sc-link.mjs); sclang is
 //                    started on the first SC load and ended with this server
+//   /lab/sample/…    Sample Designer projects: save, save as, export (see sample-lab.mjs)
 // strudel.cc is a public https page; Chrome lets it reach localhost only with the CORS and private-network headers.
 import crypto from 'crypto'
 import http from 'http'
@@ -25,6 +26,7 @@ import { find, scan, toPublic } from './catalogue.mjs'
 import { handleTake } from './take-save.mjs'
 import { handleRecording } from './recording.mjs'
 import { createScLink } from './sc-link.mjs'
+import { createSampleLab } from './sample-lab.mjs'
 import { repo } from './catalogue.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
@@ -39,7 +41,9 @@ const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods
   'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Private-Network': 'true' }
 const clients = new Set()
 let received = 0
-const sc = createScLink({ repo, resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null } })
+const sampleLab = createSampleLab({ getSc: () => sc })
+const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
+  resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null } })
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`)
@@ -60,6 +64,7 @@ const server = http.createServer((request, response) => {
   }
   if (url.pathname.startsWith('/recording/')) return handleRecording(request, response, url, fromOwnPage)
   if (url.pathname === '/sc' || url.pathname.startsWith('/sc/')) return sc.handle(request, response, url, fromOwnPage)
+  if (url.pathname.startsWith('/lab/sample/')) return sampleLab.handle(request, response, url, fromOwnPage)
   if (request.method === 'OPTIONS') return response.writeHead(204, CORS).end()
   if (request.method === 'POST' && url.pathname === '/events') {
     let body = ''
