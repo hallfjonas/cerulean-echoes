@@ -1,9 +1,9 @@
 ---
 name: sc-migration
-status: backlog
+status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-20T12:29:46Z
-progress: 0%
+updated: 2026-11-20T12:31:53Z
+progress: 9%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -103,7 +103,7 @@ Biggest items: 002 (engine) and the ports (007, 008).
 - [ ] 008.md - Port 016-grroove-opus to SC (parallel: true)
 - [ ] 009.md - SC lab and archive of the Strudel lab (parallel: true)
 - [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
-- [ ] 011.md - Retire the Tools page and the Analysis page (parallel: true)
+- [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
 
 Total tasks: 11
 Parallel tasks: 8

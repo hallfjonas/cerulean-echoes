@@ -138,9 +138,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   strudel.cc.
 - Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
   Visualization), the page links, track, Play/Stop/Record/Save take, auto-perform and the visual settings; **?** opens
-  the help. The Tools page (`/tools.html`) runs the Node checks (check
-  sounds, loudness, layouts, stem lab, set build) against a catalogue entry, one job at a time; Analysis
-  (`/analyse.html`) is a tool there.
+  the help.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked

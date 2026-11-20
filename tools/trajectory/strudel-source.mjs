@@ -1,5 +1,5 @@
-// Turns Strudel events (from a tapped track, relayed by server.mjs) into trajectory lines, the same format the audio
-// analysis writes (analyse.mjs), so the renderer does not care where the music comes from. Unlike the audio analysis,
+// Turns Strudel events (from a tapped track, relayed by server.mjs) into trajectory lines, the trajectory format (README, "How it
+// is built"), so the renderer does not care where the music comes from. Unlike the audio analysis,
 // every stem is exact: pan, pitch, reverb share and level come from the events themselves, the pulse from Strudel's
 // clock. Each event is played out when it sounds (its `delay`), not when the scheduler sends it. onBatch gets every
 // batch as it arrives (the player keeps them with a take, take.mjs).

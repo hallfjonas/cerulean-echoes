@@ -1,5 +1,5 @@
 // Draws a live trajectory on a canvas. Stems are created as they arrive, so it shows five audio bands as well as the
-// sixteen stems of a tapped Strudel track. Feed it lines in the trajectory format (see analyse.mjs) with `push`.
+// sixteen stems of a tapped Strudel track. Feed it lines in the trajectory format (see the README, "How it is built") with `push`.
 // Pan is widened to the range the music used over the last ~20 s (up to ×5), so a narrow mix still shows its
 // left-right movement.
 // Three looks (toggleLook cycles them):

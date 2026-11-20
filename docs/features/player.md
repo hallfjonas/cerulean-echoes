@@ -4,7 +4,7 @@
 
 A web page on your own computer that plays any live track or lab board. It opens on the MIDI panel: both Launch
 Control pages and the Launchkey row with every control's name and value. Its second view draws the music: every part
-of the track is a moving shape with its name. It also holds a Tools page for the checks and a recorder.
+of the track is a moving shape with its name. It also holds a recorder.
 
 ## When to use it
 
@@ -22,7 +22,7 @@ of the track is a moving shape with its name. It also holds a Tools page for the
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
-The sidebar holds the views (MIDI panel, Visualization), the pages (Tools, Analysis), the track list, Play, Stop,
+The sidebar holds the views (MIDI panel, Visualization), the track list, Play, Stop,
 Record, Save take, Auto-perform and the visual settings. Switching views keeps the sound playing. The top bar holds the
 status line and **?** for help about the page.
 
@@ -45,7 +45,6 @@ Keys:
 - The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Visual settings change the visuals, never the
   sound.
 - Recordings go to `recordings/<track>/` in the repo root and are not part of git.
-- The Tools page (http://localhost:8766/tools.html) runs the Node checks from the browser, one job at a time.
 - A tab in the background slows its timers down. Keep the player tab visible while a script or a replay runs.
 - Without Web MIDI the player still plays.
 

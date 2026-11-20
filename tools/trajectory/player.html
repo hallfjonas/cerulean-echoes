@@ -83,8 +83,6 @@
   <nav>
     <a href="#panel" data-view="panel">MIDI panel</a>
     <a href="#visuals" data-view="visuals">Visualization</a>
-    <a href="tools.html">Tools</a>
-    <a href="analyse.html">Analysis</a>
   </nav>
   <section>
     <h2>Track</h2>
@@ -145,8 +143,8 @@ mountHelp([
     'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
     'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
     + 'captured too.',
-    'Save take after a replay names its original and shows the replay check; the Tools page lists every differing bar '
-    + '(Check replay fidelity).',
+    'Save take after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
+    + 'lists every differing bar.',
     'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
     'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
     + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
