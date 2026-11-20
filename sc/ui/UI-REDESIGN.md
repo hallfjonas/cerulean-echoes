@@ -427,3 +427,7 @@ cross data (halo in background colour if it must sit on top).
     ▶** (not used by any track; check what the MK4 sends for it on its MIDI port, maybe only on the DAW port), else LC
     XL 3 Shift + page ▶ if the custom mode leaves it free. Whether to keep map / energy area / spectrogram (user asked).
     The ring's centre number counts minutes since the first sample of this server session, not since a set start.
+- 2026-11-20, user: in the ring, a cell's brightness follows its minute's age (newest = current-hour colour → 60′ old
+  = previous-lap colour, blended), instead of two steps by lap. So the only edge is at the needle (newest next to
+  oldest); there is no cut at 12 o'clock when the second hour starts.
+
