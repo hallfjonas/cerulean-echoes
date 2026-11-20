@@ -5,8 +5,10 @@ design stub, a perform script and its design stub. Every part plays its notes as
 re-voiced with the project's sounds; song bar 1 = cycle 0, one bar = one cycle. The workflow around it (design gate,
 listening loop, feeding lessons back) is the project skill `/producer` (`.claude/skills/producer/SKILL.md`).
 
-Built from the pilot `tracks/edm/012-edm-snippet/` (hand-built, the producer reproduces its events) and proven on
-`tracks/classical/013-hope-for-niklas/` (generated, the map regenerates the track and its script exactly).
+Built from the pilot `fixtures/012-edm-snippet/` (hand-built, the producer reproduces its events) and proven on
+`fixtures/013-hope-for-niklas/` (generated, the map regenerates the track and its script exactly). The two songs were
+removed from `tracks/` on 2026-11-20; their `.mid`, map, track (`.strudel-fixture`) and perform script stay here as test
+fixtures.
 
 ## Export from Guitar Pro
 1. File → Export → MIDI. One `.mid` per song.

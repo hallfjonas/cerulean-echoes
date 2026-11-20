@@ -9,8 +9,8 @@ The producer (`tools/producer/`, README there: export, map format, commands) wri
 play the song's parts as written, re-voiced, plus design stubs and a perform script. Decisions live in
 `<track>-map.json`; the track is regenerated from it, never patched by hand. Two user gates, both logged:
 the song design (track folder `feedback.md`) and the performance (`tools/trajectory/perform/<track>/feedback.md`).
-The agent cannot hear: the user's words decide. Examples to match: `tracks/edm/012-edm-snippet/` (hand-built pilot)
-and `tracks/classical/013-hope-for-niklas/` (generated), each with its perform folder.
+The agent cannot hear: the user's words decide. Examples to match: `tools/producer/fixtures/012-edm-snippet/` (hand-built pilot)
+and `tools/producer/fixtures/013-hope-for-niklas/` (generated), each with its map and perform script.
 
 ## 1. Export and read
 1. The user exports from Guitar Pro: File → Export → MIDI. Pick the number (next free `NNN` over `tracks/*/`) and

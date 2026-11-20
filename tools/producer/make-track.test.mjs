@@ -9,14 +9,14 @@ import { buildTrack, buildScript, checkMap, defaultMap, formatMap, produce } fro
 import { load, run, sig, audible } from '../strudel-sim/harness.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const PILOT = path.join(ROOT, 'tracks/edm/012-edm-snippet')
-const PILOT_TRACK = path.join(PILOT, '012-edm-snippet.strudel')
+const PILOT = path.join(ROOT, 'tools/producer/fixtures/012-edm-snippet')
+const PILOT_TRACK = path.join(PILOT, '012-edm-snippet.strudel-fixture')
 const PILOT_MIDI = path.join(PILOT, 'gp-edm-snippet.mid')
-const PILOT_SCRIPT = path.join(ROOT, 'tools/trajectory/perform/012-edm-snippet/rise-and-drop.json')
-const CLASSICAL = path.join(ROOT, 'tracks/classical/013-hope-for-niklas')
+const PILOT_SCRIPT = path.join(PILOT, 'rise-and-drop.json')
+const CLASSICAL = path.join(ROOT, 'tools/producer/fixtures/013-hope-for-niklas')
 const CLASSICAL_MIDI = path.join(CLASSICAL, 'gp-classical.mid')
 const CLASSICAL_MAP = path.join(CLASSICAL, '013-hope-for-niklas-map.json')
-const CLASSICAL_SCRIPT = path.join(ROOT, 'tools/trajectory/perform/013-hope-for-niklas/one-hope.json')
+const CLASSICAL_SCRIPT = path.join(CLASSICAL, 'one-hope.json')
 const SONG_BARS = 24
 const PHRASE = 8
 const PATTERN_BUTTONS = [...[37, 38, 39, 40, 41, 42, 43], ...[85, 86, 87, 88, 89, 90, 91]]
@@ -90,7 +90,7 @@ test('013 map regenerates the track and the performance script', () => {
   const map = JSON.parse(fs.readFileSync(CLASSICAL_MAP, 'utf8'))
   assert.deepEqual(checkMap(map, readMidi(CLASSICAL_MIDI)), [])
   assert.equal(buildTrack(map, readMidi(CLASSICAL_MIDI)).text,
-    fs.readFileSync(path.join(CLASSICAL, '013-hope-for-niklas.strudel'), 'utf8'))
+    fs.readFileSync(path.join(CLASSICAL, '013-hope-for-niklas.strudel-fixture'), 'utf8'))
   assert.deepEqual(buildScript(map), JSON.parse(fs.readFileSync(CLASSICAL_SCRIPT, 'utf8')))
 })
 

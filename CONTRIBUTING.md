@@ -20,9 +20,9 @@ tracks safe. For what the project does, start at [docs/README.md](docs/README.md
 ## Rules for tracks
 
 - **Do not overwrite a track.** A new version goes into a new file. Replace an old one only when asked to.
-- **One file per live track.** Each live track (007 to 010, 012, 013) lives in one `NNN-<name>.strudel` file. Every
+- **One file per live track.** Each live track (007 to 010 and the newer ones) lives in one `NNN-<name>.strudel` file. Every
   controller is optional. Edit that file, not a copy.
-- **Songs from Guitar Pro are generated.** 013 comes from its map file `<track>-map.json`. Change the map and run
+- **Songs from Guitar Pro are generated** from their map file `<track>-map.json`. Change the map and run
   `npm run producer`, never the track. See [producer mode](docs/features/producer-mode.md).
 - **Ask before changing the sound.** Effects, reverb, delay, orbits, naming and the controller layout change how a
   track plays and feels. Discuss these first.
@@ -38,7 +38,7 @@ These files are generated. On a merge conflict take either side, then regenerate
 | Layout sheets `<track>-layout.pdf` | `npm run layouts` |
 | Controller modes `*.syx` | `npm run syx` |
 | `tracks/sets/011-combining-all/011-set-dual.strudel` | `npm run set` |
-| `013-hope-for-niklas.strudel` and its perform script | `npm run producer` (edit the map, not the track) |
+| a Guitar Pro song track and its perform script | `npm run producer` (edit the map, not the track) |
 
 An editor hook regenerates sheets and `.syx` files after every save when you work with Claude Code. Without it, run
 `npm run watch` to do the same on save. The text of a control is the `// @ctl` comment in the track, so change it

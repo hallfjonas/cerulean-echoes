@@ -98,11 +98,11 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 ## EDM
 
 - **Definition**: festival electronic dance music: big builds, a drop, bright lead sounds and a high, uplifting energy.
-- **Tempo**: about 120–130 BPM (to agree; 012 is 120).
+- **Tempo**: about 120–130 BPM (to agree).
 - **Must have**: a build (rising tension, sweeps, fills) that resolves in a drop; a loud, bright lead; a four-on-the-floor
   or sidechain-style pumping rhythm; a played melody from a Guitar Pro source, as written.
 - **Must not have**: a slow, soft feel without a drop (ambient house); no lead and no build (house or techno).
-- **Tracks here**: [012-edm-snippet](../../tracks/edm/012-edm-snippet/) (G♯ minor, 120 BPM, 24 bars).
+- **Tracks here**: 012-edm-snippet none any more (deleted 2026-11-20; git history keeps it).
 
 ## Classical
 
@@ -111,17 +111,16 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 - **Must have**: a composed score as source (Guitar Pro MIDI); melodic lines and harmony that follow the score; no
   four-on-the-floor kick.
 - **Must not have**: a dance groove or an electronic beat driving the piece (any dance genre).
-- **Tracks here**: [013-hope-for-niklas](../../tracks/classical/013-hope-for-niklas/) (A minor, 110 BPM, 56 bars).
+- **Tracks here**: 013-hope-for-niklas none any more (deleted 2026-11-20; git history keeps it).
 
 ## Rock
 
 - **Definition**: band music with guitars, bass and drums: overdriven guitars, a steady beat, a clear song form.
-- **Tempo**: about 100–115 BPM for slow rock (015 changes from 100 to 115 BPM at bar 100).
+- **Tempo**: about 100–115 BPM for slow rock.
 - **Must have**: distorted or overdriven guitar; a bass line in half notes or riffs; a live-band drum kit (kick, snare,
   hats, crash, toms); a song form with verse, chorus and a final section.
 - **Must not have**: a four-on-the-floor kick as the main pulse (house, techno, EDM); no guitar or bass voice.
-- **Tracks here**: [015-slow-rock](../../tracks/rock/015-slow-rock/) (D minor, 100 → 115 BPM; the Guitar Pro file is in the
-  folder, the track is not built yet).
+- **Tracks here**: 015-slow-rock none any more (deleted 2026-11-20; git history keeps it).
 
 ## Not genres
 

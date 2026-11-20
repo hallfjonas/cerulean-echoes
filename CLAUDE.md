@@ -16,7 +16,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 
 ## Layout
 - `tracks/<genre>/NNN-<name>/` — one folder per track, grouped by genre (`ambient`, `ambient-house`, `house`,
-  `techno`, `edm`, `classical`, `rock`; `sets/` for 011, `historic/` for 000-006): the track (`NNN-<name>.strudel`),
+  `techno`; `sets/` for 011, `historic/` for 000-006): the track (`NNN-<name>.strudel`),
   its layout sheets, custom modes (`.syx`) and feedback notes; a Guitar Pro song also its `.mid`, `<track>-map.json`
   and `<track>-design.md`. No `old/` folders: superseded variants are deleted once committed, git history keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
@@ -50,14 +50,14 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   take either side and regenerate (hook, `npm run layouts`/`syx`/`set`).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
-## Live tracks (007-010, 012, 013): one file each
+## Live tracks (007-010 and newer): one file each
 The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-ambient`, `008-groove-techno`,
-`009-house`, `010-ambient-house`, `012-edm-snippet`, `013-hope-for-niklas`), every controller optional. Edit these
+`009-house`, `010-ambient-house`, …), every controller optional. Edit these
 files.
-- 012 and 013 are Guitar Pro songs: every part plays its notes as written (song bar 1 = cycle 0), re-voiced; the
-  decisions live in `<track>-map.json` beside the `.mid`. 013 is generated: change the map (or `tools/producer/`) and
-  re-run `npm run producer`, not the track. 012 is the hand-built pilot the producer reproduces event by event. See
-  `/producer`.
+- A Guitar Pro song: every part plays its notes as written (song bar 1 = cycle 0), re-voiced; the decisions live in
+  `<track>-map.json` beside the `.mid`. It is generated: change the map (or `tools/producer/`) and re-run
+  `npm run producer`, not the track. The reference songs 012 (hand-built pilot) and 013 live on as test fixtures in
+  `tools/producer/fixtures/`. See `/producer`.
 - Rows and columns after `midi-layouts/templates/dual-lc.strudel`: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour
   on columns 1-7, column 8 global. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0
   must already sound good.
