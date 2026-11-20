@@ -1,5 +1,6 @@
 // SuperCollider as the player's engine: boots once, then plays whatever track the player asks for.
-// Started by the player's server (tools/trajectory/sc-link.mjs) as `sclang sc/engine.scd <port>`, no IDE needed.
+// Started by the player's server (tools/trajectory/sc-link.mjs) as `sclang sc/engine.scd <port> <server port>`, no IDE
+// needed.
 // Talks OSC with the player's server on UDP <port> (default 57131; not 57130, the port of live.scd's LC view bridge,
 // so both can run), with the messages of the LC view (lib/ui.scd), plus:
 //   player → SC: /ce/load <track file path>   stop what plays, load that track, start it at bar 0
@@ -12,10 +13,11 @@
 // Controllers go straight to SC (MIDI), never through the player. Live play from the IDE stays sc/live.scd.
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;
+var serverPort = (thisProcess.argv[1] ? "57140").asInteger;
 var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack;
 // its own sound server on its own port: never the IDE's default server (localhost:57110), so the engine and a
 // SuperCollider IDE session (live.scd) can run side by side without taking over each other's server
-s = Server(\ceEngine, NetAddr("127.0.0.1", 57140));
+s = Server(\ceEngine, NetAddr("127.0.0.1", serverPort));
 Server.default = s;
 // the server settings of live.scd, except the input device
 s.options.sampleRate = 48000;

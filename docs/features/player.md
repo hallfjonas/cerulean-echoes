@@ -20,6 +20,9 @@ of the track is a moving shape with its name. It also holds a recorder.
 2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the [lab boards](lab-boards.md). Boards
    without a master `stack(` are greyed out.
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
+   A SuperCollider track (most live tracks; the old Strudel version is listed as "(Strudel)") starts SuperCollider
+   in the background the first time, which takes a few seconds. SuperCollider must be installed. Record,
+   auto-perform and the visuals do not work for SuperCollider tracks yet.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
 The sidebar holds the views (MIDI panel, Visualization), the track list, Play, Stop,

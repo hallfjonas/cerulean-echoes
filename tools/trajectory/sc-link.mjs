@@ -19,6 +19,8 @@ import path from 'path'
 import { encode, decode } from './osc.mjs'
 
 export const OSC_PORT = Number(process.env.CE_SC_PORT ?? 57131)
+// SC's own sound server (not the IDE's 57110, so the player and an IDE session can run side by side)
+export const SERVER_PORT = Number(process.env.CE_SC_SERVER_PORT ?? 57140)
 const BOOT_TIMEOUT = 60e3, LOAD_TIMEOUT = 60e3
 
 // sclang: SCLANG in the environment (a path that does not exist, e.g. SCLANG=none, means none), else the macOS app,
@@ -41,7 +43,7 @@ const clamp01 = v => Math.min(1, Math.max(0, +v))
 export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = console.log }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
   const viewFile = path.join(repo, 'sc', 'ui', 'index.html')
-  const logFile = path.join(os.tmpdir(), 'cerulean-sc-engine.log')
+  const logFile = path.join(os.tmpdir(), `cerulean-sc-engine-${OSC_PORT}.log`)
   let sc = { address: '127.0.0.1', port: 57120 }   // learnt from SC's first message
   let child = null, bound = false, bindError = null
   const state = { layout: null, ccs: null, state: null, beat: null, midi: null, lk: null }
@@ -105,7 +107,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     if (bindError) return Promise.reject(new Error(`SuperCollider link: UDP ${OSC_PORT} is taken (${bindError.message})`))
     if (!sclang) return Promise.reject(new Error('SuperCollider is not installed (no sclang found)'))
     const out = fs.openSync(logFile, 'w')
-    child = spawn(sclang, [engineFile, String(OSC_PORT)], { cwd: path.dirname(engineFile), stdio: ['ignore', out, out] })
+    child = spawn(sclang, [engineFile, String(OSC_PORT), String(SERVER_PORT)], { cwd: path.dirname(engineFile), stdio: ['ignore', out, out] })
     fs.closeSync(out)
     setHost({ running: true, ready: false, track: null, error: null })
     log(`SuperCollider: starting (log: ${logFile})`)

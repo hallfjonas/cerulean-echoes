@@ -1,5 +1,9 @@
 # LC-Ansicht (Web-UI) für die SuperCollider-Version
 
+> Im Player (`tools/trajectory`, `node trajectory/server.mjs`) erscheint dieselbe Seite als MIDI-Panel der SC-Tracks
+> (unter `/sc/`, über `sc-link.mjs`, ohne diese Brücke; eigene Ports, läuft neben `live.scd`). Die Brücke hier bleibt für
+> das Spielen aus der SuperCollider-IDE mit `live.scd`.
+
 `live.scd` startet sie mit: die Brücke (`bridge.mjs`, Node.js, keine Pakete nötig) und einen Browser-Tab auf
 http://localhost:7770. Vom Handy oder Tablet im selben Netz: die Adresse, die die Brücke beim Start ins
 Post-Fenster schreibt (`phone/tablet: http://…:7770`).
