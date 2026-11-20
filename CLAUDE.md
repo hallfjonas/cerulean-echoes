@@ -125,6 +125,7 @@ Tools (run in `tools/`):
   [--out <dir>] [--force]`; `--perform` writes only the script from the map's `performance`; notes per bar:
   `node producer/midi-read.mjs <file.mid> --dump` (`tools/producer/README.md`)
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
+- Stem library (`sc/stems/`, SC stems and stem tracks, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`
 - The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
   `node trajectory/make-tapped.mjs <track>` puts the tapped code on the clipboard for strudel.cc
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`

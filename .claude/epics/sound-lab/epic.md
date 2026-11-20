@@ -2,8 +2,8 @@
 name: sound-lab
 status: backlog
 created: 2026-11-20T18:11:25Z
-updated: 2026-11-20T18:11:25Z
-progress: 0%
+updated: 2026-11-20T20:00:00Z
+progress: 10%
 prd: .claude/prds/sound-lab.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -47,7 +47,10 @@ stay there as ideas).
   copy = "Save as" in the player or a file copy by the skill. Projects are working files, the library holds results.
 - **Non-destructive everywhere.** Swap, promote and export write new files; originals stay.
 
-### Stem file (sketch, finalised in 001)
+### Stem file (format 1, finalised in 001)
+
+Full reference: `docs/features/stems.md`; schemas `sc/stems/stem.schema.json`, `sc/stems/track.schema.json`; add-on
+library `sc/stems/addons.json`; check `tools/stems/check-stems.mjs`.
 
 ```json
 {
@@ -57,14 +60,17 @@ stay there as ideas).
   "about": "Flute line on the chords; ornaments grow with Complexity.",
   "meta": { "role": "lead", "genres": ["house"], "energy": 2, "tags": ["airy"], "harmony": "chords" },
   "sample": { "name": "flute", "preset": { "breath": 0.3 } },
+  "gain": 1,
   "pitch": "scale",
+  "frame": { "break": "stay" },
   "patterns": [
     { "label": "core", "notes": "<0 2 4 2>", "rhythm": "~ x ~ x" },
-    { "label": "answer", "notes": "<4 2 0 ~>", "rhythm": "x ~ ~ x ~ x ~ ~" }
+    { "label": "answer", "notes": "<4 2 0 ~>", "rhythm": "x ~ ~ x ~ x ~ ~", "velocity": "1 0.8" }
   ],
   "controls": {
     "k1": { "label": "Brightness", "about": "dull ↔ bright.", "param": "bright", "range": [0.2, 1] },
-    "k2": { "label": "Space", "about": "dry ↔ room.", "param": "space", "range": [0, 0.6] },
+    "k2": { "label": "Space", "about": "dry ↔ echo + room.",
+      "targets": [{ "param": "space", "range": [0, 0.6] }, { "param": "echo", "range": [0, 0.3] }] },
     "k3": { "label": "Complexity", "about": "core → + neighbours → + trill.", "code": "flute-complexity.scd" },
     "fader": { "label": "Level", "about": "flute." },
     "b1": { "label": "Pattern", "about": "core → answer." },
@@ -73,18 +79,28 @@ stay there as ideas).
 }
 ```
 
-### Stem track file (sketch)
+Changes from the first sketch: `gain` (loudness trim), `frame` (opt-outs from the global column, Break out / stay),
+`velocity` on patterns, `targets` for a knob that moves several parameters, an optional stem-level `code`; the
+add-on ids live in `sc/stems/addons.json`.
+
+### Stem track file (format 1)
 
 ```json
 {
   "format": 1,
   "name": "009-house",
+  "about": "Happy, jazzy, dry house in A minor.",
   "tempo": 124,
-  "harmony": { "chapters": ["vamp-am9", "progression"] },
-  "slots": { "1:1": "kick909/kick909-brightness-space-punch-pattern-drop.stem", "2:4": "flute/flute-….stem" },
-  "global": "house"
+  "swing": 0.1,
+  "genre": "house",
+  "frame": "009-house-frame.scd",
+  "chapters": ["Vamp", "Progression"],
+  "slots": { "1:1": "kick909/kick909-brightness-space-punch-pattern-drop-out.stem", "2:4": "flute/flute-….stem" }
 }
 ```
+
+A stem track is `sc/tracks/<id>/<id>.track`. The sketch's `harmony` and `global` became one `frame` SC file next to the
+track (chords, progressions, chapters, global column 8, Launchkey); `chapters` repeats the chapter names for the tools.
 
 ### Alignment with llm-support (decided 2026-11-20)
 
@@ -171,7 +187,7 @@ Risks:
 Designer), 007 (Stem Designer).
 
 ## Tasks Created
-- [ ] 001.md - Stem architecture and file format (parallel: false)
+- [x] 001.md - Stem architecture and file format (parallel: false)
 - [ ] 002.md - SC stem loader and add-on library (parallel: false)
 - [ ] 003.md - Pilot: 009-house as a stem track (parallel: false)
 - [ ] 004.md - Stem library index (parallel: true)
