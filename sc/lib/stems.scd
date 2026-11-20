@@ -124,8 +124,9 @@
 			{ col[\ccs].includesKey(x) } { col[\ccs][x] }
 			{ x }
 		},
-		// after the server set-up (buses exist), before the first note: latches, the add-on's state, the global inputs
-		startCol: { |col, ce|
+		// after the server set-up (buses exist), before the first note: latches, the add-on's state, the global inputs.
+		// The latches and the hooks column code makes here belong to the column (a swap drops them, ~ce.dropHooks).
+		startCol: { |col, ce| ce.owning(col, {
 			var names = col[\pats].collect { |p| p[\label] };
 			col[\patLatch] = ce.latch(1, 0, { |i| ce.status(col[\slot], names[i]); ce.uiPush });
 			if(col[\addonMode] == \step) { col[\b2Latch] = ce.latch(1, 0) };
@@ -133,7 +134,7 @@
 				("c" ++ if(col[\tension]) { ce.toneBus } { ce.fogBus }).asSymbol };
 			col[\thinArg] = if(col[\thin] and: { col[\inputs].includes(\thinF) }) { ("c" ++ ce.thinBus).asSymbol };
 			col[\colCode] !? { |c| c[\start] !? { |f| f.(col, ce) } };
-		},
+		}) },
 		// the MIDI panel shows the pattern of button 1 (Mode 1: jojo:<n>, Mode 2: jonas:<n>)
 		showRow: { |col| var s = col[\slot].asString;
 			col[\ce].uiRows[((if(s[0] == $1) { "jojo:" } { "jonas:" }) ++ s[2]).asSymbol] =

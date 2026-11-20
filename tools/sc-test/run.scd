@@ -163,6 +163,21 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 			check.("009 stem track: Chords on the chords column steps the frame's progressions", {
 				var log = play.(house, 12, [[1.5, 85], [1.7, 44]]), track = ~lastCe.track;
 				(track.prog.now == 1) and: { track.chordAt(8).name == "Am7" } and: { track.chordAt(0).name == "Am9" } });
+			// keys (2:2) makes its own button-2 press and knob hooks; vibraphone wants the same strip
+			check.("009 swap: the outgoing stem's own hooks and latches leave with it", {
+				var vib = "vibraphone/vibraphone-brightness-space-complexity-pattern-echo-throw.stem", keys, before, ce, log;
+				log = play.(house, 4, [[0.5, { var c = ~lastCe; keys = c.track.columns['2:2'];
+					before = [(c.pressFns[94] ? []).size, c.ccHooks[63].size, c.latches.includes(keys[\patLatch])] }],
+					[1.5, { ~lastCe.swapSlot('2:2', vib, { |m, done| done.value }) }]]);
+				ce = ~lastCe;
+				(before == [1, 2, true]) and: { (ce.pressFns[94] ? []).isEmpty } and: { ce.ccHooks[63].size == 1 }
+					and: { ce.latches.includes(keys[\patLatch]).not } and: { ce.track.slots['2:2'] == vib }
+					and: { of.(log, \s2_2, 8, 16).notEmpty } });
+			check.("009 swap: a stem that needs another strip is refused live; a load takes it in place of the file's", {
+				var ce = loadCe.value, track = ce.loadTrack(house, "{ \"1:4\": \"%\" }".format(bassRef));
+				ce.prepare(ScoreStreamPlayer.new, track);
+				(track.slots['1:4'] == bassRef) and: { ce.swapProblem('1:4', ce.loadTrack(house).slots['1:4']).notNil }
+					and: { ce.swapProblem('1:1', "kick909/kick909-brightness-space-punch-pattern-drop-out.stem").isNil } });
 		}.value;
 	}.value;
 

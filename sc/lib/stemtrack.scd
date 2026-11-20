@@ -24,11 +24,12 @@
 	(name: name, bass: b, tones: t, root: low + ((b - low) % 12),
 		scale: scale.split($ ).collect { |n| self.noteNumber(n ++ "4") % 12 })
 };
-~ce.loadTrack = { |self, path| if(path.endsWith(".track")) { self.loadStemTrack(path) } { path.load } };
+// slots (stem tracks only): a JSON object { "1:4": ref, … } that replaces those slots of the file (the player's swaps)
+~ce.loadTrack = { |self, path, slots| if(path.endsWith(".track")) { self.loadStemTrack(path, slots) } { path.load } };
 ~ce.stemSlots = ['1:1', '1:2', '1:3', '1:4', '1:5', '1:6', '1:7', '2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7'];
 ~ce.stemGlobal = (fog: 20, thin: 28, tension: 36, master: 12, chapter: 44, break: 52);
 
-~ce.loadStemTrack = { |self, path|
+~ce.loadStemTrack = { |self, path, slots|
 	var json = self.readJSON(path), dir = path.dirname, frameFile = dir +/+ json[\frame], frame = frameFile.load;
 	var bpm = self.numOf(json[\tempo]), glob = self.stemGlobal, chapters = json[\chapters];
 	var track = (
@@ -60,15 +61,23 @@
 			var msgs = if(k % 16 == 0 and: { self.pending[slot].notNil }) { self.switchSlot(slot) } { [] };
 			msgs ++ self.columns[slot].stepNotes(k)
 		},
+		// the outgoing column's own hooks and latches leave with it; the strip takes the new stem's settings (its shape
+		// is the same, ~ce.swapProblem)
 		switchSlot: { |self, slot|
-			var ce = self.ce, col = self.pending.removeAt(slot), msgs = List[], node = ce.stripNode[col[\stemName]][\main];
+			var ce = self.ce, col = self.pending.removeAt(slot), msgs = List[], name = col[\stemName];
+			var node = ce.stripNode[name][\main], entry = ce.columnStem(col, self), orbit = entry[\orbit];
 			var tension = if(col[\tension]) { ce.ccIndex(self.global.tension) } { -1 };
+			var delayBus = ce.stemDelayBus[name] ? ce.orbitDelayBus[orbit];
+			self.columns[slot] !? { |old| ce.dropHooks(old) };
 			self.columns[slot] = col;
 			self.slots[slot] = col[\stem][\ref];
-			msgs.add((msg: [\n_set, node, \hpOwn, col[\hpOwn], \thinOn, col.thinOnStrip.asInteger, \trim, col[\gain],
-				\tEchoOn, col[\tension].asInteger, \roomOut, ce.orbitBus[col[\orbit]] ? 0,
-				\delayOut, ce.orbitDelayBus[col[\orbit]] ? 0, \tension, 0]));
+			msgs.add((msg: [\n_set, node, \hpOwn, col[\hpOwn], \thinOn, col.thinOnStrip.asInteger,
+				\tEchoOn, col[\tension].asInteger, \roomOut, ce.orbitBus[orbit] ? 0, \roomOn, ce.orbitBus[orbit].notNil.asInteger,
+				\delayOut, delayBus ? 0, \delayOn, ((entry[\echo].notNil or: { entry[\echoSend].notNil })
+					and: { delayBus.notNil }).asInteger, \tension, 0]
+				++ if(entry[\trim].isNumber) { [\trim, entry[\trim]] } { [] }));
 			msgs.add((msg: [\n_map, node, \tension, tension]));
+			entry[\ownDelay] !? { |d| msgs.add((msg: [\n_set, ce.stemDelayNode[name], \time, d[0], \feedback, d[1]])) };
 			col.refreshStates({ |m| msgs.add((msg: m)) });
 			col.showRow;
 			self.tagLines = ce.stemTrackTags(self);
@@ -95,6 +104,7 @@
 		}
 	);
 	json[\slots].keysValuesDo { |slot, ref| track.slots[slot] = ref };
+	slots !? { self.jsonEvent(slots.parseJSON).keysValuesDo { |slot, ref| track.slots[slot] = ref } };
 	self.stemSlots.do { |slot| track.slots[slot] !? { |ref|
 		track.columns[slot] = self.stemColumn(self.loadStem(ref), slot, track) } };
 	track.stems = self.stemSlots.select { |slot| track.columns[slot].notNil }.collect { |slot|
@@ -150,16 +160,38 @@
 // (default: live, sent in a Routine with s.sync). A slot must hold a stem already (an empty slot has no strip: load
 // the changed track instead). Returns the new column.
 ~ce.swapSlot = { |self, slot, ref, load|
-	var track = self.track, known = self.sounds.keys.copy, col, msgs;
+	var track = self.track, known = self.serverSounds, col, msgs, fresh;
 	slot = slot.asSymbol;
 	if(track[\columns].isNil or: { track[\columns][slot].isNil }) {
 		Error("slot % holds no stem: load the track with it instead".format(slot)).throw };
 	col = self.stemColumn(self.loadStem(ref), slot, track);
 	col.startCol(self);
-	msgs = self.soundMsgs(col[\sounds].reject { |s| known.includes(s) }) ++ self.stateMsgs(col.stateValues);
+	fresh = col[\sounds].reject { |s| known.includes(s) }.asSet.asArray;
+	msgs = self.soundMsgs(fresh) ++ self.stateMsgs(col.stateValues);
+	known.addAll(fresh);
 	load = load ? { |m, done| fork { self.sendInit(m); done.value } };
-	load.(msgs, { track[\pending][slot] = col });
+	// a second swap before the bar line replaces the first one
+	load.(msgs, { track[\pending][slot] !? { |was| self.dropHooks(was) }; track[\pending][slot] = col });
 	col
+};
+
+// Why `ref` cannot take over `slot` while the track plays (nil: it can). The slot's mixer strip was made at the load for
+// the stem it held then, so the new stem must want the same strip: fader, room and echo sends, lanes, an own echo line
+// (its time and feedback may differ), a mapped trim, and only map buses the track has. Otherwise: load the track with
+// the new stem (the player's fallback, a short gap).
+~ce.swapProblem = { |self, slot, ref|
+	var track = self.track, old, col, shape;
+	slot = slot.asSymbol;
+	old = track[\columns] !? { |c| c[slot] };
+	shape = { |c| var e = self.columnStem(c, track);
+		[\level, \roomR, \echoSend, \space, \echo, \fade, \lanes].collect { |k| e[k] }
+			++ [e[\ownDelay].notNil, if(e[\trim].isNumber) { 1 } { e[\trim] }] };
+	case
+	{ old.isNil } { "slot % holds no stem".format(slot) }
+	{ col = self.stemColumn(self.loadStem(ref), slot, track); shape.(col).asCompileString != shape.(old).asCompileString }
+		{ "the new stem needs another mixer strip" }
+	{ col[\maps].keys.any { |m| self.mapBus[m].isNil } } { "the new stem needs map buses the track does not have" }
+	{ nil }
 };
 
 // Set-up messages of sounds loaded after ~ce.prepare: SynthDefs, sample buffers, wavetables (as prepare makes them)

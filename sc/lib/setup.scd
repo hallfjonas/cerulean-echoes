@@ -16,6 +16,7 @@
 	(track.aliases ? ()).keysValuesDo { |from, to| self.ccAlias[from] = to };
 	// sounds the track uses
 	track.stems.do { |st| st.sounds.do { |snd| if(self.sounds[snd].isNil) { self.loadSound(snd) } } };
+	self.serverSounds = self.sounds.keys.copy;   // their SynthDefs go to the server below (a swap sends the ones it adds)
 	// SynthDefs (also into the SynthDescLib: events then send every control of a sound, not just freq/amp)
 	self.defs.do { |d| d.add; msgs.add([\d_recv, d.asBytes]) };
 	// samples
