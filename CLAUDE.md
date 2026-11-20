@@ -192,6 +192,8 @@ and 2 on every LC). Load them with Novation Components. Hand-written `*-layout.t
 
 ## CCPM epics and PRDs
 Optional: use CCPM only when the user asks. The rules are in `CONTRIBUTING.md` ("Planning larger work (optional)").
+The CCPM skill is vendored in `.claude/skills/ccpm/` (`SOURCE.md`); where it differs from CONTRIBUTING.md (plan PR,
+no GitHub issue sync by default, removal PR when done), CONTRIBUTING.md wins.
 
 ## Machine
 M2 Air, 16 GB, shared with other agents: the global resource rules apply (one heavy job at a time, test small first).
