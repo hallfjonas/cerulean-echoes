@@ -1,0 +1,327 @@
+[
+ {
+  "name": "perc-base",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-bright05",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "19": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-bright1",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "19": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-space05",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "27": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-char03",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "35": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-char08",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "35": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-char1",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "35": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-patterns",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 43,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 43,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 43,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-btn2",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 51,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 51,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-chapter",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-break",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "perc-fogtension",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-tension1",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-thin",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "perc-prog",
+  "strudel": "stemJ7_perc",
+  "sc": "perc",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 16,
+   "cc": {
+    "11": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 8.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 8.6,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ }
+]
