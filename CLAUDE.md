@@ -4,6 +4,7 @@ Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control 
 Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/devices.md`).
 Talk to the user in English; code comments are English too. Explain audio basics plainly.
 Docs for people: `docs/README.md`; contribution rules: `CONTRIBUTING.md`.
+Deprecated features: `DEPRECATION.md`. Read it before building any feature; never extend a deprecated feature (Strudel is deprecated, new work goes to SuperCollider).
 
 ## Labels
 Everything the player reads is English and short: `@ctl` texts, control and option names, the live view (`▣ LC big`), the status box.
