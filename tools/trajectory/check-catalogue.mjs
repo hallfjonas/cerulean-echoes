@@ -36,6 +36,7 @@ const attempt = async (label, file, code) => {
 
 let failed = 0
 for (const entry of scan()) {
+  if (entry.engine === 'sc') continue   // SuperCollider tracks are not Strudel code
   if (!entry.taps && !all) continue
   const source = fs.readFileSync(entry.path, 'utf8')
   const problems = []

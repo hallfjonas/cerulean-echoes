@@ -2,8 +2,8 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-20T12:54:24Z
-progress: 18%
+updated: 2026-11-20T13:20:08Z
+progress: 27%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -94,7 +94,7 @@ Biggest items: 002 (engine) and the ports (007, 008).
 
 ## Tasks Created
 - [x] 001.md - Feature-test harness and SC core tests (parallel: false)
-- [ ] 002.md - SC engine in the player (parallel: false)
+- [x] 002.md - SC engine in the player (parallel: false)
 - [ ] 003.md - Visuals from SC, playground (parallel: true)
 - [ ] 004.md - Auto-perform and takes on SC (parallel: true)
 - [ ] 005.md - Recording in SC (parallel: true)

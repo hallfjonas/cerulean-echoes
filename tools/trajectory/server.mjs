@@ -12,6 +12,8 @@
 //   GET  /track/<id> also sends X-Track-Hash: sha1 of the track file text, kept in a take
 //   POST /recording/<track>, PUT /recording/<track>/<name>, POST …/finish   audio recordings into recordings/, only
 //                                    for this server's own pages (see recording.mjs)
+//   /sc/…            SuperCollider tracks: their LC view, live state, load / stop (see sc-link.mjs); sclang is
+//                    started on the first SC load and ended with this server
 // strudel.cc is a public https page; Chrome lets it reach localhost only with the CORS and private-network headers.
 import crypto from 'crypto'
 import http from 'http'
@@ -22,6 +24,8 @@ import { tapSource } from './make-tapped.mjs'
 import { find, scan, toPublic } from './catalogue.mjs'
 import { handleTake } from './take-save.mjs'
 import { handleRecording } from './recording.mjs'
+import { createScLink } from './sc-link.mjs'
+import { repo } from './catalogue.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const port = Number(process.argv[2] ?? 8766)
@@ -35,8 +39,9 @@ const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods
   'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Private-Network': 'true' }
 const clients = new Set()
 let received = 0
+const sc = createScLink({ repo, resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null } })
 
-http.createServer((request, response) => {
+const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`)
   if (url.pathname.startsWith('/take/')) {
     if (!fromOwnPage(request) || request.method !== 'POST') return response.writeHead(403).end('forbidden')
@@ -46,13 +51,15 @@ http.createServer((request, response) => {
     if (!fromOwnPage(request) || request.method !== 'GET') return response.writeHead(403).end('forbidden')
     const [id, ...rest] = decodeURIComponent(url.pathname.slice('/perform/'.length)).split('/')
     const script = rest.join('/')
-    if (!find(id)?.scripts.includes(script)) {
+    const entry = find(id)
+    if (!entry?.scripts.includes(script)) {
       return response.writeHead(404).end('not found')
     }
     return response.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
-      .end(fs.readFileSync(path.join(PERFORM, id, script + '.json')))
+      .end(fs.readFileSync(path.join(PERFORM, entry.base ?? id, script + '.json')))
   }
   if (url.pathname.startsWith('/recording/')) return handleRecording(request, response, url, fromOwnPage)
+  if (url.pathname === '/sc' || url.pathname.startsWith('/sc/')) return sc.handle(request, response, url, fromOwnPage)
   if (request.method === 'OPTIONS') return response.writeHead(204, CORS).end()
   if (request.method === 'POST' && url.pathname === '/events') {
     let body = ''
@@ -72,6 +79,7 @@ http.createServer((request, response) => {
     const id = decodeURIComponent(url.pathname.slice('/track/'.length))
     const entry = find(id)
     if (!entry) return response.writeHead(404, CORS).end('not found')
+    if (entry.engine === 'sc') return response.writeHead(409, CORS).end('a SuperCollider track: the player loads it through /sc/load')
     if (!entry.taps) return response.writeHead(409, CORS).end('this entry has no master stack to tap')
     const file = entry.path
     try {
@@ -105,3 +113,12 @@ setInterval(() => {
   if (received) console.log(`${received} event batches relayed to ${clients.size} page(s) in the last 10 s`)
   received = 0
 }, 10000)
+
+// end SuperCollider with the server (Ctrl-C or kill): no sclang / scsynth left behind
+const shutdown = async () => {
+  await sc.close()
+  server.close()
+  process.exit(0)
+}
+process.once('SIGINT', shutdown)
+process.once('SIGTERM', shutdown)

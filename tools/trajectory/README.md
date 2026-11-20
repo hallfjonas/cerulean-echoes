@@ -21,8 +21,12 @@ name and value (the track's LC view). The visuals (every stem with its name, tem
 second view of the same page.
 The server only answers to its own pages (Origin and Host are checked on the routes that run something).
 
-1. Pick a track in the sidebar: **Live** holds the one-file live tracks (007-010), **Lab** the boards from
+1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the boards from
    `lab/`. Boards without a master `stack(` cannot be tapped and are greyed out.
+   SuperCollider tracks (`sc/tracks/`, listed under their plain id; a ported track's frozen Strudel file shows as
+   `<id> (Strudel)`) play through SC: the server starts `sclang sc/engine.scd` on the first SC load (a few seconds) and
+   ends it with itself; the MIDI panel shows SC's LC view (`sc/ui/index.html` at `/sc/`); the controllers go straight to
+   SC. Not yet for SC tracks: Record, auto-perform, visuals (sc-migration tasks 003-005).
 2. **Play**. The player taps the track file in memory each time it loads it, so editing a track and pressing Play
    plays the edit; there is no tapped copy on disk and no extra step. Picking another track while one plays stops it
    and loads the new one.
@@ -260,7 +264,9 @@ it was retired on 2026-11-20):
 | `replay-check.mjs`, `check-replay.mjs` | replay fidelity: the pure event comparison and its CLI |
 | `check-recording.mjs` | end-to-end test of the recording endpoints |
 | `settings.mjs` | every visual setting as data; builds the Visual settings and the keys |
-| `catalogue.mjs` | scans live tracks and lab boards, their auto-perform scripts |
+| `catalogue.mjs` | scans live tracks (Strudel and SuperCollider, field `engine`) and lab boards, their auto-perform scripts |
+| `engine-sc.mjs` | the SuperCollider engine in the page: load / stop over `/sc/…`, `cycle()` from SC's beats, no audio output in the page |
+| `sc-link.mjs`, `osc.mjs` | the server's link to SC: starts `sc/engine.scd`, OSC on UDP 57131 (SC's own server on 57140, not the IDE's 57110), `/sc/` routes and live state for the pages |
 | `help.mjs`, `ui.css` | the Help panel and the look |
 | `banks.mjs` | sample banks and soundfonts the player loads, as strudel.cc does |
 

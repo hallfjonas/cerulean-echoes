@@ -150,6 +150,10 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   with the play's tapped events). Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
   replay fidelity) compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
+- SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's Strudel file is
+  `<id>-strudel`): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
+  OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it); `tools/trajectory/sc-link.mjs`,
+  `engine-sc.mjs`. Record, auto-perform and visuals for SC tracks: sc-migration tasks 003-005.
 
 ## Writing efficient Strudel (CPU)
 Strudel computes every event of every layer even when it is silent; dense tracks then drop out.
