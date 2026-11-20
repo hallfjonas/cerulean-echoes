@@ -53,7 +53,14 @@ A second version with the same labels gets `-2`, then `-3`. The `name` field is 
   track silently; a track takes a new version by a swap.
 - `parent` is the path of the version it came from, relative to `sc/stems/` (`"kick909/kick909-…-drop-out.stem"`), or
   `null` for a first version. The parent is in the same folder (same sample).
-- Which tracks use a version is computed from the track files (`npm run stems`, task 004), never stored in the stem.
+- Which tracks use a version is computed from the track files (`npm run stems`), never stored in the stem.
+
+## Finding stems
+`cd tools && npm run stems [-- --role lead --genre house --energy 2-4 --tag airy --used-by]` lists the versions grouped
+by stem, each with its metadata and lineage (parent, children). The filters combine; `--energy` takes `3`, `2-4` or
+`3-` (3 and up). `--used-by` adds the tracks (and slots) that pin each version, read from `sc/tracks/*/*.track`;
+`--json` prints the data as JSON. The player's server answers the same filters at `GET /stems?role=lead&energy=2-4`
+with the JSON, tracks included. Code: `tools/stems/stem-index.mjs`.
 
 ## The stem file (format 1)
 Schema: `sc/stems/stem.schema.json`. All fields:
@@ -331,11 +338,11 @@ would name the tracks in order and the length of each change. There is no set fi
   from sample + labels, the sample, preset keys, parameters, code files, add-on, parent and the stems a track names
   exist, label rules, mini-notation brackets, at most 3 patterns on a Mode 1 slot.
 - The schemas' genre list must match the `##` headings of [genres.md](../reference/genres.md); `npm test` checks it.
-- Feature tests: `tools/stems/check-stems.test.mjs` (a broken copy of an example per rule),
+- Feature tests: `tools/stems/check-stems.test.mjs` (a broken copy of an example per rule), `tools/stems/stem-index.test.mjs` (the library index),
   `tools/stems/stem-tags.test.mjs` (the `@ctl` lines of a stem track), and in `tools/sc-test/run.scd`: a stem loads,
   Pattern cycles, a knob reaches its bus, every add-on fires, silent columns are gated, Break, the code hatch, the
   swap, and SC makes the same `@ctl` lines as `tools/stems/stem-tags.mjs`.
-- Not built yet: `npm run stems` (task 004), Sample Designer, Stem Designer and the stem swap in the player
+- Not built yet: Sample Designer, Stem Designer and the stem swap in the player
   (`.claude/epics/sound-lab/epic.md`).
 
 ## In SuperCollider
