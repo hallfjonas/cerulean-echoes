@@ -12,7 +12,7 @@ var trackFile = args[0], scen = File.readAllString(args[1]).parseJSON, prefix = 
 var ce, track, server, msgs, bps, cycles, ctl, ctlPat, score, json, f, num, isLk, ccOf;
 num = { |x| if(x.isString) { x.asFloat } { x } };
 isLk = { |k| k.asString.beginsWith("lk") };
-ccOf = { |k| if(isLk.(k)) { k.asString } { k.asInteger } };   // "lk21" stays a string: a Launchkey control
+ccOf = { |k| if(isLk.(k)) { k.asString } { k.asInteger } };   // "lk31" stays a string: a Launchkey control
 ce = (here.dirname +/+ "lib/ce.scd").load;
 ce.quiet = true; ce.trimDb = 0; ce.limit = 0;
 // comparisons: the FM modulator starts where superdough's offline render has it; "livePhase": true = random as live
@@ -23,7 +23,7 @@ server = ScoreStreamPlayer.new;
 bps = num.(scen["bpm"] ? track.bpm) / 60;
 cycles = num.(scen["cycles"] ? 8);
 msgs = ce.prepare(server, track);
-// CCs: numbers = the LC layout; "lk21" = a Launchkey control (its own, ~ce.lkCC)
+// CCs: numbers = the LC layout; "lk31" = a Launchkey control (its own, ~ce.lkCC)
 (scen["cc"] ? ()).keysValuesDo { |k, v| var c = k.asInteger;
 	if(isLk.(k)) { ce.lkCC[k.asString.drop(2).asInteger] = num.(v) } {
 		ce.cc[ce.ccAlias[c] ? c] = num.(v); msgs = msgs.add([\c_set, ce.ccIndex(c), num.(v)]) } };

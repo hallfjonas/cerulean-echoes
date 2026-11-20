@@ -12,8 +12,9 @@ verglichen. Bedienung: `ANLEITUNG.md`; Stand und Entscheidungen: `PORTING.md`.
    Master-Fader (Spalte 8).
 3. Stoppen: `~ce.stopTrack`.
 
-Controller-Belegung = die des Strudel-Tracks (dieselben Custom Modes / `.syx`). Unterschied: **Regler und Fader
-wirken sofort**, auch auf klingende Töne (Control-Busse, 20 ms Glättung). Pattern-Tasten schalten wie bisher auf
+Controller-Belegung = die des Strudel-Tracks (dieselben Custom Modes / `.syx`). Unterschied: **Regler wirken
+sofort**, auch auf klingende Töne (Control-Busse, 20 ms Glättung); Fader wie in Strudel ab der nächsten Note, Master
+sofort. Pattern-Tasten schalten wie bisher auf
 den nächsten Takt bzw. die nächste Phrase.
 
 ## Aufbau
@@ -24,7 +25,7 @@ sc/
   lib/                     Kern, für alle Tracks gleich
     ce.scd                 lädt alles → ~ce
     controls.scd           CC → Control-Bus, Tasten, Latches (Umschalten auf den Takt), MIDI
-    mixer.scd              Kanalzug (Thin, Fader × Master, Hall-Send), Hall-Return, Master (Trim, Limiter −1 dBFS)
+    mixer.scd              Kanalzug (Thin, Master, Überblend-Pegel, Hall-Send; Fader pro Note), Hall-Return, Master (Trim, Limiter −1 dBFS)
     sounds.scd             Sound-Bibliothek: Laden + Formatprüfung, Hüllkurven/Filter wie superdough
     steps.scd              Step-Engine: pro 16tel eine Funktion k → Noten
     mini.scd               Strudels Mini-Notation (Schritte, @, !, [ ], < >)

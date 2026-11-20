@@ -1,0 +1,470 @@
+[
+ {
+  "name": "shimmer-base",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-bright0",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "62": 0
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-bright05",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "62": 0.5
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-bright1",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "62": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-char03",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 0.3
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-char05",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 0.5
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-char08",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 0.8
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-char1",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "78": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-space05",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "70": 0.5
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-patterns",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    },
+    {
+     "t": 1.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 86,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-chapter",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    },
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-fogtension",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-tension1",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-room",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1,
+    "28": 0.5,
+    "70": 0.3
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "shimmer-both",
+  "strudel": "stemN2_shimmer",
+  "sc": "shimmer",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 10,
+   "from": 1,
+   "cc": {
+    "54": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 0.2,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 0.3,
+     "cc": 94,
+     "v": 0
+    },
+    {
+     "t": 1.3,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 1.4,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ }
+]

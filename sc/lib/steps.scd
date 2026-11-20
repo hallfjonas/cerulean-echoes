@@ -8,6 +8,9 @@ Event.addEventType(\ceMulti, { |server|
 	(~msgs ? []).do { |m| ~schedBundleArray.(~lag ? 0, (m[\at] ? 0) / 4, ~server, [m[\msg]], ~latency) };
 	~notes.do { |n|
 		var e = n.copy, at = (n[\at] ? 0) / 4;   // 16ths → beats
+		// the fader at the note's start (Strudel postgain); at 0 the note is not played (Strudel gates the stem)
+		var lv = topEnvironment[\ce].noteLevel(parent[\stem], n[\lane]);
+		if(lv > 0) {
 		e.removeAt(\at);
 		e[\type] = \note;
 		e[\group] = parent[\group];
@@ -20,9 +23,11 @@ Event.addEventType(\ceMulti, { |server|
 		e[\schedBundleArray] = parent[\schedBundleArray];
 		e[\schedBundle] = parent[\schedBundle];
 		e[\dur] = 0; e[\delta] = 0;
+		e[\post] = (e[\post] ? 1) * lv;
 		// nolog: a layer that is silent right now (live mix at 0, Strudel would not play it): not in the event log
 		if(e.removeAt(\nolog) != true) { topEnvironment[\ce].log !? { |log| log.add([beats + at, parent[\stem], e]) } };
 		e.play;
+		};
 	};
 });
 

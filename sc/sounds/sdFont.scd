@@ -16,7 +16,7 @@ params: ~ce.sdParams((
 	loopStart: (default: 0, spec: [0, 10], label: "Loop start", about: "seconds"),
 	loopEnd: (default: 0, spec: [0, 10], label: "Loop end", about: "seconds"),
 )),
-def: SynthDef(\ce_sdFont, { |out = 0, amp = 1, hold = 0.25, buf = 0, rate = 1, loopOn = 0, loopStart = 0, loopEnd = 0,
+def: SynthDef(\ce_sdFont, { |out = 0, post = 1, amp = 1, hold = 0.25, buf = 0, rate = 1, loopOn = 0, loopStart = 0, loopEnd = 0,
 	a = 0.001, d = 0.001, s = 1, r = 0.01,
 	lpOn = 0, bright = 0, lo = 1000, hi = 1000, tone = 1, cutMul = 1, lpq = 1, hp = 0, thinF = 1, hpq = 1,
 	bp = 0, bpq = 1, pan = -1, stereoIn = 0|
@@ -30,6 +30,6 @@ def: SynthDef(\ce_sdFont, { |out = 0, amp = 1, hold = 0.25, buf = 0, rate = 1, l
 	sig = ~ce.sdFx(sig, (lpOn: lpOn, bright: bright, lo: lo, hi: hi, tone: tone, cutMul: cutMul, lpq: lpq, hp: hp,
 		thinF: thinF, hpq: hpq, bp: bp, bpq: bpq, pan: pan, stereoIn: stereoIn));
 	Line.kr(0, 0, hold + r + 0.05, doneAction: 2);
-	OffsetOut.ar(out, sig);
+	OffsetOut.ar(out, sig * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

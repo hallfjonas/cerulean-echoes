@@ -26,7 +26,7 @@ params: ~ce.sdParams((
 	lpenv: (default: 0, spec: [0, 8], label: "Filter env", about: "octaves the low-pass opens at the attack (0 = none)"),
 	shape: (default: 0, spec: [0, 0.99], label: "Shape", about: "waveshaper drive (superdough shape), 0 = clean"),
 )),
-def: SynthDef(\ce_sdSynthMod, { |out = 0, amp = 1, hold = 0.1, freq = 440, wave = 0, sawBuf = 0, sqBuf = 0, vib = 0, vibmod = 0.5,
+def: SynthDef(\ce_sdSynthMod, { |out = 0, post = 1, amp = 1, hold = 0.1, freq = 440, wave = 0, sawBuf = 0, sqBuf = 0, vib = 0, vibmod = 0.5,
 	fmi = 0, fmh = 1, modPhase = -1,
 	penv = 0, pa = 0.001, pd = 0.001, ps = 0.001, pr = 0.01,
 	lpenv = 0, la = 0.005, ld = 0.14, ls = 0, lr = 0.1,
@@ -55,6 +55,6 @@ def: SynthDef(\ce_sdSynthMod, { |out = 0, amp = 1, hold = 0.1, freq = 440, wave 
 	x = { |sh| var k = 2 * sh / (1 - sh); (1 + k) * x / (1 + (k * x.abs)) }.(shape.clip(0, 0.999));
 	x = Select.ar(pan >= 0, [[x, x], ~ce.webPan([x, x], pan, 0)]);
 	Line.kr(0, 0, hold + r.max(pr) + 0.05, doneAction: 2);
-	OffsetOut.ar(out, x);
+	OffsetOut.ar(out, x * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

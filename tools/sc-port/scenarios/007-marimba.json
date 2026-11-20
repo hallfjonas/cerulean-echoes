@@ -1,0 +1,313 @@
+[
+ {
+  "name": "marimba-base",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-bright0",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "63": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-bright05",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "63": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-bright1",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "63": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-char03",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-char05",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-char08",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-char1",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-space05",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "71": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-patterns",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 12,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 7.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 7.6,
+     "cc": 87,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "marimba-btn2",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 95,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 95,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "marimba-chapter",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "marimba-fogtension",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-tension1",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "marimba-room",
+  "strudel": "stemN3_marimba",
+  "sc": "marimba",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "28": 0.5,
+    "71": 0.3
+   },
+   "events": []
+  }
+ }
+]

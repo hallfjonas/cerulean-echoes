@@ -44,8 +44,9 @@ global. **Jeder Launch Control XL 3 bekommt die volle Belegung**, egal wie viele
 mehreren gilt der zuletzt bewegte Regler.
 
 Andere Controller:
-- **Launchkey MK4 25:** eigene Spur wie in Strudel (Tabelle unten): Tasten = Rhodes, Drum-Pads (Drum-Modus,
-  Kanal 10) = 16 One-Shots. Jede Taste spielt eine Note fester Länge (Regler 4), wie in Strudel. Anders als in
+- **Launchkey MK4 25:** eigene Spur wie in Strudel (Tabelle unten): Tasten = Jonas' Keys (Piano/Rhodes,
+  Orgel B3/M1, Vibraphon/Marimba, wie in 008 und 010), Drum-Pads (Drum-Modus, Kanal 10) = 16 One-Shots. Jede Taste
+  spielt eine Note fester Länge (Regler 5), wie in Strudel. Anders als in
   Strudel klingen Tasten und Pads **sofort** (wenige Millisekunden statt des Vorlaufs des Schedulers).
 - **Alle anderen Controller** werden erkannt und im Post-Fenster aufgelistet, aber ignoriert. Ihre CC-Nummern
   würden sonst die Regler des Tracks verstellen. Ein neuer Controller-Typ bekommt einen Eintrag in `midiKinds`
@@ -105,17 +106,18 @@ Werte.
 
 | Element | Funktion |
 |---|---|
-| Tasten | Rhodes (die Samples der Keys) mit zwei leicht verstimmten Kopien |
-| Modulationsrad | Pegel der Tasten (× Master); auf 0 schweigen die Tasten, die Pads spielen weiter |
-| Regler 1 | Helligkeit der Tasten (Tiefpass 300–6000 Hz, × Fog/Tension) |
-| Regler 2 | Resonanz |
-| Regler 3 | Anschlag: Hammer ↔ weiches Einschwellen |
-| Regler 4 | Notenlänge: ¼ Takt ↔ 2 Takte (auch die Orgel-/Bläser-/Chor-Pads) |
-| Regler 5 | Verstimmung der beiden Kopien |
+| Tasten | Jonas' Keys: Piano, Rhodes, Orgel B3 und M1, Vibraphon, Marimba (Mischung mit Regler 2–4) |
+| Modulationsrad | Pegel der Tasten (× Master), ab dem nächsten Anschlag; auf 0 schweigen die Tasten, die Pads spielen weiter |
+| Regler 1 | Helligkeit der Tasten (wirkt sofort); härterer Anschlag = heller |
+| Regler 2 | Piano → Rhodes: aus → Piano → Rhodes → aus (Start: Piano + Rhodes, bis der Regler bewegt wird) |
+| Regler 3 | B3 → M1: aus → Orgel B3 → M1 → aus |
+| Regler 4 | Vibes → Marimba: aus → Vibraphon → Marimba → aus |
+| Regler 5 | Notenlänge: ¼ Takt ↔ 2 Takte (auch Chor und Vibraphon auf den Pads) |
 | Regler 6 | Hall der Tasten |
 | Regler 7 | Echo der Tasten |
 | Regler 8 | Pad Fog: Drum-Pads klar ↔ dumpf |
-| Drum-Pads 1–16 | Stimme „brace“, Clap, Open Hat, Rim (mit Echo), Stimme „letzte Wiese“, Bongo, Cowbell, Tom, Orgel, Bläser, Chor „ooh“, Crash rückwärts, Ride, Tamburin, Vibraphon, Snare |
+| Drum-Pads 1–8 | Stimmen: Brace, Paper, Wine, Evening, Wiese, Creatures, No end, Vast (lange Stimmen laufen einmal durch, weitere Schläge darauf werden ignoriert) |
+| Drum-Pads 9–16 | Clap, Open Hat, Rim (mit Echo), Low Tom, Chor „ooh“, Crash rückwärts, Vibraphon, Snare |
 
 ## 4. LC-Ansicht: anzeigen und mit der Maus spielen
 
@@ -148,7 +150,9 @@ SuperCollider). Ansicht wieder öffnen: http://localhost:7770 im Browser.
 
 ## 5. Was anders ist als in Strudel
 
-- **Regler und Fader wirken sofort**, auch auf Töne, die gerade klingen, nicht erst bei der nächsten Note.
+- **Regler wirken sofort**, auch auf Töne, die gerade klingen, nicht erst bei der nächsten Note.
+- **Fader** (und das Launchkey-Modrad) wirken **wie in Strudel ab dem nächsten Ton**: klingende Töne behalten ihre
+  Lautstärke, das klingt organischer. Nur **Master** wirkt sofort (Notbremse).
 - Tasten verhalten sich wie gewohnt: Pattern-Wechsel ab dem nächsten Takt bzw. der nächsten Phrase.
 - **Lautstärke:** SuperCollider spielt 9 dB leiser als Strudel (Master-Trim), damit auch alle Fader oben mit
   Tension nicht übersteuern; am Interface bzw. an den Boxen entsprechend lauter drehen. Der Limiter (−1 dBFS) ist

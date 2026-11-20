@@ -105,20 +105,22 @@
 		msgs.add([\s_new, \ce_delay, dnode, 1, self.groups.fx, \in, dbus, \out, self.masterIn, \time, d[0], \feedback, d[1]]) } };
 	// stems: an audio bus and a strip each; a stem with lanes (layers on other orbits or with another echo) gets
 	// one bus and strip per lane, all on the stem's fader. Notes pick their lane with \lane (default: the first).
-	self.stemBus = ();
+	self.stemBus = (); self.levelSrc = ();
 	track.stems.do { |st|
 		var snd = self.sounds[st.sounds[0]], lanes = st.lanes ?? { [(name: \main)] };
 		var val = { |x| if(x.isKindOf(Symbol)) { ("c" ++ self.mapBus[x]).asSymbol } { x } };
-		self.stemBus[st.name] = ();
+		self.stemBus[st.name] = (); self.levelSrc[st.name] = ();
 		lanes.do { |ln, i|
 			var bus = aud.(), orbit = ln.orbit ? st.orbit, space = ln.space ? st.space;
 			self.stemBus[st.name][ln.name] = bus;
-			if(i == 0) { self.stemBus[st.name][\main] = bus };
+			// the fader (a CC, a state bus or a number; a lane may have its own): read at each note's start (noteLevel)
+			self.levelSrc[st.name][ln.name] = ln[\level] ? st.level;
+			if(i == 0) { self.stemBus[st.name][\main] = bus; self.levelSrc[st.name][\main] = ln[\level] ? st.level };
 			msgs.add([\s_new, \ce_strip, node.(), 1, self.groups.strips,
 				\in, bus, \out, self.masterIn, \hpOwn, st.hpOwn ? snd.hpf, \thinOn, (st[\thin] != false).asInteger,
-				// level: a state bus (symbol), a fixed number, or a CC; a lane may have its own
-				\level, (ln[\level] ? st.level) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } {
-					if(x.isKindOf(Float)) { x } { self.ccMap(x) } } },
+				// the fader is not here (it acts per note, see noteLevel); fade: a lane's level that acts at once on
+				// sounding notes (a crossfade between layers): a state bus (symbol) or a number
+				\level, (ln[\fade] ? st[\fade]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? 1,
 				\master, self.ccMap(track.global.master),
 				// room / echo amount of a lab column: a state bus (symbol) or a fixed number
 				\rDirect, (ln[\roomR] ? st[\roomR]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? -1,
@@ -138,6 +140,17 @@
 	};
 	msgs.add([\s_new, \ce_master, node.(), 0, self.groups.master, \in, self.masterIn, \trimDb, self.trimDb, \limit, self.limit]);
 	msgs.asArray
+};
+
+// The fader of a stem's lane now (0..1), read when a note starts: as Strudel's postgain, a fader change is heard from
+// the next note on, sounding notes keep their level. nil: no fader (level 1).
+~ce.noteLevel = { |self, stem, lane|
+	var src = self.levelSrc !? { |l| l[stem] !? { |s| s[lane ? \main] ?? { s[\main] } } };
+	case
+	{ src.isNil } { 1 }
+	{ src.isKindOf(Symbol) } { self.stateVal[src] ? 0 }
+	{ src.isKindOf(Float) } { src }
+	{ self.val(src) }
 };
 
 // Live: send the set-up messages in three steps (files and SynthDefs load asynchronously, wavetables and reverb

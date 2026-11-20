@@ -1,0 +1,345 @@
+[
+ {
+  "name": "bass-base",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-bright0",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "16": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-bright05",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "16": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-bright1",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "16": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-char03",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "32": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-char05",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "32": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-char08",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "32": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-char1",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "32": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-space05",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "24": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-patterns",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 40,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 40,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 40,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 40,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "bass-btn2",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 48,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 48,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "bass-chapter",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 12,
+   "cc": {
+    "8": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "bass-break",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "bass-fogtension",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-tension1",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-thin",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "bass-roomt",
+  "strudel": "stemJ4_bass",
+  "sc": "bass",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "8": 1,
+    "12": 1,
+    "36": 0.4,
+    "24": 0.3
+   },
+   "events": []
+  }
+ }
+]

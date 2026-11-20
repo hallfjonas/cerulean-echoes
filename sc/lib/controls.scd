@@ -69,7 +69,7 @@
 //   lc        every Launch Control XL 3 gets the full layout (Mode 1 + Mode 2 + column 8); with several, the control
 //             moved last wins (every message writes the bus). Its DAW port is ignored.
 //   launchkey the Launchkey MK4 25: its own stem as in the Strudel tracks: keys and drum pads (channel 10) play at
-//             once (the track's lkNote), its mod wheel and knobs (CC 1, 21-28) go to ~ce.lkCC and the track's lkCtl
+//             once (the track's lkNote), its mod wheel and knobs (CC 1, 31-38) go to ~ce.lkCC and the track's lkCtl
 //             (its own controls, apart from the LC's: its knobs would collide with the LC knobs).
 //   (none)    any other controller: listed in the post window, ignored, so it cannot change the track by accident.
 ~ce.midiKinds = [
@@ -99,20 +99,21 @@
 ~ce.lkPlay = { |self, note, vel, chan|
 	var notes = self.track !? { |t| t[\lkNote] !? { |f| f.(self, note, vel, chan) } } ? [];
 	self.uiSend('/ce/lknote', note, chan);
-	self.playNow(notes, self.stemBus[\lk], self.groups.src)
+	self.playNow(notes, self.stemBus[\lk], self.groups.src, \lk)
 };
 // Notes as the tracks make them (ce.note …, \lane, \hold in 16ths, \msg entries), started immediately
-~ce.playNow = { |self, notes, lanes, group|
+~ce.playNow = { |self, notes, lanes, group, stem|
 	var bps = TempoClock.default.tempo, srv = self.server;
-	// returns the node ids of the started synths
+	// returns the node ids of the started synths; the fader at this moment (noteLevel), a note at level 0 is not played
 	notes.collect { |n|
-		if(n[\msg].notNil) { srv.sendMsg(*n[\msg]); nil } {
+		var lv = self.noteLevel(stem, n[\lane]);
+		if(n[\msg].notNil) { srv.sendMsg(*n[\msg]); nil } { if(lv <= 0) { nil } {
 			var desc = SynthDescLib.global[n[\instrument]], args = List[], id = srv.nextNodeID;
-			var e = n.copy.putAll((out: lanes[n[\lane] ? \main], hold: (n[\hold] ? 1) / 4 / bps));
+			var e = n.copy.putAll((out: lanes[n[\lane] ? \main], hold: (n[\hold] ? 1) / 4 / bps, post: (n[\post] ? 1) * lv));
 			desc !? { desc.controlNames.do { |k| e[k] !? { |v| args.add(k).add(v) } } };
 			srv.sendMsg(\s_new, n[\instrument], id, 0, group.asNodeID, *args);
 			id
-		}
+		} }
 	}.reject(_.isNil)
 };
 // Connect every port not yet connected; report what is new or gone

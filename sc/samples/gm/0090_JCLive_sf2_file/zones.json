@@ -1,0 +1,98 @@
+[
+ {
+  "midi": 9.0,
+  "originalPitch": 6800.0,
+  "keyRangeLow": 21.0,
+  "keyRangeHigh": 43.0,
+  "loopStart": 30439.0,
+  "loopEnd": 39797.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z0.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 6800.0,
+  "keyRangeLow": 44.0,
+  "keyRangeHigh": 44.0,
+  "loopStart": 30439.0,
+  "loopEnd": 39797.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z1.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 6800.0,
+  "keyRangeLow": 45.0,
+  "keyRangeHigh": 65.0,
+  "loopStart": 30439.0,
+  "loopEnd": 39797.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z2.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 6800.0,
+  "keyRangeLow": 66.0,
+  "keyRangeHigh": 81.0,
+  "loopStart": 30439.0,
+  "loopEnd": 39797.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z3.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 6800.0,
+  "keyRangeLow": 82.0,
+  "keyRangeHigh": 86.0,
+  "loopStart": 30439.0,
+  "loopEnd": 39797.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z4.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 9200.0,
+  "keyRangeLow": 87.0,
+  "keyRangeHigh": 90.0,
+  "loopStart": 1135.0,
+  "loopEnd": 1285.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z5.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 9200.0,
+  "keyRangeLow": 91.0,
+  "keyRangeHigh": 93.0,
+  "loopStart": 1135.0,
+  "loopEnd": 1285.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z6.wav"
+ },
+ {
+  "midi": 9.0,
+  "originalPitch": 9200.0,
+  "keyRangeLow": 94.0,
+  "keyRangeHigh": 108.0,
+  "loopStart": 1135.0,
+  "loopEnd": 1285.0,
+  "coarseTune": 0.0,
+  "fineTune": 0.0,
+  "sampleRate": 31250.0,
+  "file": "gm/0090_JCLive_sf2_file/z7.wav"
+ }
+]

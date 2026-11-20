@@ -10,7 +10,10 @@ Stand 18.11.2026. Aus der Portierung von 009 (alle Spalten, Launchkey, global) g
    bei festen Reglerstellungen gleich. Auch Strudel-Eigenheiten werden übernommen und in `PORTING.md` notiert
    (bei 009: Swing verdoppelt/verschluckt Töne, `+1` auf Notennamen tut nichts). Nichts „verbessern“, ohne zu fragen.
 2. **Ausnahmen, die immer gelten** (vom Nutzer so gewollt, bei 009 schon umgesetzt):
-   - Level, Space, Echo, Fog, Thin, Tension wirken **live auf klingende Noten** (Kanalzüge, Control-Busse).
+   - Space, Echo, Fog, Thin, Tension, Master wirken **live auf klingende Noten** (Kanalzüge, Control-Busse).
+   - **Fader (Level) und Launchkey-Modrad wie in Strudel pro Note** (Nutzer 2026-11-19): `level:` des Stems / der
+     Lane wird beim Anschlag gelesen (`~ce.noteLevel` → `post`). Überblendungen zwischen Lanes gehören auf `fade:`
+     (State-Bus im Kanalzug, sofort), nicht in `level:`.
    - **Lange, gehaltene Klänge** (Flächen, Harmonien, Swells, z. B. die Strings in 008): Brightness und
      Klang-Überblendungen wirken ebenfalls live auf die klingenden Noten (State-Busse, die die Noten gemappt lesen:
      `lo: ce.stateMap(\xCut)`, `mix: ce.stateMap(\xMix)`; Schichten, die überblendet werden, laufen dafür immer mit,
@@ -49,7 +52,7 @@ dann Jojos Spalten, dann Jonas', dann Launchkey. Neue Sounds in `sc/sounds/`, ne
 | `phaser*` | `sdSamplePh` (Notch + Dreieck-LFO); nur verwenden, wenn der Phaser an ist |
 | Noise (`pink`/`white`/`brown`) | `sdNoise` mit superdoughs Puffern |
 | Orbit (room, roomsize, delay) | `orbits:` im Track (IR je Raumgröße: `tools/sc-port/reverb-ir.mjs <size>` messen), `ownDelay` |
-| `postgain(level × master)`, Thin, Fog/Tension-Tiefpass | Kanalzug (`ce_strip`); Tiefpass pro Note mit `tone`-Bus |
+| `postgain(level × master)`, Thin, Fog/Tension-Tiefpass | level: pro Note (`post`); master, Thin: Kanalzug (`ce_strip`); Tiefpass pro Note mit `tone`-Bus |
 | `midikeys` (Launchkey) | `lkNote` / `lkCtl` im Track, Kanal 10 = Pads |
 
 **Neu für 007/008/010** (in 009 nicht gebraucht, vor dem Einbau gegen superdough-Quellcode prüfen,

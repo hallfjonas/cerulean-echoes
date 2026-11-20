@@ -1,0 +1,345 @@
+[
+ {
+  "name": "clap-base",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-bright0",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "17": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-bright05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "17": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-bright1",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "17": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-char03",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "33": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-char05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "33": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-char08",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "33": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-char1",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "33": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-space05",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "25": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-patterns",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 41,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 41,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 41,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 41,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-btn2",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 49,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 49,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-chapter",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 12,
+   "cc": {
+    "9": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-break",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "clap-fogtension",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-tension1",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-thin",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "clap-roomt",
+  "strudel": "stemJ5_clap",
+  "sc": "clap",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "9": 1,
+    "12": 1,
+    "36": 0.4,
+    "25": 0.3
+   },
+   "events": []
+  }
+ }
+]

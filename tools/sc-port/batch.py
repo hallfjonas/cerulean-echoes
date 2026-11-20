@@ -18,6 +18,12 @@ here = os.path.dirname(os.path.abspath(__file__))
 track = os.environ.get('CE_TRACK', '009-house/009-house')
 os.environ['CE_TRACK'] = track   # for sc-render.sh
 track_strudel = os.path.join(here, '..', '..', 'tracks', track + '.strudel')
+# the Strudel tracks live in genre folders (tracks/<genre>/<folder>/<name>.strudel): find <name>.strudel there
+if not os.path.exists(track_strudel):
+    import glob
+    hits = [f for f in glob.glob(os.path.join(here, '..', '..', 'tracks', '**', os.path.basename(track) + '.strudel'), recursive=True)
+            if '/old/' not in f and '/sets/' not in f]
+    if hits: track_strudel = hits[0]
 sc_render = os.environ.get('SC_RENDER', os.path.join(here, 'sc-render.sh'))
 
 scens = json.load(open(sys.argv[1])); work = sys.argv[2]; filt = sys.argv[3] if len(sys.argv) > 3 else ''

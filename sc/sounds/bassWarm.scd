@@ -16,7 +16,7 @@ params: (
 	dark:   (default: 0, spec: [0, 1], label: "Dead note", about: "1 = cutoff × 0.6 (ghost notes)"),
 	level:  (default: 1, spec: [0, 1], label: "Level", about: "continuous gain (sound blend)"),
 ),
-def: SynthDef(\ce_bassWarm, { |out = 0, amp = 1, hold = 0.1, freq = 55, bright = 0, lo = 250, hi = 3500, tone = 1,
+def: SynthDef(\ce_bassWarm, { |out = 0, post = 1, amp = 1, hold = 0.1, freq = 55, bright = 0, lo = 250, hi = 3500, tone = 1,
 	dark = 0, level = 1, sawBuf = 0, sqBuf = 0|
 	var env = EnvGen.ar(~ce.adsr(0.003, 0.3, 0.6, 0.08, hold));
 	// saw and square from wavetables with WebAudio's waveforms and phase: blended with the M1 organ's triangle
@@ -27,6 +27,6 @@ def: SynthDef(\ce_bassWarm, { |out = 0, amp = 1, hold = 0.1, freq = 55, bright =
 	var cut = (~ce.cutoff(bright, lo, hi, tone) * (1 - (0.4 * dark)) * fenv).min(20000);
 	sig = ~ce.lpf(sig * env * 0.3 * amp, cut, ~ce.rq(2));
 	Line.kr(0, 0, hold + 0.12, doneAction: 2);
-	OffsetOut.ar(out, (sig * Lag.kr(level, 0.02)) ! 2);
+	OffsetOut.ar(out, ((sig * Lag.kr(level, 0.02)) ! 2) * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

@@ -60,6 +60,17 @@ if (flag !== '--no-wav') {
   const sr = 48000, TAIL = 2
   const ctx = new wa.OfflineAudioContext(2, Math.ceil(sr * (cyc / cps + TAIL)), sr)
   sd.setAudioContext(ctx)
+  // node-web-audio-api rejects some WAV headers browsers accept (VCSL shaker: "malformed fmt_pcm chunk"): such files
+  // are re-encoded with ffmpeg (float WAV) and decoded again
+  const realDecode = ctx.decodeAudioData.bind(ctx)
+  ctx.decodeAudioData = async (data, ...rest) => {
+    try { return await realDecode(data.slice(0), ...rest) } catch (e) {
+      const { execFileSync } = await import('child_process')
+      const out = execFileSync('ffmpeg', ['-v', 'quiet', '-i', 'pipe:0', '-f', 'wav', '-c:a', 'pcm_f32le', 'pipe:1'],
+        { input: Buffer.from(data), maxBuffer: 1 << 30 })
+      return realDecode(out.buffer.slice(out.byteOffset, out.byteOffset + out.length), ...rest)
+    }
+  }
   await sd.initAudio({})
   sd.registerSynthSounds()
   await sd.samples('https://raw.githubusercontent.com/felixroos/dough-samples/main/tidal-drum-machines.json')
@@ -70,7 +81,8 @@ if (flag !== '--no-wav') {
   // strudel.cc's General MIDI soundfonts (gm_*), as @strudel/soundfonts plays them, from the zones that
   // soundfont-extract.py wrote (sc/samples/gm): the same decoded audio SuperCollider plays; only the first preset
   const GM = { gm_vibraphone: '0110_JCLive_sf2_file', gm_marimba: '0120_JCLive_sf2_file', gm_drawbar_organ: '0160_JCLive_sf2_file',
-    gm_brass_section: '0610_JCLive_sf2_file', gm_voice_oohs: '0530_Aspirin_sf2_file' }
+    gm_brass_section: '0610_JCLive_sf2_file', gm_voice_oohs: '0530_Aspirin_sf2_file',
+    gm_glockenspiel: '0090_JCLive_sf2_file', gm_choir_aahs: '0520_Aspirin_sf2_file' }
   const gmDir = repoRoot + 'sc/samples/'
   const zoneBuf = {}
   for (const [name, preset] of Object.entries(GM)) {

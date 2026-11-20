@@ -17,7 +17,7 @@ params: (
 	hi:     (default: 16000, spec: [80, 18000, \exp], label: "Low-pass max", about: "cutoff at brightness 1"),
 	tone:   (default: 1, spec: [0.05, 2.5, \exp], label: "Tone", about: "global factor (Fog, Tension)"),
 ),
-def: SynthDef(\ce_kick909, { |out = 0, amp = 1, hold = 0.48, punch = 0, body = 33, bright = 0, lo = 4000, hi = 16000,
+def: SynthDef(\ce_kick909, { |out = 0, post = 1, amp = 1, hold = 0.48, punch = 0, body = 33, bright = 0, lo = 4000, hi = 16000,
 	tone = 1, bd = 0|
 	var p = punch, dec = 0.28 - (0.06 * p), penv = (24 + (12 * p)) * 100;
 	var smp = PlayBuf.ar(2, bd, BufRateScale.ir(bd)) * EnvGen.ar(~ce.adsr(0.001, dec, 0, 0.02, hold)) * 0.75;
@@ -27,6 +27,6 @@ def: SynthDef(\ce_kick909, { |out = 0, amp = 1, hold = 0.48, punch = 0, body = 3
 	var sig = (smp + bod) * amp;
 	sig = ~ce.lpf(sig, ~ce.cutoff(bright, lo, hi, tone), ~ce.rq(1));
 	Line.kr(0, 0, hold.max(0.3) + 0.05, doneAction: 2);
-	OffsetOut.ar(out, sig);
+	OffsetOut.ar(out, sig * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

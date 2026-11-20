@@ -1,0 +1,257 @@
+[
+ {
+  "name": "voice-base",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-bright0",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "67": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-bright05",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "67": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-bright1",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "67": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-char03",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "83": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-char05",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "83": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-char08",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "83": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-char1",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "83": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-space05",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "75": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-btn2",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 99,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 99,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "voice-chapter",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "voice-fogtension",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-tension1",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "voice-room",
+  "strudel": "stemN7_voice",
+  "sc": "voice",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 4,
+   "cc": {
+    "59": 1,
+    "12": 1,
+    "28": 0.5,
+    "75": 0.3
+   },
+   "events": []
+  }
+ }
+]

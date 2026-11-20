@@ -32,3 +32,17 @@
 - `dirt/metal-00.wav`, `dirt/space-00.wav`, `dirt/wind-00.wav` — from [tidalcycles/Dirt-Samples](https://github.com/tidalcycles/Dirt-Samples)
   (`metal/000_0.wav`, `space/000_0.wav`, `wind/000_wind1.wav`), strudel.cc's default sample pack (n 0 of `metal`,
   `space`, `wind`): track 008's Launchkey pads.
+- `ir/orbit-6.wav`, `ir/orbit-6.5.wav` (+ `-44100`) — the same measurement for room sizes 6 and 6.5 (track 007: orbit 2
+  and orbit 1).
+- `vcsl/` (FLAC, lossless from the WAV files) — VCSL ([sgossner/VCSL](https://github.com/sgossner/VCSL), CC0), the files
+  of strudel.cc's sample maps that track 007 plays: `vibraphone_bowed`, `xylophone_soft_ff`, `glockenspiel` (one file
+  per key), `shaker_small` (12), `cabasa` (2), `tom2_mallet` (n 0), `agogo` (n 1).
+- `voice/david.flac`, `voice/in_the_vast.flac`, `voice/piece_of_paper.flac`, `voice/plaenterwald_wine_and_cheese.flac`,
+  `voice/the_creatures_have_begun_illumination.flac`, `voice/the_evening_does_not_end.flac`,
+  `voice/the_evening_progresses.flac` — the repository's own spoken recordings (`samples/voice/*.mp3`), decoded to FLAC
+  (44.1 kHz mono) with ffmpeg: track 007 (Jonas 7 = David, the Launchkey pads = the others).
+- `gm/0090_JCLive_sf2_file/` (gm_glockenspiel), `gm/0520_Aspirin_sf2_file/` (gm_choir_aahs) — track 007's Launchkey pads.
+- `voice/plaenterwald.flac` — the repository's own `samples/voice/plaenterwald.mp3`, decoded (track 008's pads).
+- `tr727/perc-00.wav`, `tr727/perc-01.wav` — TR-727 agogo high / low (tidal-drum-machines, `RolandTR727_perc` n 0 / 1):
+  track 010's congas.
+- `ir/orbit-5.wav` (+ `-44100`) — the orbit reverb measurement for room size 5 (track 010, orbit 2).

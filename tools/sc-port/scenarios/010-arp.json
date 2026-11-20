@@ -1,0 +1,359 @@
+[
+ {
+  "name": "arp-base",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-bright0",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "63": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-bright05",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "63": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-bright1",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "63": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-char03",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-char05",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-char08",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-char1",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "79": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-space05",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "71": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-patterns",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 18,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 7.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 7.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 9.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 9.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 11.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 11.6,
+     "cc": 87,
+     "v": 0
+    },
+    {
+     "t": 13.5,
+     "cc": 87,
+     "v": 1
+    },
+    {
+     "t": 13.6,
+     "cc": 87,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "arp-btn2",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 95,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 95,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "arp-chapter",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 12,
+   "cc": {
+    "55": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "arp-fogtension",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-tension1",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-thin",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "arp-roomt",
+  "strudel": "stemN3_arp",
+  "sc": "arp",
+  "events": "generic",
+  "scen": {
+   "bpm": 120,
+   "cycles": 8,
+   "cc": {
+    "55": 1,
+    "12": 1,
+    "36": 0.4,
+    "71": 0.3
+   },
+   "events": []
+  }
+ }
+]

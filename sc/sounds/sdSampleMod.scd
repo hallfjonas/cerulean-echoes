@@ -14,7 +14,7 @@ params: ~ce.sdParams((
 	shape: (default: 0, spec: [0, 0.99], label: "Shape", about: "waveshaper drive (superdough shape), 0 = clean"),
 	cutMax: (default: 20000, spec: [80, 20000, \exp], label: "Low-pass ceiling", about: "the low-pass never above this (Hz)"),
 )),
-def: SynthDef(\ce_sdSampleMod, { |out = 0, amp = 1, hold = -1, buf = 0, rate = 1, begin = 0, shape = 0, cutMax = 20000,
+def: SynthDef(\ce_sdSampleMod, { |out = 0, post = 1, amp = 1, hold = -1, buf = 0, rate = 1, begin = 0, shape = 0, cutMax = 20000,
 	a = 0.001, d = 0.001, s = 1, r = 0.01,
 	lpOn = 0, bright = 0, lo = 1000, hi = 1000, tone = 1, cutMul = 1, lpq = 1, hp = 0, thinF = 1, hpq = 1,
 	bp = 0, bpq = 1, pan = -1, stereoIn = 1|
@@ -30,6 +30,6 @@ def: SynthDef(\ce_sdSampleMod, { |out = 0, amp = 1, hold = -1, buf = 0, rate = 1
 	sig = (1 + k) * sig / (1 + (k * sig.abs));
 	sig = Select.ar(pan >= 0, [sig, ~ce.webPan(sig, pan, stereoIn)]);
 	Line.kr(0, 0, len + r + 0.05, doneAction: 2);
-	OffsetOut.ar(out, sig);
+	OffsetOut.ar(out, sig * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

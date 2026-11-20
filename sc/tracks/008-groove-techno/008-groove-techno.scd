@@ -1,8 +1,8 @@
 // TRACK 008 GROOVE TECHNO — SuperCollider port of tracks/008-groove-techno/008-groove-techno.strudel (groove techno on F,
 // 140 BPM). Same controller layout as the Strudel track: Mode 1 = Jojo (foundation, plain CCs), Mode 2 = Jonas
 // (colour, CC + 48), column 8 global on both (Jojo's column 8, the ride, is off as in Strudel), the Launchkey MK4 25
-// optional. Ported 1:1 (see sc/PORTING.md). Level, Space, echo and the global column act at once, also on sounding
-// notes; Brightness (and Sound on the strings) acts at once on the long sounds (pads, strings, breath, Launchkey keys),
+// optional. Ported 1:1 (see sc/PORTING.md). Level (faders, mod wheel) acts from the next note, as in Strudel; Space,
+// echo and the global column act at once, also on sounding notes; Brightness (and Sound on the strings) acts at once on the long sounds (pads, strings, breath, Launchkey keys),
 // on the short ones from the next note; pattern buttons switch at the next bar.
 // The @ tags below are read by the web UI (sc/ui): column names, and each control's name | what it does.
 // @layout Track 008 — groove techno (SuperCollider)
@@ -114,16 +114,18 @@
 // @ctl 2:7.fader Level | slow, uneven breathing.
 // @ctl 2:7.b1 Pattern | one breath per 2 → 4 → 8 → 1 bar(s).
 // @ctl 2:7.b2 Open | the breath opens fully while held.
-// @lk level Keys Level | mod wheel: volume of the keys pad (× master). 0 = keys silent, pads still play.
-// @lk k1 Brightness | dark ↔ open (lpf 600–9000 Hz, × fog/tension).
-// @lk k2 Resonance | flat ↔ whistling filter peak.
-// @lk k3 Attack | quick (0.15 s) ↔ slow fade-in (2 s).
-// @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
-// @lk k5 Detune | narrow ↔ wide, wobbly supersaw.
-// @lk k6 Space | a little reverb ↔ far away. Starts at 40 % until turned.
-// @lk k7 Echo | dry ↔ long dub echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog (lpf 18 kHz → 800 Hz).
+// @lk level Keys Level | mod wheel: volume of the keys.
+// @lk k1 Brightness | dull ↔ bright; harder keys brighter.
+// @lk k2 Piano → Rhodes | off → piano → Rhodes → off.
+// @lk k3 B3 → M1 | off → organ B3 → M1 → off.
+// @lk k4 Vibes → Marimba | off → vibraphone → marimba → off.
+// @lk k5 Length | short notes ↔ long.
+// @lk k6 Space | a little air ↔ room.
+// @lk k7 Echo | dry ↔ long echo.
+// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 (
+// the Launchkey's keys: the shared keys of 008 / 009 / 010 (sc/lib/lkkeys.scd)
+var lkKeysLib = (~ce.root +/+ "lib/lkkeys.scd").load;
 var bpm = 140, beat = 60 / bpm;
 // ---------------------------------------------------------------------------------------------------------
 // CC numbers of column n (1-8): row 1-3 knobs, fader, buttons. Jojo = plain, Jonas = + 48.
@@ -170,15 +172,15 @@ uiGlobal: { |self, ce| (b1: ["F " ++ moods[self.mood.now].name, "F " ++ moods[se
 orbits: (1: (ir: "ir/orbit-1.6.wav", delay: [0.75 * beat, 0.3]), 2: (ir: "ir/orbit-4.wav", delay: [0.75 * beat, 0.58]),
 	3: (ir: "ir/orbit-2.6.wav", delay: [0.25 * beat, 0.45])),
 // state buses: room and echo amounts the language derives from knobs (columns whose Space is scaled, echo throws)
-states: (rumRoom: 0.9 * 0.35, rumEcho: 0, padRoom: 0.9 * 0.3, strRoom: 0.9 * 0.3, strEcho: 0, strJx: 0, strAn: 0,
+states: (rumRoom: 0.9 * 0.35, rumEcho: 0, padRoom: 0.9 * 0.3, strRoom: 0.9 * 0.3, strEcho: 0, strJx: 1, strAn: 0,
 	seqRoom: 0.9 * 0.3, seqEcho: 0.4 * 2 * 0.3, stabRoom: 0.9 * 0.25, stabEcho: 0, ansRoom: 0.9 * 0.35, ansEcho: 0.55 * 2 * 0.35,
-	fxRoom: 0.9 * 0.08, lkLevel: 0, lkBright: 0, lkRes: 0, lkDet: 0.08, lkRoom: 0.9 * 0.39, lkEcho: 0),
+	fxRoom: 0.9 * 0.08, lkLevel: 0, lkBright: 0, lkRoom: 0.9 * 0.1, lkEcho: 0),
 // samples the drum stems play (the files Strudel plays: tidal-drum-machines, see sc/samples/CREDITS.md)
 samples: ["tr909/bd-01.wav", "tr909/cp-00.wav", "tr909/sd-00.wav", "tr909/oh-00.wav", "tr909/hh-00.wav", "tr909/rim-00.wav",
 	// the Launchkey's drum pads: more drum-machine one-shots, Dirt-Samples (strudel.cc's default samples), the spoken samples
-	"voice/brace.wav", "voice/lw.wav", "tr909/lt-00.wav", "tr808/cb-00.wav", "tr909/rd-00.wav", "tr909/cr-00.wav", "dirt/metal-00.wav",
-	"tr808/sh-00.wav", "sergemodular/perc-00.wav", "emumodular/perc-00.wav", "viscospacedrum/misc-00.wav", "dirt/space-00.wav",
-	"dirt/wind-00.wav", "tr909/ht-00.wav"],
+	"voice/brace.wav", "voice/piece_of_paper.flac", "voice/plaenterwald_wine_and_cheese.flac", "voice/plaenterwald.flac",
+	"voice/lw.wav", "voice/the_creatures_have_begun_illumination.flac", "voice/the_evening_does_not_end.flac", "voice/in_the_vast.flac",
+	"tr909/lt-00.wav", "tr909/cr-00.wav", "tr808/sh-00.wav", "dirt/space-00.wav", "dirt/wind-00.wav"] ++ ~ce.lkKeysFiles,
 
 stems: [
 	// JOJO 1 KICK — a sine kick tuned to C2 (the fifth of F) with a pitch drop, a little 909 click on top; Punch
@@ -204,9 +206,9 @@ stems: [
 	// together; Pump fades to chords struck on every beat; button 1 = the progression for all, button 2 = chord colour
 	(name: \pad, sounds: [\sdSynthMod], level: jonas.(1).level, roomR: \padRoom, orbit: 2, trim: 1.2, thin: false),
 	// JONAS 2 STRINGS — background strings on an open F minor, one voice moving now and then; Sound fades JX-10 strings
-	// (supersaws) ↔ analogue strings (squares, saw, triangle): a lane each, the fade on their levels (at once)
-	(name: \strings, sounds: [\sdSupersawWide, \sdSynthMod], orbit: 2, trim: 0.7, thin: false, roomR: \strRoom, echoSend: \strEcho,
-		tensionEcho: false, lanes: [(name: \jx, level: \strJx), (name: \analog, level: \strAn)]),
+	// (supersaws) ↔ analogue strings (squares, saw, triangle): a lane each, the crossfade on their fades (at once)
+	(name: \strings, sounds: [\sdSupersawWide, \sdSynthMod], level: jonas.(2).level, orbit: 2, trim: 0.7, thin: false,
+		roomR: \strRoom, echoSend: \strEcho, tensionEcho: false, lanes: [(name: \jx, fade: \strJx), (name: \analog, fade: \strAn)]),
 	// JONAS 3 SEQUENCE — a hypnotic FM mallet loop (3, 5 or 7 steps against the 4/4) on the chord, echo
 	(name: \seq, sounds: [\sdSynthMod], level: jonas.(3).level, roomR: \seqRoom, echoSend: \seqEcho, orbit: 2, trim: 0.8, thin: false),
 	// JONAS 4 STAB — root + fifth on detuned saws (+ a square below) through a resonant low-pass that snaps shut
@@ -218,71 +220,83 @@ stems: [
 	(name: \darkperc, sounds: [\sdSynthMod, \sdNoise], level: jonas.(6).level, space: jonas.(6).space, orbit: 2, trim: 0.8, thin: false),
 	// JONAS 7 FX / BREATH — pink-noise grains whose level and band-pass breathe slowly; Complexity adds chord pulses
 	(name: \fx, sounds: [\sdNoise, \sdSynthMod], level: jonas.(7).level, roomR: \fxRoom, orbit: 2, trim: 0.17, thin: false),
-	// LAUNCHKEY MK4 25 — keys: a dark supersaw pad (orbit 2, mod wheel = level); drum pads: 16 dark one-shots (orbit 1,
-	// at master level, each lane a shot's own room / echo). No Tension echo (the Strudel track gives these notes none).
-	(name: \lk, sounds: [\sdSupersawWide, \sdSampleMod], level: \lkLevel, tensionEcho: false, thin: false,
+	// LAUNCHKEY MK4 25 — keys: Jonas' keys of 009 (piano / Rhodes, B3 / M1, vibraphone / marimba; orbit 2, mod wheel =
+	// level); drum pads: 16 one-shots (orbit 1, each lane a shot's own room / echo). No Tension echo (Strudel gives none).
+	(name: \lk, sounds: ~ce.lkKeysSounds ++ [\sdSampleMod, \sdSynthMod], level: \lkLevel, tensionEcho: false, thin: false,
 		lanes: [(name: \keys, orbit: 2, roomR: \lkRoom, echoSend: \lkEcho),
 			(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \lt, orbit: 1, level: 1.0, roomR: 0.5),
-			(name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.4), (name: \cb, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.3),
-			(name: \metal, orbit: 1, level: 1.0, roomR: 0.6), (name: \space, orbit: 1, level: 1.0, roomR: 0.9),
-			(name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
+			(name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.4), (name: \braaam, orbit: 1, level: 1.0, roomR: 0.9),
+			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
 
-// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level (× master),
-// knob 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 one-shot darkness. Every key
-// plays a note of fixed length (Strudel's midikeys has no note-off: the length is knob 4). Brightness, Resonance and
-// Detune act at once on sounding keys (state buses), the rest from the next key.
+// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level, knobs CC 31-38:
+// 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 one-shot darkness. Every key plays a note of
+// fixed length (Strudel's midikeys has no note-off: the length is knob 5). Brightness, Space and Echo act at once.
 lkCtl: { |ce, num, v, send|
+	if(num == 32) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
 	switch(num,
 		1, { ce.setState(\lkLevel, v, send) },
-		21, { ce.setState(\lkBright, v, send) },
-		22, { ce.setState(\lkRes, 12 * v, send) },
-		25, { ce.setState(\lkDet, 0.08 + (0.52 * v), send) },
-		26, { ce.setState(\lkRoom, 0.9 * (0.39 + (0.61 * v)), send) },   // roomOf(0.39 … 1)
-		27, { ce.setState(\lkEcho, 0.6 * v, send) })
+		31, { ce.setState(\lkBright, v, send) },
+		36, { ce.setState(\lkRoom, 0.9 * (0.1 + (0.7 * v)), send) },   // roomOf(0.1 … 0.8)
+		37, { ce.setState(\lkEcho, 0.6 * v, send) })
 },
 lkNote: { |ce, note, vel, chan|
-	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(4));   // note length in bars
+	var k = { |n| ce.lkCC[30 + n] }, nl = 0.25 + (1.75 * k.(5));   // note length in bars
 	var tone = ("c" ++ ce.toneBus).asSymbol, thin = ("c" ++ ce.thinBus).asSymbol;
 	if(chan != 9) {
-		// keys: a dark supersaw pad (7 saws), high-passed at 220 Hz
-		var adsr = ce.sdADSR(0.15 + (1.85 * k.(3)), 0.4, 0.75, 1.6);
-		[ce.note(\sdSupersawWide, (freq: note.midicps, unison: 7, dtn: ce.stateMap(\lkDet), spread: 0.8, amp: 0.7 * vel,
-			a: adsr[0], d: adsr[1], s: adsr[2], r: adsr[3], hold: nl * 16, hp: 220, thinF: thin,
-			lpOn: 1, bright: ce.stateMap(\lkBright), lo: 600, hi: 9000, tone: tone, lpq: ce.stateMap(\lkRes),
-			lane: \keys, tag: "supersaw", g: 0.7 * vel, midi: note))]
+		ce.lkKeysNotes(note, vel, [if(ce.lkTurned2 == true) { k.(2) } { 0.5 }, k.(3), k.(4)],
+			(hold: nl * 16, lane: \keys, tone: tone, bright: ce.stateMap(\lkBright), thinF: thin))
 	} {
-		// drum pads 36-51 (Drum mode): dark one-shots; the lane carries each shot's own room and echo
+		// drum pads 36-51 (Drum mode): the spoken samples (left half), drum one-shots, a synth drop hit, Dirt-Samples
 		var shots = [
 			(file: "voice/brace.wav", tag: "brace"),
-			(file: "tr909/lt-00.wav", tag: "rolandtr909_lt", rate: 0.7, lane: \lt),
-			(file: "tr909/rim-00.wav", tag: "rolandtr909_rim", rate: 0.8, lane: \rim),
-			(file: "tr808/cb-00.wav", tag: "rolandtr808_cb", rate: 0.5, cutMax: 2500, lane: \cb),
-			(file: "voice/lw.wav", tag: "lw"),
+			(file: "voice/piece_of_paper.flac", tag: "paper", gain: 0.99),
+			(file: "voice/plaenterwald_wine_and_cheese.flac", tag: "wine", gain: 0.98, once: 5.33),
+			(file: "voice/plaenterwald.flac", tag: "plaenterwald", gain: 1.45),
+			(file: "voice/lw.wav", tag: "lw", gain: 0.56),
+			(file: "voice/the_creatures_have_begun_illumination.flac", tag: "creatures", once: 4.52),
+			(file: "voice/the_evening_does_not_end.flac", tag: "noend", gain: 0.76, once: 10.19),
+			(file: "voice/in_the_vast.flac", tag: "vast", once: 14.6),
+			(file: "tr909/lt-00.wav", tag: "rolandtr909_lt", rate: 0.7, lane: \lt, gain: 0.71),
+			(file: "tr909/rim-00.wav", tag: "rolandtr909_rim", rate: 0.8, lane: \rim, gain: 1.19),
+			(braaam: true, once: 3.5, lane: \braaam, cutoff: 1400),
 			(file: "tr909/oh-00.wav", tag: "rolandtr909_oh", rate: 0.9, hp: 3000),
-			(file: "tr909/rd-00.wav", tag: "rolandtr909_rd", rate: 0.75),
-			(file: "tr909/cr-00.wav", tag: "rolandtr909_cr", rate: -0.6),   // backwards: a swell into the next beat
-			(file: "dirt/metal-00.wav", tag: "metal", rate: 0.6, lane: \metal),
-			(file: "tr808/sh-00.wav", tag: "rolandtr808_sh", rate: 0.8),
-			(file: "sergemodular/perc-00.wav", tag: "sergemodular_perc", rate: 0.7, lane: \rim),
-			(file: "emumodular/perc-00.wav", tag: "emumodular_perc", rate: 0.6),
-			(file: "viscospacedrum/misc-00.wav", tag: "viscospacedrum_misc", rate: 0.7, lane: \metal),
-			(file: "dirt/space-00.wav", tag: "space", rate: 0.5, lane: \space),
-			(file: "dirt/wind-00.wav", tag: "wind", rate: 0.5, lane: \wind),
-			// distort 0.8 (superdough's s-curve) = shape k / (2 + k), k = e^0.8 − 1
-			(file: "tr909/ht-00.wav", tag: "rolandtr909_ht", rate: 0.45, cutMax: 1500, shape: (0.8.exp - 1) / (0.8.exp + 1)),
+			(file: "tr909/cr-00.wav", tag: "rolandtr909_cr", rate: -0.6, gain: 0.54),
+			(file: "tr808/sh-00.wav", tag: "rolandtr808_sh", rate: 0.8, gain: 1.58),
+			(file: "dirt/space-00.wav", tag: "space", rate: 0.5, lane: \space, gain: 0.65),
+			(file: "dirt/wind-00.wav", tag: "wind", rate: 0.5, lane: \wind, gain: 1.36),
 		];
-		var sh = shots[(note - 36) % 16], cut = 18000 * ((800 / 18000) ** k.(8));
-		// no clip or release: the whole sample
-		[ce.note(\sdSampleMod, (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
-			rate: sh[\rate] ? 1, hold: -1, amp: 0.8 * vel, lpOn: 1, lo: cut, hi: cut, tone: tone, cutMax: sh[\cutMax] ? 20000,
-			hp: sh[\hp] ? 0, thinF: thin, shape: sh[\shape] ? 0, lane: sh[\lane] ? \shots, tag: sh[\tag], g: vel)
-			++ (a: 0.001, d: 0.001, s: 1, r: 0.01))]
+		// gain: the shot's own, else superdough's default 0.8 (the log keeps Strudel's notation: gain × velocity)
+		var i = (note - 36) % 16, sh = shots[i], g = (sh[\gain] ? 0.8) * vel, gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
+		// the low-pass: knob 8 (18 kHz → 800 Hz) × Fog / Tension at the hit, the shot's own at most
+		var tv = (0.06 ** ce.val(glob.bright)) * (1 + (1.5 * ce.val(glob.char)));
+		var cut = ((18000 * ((800 / 18000) ** k.(8))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
+		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]);
+		// a shot with `once` ignores new hits until it has played out
+		ce.lkOnce = ce.lkOnce ? ();
+		if(sh[\once].notNil and: { (ce.lkOnce[i] ? -1) > now }) { [] } {
+			sh[\once] !? { ce.lkOnce[i] = now + sh[\once] };
+			if(sh[\braaam] == true) {
+				// Braaam: a huge dark chord on F (F1, F2 detuned, C3, the tritone B2), the filter opening slowly (2 octaves),
+				// driven (shape 0.5), over a sine boom that falls onto F1
+				var env = ce.sdADSR(0.08, 1.2, 0.6, 2.5), fe = ce.sdADSR(0.3, 1.5, nil, nil, [0.005, 0.14, 0, 0.1]);
+				var common = base ++ (hold: nl * 16, lpenv: 2, la: fe[0], ld: fe[1], ls: fe[2], lr: fe[3], shape: 0.5);
+				[[2, 29, 0.5, -1], [2, 41.15, 0.4, 0.3], [2, 40.85, 0.4, 0.7], [3, 48, 0.18, -1], [2, 47, 0.2, -1]].collect { |x|
+					ce.note(\sdSynthMod, common ++ (wave: x[0], freq: x[1].midicps, amp: x[2] * vel, pan: x[3],
+						a: env[0], d: env[1], s: env[2], r: env[3], tag: ["", "", "sawtooth", "square"][x[0]], g: x[2] * vel, midi: x[1])) }
+				++ [ce.note(\sdSynthMod, common ++ (wave: 0, freq: 29.midicps, amp: 0.9 * vel, penv: 12, pa: 0.001, pd: 0.4, ps: 0.001, pr: 0.01,
+					a: 0.005, d: 1.5, s: 0, r: 2.5, tag: "sine", g: 0.9 * vel, midi: 29))]
+			} {
+				// no clip or release: the whole sample
+				[ce.note(\sdSampleMod, base ++ (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
+					rate: sh[\rate] ? 1, hold: -1, amp: g, g: gl, hp: sh[\hp] ? 0, a: 0.001, d: 0.001, s: 1, r: 0.01))]
+			}
+		}
 	}
 },
 // web UI: the names of the 16 drum pads (pads 1-8 = notes 36-43, 9-16 = 44-51)
-lkPadNames: ["Brace", "Low tom", "Rim", "Cowbell", "Voice", "Open hat", "Ride", "Crash rev", "Metal", "Shaker", "Claves",
-	"Flick", "Bleep", "Space", "Wind", "Tom dist"],
+lkPadNames: ["Brace", "Paper", "Wine", "Plaenterwald", "Wiese", "Creatures", "No end", "Vast", "Low tom", "Rim echo",
+	"Braaam", "Open hat", "Crash reverse", "Shaker", "Space", "Wind"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)
 build: { |self, ce|
@@ -301,12 +315,11 @@ build: { |self, ce|
 	// the FM modulator's start phase: offline as superdough's render has it (started at time 0), live random
 	var modPhase = { |k, at, freq| if(ce.webaudioPhase == true) { (2pi * freq * ((k + at) / 4 / (bpm / 60))) % 2pi } { -1 } };
 
-	// Knob defaults of the Strudel track (live only, as there: Web MIDI): Jonas' pad Space 0.5, the Launchkey's reverb 0.4,
+	// Knob defaults of the Strudel track (live only, as there: Web MIDI): Jonas' pad Space 0.5,
 	// until the knob is moved. Offline renders (comparisons) start from the scenario's values, as the Node tools do.
 	if(ce.log.isNil) {
 		var send = { |m| ce.server.sendMsg(*m) };
 		ce.setCC(69, 0.5, send, true);
-		ce.lkCC[26] = 0.4; self[\lkCtl].(ce, 26, 0.4, send);
 	};
 
 	// GLOBAL: Chapter (mood, next bar), Break (next bar)
@@ -588,11 +601,11 @@ build: { |self, ce|
 			["Line down", [hold.(65), hold.(72), [[77, 1], [76, 1], [75, 1], [74, 1]], hold.(80)]],
 			["Chain", [hold.(65), [[72, 1], [73, 2], [72, 1]], hold.(77), [[80, 2], [82, 1], [80, 1]]]],
 		].collect { |mv| [mv[0], mv[1].collect { |v| v.collect { |x| x[0] ! x[1] }.flatten }] };   // voice → note per unit
-		// Sound: JX ↔ analogue, equal power, on the two lanes' levels (fader × cos / sin): it acts at once
-		var lanes = { |send| var v = ce.val(sc.char), f = ce.val(sc.level);
-			ce.setState(\strJx, f * cos(v * pi / 2) * (v < 0.999).binaryValue, send);
-			ce.setState(\strAn, f * sin(v * pi / 2) * (v > 0.001).binaryValue, send) };
-		[sc.char, sc.level].do { |cc| ce.onCC(cc, { |v, send| lanes.(send) }) };
+		// Sound: JX ↔ analogue, equal power, on the two lanes' fades (cos / sin): it acts at once; the fader per note
+		var lanes = { |send| var v = ce.val(sc.char);
+			ce.setState(\strJx, cos(v * pi / 2) * (v < 0.999).binaryValue, send);
+			ce.setState(\strAn, sin(v * pi / 2) * (v > 0.001).binaryValue, send) };
+		[sc.char].do { |cc| ce.onCC(cc, { |v, send| lanes.(send) }) };
 		self.spaceState(sc.space, \strRoom, { |s| 0.9 * (0.3 + (0.7 * s)) });
 		self.throwState(sc.btn2, \strEcho);
 		self.strVar = ce.change(sc.btn, moves.size, "Strings", moves.collect(_[0]));

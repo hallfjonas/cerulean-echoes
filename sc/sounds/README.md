@@ -20,7 +20,8 @@ def: SynthDef(\ce_kick909, { |out, amp = 1, hold = 0.1, …| … })
 ```
 
 Standard-Eingänge jedes SynthDefs: `out` (Stereo-Bus des Kanals), `amp` (linear), `hold` (Notenlänge in Sekunden,
-der Klang endet selbst nach hold + Release, kein `gate`). Klänge mit Tiefpass haben außerdem `bright` (0..1),
+der Klang endet selbst nach hold + Release, kein `gate`). Außerdem `post` (linear, ganz am Ende der Kette): der Fader beim Anschlag der Note, wie
+Strudels `postgain` — die Engine setzt ihn, ein Fader wirkt so erst ab der nächsten Note. Klänge mit Tiefpass haben außerdem `bright` (0..1),
 `lo`/`hi` (Hz) und `tone` (globaler Faktor aus Fog/Tension). Regler-Parameter sind in den Tracks auf Control-Busse
 gemappt und wirken damit auch auf schon klingende Töne.
 

@@ -17,7 +17,7 @@ params: ~ce.sdParams((
 	phCenter: (default: 1000, spec: [100, 8000, \exp], label: "Phaser centre", about: "Hz (+ 282 as superdough)"),
 	phSweep: (default: 2000, spec: [0, 4800], label: "Phaser sweep", about: "LFO range in cents (±)"),
 )),
-def: SynthDef(\ce_sdSamplePh, { |out = 0, amp = 1, hold = -1, buf = 0, rate = 1, begin = 0,
+def: SynthDef(\ce_sdSamplePh, { |out = 0, post = 1, amp = 1, hold = -1, buf = 0, rate = 1, begin = 0,
 	a = 0.001, d = 0.001, s = 1, r = 0.01,
 	lpOn = 0, bright = 0, lo = 1000, hi = 1000, tone = 1, cutMul = 1, lpq = 1, hp = 0, thinF = 1, hpq = 1,
 	bp = 0, bpq = 1, pan = -1, stereoIn = 1,
@@ -33,6 +33,6 @@ def: SynthDef(\ce_sdSamplePh, { |out = 0, amp = 1, hold = -1, buf = 0, rate = 1,
 		thinF: thinF, hpq: hpq, bp: bp, bpq: bpq, pan: pan, stereoIn: stereoIn));
 	sig = SOS.ar(sig, n, -2 * c * n, n, 2 * c * n, (alpha - 1) * n);   // the notch, after the panner (superdough's order)
 	Line.kr(0, 0, len + r + 0.05, doneAction: 2);
-	OffsetOut.ar(out, sig);
+	OffsetOut.ar(out, sig * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

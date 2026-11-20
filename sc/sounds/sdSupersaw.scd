@@ -13,7 +13,7 @@ params: ~ce.sdParams((
 	detune: (default: 0.18, spec: [0, 2], label: "Detune", about: "spread of the voices in semitones"),
 	spread: (default: 0.6, spec: [0, 1], label: "Stereo", about: "how far the voices go left / right"),
 )),
-def: SynthDef(\ce_sdSupersaw, { |out = 0, amp = 1, mix = 1, hold = 0.1, freq = 440, unison = 2, detune = 0.18, spread = 0.6,
+def: SynthDef(\ce_sdSupersaw, { |out = 0, post = 1, amp = 1, mix = 1, hold = 0.1, freq = 440, unison = 2, detune = 0.18, spread = 0.6,
 	a = 0.001, d = 0.05, s = 0.6, r = 0.01,
 	lpOn = 0, bright = 0, lo = 1000, hi = 1000, tone = 1, cutMul = 1, lpq = 1, hp = 0, thinF = 1, hpq = 1,
 	bp = 0, bpq = 1, pan = -1|
@@ -29,6 +29,6 @@ def: SynthDef(\ce_sdSupersaw, { |out = 0, amp = 1, mix = 1, hold = 0.1, freq = 4
 	sig = ~ce.sdFx(sig, (lpOn: lpOn, bright: bright, lo: lo, hi: hi, tone: tone, cutMul: cutMul, lpq: lpq, hp: hp,
 		thinF: thinF, hpq: hpq, bp: bp, bpq: bpq, pan: pan, stereoIn: 1));
 	Line.kr(0, 0, hold + r + 0.05, doneAction: 2);
-	OffsetOut.ar(out, sig);
+	OffsetOut.ar(out, sig * post);   // post: the fader at the note's start (Strudel postgain)
 }),
 )

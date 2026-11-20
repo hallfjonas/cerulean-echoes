@@ -20,7 +20,7 @@
 		if(snd.def.isKindOf(SynthDef).not) { p.add("def must be a SynthDef") } {
 			var controls = snd.def.allControlNames.collect(_.name);
 			// standard inputs of every sound
-			[\out, \amp, \hold].do { |c| if(controls.includes(c).not) { p.add("SynthDef lacks the standard input " ++ c) } };
+			[\out, \amp, \hold, \post].do { |c| if(controls.includes(c).not) { p.add("SynthDef lacks the standard input " ++ c) } };
 			if(controls.includes(\gate)) { p.add("no gate: sounds end by themselves after hold + release") };
 			(snd.params ? ()).keysValuesDo { |k, spec|
 				if(controls.includes(k).not) { p.add("param % is not a SynthDef control".format(k)) };

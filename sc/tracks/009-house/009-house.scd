@@ -1,7 +1,8 @@
 // TRACK 009 HOUSE — SuperCollider port of tracks/009-house/009-house.strudel (happy, jazzy, dry house, A minor,
 // 124 BPM). Same controller layout as the Strudel track: Mode 1 = Jojo (foundation, plain CCs), Mode 2 = Jonas
 // (colour, CC + 48), column 8 global on both, the Launchkey MK4 25 optional. All stems ported 1:1 (see sc/PORTING.md).
-// Knobs and faders act at once, also on sounding notes (control buses); pattern buttons switch at the next bar.
+// Knobs act at once, also on sounding notes (control buses); faders and the mod wheel from the next note (as in
+// Strudel); pattern buttons switch at the next bar.
 // The @ tags below are read by the web UI (sc/ui): column names, and each ported control's name | what it does.
 // @layout Track 009 — house (SuperCollider)
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
@@ -112,16 +113,17 @@
 // @ctl 2:7.fader Level | plucked guitar.
 // @ctl 2:7.b1 Pattern | 8 lines.
 // @ctl 2:7.b2 Lift | phaser, brighter while held.
-// @lk level Keys Level | mod wheel: volume of the keys Rhodes (× master). 0 = keys silent, pads still play.
-// @lk k1 Brightness | dark ↔ open (lpf 300–6000 Hz, × fog/tension).
-// @lk k2 Resonance | flat ↔ whistling filter peak.
-// @lk k3 Attack | hammer (5 ms) ↔ soft swell (0.5 s).
-// @lk k4 Length | short notes (¼ bar) ↔ long (2 bars).
-// @lk k5 Detune | one clean voice ↔ wide and wobbly (two detuned voices around it).
-// @lk k6 Space | dry ↔ a little reverb (house stays fairly dry).
+// @lk level Keys Level | mod wheel: volume of the keys (× master).
+// @lk k1 Brightness | dull ↔ bright; harder keys brighter.
+// @lk k2 Piano → Rhodes | off → piano → Rhodes → off.
+// @lk k3 B3 → M1 | off → organ B3 → M1 → off.
+// @lk k4 Vibes → Marimba | off → vibraphone → marimba → off.
+// @lk k5 Length | short notes ↔ long.
+// @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog (lpf 18 kHz → 800 Hz).
+// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 (
+var lkKeysLib = (~ce.root +/+ "lib/lkkeys.scd").load;   // the Launchkey keys (shared with 008, 010)
 var bpm = 124;
 // ---------------------------------------------------------------------------------------------------------
 // CC numbers of column n (1-8): row 1-3 knobs, fader, buttons. Jojo = plain, Jonas = + 48.
@@ -221,8 +223,8 @@ var stringMaps = [
 	[\vs_vn, "Violin Section/Spic/VlnEns_Spic_", "G2 A2 B2 D3 F#3 A3 C4 E4 G4 B4 D5"],
 	[\vs_va, "Viola Section/spic/Violas_spic_", "C2 E2 G2 B2 D3 F3 A3 C4 E4 G4"],
 ].collect { |m| [m[0], m[2].split($ ).collect { |n| [midi.(n.toLower) + 12, "vsco/" ++ m[1] ++ n ++ "_v2_rr1.flac"] }] };
-// General MIDI presets the track plays (keys: vibraphone, marimba; Launchkey pads: organ, brass, voices, vibraphone)
-var gmPresets = ["0110_JCLive_sf2_file", "0120_JCLive_sf2_file", "0160_JCLive_sf2_file", "0610_JCLive_sf2_file", "0530_Aspirin_sf2_file"];
+// General MIDI presets the track plays (keys: vibraphone, marimba; Launchkey pads: voices, vibraphone)
+var gmPresets = ["0110_JCLive_sf2_file", "0120_JCLive_sf2_file", "0530_Aspirin_sf2_file"];
 // Stratocaster: three takes, every note 52..86 (E3..D6); low notes from the D string, then G, then high E
 var stratMaps = (1..3).collect { |take| [("strat" ++ take).asSymbol, (52..86).collect { |m|
 	var n = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"][m % 12] ++ ((m / 12).floor.asInteger - 1);
@@ -284,7 +286,7 @@ orbits: (1: (ir: "ir/orbit-0.6.wav", delay: [0.75 * 60 / bpm, 0.2]), 2: (ir: "ir
 // state buses of the lab columns (Jonas): level (fader × gain × brightness ±2 dB), room amount, echo send
 states: (harmLevel: 0, harmRoom: 0, harmEcho: 0, harmCut: 1000, harmJx: 0, harmB3: 0, keysLevel: 0, keysRoom: 0, keysEcho: 0, vibLevel: 0, vibRoom: 0, vibEcho: 0, fluLevel: 0, fluRoom: 0, fluEcho: 0, brsLevel: 0, brsRoom: 0, brsEcho: 0,
 	strLevel: 0, strRoom: 0, strEcho0: 0, strEcho3: 0, strEcho5: 0, gtrLevel: 0, gtrRoom: 0, gtrEcho: 0,
-	lkLevel: 0, lkRoom: 0, lkEcho: 0),
+	lkLevel: 0, lkBright: 0, lkRoom: 0.9 * 0.1, lkEcho: 0),
 // samples the drum stems play (the files Strudel plays: tidal-drum-machines, see sc/samples/CREDITS.md)
 samples: ["repo:vcsl-keys/JHPiano_Sus_Close_F#3_vl3_rr1.flac", "repo:vcsl-keys/JHPiano_Sus_Close_G#3_vl3_rr1.flac",
 	"repo:vcsl-keys/JHPiano_Sus_Close_A#3_vl3_rr1.flac", "repo:vcsl-keys/JHPiano_Sus_Close_C4_vl3_rr1.flac",
@@ -304,8 +306,10 @@ samples: ["repo:vcsl-keys/JHPiano_Sus_Close_F#3_vl3_rr1.flac", "repo:vcsl-keys/J
 	++ stratMaps.collect { |m| m[1].collect(_[1]) }.flatten
 	// General MIDI soundfont zones (WebAudioFont presets, as Strudel's gm_* sounds; tools/sc-port/soundfont-extract.py)
 	++ gmPresets.collect { |p| ~ce.fontFiles(p) }.flatten
-	// Launchkey pads: the spoken samples (repo samples/voice, decoded from m4a) and more drum-machine one-shots
-	++ ["voice/brace.wav", "voice/lw.wav", "tr909/lt-00.wav", "tr909/cr-00.wav", "tr909/rd-00.wav", "tr808/cb-00.wav", "tr707/tb-00.wav"],
+	// Launchkey pads: the spoken samples (repo samples/voice) and more drum-machine one-shots; keys: lib/lkkeys.scd
+	++ ["voice/brace.wav", "voice/piece_of_paper.flac", "voice/plaenterwald_wine_and_cheese.flac", "voice/the_evening_progresses.flac",
+		"voice/lw.wav", "voice/the_creatures_have_begun_illumination.flac", "voice/the_evening_does_not_end.flac",
+		"voice/in_the_vast.flac", "tr909/lt-00.wav", "tr909/cr-00.wav"] ++ ~ce.lkKeysFiles,
 
 stems: [
 	// JOJO 1 KICK — a short, tight 909 kick, four on the floor, with a short sine body on A1 (tuned to the key)
@@ -353,9 +357,10 @@ stems: [
 	// JONAS 7 GUITAR — from the guitar lab (lab/gitarre/disco-gitarre-3): plucked Stratocaster notes (nyanshell.strat,
 	// MIT), eight lines on the chord tones; Complexity adds dead notes, a variation, a 16th motor; Lift = phaser
 	(name: \guitar, sounds: [\sdSample, \sdSamplePh], level: \gtrLevel, roomR: \gtrRoom, echoSend: \gtrEcho, orbit: 3, ownDelay: [30 / bpm, 0.15], thin: false),
-	// LAUNCHKEY MK4 25 — keys: the Rhodes with two detuned copies (orbit 2, mod wheel = level); drum pads: 16 one-shots
-	// (orbit 1, at master level, their own room). No Tension echo (the Strudel track gives these notes none).
-	(name: \lk, sounds: [\sdSample, \sdFont], level: \lkLevel, tensionEcho: false,
+	// LAUNCHKEY MK4 25 — keys: Jonas' keys (piano / Rhodes, B3 / M1, vibraphone / marimba; orbit 2, mod wheel = level);
+	// drum pads: 16 one-shots (orbit 1, at master level, their own room). No Tension echo (the Strudel track gives these
+	// notes none). Thin per note (every voice has it), not on the strip.
+	(name: \lk, sounds: ~ce.lkKeysSounds ++ [\sdSampleMod, \sdFont], level: \lkLevel, tensionEcho: false, thin: false,
 		lanes: [(name: \keys, orbit: 2, roomR: \lkRoom, echoSend: \lkEcho),
 			(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.3),
 			(name: \oohs, orbit: 1, level: 1.0, roomR: 0.6), (name: \vib, orbit: 1, level: 1.0, roomR: 0.5)]),
@@ -369,59 +374,69 @@ maps: (
 	bassBlend2: (ccs: [jojo.(4).char], fn: { |v| (v > 0.5) * sin((v - 0.5) * pi) * (v > 0.501) }),
 ),
 
-// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level (× master),
-// knob 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 one-shot darkness. Every key
-// plays a note of fixed length (Strudel's midikeys has no note-off: the length is knob 4).
+// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level, knobs CC 31-38:
+// 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 one-shot darkness. Every key plays a note of
+// fixed length (Strudel's midikeys has no note-off: the length is knob 5). Brightness, Space and Echo act at once.
 lkCtl: { |ce, num, v, send|
+	if(num == 32) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
 	switch(num,
 		1, { ce.setState(\lkLevel, v, send) },
-		26, { ce.setState(\lkRoom, 0.9 * 0.8 * v, send) },   // roomOf(knob 6 × 0.8)
-		27, { ce.setState(\lkEcho, 0.6 * v, send) })
+		31, { ce.setState(\lkBright, v, send) },
+		36, { ce.setState(\lkRoom, 0.9 * (0.1 + (0.7 * v)), send) },   // roomOf(0.1 … 0.8)
+		37, { ce.setState(\lkEcho, 0.6 * v, send) })
 },
-// the pads' names in the web UI (pad 1 = note 36)
-lkPadNames: ["brace", "Clap", "Open hat", "Rim", "lw", "Bongo", "Cowbell", "Tom", "Organ", "Brass", "Ooh", "Crash rev",
-	"Ride", "Tamb", "Vibes", "Snare"],
 lkNote: { |ce, note, vel, chan|
-	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(4));   // note length in bars
+	var k = { |n| ce.lkCC[30 + n] }, nl = 0.25 + (1.75 * k.(5));   // note length in bars
 	var tone = ("c" ++ ce.toneBus).asSymbol, thin = ("c" ++ ce.thinBus).asSymbol;
 	if(chan != 9) {
-		// keys: the Rhodes (jRhodes3d, the keys' samples) and two copies detuned up / down
-		var det = 0.04 + (0.26 * k.(5)), cut = 300 * (20 ** k.(1));
-		var adsr = ce.sdADSR(0.005 + (0.495 * k.(3)), 1.2, 0.5, 0.8);
-		var keysList = [[55, "jrhodes/A_055__G3_3.flac"], [59, "jrhodes/A_059__B3_3.flac"], [62, "jrhodes/A_062__D4_3.flac"], [65, "jrhodes/A_065__F4_3.flac"]];
-		[[0, 0.35], [det, 0.15], [det.neg, 0.15]].collect { |x|
-			var m = note + x[0], key = keysList[keysList.minIndex { |kk, i| (kk[0] - m).abs + (i * 1e-6) }];
-			ce.note(\sdSample, (buf: ce.sampleBuffers[key[1]], stereoIn: 0, rate: 2 ** ((m - key[0]) / 12), amp: x[1] * vel,
-				a: adsr[0], d: adsr[1], s: adsr[2], r: adsr[3], hold: nl * 16, lpOn: 1, lo: cut, hi: cut, tone: tone,
-				lpq: 12 * k.(2), thinF: thin, lane: \keys, tag: "jrh", g: x[1] * vel, midi: m))
-		}
+		ce.lkKeysNotes(note, vel, [if(ce.lkTurned2 == true) { k.(2) } { 0.5 }, k.(3), k.(4)],
+			(hold: nl * 16, lane: \keys, tone: tone, bright: ce.stateMap(\lkBright), thinF: thin))
 	} {
-		// drum pads 36-51 (Drum mode): one-shots; pads 1 and 5 = the spoken samples; pitched shots have their note
+		// drum pads 36-51 (Drum mode): the spoken samples (left half), the other one-shots (right half); pitched shots
+		// have their note
 		var shots = [
-			(file: "voice/brace.wav", tag: "brace"), (file: "tr909/cp-00.wav", tag: "rolandtr909_cp"),
-			(file: "tr909/oh-00.wav", tag: "rolandtr909_oh", rate: 0.95), (file: "tr909/rim-00.wav", tag: "rolandtr909_rim", lane: \rim),
-			(file: "voice/lw.wav", tag: "lw"), (file: "tr727/perc-02.wav", tag: "rolandtr727_perc"),
-			(file: "tr808/cb-00.wav", tag: "rolandtr808_cb", rate: 0.9), (file: "tr909/lt-00.wav", tag: "rolandtr909_lt", rate: 0.9),
-			(font: "0160_JCLive_sf2_file", tag: "gm_drawbar_organ", note: 57, adsr: [nil, 0.3, 0, 0.2]),
-			(font: "0610_JCLive_sf2_file", tag: "gm_brass_section", note: 69, adsr: [nil, 0.25, 0, 0.2]),
+			(file: "voice/brace.wav", tag: "brace"),
+			(file: "voice/piece_of_paper.flac", tag: "paper", gain: 0.99),
+			(file: "voice/plaenterwald_wine_and_cheese.flac", tag: "wine", gain: 0.98, once: 5.33),
+			(file: "voice/the_evening_progresses.flac", tag: "evening", gain: 1.04, once: 9.25),
+			(file: "voice/lw.wav", tag: "lw", gain: 0.56),
+			(file: "voice/the_creatures_have_begun_illumination.flac", tag: "creatures", once: 4.52),
+			(file: "voice/the_evening_does_not_end.flac", tag: "noend", gain: 0.76, once: 10.19),
+			(file: "voice/in_the_vast.flac", tag: "vast", once: 14.6),
+			(file: "tr909/cp-00.wav", tag: "rolandtr909_cp", gain: 1.2),
+			(file: "tr909/oh-00.wav", tag: "rolandtr909_oh", rate: 0.95, gain: 1.14),
+			(file: "tr909/rim-00.wav", tag: "rolandtr909_rim", lane: \rim, gain: 1.19),
+			(file: "tr909/lt-00.wav", tag: "rolandtr909_lt", rate: 0.9, gain: 0.76),
 			(font: "0530_Aspirin_sf2_file", tag: "gm_voice_oohs", note: 64, adsr: [0.1, nil, nil, 1], lane: \oohs),
-			(file: "tr909/cr-00.wav", tag: "rolandtr909_cr", rate: -0.6), (file: "tr909/rd-00.wav", tag: "rolandtr909_rd"),
-			(file: "tr707/tb-00.wav", tag: "rolandtr707_tb"),
+			(file: "tr909/cr-00.wav", tag: "rolandtr909_cr", rate: -0.6, gain: 0.54),
 			(font: "0110_JCLive_sf2_file", tag: "gm_vibraphone", note: 76, lane: \vib),
-			(file: "tr909/sd-00.wav", tag: "rolandtr909_sd", rate: 0.8),
+			(file: "tr909/sd-00.wav", tag: "rolandtr909_sd", rate: 0.8, gain: 1.28),
 		];
-		var sh = shots[(note - 36) % 16], cut = 18000 * ((800 / 18000) ** k.(8));
-		var base = (amp: 0.8 * vel, lpOn: 1, lo: cut, hi: cut, tone: tone, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag], g: vel);
-		if(sh[\font].notNil) {
-			var z = ce.fontNote(sh[\font], sh[\note]), adsr = ce.sdADSR(*(sh[\adsr] ? [nil, nil, nil, nil]));
-			z !? { [ce.note(\sdFont, base ++ z ++ (hold: nl * 16, a: adsr[0], d: adsr[1], s: adsr[2], r: adsr[3], midi: sh[\note]))] } ? []
-		} {
-			// no clip or release: the whole sample
-			[ce.note(\sdSample, base ++ (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
-				rate: sh[\rate] ? 1, hold: -1))]
+		// gain: the shot's own, else superdough's default 0.8 (the log keeps Strudel's notation: gain × velocity)
+		var i = (note - 36) % 16, sh = shots[i], g = (sh[\gain] ? 0.8) * vel, gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
+		// the low-pass: knob 8 (18 kHz → 800 Hz) × Fog / Tension at the hit
+		var tv = (0.06 ** ce.val(glob.bright)) * (1 + (1.5 * ce.val(glob.char)));
+		var cut = ((18000 * ((800 / 18000) ** k.(8))) * tv).clip(80, 18000);
+		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]);
+		// a shot with `once` ignores new hits until it has played out
+		ce.lkOnce = ce.lkOnce ? ();
+		if(sh[\once].notNil and: { (ce.lkOnce[i] ? -1) > now }) { [] } {
+			sh[\once] !? { ce.lkOnce[i] = now + sh[\once] };
+			if(sh[\font].notNil) {
+				var z = ce.fontNote(sh[\font], sh[\note]), adsr = ce.sdADSR(*(sh[\adsr] ? [nil, nil, nil, nil]));
+				z !? { [ce.note(\sdFont, base ++ z ++ (amp: g, g: gl, hold: nl * 16, a: adsr[0], d: adsr[1], s: adsr[2], r: adsr[3],
+					midi: sh[\note]))] } ? []
+			} {
+				// no clip or release: the whole sample
+				[ce.note(\sdSampleMod, base ++ (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
+					rate: sh[\rate] ? 1, hold: -1, amp: g, g: gl, a: 0.001, d: 0.001, s: 1, r: 0.01))]
+			}
 		}
 	}
 },
+// web UI: the names of the 16 drum pads (pads 1-8 = notes 36-43, 9-16 = 44-51)
+lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Wiese", "Creatures", "No end", "Vast", "Clap", "Open hat", "Rim echo",
+	"Low tom", "Voice ooh", "Crash reverse", "Vibraphone", "Snare"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)
 build: { |self, ce|

@@ -1,0 +1,313 @@
+[
+ {
+  "name": "pulse-base",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-bright0",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "13": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-bright05",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "13": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-bright1",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "13": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-char02",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "29": 0.2
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-char05",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "29": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-char09",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "29": 0.9
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-space05",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "21": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-patterns",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 37,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 37,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 37,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pulse-btn2",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 45,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 45,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pulse-chapter",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pulse-break",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pulse-fogtension",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-tension1",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pulse-room",
+  "strudel": "stemJ1_pulse",
+  "sc": "pulse",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "5": 1,
+    "12": 1,
+    "28": 0.5,
+    "21": 0.3
+   },
+   "events": []
+  }
+ }
+]

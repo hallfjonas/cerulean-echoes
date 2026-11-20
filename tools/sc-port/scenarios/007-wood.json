@@ -1,0 +1,329 @@
+[
+ {
+  "name": "wood-base",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-bright0",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "19": 0
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-bright05",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "19": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-bright1",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "19": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-char03",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "35": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-char05",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "35": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-char08",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "35": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-char1",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "35": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-space05",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "27": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-patterns",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 43,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 43,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 43,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "wood-btn2",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 51,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 51,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "wood-chapter",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "wood-break",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "wood-fogtension",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-tension1",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "wood-room",
+  "strudel": "stemJ7_wood",
+  "sc": "wood",
+  "events": "generic",
+  "scen": {
+   "bpm": 70,
+   "cycles": 8,
+   "cc": {
+    "11": 1,
+    "12": 1,
+    "28": 0.5,
+    "27": 0.3
+   },
+   "events": []
+  }
+ }
+]

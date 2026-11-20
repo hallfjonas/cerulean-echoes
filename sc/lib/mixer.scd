@@ -1,4 +1,4 @@
-// Mixer: one channel strip per stem (thin/high-pass, fader × master, reverb send), effect returns per orbit, master.
+// Mixer: one channel strip per stem (thin/high-pass, master, reverb send), effect returns per orbit, master.
 // Signal flow (node order): sources → strips → returns → master → hardware out.
 // Levels are linear like the Strudel faders; the master has a trim and a limiter (ceiling -1 dBFS) as the last link.
 (
@@ -15,7 +15,8 @@
 // Channel strip. hpOwn: the sound's own high-pass (Hz), 0 = none. Thin multiplies it (a sound without one starts
 // at 30 Hz); Thin at 0 adds no filter at all (the filter fades in over the first 2 % of the knob).
 // WebAudio biquads (Strudel) take Q in dB: Q 1 dB → rq = 1 / 10^(1/20).
-// trim: the stem's own gain (a number or a mapped bus), on top of fader × master.
+// level: a lane's crossfade level (acts at once); the fader itself acts per note (post, see ~ce.noteLevel).
+// trim: the stem's own gain (a number or a mapped bus), on top of level × master.
 // thinOn 0: the stem's voices do Thin themselves (per note, sd voices). Delay send (Strudel bus()): echo × 2 ×
 // space, at most 0.9, or Tension's echo (0 → 0.45 over the first half of the knob) where that is larger; delayOn 0
 // for dry stems (Strudel dryBus: kick, sub, bass).
