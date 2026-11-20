@@ -93,7 +93,7 @@ const send = (cc, v) => {
 }
 const flush = async () => {
   const batch = outbox; outbox = []
-  try { await fetch('/cc', { method: 'POST', body: JSON.stringify(batch), keepalive: true }) } catch (e) {}
+  try { await fetch('cc', { method: 'POST', body: JSON.stringify(batch), keepalive: true }) } catch (e) {}
   flushing = false
   if (outbox.length) { flushing = true; requestAnimationFrame(flush) }
 }
@@ -105,12 +105,12 @@ const lkSend = (n, v) => {
   S.lk[n] = v; lkMine[n] = performance.now(); lkOut[n] = v; S.lkLive = performance.now(); update()
   if (!lkFlushing) { lkFlushing = true; requestAnimationFrame(async () => {
     const cc = Object.entries(lkOut).map(([k, x]) => [+k, x]); lkOut = {}
-    try { await fetch('/lk', { method: 'POST', body: JSON.stringify({ cc }), keepalive: true }) } catch (e) {}
+    try { await fetch('lk', { method: 'POST', body: JSON.stringify({ cc }), keepalive: true }) } catch (e) {}
     lkFlushing = false
   }) }
 }
 const lkNote = (note, chan) => {   // chan 0-based: 9 = drum pads; velocity 100
-  fetch('/lk', { method: 'POST', body: JSON.stringify({ note: [note, 100, chan] }), keepalive: true }).catch(() => {})
+  fetch('lk', { method: 'POST', body: JSON.stringify({ note: [note, 100, chan] }), keepalive: true }).catch(() => {})
 }
 const hasLk = () => Object.keys(tags()).some(k => k.startsWith('lk.'))
 const LK_CTLS = [['level', 1], ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ['k' + n, 30 + n])]
@@ -304,7 +304,7 @@ const draw = () => {
 
 // ---- live state from the bridge ----
 const connect = () => {
-  const es = new EventSource('/events')
+  const es = new EventSource('events')
   es.onopen = () => { S.bridge = true; update() }
   es.onerror = () => { S.bridge = false; update() }
   es.onmessage = e => {

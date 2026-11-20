@@ -10,37 +10,11 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { encode, decode } from '../../tools/trajectory/osc.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const HTTP_PORT = Number(process.argv[2] ?? 7770), OSC_PORT = 57130
 let sc = { address: '127.0.0.1', port: 57120 }   // learnt from SC's first message
-
-// --- OSC (int32 i, float32 f, string s) ---
-const pad4 = n => (n + 3) & ~3
-const oscString = s => { const b = Buffer.from(s + '\0', 'utf8'); const out = Buffer.alloc(pad4(b.length)); b.copy(out); return out }
-const encode = (address, args) => {
-  const tags = ',' + args.map(a => typeof a === 'string' ? 's' : Number.isInteger(a.i) ? 'i' : 'f').join('')
-  return Buffer.concat([oscString(address), oscString(tags), ...args.map(a => {
-    if (typeof a === 'string') return oscString(a)
-    const b = Buffer.alloc(4)
-    if (Number.isInteger(a.i)) b.writeInt32BE(a.i); else b.writeFloatBE(a.f)
-    return b
-  })])
-}
-const readString = (buf, at) => { const end = buf.indexOf(0, at); return [buf.toString('utf8', at, end), pad4(end + 1)] }
-const decode = buf => {
-  let [address, at] = readString(buf, 0), tags
-  ;[tags, at] = readString(buf, at)
-  const args = []
-  for (const t of tags.slice(1)) {
-    if (t === 'i') { args.push(buf.readInt32BE(at)); at += 4 }
-    else if (t === 'f') { args.push(buf.readFloatBE(at)); at += 4 }
-    else if (t === 'd') { args.push(buf.readDoubleBE(at)); at += 8 }
-    else if (t === 's' || t === 'S') { const [s, next] = readString(buf, at); args.push(s); at = next }
-    else if (t === 'h') { args.push(Number(buf.readBigInt64BE(at))); at += 8 }
-  }
-  return { address, args }
-}
 
 // --- state cache (a browser that connects gets everything at once) ---
 const state = { layout: null, ccs: null, state: null, beat: null, midi: null, lk: null, sc: false }
