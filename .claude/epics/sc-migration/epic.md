@@ -1,0 +1,111 @@
+---
+name: sc-migration
+status: backlog
+created: 2026-11-20T12:13:35Z
+updated: 2026-11-20T12:29:46Z
+progress: 0%
+prd: .claude/prds/sc-migration.md
+github: (not synced; issue sync is off, see CONTRIBUTING.md)
+---
+
+# Epic: sc-migration
+
+## Overview
+
+Make SuperCollider the engine for every live track and every player feature, port the three Strudel-only tracks,
+start an SC lab, and retire the Strudel parts that cost upkeep. The player (`tools/trajectory/`) stays the one front
+end; SC becomes a second engine behind its existing engine interface. Supersedes the phase list in
+`sc/PLAN-SC-ENGINE.md` (its decisions, tool table and test scope stay valid; the file is removed with this epic).
+
+## Architecture Decisions
+
+- **Player stays, SC is a second engine.** `engine-sc.mjs` implements `{ ready, load, stop, cycle, cps, output }` like
+  `engine-strudel.mjs`; nothing in the page needs to know which engine plays.
+- **One Node process.** `sc/ui/bridge.mjs` (OSC ⇄ HTTP) folds into `tools/trajectory/server.mjs`; SC already speaks
+  `/ce/cc`, `/ce/lkcc`, `/ce/lknote` in and `/ce/beat`, `/ce/state`, `/ce/layout`, `/ce/ccs` out (`sc/lib/ui.scd`).
+- **Controllers go to SC directly.** The browser listens to the same hardware only to show values and capture takes.
+- **SC records itself** (`DiskOut`); the WAV no longer passes through the browser.
+- **D1:** a ported track's `.scd` is the source of truth, its `.strudel` is frozen. **D2:** the Strudel engine stays
+  while it needs no work. **D3:** no remote access.
+- **Tests check features, not tracks** (no golden logs, no sound measuring). The visuals are a playground: no tests.
+- **Tools page and Analysis page retired** (not needed any more).
+
+## Technical Approach
+
+### Frontend Components
+- `tools/trajectory/engine-sc.mjs` (new); `sc-source.mjs` (new, note messages → visuals; playground).
+- `player.html`: picks the engine per catalogue entry; MIDI panel fed from SC state when SC plays.
+- `autoperform.mjs` / `take.mjs`: send steps to the engine (OSC for SC) instead of the virtual Web MIDI port.
+
+### Backend Services
+- `server.mjs`: OSC socket + WebSocket relay (from `bridge.mjs`); recording endpoints start/stop SC's recorder.
+- `catalogue.mjs`: lists `sc/tracks/*/*.scd` with `engine: 'sc'`.
+- SC (`sc/lib/ui.scd`, `steps.scd`, `setup.scd`): `/ce/load`, `/ce/stop`, `/ce/note` per sounding note, `/ce/record`.
+- Launcher: macOS app/script that starts `sclang` headless with `sc/live.scd`, the server, and the browser.
+
+### Infrastructure
+- `npm test` runs all Node tests and one headless `sclang` test script; GitHub Actions runs the Node part per PR.
+- `verify-sc` (small): track loads headless, tags parse, perform scripts valid.
+
+## Implementation Strategy
+
+Foundation first (tests + engine), then the player features in parallel, while the track ports and the SC lab run
+alongside. Retirement comes last, when nothing that stays depends on the Strudel tools. Each task group is its own
+branch and PR (`epic/sc-migration-<group>`), ends playable, and updates its task status in the same PR.
+
+Risks: two clocks drifting (the page must follow SC's beat); OSC traffic per note for visuals (send from the language,
+not the audio thread); the take ↔ WAV alignment once SC records.
+
+## Task Breakdown Preview
+
+| # | Task | Parallel |
+|---|---|---|
+| 001 | Feature-test harness: one `npm test`, SC core `UnitTest`, CI for Node | first |
+| 002 | SC engine in the player: load / stop / clock / catalogue / MIDI panel | after 001 |
+| 003 | Visuals from SC (playground, low priority, no tests) | after 002, any time |
+| 004 | Auto-perform and takes on SC | after 002 |
+| 005 | Recording in SC | after 002 |
+| 006 | Launcher (one double-click start) | after 002 (005 nice to have) |
+| 007 | Port 001-groove and 002-groove | after 001, parallel to everything |
+| 008 | Port 016-grroove-opus | after 001, parallel to everything |
+| 009 | SC lab (machine lab, options lab, promote) and archive the Strudel lab | after 002 |
+| 011 | Retire the Tools page and the Analysis page | now, parallel to everything |
+| 010 | Tools, skills and docs for SC; retire set 011, historic, Strudel checks and skills | last |
+
+## Dependencies
+
+- PRs #54 (layout retirement) and #55 (CCPM skill) merged.
+- SuperCollider ≥ 3.13 on both machines; `tools/` Node setup.
+- Existing: `tools/sc-port/` (porting and comparison), `sc/tools/render.scd` (offline render with event log).
+
+## Success Criteria (Technical)
+
+- `npm test` green: feature tests for track list, load/play/stop/switch, controllers, pattern/Chapter/Break, MIDI
+  panel, auto-perform, takes, recording, producer, SC core.
+- 7 live tracks load on SC from the player; perform scripts in `tools/trajectory/perform/` play on SC to the end.
+- Launcher starts and stops everything with no leftover processes.
+- `tracks/sets/`, `tracks/historic/`, Strudel lab boards and Strudel-only checks/skills removed; `npm run path-lint`
+  shows no new missing paths.
+
+## Estimated Effort
+
+About 10 task groups, roughly 107 hours of agent work plus listening/approval time by the players; no deadline.
+Biggest items: 002 (engine) and the ports (007, 008).
+
+## Tasks Created
+- [ ] 001.md - Feature-test harness and SC core tests (parallel: false)
+- [ ] 002.md - SC engine in the player (parallel: false)
+- [ ] 003.md - Visuals from SC, playground (parallel: true)
+- [ ] 004.md - Auto-perform and takes on SC (parallel: true)
+- [ ] 005.md - Recording in SC (parallel: true)
+- [ ] 006.md - Launcher (parallel: true)
+- [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true)
+- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true)
+- [ ] 009.md - SC lab and archive of the Strudel lab (parallel: true)
+- [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
+- [ ] 011.md - Retire the Tools page and the Analysis page (parallel: true)
+
+Total tasks: 11
+Parallel tasks: 8
+Sequential tasks: 3
+Estimated total effort: 107 hours
