@@ -16,11 +16,11 @@
 // @col 16:4 4 Bass
 // @col 16:5 5 Wood
 // @col 16:6 6 Hats
-// @col 16:7 7 Percussion
+// @col 16:7 7 Perc
 // @mode 2 Mode 2 — Colour (stab + answer)
 // @col 2:1 1 Pads
 // @col 2:2 2 Strings
-// @col 2:3 3 Stab Shape
+// @col 2:3 3 Shape
 // @col 2:4 4 Stab
 // @col 2:5 5 Answer
 // @col 2:6 6 Accents
@@ -303,7 +303,7 @@ lkNote: { |ce, note, vel, chan|
 	}
 },
 // web UI: the names of the 16 drum pads (pads 1-8 = notes 36-43, 9-16 = 44-51)
-lkPadNames: ["Brace", "Paper", "Wine", "Plaenterwald", "Wiese", "Creatures", "No end", "Vast", "Low tom", "Rim echo",
+lkPadNames: ["Brace", "Paper", "Wine", "Forest", "Meadow", "Creatures", "No end", "Vast", "Low tom", "Rim echo",
 	"Braaam", "Open hat", "Crash reverse", "Shaker", "Space", "Wind"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)
