@@ -24,10 +24,12 @@ Server.default = s;
 // samples and reverbs follow the rate, the warning below says when it is too low
 s.options.sampleRate = nil;
 s.options.numInputBusChannels = 0;
-// no input device pinned (live.scd pins the built-in mic): started headless, opening that device waits for a
-// microphone permission that never comes, and the boot hangs. A Bluetooth headset may then drop to call quality:
-// the warning below says so.
-s.options.inDevice = nil;
+// No microphone is ever opened: a Bluetooth headset (MOMENTUM 4 …) whose mic is opened switches to call mode,
+// 16 kHz, and everything sounds dull. live.scd pins the built-in mic; started headless, that can wait for a
+// microphone permission. So the input is an output-only built-in device (the speakers): nothing to record, no mic,
+// no permission. Fallback: the built-in mic, as in live.scd.
+s.options.inDevice = ServerOptions.outDevices.detect { |d| d.containsi("MacBook") or: { d.containsi("Built-in") } or: { d.containsi("Speakers") } }
+	?? { ServerOptions.inDevices.detect { |d| d.containsi("MacBook") or: { d.containsi("Built-in") } } };
 s.options.hardwareBufferSize = 128;
 s.options.memSize = 65536;
 s.options.numWireBufs = 256;
