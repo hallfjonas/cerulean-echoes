@@ -117,6 +117,10 @@
 		hpOwn: col[\hpOwn], roomR: col.stateName(\room), echoSend: if(col[\echoOn]) { col.stateName(\echo) },
 		thin: col.thinOnStrip, trim: col[\gain], tension: col[\tension], tensionEcho: col[\tension],
 		notes: { |k| track.slotStep(slot, k) });
+	if(col[\boostOn] == true) { entry[\level] = col.stateName(\boost) };
+	if(col[\maps].includesKey(col.mapName(\trim))) { entry[\trim] = col.mapName(\trim) };
+	col[\echoOwn] !? { var e = col.echoValues(false); entry[\ownDelay] = [e[0] * 60 / track.bpm, e[1]];
+		col[\echoNow] = entry[\ownDelay] };
 	strip !? {
 		entry.removeAt(\roomR); entry.removeAt(\echoSend);
 		[\level, \orbit, \roomR, \echoSend, \space, \echo, \trim].do { |key|

@@ -61,7 +61,7 @@
 	var mini = { |str| str !? { self.mini(str.asString) } };
 	var code = stem[\code] !? { |c| (stem[\dir] +/+ c).load }, colCode = if(code.isKindOf(Event)) { code };
 	var extra = (stem[\sample][\extra] ? []).collect(_.asSymbol);
-	var ccs = self.slotCCs(slot), maps = (), gain = self.numOf(stem[\gain] ? 1);
+	var ccs = self.slotCCs(slot), maps = (), gain = self.numOf(stem[\gain] ? 1), layers, busParams;
 	// a column's map named trim is its strip trim: the stem's gain multiplies it
 	(colCode !? { |c| c[\maps] } ? ()).keysValuesDo { |name, m|
 		maps[(stemName ++ "_" ++ name).asSymbol] = (ccs: m[\ccs].collect { |c| ccs[c] ? c },
@@ -71,27 +71,45 @@
 	(b2[\args] ? ()).keysValuesDo { |k, v|
 		args[k] = if(v.isString and: { "^-?[0-9.]+$".matchRegexp(v) }) { v.asFloat } { v } };
 	[\k1, \k2, \k3].do { |kk| var knob = controls[kk];
-		var one = { |t| (param: t[\param].asSymbol, lo: self.numOf(t[\range][0]), hi: self.numOf(t[\range][1]),
-			exp: t[\curve] == "exp") };
+		var one = { |t| (param: t[\param].asSymbol, lo: self.numOf(t[\range] !? { |r| r[0] } ? 0),
+			hi: self.numOf(t[\range] !? { |r| r[1] } ? 1), exp: t[\curve] == "exp",
+			points: t[\points] !? { |ps| ps.collect { |pt| pt.collect { |x| self.numOf(x) } } }) };
 		case
 		{ knob[\param].notNil } { targets[kk] = [one.(knob)] }
 		{ knob[\targets].notNil } { targets[kk] = knob[\targets].collect(one) }
 		{ knob[\code].notNil } { knobCode[kk] = (stem[\dir] +/+ knob[\code]).load }
 	};
+	// format 2: a knob on trim is the strip's gain, made on the server from the knob (× the stem's gain)
+	targets.keysValuesDo { |kk, list| list.do { |t| if(t[\param] == \trim) {
+		maps[(stemName ++ "_trim").asSymbol] = (ccs: [ccs[kk]], fn: { |v|
+			if(t[\exp]) { t[\lo] * ((t[\hi] / t[\lo]) ** v) } { t[\lo] + ((t[\hi] - t[\lo]) * v) } * gain }) } } };
+	layers = self.stemLayers(stem);
+	layers.do { |l| if(l[\sound] != sample and: { extra.includes(l[\sound]).not }) { extra = extra.add(l[\sound]) } };
+	busParams = targets.values.flatten(1).collect { |t| t[\param] }.asSet.asArray
+		.select { |p| layers.any { |l| l[\inputs].includes(p) } and: { [\hold, \amp].includes(p).not } };
+	layers.do { |l| l[\busParams] = busParams.select { |p| l[\inputs].includes(p) } };
 	(
 		ce: ce, track: track, stem: stem, slot: slot.asSymbol, stemName: stemName, ccs: ccs,
 		sample: sample, sounds: [sample] ++ extra ++ (addon[\sounds] ? []), pitch: stem[\pitch].asSymbol,
 		colCode: colCode, maps: maps, st: (),
-		echoOn: targets.values.flatten(1).any { |t| t[\param] == \echo } or: { addon === self.addons[\echoThrow] },
+		echoOn: targets.values.flatten(1).any { |t| t[\param] == \echo } or: { addon === self.addons[\echoThrow] }
+			or: { stem[\echo].notNil },
 		gain: gain, preset: preset, inputs: inputs, hpOwn: snd.hpf,
-		orbit: if(self.lowRoles.includes(stem[\meta][\role].asSymbol)) { 1 } { 2 },
+		orbit: stem[\orbit] !? { |o| self.numOf(o).asInteger } ?? {
+			if(self.lowRoles.includes(stem[\meta][\role].asSymbol)) { 1 } { 2 } },
 		fog: opt.(\fog), thin: opt.(\thin), tension: opt.(\tension), swing: opt.(\swing), breakOut: frame[\break] == "out",
+		tensionFilter: opt.(\tensionFilter),
 		targets: targets, knobCode: knobCode,
 		holdKnob: targets.values.flatten(1).any { |t| t[\param] == \hold },
-		busParams: targets.values.flatten(1).collect { |t| t[\param] }.asSet.asArray
-			.select { |p| inputs.includes(p) and: { [\hold, \amp].includes(p).not } },
-		pats: stem[\patterns].collect { |p| (label: p[\label], rhythm: mini.(p[\rhythm]), notes: mini.(p[\notes]),
-			vel: mini.(p[\velocity])) },
+		boostOn: targets.values.flatten(1).any { |t| t[\param] == \boost },
+		busParams: busParams,
+		pats: stem[\patterns].collect { |p| self.stemPart(p) },
+		layers: layers,
+		kit: stem[\sample][\kit],
+		register: stem[\register] !? { |r| self.numOf(r) },
+		push: stem[\push] == "true" or: { stem[\push] == true },
+		ungated: layers.any { |l| l[\pats].any { |p| p[\strike].notNil } },
+		echoOwn: stem[\echo] !? { |e| [self.numOf(e[\beats] ? 0.75), self.numOf(e[\feedback] ? 0.3)] },
 		stemCode: if(colCode.isNil) { code },
 		b1Code: controls[\b1][\code] !? { |c| (stem[\dir] +/+ c).load },
 		addon: addon, addonMode: b2[\mode].asSymbol, addonState: (args: args, since: nil,
@@ -129,9 +147,12 @@
 			var names = col[\pats].collect { |p| p[\label] };
 			col[\patLatch] = ce.latch(1, 0, { |i| ce.status(col[\slot], names[i]); ce.uiPush });
 			if(col[\addonMode] == \step) { col[\b2Latch] = ce.latch(1, 0) };
-			col[\toneArg] = if(col[\fog] and: { col[\inputs].includes(\tone) }) {
-				("c" ++ if(col[\tension]) { ce.toneBus } { ce.fogBus }).asSymbol };
-			col[\thinArg] = if(col[\thin] and: { col[\inputs].includes(\thinF) }) { ("c" ++ ce.thinBus).asSymbol };
+			col[\layers].do { |l|
+				l[\toneArg] = if(col[\fog] and: { l[\inputs].includes(\tone) }) {
+					("c" ++ if(col[\tension] and: { col[\tensionFilter] }) { ce.toneBus } { ce.fogBus }).asSymbol };
+				l[\thinArg] = if(col[\thin] and: { l[\inputs].includes(\thinF) }) { ("c" ++ ce.thinBus).asSymbol } };
+			col[\toneArg] = col[\layers][0][\toneArg];
+			col[\thinArg] = col[\layers][0][\thinArg];
 			col[\colCode] !? { |c| c[\start] !? { |f| f.(col, ce) } };
 		},
 		// the MIDI panel shows the pattern of button 1 (Mode 1: jojo:<n>, Mode 2: jonas:<n>)
@@ -168,33 +189,58 @@
 				{ false })
 		},
 		mapKnob: { |col, t, v|
-			if(t[\exp] and: { t[\lo] > 0 } and: { t[\hi] > 0 }) { t[\lo] * ((t[\hi] / t[\lo]) ** v) } {
-				t[\lo] + ((t[\hi] - t[\lo]) * v) }
+			case
+			{ t[\points].notNil } { col[\ce].stemCurve(t[\points], v) }
+			{ t[\exp] and: { t[\lo] > 0 } and: { t[\hi] > 0 } } { t[\lo] * ((t[\hi] / t[\lo]) ** v) }
+			{ t[\lo] + ((t[\hi] - t[\lo]) * v) }
 		},
-		// the preset, the knobs, then the add-on: parameter → value; space becomes the room send
+		// the preset, the knobs, then the add-on: parameter → value; space becomes the room send (a knob on room sets it)
 		knobValues: { |col, on|
 			var p = col[\preset].copy;
 			col[\targets].keysValuesDo { |kk, list| var v = col.knob(kk); list.do { |t| p[t[\param]] = col.mapKnob(t, v) } };
-			p[\room] = 0.9 * (p.removeAt(\space) ? 0);
+			if(p[\space].notNil or: { p[\room].isNil }) { p[\room] = 0.9 * (p.removeAt(\space) ? 0) };
 			p[\echo] = p[\echo] ? 0;
 			if(on) { col[\addon][\params] !? { |f| f.(col[\addonState], col, p) } };
 			p
 		},
-		// the state buses of the column: its knob parameters, room and echo send
+		// format 2: what a layer's amount or chance reads (a knob, button 2's add-on state, Tension) through its points
+		sourceValue: { |col, src, bar|
+			switch(src, \b2, { col.addonOn(bar).binaryValue }, \tension, { col[\ce].val(col[\track].global.tension) },
+				{ col.knob(src) })
+		},
+		amountOf: { |col, a, bar| col[\ce].stemCurve(a[\points], col.sourceValue(a[\source], bar), a[\power]) },
+		// its own echo: [time in beats, feedback] from the stem's echo, the knobs and the add-on
+		echoValues: { |col, on|
+			var p = col.knobValues(on), e = col[\echoOwn];
+			[p[\echoTime] ? e[0], p[\echoFeedback] ? e[1]]
+		},
+		// the state buses of the column: its knob parameters, room and echo send; format 2: the fader × boost, the
+		// live amounts of its layers
 		stateValues: { |col|
 			var p, out = (), now = col[\ce][\stateVal] ? ();
 			if(col[\colCode].notNil) {
 				(col[\colCode][\states] ? ()).keysValuesDo { |k, v| var n = col.stateName(k); out[n] = now[n] ? v } } {
 				p = col.knobValues(col.addonOn(nil));
-				(col[\busParams] ++ [\room, \echo]).do { |param| out[col.stateName(param)] = p[param] } };
+				(col[\busParams] ++ [\room, \echo]).do { |param| out[col.stateName(param)] = p[param] };
+				if(col[\boostOn]) { out[col.stateName(\boost)] = col.knob(\fader) * p[\boost] };
+				col[\layers].do { |l| l[\amount] !? { |a| a[\param] !? {
+					out[col.stateName(l[\live])] = col.amountOf(a, nil) } } } };
 			out
 		},
+		// knobs, fader and button 2 set the state buses; a stem with its own echo sets its time and feedback
 		refreshStates: { |col, send|
+			var e, node;
 			if(col[\colCode].notNil) { col[\colCode][\update] !? { |f| f.(col, send) } } {
-				col.stateValues.keysValuesDo { |name, v| col[\ce].setState(name, v, send) } } },
-		// column code with gate: false is asked at fader 0 too (its state moves on; notes at level 0 are not played)
+				col.stateValues.keysValuesDo { |name, v| col[\ce].setState(name, v, send) };
+				node = col[\ce][\stemDelayNode] !? { |d| d[col[\stemName]] };
+				if(col[\echoOwn].notNil and: { node.notNil }) {
+					e = col.echoValues(col.addonOn(nil));
+					e = [e[0] * 60 / col[\track].bpm, e[1]];
+					if(e != col[\echoNow]) { col[\echoNow] = e; send.([\n_set, node, \time, e[0], \feedback, e[1]]) } } } },
+		// column code with gate: false and a stem with held chords are asked at fader 0 too (state and look-ahead move
+		// on; notes at level 0 are not played)
 		gated: { |col, bar|
-			var ce = col[\ce], always = col[\colCode] !? { |c| c[\gate] == false } ? false;
+			var ce = col[\ce], always = col[\colCode] !? { |c| c[\gate] == false } ? col[\ungated];
 			(always.not and: { (ce.val(col[\ccs][\fader]) <= 0) or: { ce.val(col[\track].global.master) <= 0 } })
 				or: { col[\breakOut] and: { col[\track].breakAt(bar) } }
 		},
@@ -211,68 +257,125 @@
 			m.events.select { |e| (e[0] * 16 + 1e-6).floor == r }.collect { |e|
 				(at: (e[0] * 16) - r, dur: e[1] * 16, t: (base / 16) + e[0], note: e[2]) }
 		},
+		// the hits of the first layer (a stem code file makes them instead)
 		patternHits: { |col, k|
-			var pat = col[\pats][col[\patLatch].atBar((k / 16).floor)];
-			if(col[\stemCode].notNil) { col[\stemCode].(col, k) ? [] } {
-				col.hitsOf(pat[\rhythm], k).collect { |h|
-					h[\note] = if(pat[\notes].isNil) { 0 } { col.miniValue(pat[\notes], h[\t]) };
-					h[\vel] = pat[\vel] !? { |v| col.miniValue(v, h[\t]) } ? 1;
-					h
-				}.select { |h| h[\note].notNil }
-			}
+			if(col[\stemCode].notNil) { col[\stemCode].(col, k) ? [] } { col.layerHits(col[\layers][0], k) }
+		},
+		// the hits of a layer in 16th k: its pattern's rhythm (or held chords), each with its note, velocity, length
+		// factor, parameters, envelope and voices
+		layerHits: { |col, l, k|
+			var part = l[\pats][col[\patLatch].atBar((k / 16).floor)], ce = col[\ce];
+			var hits = case
+			{ part[\strike].notNil } { col.strikeHits(part[\strike], k) }
+			{ part[\rhythm].notNil } { col.hitsOf(part[\rhythm], k) }
+			{ [] };
+			hits.collect { |h|
+				h[\note] = if(part[\notes].isNil) { 0 } { col.miniValue(part[\notes], h[\t]) };
+				h[\vel] = part[\vel] !? { |v| ce.stemValueAt(v, h[\t], col) } ? 1;
+				part[\length] !? { |m| h[\length] = col.miniValue(m, h[\t]) };
+				part[\params] !? { |ps| h[\params] = (); ps.keysValuesDo { |kk, v|
+					ce.stemValueAt(v, h[\t], col) !? { |x| h[\params][kk] = x } } };
+				h[\env] = part[\env];
+				h[\voices] = part[\voices];
+				h
+			}.select { |h| h[\note].notNil }
+		},
+		// a held chord: struck where the chord changes (with push: two 16ths early) and again every span 16ths after,
+		// held until the next change (at most span 16ths)
+		strikeHits: { |col, span, k|
+			var nameAt = { |x| col.chordAtK(x, col[\push])[\name] }, name = nameAt.(k), c = k, start, e;
+			while { (c > (k - span)) and: { nameAt.(c - 1) == name } } { c = c - 1 };
+			if(c == (k - span)) { c = span * (k / span).floor };
+			start = c + (span * ((k - c) / span).floor);
+			if(start != k) { [] } {
+				e = k + 1;
+				while { ((e - k) < span) and: { nameAt.(e) == name } } { e = e + 1 };
+				[(at: 0, dur: e - k, t: k / 16, note: 0)] }
 		},
 		// the note value of the current pattern at cycle time t (0 without notes)
 		noteAt: { |col, t|
 			var pat = col[\pats][col[\patLatch].atBar(t.floor)];
 			if(pat[\notes].isNil) { 0 } { col.miniValue(pat[\notes], t) }
 		},
-		midiOf: { |col, v, bar|
-			var c = col.chordAt(bar), n = if(v.isString) { col[\ce].noteNumber(v) } { v }, i = n.round.asInteger;
+		// a note value as MIDI at 16th k, through the chord there (push: two 16ths early) and the stem's register
+		midiOf: { |col, v, k|
+			var c = col.chordAtK(k, col[\push]), n = if(v.isString) { col[\ce].noteNumber(v) } { v }, i = n.round.asInteger;
+			var reg = col[\register], fold = { |m| if(reg.isNil) { m } { reg + ((m - reg) % 12) } };
 			switch(col[\pitch],
 				\midi, { n },
-				\root, { c[\bass] + n },
-				\chord, { var t = c[\tones].copy.sort; t.wrapAt(i) + (12 * (i / t.size).floor) },
+				\root, { fold.(c[\bass]) + n },
+				\chord, { var t = c[\tones].copy.sort, pcs;
+					if(reg.isNil) { t.wrapAt(i) + (12 * (i / t.size).floor) } {
+						pcs = t.collect { |m| m % 12 };
+						if(i >= 0) { (reg .. reg + 96).select { |m| pcs.includes(m % 12) }[i] } {
+							(reg - 1, reg - 2 .. reg - 96).select { |m| pcs.includes(m % 12) }[i.neg - 1] } } },
 				\scale, { var iv = c[\scale].collect { |pc| (pc - c[\root]) % 12 }.asSet.asArray.sort;
-					c[\root] + iv.wrapAt(i) + (12 * (i / iv.size).floor) })
+					fold.(c[\root]) + iv.wrapAt(i) + (12 * (i / iv.size).floor) })
 		},
-		noteOf: { |col, h, k, bar, p, on|
-			var ce = col[\ce], args = p.copy, m, at = h[\at], ad = col[\addon];
-			var hold = if(col[\holdKnob]) { p[\hold] * 4 * col[\track].bpm / 60 } { h[\dur] };
+		// one note of a hit: the knob values p, the hit's own parameters, its layer's sound, kit file, pitch, envelope,
+		// swing and amount (amt: × amp, or live on a parameter). A sound with a modulator phase input gets the WebAudio
+		// phase of the note's time in a render (comparisons with Strudel).
+		noteOf: { |col, h, k, bar, p, on, layer, amt = 1|
+			var ce = col[\ce], l = layer ?? { col[\layers][0] }, args = p.copy, m, at = h[\at], ad = col[\addon], hold, file;
+			var live = l[\amount] !? { |a| a[\param] };
+			(h[\params] ? ()).keysValuesDo { |kk, v| args[kk] = v };
+			hold = case
+			{ col[\kit].notNil } { -1 }
+			{ col[\holdKnob] } { args[\hold] * 4 * col[\track].bpm / 60 }
+			{ h[\dur] * (h[\length] ? 1) * (args[\length] ? 1) };
 			if(col[\pitch] != \none) {
-				m = h[\note] !? { |v| col.midiOf(v, bar) };
+				m = h[\note] !? { |v| col.midiOf(v, k) };
+				m !? { m = m + l[\transpose] + (args[\transpose] ? 0) };
 				if(on and: { m.notNil }) { ad[\transpose] !? { |f| m = m + f.(col[\addonState]) } };
 			};
-			if(col[\pitch] != \none and: { m.isNil }) { nil } {
-				[\room, \echo, \hold].do { |key| args.removeAt(key) };
-				col[\busParams].do { |param| args[param] = ce.stateMap(col.stateName(param)) };
+			col[\kit] !? { |kit| file = kit[h[\note].asString.asSymbol] };
+			if((col[\pitch] != \none and: { m.isNil }) or: { col[\kit].notNil and: { file.isNil } }) { nil } {
+				[\room, \echo, \hold, \space, \length, \boost, \trim, \transpose, \echoTime, \echoFeedback].do { |key|
+					args.removeAt(key) };
+				l[\busParams].do { |param| args[param] = ce.stateMap(col.stateName(param)) };
 				col[\knobCode].keysValuesDo { |kk, f| args.putAll(f.(col.knob(kk), col) ? ()) };
-				col[\toneArg] !? { |x| args[\tone] = x };
-				col[\thinArg] !? { |x| args[\thinF] = x };
+				l[\toneArg] !? { |x| args[\tone] = x };
+				l[\thinArg] !? { |x| args[\thinF] = x };
+				file !? { args[\buf] = ce.sampleBuffers[file]; args[\stereoIn] = (ce.sampleMono[file] != true).asInteger };
 				m !? { args[\freq] = m.midicps; args[\midi] = m };
-				if(col[\swing] and: { ((k % 16) + at).floor.asInteger.odd }) { at = at + (col[\track].swing ? 0) };
-				args[\amp] = (p[\amp] ? 1) * (h[\vel] ? 1);
+				(h[\env] !? { |e| ce.sdADSR(e[\a], e[\d], e[\s], e[\r]) } ?? { l[\envDefault] }) !? { |e|
+					[\a, \d, \s, \r].do { |key, i| args[key] = e[i] } };
+				if(col[\swing] and: { ((k % 16) + at).floor.asInteger.odd }) { at = at + (l[\swing] ? col[\track].swing ? 0) };
+				args[\amp] = (args[\amp] ? 1) * (h[\vel] ? 1) * if(live.isNil) { amt } { 1 };
+				live !? { args[live] = ce.stateMap(col.stateName(l[\live])); if(amt <= 0) { args[\nolog] = true } };
+				if(m.notNil and: { ce.webaudioPhase == true } and: { l[\inputs].includes(\modPhase) }) {
+					args[\modPhase] = (2pi * m.midicps * ((k + at) / 4 / (col[\track].bpm / 60))) % 2pi };
 				args[\at] = at;
 				args[\hold] = hold * if(on) { ad[\hold] ? 1 } { 1 };
-				ce.note(col[\sample], args)
+				ce.note(l[\sound], args)
 			}
 		},
 		// the notes of 16th k (asked by the step engine through the stem track's slot)
+		// every layer: its amount (0: no notes, unless a live amount plays on), hits, chance, voices; the add-on's hits
+		// change the first layer
 		stepNotes: { |col, k|
-			var bar = (k / 16).floor, on, a = col[\addonState], ad = col[\addon], hits, out = [], p;
+			var bar = (k / 16).floor, on, a = col[\addonState], ad = col[\addon], out = List[], p;
 			on = col[\colCode].isNil and: { col.addonOn(bar) };
 			if(on) { a[\since] = a[\since] ? k } { a[\since] = nil };
 			case
 			{ col.gated(bar) or: { on and: { ad[\mute] == true } } } { [] }
 			{ col[\colCode].notNil } { col[\colCode][\notes].(col, k) ? [] }
 			{
-				hits = col.patternHits(k);
-				if(on) { ad[\hits] !? { |f| hits = f.(a, col, k, hits) } };
-				if(hits.notEmpty) {
-					p = col.knobValues(on);
-					out = hits.collect { |h| col.noteOf(h, k, bar, p, on) }.reject(_.isNil);
+				col[\layers].do { |l, i|
+					var amt = l[\amount] !? { |x| col.amountOf(x, bar) } ? 1, hits, c;
+					if((amt > 0) or: { l[\amount] !? { |x| x[\param].notNil and: { x[\play] } } ? false }) {
+						hits = if(i == 0) { col.patternHits(k) } { col.layerHits(l, k) };
+						if(on and: { i == 0 }) { ad[\hits] !? { |f| hits = f.(a, col, k, hits) } };
+						l[\chance] !? { |x| c = if(x.isNumber) { x } { col.amountOf(x, bar) };
+							hits = hits.select { |h| col[\ce].rand((k + h[\at]) / 16) >= (1 - c) } };
+						if(hits.notEmpty) {
+							p = p ?? { col.knobValues(on) };
+							hits.do { |h| (h[\voices] ? [0]).do { |o| var hh = h;
+								if(o != 0) { hh = h.copy; hh[\note] = h[\note] + o };
+								col.noteOf(hh, k, bar, p, on, l, amt) !? { |n| out.add(n) } } } } }
 				};
 				if(on) { ad[\notes] !? { |f| out = out ++ f.(a, col, k) } };
-				out
+				out.asArray
 			}
 		},
 	)
