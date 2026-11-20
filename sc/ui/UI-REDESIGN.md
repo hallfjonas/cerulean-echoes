@@ -200,7 +200,8 @@ The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternat
 ## Rules
 
 - Flat: no gradients, shadows, glow or blur.
-- Minimum text size 11 px; lower case labels as in the mockup.
+- Minimum text size 11 px; **everything on the panel is lower case** (user, 2026-11-20): names, labels, pattern and
+  chord names, status strip, Launchkey, pad names.
 - Draw knobs as SVG. Update values in a `requestAnimationFrame` loop, not on every MIDI message.
 - **Every label is one line, one or two words, as short as possible.** Never wrap, never shrink the font to fit.
   Limits: column name ≤ 7 characters, pattern name ≤ 6, button 2 name ≤ 6, knob row names ≤ 10.
@@ -260,7 +261,7 @@ The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternat
   - Launchkey knobs are CC 21-28 (the brief's 31-38 is outdated). Launchkey box: inner gaps 10 / 6 (mockup 12) and keys
   44 units, so the board stays under 900 units with the brief's 14-unit column gap (the mockup uses 10).
   - Labels are clipped with an ellipsis (visible, not silent) when over their width; names, knob labels and button 2
-  are shown in lower case, button 1 (pattern / chapter / chord names from the track) as the track writes them.
+  are shown in lower case, and since 2026-11-20 button 1 (pattern / chapter / chord names) and everything else too.
   - Fader names (Level, Master, Overtones) are not drawn (as in the mockup), they are in the tooltip. Pad sample
   names are in the pad tooltip and after `launchkey ·` when hit, not under the pads (no room on the board).
   - Unported cells are hidden (as before), not greyed.

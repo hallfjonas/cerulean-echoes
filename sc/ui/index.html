@@ -19,6 +19,8 @@ body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--
   --font:-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,"DejaVu Sans",sans-serif}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+/* everything on the panel is lower case (user, 2026-11-20): pattern and chord names, status, Launchkey, pads */
+body{text-transform:lowercase}button,input,select{text-transform:inherit}
 body{display:flex;align-items:center;justify-content:center;color:var(--text);font-family:var(--font);line-height:1.4;
   user-select:none;-webkit-user-select:none;
   --px:min(calc(96vw / var(--W)), calc(94vh / var(--H)));
@@ -32,8 +34,8 @@ body{display:flex;align-items:center;justify-content:center;color:var(--text);fo
 .pair>section{min-width:0;display:flex;flex-direction:column}
 .lab{display:flex;gap:.6em;font-size:var(--fs-lab);color:var(--off);margin:0 calc(12 * var(--px)) calc(8 * var(--px));
   white-space:nowrap;overflow:hidden;text-transform:lowercase}
-.lab .hint{margin-left:auto;overflow:hidden;text-overflow:ellipsis;text-transform:none}
-.lab .pad-name{color:var(--text);text-transform:none}
+.lab .hint{margin-left:auto;overflow:hidden;text-overflow:ellipsis}
+.lab .pad-name{color:var(--text)}
 /* each controller is its own panel with a subtle edge; the one moved last is framed (off with the player's LC frame off) */
 .pn{padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px))}
 body:not(.noframe) .pn.live{border-color:var(--frame)}
