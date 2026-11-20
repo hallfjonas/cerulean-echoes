@@ -27,7 +27,7 @@ Everything is logged in `perform/<track>/feedback.md`. Formats and the design sk
    28, Tension 36, Chapter 44, Break 52. Launchkey: keys, mod wheel CC 1, knobs CC 31-38 (the `@lk` tags name them),
    pads 36-51; which sound each pad plays is in the track code (search `LK_SHOTS`), not in the tags. The `@ctl` tags win
    over a header comment that says a column is empty.
-3. `docs/reference/listening-list.md` for the genre, the track folder's `feedback.md`, existing scripts in `perform/<track>/` (an
+3. `docs/reference/genres.md` (what the genre is, per stem for groove techno) and `docs/reference/listening-list.md` for the genre, the track folder's `feedback.md`, existing scripts in `perform/<track>/` (an
    existing script, like 010's spike, is the best starting point: describe it in sections instead of starting over).
 4. Finished examples to match in style: `perform/010-ambient-house/journey.md` + `journey.json` + `feedback.md`.
 5. What a track needs from the script, read from its code: knobs read 0 until set (Launchkey Brightness, Length), keys
