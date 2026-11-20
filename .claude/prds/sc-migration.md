@@ -11,8 +11,8 @@ created: 2026-11-20T12:13:35Z
 
 cerulean-echoes is a tool for collaborative live performance with MIDI controllers, playable by people without
 prior knowledge. Today it runs on two engines: Strudel (browser) and a SuperCollider (SC) port of 007-010. This
-project makes SC the one engine for live play: the player (track list, MIDI panel, visuals, auto-perform, takes,
-recording) runs on SC, the remaining Strudel-only tracks are ported, sound development moves to a new SC lab, and
+project makes SC the one engine for live play: the player (track list, MIDI panel, auto-perform, takes, recording,
+and the visuals as a playground) runs on SC, the remaining Strudel-only tracks are ported, sound development moves to a new SC lab, and
 Strudel parts that need upkeep are retired. Background and earlier decisions: `SC-MIGRATION.md`,
 `sc/PLAN-SC-ENGINE.md`, `sc/PLAN-UI.md`, `sc/PLAN-STEM-LIBRARY.md`.
 
@@ -36,24 +36,25 @@ Strudel parts that need upkeep are retired. Background and earlier decisions: `S
    reading control names in the MIDI panel.
    - Acceptance: from a Mac with the app installed, one double-click opens the player on the MIDI panel with SC
      running; no SC IDE, no terminal.
-3. **As a player** I watch the visuals, run an auto-performance, save and replay a take, and record a WAV, all on
-   SC.
+3. **As a player** I run an auto-performance, save and replay a take, and record a WAV, all on SC.
    - Acceptance: each of these works on 009 (SC) as it does on Strudel today; the existing perform scripts play
      unchanged.
+   - The visuals are a playground: they draw SC tracks, low priority, need not match today's look, no tests.
 4. **As a sound designer (with Claude)** I develop and compare sounds in an SC lab and promote a winner into a
    track or the library.
    - Acceptance: an SC machine lab (one instrument on the whole LC) and an options lab (columns = variants) exist,
      and one sound has gone lab → library → track.
 5. **As a maintainer** I change the software and know that every feature still works.
    - Acceptance: one `npm test` runs the feature tests (player, controllers, auto-perform, takes, recording,
-     tools page, producer, SC core); a GitHub Actions job runs the Node part on every PR.
+     producer, SC core); a GitHub Actions job runs the Node part on every PR.
 
 ## Functional Requirements
 
 1. Player engine: `engine-sc.mjs` behind the existing engine interface (`load`, `stop`, `cycle`, `cps`, output via
    SC); SC's OSC bridge folded into `tools/trajectory/server.mjs`; the catalogue lists SC tracks with their engine.
 2. Controllers go straight to SC; the browser only mirrors them (MIDI panel shows SC's state).
-3. Visuals: SC sends one OSC message per note; an adapter turns them into the existing trajectory lines.
+3. Visuals (low priority, playground): SC sends note messages and the visuals draw them; they need not match today's
+   version and get no tests.
 4. Auto-perform and take replay send their steps to SC (`/ce/cc`, `/ce/lkcc`, `/ce/lknote`); take capture keeps
    working; the bar clock comes from SC.
 5. Recording: SC records its master output; `recording.mjs` keeps file names and the sidecar format.
@@ -81,11 +82,10 @@ Strudel parts that need upkeep are retired. Background and earlier decisions: `S
 ## Success Criteria
 
 - All 7 live tracks play from the player on SC; 0 live tracks need the Strudel engine.
-- All player features (track list, MIDI panel, visuals, auto-perform, takes, recording, tools page) pass their
-  feature tests on SC.
+- All player features (track list, MIDI panel, auto-perform, takes, recording) pass their feature tests on SC.
 - A first-time user starts a set in under 2 minutes with the launcher and the README (tried with one person).
 - `npm test` green on `main`, run on every PR by CI (Node part).
-- Retired parts gone from the working tree: `tracks/sets/`, `tracks/historic/`, the Strudel lab boards, the
+- Retired parts gone from the working tree: the Tools page and the Analysis page, `tracks/sets/`, `tracks/historic/`, the Strudel lab boards, the
   Strudel-only checks and skills; CLAUDE.md and docs describe the SC workflow.
 
 ## Constraints & Assumptions
@@ -100,7 +100,9 @@ Strudel parts that need upkeep are retired. Background and earlier decisions: `S
 ## Out of Scope
 
 - Remote / phone access to the player (D3: not for now).
-- Layout sheets and per-track `.syx` (retired 2026-11-20).
+- Layout sheets and per-track `.syx` (retired 2026-11-20); the player's Tools page and Analysis page (retired
+  2026-11-20, task 011).
+- Visuals matching the current version, and tests for the visuals.
 - Sound or loudness testing, event-by-event track comparisons, proving tracks stay identical.
 - Producer (Guitar Pro → track): stays as it is, writing Strudel; an SC output is decided when the next song comes.
 - Removing the player's Strudel engine: it stays while it needs no maintenance (D2); removing it is a later step.
