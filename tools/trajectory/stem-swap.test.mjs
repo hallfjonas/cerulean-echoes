@@ -9,6 +9,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { createStemSwap } from './stem-swap.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
+import { checkFiles } from '../stems/check-stems.mjs'
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const KICK_2 = 'kick909/kick909-brightness-space-punch-pattern-drop-out-2.stem'
@@ -80,6 +81,7 @@ test('stem swap: the endpoint changes the slot, Save as writes a new track, the 
     assert.equal(saved.name, '090-stem-demo-v2')
     assert.deepEqual(saved.slots, { '1:1': KICK_2, '1:4': BASS_FM })
     assert.ok(fs.existsSync(path.join(root, 'sc', 'tracks', '090-stem-demo-v2', saved.frame)), 'the frame is next to it')
+    assert.deepEqual(checkFiles([path.join(root, result.body.file)], root)[0].errors, [], 'a valid stem track')
     assert.equal((await post('/track/save-as', { track: '090-stem-demo', name: '090-stem-demo-v2' })).status, 409,
       'never overwrites')
     assert.equal((await post('/track/save-as', { track: '090-stem-demo', name: 'Bad Name' })).status, 400)

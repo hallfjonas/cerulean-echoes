@@ -40,6 +40,7 @@
     flex-wrap: nowrap; padding: 0 12px; background: var(--panel); border-bottom: 0; z-index: 1; transition: opacity 0.6s }
   body.side-closed header, body.side-closed #stage { left: 0 }
   body.help-open header, body.help-open #stage { right: 320px }
+  body.drawer-open header, body.drawer-open #stage { right: 340px }
   #status { overflow: hidden; white-space: nowrap; text-overflow: ellipsis }
   #helpToggle { width: 34px; padding: 6px 0; border-radius: 50%; font-weight: 600 }
   #stage { position: fixed; top: var(--top); left: var(--side); right: 0; bottom: 0; background: #111 }
@@ -78,7 +79,9 @@
      Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
      tail. Stop, a track change or a new auto-perform run ends a recording.
-     The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window. -->
+     The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window.
+     Stem tracks: a click on a column's name in the MIDI panel selects the column (selection.mjs) and opens the stem
+     drawer (stem-drawer.mjs): swap the column's stem, Revert, Save as (a new track file; stem-swap.mjs). -->
 <canvas id="view"></canvas>
 <aside id="sidebar">
   <nav>
@@ -128,6 +131,8 @@ import { mountHelp } from './help.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
+import { createSelection, columnSelection } from './selection.mjs'
+import { mountStemDrawer } from './stem-drawer.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -153,7 +158,13 @@ mountHelp([
     + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
   { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
     'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
-    'Stop or another track ends a recording. Recordings stay out of git.'] }
+    'Stop or another track ends a recording. Recordings stay out of git.'] },
+  { heading: 'Stem swap', text: ['Stem tracks only: click a column\'s name in the MIDI panel.',
+    'The drawer lists the library stems of that column\'s role; filter by genre, energy and tag.',
+    'Pick one: it plays from the next bar, the other columns play on. A stem that needs another mixer strip loads '
+    + 'the track again with it (a short gap; the drawer says so).',
+    'The track file is not changed. Revert puts the file\'s stems back; Save as writes a new track with the stems '
+    + 'that play. Play reloads the file.'] }
 ], { title: 'About this page', button: '?', startOpen: false })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
@@ -179,7 +190,8 @@ const recorder = createRecorder({ midi, engine })
 strudelEngine.ready.then(() => { label = 'ready' })
 let catalogue = []
 const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
-fetch('catalogue').then(r => r.json()).then(entries => {
+const loadCatalogue = () => fetch('catalogue').then(r => r.json()).then(entries => {
+  const picked = $('track').value
   catalogue = entries
   const group = (label, kind) => {
     const optgroup = document.createElement('optgroup')
@@ -193,8 +205,27 @@ fetch('catalogue').then(r => r.json()).then(entries => {
     return optgroup
   }
   $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
-  $('track').value = ['010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
+  $('track').value = [picked, '010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
   showScripts()
+})
+loadCatalogue()
+
+// stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
+const selection = createSelection()
+mountStemDrawer({ selection, onSaved: loadCatalogue })
+let playingId = null
+const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns: !!entryOf(playingId)?.stems }, location.origin)
+const setPlaying = id => {
+  playingId = id
+  selection.clear()
+  sendPick()
+}
+addEventListener('message', async event => {
+  const slot = event.data?.select?.slot
+  if (event.source !== $('scPanel').contentWindow || !slot || !entryOf(playingId)?.stems) return
+  const state = await fetch('swap?track=' + encodeURIComponent(playingId), { cache: 'no-store' }).then(r => r.json())
+  const stem = state.slots?.[slot]?.stem
+  if (stem) selection.select(columnSelection({ track: playingId, slot, stem }))
 })
 $('track').onchange = () => {
   showScripts()
@@ -263,6 +294,7 @@ const playSc = async (track, script) => {
   label = scEngine.host().ready ? 'loading track …' : 'starting SuperCollider …'
   try {
     await scEngine.load(track)
+    setPlaying(track)
     recorder.start({ track, trackHash: null, cps: engine.cps(), ...script && { script } })
     label = 'playing: ' + track + ' (SuperCollider)'
   } catch (error) {
@@ -278,6 +310,7 @@ const play = async script => {
   const track = $('track').value
   if (entryOf(track)?.engine === 'sc') return playSc(track, script)
   scEngine.stop()
+  setPlaying(null)
   current = strudelEngine
   await Promise.all([engine.ready, midi.ready])
   label = 'loading track …'
@@ -300,7 +333,7 @@ const play = async script => {
   return true
 }
 $('play').onclick = () => play()
-$('stop').onclick = () => { stopPerformer(); engine.stop(); stopRecording(); label = 'stopped' }
+$('stop').onclick = () => { stopPerformer(); engine.stop(); stopRecording(); setPlaying(null); label = 'stopped' }
 
 const startScript = async id => {
   const track = $('track').value
@@ -424,7 +457,7 @@ const applyLcFrame = () => {
 // the SuperCollider panel follows the LC frame setting too (sent on change and whenever the panel (re)loads)
 let sentLcFrame = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
-$('scPanel').addEventListener('load', sendLcFrame)
+$('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick() })
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()

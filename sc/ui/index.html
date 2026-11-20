@@ -23,6 +23,7 @@ body:not(.noframe) .page.live,body:not(.noframe) .lk.live{border-color:var(--fra
   grid-template-rows:20px repeat(3,48px) clamp(90px,22vh,150px) 18px 18px;align-content:start;column-gap:2px;row-gap:6px}
 .g{border-left:1px solid var(--track)}
 .col{font-size:13px;font-weight:500;text-align:center;white-space:nowrap;overflow:hidden;align-self:end}
+body.pick .col[data-col]{cursor:pointer;text-decoration:underline dotted}
 .cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:0}
 .cell span{font-size:11px;white-space:nowrap;overflow:hidden;max-width:100%}
 .cell.off{visibility:hidden}
@@ -92,6 +93,8 @@ addEventListener('message', e => {
   if (THEMES.includes(e.data?.panelTheme)) applyTheme(e.data.panelTheme)
   // the player's "LC frame" setting (key H): frame the controller moved last, or not
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
+  // a stem track in the player: a click on a column's name selects that column (the player opens the stem drawer)
+  if (typeof e.data?.pickColumns === 'boolean') document.body.classList.toggle('pick', e.data.pickColumns)
 })
 applyTheme(readTheme())
 
@@ -229,11 +232,15 @@ const build = () => {
     const title = tags()[PREFIX[page]] ?? (page === 'jojo' ? 'Mode 1' : 'Mode 2')
     const cols = [1, 2, 3, 4, 5, 6, 7, 8]
     return '<section class=page data-page=' + page + '><h2>' + esc(shortTitle(title)) + '</h2><div class=grid>' +
-      cols.map(n => '<div class="col' + (isGlobal(n) ? ' g' : '') + '">' +
-        esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</div>').join('') +
+      cols.map(n => { const name = (tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')
+        return '<div class="col' + (isGlobal(n) ? ' g' : '') + '"' + (isGlobal(n) || !name ? '' : ' data-col="' + (page === 'jojo' ? 1 : 2) + ':' + n + '"') +
+          '>' + esc(name) + '</div>' }).join('') +
       ROWS.map(row => cols.map(n => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>').join('')).join('') + '</div></section>'
   }).join('') + '</div>' + lkHtml() + '<div class=head id=head></div>'
   lkAttach(root)
+  for (const el of root.querySelectorAll('[data-col]')) el.addEventListener('click', () => {
+    if (parent !== window && document.body.classList.contains('pick')) parent.postMessage({ select: { kind: 'column', slot: el.dataset.col } }, location.origin)
+  })
   for (const div of root.querySelectorAll('[data-cell]')) {
     const [page, n0, row] = div.dataset.cell.split(':'), n = +n0
     const [name, desc] = (tagOf(page, n, row) ?? '').split(' | ')

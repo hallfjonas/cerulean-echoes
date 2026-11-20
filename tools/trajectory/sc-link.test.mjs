@@ -4,6 +4,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawn, execFileSync } from 'child_process'
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { encode, decode } from './osc.mjs'
@@ -109,6 +110,30 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     const layout = await waitFor(e => e.type === 'layout', mark)
     assert.equal(layout?.data.tags['16:4.k3'], 'Length | short ↔ long.', 'the stem track shows its stems')
     assert.ok(await waitFor(e => e.type === 'beat', mark), 'the stem track plays')
+
+    // stem swap (stem-swap.mjs): kick version 2 fits the kick's strip (from the next bar); the FM bass needs another
+    // strip (the track loads again with it); Revert plays the file's stems; the track file never changes
+    const demoFile = path.join(here, '..', '..', 'sc', 'tracks', '090-stem-demo', '090-stem-demo.track')
+    const demoText = fs.readFileSync(demoFile, 'utf8')
+    const swap = (route, body) => fetch(base + route, { method: 'POST', headers: { Origin: base }, body: JSON.stringify(body) })
+      .then(async r => ({ status: r.status, body: await r.json() }))
+    const kick2 = 'kick909/kick909-brightness-space-punch-pattern-drop-out-2.stem'
+    const bassFm = 'bassFM/bass-fm-brightness-space-sound-pattern-octave.stem'
+    let swapped = await swap('/swap', { track: '090-stem-demo', slot: '1:1', stem: kick2 })
+    assert.equal(swapped.status, 200, JSON.stringify(swapped.body))
+    assert.equal(swapped.body.mode, 'next-bar')
+    mark = since()
+    swapped = await swap('/swap', { track: '090-stem-demo', slot: '1:4', stem: bassFm })
+    assert.equal(swapped.status, 200, JSON.stringify(swapped.body))
+    assert.equal(swapped.body.mode, 'reload')
+    assert.ok(await waitFor(e => e.type === 'layout' && e.data.tags['16:4.k3'] === 'Sound | FM → M1 organ → analog.',
+      mark), 'the reload plays the FM bass')
+    const state = await (await fetch(base + '/swap?track=090-stem-demo')).json()
+    assert.deepEqual([state.slots['1:1'].stem, state.slots['1:4'].stem], [kick2, bassFm])
+    swapped = await swap('/swap/revert', { track: '090-stem-demo' })
+    assert.equal(swapped.status, 200, JSON.stringify(swapped.body))
+    assert.deepEqual(swapped.body.slots, JSON.parse(demoText).slots)
+    assert.equal(fs.readFileSync(demoFile, 'utf8'), demoText, 'the track file is unchanged')
 
     // stop: no more bars
     assert.equal((await post('stop')).status, 200)
