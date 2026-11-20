@@ -24,7 +24,6 @@ The Claude skills `lab-board` (build a round) and `lab-to-track` (move a winner 
 ([Claude skills](claude-skills.md)).
 
 ## Good to know
-- Each board has a layout sheet (`<board>-layout.pdf`) made from its `@ctl` comments ([layout sheets](layout-sheets.md)).
 - Boards need rhythm, not only held notes, and all knobs at 0 must already sound good.
 - Nothing you rejected comes back: `feedback.md` is read before every new round.
 - A board also has a context: a few faders (drums, bass, pad) on the second controller mode, so the candidate is

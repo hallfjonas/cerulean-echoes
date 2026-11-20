@@ -96,49 +96,57 @@ Every Node tool today reads `.strudel` files through `tools/strudel-sim` (Strude
 
 | Tool | Job | After the switch |
 |---|---|---|
-| `lcxl-layout` (layout sheets, `.syx`), hook | controller sheets and custom modes from `@ctl` | **extend to `.scd`**: SC tracks already carry `// @col` / `// @ctl` in the same format (`sc/ui/README.md`). Needed: without it no `.syx` for SC tracks. Small. |
-| `npm run verify` | after an edit: transpile, compare with HEAD, sounds, layout, perform scripts | **SC counterpart `verify-sc`**: the track loads headless in `sclang` without errors, every sample file exists, layout/syx regenerate, perform scripts only use controls the track has, event log equal to HEAD unless the change is meant (see tests below). |
-| `compare` (old vs new, event by event) | prove a refactor is inaudible | **SC counterpart**: SC's offline render already writes an event log (`sc/tools/render.scd`); compare two `.scd` versions on the same scenario. Replaces `/strudel-optimize` for SC tracks. |
-| `audibility`, `measure` (levels) | loudness per stem, SILENT / LOW / CLIPS | **SC counterpart**: offline render per stem + loudness; `tools/sc-port/batch.py` already measures LUFS and peaks. Needed for `/strudel-mix` on SC tracks. |
-| `scenario` | controller scenario → events / stems / LC view as text | **SC counterpart**: `render.scd` already takes the scenario JSON; add the text outputs. |
-| `check-sounds`, `samples/sounds.json`, `mirror-sound` | does every sound load in a browser | **drop for SC**: SC loads local files; replaced by the "every sample exists" check in `verify-sc`. |
-| CPU gating rules, `@shared` blocks, `npm run shared` | Strudel-specific cost and code sharing | **drop for SC**: SC shares code through `sc/lib/` and has its own CPU behaviour. |
-| `tools/sc-port` (Strudel ↔ SC comparison) | proves a port is faithful | **keep only for porting** further tracks; a ported track is no longer compared with its frozen Strudel file. |
+| layout sheets (PDF), per-track `.syx` | printable sheets, control names on the LC display | **retired 2026-11-20.** The `@ctl` texts stay (LC view, MIDI panel, SC UI, `check-perform`); every LC gets the same two modes once (`midi-layouts/lcxl3-mode1.syx` / `-mode2.syx`). |
+| `npm run verify` | after an edit: transpile, compare with HEAD, sounds, tags, perform scripts | **SC counterpart `verify-sc`**, small: the track loads headless in `sclang` without errors (a missing sample file counts as an error), `@ctl` tags parse, perform scripts only use controls the track has. No comparison with HEAD. |
+| `compare` (old vs new, event by event) | prove a refactor is inaudible | **drop for SC**: tracks may change; we do not prove they stay identical. |
+| `audibility`, `measure` (levels) | loudness per stem, SILENT / LOW / CLIPS | **drop for now**: measuring sound is too much burden for how we work; levels are set by ear. |
+| `scenario` | controller scenario → events / stems / LC view as text | **later, only if we miss it**: `render.scd` already takes the scenario JSON. |
+| `check-sounds`, `samples/sounds.json`, `mirror-sound` | does every sound load in a browser | **drop for SC** (SC loads local files). |
+| CPU gating rules, `@shared` blocks, `npm run shared` | Strudel-specific cost and code sharing | **drop for SC**: SC shares code through `sc/lib/`. |
+| `tools/sc-port` (Strudel ↔ SC comparison) | proves a port is faithful | **keep only for porting** further tracks, if wanted; a ported track is never compared with its frozen Strudel file again. |
 | `set` / `continuum` (011) | the frozen Strudel set | **unchanged, frozen** (low priority); falls away with D2. |
 | `producer` | Guitar Pro → Strudel track | **unchanged for now**: writes Strudel. An SC output is a separate decision when the next song comes. |
 | `track-map`, `path-lint`, `session-digest`, `lang-scan` | engine-independent | **keep**; `track-map` learns `.scd`. |
-| player checks (`check-perform`, `check-replay`, `check-recording`) | auto-perform, takes, recording | **follow the SC engine** (Phases 3 and 4). |
+| player checks (`check-perform`, `check-replay`, `check-recording`) | auto-perform, takes, recording | **follow the SC engine** (Phases 3 and 4) and become feature tests (below). |
 
-Skills follow their tools: `/strudel-mix`, `/strudel-optimize`, `/lcxl-layout`, `/lab-board`, `/lab-to-track`,
-`/add-sample` and `/auto-perform` each get an SC path when their tool does; until then they say "Strudel tracks only".
+Skills follow their tools: `/strudel-mix`, `/strudel-optimize`, `/lab-board`, `/lab-to-track`, `/add-sample` and
+`/auto-perform` each get an SC path when their tool does; until then they say "Strudel tracks only".
 
-## Tests: yes, now
+## Tests: yes, now — features, not tracks
 
-Now is the right time, for three reasons: (1) under D1 the Strudel↔SC comparison stops guarding the ported tracks, so
-the SC tracks need their own safety net before anyone edits them; (2) Phase 1 rewires the player, and the engine
-interface is easiest to pin down with tests before the second engine exists; (3) the suite is small today
-(`npm test` runs only `trajectory/*.test.mjs`; the producer tests are not in it; there is no CI).
+**Goal: every feature of the software keeps working.** Not a goal: that a track stays exactly the same (tracks are
+meant to change), nor measuring sound (too much burden for how we work).
 
-Scope, in this order (each one fast, minutes not hours):
+Now is the right time: Phase 1 rewires the player, and what "works" means is easiest to pin down before the second
+engine exists. Today `npm test` runs only `trajectory/*.test.mjs` (the producer tests are not in it) and there is no CI.
 
-1. **SC core unit tests** (SC's built-in `UnitTest`, run headless by one `sclang` script): `lib/mini.scd` (mini-notation
-   cases, taken from `tools/sc-port/mini-check.mjs`), `lib/strudel.scd` (rand / perlin values against stored Strudel
-   numbers), latches (`controls.scd`: switch on the bar, not before), `~ce.adsr` / `~ce.rq`, last-moved-wins for
-   several LCs.
-2. **Golden event logs per SC track** (snapshot tests): each track on a few scenarios (all knobs 0; full mix; every
-   pattern button; Chapter / Break) rendered event-only, compared with a stored log. A meant change updates the log in
-   the same commit. This replaces "compare with HEAD" and the hour-long audio comparison as the everyday check.
-3. **Player contract tests** (`node --test`, like `take.test.mjs`): both engines satisfy `{ ready, load, stop, cycle,
-   cps, output }`; OSC encode/decode of the bridge; the catalogue lists `.scd` tracks with `engine: 'sc'`;
-   `sc-source.mjs` turns note messages into the same lines as `strudel-source.mjs` for the same notes; the recording
-   sidecar format.
-4. **One command:** `npm test` runs all Node tests (trajectory and producer) plus the `sclang` tests; `verify-sc` runs
-   it for a changed track. A GitHub Actions job for the Node tests is cheap; SC in CI later, if at all.
+A feature test asks "does it still do its job", with loose checks (something plays, a value arrives, a file is
+written), never "is the output identical". Each runs in seconds; the whole suite in a few minutes.
 
-Not unit tests: the audio null tests and loudness comparisons stay manual (they take about an hour, see the resource
-rules).
+| Feature | Test (passes when …) |
+|---|---|
+| Track list | every live track (Strudel and SC) shows up in the catalogue with its engine; a broken file is reported, not hidden |
+| Load / play / stop / switch | each engine loads every live track without errors, plays notes once the master fader is up, stops, and switching tracks leaves nothing playing |
+| Controllers | a CC from one LC reaches the track; with two LCs the one moved last wins; Launchkey keys and pads play; the mod wheel moves the keys level |
+| Pattern buttons, Chapter, Break | a press changes what plays, on the next bar, not before |
+| MIDI panel / LC view | a moved control shows its new value and its `@ctl` name |
+| Visualization | the engine's notes become trajectory lines (per stem, pan and pitch in range) |
+| Auto-perform | every script in `perform/` passes `check-perform` and plays to its end on the engine without errors |
+| Takes | a captured take saves as a valid script v2 and replays (`check-replay`, loose bar-by-bar check) |
+| Recording | Record writes a WAV with sound in it and a sidecar that matches the take (`check-recording`) |
+| Tools page | each job starts, finishes and reports |
+| Producer | the two fixtures still turn into a track that loads and plays (no exact comparison needed) |
+| SC core | the building blocks in `sc/lib/` (mini-notation, latches, last-moved-wins) do their job: a few `UnitTest` cases run headless by one `sclang` script |
 
-Where it goes in the phases: 1 and 2 before or with Phase 1 (they guard the tracks), 3 grows with each phase.
+How it runs:
+
+- **One command:** `npm test` runs all Node tests plus the `sclang` script; `verify-sc` runs the checks for one
+  changed track.
+- **Cheap CI:** a GitHub Actions job for the Node tests on every PR; SC in CI later, if at all.
+- **Grows with the plan:** each phase adds the tests for what it builds (Phase 1: track list, load/play/stop,
+  controllers, MIDI panel; Phase 2: visualization; Phase 3: auto-perform, takes; Phase 4: recording).
+
+Not tests: audio null tests, loudness comparisons, event-by-event track comparisons.
 
 ## Risks
 

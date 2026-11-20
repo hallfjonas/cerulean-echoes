@@ -17,8 +17,8 @@ dropouts, a sound that does not load.
 | What happens when I move a knob or press a pad? | `npm run scenario -- <track> --cc 13=0.5@1` |
 | Do all sounds load? | `node strudel-sim/check-sounds.mjs <track>` |
 
-- `verify` checks the syntax, compares with the last commit, checks the sounds, regenerates the layout sheet and `.syx`
-  files, and checks the auto-perform scripts. With no arguments it checks every changed track. Add `--online` to
+- `verify` checks the syntax, compares with the last commit, checks the sounds, checks the `@ctl` tags, and checks the
+  auto-perform scripts. With no arguments it checks every changed track. Add `--online` to
   check the sounds over the network.
 - `audibility` renders the mix, every stem, the Launchkey keys and the pads at the default state and flags
   `SILENT`, `LOW` or `CLIPS`. Clipping is a level so high that the sound distorts.
@@ -36,6 +36,5 @@ dropouts, a sound that does not load.
 
 ## Related
 - [Claude skills](claude-skills.md)
-- [Layout sheets](layout-sheets.md)
 - [Samples and sounds](samples-and-sounds.md)
 - [Live tracks](live-tracks.md)

@@ -22,7 +22,7 @@
 	{ self.toJSON(x.asString) }
 };
 
-// Layout tags from the track file: // @mode, @col, @ctl lines (same format as the Strudel tracks and the layout sheets)
+// Layout tags from the track file: // @mode, @col, @ctl lines (same format as the Strudel tracks)
 ~ce.uiTags = { |self|
 	var tags = ();
 	if(self.trackFile.notNil) {

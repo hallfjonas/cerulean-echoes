@@ -17,7 +17,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 ## Layout
 - `tracks/<genre>/NNN-<name>/` — one folder per track, grouped by genre (`ambient`, `ambient-house`, `house`,
   `techno`; `sets/` for 011, `historic/` for 000-006): the track (`NNN-<name>.strudel`),
-  its layout sheets, custom modes (`.syx`) and feedback notes; a Guitar Pro song also its `.mid`, `<track>-map.json`
+  its feedback notes; a Guitar Pro song also its `.mid`, `<track>-map.json`
   and `<track>-design.md`. No `old/` folders: superseded variants are deleted once committed, git history keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
 - `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
@@ -33,7 +33,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
-- `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness, layout sheets,
+- `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness,
   Guitar Pro MIDI → live track (`producer/`)
 
 ## Rules
@@ -46,8 +46,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - Never push to main or force-push it; branch from a fresh `origin/main`, one PR per feature.
 - Before a multi-file edit: `git status`, and look for sibling branches/PRs and other sessions working on the same
   track (`gh pr list`), so nothing is built twice or overwritten.
-- Generated files (layout PDFs, `.syx`, `-single`, `011-set-dual.strudel`) are never merged by hand: on a conflict
-  take either side and regenerate (hook, `npm run layouts`/`syx`/`set`).
+- Generated files (`-single`, `011-set-dual.strudel`) are never merged by hand: on a conflict take either side and
+  regenerate (hook, `npm run set`).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
 ## Live tracks (007-010 and newer): one file each
@@ -92,7 +92,6 @@ files.
 Use them instead of redoing the steps by hand:
 - Same sound, less CPU, "drops out", "compare old/new", "event by event": `/strudel-optimize`.
 - Levels, "louder/quieter", "can't hear", clipping, balance of stems, pads, keys and voices: `/strudel-mix`.
-- Layout sheet, "regenerate layout", `.syx`, custom mode, Novation Components: `/lcxl-layout`.
 - New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
@@ -101,8 +100,8 @@ Use them instead of redoing the steps by hand:
 - A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song", "new Guitar Pro
   song"): `/producer`.
 
-Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their sheet,
-syx and single regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`; one line per file). A commit
+Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their
+`@`-tags checked and their single version regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`). A commit
 with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
 
 Tools (run in `tools/`):
@@ -123,7 +122,6 @@ Tools (run in `tools/`):
   [--out <dir>] [--force]`; `--perform` writes only the script from the map's `performance`; notes per bar:
   `node producer/midi-read.mjs <file.mid> --dump` (`tools/producer/README.md`)
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
-- Layout sheets / `.syx`: `npm run layouts`, `npm run syx`; on save: `npm run watch`
 - The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
   `node trajectory/make-tapped.mjs <track>` puts the tapped code on the clipboard for strudel.cc
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
@@ -180,16 +178,16 @@ loads the same banks as strudel.cc, `banks.mjs`, plus the gm_* soundfonts). `sam
   refuses) is copied into `samples/mirror/` with `node strudel-sim/mirror-sound.mjs <sound>`; every track loads
   `samples/mirror/mirror.json`, so the copy plays under the same name once pushed to main.
 
-## Layout sheets
-Each tagged track has a generated `<track>-layout.pdf` (Typst). The source of truth is the `// @ctl` comments in
-the track; a hook regenerates the PDF after every edit. See `/lcxl-layout`.
-The same hook writes the track's LC XL 3 custom modes (`tools/lcxl-layout/make-syx.mjs`, control names on the display,
-all buttons momentary): dual → `-jojo.syx` / `-jonas.syx` (slot 16 on each LC), single → `-single-mode1.syx` /
-`-single-mode2.syx` (slots 1 and 2), one-file track (has `// @mode 16 Mode 1`) → `-mode1.syx` / `-mode2.syx` (slots 1
-and 2 on every LC). Load them with Novation Components. Hand-written `*-layout.typ` files are older sheets; the lab boards keep theirs on purpose (they add pages the generator cannot make: sound descriptions, variant tables).
+## Control texts (`@ctl`)
+The `// @ctl` comments in a track describe every control; the LC view, the player's MIDI panel, the SC UI and
+`check-perform` read them (`tools/lcxl-layout/ctl.mjs`). Layout sheets (PDF) and per-track `.syx` modes were retired on
+2026-11-20. Every LC XL 3 gets the same two custom modes once, with Novation Components: `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` in slots 1
+and 2 (same CCs for every track).
 
 ## CCPM epics and PRDs
 Optional: use CCPM only when the user asks. The rules are in `CONTRIBUTING.md` ("Planning larger work (optional)").
+The CCPM skill is vendored in `.claude/skills/ccpm/` (`SOURCE.md`); where it differs from CONTRIBUTING.md (plan PR,
+no GitHub issue sync by default, removal PR when done), CONTRIBUTING.md wins.
 
 ## Machine
 M2 Air, 16 GB, shared with other agents: the global resource rules apply (one heavy job at a time, test small first).

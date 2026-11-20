@@ -43,7 +43,7 @@ node --test producer/*.test.mjs
   designs are left alone.
 
 Files written: `<id>.strudel`, `<id>-design.md` (stub), `<id>-map.json` (only without `--map`), the `.mid` (copied),
-`perform/<id>/<name>.json` and `<name>.md` (stub). The hook then writes the layout sheet and `.syx`.
+`perform/<id>/<name>.json` and `<name>.md` (stub).
 
 After generating: `npm run verify -- <track>`, `node strudel-sim/check-sounds.mjs <track>` (new sounds are "not
 checked yet" in `samples/sounds.json` until it runs), `npm run audibility -- <track>`.

@@ -23,8 +23,7 @@ asks: a lab column with Length on row 3 and Shift on button 2 keeps them.
 4. **Labels 1:1 too**: the board's dashboard is part of the column. Register the column in the track's `COLVIEW`
    (`'page:column'` → `(row, { esc, pending }) => html`) with the board's cell code: its labels (English, short: Brightness, Space,
    Length, Level …; see CLAUDE.md "Labels"), the values from the column's state (not raw CCs, when shift routes them), the pattern name under button 1 (no x/./- string),
-   the shift view. Copy the board's `@ctl` texts for the layout sheet; only shorten a
-   button text that would overflow.
+   the shift view. Copy the board's `@ctl` texts; keep each one short (about 50 characters).
 5. **Keep what the lab decided**: voicing, rhythms, touch, swing, brightness ranges, per-sound gains, effects
    (the lab's own space mapping), start values for controls that have not been moved. Track-wide things stay on top:
    global Fog / Tension (multiply the cutoff by `globalTone`), global Room, Tension echo, break gating if the stem is
@@ -34,8 +33,7 @@ asks: a lab column with Length on row 3 and Shift on button 2 keeps them.
 7. **Level**: render the stem offline with the lab's start settings (`tools/strudel-sim/render.mjs`, with
    `globalThis.samples = sd.samples` so the board's samples load) and set one stem level constant; compare with a few
    other stems (kick, clap). Check the dual master for peaks.
-8. **Outputs**: `node --check` on a copy, `make-single.mjs`, `gen-layout.mjs` (dual + single), `make-syx.mjs`; look
-   at the layout PNG (no overflow, button text ≤ 3 lines). Log it in the track's `feedback.md`.
+8. **Outputs**: `node --check` on a copy, `npm run verify -- <track>` (tags, single version, perform scripts). Log it in the track's `feedback.md`.
 
 ## Don'ts
 - No new controls, no renamed controls, no merged knobs, no changed ranges "to fit the track".

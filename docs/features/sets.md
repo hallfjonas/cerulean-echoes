@@ -33,5 +33,4 @@ first, then the low end, then drums, then melodies last. Tempo changes slowly to
 ## Related
 - [Live tracks](live-tracks.md)
 - [Controllers](controllers.md)
-- [Layout sheets](layout-sheets.md)
 - [Checks](checks.md)

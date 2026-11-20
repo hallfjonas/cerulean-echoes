@@ -40,7 +40,7 @@ melodies, on columns 1 to 7. Column 8 is global on both.
 | Button 1 | Chapter | the next mood or chord progression, at the next bar or phrase. |
 | Button 2 | Break | first press: the low end goes out. Second press: all back on the one. |
 
-Each control's own text is on the LC display (after loading the `.syx` files) and in the layout sheet PDF. A good way
+Each control's own text is in the player's MIDI panel (from the track's `@ctl` comments). A good way
 to start: raise the master, bring in the kick or the pad, turn Brightness and Space, press Pattern.
 
 ## Good to know
@@ -54,5 +54,5 @@ to start: raise the master, bring in the kick or the pad, turn Brightness and Sp
 ## Related
 
 - [Controllers](controllers.md), [player](player.md), [auto-perform](auto-perform.md)
-- [Layout sheets](layout-sheets.md), [sets](sets.md)
+- [Sets](sets.md)
 - [Glossary](../reference/glossary.md)

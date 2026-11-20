@@ -1,4 +1,4 @@
-// One check for edited tracks: transpile, compare with the HEAD version, sounds, layout sheet + .syx, tap, auto-perform
+// One check for edited tracks: transpile, compare with the HEAD version, sounds, @-tags (+ single version), tap, auto-perform
 // scripts (every CC in the track's @ctl, trajectory/check-perform.mjs).
 // usage (in tools/): node verify/verify.mjs [--online] [<file.strudel> …]
 //   no files: every .strudel file changed vs HEAD (git status), and the track of every changed auto-perform script
@@ -10,9 +10,8 @@ import os from 'os'
 import path from 'path'
 import { execFileSync, spawnSync } from 'child_process'
 import { fileURLToPath } from 'url'
-import { generate as makeLayout } from '../lcxl-layout/gen-layout.mjs'
+import { parse } from '../lcxl-layout/ctl.mjs'
 import { makeSingle, singleOf } from '../lcxl-layout/make-single.mjs'
-import { generate as makeSyx } from '../lcxl-layout/make-syx.mjs'
 import { tapSource } from '../trajectory/make-tapped.mjs'
 import { checkOffline } from '../strudel-sim/check-sounds.mjs'
 import { checkTrack, trackFileOf } from '../trajectory/check-perform.mjs'
@@ -74,15 +73,13 @@ async function sounds(file) {
   return problems.length ? ['FAIL', problems.join('; ')] : ['ok', 'all sounds in samples/sounds.json']
 }
 
-function layout(file) {
-  const written = []
-  for (const f of singleOf(file) ? [file, makeSingle(file)] : [file]) {
-    const pdf = makeLayout(f, root)
-    if (!pdf) continue
-    written.push(path.basename(pdf))
-    if (isTrack(f)) written.push(...makeSyx(f).map(({ out }) => path.basename(out)))
-  }
-  return written.length ? ['ok', written.join(', ')] : ['skip', 'no @ctl tags']
+function tags(file) {
+  try {
+    const files = singleOf(file) ? [file, makeSingle(file)] : [file]
+    const controls = files.map(f => parse(fs.readFileSync(f, 'utf8'), f).ctls.length)
+    const single = files.length > 1 ? `, wrote ${path.basename(files[1])}` : ''
+    return controls[0] ? ['ok', `${controls[0]} controls${single}`] : ['skip', 'no @ctl tags']
+  } catch (e) { return ['FAIL', e.message] }
 }
 
 function tap(file) {
@@ -98,7 +95,7 @@ function perform(file) {
   return ['FAIL', failed.map(([f, errors]) => `${path.basename(f)}: ${errors.join('; ')}`).join(' | ')]
 }
 
-const steps = { transpile, compare, sounds, layout, tap, perform }
+const steps = { transpile, compare, sounds, tags, tap, perform }
 let failed = false
 for (const file of files) {
   const name = path.basename(file)

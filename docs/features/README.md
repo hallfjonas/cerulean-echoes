@@ -10,7 +10,6 @@ related. New here? Start with [getting started](../getting-started.md).
 - [Lab boards](lab-boards.md) - test and compare sounds before they go into a track
 - [Sets](sets.md) - several tracks played as one set
 - [Samples and sounds](samples-and-sounds.md) - adding audio and checking that sounds load
-- [Layout sheets](layout-sheets.md) - printable control sheets and custom modes for the controller
 - [Checks](checks.md) - tools that test a track without a browser
 - [Visuals](visuals.md) - the looks and settings of the picture
 - [Producer mode](producer-mode.md) - Guitar Pro songs as live tracks

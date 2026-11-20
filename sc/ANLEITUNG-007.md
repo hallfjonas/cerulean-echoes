@@ -7,8 +7,7 @@ verglichen (dieselben Noten, Details in `sc/PORTING.md`, Abschnitt 007). Optimie
 Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unterschiede:
 
 - **Track wählen:** in `sc/live.scd` die Zeile `var trackName = …;` auf `"007-ambient"` ändern.
-- **Custom Modes:** dieselben wie für den Strudel-Track (`tracks/ambient/007-ambient-soundscape/…-mode1.syx`,
-  `…-mode2.syx`, Slots 1 und 2). Die Belegung ändert sich nicht.
+- **Custom Modes:** die gemeinsamen (`midi-layouts/lcxl3-mode1.syx` / `-mode2.syx`, Slots 1 und 2). Die Belegung ändert sich nicht.
 - **Samples:** `sc/samples/voice/david.flac` (Jonas 7, die gesprochene Aufnahme, 9:13 min) ist 46 MB groß und wird
   beim Start geladen (ein, zwei Sekunden).
 
@@ -29,7 +28,7 @@ Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unter
 
 ## Belegung
 
-Dieselbe wie im Strudel-Track (Layout-Sheet im Track-Ordner). Mode 1 = Jojo (Pulse, Sea / Wind, Drone, Bass, Rim,
+Dieselbe wie im Strudel-Track (die `@ctl`-Texte im Track, in der LC-Ansicht). Mode 1 = Jojo (Pulse, Sea / Wind, Drone, Bass, Rim,
 Shaker, Wood / Drops), Mode 2 = Jonas (Pad, Eno / Shimmer, Marimba, Toms, Choir, Glitter, Voice), Spalte 8 global:
 Fog, Room, Tension, Master, Chapter (schwebend → melancholisch → seltsam), Break. Jojos Spalte 8 (Crackle) ist wie
 in Strudel aus.

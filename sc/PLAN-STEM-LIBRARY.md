@@ -77,6 +77,7 @@ Geräte, von denen wir Ideen nehmen (was sie können, was wir übernehmen): `doc
 | Klang | FM (E-Piano, Glocken, Stabs) | DX7, vereinfacht auf 2–4 Operatoren |
 | Klang | Texture (Ambient-Flächen, Drones) | Mutable Instruments Plaits/Clouds, Cyma Forma ALT, Elta Solar 42 |
 | Klang | Balsam (8 Stimmen, Tonhöhe pro Fader, langsames Gleiten, reine Stimmung) | GLX Balsam |
+| Klang | Wavetable (Morph durch eine Tabelle von Einzelwellen; Wellen-Effekte: Pre-Gain, Phase Shift, Harmonic Shift, Comb, Ring Mod, Chebyshev, Sample & Hold, Quantize, Slew, Low-/Highpass, Post-Gain) | OXI Coral (Wavetable-Editor, Screenshot `sc/ui/reference/oxi-coral-wavetable-editor.png`) |
 | Noten | Arpeggiator | Juno/SH-101, dazu Ratchets und Wahrscheinlichkeit |
 | Noten | 303-Sequencer | TB-303 (Accent, Slide, Gate), getrennt vom Klang |
 | Noten | Chord Memory | Korg Polysix (eine Taste = ganzer Akkord) |

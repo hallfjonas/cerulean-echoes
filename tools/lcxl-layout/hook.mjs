@@ -1,7 +1,6 @@
-// Claude Code PostToolUse hook (Edit|Write): after a .strudel file changes, regenerate its layout sheet.
-// A -dual.strudel file (or the dual-lc template) also rewrites its single version (make-single.mjs) and that sheet.
-// Tracks (tracks/) also get their custom modes (.syx, make-syx.mjs).
-// Files without @ctl tags are skipped. A broken tag or Typst error is reported back (exit 2).
+// Claude Code PostToolUse hook (Edit|Write): after a .strudel file changes, check its @-tags (ctl.mjs; a broken tag is
+// reported back, exit 2). A -dual.strudel file (or the dual-lc template) also rewrites its single version
+// (make-single.mjs). Layout sheets and .syx modes are no longer made (retired 2026-11-20).
 // A track (tracks/, not old/) is compared with the sound list samples/sounds.json (check-sounds.mjs --offline): a sound
 // that is broken or not checked yet is reported back (exit 2).
 // On success one line says what was regenerated. bash-hook.mjs runs the same `refresh` for files changed via Bash;
@@ -31,22 +30,17 @@ export async function refresh(file) {
   const inTracks = f => path.resolve(f).startsWith(path.join(root, 'tracks') + path.sep)
   let checkOffline
   try {
-    const { generate } = await import('./gen-layout.mjs')
+    const { parse } = await import('./ctl.mjs')
     const { makeSingle, singleOf } = await import('./make-single.mjs')
-    const { generate: makeSyx } = await import('./make-syx.mjs')
     ;({ checkOffline } = await import('../strudel-sim/check-sounds.mjs'))
     const files = [file]
     if (singleOf(file)) {
       files.push(makeSingle(file))
       made.push('single')
     }
-    for (const f of files) {
-      if (!generate(f, root)) continue
-      if (!made.includes('PDF')) made.push('PDF')
-      if (inTracks(f) && makeSyx(f).length && !made.includes('syx')) made.push('syx')
-    }
+    for (const f of files) parse(fs.readFileSync(f, 'utf8'), f)
   } catch (e) {
-    return { line: '', error: `layout sheet for ${path.basename(file)} not updated: ${e.stderr?.toString() || e.message}` }
+    return { line: '', error: `${path.basename(file)}: tags or single version: ${e.stderr?.toString() || e.message}` }
   }
   const line = made.length ? `${path.relative(root, path.resolve(file))}: regenerated ${made.join(', ')}` : ''
   let problems = []

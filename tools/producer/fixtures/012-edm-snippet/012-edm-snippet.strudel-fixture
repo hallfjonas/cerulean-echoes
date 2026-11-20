@@ -941,7 +941,7 @@ showStatus()
 // thirds, which fades out towards full. 5 length, 6 space, 7 echo, 8 pad fog (one-shot darkness, 0 = open). Until
 // knob 2 is turned the keys play piano + Rhodes. Drum pads (Drum mode, channel 10, notes 36-51) ignore knobs 1-7.
 // Same knobs and keys as in 008-010; only the pads differ. The song is in G♯ minor: mostly the black keys.
-// Names for the LC view (its Launchkey row); not read by the layout sheet tools.
+// Names for the LC view (its Launchkey row).
 // @lk level Keys Level | mod wheel: volume of the keys (× master).
 // @lk k1 Brightness | dull ↔ bright; harder keys brighter.
 // @lk k2 Piano → Rhodes | off → piano → Rhodes → off.
