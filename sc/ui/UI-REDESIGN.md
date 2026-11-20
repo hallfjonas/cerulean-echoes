@@ -1,11 +1,11 @@
 # UI redesign: controller mirror (brief for the implementing agent)
 
-Status: design decided in conversation on 2026-11-20 from sketches and a rendered mockup. **Implemented** 2026-11-20
-(`sc/ui/index.html`), see "Implementation notes" at the end.
+Status: design decided in conversation on 2026-11-20 from sketches and a rendered mockup. Not implemented.
 Belongs to the SuperCollider move (`SC-MIGRATION.md`, `sc/PLAN-UI.md`). The UI lives in `sc/ui/`.
 
 **Reference mockup:** `sc/ui/reference/layout-mockup.html` (open it in a browser). It is the agreed look and
-scaling, with demo data. Query parameters: `?theme=black|te`, `?spec=dots|segments|bars|line|area`, `?nolk`.
+scaling, with demo data. Query parameters: `?theme=black|te`, `?spec=dots|segments|bars|line|area`, `?set=ring|map|energy|spectrogram`,
+`?nolk`; in the page, key `V` cycles the set view.
 Where this brief and the mockup disagree, ask.
 
 ## Goal
@@ -28,8 +28,8 @@ fallback and list it as an open point; do not invent a new protocol on your own.
  mode 1 · foundation              mode 2 · colour
  ┌ LC panel (8 columns) ┐         ┌ LC panel (8 columns) ┐
  └──────────────────────┘         └──────────────────────┘
- launchkey                         spectrum
- mod │ 8 knobs over 2 × 8 pads     energy over frequency
+ launchkey                         spectrum               set view
+ mod │ 8 knobs over 2 × 8 pads     energy over frequency  set over time (4 views)
 ```
 
 - **Two LC panels** side by side: Mode 1 (Jojo's foundation) and Mode 2 (Jonas' colour), as in the current LC
@@ -40,8 +40,9 @@ fallback and list it as an open point; do not invent a new protocol on your own.
 - **Bottom row**, same two-column grid as the panels:
   - left, under Mode 1: the **Launchkey strip** (optional device, see below), on the same 8-column grid as the
     panel above, mod wheel to its left
-  - right, under Mode 2: the **spectrum** (see below)
-- Without a Launchkey, its place stays empty (the spectrum stays where it is).
+  - right, under Mode 2: the **spectrum** (see below) and, right of it, the **set view**: a square-ish box,
+    300 units wide, 190 high, showing how the energy of the set evolved (see "Set view")
+- Without a Launchkey, its place stays empty (spectrum and set view stay where they are).
 - **Status strip** (tempo, harmony state, chapter, phrase position): not in the mockup. Keep what exists, as one
   line under the board, restyled with the tokens, and inside the scaled board (see "Scaling").
 
@@ -54,14 +55,17 @@ screen. Do not copy the physical ratio.
 | Element | Content | Notes |
 |---|---|---|
 | Column name | stem name, e.g. `kick` | `--fs-name`, weight 500 |
-| Knob row 1 | Brightness | knob component |
-| Knob row 2 | Space | knob component |
-| Knob row 3 | per-track name (Length, Complexity …) | knob component |
+| Knob row 1 | Brightness | knob component, label `bright` under it |
+| Knob row 2 | Space | knob component, label `space` under it |
+| Knob row 3 | per-track name (Length, Complexity …) | knob component, its name under it (e.g. `length`, `decay`) |
 | Fader | Level | fader component |
 | Button 1 | **name of the active pattern**, e.g. `16th` | text only, `--fs-btn` |
 | Button 2 | name of its function, e.g. `lift`, `open` | text only, `--fs-btn` |
 
-Global column 8: knobs Fog / Thin / Tension, fader Master, button 1 Chapter (shows the chapter name, e.g.
+Every knob has a **small label under it** in `off` colour at `--fs-knob`, one word, lower case (knob and label
+form one group, 3 units apart). Launchkey knobs get labels too (their sound parameter, e.g. `tone`, `drive`).
+
+Global column 8: knobs Fog / Thin / Tension (labels `fog`, `thin`, `tension`), fader Master, button 1 Chapter (shows the chapter name, e.g.
 `groove`), button 2 Break.
 
 Pattern names: each pattern needs a short name (one word, at most 6 characters, see "Rules"). If the track or
@@ -84,8 +88,9 @@ has a floor and a ceiling:
 | `--fs-name` | column names | `clamp(13px, 20 × --px, 32px)` |
 | `--fs-btn` | button labels, `mod` | `clamp(11px, 18 × --px, 28px)` |
 | `--fs-lab` | panel labels, spectrum frequencies | `clamp(11px, 16 × --px, 24px)` |
+| `--fs-knob` | knob labels | `clamp(11px, 14 × --px, 21px)` |
 
-Line height 1.4, no uppercase, no letter-spacing changes. Checked in the mockup at 1280×800 (@2x), 1920×1080,
+Line height 1.4 (knob labels 1.2), no uppercase, no letter-spacing changes. Checked in the mockup at 1280×800 (@2x), 1920×1080,
 2560×1440 and 3840×2160: no overflow, same proportions.
 
 Design-unit sizes:
@@ -96,7 +101,7 @@ Design-unit sizes:
 | Gap between panel row and bottom row | 32 |
 | Panel padding | 14 vertical, 12 horizontal; frame radius 10 |
 | Gap between columns | 4 |
-| Gap between elements in a column | 14 |
+| Gap between elements in a column | 10 (knob to its label: 3) |
 | Knob | 48 (TE disc: 52) |
 | Fader | 28 wide, 150 high; track `max(2px, 4)` wide; handle 28 × 12, radius 1 |
 | Launchkey: mod wheel fader | 28 × 130 |
@@ -171,7 +176,7 @@ off state.
 
 Same tokens and components as the active theme, on the same 8-column grid as the LC panel above it:
 - Mod wheel (CC 1, keys level) as a fader, labelled `mod`, left of the grid.
-- 8 knobs (CC 31–38), one per column; in TE the row-3 disc.
+- 8 knobs (CC 31–38), one per column, each with its label; in TE the row-3 disc.
 - 16 drum pads as 2 × 8, two per column under its knob. Black: square outline in `off`, filled `text` while hit.
   TE: round, filled `track`, `#D85A30` while hit. Hit = short flash.
 - Keys: not in the mockup. Keep whatever the current view shows, restyled with the tokens.
@@ -197,11 +202,80 @@ Live energy over frequency of the master output, under Mode 2.
 
 The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternatives; build only the defaults.
 
+## Set view (energy of the set over time)
+
+Status: **four candidate views, all to be built and switchable.** The players have to try them in practice before
+one is chosen, so none of them is the default for good. The mockup draws all four from invented demo data
+(`set view` script in `layout-mockup.html`); only the drawing is a reference, not the data.
+
+### Switching
+
+- One box, one view at a time. The view is a setting (settings drawer) **and** can be cycled live without the
+  laptop: propose a controller combination (e.g. Shift + a global button) and list it as an open point; do not
+  take a button that is already mapped. Persist the choice in `localStorage` (try/catch).
+- Label above the box: `set · <view>` (e.g. `set · ring`), in `--fs-lab`.
+- Same size, position and tokens for all four views; switching must not move anything else.
+
+### Data (all views)
+
+- One sample every **10 s** of the master output, kept for the whole set in memory (a 2-hour set is 720
+  samples): `energy` (short-term loudness, 0..1 after normalising to the set's range), `punch` (dynamics left,
+  e.g. crest factor or short-term loudness range, 0..1), `tension` (see open points), and a 64-band log spectrum
+  (20 Hz–20 kHz) for the spectrogram.
+- Computed in SuperCollider and sent over the existing OSC bridge; if that does not exist yet, add the smallest
+  possible addition and list it as an open point. Smooth on display, not on capture.
+
+### Colour rule (all views)
+
+One meaning per colour: the theme's `now` colour (Black `#F1EFE8`, TE `#D85A30`) only for "now" (needle, dot,
+latest trail, now line); all data in one ink (Black `#888780`, TE `#2C2C2A`); "flat" in Black `#F1EFE8`, TE
+`#378ADD`. No chapter names in any view (decided: they repeat what the shape shows and clutter).
+
+### The four views
+
+| View | Time model | What it shows |
+|---|---|---|
+| `ring` | **fixed 60′ clock**, 12 o'clock = full hour; in the second hour the new lap **paints over** the first | **grid ring** in the spectrum's language (decided): 60 spokes, one per minute, 8 cells from inside to outside; lit cells = round(√energy · 8); current minute's spoke in `now` colour; current hour, previous lap (ahead of the needle) and unlit cells in three steps (see below); current minute (`72′`) in the centre in `now` colour |
+| `map` | **no window**: the trail simply fades with age (alpha = e^(−age/12′), dropped below 0.05) | 2D path, x = energy, y = tension; corner labels `calm`, `tense`, `full`, `driving`; last 90 s and the dot in `now` colour, older trail in data ink |
+| `energy` | **last 60′**, now at the right edge | area, height = energy; a band along the top edge, clipped to the area, where punch < 0.35 (`flat` colour) |
+| `spectrogram` | **last 60′**, now at the right edge | 64 log-frequency rows, bottom 20 Hz → top 20 kHz; intensity = ink alpha, each row scaled to its own maximum, curve ^1.4, ~30 s soft smoothing; labels `100`, `1k`, `10k` on the left |
+
+Grid ring details (cells must **grow with the radius** in both themes):
+
+| | Black | TE |
+|---|---|---|
+| cell shape | dot, radius = min(0.32 × radial step, 0.55 × half the tangential slot) | rounded bar along the spoke: length 0.68 × radial step, width 0.85 × tangential slot, corner radius 0.3 × the smaller side |
+| current hour | `#B4B2A9` | `#2C2C2A` |
+| previous lap | `#5F5E5A` | `#5F5E5A` |
+| unlit | `#2C2C2A` | `#B4B2A9` |
+| now (current minute) | `#F1EFE8` | `#D85A30` |
+
+Inner radius 0.4 × outer radius; tangential slot = 2π·r / 60 at the cell's radius.
+
+Strips: time labels `−60′`, `−30′`, `now` under the plot; a 2.5 unit now line at the right edge.
+
+Drawing rules: canvas with `devicePixelRatio`; draw
+trails as a few continuous paths per alpha step (no per-segment round caps, they look beaded); never let a label
+cross data (halo in background colour if it must sit on top).
+
+### Open points (set view)
+
+- **Tension** has no measurement yet. Candidates: share of high-frequency energy, onset density, or the Tension
+  control of column 8. Decide with the players; until then use the Tension control.
+- **Punch**: crest factor vs. loudness range; check on real recordings which one matches "it got flat".
+- **TE colour clash**: the live spectrum (segments) uses orange for the bass range, while orange means "now" in
+  the set view. Leave as is for the first test; if it confuses, make the spectrum segments ink with the peak
+  segment in orange.
+- Controller combination for switching views.
+- Judge all four views on a recorded real set before choosing (the mockup data is invented).
+- Tried and dropped for now: a smooth filled ring (replaced by the grid ring); grid versions of the mood map (the path
+  turns into a cloud). Energy and spectrogram as grids (30 two-minute columns) were rendered too and are an option to
+  test; the brief keeps them smooth.
+
 ## Rules
 
 - Flat: no gradients, shadows, glow or blur.
-- Minimum text size 11 px; **everything on the panel is lower case** (user, 2026-11-20): names, labels, pattern and
-  chord names, status strip, Launchkey, pad names.
+- Minimum text size 11 px; lower case labels as in the mockup.
 - Draw knobs as SVG. Update values in a `requestAnimationFrame` loop, not on every MIDI message.
 - **Every label is one line, one or two words, as short as possible.** Never wrap, never shrink the font to fit.
   Limits: column name ≤ 7 characters, pattern name ≤ 6, button 2 name ≤ 6, knob row names ≤ 10.
@@ -225,11 +299,12 @@ The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternat
   now; if it gets confusing, pads light dark instead.
 - Where the status strip sits exactly (not in the mockup).
 - Spectrum data from SC (see "Spectrum").
+- Set view: see "Open points (set view)".
 
 ## Done when
 
-- Both themes render the two LC panels, the Launchkey strip, the spectrum and the status strip, with and without a
-  Launchkey.
+- Both themes render the two LC panels, the Launchkey strip, the spectrum, the set view (all four views,
+  switchable) and the status strip, with and without a Launchkey.
 - Screenshots of both themes at the four sizes above, with: a column on, off, waiting on, waiting off, button 2
   active, fader at 0 and 1, knob at 0 and 1, the "moved last" frame on each panel, a pad hit.
 - The view still plays a track end to end with real controllers and without them (auto-perform).

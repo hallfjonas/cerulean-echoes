@@ -54,6 +54,8 @@ body.te .pad.hit { background: var(--handle); }
 .wheel { display: flex; flex-direction: column; align-items: center; gap: calc(12 * var(--px)); }
 .spec { padding: 0 calc(12 * var(--px)); }
 .spec canvas { display: block; width: 100%; height: calc(190 * var(--px)); }
+.duo { display: grid; grid-template-columns: minmax(0, 1fr) calc(300 * var(--px)); gap: calc(28 * var(--px)); }
+.setv canvas { display: block; width: 100%; height: calc(190 * var(--px)); }
 body.no-lk .lkbox { visibility: hidden; }
 @keyframes bl { 0%, 49% { opacity: 1 } 50%, 100% { opacity: .25 } }
 .q { animation: bl 1s steps(1) infinite; }
@@ -72,7 +74,10 @@ body.no-lk .lkbox { visibility: hidden; }
         <div class="gr" id="lk"></div>
       </div>
     </section>
-    <section><p class="lab">spectrum</p><div class="spec"><canvas id="spec"></canvas></div></section>
+    <section class="duo">
+      <div><p class="lab">spectrum</p><div class="spec"><canvas id="spec"></canvas></div></div>
+      <div><p class="lab" id="setlab">set</p><div class="setv"><canvas id="setv"></canvas></div></div>
+    </section>
   </div>
 </div>
 <script>
@@ -192,6 +197,104 @@ function draw(t) {
 }
 resize(); addEventListener("resize", resize);
 if (FROZEN) draw(+Q.get("t")); else { const loop = ts => { draw(ts / 1000); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+
+/* ---------- set view: energy of the set over time, four switchable views (key V) ---------- */
+(() => {
+  const VIEWS = ["ring", "map", "energy", "spectrogram"];
+  let view = Q.get("set") || "ring";
+  const TEm = THEME === "te";
+  const SK = TEm
+    ? { now: "#D85A30", data: "#2C2C2A", old: "#888780", flat: "#378ADD", lab: "#888780", grid: "#B4B2A9", bg: [211, 209, 199], ink: [44, 44, 42] }
+    : { now: "#F1EFE8", data: "#888780", old: "#444441", flat: "#F1EFE8", lab: "#5F5E5A", grid: "#2C2C2A", bg: [11, 11, 11], ink: [241, 239, 232] };
+  /* demo: invented 72-minute set, one sample per 10 s; replace with data from SC */
+  const NOW = 72, STEP = 1 / 6, WIN = 60;
+  const BR = [[13, 14], [22.5, 24], [31, 34], [51.5, 53], [66, 67]];
+  const EKs = [[0, .15], [6, .3], [8, .42], [13, .5], [17, .55], [22, .7], [24, .82], [29, .78], [31, .3], [34, .45], [38, .6], [41, .62], [52, .63], [55, .72], [60, .9], [65, .86], [68, .55], [75, .2]];
+  const TKs = [[0, .2], [8, .3], [13, .55], [17, .5], [22, .8], [24, .55], [29, .5], [31, .75], [34, .5], [38, .35], [41, .3], [52, .32], [53, .75], [60, .6], [65, .55], [66, .78], [68, .4], [75, .2]];
+  const DKs = [[0, .8], [8, .7], [17, .55], [24, .25], [29, .3], [31, .85], [34, .75], [41, .65], [52, .6], [53, .7], [55, .45], [60, .2], [65, .25], [68, .6], [75, .7]];
+  const HKs = [[0, 0], [8, 0], [9, 1], [31, 1], [32, 0], [41, 0], [42, 1], [75, 1]];
+  const lk = (k, m) => { for (let i = 1; i < k.length; i++) if (m <= k[i][0]) { const [a, va] = k[i - 1], [b, vb] = k[i], u = (m - a) / (b - a); return va + (vb - va) * (u * u * (3 - 2 * u)); } return k[k.length - 1][1]; };
+  const inBr = m => BR.some(([a, b]) => m >= a && m < b);
+  let sd = 11; const rn = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const D = [];
+  for (let m = 0; m < NOW; m += STEP) { const br = inBr(m);
+    D.push({ m, e: Math.min(1, lk(EKs, m) * (br ? .55 : 1) + (rn() - .5) * .03), t: Math.min(1, lk(TKs, m) + (rn() - .5) * .03), d: Math.min(1, lk(DKs, m) + (br ? .15 : 0) + (rn() - .5) * .03) }); }
+  const sm = (arr, k) => arr.map((_, i) => { const a = arr.slice(Math.max(0, i - k), i + k + 1); return a.reduce((x, y) => x + y, 0) / a.length; });
+  const rgbS = a => `rgb(${a.join(",")})`;
+  const cv = document.getElementById("setv"), c = cv.getContext("2d");
+  function draw() {
+    document.getElementById("setlab").textContent = `set · ${view}`;
+    const dpr = devicePixelRatio || 1, r = cv.getBoundingClientRect(), w = r.width, h = r.height;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+    const fs = parseFloat(getComputedStyle(document.querySelector(".lab")).fontSize), F = getComputedStyle(document.body).fontFamily;
+    c.font = `${fs}px ${F}`; c.lineJoin = "round";
+    const E = D.map(s => s.e);
+    if (view === "ring") {
+      /* fixed 60′ clock in the same grid language as the spectrum: 60 spokes (1 per minute) × 8 cells,
+         lit cells = round(√energy · 8); cells grow with the radius; the second hour paints over the first */
+      const cx = w / 2, cy = h / 2, R1 = Math.min(w, h) / 2 - 2, R0 = R1 * .4, RINGS = 8, lap = Math.floor(NOW / 60) * 60, st = (R1 - R0) / RINGS;
+      const COL = TEm ? { cur: "#2C2C2A", old: "#5F5E5A", off: "#B4B2A9" } : { cur: "#B4B2A9", old: "#5F5E5A", off: "#2C2C2A" };
+      for (let k = 0; k < 60; k++) {
+        const a = (-90 + (k + .5) * 6) * Math.PI / 180, mAbs = k < NOW - lap ? lap + k : lap - 60 + k, cur = mAbs >= lap;
+        const ss = D.filter(s => s.m >= mAbs && s.m < mAbs + 1), me = ss.length ? ss.reduce((x, s) => x + s.e, 0) / ss.length : 0;
+        const on = Math.round(Math.sqrt(me) * RINGS), isNow = mAbs === Math.floor(NOW - 1e-6);
+        for (let r = 0; r < RINGS; r++) {
+          const rr = R0 + (r + .5) * st, x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a), slot = rr * Math.PI / 30;
+          c.fillStyle = r < on ? (isNow ? SK.now : cur ? COL.cur : COL.old) : COL.off; c.beginPath();
+          if (TEm) { const tw = slot * .85 / 2 * 1; c.save(); c.translate(x, y); c.rotate(a); c.roundRect(-st * .34, -tw / 2, st * .68, tw, Math.min(tw, st) * .3); c.restore(); }
+          else c.arc(x, y, Math.min(st * .32, slot / 2 * .55), 0, 7);
+          c.fill(); } }
+      c.fillStyle = SK.now; c.textAlign = "center"; c.textBaseline = "middle"; c.font = `${fs * 1.5}px ${F}`; c.fillText(`${NOW}′`, cx, cy);
+    } else if (view === "map") {
+      /* no window: the trail simply fades with age */
+      const side = Math.min(w, h), x0 = (w - side) / 2, y0 = (h - side) / 2, X = e => x0 + e * side, Y = t => y0 + side - t * side;
+      c.strokeStyle = SK.grid; c.lineWidth = 1; c.strokeRect(x0 + .5, y0 + .5, side - 1, side - 1);
+      c.fillStyle = SK.grid; c.fillRect(x0 + side / 2, y0, 1, side); c.fillRect(x0, y0 + side / 2, side, 1);
+      c.fillStyle = SK.lab; c.textBaseline = "top"; c.fillText("tense", x0 + 6, y0 + 4); c.textAlign = "right"; c.fillText("full", x0 + side - 6, y0 + 4);
+      c.textBaseline = "bottom"; c.fillText("driving", x0 + side - 6, y0 + side - 4); c.textAlign = "left"; c.fillText("calm", x0 + 6, y0 + side - 4);
+      const Ex = sm(E, 12), Tx = sm(D.map(s => s.t), 12), n = D.length - 1, TAU = 12;
+      for (let b = 0; b < 10; b++) {             // 10 age buckets, each one path
+        const a0 = b * 3, a1 = a0 + 3, alpha = Math.exp(-(a0 + 1.5) / TAU); if (alpha < .05) continue;
+        c.globalAlpha = alpha; c.strokeStyle = SK.data; c.lineWidth = 1 + 2 * alpha; c.beginPath(); let st = false;
+        for (let i = 0; i <= n; i++) { const age = NOW - D[i].m; if (age < a0 || age > a1 + STEP) continue; st ? c.lineTo(X(Ex[i]), Y(Tx[i])) : c.moveTo(X(Ex[i]), Y(Tx[i])); st = true; }
+        c.stroke(); }
+      c.globalAlpha = 1; c.strokeStyle = SK.now; c.lineWidth = 3; c.lineCap = "round"; c.beginPath();
+      for (let i = n - 9; i <= n; i++) i === n - 9 ? c.moveTo(X(Ex[i]), Y(Tx[i])) : c.lineTo(X(Ex[i]), Y(Tx[i])); c.stroke();
+      c.fillStyle = SK.now; c.beginPath(); c.arc(X(Ex[n]), Y(Tx[n]), 6, 0, 7); c.fill();
+    } else {
+      /* strips: last 60′, now at the right edge */
+      const L = view === "spectrogram" ? fs * 2.2 : 0, top = 4, H = h - fs * 1.6 - 6, t0 = NOW - WIN, X = m => L + (m - t0) / WIN * (w - L);
+      const vis = D.filter(s => s.m >= t0);
+      if (view === "energy") {
+        const area = () => { c.beginPath(); c.moveTo(X(vis[0].m), top + H); vis.forEach(s => c.lineTo(X(s.m), top + H - s.e * H)); c.lineTo(X(NOW), top + H); c.closePath(); };
+        c.fillStyle = SK.data; area(); c.fill();
+        c.save(); area(); c.clip(); c.strokeStyle = SK.flat; c.lineWidth = 8; let on = false;
+        vis.forEach(s => { const x = X(s.m), y = top + H - s.e * H; if (s.d < .35) { if (!on) { c.beginPath(); c.moveTo(x, y); on = true; } else c.lineTo(x, y); } else if (on) { c.stroke(); on = false; } });
+        if (on) c.stroke(); c.restore();
+      } else {
+        const ROWS = 64, N = vis.length, img = new ImageData(N, ROWS), G = Array.from({ length: ROWS }, () => new Float32Array(N));
+        vis.forEach((s, i) => { const br = inBr(s.m), hat = lk(HKs, s.m), pad = (br || (s.m >= 34 && s.m < 41)) ? 1 : 0;
+          for (let rr = 0; rr < ROWS; rr++) { const fr = rr / (ROWS - 1); let v = .45 * s.e - .3 * fr;
+            if (!br) v += .45 * Math.exp(-(((fr - .18) / .07) ** 2)); v += .3 * s.e * Math.exp(-(((fr - .45) / .12) ** 2));
+            if (!br) v += .3 * s.e * hat * Math.exp(-(((fr - .8) / .06) ** 2)); v += .22 * pad * Math.exp(-(((fr - .55) / .2) ** 2));
+            G[rr][i] = Math.max(0, v); } });
+        G.forEach((row, rr) => { const s2 = sm(Array.from(row), 3), mx = Math.max(...s2) || 1;
+          s2.forEach((v, i) => { const a = .85 * Math.min(1, v / mx) ** 1.4, p = ((ROWS - 1 - rr) * N + i) * 4;
+            for (let k = 0; k < 3; k++) img.data[p + k] = SK.bg[k] + (SK.ink[k] - SK.bg[k]) * a; img.data[p + 3] = 255; }); });
+        const off = new OffscreenCanvas(N, ROWS); off.getContext("2d").putImageData(img, 0, 0);
+        c.imageSmoothingEnabled = true; c.drawImage(off, X(vis[0].m), top, X(NOW) - X(vis[0].m), H);
+        c.fillStyle = SK.lab; c.textAlign = "right"; c.textBaseline = "middle";
+        for (const [fq, l] of [[100, "100"], [1000, "1k"], [10000, "10k"]]) c.fillText(l, L - 6, top + H - Math.log(fq / 20) / Math.log(1000) * H);
+      }
+      c.fillStyle = SK.lab; c.textBaseline = "top"; c.textAlign = "left"; c.fillText(`−60′`, L, top + H + 6);
+      c.textAlign = "center"; c.fillText(`−30′`, X(NOW - 30), top + H + 6);
+      c.fillStyle = SK.now; c.fillRect(X(NOW) - 2, top, 2.5, H); c.textAlign = "right"; c.fillText("now", w, top + H + 6);
+    }
+    c.textAlign = "left";
+  }
+  draw(); addEventListener("resize", draw);
+  addEventListener("keydown", e => { if (e.key === "v" || e.key === "V") { view = VIEWS[(VIEWS.indexOf(view) + 1) % VIEWS.length]; draw(); } });
+})();
 </script>
 </body>
 </html>
