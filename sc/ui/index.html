@@ -12,10 +12,10 @@
    Flat: no gradients, shadows, glow or blur. Nothing dims except button text. */
 :root{--W:1600;--H:900}
 body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;
-  --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:#46463F;--keyB:#0b0b0b;
+  --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:#141414;--keyB:#3A3A3A;--keyLine:#3A3A3A;--keyLab:#8A8A8A;--padF:#1A1A1A;--padLine:#3A3A3A;--wheelF:#8A8A8A;
   --font:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
 body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;
-  --edge:#B4B2A9;--frame:#2C2C2A;--hit:#D85A30;--keyW:#F1EFE8;--keyB:#2C2C2A;
+  --edge:#B4B2A9;--frame:#2C2C2A;--hit:#D85A30;--keyW:#F1EFE8;--keyB:#2C2C2A;--keyLine:#B4B2A9;--keyLab:#888780;--padF:#B4B2A9;--padLine:transparent;--wheelF:#2C2C2A;
   --font:-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,"DejaVu Sans",sans-serif}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
@@ -34,7 +34,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--text);fo
 .pair>section{min-width:0;display:flex;flex-direction:column}
 .lab{display:flex;gap:.6em;font-size:var(--fs-lab);color:var(--off);margin:0 calc(12 * var(--px)) calc(8 * var(--px));
   white-space:nowrap;overflow:hidden;text-transform:lowercase}
-.lab .hint{margin-left:auto;overflow:hidden;text-overflow:ellipsis}
+.lab .hint{margin-left:auto;overflow:hidden;text-overflow:ellipsis;opacity:.6}
 .lab .pad-name{color:var(--text)}
 /* each controller is its own panel with a subtle edge; the one moved last is framed (off with the player's LC frame off) */
 .pn{padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px))}
@@ -49,7 +49,6 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 .kl{font-size:var(--fs-knob);line-height:1.2;color:var(--off);max-width:100%}
 /* knob: Black = arc (viewBox 24), TE = disc with pointer (viewBox 26) */
 .knob{width:calc(48 * var(--px));aspect-ratio:1;display:block;flex:none}
-body[data-theme=te] .knob{width:calc(52 * var(--px))}
 .kb-track,.kb-val{fill:none;stroke-width:3;stroke-linecap:round}.kb-track{stroke:var(--track)}.kb-val{stroke:var(--text)}
 .kb-ptr{stroke-width:2.5;stroke-linecap:round}.kb-disc{stroke-width:1}
 .r1 .kb-disc{fill:#378ADD;stroke:#378ADD}.r2 .kb-disc{fill:#1D9E75;stroke:#1D9E75}.r3 .kb-disc{fill:#F1EFE8;stroke:#888780}
@@ -59,6 +58,11 @@ body[data-theme=te] .knob{width:calc(52 * var(--px))}
 .fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
 .fader .handle{position:absolute;left:0;width:100%;height:calc(12 * var(--px));border-radius:1px;background:var(--handle);
   bottom:calc(var(--v, 0) * (100% - 12 * var(--px)))}
+/* black (minimal): the fader is a slim slot that fills from the bottom (a sliver at 0); same box as TE, so a theme
+   switch moves nothing */
+body:not([data-theme=te]) .fader .bar{width:calc(12 * var(--px));background:var(--padF);box-shadow:inset 0 0 0 1px var(--padLine);border-radius:calc(6 * var(--px))}
+body:not([data-theme=te]) .fader .handle{left:50%;transform:translateX(-50%);width:calc(12 * var(--px));bottom:0;
+  height:max(calc(3 * var(--px)), calc(var(--v, 0) * 100%));border-radius:calc(6 * var(--px));background:var(--handle)}
 /* buttons: text only; button 1 = the active pattern, button 2 = its function */
 .btns{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--px));min-width:0;max-width:100%}
 .btn{font-size:var(--fs-btn);max-width:100%;color:var(--off)}
@@ -66,31 +70,36 @@ body[data-theme=te] .knob{width:calc(52 * var(--px))}
 .blink{animation:blink 1s steps(1,end) infinite}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
 .off{visibility:hidden}
 /* Launchkey: mod wheel left of the 8-column grid (knob over 2 pads per column), the keys under the pads */
-.lk{display:grid;grid-template-columns:calc(60 * var(--px)) minmax(0,1fr);column-gap:calc(24 * var(--px));row-gap:calc(10 * var(--px))}
-.wheel{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:calc(10 * var(--px))}
-.wheel .btn{color:var(--text)}
-.wheel .fader{height:calc(130 * var(--px));margin:0}
-.lkc{display:flex;flex-direction:column;align-items:center;gap:calc(10 * var(--px));min-width:0}
-.lkc .pads{display:flex;flex-direction:column;gap:calc(6 * var(--px))}
-.pad{width:calc(36 * var(--px));aspect-ratio:1;border:1px solid var(--off);border-radius:calc(4 * var(--px));cursor:pointer}
-.pad.on{background:var(--text);border-color:var(--text)}
-body[data-theme=te] .pad{border:0;background:var(--track);border-radius:50%}
-body[data-theme=te] .pad.on{background:var(--hit)}
-.oct{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:calc(8 * var(--px));min-width:0}
-.oct span{font-size:var(--fs-btn);color:var(--off);line-height:1.2}
-.oct div{display:flex;gap:calc(10 * var(--px))}
-.oct button{font:inherit;font-size:var(--fs-btn);line-height:1.2;background:none;border:0;padding:0;color:var(--text);cursor:pointer}
-.keys{position:relative;height:calc(64 * var(--px))}
+.lk{display:grid;grid-template-columns:calc(56 * var(--px)) minmax(0,1fr);grid-template-rows:auto auto auto;
+  grid-template-areas:"oct knobs" "wheel pads" "wheel keys";column-gap:calc(16 * var(--px));row-gap:calc(6 * var(--px));
+  padding:calc(12 * var(--px)) calc(12 * var(--px))}
+.lkknobs{grid-area:knobs}.lk .kb-track,.lk .kb-val{stroke-width:4}body:not([data-theme=te]) .lk .kl{letter-spacing:-.03em}.lk .knob{width:calc(30 * var(--px))}
+.lkpads{grid-area:pads;grid-template-rows:repeat(2,calc(30 * var(--px)));gap:calc(4 * var(--px));margin-top:calc(2 * var(--px))}
+.oct{grid-area:oct}.wheel{grid-area:wheel}.keys{grid-area:keys;margin-top:calc(2 * var(--px))}
+/* one corner radius for the whole Launchkey: 3 units */
+.pad{width:100%;height:100%;border:0;background:var(--padF);box-shadow:inset 0 0 0 1px var(--padLine);border-radius:calc(3 * var(--px));cursor:pointer}
+.pad.on{background:var(--hit);box-shadow:none}
+/* octave: the label, then ◀ shift ▶ on one line, secondary colour */
+.oct{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:calc(2 * var(--px));min-width:0;font-size:var(--fs-knob);line-height:1.2;color:var(--off)}
+.oct div{display:flex;align-items:baseline;gap:calc(5 * var(--px))}
+.oct button{font:inherit;line-height:1.2;background:none;border:0;padding:0;color:var(--keyLab);cursor:pointer}
+.oct b{font-weight:400;color:var(--text);min-width:1.6em;text-align:center}
+/* mod wheel: a rounded slot that fills from the bottom, its label under it */
+.wheel{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--px));margin-top:calc(2 * var(--px))}
+.wheel .btn{color:var(--off);font-size:var(--fs-knob);line-height:1.2}
+/* the keys level uses the stems' fader, as tall as pads + keys */
+.wheel .fader{flex:1;height:auto;margin:0}
+/* keys: white keys with real gaps, black keys shorter, between them (slightly off-centre as on a real keyboard) */
+.keys{position:relative;height:calc(130 * var(--px))}
 .keys i{position:absolute;top:0;font-style:normal;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.keys i.wht{height:100%;width:calc(100% / 15 + 1px);border:1px solid var(--track);background:var(--keyW);color:var(--off);
-  font-size:var(--fs-knob);line-height:1.2;z-index:1;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
-.keys i.blk{height:60%;width:calc(100% / 15 * .6);background:var(--keyB);border:1px solid var(--bg);border-top:0;z-index:2;
-  border-radius:0 0 calc(2 * var(--px)) calc(2 * var(--px))}
-.keys i.on{background:var(--hit)}.keys i.wht.on{color:var(--bg)}
+.keys i.wht{height:100%;width:calc(100% / 15 - 2 * var(--px));background:var(--keyW);box-shadow:inset 0 0 0 1px var(--keyLine);color:var(--keyLab);
+  font-size:var(--fs-knob);line-height:1.6;z-index:1;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
+.keys i.blk{height:60%;width:calc(100% / 15 * .58);background:var(--keyB);z-index:2;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
+.keys i.on{background:var(--hit);box-shadow:none}.keys i.wht.on{color:var(--bg)}
 body.no-lk .lkbox{visibility:hidden}
 /* spectrum and status strip under Mode 2 (the status strip ends level with the Launchkey box) */
-.spec{flex:1;display:flex;flex-direction:column;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid transparent;min-height:0}
-.spec canvas{display:block;width:100%;height:calc(160 * var(--px));flex:none}
+.spec{flex:1;display:flex;flex-direction:column;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
+.spec canvas{display:block;width:100%;height:calc(180 * var(--px));flex:none}
 .head{margin-top:auto;padding-top:calc(6 * var(--px));display:flex;flex-direction:column;gap:calc(2 * var(--px));
   font-size:var(--fs-lab);line-height:1.4;min-width:0}
 /* two lines: chapter / chords / break / global knobs, then bar marks, beats, chord and the theme switch */
@@ -227,15 +236,18 @@ const lkHtml = () => {
   const pad = n => '<div class=pad data-pad="' + n + '" title="' + esc(padName(n)) + ' (note ' + n + ')"></div>'
   // a two-octave keyboard from C (the window always starts on a C): 15 white keys, the black keys shorter, between them
   const WHITE = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24], w = 100 / 15
-  const keys = WHITE.map((k, i) => '<i class=wht data-key="' + k + '" style="left:' + (i * w) + '%"></i>').join('') +
-    WHITE.slice(0, -1).flatMap((k, i) => BLACK.includes((k + 1) % 12) ? ['<i class=blk data-key="' + (k + 1) + '" style="left:' + ((i + 1) * w - w * 0.3) + '%"></i>'] : []).join('')
+  const keys = WHITE.map((k, i) => '<i class=wht data-wi="' + i + '" data-key="' + k + '" style="left:' + (i * w) + '%"></i>').join('') +
+    WHITE.slice(0, -1).flatMap((k, i) => { const b = (k + 1) % 12, shift = { 1: -0.06, 6: -0.06, 3: 0.06, 10: 0.06 }[b] ?? 0
+      return BLACK.includes(b) ? ['<i class=blk data-bi="' + (i + 1) + '" data-sh="' + shift + '" data-key="' + (k + 1) + '" style="left:' + ((i + 1) * w - w * 0.29 + w * shift) + '%"></i>'] : [] }).join('')
   const [wheelName, wheelDesc] = tag('level')
   return '<section class=lkbox><p class=lab><span>launchkey</span><span class=pad-name id=lkPad></span>' +
     '<span class=hint>computer keys A–K · octave Z / X</span></p><div class="pn lk" id=lk>' +
-    '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '"><span class=btn>mod</span>' +
-    '<div class=fader><div class=bar></div><div class=handle></div></div></div>' +
-    '<div class=gr>' + LK_KNOBS.map((k, i) => '<div class=lkc>' + knob(k) + '<div class=pads>' + pad(PADS_TOP[i]) + pad(PADS_BOTTOM[i]) + '</div></div>').join('') + '</div>' +
-    '<div class=oct><button data-oct="-24" title="two octaves down (Z)">◀ oct</button><button data-oct="24" title="two octaves up (X)">oct ▶</button></div>' +
+    // as on the Launchkey 25: knobs over a tight 2 x 8 pad block, the keys at the bottom with the mod wheel left of them
+    '<div class=oct><span>oct</span><div><button data-oct="-24" title="two octaves down (Z)">◀</button><b id=octv>0</b><button data-oct="24" title="two octaves up (X)">▶</button></div></div>' +
+    '<div class="gr lkknobs">' + LK_KNOBS.map(knob).join('') + '</div>' +
+    '<div class="gr lkpads">' + [...PADS_TOP, ...PADS_BOTTOM].map(pad).join('') + '</div>' +
+    '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '">' +
+    '<span class=btn>mod</span><div class=fader><div class=bar></div><div class=handle></div></div></div>' +
     '<div class=keys>' + keys + '</div></div></section>'
 }
 const lkAttach = root => {
@@ -285,6 +297,7 @@ const build = () => {
     '<section><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas><div class=head id=head></div></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
+  requestAnimationFrame(layoutKeys)
   for (const div of root.querySelectorAll('[data-cell]')) {
     const [page, n0, row] = div.dataset.cell.split(':'), n = +n0
     const [name, desc] = (tagOf(page, n, row) ?? '').split(' | ')
@@ -392,6 +405,7 @@ const draw = () => {
       setText(el, m % 12 === 0 ? 'C' + (m / 12 - 1) : '')
     }
     for (const el of lk.querySelectorAll('[data-pad]')) el.classList.toggle('on', lit('p' + el.dataset.pad))
+    const o = (S.lkBase - 48) / 12; setText(document.getElementById('octv'), o > 0 ? '+' + o : String(o))
     // the name of the pad hit last, for 2 s, in the label line
     const pad = S.lkPad && now - S.lkPad[1] < 2000 ? S.lkPad[0] : null
     setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
@@ -407,11 +421,13 @@ const draw = () => {
   head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
   const html =
     (!S.bridge ? '<div class="warn keep">Bridge not reachable</div>' : !S.sc ? '<div class="warn keep">SuperCollider not running</div>' : '') +
-    '<div class=row>' + (S.state?.head ?? []).map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
+    // chapter and break show in the global column already: here only the chords, bar and beats, the global knobs, the theme
+    '<div class=row>' + (S.state?.head ?? []).filter(([k]) => !['chapter', 'break'].includes(String(k).toLowerCase()))
+      .map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
     // the global knobs once they are up (fog / thin / tension), as before the rebuild
     ['k1', 'k2', 'k3'].map(rw => [(tags()['g.' + rw] ?? rw).split(' | ')[0], S.cc[CC_ROW[rw] + 8]]).filter(([, v]) => v > 0.01)
-      .map(([k, v]) => '<div class="next keep"><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') + '</div>' +
-    '<div class=row><div class=keep><span class=k>bar</span>' + beat + '</div>' +
+      .map(([k, v]) => '<div class="next keep"><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
+    '<div class=keep><span class=k>bar</span>' + beat + '</div>' +
     '<div class=keep style="margin-left:auto"><button class=theme id=theme title="Panel theme (also in the player: Visual settings, key T)">' + themeLabel() + '</button></div></div>'
   if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
@@ -431,6 +447,22 @@ const spectrumResize = () => {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 }
 addEventListener('resize', spectrumResize)
+// keys on whole device pixels: equal gaps (no 2 px / 3 px shimmer), the last key flush with the pad block's right edge
+const layoutKeys = () => {
+  const box = document.querySelector('.keys'), board = document.querySelector('.board')
+  if (!box || !board) return
+  const W = box.clientWidth, unit = board.getBoundingClientRect().width / 1600, g = Math.max(1, Math.round(2 * unit)), kw = W / 15
+  for (const el of box.querySelectorAll('[data-wi]')) {
+    const i = +el.dataset.wi, x0 = Math.round(i * kw), x1 = i === 14 ? W : Math.round((i + 1) * kw) - g
+    el.style.left = x0 + 'px'; el.style.width = (x1 - x0) + 'px'
+  }
+  const bw = Math.round(kw * 0.58)
+  for (const el of box.querySelectorAll('[data-bi]')) {
+    const x = Math.round(+el.dataset.bi * kw - g / 2 - bw / 2 + kw * +el.dataset.sh)
+    el.style.left = x + 'px'; el.style.width = bw + 'px'
+  }
+}
+addEventListener('resize', () => requestAnimationFrame(layoutKeys))
 const colors = () => te()
   ? { dim: '#B4B2A9', lab: '#888780', low: '#D85A30', mid: '#1D9E75', high: '#378ADD' }
   : { fg: '#F1EFE8', dim: '#2C2C2A', lab: '#5F5E5A' }

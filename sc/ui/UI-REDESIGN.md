@@ -298,3 +298,13 @@ The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternat
   values once above 0), on two lines under the spectrum (spectrum canvas 160 units instead of 190); the keyboard
   is back to its look before the rebuild (distinct white / black key colours, taller, `◀ oct` / `oct ▶` beside it);
   faders 130 units high so the board stays within 900 units.
+- 2026-11-20, Launchkey reworked in three critique rounds: knobs 30 units over a tight 2 × 8 pad block, keys 130
+  units (about 3:1, real gaps on whole pixels, black keys slightly off-centre), mod wheel left of pads + keys,
+  `oct ◀ 0 ▶` with the current shift; black theme Launchkey in neutral greys.
+- 2026-11-20, user: a theme switch moves nothing (knobs the same size in both themes; only text width differs with
+  the font). The keys level uses the stems' fader. In black every fader is a slim slot filling from the bottom (12
+  units wide, a sliver at 0); in TE track + handle. Status strip on one line without chapter and break (both shown
+  in the global column).
+- Open (user's call): neutral greys for the whole black theme; neutral fader caps so only hits use the accent;
+  shorter names for `piano → rhodes`, `vibes → marimba`.
+
