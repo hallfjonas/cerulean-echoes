@@ -96,10 +96,14 @@ body:not([data-theme=te]) .fader .handle{left:50%;transform:translateX(-50%);wid
 .keys i.blk{height:60%;width:calc(100% / 15 * .58);background:var(--keyB);z-index:2;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
 .keys i.on{background:var(--hit);box-shadow:none}.keys i.wht.on{color:var(--bg)}
 body.no-lk .lkbox{visibility:hidden}
-/* spectrum and status strip under Mode 2 (the status strip ends level with the Launchkey box) */
-.spec{flex:1;display:flex;flex-direction:column;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
-.spec canvas{display:block;width:100%;height:calc(180 * var(--px));flex:none}
-.head{margin-top:auto;padding-top:calc(6 * var(--px));display:flex;flex-direction:column;gap:calc(2 * var(--px));
+/* under Mode 2: the spectrum and, right of it, the set view (300 units wide), the status strip on one line under both
+   (it ends level with the Launchkey box); both boxes the same height, nothing moves when the set view switches */
+.duo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) calc(300 * var(--px));gap:calc(28 * var(--px));min-height:0}
+.duo>div{display:flex;flex-direction:column;min-width:0;min-height:0}
+.spec{flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
+.spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
+.setlab{font:inherit;background:none;border:0;padding:0;color:inherit;cursor:pointer;white-space:nowrap}
+.head{padding:calc(8 * var(--px)) calc(12 * var(--px)) 0;display:flex;flex-direction:column;gap:calc(2 * var(--px));
   font-size:var(--fs-lab);line-height:1.4;min-width:0}
 /* two lines: chapter / chords / break / global knobs, then bar marks, beats, chord and the theme switch */
 .head .row{display:flex;gap:calc(18 * var(--px));align-items:baseline;white-space:nowrap;overflow:hidden;min-width:0}
@@ -286,14 +290,16 @@ const build = () => {
   cells.length = 0
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
   const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
-  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jojo' ? '<span class=hint id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
+  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
     cols.map(n => '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name>' +
       esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</span>' +
       cell(page, n, 'k1') + cell(page, n, 'k2') + cell(page, n, 'k3') + cell(page, n, 'fader') +
       '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>').join('') + '</div></div></section>').join('')
   root.className = 'board'
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
-    '<section><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas><div class=head id=head></div></div></section></div>'
+    '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
+    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: click cycles ring (energy) / map / area / spectrogram (also in the player: Visual settings, key C)"></button></p>' +
+    '<div class="spec setbox"><canvas id=setv></canvas></div></div></div><div class=head id=head></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
   requestAnimationFrame(layoutKeys)
@@ -310,6 +316,7 @@ const build = () => {
     cells.push(c)
   }
   spectrumResize()
+  setDraw()
   update()
 }
 
@@ -499,6 +506,149 @@ const drawSpectrum = () => {
 const loop = () => { drawSpectrum(); requestAnimationFrame(loop) }
 requestAnimationFrame(loop)
 
+// ---- set view (UI-REDESIGN.md "Set view"): how the set's energy evolved, four views on one canvas (devicePixelRatio).
+// Data: one sample every 10 s from SC (sc/lib/ui.scd uiSetFrame) kept by the player's link for the whole session:
+// sethistory on connect, then setsample. A sample: t (ms), e (energy dB), p (punch 0..1), x (tension 0..1), s (64 bands).
+// The view is a browser setting (the player's "Set view", key C, sends it by postMessage); a click on the label cycles it.
+// Default: the ring, labelled 'energy' (it shows the set's energy); the other labels after SET_LABELS (user, 2026-11-20).
+const SET_KEY = 'ce.setView', SET_VIEWS = ['ring', 'map', 'energy', 'spectrogram'], SET_STEP = 10 / 60   // minutes per sample
+const readSetView = () => { try { const v = localStorage.getItem(SET_KEY); return SET_VIEWS.includes(v) ? v : 'ring' } catch (e) { return 'ring' } }
+const SET_LABELS = { ring: 'energy', energy: 'energy · area', map: 'map', spectrogram: 'spectrogram' }
+let setView = readSetView()
+S.setHist = []
+const applySetView = v => { if (SET_VIEWS.includes(v) && v !== setView) { setView = v; setDraw() } }
+const cycleSetView = () => {
+  const v = SET_VIEWS[(SET_VIEWS.indexOf(setView) + 1) % SET_VIEWS.length]
+  try { localStorage.setItem(SET_KEY, v) } catch (e) {}
+  applySetView(v)
+  if (parent !== window) parent.postMessage({ setView: v }, location.origin)   // the player keeps its setting in step
+}
+addEventListener('message', e => { if (e.origin === location.origin && SET_VIEWS.includes(e.data?.setView)) applySetView(e.data.setView) })
+addEventListener('storage', e => { if (e.key === SET_KEY) applySetView(readSetView()) })
+document.addEventListener('click', e => { if (e.target.closest?.('#setlab')) cycleSetView() })
+addEventListener('resize', () => setDraw())
+
+// samples → minutes since the set began (the first sample ends its first 10 s); energy normalised to the set's range:
+// top = the loudest sample, bottom 3 dB under the quietest one that is not silent, at most 36 and at least 6 dB below
+// the top; silence (the -70 dB floor) is 0
+const setData = () => {
+  const H = S.setHist
+  if (!H.length) return { D: [], NOW: 0 }
+  const t0 = H[0].t - 10000, loud = H.filter(s => s.e > -69).map(s => s.e)
+  const hi = loud.length ? Math.max(...loud) : 0, lo = Math.min(hi - 6, Math.max(hi - 36, (loud.length ? Math.min(...loud) : hi) - 3))
+  const D = H.map(s => ({ m: (s.t - t0) / 60000, e: s.e > -69 ? Math.min(1, Math.max(0, (s.e - lo) / (hi - lo))) : 0, t: s.x, d: s.p, s: s.s }))
+  return { D, NOW: D[D.length - 1].m }
+}
+const smooth = (arr, k) => arr.map((_, i) => { let sum = 0, n = 0; for (let j = Math.max(0, i - k); j <= Math.min(arr.length - 1, i + k); j++) { sum += arr[j]; n++ } return sum / n })
+// runs of samples without a gap of more than 30 s (a stop): paths break there
+const runs = D => { const out = []; let cur = []
+  D.forEach((s, i) => { if (i && s.m - D[i - 1].m > 0.5) { out.push(cur); cur = [] } cur.push(i) }); if (cur.length) out.push(cur); return out }
+
+const setColors = () => te()
+  ? { now: '#D85A30', data: '#2C2C2A', flat: '#378ADD', lab: '#888780', grid: '#B4B2A9', bg: '#D3D1C7', bgRgb: [211, 209, 199], ink: [44, 44, 42],
+      cur: '#2C2C2A', old: '#5F5E5A', off: '#B4B2A9' }
+  : { now: '#F1EFE8', data: '#888780', flat: '#F1EFE8', lab: '#5F5E5A', grid: '#2C2C2A', bg: '#0b0b0b', bgRgb: [11, 11, 11], ink: [241, 239, 232],
+      cur: '#B4B2A9', old: '#5F5E5A', off: '#2C2C2A' }
+
+const setDraw = () => {
+  const cv = document.getElementById('setv'), lab = document.getElementById('setlab')
+  if (lab) setText(lab, SET_LABELS[setView])
+  if (!cv || !cv.isConnected) return
+  const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect(), w = r.width, h = r.height
+  if (!w || !h) return
+  cv.width = Math.max(1, Math.round(w * dpr)); cv.height = Math.max(1, Math.round(h * dpr))
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h)
+  const K = setColors(), u = document.querySelector('.board').getBoundingClientRect().width / 1600
+  const fs = parseFloat(getComputedStyle(document.querySelector('.lab')).fontSize), F = getComputedStyle(document.body).fontFamily
+  c.font = fs + 'px ' + F; c.lineJoin = 'round'
+  // a label on top of data gets a halo in the background colour
+  const label = (text, x, y, color) => { c.lineWidth = 3 * u + 2; c.strokeStyle = K.bg; c.strokeText(text, x, y); c.fillStyle = color; c.fillText(text, x, y) }
+  const { D, NOW } = setData()
+  if (setView === 'ring') {
+    // fixed 60′ clock in the spectrum's grid language: 60 spokes (one per minute) x 8 cells, lit = round(√energy · 8);
+    // cells grow with the radius; the second hour paints over the first (the previous lap stays ahead of the needle)
+    const cx = w / 2, cy = h / 2, R1 = Math.min(w, h) / 2 - 2, R0 = R1 * .4, RINGS = 8, st = (R1 - R0) / RINGS
+    const sums = new Map()
+    for (const s of D) { const k = Math.floor(s.m - SET_STEP / 2), a = sums.get(k) ?? [0, 0]; a[0] += s.e; a[1]++; sums.set(k, a) }
+    const nowMin = D.length ? Math.floor(NOW - SET_STEP / 2) : -1, lap = Math.floor(nowMin / 60) * 60
+    for (let k = 0; k < 60; k++) {
+      const a = (-90 + (k + .5) * 6) * Math.PI / 180, mAbs = k <= nowMin - lap ? lap + k : lap - 60 + k, cur = mAbs >= lap
+      const sm = sums.get(mAbs), on = sm ? Math.round(Math.sqrt(sm[0] / sm[1]) * RINGS) : 0, isNow = D.length > 0 && mAbs === nowMin
+      for (let rr = 0; rr < RINGS; rr++) {
+        const rad = R0 + (rr + .5) * st, x = cx + rad * Math.cos(a), y = cy + rad * Math.sin(a), slot = rad * Math.PI / 30
+        c.fillStyle = rr < on ? (isNow ? K.now : cur ? K.cur : K.old) : K.off
+        c.beginPath()
+        if (te()) { const tw = slot * .85 / 2; c.save(); c.translate(x, y); c.rotate(a); c.roundRect(-st * .34, -tw / 2, st * .68, tw, Math.min(tw, st * .68) * .3); c.restore() }
+        else c.arc(x, y, Math.min(st * .32, slot / 2 * .55), 0, Math.PI * 2)
+        c.fill()
+      }
+    }
+    c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (fs * 1.5) + 'px ' + F; c.fillStyle = K.now
+    c.fillText(Math.floor(NOW) + '′', cx, cy)
+  } else if (setView === 'map') {
+    // mood map, x = energy, y = tension; no window: the trail fades with age (alpha = e^(−age/12′), gone below 0.05)
+    const side = Math.min(w, h), x0 = (w - side) / 2, y0 = (h - side) / 2, X = e => x0 + e * side, Y = t => y0 + side - t * side
+    c.strokeStyle = K.grid; c.lineWidth = 1; c.strokeRect(x0 + .5, y0 + .5, side - 1, side - 1)
+    c.fillStyle = K.grid; c.fillRect(x0 + side / 2, y0, 1, side); c.fillRect(x0, y0 + side / 2, side, 1)
+    if (D.length) {
+      const Ex = smooth(D.map(s => s.e), 12), Tx = smooth(D.map(s => s.t), 12), n = D.length - 1, TAU = 12, B = 3
+      for (let b = 0; ; b++) {   // age buckets of 3′, each drawn as a few continuous paths
+        const a0 = b * B, alpha = Math.exp(-(a0 + B / 2) / TAU); if (alpha < .05) break
+        c.globalAlpha = alpha; c.strokeStyle = K.data; c.lineWidth = (1 + 2 * alpha) * u; c.beginPath()
+        for (const run of runs(D)) { let open = false
+          for (const i of run) { const age = NOW - D[i].m; if (age < a0 || age > a0 + B + SET_STEP) { open = false; continue }
+            open ? c.lineTo(X(Ex[i]), Y(Tx[i])) : c.moveTo(X(Ex[i]), Y(Tx[i])); open = true } }
+        c.stroke()
+      }
+      c.globalAlpha = 1; c.strokeStyle = K.now; c.lineWidth = 3 * u; c.lineCap = 'round'; c.beginPath()
+      for (let i = Math.max(0, n - 9); i <= n; i++) i === Math.max(0, n - 9) ? c.moveTo(X(Ex[i]), Y(Tx[i])) : c.lineTo(X(Ex[i]), Y(Tx[i]))
+      c.stroke(); c.lineCap = 'butt'
+      c.fillStyle = K.now; c.beginPath(); c.arc(X(Ex[n]), Y(Tx[n]), 6 * u, 0, Math.PI * 2); c.fill()
+    }
+    const pad = 6 * u
+    c.textBaseline = 'top'; c.textAlign = 'left'; label('tense', x0 + pad, y0 + pad / 2, K.lab); c.textAlign = 'right'; label('full', x0 + side - pad, y0 + pad / 2, K.lab)
+    c.textBaseline = 'bottom'; label('driving', x0 + side - pad, y0 + side - pad / 2, K.lab); c.textAlign = 'left'; label('calm', x0 + pad, y0 + side - pad / 2, K.lab)
+  } else {
+    // strips: the last 60′, now at the right edge
+    const L = setView === 'spectrogram' ? fs * 2.2 : 0, top = 4 * u, H = h - fs * 1.6 - 6 * u, t0 = NOW - 60, X = m => L + (m - t0) / 60 * (w - L)
+    const vis = D.map((s, i) => i).filter(i => D[i].m >= t0 - SET_STEP)
+    if (setView === 'energy' && vis.length) {
+      const E = smooth(D.map(s => s.e), 1), P = smooth(D.map(s => s.d), 1), Yv = i => top + H - E[i] * H
+      const groups = runs(D).map(run => run.filter(i => vis.includes(i))).filter(g => g.length)
+      const area = () => { c.beginPath(); for (const g of groups) { c.moveTo(X(D[g[0]].m - SET_STEP), top + H); g.forEach(i => c.lineTo(X(D[i].m), Yv(i))); c.lineTo(X(D[g[g.length - 1]].m), top + H); c.closePath() } }
+      c.fillStyle = K.data; area(); c.fill()
+      // a band along the top edge where punch < 0.35 ("it got flat"), clipped to the area
+      c.save(); area(); c.clip(); c.strokeStyle = K.flat; c.lineWidth = 8 * u; c.beginPath()
+      for (const g of groups) { let open = false
+        for (const i of g) { if (P[i] < .35) { open ? c.lineTo(X(D[i].m), Yv(i)) : c.moveTo(X(D[i].m) - (g.length > 1 ? 0 : 2), Yv(i)); open = true } else open = false } }
+      c.stroke(); c.restore()
+    } else if (setView === 'spectrogram') {
+      // 64 log-frequency rows (bottom 20 Hz → top 20 kHz), 360 columns of 10 s; intensity = ink alpha, each row scaled to
+      // its own maximum, curve ^1.4, ±3 samples (~30 s) soft smoothing; no sample = background
+      const ROWS = 64, COLS = 360, img = new ImageData(COLS, ROWS)
+      const cols = vis.map(i => Math.floor((D[i].m - t0) / SET_STEP - .5)).map(k => Math.min(COLS - 1, k))
+      for (let rr = 0; rr < ROWS; rr++) {
+        const row = smooth(vis.map(i => D[i].s?.[rr] ?? 0), 3), mx = Math.max(0, ...row) || 1
+        row.forEach((v, j) => { const k = cols[j]; if (k < 0) return
+          const a = .85 * Math.min(1, v / mx) ** 1.4, p = ((ROWS - 1 - rr) * COLS + k) * 4
+          for (let q = 0; q < 3; q++) img.data[p + q] = K.bgRgb[q] + (K.ink[q] - K.bgRgb[q]) * a
+          img.data[p + 3] = 255 })
+      }
+      const off = document.createElement('canvas'); off.width = COLS; off.height = ROWS; off.getContext('2d').putImageData(img, 0, 0)
+      c.imageSmoothingEnabled = true; c.drawImage(off, L, top, w - L, H)
+    }
+    if (setView === 'spectrogram') {
+      c.fillStyle = K.lab; c.textAlign = 'right'; c.textBaseline = 'middle'
+      for (const [fq, l] of [[100, '100'], [1000, '1k'], [10000, '10k']]) c.fillText(l, L - 6 * u, top + H - Math.log(fq / 20) / Math.log(1000) * H)
+    }
+    c.fillStyle = K.lab; c.textBaseline = 'top'; c.textAlign = 'left'; c.fillText('−60′', L, top + H + 6 * u)
+    c.textAlign = 'center'; c.fillText('−30′', X(NOW - 30), top + H + 6 * u)
+    c.fillStyle = K.now; c.textAlign = 'right'; c.fillText('now', w, top + H + 6 * u)
+    c.fillRect(w - 2.5 * u, top, 2.5 * u, H)
+  }
+  c.textAlign = 'left'; c.globalAlpha = 1
+}
+
 // ---- live state from the bridge ----
 const connect = () => {
   const es = new EventSource('events')
@@ -507,6 +657,8 @@ const connect = () => {
   es.onmessage = e => {
     const { type, data } = JSON.parse(e.data)
     if (type === 'spectrum') { if (Array.isArray(data)) { S.spec.set(data.slice(0, N)); S.specAt = performance.now() } return }
+    if (type === 'sethistory') { if (Array.isArray(data)) { S.setHist = data; setDraw() } return }
+    if (type === 'setsample') { if (data && typeof data.t === 'number') { S.setHist.push(data); setDraw() } return }
     if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) build() }
     else if (type === 'ccs') { data.forEach((v, i) => { if (!(performance.now() - (mine[i] ?? -1e9) < 300)) S.cc[i] = v }) }
     else if (type === 'cc') {
