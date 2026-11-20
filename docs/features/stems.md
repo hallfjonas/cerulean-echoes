@@ -341,9 +341,23 @@ would name the tracks in order and the length of each change. There is no set fi
 - Feature tests: `tools/stems/check-stems.test.mjs` (a broken copy of an example per rule), `tools/stems/stem-index.test.mjs` (the library index),
   `tools/stems/stem-tags.test.mjs` (the `@ctl` lines of a stem track), and in `tools/sc-test/run.scd`: a stem loads,
   Pattern cycles, a knob reaches its bus, every add-on fires, silent columns are gated, Break, the code hatch, the
-  swap, and SC makes the same `@ctl` lines as `tools/stems/stem-tags.mjs`.
-- Not built yet: Sample Designer, Stem Designer and the stem swap in the player
-  (`.claude/epics/sound-lab/epic.md`).
+  swap (the outgoing stem's own hooks leave with it; a stem that needs another strip is refused live), and SC makes
+  the same `@ctl` lines as `tools/stems/stem-tags.mjs`. The swap endpoints: `tools/trajectory/stem-swap.test.mjs`
+  (without SC) and `tools/trajectory/sc-link.test.mjs` (with SC).
+- Not built yet: Sample Designer and Stem Designer (`.claude/epics/sound-lab/epic.md`).
+
+## Stem swap in the player
+- Play a stem track, click a column's name in the MIDI panel: the stem drawer lists the library stems of that
+  column's role (filters genre, energy, tag), marks the one that plays and the one in the file. Pick one: it plays
+  from the next bar, the other columns play on.
+- A stem that needs another mixer strip than the slot has (another echo set-up, lanes, map buses, column code with
+  its own strip) cannot take over live: the track loads again with it, a short gap, and the drawer says so.
+- The track file is never changed. Revert puts the file's stems back; Save as writes
+  `sc/tracks/<name>/<name>.track` with the stems that play and a copy of the frame (`<name>-frame.scd`), never over an
+  existing track (default name: `<track>-v2`, `-v3` …). Play loads the file again (unsaved swaps are gone).
+- Endpoints (`tools/trajectory/stem-swap.mjs`): `GET /swap?track=<id>`, `POST /swap`, `POST /swap/revert`,
+  `POST /track/save-as`. The column click goes through `tools/trajectory/selection.mjs` (kind `column`: track, slot,
+  stem), the registry other drawers reuse.
 
 ## In SuperCollider
 - `sc/lib/stems.scd` makes a column of a `.stem`, `sc/lib/addons.scd` holds the add-ons, `sc/lib/stemtrack.scd`
@@ -360,6 +374,10 @@ would name the tracks in order and the length of each change. There is no set fi
   next bar line; the other columns play on. `load.(msgs, done)` sends the new sounds, samples and state buses
   (default: live, with `s.sync`) and then calls `done`. The slot must hold a stem already (an empty slot has no
   strip: load the changed track instead). The swap changes only the running track, never the file.
+  `~ce.swapProblem(slot, ref)` says why a stem cannot take over live (nil: it can); the hooks and latches a column
+  makes in `startCol` belong to it (`~ce.owning`) and leave with it at the switch (`~ce.dropHooks`).
+  `~ce.loadTrack(path, slots)` takes slots (JSON) in place of the file's: the player's reload fallback.
+  The engine (`sc/engine.scd`) answers `/ce/swap <slot> <ref>` with `/ce/swapped`, `/ce/swapReload` or `/ce/swapError`.
 
 ## Related
 - [Samples and sounds](samples-and-sounds.md)

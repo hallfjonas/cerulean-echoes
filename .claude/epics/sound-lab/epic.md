@@ -3,7 +3,7 @@ name: sound-lab
 status: backlog
 created: 2026-11-20T18:11:25Z
 updated: 2026-11-21T00:40:00Z
-progress: 30%
+progress: 50%
 prd: .claude/prds/sound-lab.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -195,7 +195,7 @@ Designer), 007 (Stem Designer).
 - [ ] 006.md - /sample-designer skill (parallel: true)
 - [ ] 007.md - Stem Designer (parallel: false)
 - [ ] 008.md - /stem-designer skill (parallel: true)
-- [ ] 009.md - Stem swap in the player (parallel: true)
+- [x] 009.md - Stem swap in the player (parallel: true; in review)
 - [ ] 010.md - Docs, skills hand-over, sound-lab wrap-up (parallel: false)
 
 Total tasks: 10
