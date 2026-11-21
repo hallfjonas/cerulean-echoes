@@ -211,7 +211,8 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     await new Promise(resolve => setTimeout(resolve, 500))
     const cut = JSON.parse(fs.readFileSync(path.join(folder, '008-groove-techno', second + '.json'), 'utf8'))
     assert.ok(cut.endedBy === 'stop' && cut.seconds > 0, 'a load leaves a finished sidecar')
-    assert.equal(fs.readFileSync(path.join(folder, '008-groove-techno', second + '.wav')).readUInt32LE(40) / 4 / cut.sampleRate, cut.seconds)
+    // the sidecar rounds seconds to 3 decimals
+    assert.ok(Math.abs(fs.readFileSync(path.join(folder, '008-groove-techno', second + '.wav')).readUInt32LE(40) / 4 / cut.sampleRate - cut.seconds) < 0.001, 'the WAV length matches the sidecar')
 
     // stop: no more bars
     assert.equal((await post('stop')).status, 200)

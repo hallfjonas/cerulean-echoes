@@ -160,8 +160,12 @@ test('auto-perform and takes on SuperCollider tracks', { skip: findSclang() ? fa
         assert.equal(notesSent, compiled.notes.reduce((sum, n) => sum + n.notes.length, 0), `${at}: every key and pad`)
         assert.ok(!ccsSent.some(([cc]) => MASTER.includes(cc)), 'the master is never sent')
         // SC holds what was sent (its echoes), keys and pads came back one by one, the master stayed at 0
-        const state = echo.stateSince(mark)
+        // SC's echoes may trail the last request (more OSC traffic with notes and levels): wait up to 5 s for them
         const lastSent = new Map(ccsSent.map(([cc, v]) => [alias(cc), v]))
+        const holds = st => [...lastSent].every(([cc, value]) => near(st.cc.get(cc) ?? 0, value)) &&
+          [...new Map(lkSent)].every(([number, value]) => near(st.lk.get(number) ?? 0, value)) && st.notes === notesSent
+        for (let waited = 0; waited < 5000 && !holds(echo.stateSince(mark)); waited += 100) await sleep(100)
+        const state = echo.stateSince(mark)
         for (const [cc, value] of lastSent) assert.ok(near(state.cc.get(cc) ?? 0, value), `${at}: SC holds cc ${cc} = ${value} (has ${state.cc.get(cc)})`)
         for (const [number, value] of new Map(lkSent)) assert.ok(near(state.lk.get(number) ?? 0, value), `${at}: SC holds lk ${number}`)
         assert.equal(state.notes, notesSent, `${at}: SC played every key and pad`)
