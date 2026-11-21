@@ -6,7 +6,7 @@
 <title>LC XL 3</title>
 <style>
 /* Controller mirror after UI-REDESIGN.md and reference/layout-mockup.html: two LC panels (Mode 1, Mode 2), the Launchkey
-   under Mode 1, the spectrum and the status strip under Mode 2. Everything is laid out on a design board of 1600 x 900
+   under Mode 1, the spectrum and the set view under Mode 2, the status (bar marks, beats) top right of Mode 1. Everything is laid out on a design board of 1600 x 900
    units and scaled as one piece (--px = one unit in CSS px); only text has a floor and a ceiling. Two styles, "minimal"
    (Torso-like, default) and "retro" (Teenage Engineering-like), each dark or light (data-tone): only tokens and the knob
    component differ.
@@ -110,20 +110,15 @@ body:not([data-theme=retro]) .fader .handle{left:50%;transform:translateX(-50%);
 .keys i.blk{height:60%;width:calc(100% / 15 * .58);background:var(--keyB);z-index:2;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
 .keys i.on{background:var(--hit);box-shadow:none}.keys i.wht.on{color:var(--bg)}
 body.no-lk .lkbox{visibility:hidden}
-/* under Mode 2: the spectrum and, right of it, the set view (300 units wide), the status strip on one line under both
+/* under Mode 2: the spectrum and, right of it, the set view (300 units wide)
    (it ends level with the Launchkey box); both boxes the same height, nothing moves when the set view switches */
 .duo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) calc(300 * var(--px));gap:calc(28 * var(--px));min-height:0}
 .duo>div{display:flex;flex-direction:column;min-width:0;min-height:0}
 .spec{flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
 .spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
 .setlab{font:inherit;background:none;border:0;padding:0;color:inherit;cursor:pointer;white-space:nowrap}
-.head{padding:calc(8 * var(--px)) calc(12 * var(--px)) 0;display:flex;flex-direction:column;gap:calc(2 * var(--px));
-  font-size:var(--fs-lab);line-height:1.4;min-width:0}
-/* two lines: chapter / chords / break / global knobs, then bar marks, beats, chord and the theme switch */
-.head .row{display:flex;gap:calc(18 * var(--px));align-items:baseline;white-space:nowrap;overflow:hidden;min-width:0}
-.head .row>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
-.head .row>div.keep{flex-shrink:0}
-.head .k{color:var(--off);margin-right:.5em;text-transform:lowercase}.head .next{color:var(--off)}
+/* the status in the top line, right of mode 1's label: a warning, or the 8 bar marks, 4 beat dots and the chord */
+.lab .head{margin-left:auto;display:flex;align-items:center;white-space:nowrap;color:var(--text)}
 .warn{color:var(--accent);font-weight:600}
 .marks i{display:inline-block;background:var(--track);margin-left:max(2px, calc(4 * var(--px)));vertical-align:middle}
 .marks.beats i{width:max(5px, calc(9 * var(--px)));height:max(5px, calc(9 * var(--px)));border-radius:50%}
@@ -311,7 +306,7 @@ const build = () => {
   cells.length = 0
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
   const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
-  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
+  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '<span class=head id=head></span>') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
     cols.map(n => '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name>' +
       esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</span>' +
       cell(page, n, 'k1') + cell(page, n, 'k2') + cell(page, n, 'k3') + cell(page, n, 'fader') +
@@ -320,7 +315,7 @@ const build = () => {
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
     '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Visual settings, key C)"></button></p>' +
-    '<div class="spec setbox"><canvas id=setv></canvas></div></div></div><div class=head id=head></div></section></div>'
+    '<div class="spec setbox"><canvas id=setv></canvas></div></div></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
   requestAnimationFrame(layoutKeys)
@@ -439,7 +434,7 @@ const draw = () => {
     setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
     if (pad) setTimeout(update, 2050)
   }
-  // status strip: only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
+  // status (top line, right of mode 1's label): only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
   // marks and 4 beat dots (no 'bar n / 8' text: the marks say it), the chord of the bar. The track's head line
   // (chords / colour) and the global knob values are on the buttons and knobs already.
   const marks = (cls, n, on) => '<span class="marks ' + cls + '">' + [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('') + '</span>'
@@ -450,8 +445,7 @@ const draw = () => {
   const head = document.getElementById('head')
   head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
   const html =
-    (!S.bridge ? '<div class="warn keep">Bridge not reachable</div>' : !S.sc ? '<div class="warn keep">SuperCollider not running</div>' : '') +
-    '<div class=row><div class=keep>' + beat + '</div></div>'
+    !S.bridge ? '<span class=warn>bridge not reachable</span>' : !S.sc ? '<span class=warn>supercollider not running</span>' : beat
   if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
 
