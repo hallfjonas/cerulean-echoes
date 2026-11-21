@@ -30,8 +30,8 @@
 	track[\build] = { |t, ce| buildBase.(t, ce); ce.stemLabBuild(t, base[\slots]) };
 	track[\uiHead] = { |t, ce|
 		[["Column", t.labSelected.asString], ["Chord", t.chordAt(TempoClock.default.bar.max(0)).name]] };
-	track[\uiGlobal] = { |t, ce| var shown = t.labShowing[t.labSelected] ? \candidate;
-		(b1: [shown.asString.capitalize] ! 2, b2: ["Promote"] ! 2) };
+	track[\uiGlobal] = { |t, ce| var shown = (t.labShowing[t.labSelected] ? \candidate).asString;
+		(b1: [shown[0].toUpper ++ shown.drop(1)] ! 2, b2: ["Promote"] ! 2) };
 	track[\uiCols] = { |t, ce| (designer: (select: t.labSelected.asString)) };
 	track
 };

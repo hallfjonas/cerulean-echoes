@@ -190,11 +190,11 @@ Designer), 007 (Stem Designer).
 ## Tasks Created
 - [x] 001.md - Stem architecture and file format (parallel: false)
 - [x] 002.md - SC stem loader and add-on library (parallel: false)
-- [x] 003.md - Pilot: 009-house as a stem track (parallel: false; in review: differences to accept)
+- [x] 003.md - Pilot: 009-house as a stem track (parallel: false; differences accepted 2026-11-21)
 - [x] 004.md - Stem library index (parallel: true)
 - [x] 005.md - Sample Designer (parallel: true)
 - [x] 006.md - /sample-designer skill (parallel: true)
-- [x] 007.md - Stem Designer (parallel: false; in review; live CPU measurement open)
+- [x] 007.md - Stem Designer (parallel: false; CPU measured 2026-11-21)
 - [x] 008.md - /stem-designer skill (parallel: true; in review)
 - [x] 009.md - Stem swap in the player (parallel: true; verified by the user 2026-11-21)
 - [x] 013.md - Stem format 2 (parallel: false)
