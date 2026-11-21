@@ -9,6 +9,7 @@ related. New here? Start with [getting started](../getting-started.md).
 - [Auto-perform](auto-perform.md) - a script plays a track without hardware
 - [Lab boards](lab-boards.md) - test and compare sounds before they go into a track
 - [Sets](sets.md) - several tracks played as one set
+- [Sound lab](sound-lab.md) - Sample Designer, Stem Designer and stem swap in the player
 - [Stems](stems.md) - one LC column as a file: format, naming, add-ons, stem tracks (SuperCollider)
 - [Samples and sounds](samples-and-sounds.md) - adding audio and checking that sounds load
 - [Checks](checks.md) - tools that test a track without a browser
