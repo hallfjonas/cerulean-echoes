@@ -1,24 +1,25 @@
 // The "About this page" text of every player page, by page key (pages.mjs pageKey): Live, Labs / Samples,
-// Labs / Stems, the planned Labs pages and Visualization. DOM-free: a section is { heading, text } as help.mjs shows it.
+// Labs / Stems, the planned Labs pages and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
 const LIVE = [
   { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
     + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample and Stem Designer '
-    + '(Tracks and Sets are planned); Visualization draws every stem with its name and the tempo. The sidebar shows '
+    + '(Tracks and Sets are planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
     + 'only what the page needs. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound, the Live panel and visuals. Save take writes what the controllers did since the '
-    + 'last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
-  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play.', 'Play the controllers, or start '
-    + 'Auto-perform (P) to try the track without hardware.', 'Live, Labs and Visualization switch the page; the sound '
-    + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Visual '
-    + 'settings (Visualization page) hold the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the '
-    + 'panel, dark, light or as the system (Auto).'] },
+  { heading: 'Output', text: 'Sound, the Live panel and visuals. With "Save take on record stop" ticked (Settings), a '
+    + 'recording\'s end writes what the controllers did since the last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
+  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play (the same button pauses and resumes).', 'Play the controllers, or start '
+    + 'Auto-perform (P) to try the track without hardware.', 'Live, Labs and Visuals switch the page; the sound '
+    + 'keeps playing.', 'S hides the sidebar, F is fullscreen.', 'The gear opens Settings: Theme (T switches '
+    + 'Minimal / Retro; the look of this page and the panel, dark, light or as the system), Visuals, MIDI panel and '
+    + 'Recording, plus the list of keyboard shortcuts.'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
-    'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
+    'With the setting "Save take on record stop" ticked (Settings, Recording), ending a recording writes the capture as a script; '
+    + 'it shows up in the Auto-perform list as takes/<name>.',
     'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
     + 'captured too.',
-    'Save take after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
+    'A take saved after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
     + 'lists every differing bar.',
     'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
     'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
@@ -81,7 +82,7 @@ const PLANNED = [
 const VISUALS = [
   { heading: 'What it does', text: 'Draws every stem of the playing track with its name and the tempo.' },
   { heading: 'Input', text: 'The track that plays: start it on Live or Labs.' },
-  { heading: 'How to use', text: ['Visual settings in the sidebar change the look.',
+  { heading: 'How to use', text: ['Settings (the gear), section Visuals, change the look.',
     'S hides the sidebar, F is fullscreen.'] }
 ]
 

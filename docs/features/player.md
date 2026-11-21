@@ -5,7 +5,7 @@
 A web page on your own computer that plays any live track or lab project. It has three pages. **Live** (the start page) shows both Launch
 Control pages and the Launchkey row with every control's name and value, and lets you pick a live track and
 auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks and Sets are placeholders).
-**Visualization** draws the music: every part of the track is a moving shape with its name. It also holds a recorder.
+**Visuals** draws the music: every part of the track is a moving shape with its name. It also holds a recorder.
 
 ## When to use it
 
@@ -26,11 +26,12 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
    auto-perform and the visuals do not work for SuperCollider tracks yet.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
-The sidebar shows only what the page needs. **Live**: the live track list, Play, Stop, Record, Save take, Auto-perform,
-Theme and the panel settings. **Labs** (Samples, Stems): the project list, Play, Stop, the designer buttons, Theme and
-the panel settings; the waveform analysis shows under the controllers on Samples only. **Visualization**: Stop, Theme and
-the visual settings. Switching pages keeps the sound playing; a page has its own address (`#live`, `#labs/samples`,
-`#labs/stems`, `#labs/tracks`, `#labs/sets`, `#visuals`).
+The sidebar shows only what the page needs. **Live**: the live track list, Play / Pause, Stop, Record and
+Auto-perform. **Labs** (Samples, Stems): the project list, Play / Pause, Stop and the designer buttons; the waveform
+analysis shows under the controllers on Samples only. **Visuals**: Stop. Switching pages keeps the sound playing; a page
+has its own address (`#live`, `#labs/samples`, `#labs/stems`, `#labs/tracks`, `#labs/sets`, `#visuals`). The gear next to
+the pages opens **Settings** on top of the current page: Theme, Visuals, MIDI panel, Recording and a list of the keyboard
+shortcuts, with a list of sections on the left to jump between them.
 
 Keys:
 
@@ -48,7 +49,7 @@ Keys:
 - The player reads the track file again on every load. Edit a track, press Play, and you hear the edit. There is no
   extra step and no copy of the track on disk.
 - A track never needs the player. The same file plays pasted into [strudel.cc](strudel-cc.md).
-- The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Visual settings change the visuals, never the
+- The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Settings (Visuals) change the visuals, never the
   sound.
 - Recordings go to `recordings/<track>/` in the repo root and are not part of git.
 - A tab in the background slows its timers down. Keep the player tab visible while a script or a replay runs.

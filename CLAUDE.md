@@ -146,17 +146,18 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
-- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems, Tracks, Sets) | Visualization;
-  the sidebar (key S) shows only the sections of the page: Live = live tracks, Play/Stop/Record/Save take, auto-perform;
-  Labs = Sample / Stem Designer; Visualization = visual settings; **?** opens the help.
+- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems, Tracks, Sets) | Visuals;
+  the sidebar (key S) shows only the sections of the page: Live = live tracks, Play-Pause/Stop/Record, auto-perform;
+  Labs = Sample / Stem Designer; the gear opens Settings (Theme, Visuals, MIDI panel, Recording, keyboard shortcuts);
+  **?** opens the help.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
   (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).
 - Record (key R) writes the master output to `recordings/<track>/` as a WAV (human set, or auto-perform with Record
   audio ticked); `node trajectory/check-recording.mjs` tests the endpoints.
-- Takes: every load captures all MIDI input; Save take writes it as a script v2 to `perform/<track>/takes/` (gitignored,
-  with the play's tapped events). Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
+- Takes: every load captures all MIDI input; the setting Save take on record stop writes it as a script v2 to `perform/<track>/takes/`
+  (gitignored, with the play's tapped events) when a recording ends. Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
   replay fidelity) compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
 - SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's Strudel file is
