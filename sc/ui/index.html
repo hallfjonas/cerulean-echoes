@@ -419,10 +419,14 @@ const render = async () => {
   if (busy || wanted === drawn) return
   busy = true
   const key = wanted
+  box.querySelector('.numbers .busy')?.remove()
   box.querySelector('.numbers').insertAdjacentHTML('beforeend', '<span class=busy>rendering …</span>')
   try {
-    const response = await fetch('/lab/sample/shape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    const body = JSON.stringify({ track: S.layout?.name })
+    const response = await fetch('/lab/sample/shape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
     const shape = await response.json()
+    // the new project's values arrive before the server sees it play: ask again shortly
+    if (response.status === 409) { busy = false; setTimeout(render, 300); return }
     if (!response.ok) throw new Error(shape.error ?? response.status)
     last = shape
     drawShape(box, shape)
