@@ -197,7 +197,7 @@ Designer), 007 (Stem Designer).
 - [ ] 007.md - Stem Designer (parallel: false)
 - [ ] 008.md - /stem-designer skill (parallel: true)
 - [ ] 009.md - Stem swap in the player (parallel: true)
-- [ ] 013.md - Stem format 2 (parallel: false; in progress)
+- [x] 013.md - Stem format 2 (parallel: false)
 - [ ] 010.md - Docs, skills hand-over, sound-lab wrap-up (parallel: false)
 
 Total tasks: 10
