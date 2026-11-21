@@ -116,6 +116,8 @@ body.no-lk .lkbox{visibility:hidden}
 .duo>div{display:flex;flex-direction:column;min-width:0;min-height:0}
 .spec{flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
 .spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
+/* the set view's canvas fills its box (same size for every view, so nothing moves when the view switches) */
+.setbox canvas{flex:1;height:auto;min-height:0}
 .setlab{font:inherit;background:none;border:0;padding:0;color:inherit;cursor:pointer;white-space:nowrap}
 /* the status in the top line, right of mode 1's label: a warning, or the 8 bar marks, 4 beat dots and the chord */
 .lab .head{margin-left:auto;display:flex;align-items:center;white-space:nowrap;color:var(--text)}
@@ -686,28 +688,40 @@ const setDraw = () => {
     c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (fs * 1.5) + 'px ' + F; c.fillStyle = K.now
     c.fillText(Math.floor(NOW) + '′', cx, cy)
   } else if (setView === 'map') {
-    // mood map, x = energy, y = tension; no window: the trail fades with age (alpha = e^(−age/12′), gone below 0.05)
-    // labels outside the square (user, 2026-11-21): above it tense / full, under it calm / driving
-    const lh = fs * 1.35, side = Math.min(w, h - 2 * lh), x0 = (w - side) / 2, y0 = (h - side) / 2, X = e => x0 + e * side, Y = t => y0 + side - t * side
-    c.strokeStyle = K.grid; c.lineWidth = 1; c.strokeRect(x0 + .5, y0 + .5, side - 1, side - 1)
-    c.fillStyle = K.grid; c.fillRect(x0 + side / 2, y0, 1, side); c.fillRect(x0, y0 + side / 2, side, 1)
+    // mood map, x = energy, y = tension, over the whole box (user, 2026-11-21: larger, nicer). A faint dot field in the
+    // spectrum's language, the centre cross, the corner words inside the corners (the one the set is in now lit). The
+    // trail is a smooth curve that fades with age (e^(−age/12′), gone below 0.05) and thins out; the last 90 s and the
+    // now dot (with a ring) in the now colour.
+    const pad = 6 * u, x0 = pad, y0 = pad, W = w - 2 * pad, H = h - 2 * pad, X = e => x0 + e * W, Y = t => y0 + H - t * H
+    const gc = retro() ? 18 : 24, gr = Math.max(4, Math.round(gc * H / W)), dr = 1 * u + .4
+    c.fillStyle = K.off
+    for (let i = 0; i <= gc; i++) for (let j = 0; j <= gr; j++) {
+      const gx = x0 + i * W / gc, gy = y0 + j * H / gr; c.beginPath()
+      if (retro()) c.rect(gx - dr, gy - dr, 2 * dr, 2 * dr); else c.arc(gx, gy, dr, 0, Math.PI * 2)
+      c.fill() }
+    c.fillStyle = K.grid; c.fillRect(Math.round(X(.5)), y0, 1, H); c.fillRect(x0, Math.round(Y(.5)), W, 1)
+    let qx = -1, qy = -1
     if (D.length) {
-      const Ex = smooth(D.map(s => s.e), 12), Tx = smooth(D.map(s => s.t), 12), n = D.length - 1, TAU = 12, B = 3
-      for (let b = 0; ; b++) {   // age buckets of 3′, each drawn as a few continuous paths
-        const a0 = b * B, alpha = Math.exp(-(a0 + B / 2) / TAU); if (alpha < .05) break
-        c.globalAlpha = alpha; c.strokeStyle = K.data; c.lineWidth = (1 + 2 * alpha) * u; c.beginPath()
-        for (const run of runs(D)) { let open = false
-          for (const i of run) { const age = NOW - D[i].m; if (age < a0 || age > a0 + B + SET_STEP) { open = false; continue }
-            open ? c.lineTo(X(Ex[i]), Y(Tx[i])) : c.moveTo(X(Ex[i]), Y(Tx[i])); open = true } }
-        c.stroke()
-      }
-      c.globalAlpha = 1; c.strokeStyle = K.now; c.lineWidth = 3 * u; c.lineCap = 'round'; c.beginPath()
-      for (let i = Math.max(0, n - 9); i <= n; i++) i === Math.max(0, n - 9) ? c.moveTo(X(Ex[i]), Y(Tx[i])) : c.lineTo(X(Ex[i]), Y(Tx[i]))
-      c.stroke(); c.lineCap = 'butt'
-      c.fillStyle = K.now; c.beginPath(); c.arc(X(Ex[n]), Y(Tx[n]), 6 * u, 0, Math.PI * 2); c.fill()
+      const Ex = smooth(D.map(s => s.e), 6), Tx = smooth(D.map(s => s.t), 6), n = D.length - 1, TAU = 12
+      const P = i => [X(Ex[i]), Y(Tx[i])], mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]
+      c.lineCap = 'round'; c.lineJoin = 'round'
+      for (const run of runs(D)) for (let k = 0; k < run.length; k++) {
+        // one piece per sample: from the midpoint before it to the midpoint after it, bent through the sample itself
+        const i = run[k], age = NOW - D[i].m, alpha = Math.exp(-age / TAU); if (alpha < .05) continue
+        const p = P(i), a = k ? mid(P(run[k - 1]), p) : p, b = k < run.length - 1 ? mid(p, P(run[k + 1])) : p
+        const fresh = age < 1.5
+        c.strokeStyle = fresh ? K.now : mix(K.bg, K.data, Math.min(1, .25 + alpha * .85))
+        c.lineWidth = (fresh ? 3 : .8 + 2.2 * alpha) * u + .3
+        c.beginPath(); c.moveTo(a[0], a[1]); c.quadraticCurveTo(p[0], p[1], b[0], b[1]); c.stroke() }
+      c.lineCap = 'butt'
+      const [nx, ny] = P(n)
+      c.strokeStyle = K.now; c.globalAlpha = .35; c.lineWidth = 1.5 * u; c.beginPath(); c.arc(nx, ny, 11 * u, 0, Math.PI * 2); c.stroke()
+      c.globalAlpha = 1; c.fillStyle = K.now; c.beginPath(); c.arc(nx, ny, 5.5 * u, 0, Math.PI * 2); c.fill()
+      qx = Ex[n] >= .5 ? 1 : 0; qy = Tx[n] >= .5 ? 1 : 0
     }
-    c.fillStyle = K.lab; c.textBaseline = 'bottom'; c.textAlign = 'left'; c.fillText('tense', x0, y0 - 2 * u); c.textAlign = 'right'; c.fillText('full', x0 + side, y0 - 2 * u)
-    c.textBaseline = 'top'; c.fillText('driving', x0 + side, y0 + side + 2 * u); c.textAlign = 'left'; c.fillText('calm', x0, y0 + side + 2 * u)
+    const corner = (text, right, top) => { c.textAlign = right ? 'right' : 'left'; c.textBaseline = top ? 'top' : 'bottom'
+      label(text, right ? x0 + W - 4 * u : x0 + 4 * u, top ? y0 + 3 * u : y0 + H - 3 * u, qx === +right && qy === +top ? K.now : K.lab) }
+    corner('tense', false, true); corner('full', true, true); corner('calm', false, false); corner('driving', true, false)
   } else {
     // strips: the last 60′, now at the right edge
     const L = setView === 'spectrogram' ? fs * 2.2 : 0, top = 4 * u, H = h - fs * 1.6 - 6 * u, t0 = NOW - 60, X = m => L + (m - t0) / 60 * (w - L)
