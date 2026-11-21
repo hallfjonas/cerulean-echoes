@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="ui.css">
 <style>
   /* no top bar: the sidebar holds everything; the stage (MIDI panel or visuals) fills the rest */
-  :root { --side: 320px }
+  :root { --side: 300px }
   body { overflow: hidden }
   body.idle { cursor: none }
   #view { position: fixed; inset: 0; display: block }
@@ -17,7 +17,7 @@
   body.side-closed #sidebar { display: none }
   #sidebar .top { display: flex; align-items: center; gap: 4px; margin: 0 0 14px }
   #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1; min-width: 0 }
-  #sidebar nav a { padding: 5px 4px; border-radius: var(--radius); white-space: nowrap }
+  #sidebar nav a { padding: 5px 6px; border-radius: var(--radius); white-space: nowrap }
   #sidebar nav a.here { background: var(--control) }
   .icon { flex: none; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
   .icon:hover, .icon.here { color: var(--fg) }
@@ -120,7 +120,7 @@
   <div class="top">
     <nav>
       <a href="#panel" data-view="panel">MIDI panel</a>
-      <a href="#visuals" data-view="visuals">Visualization</a>
+      <a href="#visuals" data-view="visuals">Visuals</a>
     </nav>
     <button class="icon" data-view="settings" title="Settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
@@ -186,16 +186,16 @@ import { createRecorder as createAudioRecorder } from './recorder.mjs'
 const $ = id => document.getElementById(id)
 mountHelp([
   { heading: 'What it does', text: 'Plays a live track or lab board right here. The MIDI panel shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Visualization draws every stem with its name '
+    + 'pages and the Launchkey row with every control\'s name and value; Visuals draws every stem with its name '
     + 'and the tempo from Strudel\'s clock. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
   { heading: 'Output', text: 'Sound, the MIDI panel and visuals. With "Save take on record stop" ticked (Settings), a recording\'s end writes '
     + 'what the controllers did since the last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
   { heading: 'How to use', text: ['Pick a track in the sidebar and press Play (the same button pauses and resumes).', 'Play the controllers, or start '
-    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visualization switch the view; the sound '
+    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visuals switch the view; the sound '
     + 'keeps playing.', 'S hides the sidebar, F is fullscreen.', 'The gear opens Settings: Theme (T switches '
-    + 'Minimal / Retro; the look of this page and the MIDI panel, dark, light or as the system), Visualization, '
+    + 'Minimal / Retro; the look of this page and the MIDI panel, dark, light or as the system), Visuals, '
     + 'MIDI panel and Recording, plus the list of keyboard shortcuts.'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
     'With the setting "Save take on record stop" ticked (Settings, Recording), ending a recording writes the capture as a script; '
@@ -348,7 +348,7 @@ const play = async script => {
     const trackHash = response.headers.get('X-Track-Hash')
     recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
     hasLcView = code.includes('globalThis.lcxlView')
-    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visualization.'
+    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visuals.'
     attachPanel()
     label = 'playing: ' + track
   } catch (error) {

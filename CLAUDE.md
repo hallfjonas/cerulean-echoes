@@ -139,7 +139,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
 - Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
-  Visualization), the page links, track, Play-Pause/Stop/Record and auto-perform; the gear opens Settings (Theme, Visualization, MIDI panel, Recording,
+  Visuals), the page links, track, Play-Pause/Stop/Record and auto-perform; the gear opens Settings (Theme, Visuals, MIDI panel, Recording,
   keyboard shortcuts); **?** opens the help.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:

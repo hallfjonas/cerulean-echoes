@@ -41,26 +41,26 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 ### Layout
 
 - **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
-- **Sidebar** (left, **‹** or key **S** hides it): the views (MIDI panel, Visualization), the **⚙** gear (Settings),
+- **Sidebar** (left, **‹** or key **S** hides it): the views (MIDI panel, Visuals), the **⚙** gear (Settings),
   **?** ("About this page", closed on every load), the track list with Play / Pause, Stop and Record (icon buttons), the
   status line (what plays, MIDI inputs, auto-perform bar) and Auto-perform (with Record audio).
-- **Settings** (the gear): a third view beside the MIDI panel and Visualization; the sound keeps playing. A list of
-  sections on the left jumps to **Theme**, **Visualization**, **MIDI panel**, **Recording** and **Keyboard shortcuts**.
+- **Settings** (the gear): a third view beside the MIDI panel and Visuals; the sound keeps playing. A list of
+  sections on the left jumps to **Theme**, **Visuals**, **MIDI panel**, **Recording** and **Keyboard shortcuts**.
   Every value is kept in `localStorage`.
 - **Theme** (Settings, Theme): one look for the page and the SuperCollider MIDI panel (`theme.mjs`, `ui.css`): **Minimal** (calm, flat,
   Torso-like) or **Retro** (Teenage Engineering-like), each **Auto** (as the system), **Dark** or **Light**; key **T**
   switches the style. Set in Settings only; the panel has no switch of its own. The Strudel tracks' LC view keeps its own look.
 - **MIDI panel** (the start view): the track's LC view, drawn into the page instead of its own window. A board
   without an LC view says so; its visuals still play.
-- **Visualization**: the visuals full screen behind the sidebar. Switching views keeps the sound playing; the visuals
+- **Visuals**: the visuals full screen behind the sidebar. Switching views keeps the sound playing; the visuals
   pause while the MIDI panel shows. The track's status box
   (bottom right) shows only in this view; its "▣ LC big" still opens the LC view in its own window, and the MIDI
   panel takes it back when it shows again.
 
 ### Settings
 
-The sections Visualization, MIDI panel and Recording of the Settings view are generated from `settings.mjs` (each setting
-has a `group`); every value is kept in `localStorage`. Visualization:
+The sections Visuals, MIDI panel and Recording of the Settings view are generated from `settings.mjs` (each setting
+has a `group`); every value is kept in `localStorage`. Visuals:
 
 - **Hard ↔ Soft** (0…1, start 0): character of the visuals. 0 = sawtooth crests, angular lines, every past time slice
   with an edge, instant response, camera pushed by the beat; 1 = round waves, thick soft crests, motion smear, sluggish

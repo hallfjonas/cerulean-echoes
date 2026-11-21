@@ -5,7 +5,7 @@
 import { describeWindow } from './smoothing.mjs'
 
 export const GROUPS = [
-  { id: 'visualization', title: 'Visualization', blurb: 'How the Visualization view draws the stems.' },
+  { id: 'visualization', title: 'Visuals', blurb: 'How the Visuals view draws the stems.' },
   { id: 'midi-panel', title: 'MIDI panel', blurb: 'What the MIDI panel shows around the controllers.' },
   { id: 'recording', title: 'Recording', blurb: 'What happens when a recording ends.' },
 ]

@@ -9,13 +9,13 @@ brightness follows the loudness. A ring pulses with the kick drum and the tempo 
 For rehearsal, for a projector behind you, or to see which voice is doing what.
 
 ## How to use it
-1. Start the [player](player.md), press Play and pick **Visualization** in the sidebar.
-2. Open **Settings** (the gear in the sidebar) and find **Visualization**; **S** hides the sidebar. Press **F** for fullscreen.
+1. Start the [player](player.md), press Play and pick **Visuals** in the sidebar.
+2. Open **Settings** (the gear in the sidebar) and find **Visuals**; **S** hides the sidebar. Press **F** for fullscreen.
 3. Press **V** to change the look:
    - **deck** (default): glowing comets with tails, rings from the kick, axes.
    - **ocean**: the stems as liquid layers, time going into depth, a floating camera.
    - **clean**: plain comets and rings.
-4. Use the two sliders in Settings, Visualization:
+4. Use the two sliders in Settings, Visuals:
    - **Hard to Soft**: sharp and quick at 0, round and slow at 1.
    - **Raw to Smooth**: how much the picture averages over time. The sound is never changed.
 5. Switches with keys: **A** axes, **L** labels (stem names), **B** beat rings, **W** pan width (**H**, the frame around the controller page
