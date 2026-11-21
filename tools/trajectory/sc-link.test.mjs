@@ -4,6 +4,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawn, execFileSync } from 'child_process'
+import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { encode, decode } from './osc.mjs'
@@ -31,8 +33,69 @@ test('track list: every SC track is a live track on engine sc; a ported track ke
   assert.equal(new Set(live.map(entry => entry.id)).size, live.length, 'ids are unique')
 })
 
+// the set view's data path without SuperCollider: OSC /ce/setsample (as sc/lib/ui.scd sends it every 10 s) → kept by
+// the link → SSE setsample to open pages, and the whole history as one sethistory event to a page that connects later
+test('set samples: passed on as they come, and a new page gets the history', { timeout: 30e3 }, async () => {
+  const port = 8792, osc = 57171
+  const server = spawn(process.execPath, [path.join(here, 'server.mjs'), String(port)],
+    { env: { ...process.env, CE_SC_PORT: String(osc), CE_SC_SERVER_PORT: '57172', SCLANG: 'none' }, stdio: 'ignore' })
+  const base = `http://localhost:${port}`
+  const streams = []
+  const listen = () => {
+    const events = [], abort = new AbortController()
+    streams.push(abort)
+    fetch(base + '/sc/events', { signal: abort.signal }).then(async response => {
+      const decoder = new TextDecoder()
+      let buffer = ''
+      for await (const chunk of response.body) {
+        buffer += decoder.decode(chunk, { stream: true })
+        let at
+        while ((at = buffer.indexOf('\n\n')) >= 0) {
+          const data = buffer.slice(0, at).split('\n').find(line => line.startsWith('data: '))
+          buffer = buffer.slice(at + 2)
+          if (data) events.push(JSON.parse(data.slice(6)))
+        }
+      }
+    }).catch(() => {})
+    return events
+  }
+  const until = async (test, ms = 5000) => {
+    for (const end = Date.now() + ms; Date.now() < end; await new Promise(resolve => setTimeout(resolve, 50))) { const hit = test(); if (hit) return hit }
+    return null
+  }
+  const udp = (await import('dgram')).default.createSocket('udp4')
+  const sample = (energy, punch, tension) => new Promise(resolve =>
+    udp.send(encode('/ce/setsample', [{ f: energy }, { f: punch }, { f: tension }, ...Array.from({ length: 64 }, (_, i) => ({ f: i / 63 }))]), osc, '127.0.0.1', resolve))
+  try {
+    for (let i = 0; i < 50; i++) {
+      try { if ((await fetch(base + '/catalogue')).ok) break } catch {}
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    const first = listen()
+    assert.deepEqual((await until(() => first.find(e => e.type === 'sethistory')))?.data, [], 'a fresh server has no history')
+    await sample(-20.5, 0.4, 0.25)
+    await sample(-18, 1.7, -1)
+    const live = await until(() => first.filter(e => e.type === 'setsample').length >= 2 && first.filter(e => e.type === 'setsample'))
+    assert.ok(live, 'both samples reach the open page')
+    assert.deepEqual(Object.keys(live[0].data).sort(), ['e', 'p', 's', 't', 'x'])
+    assert.equal(live[0].data.e, -20.5)
+    assert.equal(live[0].data.s.length, 64)
+    assert.equal(live[1].data.p, 1, 'punch is clamped to 0..1')
+    assert.equal(live[1].data.x, 0, 'tension is clamped to 0..1')
+    const later = listen()
+    const history = await until(() => later.find(e => e.type === 'sethistory'))
+    assert.deepEqual(history?.data, live.map(e => e.data), 'a page that connects later gets the whole history')
+  } finally {
+    udp.close()
+    for (const abort of streams) abort.abort()
+    const exited = new Promise(resolve => server.once('exit', resolve))
+    server.kill('SIGINT')
+    await exited
+  }
+})
+
 // a few ports away from a player that may be running (8766, 57131, 57140)
-const PORT = 8790, OSC = 57151, SERVER = 57152
+const PORT = +(process.env.CE_TEST_HTTP ?? 8790), OSC = +(process.env.CE_TEST_OSC ?? 57151), SERVER = +(process.env.CE_TEST_SERVER ?? 57152)
 const engineProcesses = () => {
   try {
     return execFileSync('ps', ['-axo', 'pid,command'], { encoding: 'utf8' }).split('\n')
@@ -41,8 +104,9 @@ const engineProcesses = () => {
 }
 
 test('SuperCollider in the player: start, play, click, switch, stop, quit', { skip: findSclang() ? false : 'sclang not installed', timeout: 180e3 }, async () => {
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'sc-link-recordings-'))
   const server = spawn(process.execPath, [path.join(here, 'server.mjs'), String(PORT)],
-    { env: { ...process.env, CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER) }, stdio: 'ignore' })
+    { env: { ...process.env, CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER), RECORDINGS_DIR: folder }, stdio: 'ignore' })
   const base = `http://localhost:${PORT}`
   const post = (route, body) => fetch(base + '/sc/' + route, { method: 'POST', headers: { Origin: base },
     body: JSON.stringify(body ?? {}) })
@@ -87,6 +151,15 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     assert.equal((await waitFor(e => e.type === 'layout', mark))?.data.bpm, 124, 'the LC view gets the track')
     assert.ok(await waitFor(e => e.type === 'beat' && e.data.bar >= 1, mark), 'bars count from the load')
     assert.equal(bars(mark)[0], 0, 'the first bar is bar 0')
+    // the master output's spectrum (sc/lib/ui.scd): 48 bands 0..1, several frames a second
+    const spectrum = await waitFor(e => e.type === 'spectrum', mark)
+    assert.equal(spectrum?.data.length, 48, 'the spectrum arrives with 48 bands')
+    assert.ok(spectrum.data.every(v => v >= 0 && v <= 1), 'bands are 0..1')
+    // the set view's sample (sc/lib/ui.scd uiSetFrame), every 10 s: energy in dB, punch, tension, 64 bands
+    const setsample = await waitFor(e => e.type === 'setsample', mark, 25000)
+    assert.ok(setsample, 'a set sample arrives within 10 s of the load')
+    assert.equal(setsample.data.s.length, 64)
+    assert.ok(setsample.data.e >= -70 && setsample.data.e <= 10, 'energy in dB')
 
     // a click in the LC view (the same as a MIDI message) reaches the track and comes back as its state
     mark = since()
@@ -100,6 +173,45 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     assert.equal((await waitFor(e => e.type === 'layout', mark))?.data.bpm, 140)
     assert.ok(await waitFor(e => e.type === 'beat', mark), 'the new track plays')
     assert.equal(bars(mark)[0], 0, 'a switch starts at bar 0')
+    assert.ok(await waitFor(e => e.type === 'spectrum', mark), 'the spectrum comes back after a switch (all nodes were freed)')
+
+    // recording: SC writes the master to recordings/<track>/ (a temporary folder here); a valid WAV and a matching sidecar
+    // (loose: the length and the header, not the loudness)
+    const rec = (route, body) => fetch(`${base}/recording/${route}`, { method: 'POST', headers: { Origin: base },
+      body: JSON.stringify(body ?? {}) })
+    mark = since()
+    response = await rec('008-groove-techno', { engine: 'sc', source: 'human', startCycle: 0, cps: 140 / 240 })
+    assert.equal(response.status, 201, await response.clone().text())
+    const { name } = await response.json()
+    assert.match(name, /^\d{4}-\d\d-\d\d-\d{6}-human$/)
+    const level = await waitFor(e => e.type === 'level', mark)
+    assert.ok(level && level.data >= 0 && level.data <= 1, 'the meter gets a peak from SC')
+    assert.equal((await rec('009-house', { engine: 'sc', source: 'human' })).status, 409, 'one recording at a time')
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    response = await rec(`008-groove-techno/${name}/finish`, { endedBy: 'stop' })
+    const meta = await response.json()
+    assert.equal(response.status, 200)
+    assert.equal(meta.engine, 'sc')
+    assert.equal(meta.endedBy, 'stop')
+    assert.ok(meta.sampleRate >= 8000 && meta.seconds > 1 && meta.seconds < 6, `length ${meta.seconds} s`)
+    const file = path.join(folder, '008-groove-techno', name)
+    const wav = fs.readFileSync(file + '.wav')
+    assert.equal(wav.toString('ascii', 0, 4), 'RIFF')
+    assert.equal(wav.readUInt16LE(22), 2, 'stereo')
+    assert.equal(wav.readUInt32LE(24), meta.sampleRate)
+    assert.equal(wav.readUInt16LE(34), 16)
+    assert.ok(Math.abs((wav.length - 44) / 4 / meta.sampleRate - meta.seconds) < 0.01, 'the sidecar length matches the file')
+    assert.deepEqual(JSON.parse(fs.readFileSync(file + '.json', 'utf8')), meta, 'the sidecar file matches')
+    assert.equal((await rec(`008-groove-techno/${name}/finish`)).status, 200, 'a second finish answers the same sidecar')
+    // a track load ends a recording (the nodes are freed): the file is closed and the sidecar written
+    response = await rec('008-groove-techno', { engine: 'sc', source: 'human' })
+    const second = (await response.json()).name
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    assert.equal((await post('load', { id: '009-house' })).status, 200)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    const cut = JSON.parse(fs.readFileSync(path.join(folder, '008-groove-techno', second + '.json'), 'utf8'))
+    assert.ok(cut.endedBy === 'stop' && cut.seconds > 0, 'a load leaves a finished sidecar')
+    assert.equal(fs.readFileSync(path.join(folder, '008-groove-techno', second + '.wav')).readUInt32LE(40) / 4 / cut.sampleRate, cut.seconds)
 
     // stop: no more bars
     assert.equal((await post('stop')).status, 200)
@@ -112,6 +224,7 @@ test('SuperCollider in the player: start, play, click, switch, stop, quit', { sk
     response = await post('load', { id: 'no-such-track' })
     assert.equal(response.status, 500)
   } finally {
+    fs.rmSync(folder, { recursive: true, force: true })
     abort.abort()
     const exited = new Promise(resolve => server.once('exit', resolve))
     server.kill('SIGINT')

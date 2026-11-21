@@ -75,7 +75,7 @@
      track so the script begins from silence.
      Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" posts
      it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
-     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
+     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs; a SuperCollider track is written by SC itself, recorder-sc.mjs): a human recording runs
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
      tail. Stop, a track change or a new auto-perform run ends a recording.
      The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window. -->
@@ -128,6 +128,7 @@ import { mountHelp } from './help.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
+import { createScRecorder } from './recorder-sc.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -205,14 +206,21 @@ const TAIL_SECONDS = 4
 let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecording = false, tailTimer = null
 let performing = null
 const queueRecord = task => (recordQueue = recordQueue.then(task))
-const audio = createAudioRecorder({ engine, onError: error => {
+const onAudioError = error => {
   recordError = error.message
   stopRecording()
+}
+// Strudel records in this page (recorder.mjs); SuperCollider writes its own WAV (recorder-sc.mjs): `audio` is the one in use
+const audioWeb = createAudioRecorder({ engine, onError: onAudioError })
+const audioSc = createScRecorder({ engine, onError: onAudioError })
+const audio = new Proxy({}, { get: (_, key) => {
+  const used = audioSc.recording ? audioSc : audioWeb.recording ? audioWeb : onSc() ? audioSc : audioWeb
+  const value = used[key]
+  return typeof value === 'function' ? value.bind(used) : value
 } })
 const startRecording = (source, script = null) => queueRecord(async () => {
   if (audio.recording) return
   recordError = ''
-  if (onSc()) return void (recordError = 'recording SuperCollider tracks is not built yet')
   try {
     await engine.ready
     await audio.start({ track: $('track').value, source, script })
@@ -425,6 +433,12 @@ const applyLcFrame = () => {
 let sentLcFrame = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
 $('scPanel').addEventListener('load', sendLcFrame)
+// a click on the panel's set view label cycles the view there: keep the setting in step
+addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
+  const view = event.data?.setView
+  if (['ring', 'map', 'energy', 'spectrogram'].includes(view) && view !== settings.get('setView')) settings.set('setView', view)
+})
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
