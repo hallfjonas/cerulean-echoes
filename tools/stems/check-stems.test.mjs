@@ -126,12 +126,12 @@ test('stem tracks point at existing stems and frames', () => {
   assert.match(track(data => { data.slots['3:1'] = KICK }), /3:1 \(name\)/)
   assert.match(track(data => { data.frame = 'gone.scd' }), /frame "gone.scd" not found/)
   assert.match(track(data => { data.name = '098-test' }), /a track lives at/)
-  assert.match(track((data, root) => {
+  assert.equal(track((data, root) => {
     const file = path.join(root, 'sc', 'stems', BASS)
     const stem = JSON.parse(fs.readFileSync(file, 'utf8'))
     stem.patterns.push({ label: 'fourth', rhythm: 'x' })
     fs.writeFileSync(file, JSON.stringify(stem))
-  }), /Mode 1 takes at most 3 patterns/)
+  }), '', 'button 1 cycles any number of patterns, on Mode 1 too')
 })
 
 test('the schemas list the genres of docs/reference/genres.md', () => {

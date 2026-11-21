@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "name": "hats909-brightness-space-hats-shaker-pattern-open",
   "parent": null,
   "about": "House off-beat hat and swung 16ths, or shakers.",
@@ -17,33 +17,73 @@
     "harmony": "none"
   },
   "sample": {
-    "name": "hats909"
+    "name": "hats909",
+    "preset": {
+      "amp": 0.9,
+      "lpOn": 1,
+      "lo": 4000,
+      "hi": 16000,
+      "pan": 0.56
+    },
+    "kit": {
+      "oh": "tr909/oh-00.wav",
+      "hh": "tr909/hh-00.wav",
+      "sh0": "tr727/sh-00.wav",
+      "sh1": "tr727/sh-01.wav"
+    }
   },
   "gain": 1.36,
   "pitch": "none",
-  "code": "hats909-shaker.scd",
   "frame": {
-    "break": "stay"
+    "break": "stay",
+    "tensionFilter": false
   },
   "patterns": [
     {
-      "label": "Off-beat"
+      "label": "Off-beat",
+      "rhythm": "[~ ~ ~ x]!4",
+      "velocity": "[~ ~ ~ 0.12]!4"
     },
     {
-      "label": "+ 16ths"
+      "label": "+ 16ths",
+      "rhythm": "[x x ~ x]!4",
+      "velocity": "[0.2 0.1 ~ 0.15]!4"
     },
     {
-      "label": "Driving"
+      "label": "Driving",
+      "rhythm": "[x x ~ x]!4",
+      "velocity": "[0.26 0.13 ~ 0.2]!4"
     }
   ],
   "controls": {
     "k1": {
       "label": "Brightness",
-      "about": "soft ↔ crisp."
+      "about": "soft ↔ crisp.",
+      "param": "bright",
+      "range": [
+        0,
+        1
+      ]
     },
     "k2": {
       "label": "Space",
-      "about": "dry ↔ room."
+      "about": "dry ↔ room.",
+      "targets": [
+        {
+          "param": "space",
+          "range": [
+            0,
+            1
+          ]
+        },
+        {
+          "param": "echo",
+          "range": [
+            0,
+            0.4
+          ]
+        }
+      ]
     },
     "k3": {
       "label": "Hats ↔ Shaker",
@@ -62,5 +102,118 @@
       "about": "open hats while held.",
       "mode": "hold"
     }
-  }
+  },
+  "layers": [
+    {
+      "name": "Closed hat",
+      "notes": "hh",
+      "swing": 0.2,
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Closed shaker",
+      "notes": "sh1",
+      "swing": 0.2,
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            2.5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Off-beat hat",
+      "rhythm": "[~ ~ x ~]!4",
+      "notes": "oh",
+      "patterns": [
+        {
+          "velocity": "0.5"
+        },
+        {
+          "velocity": "0.5"
+        },
+        {
+          "velocity": "0.45"
+        }
+      ],
+      "env": {
+        "d": 0.15,
+        "s": 0
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0.5,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Off-beat shaker",
+      "rhythm": "[~ ~ x ~]!4",
+      "notes": "sh0",
+      "patterns": [
+        {
+          "velocity": "0.5"
+        },
+        {
+          "velocity": "0.5"
+        },
+        {
+          "velocity": "0.45"
+        }
+      ],
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            2.5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Open",
+      "rhythm": "[x ~]!8",
+      "notes": "oh",
+      "velocity": "0.3",
+      "env": {
+        "d": 0.22,
+        "s": 0
+      },
+      "amount": {
+        "source": "b2"
+      }
+    }
+  ]
 }

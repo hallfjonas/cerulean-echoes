@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "name": "sd-supersaw-brightness-space-strings-b3-chords-echo-throw",
   "parent": null,
   "about": "Held chords: JX-10 strings ↔ soft Hammond B3.",
@@ -21,27 +21,121 @@
     "name": "sdSupersaw",
     "extra": [
       "sdSynth"
-    ]
+    ],
+    "preset": {
+      "lpOn": 1
+    }
   },
   "gain": 3.2,
   "pitch": "chord",
-  "code": "supersaw-held-chords.scd",
   "frame": {
     "break": "stay"
   },
   "patterns": [
     {
-      "label": "Held"
+      "label": "Held",
+      "strike": {
+        "bars": 4
+      },
+      "notes": "0",
+      "voices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "velocity": {
+        "wave": "perlin",
+        "range": [
+          0.85,
+          1
+        ]
+      }
     }
   ],
   "controls": {
     "k1": {
       "label": "Brightness",
-      "about": "dull ↔ bright."
+      "about": "dull ↔ bright.",
+      "targets": [
+        {
+          "param": "lo",
+          "range": [
+            400,
+            6000
+          ],
+          "curve": "exp"
+        },
+        {
+          "param": "hi",
+          "range": [
+            400,
+            6000
+          ],
+          "curve": "exp"
+        },
+        {
+          "param": "boost",
+          "range": [
+            0.7943282,
+            1.2589254
+          ],
+          "curve": "exp"
+        }
+      ]
     },
     "k2": {
       "label": "Space",
-      "about": "dry ↔ echo + room."
+      "about": "dry ↔ echo + room.",
+      "targets": [
+        {
+          "param": "room",
+          "points": [
+            [
+              0.35,
+              0
+            ],
+            [
+              1,
+              0.8
+            ]
+          ]
+        },
+        {
+          "param": "echo",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0.24
+            ],
+            [
+              0.5,
+              0.6
+            ]
+          ]
+        },
+        {
+          "param": "echoFeedback",
+          "points": [
+            [
+              0,
+              0.15
+            ],
+            [
+              0,
+              0.29
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ]
+        }
+      ]
     },
     "k3": {
       "label": "Strings ↔ B3",
@@ -58,7 +152,222 @@
     "b2": {
       "label": "Echo throw",
       "about": "long echo while held.",
-      "mode": "hold"
+      "addon": "echoThrow",
+      "mode": "hold",
+      "args": {
+        "echo": 0.65,
+        "room": 0,
+        "echoTime": 0.75,
+        "echoFeedback": 0.62
+      }
     }
-  }
+  },
+  "register": 52,
+  "push": true,
+  "orbit": 3,
+  "echo": {
+    "beats": 0.5,
+    "feedback": 0.15
+  },
+  "layers": [
+    {
+      "name": "Strings",
+      "params": {
+        "unison": 2,
+        "detune": 0.08,
+        "spread": 0.6,
+        "amp": 0.12
+      },
+      "env": {
+        "a": 0.35,
+        "d": 0.1,
+        "s": 1,
+        "r": 0.8
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "curve": "power",
+        "param": "mix",
+        "zero": "play"
+      }
+    },
+    {
+      "name": "Strings detuned",
+      "transpose": 0.1,
+      "params": {
+        "unison": 2,
+        "detune": 0.05,
+        "spread": 0.9,
+        "amp": 0.072
+      },
+      "env": {
+        "a": 0.35,
+        "d": 0.1,
+        "s": 1,
+        "r": 0.8
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "curve": "power",
+        "param": "mix",
+        "zero": "play"
+      }
+    },
+    {
+      "name": "B3 low left",
+      "sound": "sdSynth",
+      "transpose": -0.04,
+      "params": {
+        "wave": 0,
+        "vib": 0.8,
+        "vibmod": 0.08,
+        "pan": 0.3,
+        "amp": 0.0658
+      },
+      "env": {
+        "a": 0.06,
+        "d": 0.001,
+        "s": 1,
+        "r": 0.25
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "curve": "power",
+        "param": "mix",
+        "zero": "play"
+      }
+    },
+    {
+      "name": "B3 low right",
+      "sound": "sdSynth",
+      "transpose": 0.04,
+      "params": {
+        "wave": 0,
+        "vib": 0.8,
+        "vibmod": 0.08,
+        "pan": 0.7,
+        "amp": 0.0658
+      },
+      "env": {
+        "a": 0.06,
+        "d": 0.001,
+        "s": 1,
+        "r": 0.25
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "curve": "power",
+        "param": "mix",
+        "zero": "play"
+      }
+    },
+    {
+      "name": "B3 high left",
+      "sound": "sdSynth",
+      "transpose": 11.96,
+      "params": {
+        "wave": 0,
+        "vib": 0.8,
+        "vibmod": 0.08,
+        "pan": 0.3,
+        "amp": 0.0517
+      },
+      "env": {
+        "a": 0.06,
+        "d": 0.001,
+        "s": 1,
+        "r": 0.25
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "curve": "power",
+        "param": "mix",
+        "zero": "play"
+      }
+    },
+    {
+      "name": "B3 high right",
+      "sound": "sdSynth",
+      "transpose": 12.04,
+      "params": {
+        "wave": 0,
+        "vib": 0.8,
+        "vibmod": 0.08,
+        "pan": 0.7,
+        "amp": 0.0517
+      },
+      "env": {
+        "a": 0.06,
+        "d": 0.001,
+        "s": 1,
+        "r": 0.25
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "curve": "power",
+        "param": "mix",
+        "zero": "play"
+      }
+    }
+  ]
 }

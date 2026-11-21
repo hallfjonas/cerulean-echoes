@@ -3,7 +3,7 @@ name: sound-lab
 status: backlog
 created: 2026-11-20T18:11:25Z
 updated: 2026-11-21T00:40:00Z
-progress: 50%
+progress: 55%
 prd: .claude/prds/sound-lab.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -164,6 +164,7 @@ Risks:
 | 007 | Stem Designer: 14 columns, context track, A/B, save/copy, promote | after 003, 004 |
 | 008 | `/stem-designer` skill ("re-design the piano stem of the house track") | after 007 |
 | 009 | Stem swap in the player's MIDI panel, Save as | after 003, 004 |
+| 013 | Stem format 2 (kits, layers, envelopes, Complexity layers; decided after the 003 pilot) | after 003, before 007 |
 | 010 | Docs, skills hand-over, `PLAN-STEM-LIBRARY.md` trimmed | last |
 
 ## Dependencies
@@ -196,9 +197,10 @@ Designer), 007 (Stem Designer).
 - [ ] 007.md - Stem Designer (parallel: false)
 - [ ] 008.md - /stem-designer skill (parallel: true)
 - [x] 009.md - Stem swap in the player (parallel: true; in review)
+- [x] 013.md - Stem format 2 (parallel: false)
 - [ ] 010.md - Docs, skills hand-over, sound-lab wrap-up (parallel: false)
 
-Total tasks: 10
+Total tasks: 11
 Parallel tasks: 5
-Sequential tasks: 5
+Sequential tasks: 6
 Estimated total effort: 80 hours

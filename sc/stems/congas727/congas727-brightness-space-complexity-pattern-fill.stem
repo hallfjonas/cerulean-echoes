@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "name": "congas727-brightness-space-complexity-pattern-fill",
   "parent": null,
   "about": "Quiet TR-727 congas and bongos, latin lines.",
@@ -16,33 +16,91 @@
     "harmony": "none"
   },
   "sample": {
-    "name": "congas727"
+    "name": "congas727",
+    "preset": {
+      "lpOn": 1,
+      "lo": 1000,
+      "hi": 12000
+    },
+    "kit": {
+      "2": "tr727/perc-02.wav",
+      "3": "tr727/perc-03.wav",
+      "4": "tr727/perc-04.wav"
+    }
   },
   "gain": 0.85,
   "pitch": "none",
-  "code": "congas727-ghosts.scd",
   "frame": {
-    "break": "stay"
+    "break": "stay",
+    "swing": false
   },
   "patterns": [
     {
-      "label": "Pillow"
+      "label": "Pillow",
+      "rhythm": "4 ~ ~ 2 ~ ~ 3 ~ 4 ~ ~ 2 ~ 3 ~ ~",
+      "notes": "4 ~ ~ 2 ~ ~ 3 ~ 4 ~ ~ 2 ~ 3 ~ ~",
+      "velocity": {
+        "wave": "perlin",
+        "range": [
+          0.18,
+          0.26
+        ]
+      }
     },
     {
-      "label": "Rolling"
+      "label": "Rolling",
+      "rhythm": "~ ~ 4 2 ~ ~ 4 ~ ~ 3 ~ 2 ~ ~ 4 ~",
+      "notes": "~ ~ 4 2 ~ ~ 4 ~ ~ 3 ~ 2 ~ ~ 4 ~",
+      "velocity": {
+        "wave": "perlin",
+        "range": [
+          0.18,
+          0.26
+        ]
+      }
     },
     {
-      "label": "Latin"
+      "label": "Latin",
+      "rhythm": "3 ~ 2 ~ 4 ~ 2 3 ~ 2 ~ 4 ~ ~ 2 ~",
+      "notes": "3 ~ 2 ~ 4 ~ 2 3 ~ 2 ~ 4 ~ ~ 2 ~",
+      "velocity": {
+        "wave": "perlin",
+        "range": [
+          0.18,
+          0.26
+        ]
+      }
     }
   ],
   "controls": {
     "k1": {
       "label": "Brightness",
-      "about": "woody ↔ crisp."
+      "about": "woody ↔ crisp.",
+      "param": "bright",
+      "range": [
+        0,
+        1
+      ]
     },
     "k2": {
       "label": "Space",
-      "about": "dry ↔ room."
+      "about": "dry ↔ room.",
+      "targets": [
+        {
+          "param": "space",
+          "range": [
+            0,
+            1
+          ]
+        },
+        {
+          "param": "echo",
+          "range": [
+            0,
+            0.6
+          ]
+        }
+      ]
     },
     "k3": {
       "label": "Complexity",
@@ -61,5 +119,69 @@
       "about": "conga run while held.",
       "mode": "hold"
     }
-  }
+  },
+  "layers": [
+    {
+      "name": "Lines",
+      "params": {
+        "pan": {
+          "wave": "sine",
+          "range": [
+            0.35,
+            0.65
+          ],
+          "bars": 4
+        }
+      }
+    },
+    {
+      "name": "Ghosts",
+      "rhythm": "x!16",
+      "notes": "3",
+      "velocity": "1",
+      "params": {
+        "pan": {
+          "wave": "sine",
+          "range": [
+            0.35,
+            0.65
+          ],
+          "bars": 4
+        }
+      },
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0.08
+          ]
+        ]
+      },
+      "chance": 0.45
+    },
+    {
+      "name": "Fill",
+      "rhythm": "x!16",
+      "notes": "2 2 3 3 2 3 4 4 2 2 3 3 4 3 4 4",
+      "velocity": "0.22",
+      "params": {
+        "pan": {
+          "wave": "sine",
+          "range": [
+            0.35,
+            0.65
+          ],
+          "bars": 4
+        }
+      },
+      "amount": {
+        "source": "b2"
+      }
+    }
+  ]
 }

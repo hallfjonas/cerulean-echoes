@@ -21,8 +21,10 @@ Stems play on SuperCollider only (`sc/`). The Strudel tracks are not converted.
    plays on a generic voice (`sdSample`, `sdSynth`) gets a small named wrapper sound first (see Wrapper sounds), so
    flutes and claps do not share one `sdSample` folder.
 2. Write the stem as JSON (format below). Start from an example:
-   `sc/stems/kick909/kick909-brightness-space-punch-pattern-drop-out.stem` (drum) or
-   `sc/stems/bassWarm/bass-warm-brightness-space-length-pattern-octave.stem` (melodic).
+   `sc/stems/kick909/kick909-brightness-space-punch-pattern-drop-out.stem` (drum, format 1),
+   `sc/stems/bassWarm/bass-warm-brightness-space-length-pattern-octave.stem` (melodic, format 1), or a format 2 stem
+   of the 009 pilot: `clap909/…` (kit, Complexity layers), `hats909/…` (cross-fade), `subSine/…` (length knob),
+   `bassFM/…` (three sounds, register), `sdSupersaw/…` (held chords, own echo).
 3. Name the file after the sample and the labels (naming rule below).
 4. Check it: `cd tools && npm run check-stems` (the whole library) or `node stems/check-stems.mjs <file.stem>`.
    `npm run verify` and `npm test` run the same check.
@@ -63,11 +65,11 @@ by stem, each with its metadata and lineage (parent, children). The filters comb
 with the JSON, tracks included. Code: `tools/stems/stem-index.mjs`.
 
 ## The stem file (format 1)
-Schema: `sc/stems/stem.schema.json`. All fields:
+Schema: `sc/stems/stem.schema.json` (formats 1 and 2; format 2 adds fields, see Format 2). All fields:
 
 | Field | Required | What it is |
 |---|---|---|
-| `format` | yes | `1` |
+| `format` | yes | `1` or `2` |
 | `name` | yes | the file name without `.stem` |
 | `parent` | yes | path of the parent version under `sc/stems/`, or `null` |
 | `about` | yes | one line (at most 60 characters): what the stem is |
@@ -100,8 +102,7 @@ sub-sequences, `< >` one item per bar. One cycle is one bar.
 | `chord` | index into the current chord's tones (0 = lowest, past the last = next octave) | chords, pads, stabs |
 | `scale` | steps of the current scale, 0 = the chord's root | leads, melodies |
 
-Button 1 steps to the next pattern at the next bar. On a Mode 1 slot a stem has at most 3 patterns (the track check
-refuses more).
+Button 1 steps to the next pattern at the next bar and cycles through any number of patterns, on Mode 1 and Mode 2.
 
 ### Controls
 Every control has a `label` (at most 20 characters) and an `about` (one short line, at most 60 characters: what the
@@ -128,8 +129,87 @@ Button 2 has a `mode`: `hold` (on while held), `toggle` (press on, press off) or
 state at the next bar), and optional `args` for the add-on. With `addon`, the label is the add-on's label (one name per
 job) and the mode one of the add-on's modes.
 
+## Format 2
+Format 2 (`"format": 2`) says in JSON what the 009 pilot first needed code for: several files of a sample (kits),
+several sounds per hit (layers), lengths relative to the note, envelopes per pattern, Complexity steps that switch
+layers on, cross-fades, chances and slow waves, held chords that follow the harmony. A format 1 file stays valid; a
+file that uses a format 2 field must say `"format": 2` (`check-stems` refuses it otherwise).
+
+### New stem fields
+| Field | What it is |
+|---|---|
+| `sample.kit` | key → file of the sample (`"cp": "tr909/cp-00.wav"`). With a kit, `pitch` is `none` and a hit's note names the key (`"notes": "cp"`, `"4 ~ 2"`); a kit hit plays its file to the end |
+| `register` | the lowest note: `root` and `scale` fold the chord's bass / root into the octave from here (bass: 41 = F2), `chord` counts chord tones upwards from here (52 = E3: note 0 is the lowest chord tone from E3) |
+| `push` | `true`: the chord changes two 16ths early (the frame's look-ahead) |
+| `orbit` | the frame's orbit (room) the stem plays on; default 1 for kick, perc, hats, clap, sub, bass, else 2 |
+| `echo` | its own echo: `{ "beats": 0.5, "feedback": 0.15 }`; knobs and the add-on move it with `echoTime` / `echoFeedback` |
+| `layers` | the sounds of every hit (below); without it the patterns are the one layer |
+| `frame.tensionFilter` | `false`: Tension does not open its filter (Fog still does; room and echo still follow Tension) |
+
+### Pattern fields (also in a layer and a layer's patterns)
+| Field | What it is |
+|---|---|
+| `velocity` | as format 1, or a wave: `{ "wave": "perlin", "range": [0.85, 1] }` |
+| `length` | mini-notation: a factor on each hit's length (`"0.79 ~ 0.95"`) |
+| `params` | parameter → number, mini-notation (one value per hit) or wave (`{ "wave": "sine", "range": [0.35, 0.65], "bars": 4 }`; `"at": "bar"` reads it at the bar's start); stem parameters too (`transpose` in semitones, e.g. an approach note `-1`) |
+| `env` | `a`, `d`, `s`, `r` (seconds, sustain 0..1), resolved as Strudel does; without it a sound with an envelope plays its defaults |
+| `voices` | note offsets every hit plays (`[0, 1, 2, 3]`: a four-note chord in `pitch: chord`) |
+| `strike` | `{ "bars": 4 }` instead of a rhythm: a held chord, struck where the chord changes and again every 4 bars, held until the next change. A stem with held chords is asked at fader 0 too (its look-ahead moves on, as in the 009 `.scd`) |
+
+A wave is `sine`, `perlin` (Strudel's smooth noise) or `rand`, from `range[0]` to `range[1]`, over `bars` (default 1).
+
+### Layers
+A layer is one sound on every hit of its own rhythm; button 1 picks the pattern of every layer at once.
+
+| Field | What it is |
+|---|---|
+| `name` | required, at most 20 characters (the designers show it) |
+| `sound` | the sample (default) or one of `sample.extra` |
+| `rhythm`, `notes`, `velocity`, `length`, `params`, `env`, `voices` | the same for every pattern; what it leaves out comes from the stem's pattern |
+| `patterns` | per-pattern fields (in the stem's pattern order): these win over the layer's own |
+| `transpose` | semitones on every note (also fractions: a detuned double) |
+| `swing` | its own swing amount (a fraction of a 16th) instead of the track's |
+| `amount` | `{ "source", "points", "curve", "param", "zero" }`: how much the layer plays, see below |
+| `chance` | a number (0..1) or an amount: the share of its hits that play (Strudel's random at the hit's time) |
+
+`amount`: `source` is `k1`, `k2`, `k3`, `b2` (the add-on mode of button 2: 1 while on) or `tension` (column 8 knob 3).
+`points` (`[[x, y], …]`, x going up; default `[[0, 0], [1, 1]]`) map the source to the amount, a line between points,
+the first and last y beyond them; two points at the same x make a step. `curve: "power"` makes equal-power cross-fades
+(sine up, cosine down; 0 within 0.001 of a point at 0). The amount multiplies `amp` at each note's start, and at 0 the
+layer plays nothing; with `param` it goes live on that input of the sound instead (a cross-fade that acts at once on
+sounding notes, e.g. `level`, `mix`), and with `"zero": "play"` the layer keeps playing at 0 (held chords that a knob
+fades in). Complexity steps are layers with an amount on k3 (`[[0.5, 0], [1, 1]]`: from half the knob on); a hold
+add-on of their own is a layer with `"source": "b2"` and a button 2 without `addon`.
+
+### New stem parameters (knob targets)
+`length` (factor on the note's length: a length knob relative to the note), `boost` (factor on the fader, read at each
+note's start), `trim` (the strip's gain, live on the server; `range` only), `room` (room send, instead of 0.9 × `space`),
+`transpose`, `echoTime`, `echoFeedback`. A knob target may give `points` instead of `range` (a curve like the labs'
+room from 0.35 of Space). A knob without a mapping is allowed when a layer's amount or chance reads it. The add-on
+`echoThrow` takes `echo`, `room`, `echoTime`, `echoFeedback` as `args`.
+
+Example (the 009 clap, shortened):
+
+```json
+"sample": { "name": "clap909", "preset": { "amp": 0.8, "lpOn": 1, "lo": 3500, "hi": 14000 },
+  "kit": { "cp": "tr909/cp-00.wav", "rim": "tr909/rim-00.wav", "sd": "tr909/sd-00.wav" } },
+"patterns": [{ "label": "2 + 4", "rhythm": "~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~", "notes": "cp", "velocity": "0.8" }],
+"layers": [
+  { "name": "Clap" },
+  { "name": "Rim", "rhythm": "~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~", "notes": "rim", "velocity": "1",
+    "amount": { "source": "k3", "points": [[0, 0], [0.5, 0.25]] } },
+  { "name": "Roll", "rhythm": "x!16", "notes": "sd", "velocity": "0.1 0.125 … 0.475", "amount": { "source": "b2" } }
+]
+```
+
+### What the Stem Designer and Track Designer can edit
+Everything in a JSON stem is data: patterns, layers (sound, rhythm, notes, velocities, lengths, parameters,
+envelopes), amounts and their points, chances, waves, knob targets and curves, register, push, orbit, own echo, the
+kit, add-on args and the metadata. Only column code (`code` files) needs SC.
+
 ### Escape hatch
-What JSON cannot say (009's Complexity steps, a knob that cross-fades three sounds, multi-sound keys) lives in an SC
+What JSON cannot say (in 009: the noise pump's knob-deep waves and its riser lane, the keys' riffs and sound mode, the
+colour columns' random phrase engines and lifts) lives in an SC
 file next to the stem: the stem's `code` (makes the events), or `code` on `k1`-`k3`, `b1`, `b2`. The JSON still
 carries every label, `about` and the metadata. Prefer JSON; with a stem `code`, a pattern needs only its `label`.
 Each file returns a Function (b2: an Event):
@@ -320,12 +400,20 @@ stems. Proof, event by event against the `.scd` (every note with all its paramet
 The start values `--cc '{"61":0.6,…,"67":0.6,"77":0.3,"79":0.3,…,"83":0.3}'` give both sides the knob positions the
 `.scd`'s colour columns assume until a knob moves.
 
-13 of 14 columns needed column code (only the kick is JSON): several samples per column (clap, hats, congas), several
-layers per hit (sub, harmony, bass, keys), lengths relative to the note, Strudel's random and hash choices, Complexity
-steps that add layers, lifts that grow over bars, harmony look-ahead and riffs that bring chords. Format proposal for
-format 2 (before task 007): kits (a pattern's `notes` pick a file of the sample), layers with a cross-fade knob,
-per-pattern envelopes and a length knob relative to the note, Complexity as layers enabled from a knob value. That
-would bring the drum and sub columns to JSON; the colour columns stay column code.
+With format 1, 13 of 14 columns needed column code. With format 2 (task 013) 7 of 14 are JSON: kick, clap, hats,
+congas, sub, bass (all seven lines) and harmony. 7 keep column code:
+- noise pump: Motion moves low-pass and pan by slow sines read at the bar start, scaled by the knob; button 2 is its
+  own riser on a second lane with a fixed room that plays through the Break;
+- keys: riffs that bring their own chords to the whole track, the Sound mode (button 2 turns the knobs into the
+  sound mix), four sounds with their own key maps;
+- vibraphone, flute, brass, strings, guitar: phrase engines with Strudel's random and hash choices per note (doubles,
+  neighbour notes, trills, rests per repetition), sample maps per note (closest recorded pitch), lifts that grow over
+  bars while button 2 is held.
+
+Differences of the format 2 stems to the `.scd` (comparison over the three scripts): only the bass under the keys'
+Atmosphere riff (Em/G: its 3rd, 5th and 7th count from the bass G, the `.scd` counts them from E) and on approach
+notes before a riff's chord change inside the bar (format 2 takes the chord of the approach note's 16th, the `.scd`
+the chord of the next note). Both happen only while the keys play a riff; see task 013.
 
 ## Set (definition only)
 A **set** is a unique, ordered list of stem tracks played as one performance: track 1 runs, then the next takes over,
@@ -336,14 +424,19 @@ would name the tracks in order and the length of each change. There is no set fi
 ## Good to know
 - `check-stems` checks every `.stem` under `sc/stems/` and every `.track` under `sc/tracks/`: schema, the file name
   from sample + labels, the sample, preset keys, parameters, code files, add-on, parent and the stems a track names
-  exist, label rules, mini-notation brackets, at most 3 patterns on a Mode 1 slot.
+  exist, label rules, mini-notation brackets; format 2: format 2 fields only with `"format": 2`, layer sounds in the
+  sample or `extra`, parameters of each layer's sound, kit files of the sample and kit keys in the notes, points going
+  up, a knob or button 2 without mapping only when a layer reads it.
 - The schemas' genre list must match the `##` headings of [genres.md](../reference/genres.md); `npm test` checks it.
 - Feature tests: `tools/stems/check-stems.test.mjs` (a broken copy of an example per rule), `tools/stems/stem-index.test.mjs` (the library index),
   `tools/stems/stem-tags.test.mjs` (the `@ctl` lines of a stem track), and in `tools/sc-test/run.scd`: a stem loads,
   Pattern cycles, a knob reaches its bus, every add-on fires, silent columns are gated, Break, the code hatch, the
-  swap (the outgoing stem's own hooks leave with it; a stem that needs another strip is refused live), and SC makes
-  the same `@ctl` lines as `tools/stems/stem-tags.mjs`. The swap endpoints: `tools/trajectory/stem-swap.test.mjs`
-  (without SC) and `tools/trajectory/sc-link.test.mjs` (with SC).
+  swap (the outgoing stem's own hooks leave with it; a stem that needs another strip is refused live), SC makes the
+  same `@ctl` lines as `tools/stems/stem-tags.mjs`, and the format 2 features of the 009 stems (kit files, Complexity
+  layers, cross-fade, length knob, held chords on a live mix, chance layers). The swap endpoints:
+  `tools/trajectory/stem-swap.test.mjs` (without SC) and `tools/trajectory/sc-link.test.mjs` (with SC).
+- `tools/sc-port/stem-compare.mjs` compares every input a note's SynthDef reads (`<prefix>.controls.json` from
+  `sc/tools/render.scd`); log labels such as `tag` and `g` are left out.
 - Not built yet: Sample Designer and Stem Designer (`.claude/epics/sound-lab/epic.md`).
 
 ## Stem swap in the player

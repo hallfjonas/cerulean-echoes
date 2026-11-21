@@ -1,0 +1,98 @@
+{
+ "track": "009-house",
+ "title": "Bass lines",
+ "bars": 32,
+ "mood": "all seven bass lines, the Sound knob, Octave, sub Length, a chapter change",
+ "steps": [
+  {
+   "bar": 0,
+   "cc": 12,
+   "value": 1
+  },
+  {
+   "bar": 0,
+   "cc": 8,
+   "value": 0.8
+  },
+  {
+   "bar": 0,
+   "cc": 7,
+   "value": 0.6
+  },
+  {
+   "bar": 0,
+   "cc": 5,
+   "value": 0.7
+  },
+  {
+   "bar": 3.5,
+   "press": 40
+  },
+  {
+   "bar": 7.5,
+   "press": 40
+  },
+  {
+   "bar": 11.5,
+   "press": 40
+  },
+  {
+   "bar": 15.5,
+   "press": 40
+  },
+  {
+   "bar": 19.5,
+   "press": 40
+  },
+  {
+   "bar": 23.5,
+   "press": 40
+  },
+  {
+   "bar": 27.5,
+   "press": 40
+  },
+  {
+   "bar": 2,
+   "cc": 32,
+   "value": 0.5,
+   "ramp": 4
+  },
+  {
+   "bar": 10,
+   "cc": 32,
+   "value": 1,
+   "ramp": 4
+  },
+  {
+   "bar": 16,
+   "cc": 32,
+   "value": 0.2,
+   "ramp": 2
+  },
+  {
+   "bar": 20,
+   "press": 44
+  },
+  {
+   "bar": 22,
+   "cc": 48,
+   "value": 1
+  },
+  {
+   "bar": 23,
+   "cc": 48,
+   "value": 0
+  },
+  {
+   "bar": 12,
+   "cc": 16,
+   "value": 0.7
+  },
+  {
+   "bar": 26,
+   "cc": 31,
+   "value": 0.8
+  }
+ ]
+}

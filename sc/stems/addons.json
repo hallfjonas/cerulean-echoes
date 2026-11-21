@@ -3,7 +3,15 @@
   "about": "The shared button-2 add-ons. A stem names one by its id; the SC add-on library builds each one.",
   "addons": {
     "dropOut": { "label": "Drop out", "about": "the stem pauses while held.", "modes": ["hold"] },
-    "echoThrow": { "label": "Echo throw", "about": "long echo while held.", "modes": ["hold"] },
+    "echoThrow": {
+      "label": "Echo throw", "about": "long echo while held.", "modes": ["hold"],
+      "args": {
+        "echo": "echo send while held, at least (default 0.6)",
+        "room": "room send while held, at least (default 0.2)",
+        "echoTime": "own echo's time in beats while held (stem with echo)",
+        "echoFeedback": "own echo's feedback while held (stem with echo)"
+      }
+    },
     "octave": {
       "label": "Octave", "about": "one octave up while held.", "modes": ["hold", "toggle"],
       "args": { "steps": "semitones, 12 (default) or -12" }

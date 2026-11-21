@@ -160,6 +160,43 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 				((5..12) ++ (53..59)).do { |c| ce.cc[c] = 1 };
 				(track.columns.size == 14) and: {
 					track.columns.every { |col| (0..127).any { |k| col.stepNotes(k).reject { |n| n[\msg].notNil }.notEmpty } } } });
+			// stem format 2: the 009 drums, sub, bass and harmony are JSON (kits, layers, amounts, lengths, held chords)
+			{
+				var ce = loadCe.value, track = ce.loadTrack(house), at = { |slot, k| track.columns[slot].stepNotes(k) };
+				var bufs = { |notes| notes.collect { |n| ce.sampleBuffers.findKeyForValue(n[\buf]) } };
+				ce.prepare(ScoreStreamPlayer.new, track); ce.patterns;
+				((5..12) ++ (53..59)).do { |c| ce.cc[c] = 1 };
+				check.("stem format 2: a kit's notes pick its files, played to their end", {
+					var n = at.('1:5', 4);
+					(bufs.(n) == ["tr909/cp-00.wav"]) and: { n[0][\hold] == -1 } });
+				check.("stem format 2: Complexity layers come in from a knob value", {
+					var off, on, more;
+					ce.cc[33] = 0; off = [at.('1:5', 8), at.('1:5', 6)];
+					ce.cc[33] = 0.25; on = [at.('1:5', 8), at.('1:5', 6)];
+					ce.cc[33] = 0.75; more = [at.('1:5', 8), at.('1:5', 6)];
+					ce.cc[33] = 0;
+					(off.flatten(1).isEmpty) and: { on[0].size == 1 } and: { on[1].isEmpty } and: { more[1].size == 1 } });
+				check.("stem format 2: a cross-fade knob trades one layer for another", {
+					var hats, shaker;
+					ce.cc[34] = 0; hats = bufs.(at.('1:6', 2));
+					ce.cc[34] = 1; shaker = bufs.(at.('1:6', 2));
+					ce.cc[34] = 0;
+					(hats == ["tr909/oh-00.wav"]) and: { shaker == ["tr727/sh-00.wav"] } });
+				check.("stem format 2: a length knob relative to the note (sub Length)", {
+					var long, short;
+					ce.cc[31] = 0; long = at.('1:3', 1).collect(_[\hold]);
+					ce.cc[31] = 1; short = at.('1:3', 1).collect(_[\hold]);
+					ce.cc[31] = 0;
+					(long == [3, 3]) and: { short.every { |h| (h - 1.05).abs < 1e-9 } } });
+				check.("stem format 2: held chords struck on a change, layers on a live mix", {
+					var n = at.('2:1', 0);
+					(n.size == 24) and: { at.('2:1', 1).isEmpty } and: { n.every { |x| x[\mix].asString[0] == $c } }
+						and: { n.collect(_[\midi]).asSet.includes(52) } });
+				check.("stem format 2: a chance layer (conga ghosts) plays from Complexity on", {
+					var count = { (0..63).collect { |k| at.('1:7', k).size }.sum }, none, some;
+					ce.cc[35] = 0; none = count.value; ce.cc[35] = 1; some = count.value; ce.cc[35] = 0;
+					some > none });
+			}.value;
 			check.("009 stem track: Chords on the chords column steps the frame's progressions", {
 				var log = play.(house, 12, [[1.5, 85], [1.7, 44]]), track = ~lastCe.track;
 				(track.prog.now == 1) and: { track.chordAt(8).name == "Am7" } and: { track.chordAt(0).name == "Am9" } });

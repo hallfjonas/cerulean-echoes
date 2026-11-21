@@ -13,7 +13,9 @@
 (
 ~ce.addons = (
 	dropOut: (mute: true),
-	echoThrow: (params: { |a, col, p| p[\echo] = (p[\echo] ? 0).max(0.6); p[\room] = (p[\room] ? 0).max(0.2) }),
+	echoThrow: (params: { |a, col, p|
+		p[\echo] = (p[\echo] ? 0).max(a.argNum(\echo, 0.6)); p[\room] = (p[\room] ? 0).max(a.argNum(\room, 0.2));
+		[\echoTime, \echoFeedback].do { |key| a[\args][key] !? { |x| p[key] = x } } }),
 	octave: (transpose: { |a| a.argNum(\steps, 12) }),
 	riser: (sounds: [\sdNoise], notes: { |a, col, k|
 		var bars = a.argNum(\bars, 2), rise = ((k - a[\since]) / 16 / bars).clip(0, 1);
