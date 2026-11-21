@@ -113,6 +113,12 @@ Design-unit sizes:
 Both themes share the layout above; only tokens and the knob component differ. Theme is a setting in the
 existing settings drawer (`Black` default, `TE`). Persist the choice in `localStorage`, wrapped in try/catch.
 
+**Update 2026-11-21 (user):** the themes are named **Minimal** (= Black below) and **Retro** (= TE below), each in a
+dark and a light tone (Minimal dark and Retro light are the palettes below; Minimal light and Retro dark are new
+tokens in `index.html`). They are chosen only on the player page (sidebar, Theme: style + Auto / Dark / Light,
+`tools/trajectory/theme.mjs`), saved as `ce.style` / `ce.tone`; the panel has no switch of its own. The player page
+uses the same tokens (`tools/trajectory/ui.css`) and has no top bar.
+
 ### Theme "Black" (Torso-like)
 
 | Token | Value |
