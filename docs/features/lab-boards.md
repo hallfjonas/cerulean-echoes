@@ -14,8 +14,7 @@ track.
 
 ## How to use it
 1. Find the board in `lab/<instrument>/`, for example `lab/bass/` or `lab/harmony/`. Each folder has a `feedback.md`.
-2. Play it in the [player](player.md) (pick it under **Lab**) or paste the file into strudel.cc
-   ([strudel.cc](strudel-cc.md)). Play the columns on the controller.
+2. Paste the file into strudel.cc ([strudel.cc](strudel-cc.md)); the player's pages no longer list Strudel boards. Play the columns on the controller.
 3. Tell Claude what you liked and what you did not. The result goes into `feedback.md` with the date.
 4. Claude builds the next round: it keeps the columns you rated good and replaces the rest with new ones. The current
    round stays in the folder, and older rounds are deleted (git history keeps them). Whole series you rejected go to

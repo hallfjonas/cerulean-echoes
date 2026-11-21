@@ -18,7 +18,7 @@ you move something. Every control sends a number from 0 to 127.
 - Every LC gets the full layout. Mode 1 = the foundation (beat and bass), Mode 2 = the colour (chords and melodies).
   Mode 1 is custom mode slot 1 and Mode 2 is slot 2: pick the slot on the controller to switch. Column 8 is global in both modes.
 - Set up each LC once: load `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` into Novation Components, slot 1 and slot 2. Every track uses
-  the same controls; what each one does in a track shows in the player's MIDI panel.
+  the same controls; what each one does in a track shows in the player's Live page.
 
 **Launchkey MK4 25** (optional)
 - Keys play a sound that fits the track (a pad, a piano or a Rhodes).

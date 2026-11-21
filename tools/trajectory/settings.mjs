@@ -1,34 +1,34 @@
-// Every visual setting of the player as data: id, label, kind, default, key, tip, apply(value, context).
+// Every visual setting of the player as data: page ('visuals' or 'panel': where the sidebar shows it), id, label, kind, default, key, tip, apply(value, context).
 // kinds: 'slider' (min, max, step, show), 'toggle', 'choice' (options). A key toggles a toggle and cycles a choice.
-// mountSettings builds the fields into a container from this list, restores saved values and saves every change.
+// mountSettings builds the fields into one container per page ({ visuals, panel }) from this list, restores saved values and saves every change.
 import { describeWindow } from './smoothing.mjs'
 
 export const SETTINGS = [
-  { id: 'character', label: 'Hard ↔ Soft', kind: 'slider', min: 0, max: 1, step: 0.01, default: 0, key: null,
+  { page: 'visuals', id: 'character', label: 'Hard ↔ Soft', kind: 'slider', min: 0, max: 1, step: 0.01, default: 0, key: null,
     tip: '0 = hard, sharp, wild · 1 = soft, smeared, sluggish', show: v => v.toFixed(2),
     apply: (value, { renderer }) => renderer.setCharacter(value) },
-  { id: 'smoothing', label: 'Raw ↔ Smooth', kind: 'slider', min: 0, max: 1, step: 0.005, default: 0.06, key: null,
+  { page: 'visuals', id: 'smoothing', label: 'Raw ↔ Smooth', kind: 'slider', min: 0, max: 1, step: 0.005, default: 0.06, key: null,
     tip: '0 = raw signals · 1 = moving average over 2^53 lines: frozen', show: describeWindow,
     apply: (value, { smoother, renderer }) => { smoother.setAmount(value); renderer.setSmoothing(value) } },
-  { id: 'axes', label: 'Axes', kind: 'toggle', default: false, key: 'a', tip: 'Key A',
+  { page: 'visuals', id: 'axes', label: 'Axes', kind: 'toggle', default: false, key: 'a', tip: 'Key A',
     apply: (value, { renderer }) => renderer.setAxes(value) },
-  { id: 'labels', label: 'Labels', kind: 'toggle', default: false, key: 'l', tip: 'Key L',
+  { page: 'visuals', id: 'labels', label: 'Labels', kind: 'toggle', default: false, key: 'l', tip: 'Key L',
     apply: (value, { renderer }) => renderer.setLabels(value) },
-  { id: 'rings', label: 'Beat rings', kind: 'toggle', default: true, key: 'b', tip: 'Key B: rings from the kick on every beat',
+  { page: 'visuals', id: 'rings', label: 'Beat rings', kind: 'toggle', default: true, key: 'b', tip: 'Key B: rings from the kick on every beat',
     apply: (value, { renderer }) => renderer.setRings(value) },
-  { id: 'lcFrame', label: 'LC frame', kind: 'toggle', default: true, key: 'h',
+  { page: 'panel', id: 'lcFrame', label: 'LC frame', kind: 'toggle', default: true, key: 'h',
     tip: 'Key H: frame around the controller used last in the LC view / MIDI panel', apply: () => {} },
-  { id: 'look', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',
+  { page: 'visuals', id: 'look', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',
     tip: 'Key V: cycles the looks', apply: (value, { renderer }) => renderer.setLook(value) },
   // the set view of the SuperCollider MIDI panel (UI-REDESIGN.md "Set view"): four candidate views, one browser setting
   // the panel reads too; a click on the panel's label (the view's name) cycles it and the panel tells the player
-  { id: 'setView', label: 'Set view', kind: 'choice', options: ['ring', 'ring10', 'minute', 'line2', 'two', 'two-line', 'spectro', 'spectro-line', 'map', 'energy', 'spectrogram'], default: 'ring', key: 'c',
+  { page: 'panel', id: 'setView', label: 'Set view', kind: 'choice', options: ['ring', 'ring10', 'minute', 'line2', 'two', 'two-line', 'spectro', 'spectro-line', 'map', 'energy', 'spectrogram'], default: 'ring', key: 'c',
     tip: 'Key C: how the box right of the spectrum shows the set so far (SuperCollider tracks); candidates, see sc/ui/reference/set-view-options.html',
     apply: value => {
       try { localStorage.setItem('ce.setView', value) } catch {}
       document.getElementById('scPanel')?.contentWindow?.postMessage({ setView: value }, location.origin)
     } },
-  { id: 'widen', label: 'Pan width', kind: 'toggle', default: true, key: 'w',
+  { page: 'visuals', id: 'widen', label: 'Pan width', kind: 'toggle', default: true, key: 'w',
     tip: 'Key W: widen the pan range the music used', apply: (value, { renderer }) => renderer.setWiden(value) },
 ]
 
@@ -71,7 +71,7 @@ const field = (setting, value, onInput) => {
   return { row, input, output }
 }
 
-export const mountSettings = (container, context) => {
+export const mountSettings = (containers, context) => {
   const values = {}
   const stored = load()
   const fields = {}
@@ -91,7 +91,8 @@ export const mountSettings = (container, context) => {
     values[setting.id] = validOr(setting, stored[setting.id])
     fields[setting.id] = field(setting, values[setting.id], value => set(setting.id, value))
   }
-  container.replaceChildren(...SETTINGS.map(setting => fields[setting.id].row))
+  for (const [page, container] of Object.entries(containers))
+    container.replaceChildren(...SETTINGS.filter(setting => setting.page === page).map(setting => fields[setting.id].row))
   for (const setting of SETTINGS) set(setting.id, values[setting.id])
 
   const handleKey = key => {

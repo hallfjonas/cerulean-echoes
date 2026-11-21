@@ -25,6 +25,20 @@ import path from 'path'
 import { encode, decode } from './osc.mjs'
 
 export const OSC_PORT = Number(process.env.CE_SC_PORT ?? 57131)
+// CE_SC_PORT / CE_SC_SERVER_PORT pin the ports (taken = error); without them the link takes the first free pair from
+// 57131 / 57140 up, so several player servers (worktrees, sessions) run side by side
+const PORTS_PINNED = process.env.CE_SC_PORT !== undefined || process.env.CE_SC_SERVER_PORT !== undefined
+const PORT_TRIES = 40
+const portFree = (port, address) => new Promise(resolve => {
+  const probe = dgram.createSocket('udp4')
+  probe.once('error', () => resolve(false))
+  probe.bind(port, address, () => probe.close(() => resolve(true)))
+})
+export const firstFreePort = async (from, skip = []) => {
+  for (let port = from; port < from + PORT_TRIES; port++)
+    if (!skip.includes(port) && await portFree(port, '127.0.0.1') && await portFree(port, '0.0.0.0')) return port
+  throw new Error(`no free UDP port from ${from} to ${from + PORT_TRIES - 1}`)
+}
 // SC's own sound server (not the IDE's 57110, so the player and an IDE session can run side by side)
 export const SERVER_PORT = Number(process.env.CE_SC_SERVER_PORT ?? 57140)
 const BOOT_TIMEOUT = 60e3, LOAD_TIMEOUT = 60e3
@@ -59,7 +73,8 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = nu
   onLoaded = () => {} }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
   const viewFile = path.join(repo, 'sc', 'ui', 'index.html')
-  const logFile = path.join(os.tmpdir(), `cerulean-sc-engine-${OSC_PORT}.log`)
+  let oscPort = OSC_PORT, serverPort = SERVER_PORT
+  let logFile = path.join(os.tmpdir(), `cerulean-sc-engine-${oscPort}.log`)
   let sc = { address: '127.0.0.1', port: 57120 }   // learnt from SC's first message
   let child = null, bound = false, bindError = null
   const state = { layout: null, ccs: null, state: null, beat: null, midi: null, lk: null }
@@ -122,18 +137,30 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = nu
       waiter.resolve(m)
     }
   })
-  udp.on('error', error => { bindError = error; log(`SuperCollider link: UDP ${OSC_PORT}: ${error.message} (a second player server running?)`) })
-  udp.bind(OSC_PORT, '127.0.0.1', () => { bound = true })
+  udp.on('error', error => { bindError = error; log(`SuperCollider link: UDP ${oscPort}: ${error.message} (a second player server running?)`) })
+  const binding = (async () => {
+    try {
+      if (!PORTS_PINNED) oscPort = await firstFreePort(OSC_PORT)
+      logFile = path.join(os.tmpdir(), `cerulean-sc-engine-${oscPort}.log`)
+      await new Promise(resolve => udp.bind(oscPort, '127.0.0.1', () => { bound = true; resolve() }).once('error', resolve))
+    } catch (error) { bindError = error }
+  })()
 
   // start sclang with the engine once; resolves when SC has booted
   let starting = null
   const start = () => {
     if (host.ready) return Promise.resolve()
     if (starting) return starting
-    if (bindError) return Promise.reject(new Error(`SuperCollider link: UDP ${OSC_PORT} is taken (${bindError.message})`))
-    if (!sclang) return Promise.reject(new Error('SuperCollider is not installed (no sclang found)'))
+    starting = begin().finally(() => { starting = null })
+    return starting
+  }
+  const begin = async () => {
+    await binding
+    if (bindError) throw new Error(`SuperCollider link: UDP ${oscPort}: ${bindError.message}`)
+    if (!sclang) throw new Error('SuperCollider is not installed (no sclang found)')
+    if (!PORTS_PINNED) serverPort = await firstFreePort(SERVER_PORT, [oscPort])
     const out = fs.openSync(logFile, 'w')
-    child = spawn(sclang, [engineFile, String(OSC_PORT), String(SERVER_PORT)], { cwd: path.dirname(engineFile), stdio: ['ignore', out, out] })
+    child = spawn(sclang, [engineFile, String(oscPort), String(serverPort)], { cwd: path.dirname(engineFile), stdio: ['ignore', out, out] })
     fs.closeSync(out)
     setHost({ running: true, ready: false, track: null, error: null })
     log(`SuperCollider: starting (log: ${logFile})`)
@@ -142,8 +169,7 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = nu
       starting = null
       setHost({ running: false, ready: false, track: null, error: code ? `sclang ended (code ${code}), log: ${logFile}` : null })
     })
-    starting = waitFor(m => m.address === '/ce/ready', BOOT_TIMEOUT, 'boot').finally(() => { starting = null })
-    return starting
+    return waitFor(m => m.address === '/ce/ready', BOOT_TIMEOUT, 'boot')
   }
 
   const load = async (id, slots) => {
@@ -227,5 +253,6 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = nu
   // keep the event streams open through proxies and sleep
   setInterval(() => { for (const res of clients) res.write(': ping\n\n') }, 15000).unref()
 
-  return { handle, load, swap, stop, quit, close, host, state, setHistory, logFile }
+  return { handle, load, swap, stop, quit, close, host, state, setHistory, get logFile() { return logFile },
+    get ports() { return { osc: oscPort, server: serverPort } } }
 }

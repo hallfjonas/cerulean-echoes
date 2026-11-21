@@ -440,7 +440,7 @@ would name the tracks in order and the length of each change. There is no set fi
 - Not built yet: Stem Designer (`.claude/epics/sound-lab/epic.md`).
 
 ## Stem swap in the player
-- Play a stem track, click a column's name in the MIDI panel: the stem drawer lists the library stems of that
+- Play a stem track, click a column's name on the Live page: the stem drawer lists the library stems of that
   column's role (filters genre, energy, tag), marks the one that plays and the one in the file. Pick one: it plays
   from the next bar, the other columns play on.
 - A stem that needs another mixer strip than the slot has (another echo set-up, lanes, map buses, column code with
@@ -462,7 +462,7 @@ would name the tracks in order and the length of each change. There is no set fi
   also on sounding notes; `hold` (seconds) and `amp` are read at each note's start. A column whose fader or the master
   is at 0, or that sits out the Break, makes no hits at all (gated).
 - The `@ctl` lines of a stem track are made from its stems and frame (`~ce.stemTrackTags`, and the same in
-  `tools/stems/stem-tags.mjs` for `check-perform`), so the MIDI panel and the auto-perform scripts work unchanged.
+  `tools/stems/stem-tags.mjs` for `check-perform`), so the Live page and the auto-perform scripts work unchanged.
 - Swap hook: `~ce.swapSlot(slot, ref, load)` puts the stem `ref` (path under `sc/stems/`) on `slot` (`'2:4'`) at the
   next bar line; the other columns play on. `load.(msgs, done)` sends the new sounds, samples and state buses
   (default: live, with `s.sync`) and then calls `done`. The slot must hold a stem already (an empty slot has no

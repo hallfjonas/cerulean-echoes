@@ -146,9 +146,9 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
-- Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
-  Visualization), the page links, track, Play/Stop/Record/Save take, auto-perform and the visual settings; **?** opens
-  the help.
+- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems, Tracks, Sets) | Visualization;
+  the sidebar (key S) shows only the sections of the page: Live = live tracks, Play/Stop/Record/Save take, auto-perform;
+  Labs = Sample / Stem Designer; Visualization = visual settings; **?** opens the help.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
@@ -195,7 +195,7 @@ loads the same banks as strudel.cc, `banks.mjs`, plus the gm_* soundfonts). `sam
   `samples/mirror/mirror.json`, so the copy plays under the same name once pushed to main.
 
 ## Control texts (`@ctl`)
-The `// @ctl` comments in a track describe every control; the LC view, the player's MIDI panel, the SC UI and
+The `// @ctl` comments in a track describe every control; the LC view, the player's Live page, the SC UI and
 `check-perform` read them (`tools/lcxl-layout/ctl.mjs`). Layout sheets (PDF) and per-track `.syx` modes were retired on
 2026-11-20. Every LC XL 3 gets the same two custom modes once, with Novation Components: `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` in slots 1
 and 2 (same CCs for every track).

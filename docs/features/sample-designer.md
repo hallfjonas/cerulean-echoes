@@ -12,15 +12,15 @@ project file, `sc/lab/samples/<name>.sample.json`: save it, copy it, export it a
 
 ## How to use it
 1. Start the player (`cd tools && node trajectory/server.mjs`, then http://localhost:8766).
-2. Under **Lab** pick `Sample: kick-round` (drum machine) or `Sample: bass-pluck` (synthesizer) and press **Load**
-   (or Play). The audition pattern plays at once; the MIDI panel shows the machine.
-3. Turn knobs, move faders, press buttons (on the LC or in the MIDI panel). Every knob acts at once, also on sounding
+2. On the **Labs** page, tab **Samples**, pick `Sample: kick-round` (drum machine) or `Sample: bass-pluck` (synthesizer) and press **Load**
+   (or Play). The audition pattern plays at once; the panel shows the machine.
+3. Turn knobs, move faders, press buttons (on the LC or in the panel). Every knob acts at once, also on sounding
    notes.
 4. **Save** (sidebar, or the LC: column 8, button 2) writes the values into the project file.
    **Save as** copies the project under a new name (its `parent` is the old one) and picks the copy.
 5. **Export** asks for a sound name (camelCase, e.g. `kickRound`) and writes `sc/sounds/<sound>.scd` and
    `samples/sound-lab/<sound>.wav` (two bars of the audition). Existing files are never overwritten.
-6. **Shape**: under the two LCs the MIDI panel shows one hit of the sound (the first note of the picked audition
+6. **Shape**: under the two LCs the panel (Labs, Samples) shows one hit of the sound (the first note of the picked audition
    pattern, full velocity, no room) and redraws it each time a control moves, about a second later (the server renders
    the hit). Four pictures and the numbers above them:
    - **Waveform**: the hit over time.
@@ -46,7 +46,7 @@ From the terminal (in `tools/`): `npm run sample-lab -- check`, `npm run sample-
 | Button 1 | block on / off | Pattern: next audition pattern at the next bar |
 | Button 2 | block type (Sine → Triangle → …) | Save |
 
-Each control's name and what it does show in the MIDI panel. Mode 2 is not used.
+Each control's name and what it does show in the panel. Mode 2 is not used.
 
 | Setup | Columns |
 |---|---|

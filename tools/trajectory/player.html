@@ -6,7 +6,7 @@
 <title>Trajectory Player</title>
 <link rel="stylesheet" href="ui.css">
 <style>
-  /* no top bar: the sidebar holds everything; the stage (MIDI panel or visuals) fills the rest */
+  /* no top bar: the sidebar holds everything; the stage (Live, Labs or visuals) fills the rest */
   :root { --side: 300px }
   body { overflow: hidden }
   body.idle { cursor: none }
@@ -66,6 +66,13 @@
   #recMeter { width: 60px; height: 6px; background: var(--control); border-radius: 3px; overflow: hidden }
   #recMeter span { display: block; height: 100%; width: 0; background: var(--rec) }
   #recError { color: var(--err); font-size: 12px }
+  .off-page { display: none !important }
+  #sidebar nav#subnav { display: flex; flex-direction: row; gap: 2px; margin: 0 0 14px }
+  #sidebar nav#subnav a { flex: 1; text-align: center }
+  #sidebar nav#subnav a.here { background: var(--control) }
+  #placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim) }
+  #placeholder[hidden] { display: none }
+  body.placeholder #lcPanel, body.placeholder #scPanel, body.placeholder #panelEmpty { display: none }
 </style>
 <script type="importmap">
 { "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
@@ -75,7 +82,9 @@
 <!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here: no strudel.cc needed.
      Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
      DAW ports; the CC moved last per number); a control not moved yet reads 0.
-     Two views share the page, so the sound keeps playing when switching: the MIDI panel (the track's LC view, drawn
+     Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
+     #labs/stems, #labs/tracks, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
+     show the track's LC view (drawn
      into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on the canvas).
      The sidebar (key S) holds the page links, the track, Play / Stop / Record / Save take, auto-perform and the visual
      settings (generated from settings.mjs, kept in localStorage). Two homotopy controls among them:
@@ -90,51 +99,59 @@
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
      tail. Stop, a track change or a new auto-perform run ends a recording.
      The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window.
-     Stem tracks: a click on a column's name in the MIDI panel selects the column (selection.mjs) and opens the stem
+     Stem tracks: a click on a column's name in the Live panel selects the column (selection.mjs) and opens the stem
      drawer (stem-drawer.mjs): swap the column's stem, Revert, Save as (a new track file; stem-swap.mjs). -->
 <canvas id="view"></canvas>
 <aside id="sidebar">
   <div class="top">
     <nav>
-      <a href="#panel" data-view="panel">MIDI panel</a>
-      <a href="#visuals" data-view="visuals">Visualization</a>
+      <a href="#live" data-page="live">Live</a>
+      <a href="#labs" data-page="labs">Labs</a>
+      <a href="#visuals" data-page="visuals">Visualization</a>
     </nav>
     <button id="sidebarToggle" class="icon" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
   </div>
+  <nav id="subnav" data-pages="labs"></nav>
   <section>
-    <h2>Track</h2>
-    <select id="track"></select>
+    <h2 id="trackHeading">Track</h2>
+    <select id="track" data-pages="live labs/samples labs/stems"></select>
     <div class="row">
-      <button id="play">Play</button>
+      <button id="play" data-pages="live labs/samples labs/stems">Play</button>
       <button id="stop">Stop</button>
-      <button id="record" title="Key R">Record</button>
+      <button id="record" title="Key R" data-pages="live">Record</button>
       <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
     </div>
-    <output id="recFile"></output>
-    <span id="recError"></span>
-    <div class="row"><button id="saveTake">Save take</button></div>
-    <output id="takeState"></output>
+    <div data-pages="live">
+      <output id="recFile"></output>
+      <span id="recError"></span>
+      <div class="row"><button id="saveTake">Save take</button></div>
+      <output id="takeState"></output>
+    </div>
     <span id="status">loading Strudel …</span>
   </section>
-  <section id="sampleLab" hidden></section>
-  <section id="stemLab" hidden></section>
-  <section id="autoPerform"></section>
+  <section id="sampleLab" data-pages="labs/samples" hidden></section>
+  <section id="stemLab" data-pages="labs/stems" hidden></section>
+  <section id="autoPerform" data-pages="live"></section>
+  <section id="placeholderNote" data-pages="labs/tracks labs/sets"></section>
   <section>
     <h2>Theme</h2>
     <div id="theme"></div>
   </section>
-  <section>
-    <details>
-      <summary>Visual settings</summary>
-      <div id="settings"></div>
-    </details>
+  <section data-pages="live labs/samples labs/stems">
+    <h2>Panel</h2>
+    <div id="settingsPanel"></div>
+  </section>
+  <section data-pages="visuals">
+    <h2>Visual settings</h2>
+    <div id="settingsVisuals"></div>
   </section>
 </aside>
 <button id="sideOpen" class="icon" title="Show the sidebar (key S)" aria-label="Show the sidebar">☰</button>
 <main id="stage">
-  <iframe id="lcPanel" title="MIDI panel"></iframe>
-  <iframe id="scPanel" title="MIDI panel (SuperCollider)" hidden></iframe>
+  <iframe id="lcPanel" title="Live"></iframe>
+  <iframe id="scPanel" title="Live (SuperCollider)" hidden></iframe>
   <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
+  <div id="placeholder" hidden></div>
 </main>
 <script type="module">
 import { createRenderer } from './render.mjs'
@@ -153,20 +170,22 @@ import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
+import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
-  { heading: 'What it does', text: 'Plays a live track or lab board right here. The MIDI panel shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Visualization draws every stem with its name '
-    + 'and the tempo from Strudel\'s clock. No strudel.cc needed.' },
-  { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
+  { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
+    + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample and Stem Designer '
+    + '(Tracks and Sets are planned); Visualization draws every stem with its name and the tempo. The sidebar shows '
+    + 'only what the page needs. No strudel.cc needed.' },
+  { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. Save take writes what the controllers did since the '
+  { heading: 'Output', text: 'Sound, the Live panel and visuals. Save take writes what the controllers did since the '
     + 'last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
   { heading: 'How to use', text: ['Pick a track in the sidebar and press Play.', 'Play the controllers, or start '
-    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visualization switch the view; the sound '
+    + 'Auto-perform (P) to try the track without hardware.', 'Live, Labs and Visualization switch the page; the sound '
     + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Visual '
-    + 'settings hold the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the MIDI '
+    + 'settings (Visualization page) hold the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the '
     + 'panel, dark, light or as the system (Auto).'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
     'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
@@ -180,7 +199,7 @@ mountHelp([
   { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
     'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
     'Stop or another track ends a recording. Recordings stay out of git.'] },
-  { heading: 'Stem swap', text: ['Stem tracks only: click a column\'s name in the MIDI panel.',
+  { heading: 'Stem swap', text: ['Stem tracks only: click a column\'s name in the Live panel.',
     'The drawer lists the library stems of that column\'s role; filter by genre, energy and tag.',
     'Pick one: it plays from the next bar, the other columns play on. A stem that needs another mixer strip loads '
     + 'the track again with it (a short gap; the drawer says so).',
@@ -215,24 +234,25 @@ const showScripts = () => {
   sampleLab.show(entryOf($('track').value))
   stemLab.show(entryOf($('track').value))
 }
-const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
+let page = parseHash(location.hash)
+const picks = {}
+const fillTrack = selectId => {
   const picked = $('track').value
-  catalogue = entries
-  const group = (label, kind) => {
-    const optgroup = document.createElement('optgroup')
-    optgroup.label = label
-    optgroup.append(...entries.filter(entry => entry.kind === kind).map(({ id, label: text, taps, noTapReason }) => {
-      const option = new Option(taps ? text : `${text} (no tap)`, id)
-      option.disabled = !taps
-      option.title = noTapReason ?? ''
-      return option
-    }))
-    return optgroup
-  }
-  $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
-  $('track').value = [selectId, picked, '010-ambient-house', ...entries.map(entry => entry.id)]
-    .find(id => entries.some(entry => entry.id === id && entry.taps))
+  if (picked) picks[pageKey(page)] = picked
+  const entries = entriesFor(page, catalogue)
+  $('track').replaceChildren(...entries.map(({ id, label: text, taps, noTapReason }) => {
+    const option = new Option(taps ? text : `${text} (no tap)`, id)
+    option.disabled = !taps
+    option.title = noTapReason ?? ''
+    return option
+  }))
+  $('track').value = [selectId, picks[pageKey(page)], '010-ambient-house', ...entries.map(entry => entry.id)]
+    .find(id => entries.some(entry => entry.id === id && entry.taps)) ?? ''
   showScripts()
+}
+const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
+  catalogue = entries
+  fillTrack(selectId)
 })
 loadCatalogue()
 const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entryOf($('track').value),
@@ -244,7 +264,9 @@ const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($(
 const selection = createSelection()
 mountStemDrawer({ selection, onSaved: () => loadCatalogue() })
 let playingId = null
-const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns: !!entryOf(playingId)?.stems }, location.origin)
+const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns: page.id === 'live' && !!entryOf(playingId)?.stems },
+  location.origin)
+const sendShape = () => $('scPanel').contentWindow?.postMessage({ shapeOn: showsShape(page) }, location.origin)
 const setPlaying = id => {
   playingId = id
   selection.clear()
@@ -351,7 +373,7 @@ const play = async script => {
     const trackHash = response.headers.get('X-Track-Hash')
     recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
     hasLcView = code.includes('globalThis.lcxlView')
-    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visualization.'
+    $('panelEmpty').textContent = 'This track has no Live panel: open Visualization.'
     attachPanel()
     label = 'playing: ' + track
   } catch (error) {
@@ -383,7 +405,7 @@ const startScript = async id => {
   performer.start(script)
 }
 
-const settings = mountSettings($('settings'), { renderer, smoother })
+const settings = mountSettings({ visuals: $('settingsVisuals'), panel: $('settingsPanel') }, { renderer, smoother })
 const theme = mountTheme($('theme'), { panel: () => $('scPanel') })
 $('scPanel').addEventListener('load', theme.sendTheme)
 const autoPerform = mountAutoPerform($('autoPerform'), { onStart: startScript, onStop: stopPerformer })
@@ -433,7 +455,7 @@ const showRecording = () => {
 
 const panelWindow = $('lcPanel').contentWindow
 panelWindow.addEventListener('keydown', event => dispatchEvent(new KeyboardEvent('keydown', { key: event.key })))
-let hasLcView = false, currentView = 'panel'
+let hasLcView = false, currentView = 'panel'   // 'panel' on Live and Labs, 'visuals' on Visualization
 const detachPanel = () => {
   const view = globalThis.lcxlView
   if (view?.win === panelWindow) view.win = null
@@ -456,18 +478,38 @@ const attachPanel = () => {
   view.win = panelWindow
   view.draw()
 }
-const showView = name => {
-  currentView = name
-  document.body.classList.toggle('visuals', name === 'visuals')
-  renderer.setPaused(name !== 'visuals')
-  for (const link of document.querySelectorAll('[data-view]')) link.classList.toggle('here', link.dataset.view === name)
+const showPage = next => {
+  page = next
+  currentView = page.id === 'visuals' ? 'visuals' : 'panel'
+  document.body.classList.toggle('visuals', currentView === 'visuals')
+  renderer.setPaused(currentView !== 'visuals')
+  for (const element of document.querySelectorAll('[data-pages]')) element.classList.toggle('off-page', !shownOn(element.dataset.pages, page))
+  for (const link of document.querySelectorAll('[data-page]')) link.classList.toggle('here', link.dataset.page === page.id)
+  for (const link of $('subnav').children) link.classList.toggle('here', link.dataset.sub === page.sub)
+  const placeholder = placeholderFor(page)
+  document.body.classList.toggle('placeholder', !!placeholder)
+  $('placeholder').hidden = !placeholder
+  $('placeholder').textContent = placeholder ?? ''
+  $('placeholderNote').textContent = placeholder ?? ''
+  $('trackHeading').textContent = page.id === 'labs' ? 'Project' : 'Track'
+  if (location.hash !== hashFor(page)) history.replaceState(null, '', hashFor(page))
+  fillTrack()
+  selection.clear()
+  sendPick()
+  sendShape()
   attachPanel()
   wake()
 }
-for (const link of document.querySelectorAll('[data-view]')) link.onclick = event => {
+$('subnav').replaceChildren(...PAGES.find(entry => entry.id === 'labs').subs.map(sub => {
+  const link = Object.assign(document.createElement('a'), { href: '#labs/' + sub.id, textContent: sub.label })
+  link.dataset.sub = sub.id
+  return link
+}))
+for (const link of [...document.querySelectorAll('[data-page]'), ...$('subnav').children]) link.onclick = event => {
   event.preventDefault()
-  showView(link.dataset.view)
+  showPage(parseHash(link.getAttribute('href')))
 }
+addEventListener('hashchange', () => showPage(parseHash(location.hash)))
 const toggleSidebar = () => document.body.classList.toggle('side-closed')
 $('sidebarToggle').onclick = toggleSidebar
 $('sideOpen').onclick = toggleSidebar
@@ -490,7 +532,7 @@ const applyLcFrame = () => {
 // the SuperCollider panel follows the LC frame setting too (sent on change and whenever the panel (re)loads)
 let sentLcFrame = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
-$('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick() })
+$('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick(); sendShape() })
 // a click on the panel's set view label cycles the view there: keep the setting in step
 addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
@@ -527,7 +569,7 @@ const wake = () => {
   idleTimer = setTimeout(() => document.body.classList.toggle('idle', currentView === 'visuals'), 3000)
 }
 addEventListener('mousemove', wake)
-showView('panel')
+showPage(page)
 </script>
 </body>
 </html>

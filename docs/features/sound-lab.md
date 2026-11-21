@@ -24,7 +24,7 @@ The old Strudel lab boards stay as they are ([Lab boards](lab-boards.md)); new s
 ### Stem swap
 1. Start the player (`cd tools && node trajectory/server.mjs`, then http://localhost:8766) and play a stem track, for
    example `009-house (stems)` under Live.
-2. Click the name of a column in the MIDI panel. The stem drawer lists the library stems that fit its role; filter by
+2. Click the name of a column on the Live page. The stem drawer lists the library stems that fit its role; filter by
    genre, energy or tag.
 3. Pick one. It takes over at the next bar. If the new stem needs another mixer strip than the old one, the track is
    loaded again with it (a short gap).
@@ -32,9 +32,9 @@ The old Strudel lab boards stay as they are ([Lab boards](lab-boards.md)); new s
    file never changes.
 
 ### Stem Designer
-1. Under **Lab** pick `Stems: flute-explore` and press **Load**. The columns of the project play on their slots; the
+1. On the **Labs** page, tab **Stems**, pick `Stems: flute-explore` and press **Load**. The columns of the project play on their slots; the
    backing stems of the context track (`009-house`: kick, sub, bass) play along without a controller.
-2. Turn the knobs of any column. The column you moved last is the selection (the MIDI panel header names it).
+2. Turn the knobs of any column. The column you moved last is the selection (the panel header names it).
 3. **A/B** (LC column 8, button 1): the selected column swaps at the next bar between its candidate and the context
    track's stem of the same slot. Press again to go back. If the two need different mixer strips, the player says so
    and nothing changes.

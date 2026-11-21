@@ -179,6 +179,8 @@ addEventListener('message', e => {
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
   // a stem track in the player: a click on a column's name selects that column (the player opens the stem drawer)
   if (typeof e.data?.pickColumns === 'boolean') document.body.classList.toggle('pick', e.data.pickColumns)
+  // the sound shape under the controllers: the player allows it on its Labs / Samples page only
+  if (typeof e.data?.shapeOn === 'boolean') dispatchEvent(new CustomEvent('ce-shape-allowed', { detail: e.data.shapeOn }))
 })
 const retro = () => document.body.dataset.theme === 'retro', light = () => document.body.dataset.tone === 'light'
 
@@ -837,13 +839,16 @@ const render = async () => {
   busy = false
   render()
 }
-addEventListener('ce-state', ({ detail }) => {
-  const on = !!detail?.designer
+let shapeAllowed = true, designer = null
+const syncShape = () => {
+  const on = !!designer && shapeAllowed
   document.body.classList.toggle('shape-on', on)
   if (!on) { wanted = drawn = last = null; return }
-  wanted = JSON.stringify(detail.designer)
+  wanted = JSON.stringify(designer)
   render()
-})
+}
+addEventListener('ce-state', ({ detail }) => { designer = detail?.designer ?? null; syncShape() })
+addEventListener('ce-shape-allowed', ({ detail }) => { shapeAllowed = detail; syncShape() })
 addEventListener('resize', () => { if (last) drawShape(box, last) })
 </script>
 </body>

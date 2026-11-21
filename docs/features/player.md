@@ -2,9 +2,10 @@
 
 ## What it is
 
-A web page on your own computer that plays any live track or lab board. It opens on the MIDI panel: both Launch
-Control pages and the Launchkey row with every control's name and value. Its second view draws the music: every part
-of the track is a moving shape with its name. It also holds a recorder.
+A web page on your own computer that plays any live track or lab project. It has three pages. **Live** (the start page) shows both Launch
+Control pages and the Launchkey row with every control's name and value, and lets you pick a live track and
+auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks and Sets are placeholders).
+**Visualization** draws the music: every part of the track is a moving shape with its name. It also holds a recorder.
 
 ## When to use it
 
@@ -25,9 +26,11 @@ of the track is a moving shape with its name. It also holds a recorder.
    auto-perform and the visuals do not work for SuperCollider tracks yet.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
-The sidebar holds the views (MIDI panel, Visualization), the track list, Play, Stop,
-Record, Save take, Auto-perform and the visual settings. Switching views keeps the sound playing. The top bar holds the
-status line and **?** for help about the page.
+The sidebar shows only what the page needs. **Live**: the live track list, Play, Stop, Record, Save take, Auto-perform,
+Theme and the panel settings. **Labs** (Samples, Stems): the project list, Play, Stop, the designer buttons, Theme and
+the panel settings; the waveform analysis shows under the controllers on Samples only. **Visualization**: Stop, Theme and
+the visual settings. Switching pages keeps the sound playing; a page has its own address (`#live`, `#labs/samples`,
+`#labs/stems`, `#labs/tracks`, `#labs/sets`, `#visuals`).
 
 Keys:
 
