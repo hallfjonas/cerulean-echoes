@@ -2,7 +2,7 @@
 name: track-designer
 status: backlog
 created: 2026-11-21T14:00:00Z
-updated: 2026-11-21T16:30:00Z
+updated: 2026-11-21T17:20:35Z
 progress: 0%
 prd: .claude/prds/track-designer.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
@@ -12,82 +12,86 @@ github: (not synced; issue sync is off, see CONTRIBUTING.md)
 
 ## Overview
 
-First of two sequential work packages (split from `track-set-designer`). The **Track Designer** builds a stem track in
-the player: stems onto the 14 LC slots, tempo, swing, genre, a frame from a template track, and the Launchkey as a
-**rig** file (keys, knobs 1-8, 16 pads). The follow-up epic `set-designer` starts when this one is done and merged.
+First of two sequential work packages (split from `track-set-designer`). The **Track Designer** is a player view for
+editing one opened stem track: replace, remove or add stems on the 14 LC slots, change the genre, change the Launchkey
+keys sound and single drum pads, then Save or Save as copy. The Launchkey becomes a **rig** file (keys, knobs 1-8, 16
+pads). The follow-up epic `set-designer` starts when this one is done and merged.
 
 ## Architecture Decisions (user, 2026-11-21)
 
 - **SC only, stem tracks only.** No Strudel.
-- **Launchkey as data.** A rig JSON (`sc/launchkey/<name>.lk`, versions as files like stems) replaces the frame's
-  Launchkey code for new tracks; a frame with Launchkey code keeps working. A track names its rig
-  (`"launchkey": "<ref>"`).
-- **Frames stay code.** The Track Designer copies a frame from a template stem track; harmony as data is out of scope.
-- **Designer projects are files** (as in sound-lab): `sc/lab/tracks/<name>.tracklab.json`, published to
-  `sc/tracks/<id>/`.
-- **Non-destructive everywhere.** Publish and Save as write new files.
-- **Standalone LC mode.** The LC XL 3 stays in standalone (MIDI) mode (decision of the spike, now task 001 of
-  `set-designer`).
+- **Edit an existing track, not build from empty.** Open a track, change it, Save or Save as copy. A new track starts
+  as a copy with stems removed.
+- **Same shell as the player.** MIDI panel with the LC view, visuals and transport stay; only the side panel is
+  replaced by designer sections (Track, Stems, Launchkey, Save).
+- **Launchkey as data.** A rig JSON (`sc/launchkey/<name>.lk`) replaces the frame's Launchkey code; a track names its
+  rig (`"launchkey": "<ref>"`). A frame with Launchkey code keeps working. Knobs load from the rig but have no editor.
+- **Frames stay code.** A copy copies the frame unchanged; harmony as data is out of scope.
+- **Save writes only the opened track's own files.** Save as copy refuses an existing id; git is the undo for Save.
 
 ## Technical Approach
 
 ### SC (`sc/lib/`)
 - `lkrig.scd`: rig → `lkNote`, `lkCtl`, `lkPadNames`, the Launchkey stem entry (lanes), states, samples.
-- `stemtrack.scd`: `launchkey` field; empty slots fillable from the designer (load with the new slot).
-- `tracklab.scd`: Track Designer project → track Event (like `stemlab.scd`).
-- `engine.scd`, `render.scd`: load `.tracklab.json`.
+- `stemtrack.scd`: `launchkey` field; empty slots fillable (load with the new slot); `genre` field read and written.
 
 ### Player (`tools/trajectory/`)
-- Catalogue Lab entries, New / Load / Save / Save as / Publish, track settings, the stem drawer on empty slots, a
-  Launchkey panel (keys, knobs, pads with a sample picker).
+- Designer view: shell as the player, side panel sections Track / Stems / Launchkey / Save.
+- Reuse `stem-drawer.mjs`, `stem-swap.mjs` (Replace, plus Remove and Add on empty slots), `selection.mjs` (kind
+  `column`, new kind `pad` for the Launchkey grid).
+- Routes for open, save, save as copy; unsaved-change marker and leave prompt.
 
 ### Tools
-- Schemas `sc/launchkey/lk.schema.json`, `sc/lab/tracks/tracklab.schema.json`; checks in `check-stems` (rigs) and the
-  project check; `npm run stems` lists rigs with "used by".
-- Skill `/track-designer`, CLI `npm run track-lab`.
+- Schema `sc/launchkey/lk.schema.json`; rig checks in `check-stems`; `npm run stems` lists rigs with "used by".
+- Skill `/track-designer` edits the same track files the designer writes.
 
 ## Implementation Strategy
 
-001 (rig) first. 002 (Track Designer) needs the rig. 003 (skill and docs) closes. One branch and PR per task group,
+001 (rig) first. 002 (view, stems, genre, Save) needs the rig only for Save as copy, so it follows 001. 003
+(Launchkey section) needs both. 004 (skill and docs) closes. One branch and PR per task group,
 `epic/track-designer-<group>`, off `epic/sound-lab` until that merges, then off `origin/main`.
 
 Risks:
 - The rig must equal 009's frame-code Launchkey event by event, or tracks sound different once they switch.
-- Few stem tracks exist (009, 090): the Track Designer is also how more get made, which the next epic needs.
+- Save in place overwrites a published track: only on explicit user action.
+- Only 009 and 090 are stem tracks: tests run on those and on copies in a temp dir.
 
 ## Task Breakdown Preview
 
 | # | Task | Parallel |
 |---|---|---|
 | 001 | Launchkey rig: format, schema, check, SC loader, 009's Launchkey extracted and proven equal | first |
-| 002 | Track Designer: project format, SC loader, player (slots, settings, Launchkey panel), Publish | after 001 |
-| 003 | `/track-designer` skill and docs | after 002 |
+| 002 | Track Designer view: open, stems (replace, remove, add), genre, Save, Save as copy | after 001 |
+| 003 | Launchkey section: keys sound picker, pad grid with sample picker and level, knobs read-only | after 002 |
+| 004 | `/track-designer` skill and docs | after 003 |
 
 ## Dependencies
 
-- Epic `sound-lab` (PR #73): stem format 2, `stemtrack.scd`, `~ce.swapSlot` / `swapProblem`, the stem drawer,
-  `stemlab.scd` as the model for project loading.
+- Epic `sound-lab` (PR #73): stem format 2, `stemtrack.scd`, `~ce.swapSlot` / `swapProblem`, the stem drawer.
+- `sc/lib/lkkeys.scd`, `tools/sc-port/`, `sc/tools/render.scd`.
 
 ## Success Criteria (Technical)
 
-- `check-stems` green on rigs and tracks; `npm test` covers rig load and equivalence, project load and publish.
+- `check-stems` green on rigs and tracks; `npm test` covers rig load and equivalence, track open, stem
+  replace/remove/add, genre save, Save as copy.
 - 009 with its rig matches the frame-code Launchkey event by event (`tools/sc-port`).
-- A track built from empty columns plays in the player and passes `check-stems`.
+- A track opened, edited (stems, genre, keys, a pad) and saved as copy plays in the player and passes `check-stems`.
 - `npm run path-lint` shows no new missing paths.
 
 ## Estimated Effort
 
-3 tasks, about 33 hours of agent work plus listening time. Biggest: 002 (Track Designer).
+4 tasks, about 36 hours of agent work plus listening time. Biggest: 002.
 
 ## Tasks Created
 - [ ] 001.md - Launchkey rig (parallel: false)
-- [ ] 002.md - Track Designer (parallel: false)
-- [ ] 003.md - /track-designer skill and docs (parallel: false)
+- [ ] 002.md - Track Designer view (parallel: false)
+- [ ] 003.md - Launchkey section (parallel: false)
+- [ ] 004.md - /track-designer skill and docs (parallel: false)
 
-Total tasks: 3
+Total tasks: 4
 Parallel tasks: 0
-Sequential tasks: 3
-Estimated total effort: 33 hours
+Sequential tasks: 4
+Estimated total effort: 36 hours
 
 ## Next
 
