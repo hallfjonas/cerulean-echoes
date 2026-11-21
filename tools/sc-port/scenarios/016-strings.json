@@ -1,0 +1,353 @@
+[
+ {
+  "name": "strings-base",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-bright05",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7,
+    "62": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-bright1",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7,
+    "62": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-space05",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7,
+    "70": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-char03",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7,
+    "78": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-char1",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7,
+    "78": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-patterns",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 86,
+     "v": 0
+    },
+    {
+     "t": 5.5,
+     "cc": 86,
+     "v": 1
+    },
+    {
+     "t": 5.6,
+     "cc": 86,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "strings-btn2",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 94,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 94,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "strings-chapter",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "strings-break",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "strings-fogtension",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.6,
+    "20": 0.4
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-tension1",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-thin",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.7,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-prog",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 16,
+   "cc": {
+    "54": 1,
+    "36": 0.7
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 8.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 8.6,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "strings-tension045",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1,
+    "36": 0.45
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "strings-tension0",
+  "strudel": "stemN2_strings",
+  "sc": "strings",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "54": 1
+   },
+   "events": []
+  }
+ }
+]

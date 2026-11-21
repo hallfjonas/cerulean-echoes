@@ -21,7 +21,8 @@ const [file, expr, scenFile, prefix, flag] = process.argv.slice(2)
 // files of our own repository from disk (its GitHub branches may not be reachable)
 const sdEarly = await import('superdough')
 globalThis.samples = (...a) => sdEarly.samples(...a)
-const repoRoot = new URL('../../', import.meta.url).pathname
+// decoded: the repository path may contain spaces (%20 in a URL), else no local file is found
+const repoRoot = decodeURIComponent(new URL('../../', import.meta.url).pathname)
 const realFetch = globalThis.fetch
 globalThis.fetch = async (url, ...rest) => {
   const m = String(url).match(/raw\.githubusercontent\.com\/hallfjonas\/cerulean-echoes\/[^/]+\/(samples\/.*)$/)

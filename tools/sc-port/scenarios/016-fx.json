@@ -1,0 +1,344 @@
+[
+ {
+  "name": "fx-base",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-bright05",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "67": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-bright1",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "67": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-space05",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "75": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-char03",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "83": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-char07",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "83": 0.7
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-char1",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "83": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-btn2",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1
+   },
+   "events": [
+    {
+     "t": 2.25,
+     "cc": 99,
+     "v": 1
+    },
+    {
+     "t": 6.5,
+     "cc": 99,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "fx-chapter",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "fx-break",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "fx-fogtension",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-tension1",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-thin",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "fx-prog",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 16,
+   "cc": {
+    "59": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 8.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 8.6,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "fx-patterns",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 18,
+   "cc": {
+    "59": 1,
+    "83": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 91,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 91,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "fx-4bars",
+  "strudel": "stemN7_fx",
+  "sc": "fx",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 10,
+   "cc": {
+    "59": 1,
+    "83": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 91,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 91,
+     "v": 0
+    },
+    {
+     "t": 0.7,
+     "cc": 91,
+     "v": 1
+    },
+    {
+     "t": 0.8,
+     "cc": 91,
+     "v": 0
+    }
+   ]
+  }
+ }
+]

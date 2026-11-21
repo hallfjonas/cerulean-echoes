@@ -1,0 +1,348 @@
+[
+ {
+  "name": "pad-base",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-bright05",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "61": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-bright1",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "61": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-space05",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "69": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-char03",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "77": 0.3
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-char05",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "77": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-char08",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "77": 0.8
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-char1",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "77": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-chapter",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 44,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 44,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 44,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pad-break",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 1.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 1.6,
+     "cc": 52,
+     "v": 0
+    },
+    {
+     "t": 3.5,
+     "cc": 52,
+     "v": 1
+    },
+    {
+     "t": 3.6,
+     "cc": 52,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pad-fogtension",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "20": 0.4,
+    "36": 0.6
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-tension1",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "36": 1
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-thin",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "28": 0.5
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-prog",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 16,
+   "cc": {
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 85,
+     "v": 0
+    },
+    {
+     "t": 8.5,
+     "cc": 85,
+     "v": 1
+    },
+    {
+     "t": 8.6,
+     "cc": 85,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pad-colours",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1
+   },
+   "events": [
+    {
+     "t": 0.5,
+     "cc": 93,
+     "v": 1
+    },
+    {
+     "t": 0.6,
+     "cc": 93,
+     "v": 0
+    },
+    {
+     "t": 2.5,
+     "cc": 93,
+     "v": 1
+    },
+    {
+     "t": 2.6,
+     "cc": 93,
+     "v": 0
+    },
+    {
+     "t": 4.5,
+     "cc": 93,
+     "v": 1
+    },
+    {
+     "t": 4.6,
+     "cc": 93,
+     "v": 0
+    }
+   ]
+  }
+ },
+ {
+  "name": "pad-tension025",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "36": 0.25
+   },
+   "events": []
+  }
+ },
+ {
+  "name": "pad-pumped-tension",
+  "strudel": "stemN1_pad",
+  "sc": "pad",
+  "events": "generic",
+  "scen": {
+   "bpm": 134,
+   "cycles": 8,
+   "cc": {
+    "53": 1,
+    "36": 0.4,
+    "77": 0.7
+   },
+   "events": []
+  }
+ }
+]
