@@ -129,7 +129,7 @@ body.no-lk .lkbox{visibility:hidden}
 .marks.beats i{width:max(5px, calc(9 * var(--px)));height:max(5px, calc(9 * var(--px)));border-radius:50%}
 .marks.bars i{width:max(7px, calc(14 * var(--px)));height:max(3px, calc(6 * var(--px)));border-radius:1px}
 .marks i.on{background:var(--text)}
-.marks,.chord{margin-left:.5em}
+.marks+.marks,.chord{margin-left:.5em}.marks i:first-child{margin-left:0}
 .ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.fader.ctl,.wheel.ctl{cursor:pointer}
 </style>
 </head>
@@ -387,7 +387,6 @@ const shownOf = cc => (performance.now() - (mine[cc] ?? -1e9) < 300) ? (S.cc[cc]
 let timer = null
 const update = () => { timer ??= requestAnimationFrame(() => { timer = null; draw() }) }
 const setText = (el, t) => { if (el && el.textContent !== t) el.textContent = t }
-const pending = (now, next) => esc(now) + (next !== undefined && next !== now ? '<span class=next> → ' + esc(next) + '</span>' : '')
 const draw = () => {
   if (!S.layout) return
   // frame on the page last moved: only with at most one Launch Control (with two, each board has its own page)
@@ -440,23 +439,19 @@ const draw = () => {
     setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
     if (pad) setTimeout(update, 2050)
   }
-  // status strip: what SC is doing, the track's head line (chapter, chords, break), bar and beat, controllers, theme
+  // status strip: only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
+  // marks and 4 beat dots (no 'bar n / 8' text: the marks say it), the chord of the bar. The track's head line
+  // (chords / colour) and the global knob values are on the buttons and knobs already.
   const marks = (cls, n, on) => '<span class="marks ' + cls + '">' + [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('') + '</span>'
   const bt = S.beat
-  const beat = !bt ? '–' : ((bt.bar % 8) + 1) + ' / 8' + marks('bars', 8, bt.bar % 8) + marks('beats', 4, bt.beat) +
+  const beat = !bt ? '' : marks('bars', 8, bt.bar % 8) + marks('beats', 4, bt.beat) +
     (bt.chord ? '<span class=chord>' + esc(bt.chord) + '</span>' : '')
   setText(document.getElementById('ports'), lcs ? lcs + ' Launch Control' + (lcs > 1 ? 's' : '') : 'no Launch Control: mouse only')
   const head = document.getElementById('head')
   head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
   const html =
     (!S.bridge ? '<div class="warn keep">Bridge not reachable</div>' : !S.sc ? '<div class="warn keep">SuperCollider not running</div>' : '') +
-    // chapter and break show in the global column already: here only the chords, bar and beats, the global knobs, the theme
-    '<div class=row>' + (S.state?.head ?? []).filter(([k]) => !['chapter', 'break'].includes(String(k).toLowerCase()))
-      .map(([k, now, next]) => '<div><span class=k>' + esc(k) + '</span>' + pending(now, next) + '</div>').join('') +
-    // the global knobs once they are up (fog / thin / tension), as before the rebuild
-    ['k1', 'k2', 'k3'].map(rw => [(tags()['g.' + rw] ?? rw).split(' | ')[0], S.cc[CC_ROW[rw] + 8]]).filter(([, v]) => v > 0.01)
-      .map(([k, v]) => '<div class="next keep"><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
-    '<div class=keep><span class=k>bar</span>' + beat + '</div></div>'
+    '<div class=row><div class=keep>' + beat + '</div></div>'
   if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
 

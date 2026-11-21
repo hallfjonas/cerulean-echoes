@@ -18,6 +18,7 @@ h1{font-size:15px;font-weight:500;margin:0 0 4px}
 p.note{color:var(--off);margin:0 0 14px;max-width:900px}
 .bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:16px}
 button,select,label.file{font:inherit;text-transform:inherit;background:var(--line);color:var(--text);border:0;border-radius:3px;padding:5px 10px;cursor:pointer}
+input[type=number]{font:inherit;background:var(--line);color:var(--text);border:0;border-radius:3px;padding:4px 6px}
 input[type=range]{width:min(520px,90vw);accent-color:var(--text)}
 #now{font-variant-numeric:tabular-nums;color:var(--off)}
 #drop{border:1px dashed var(--off);border-radius:3px;padding:10px 14px;color:var(--off)}
@@ -38,6 +39,8 @@ through fast; the hour views fill only as far as the recording goes.</p>
 <div class=bar>
   <span id=drop>drop audio files · or <label class=file>choose<input id=pick type=file accept="audio/*" multiple hidden></label></span>
   <select id=rec></select>
+  <select id=scale title="how loudness becomes height"><option value=fixed>scale: fixed (lufs)</option><option value=punch>scale: fixed + punch</option><option value=relative>scale: relative (as built)</option></select>
+  <label title="loudness at the bottom / top of the fixed scale (lufs)">lufs <input id=lo type=number value=-36 step=1 style="width:4.5em"> … <input id=hi type=number value=-6 step=1 style="width:4.5em"></label>
   <select id=theme><option>minimal-dark</option><option>minimal-light</option><option>retro-light</option><option>retro-dark</option></select>
 </div>
 <div class=bar>
@@ -71,11 +74,13 @@ const analyse = async (name, data) => {
   const sh = off.createBiquadFilter(); sh.type = 'highshelf'; sh.frequency.value = 1500; sh.gain.value = 4
   src.connect(hp).connect(sh).connect(off.destination); src.start()
   const kw = await off.startRendering()
-  const fl = Math.round(sr * FRAME), nF = Math.floor(len / fl), power = new Float32Array(nF)
+  const fl = Math.round(sr * FRAME), nF = Math.floor(len / fl), power = new Float32Array(nF), crest = new Float32Array(nF).fill(NaN)
   const K = [...Array(chs)].map((_, c) => kw.getChannelData(c)), R = [...Array(chs)].map((_, c) => dec.getChannelData(c))
   for (let f = 0; f < nF; f++) { let s = 0
     for (const ch of K) for (let i = f * fl, e = i + fl; i < e; i++) s += ch[i] * ch[i]
-    power[f] = s / fl }
+    power[f] = s / fl
+    let pk = 0, sq = 0; for (let i = f * fl, e = i + fl; i < e; i++) { const m = R.reduce((a, ch) => a + ch[i], 0) / chs; sq += m * m; pk = Math.max(pk, Math.abs(m)) }
+    const rms = Math.sqrt(sq / fl); if (rms > 0.001) crest[f] = 20 * Math.log10(pk / rms) }
   const N = 4096, bands = [], win = new Float32Array(N).map((_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N))
   const edges = [...Array(NB + 1)].map((_, i) => 20 * 1000 ** (i / NB))
   for (let t = 0; t + N < len; t += Math.round(sr * BAND_STEP)) {
@@ -86,19 +91,37 @@ const analyse = async (name, data) => {
     for (let k = 1; k < N / 2; k++) { const f = k * sr / N, j = edges.findIndex(e => e > f) - 1; if (j >= 0 && j < NB) b[j] += re[k] * re[k] + im[k] * im[k] }
     bands.push(b.map(v => Math.min(1, Math.max(0, (10 * Math.log10(v / (N * N / 16) + 1e-12) + 60) / 60))))
   }
-  recs.push({ name, dur: nF * FRAME, power, bands }); fillRecs(recs.length - 1)
+  recs.push({ name, dur: nF * FRAME, power, crest, bands }); fillRecs(recs.length - 1)
 }
 
 // ---------- data at a resolution: one value per `step` seconds up to `now`, energy in dB → 0..1 like the panel's
 // setData (range = the loudest value so far down to the quietest, at least 6 dB and at most 36 dB) ----------
-const series = (rec, step, now, partial = false) => {   // partial: the value in progress counts (mean so far)
+const seriesDB = (rec, step, now, partial = false) => {   // partial: the value in progress counts (mean so far)
   const per = Math.max(1, Math.round(step / FRAME)), F = Math.floor(Math.min(now, rec.dur) / FRAME), n = (partial ? Math.ceil : Math.floor)(F / per), dB = []
   for (let i = 0; i < n; i++) { let s = 0, k = 0; for (let f = i * per; f < Math.min(F, (i + 1) * per); f++) { s += rec.power[f]; k++ }
     const m = s / Math.max(1, k); dB.push(m > 0 ? Math.max(-70, 10 * Math.log10(m) - 0.691) : -70) }
   return dB
 }
+// punch: mean crest factor (peak / RMS of each 100 ms) of the frames with sound, 3..18 dB → 0..1 (as ui.scd)
+const punchSeries = (rec, step, now, partial = false) => {
+  const per = Math.max(1, Math.round(step / FRAME)), F = Math.floor(Math.min(now, rec.dur) / FRAME), n = (partial ? Math.ceil : Math.floor)(F / per), out = []
+  for (let i = 0; i < n; i++) { let s = 0, k = 0; for (let f = i * per; f < Math.min(F, (i + 1) * per); f++) if (!isNaN(rec.crest[f])) { s += rec.crest[f]; k++ }
+    out.push(k ? Math.min(1, Math.max(0, (s / k - 3) / 15)) : 0) }
+  return out
+}
+// the scale (select 'scale'): fixed = a loudness meter from LO to HI LUFS (same sound, same height, never rescales);
+// relative = as built (range from the set so far, the ring takes a square root); punch = fixed, 70 % loudness + 30 % punch
+const SCALE = () => document.getElementById('scale').value
+const fixed = v => v > -69 ? Math.min(1, Math.max(0, (v - +$('lo').value) / (+$('hi').value - +$('lo').value))) : 0
+const vals = (rec, step, now, partial = false) => {
+  const dB = seriesDB(rec, step, now, partial), mode = SCALE()
+  if (mode === 'relative') return dB.map(normalise(rec, now))
+  if (mode === 'punch') { const p = punchSeries(rec, step, now, partial); return dB.map((v, i) => v > -69 ? .7 * fixed(v) + .3 * p[i] : 0) }
+  return dB.map(fixed)
+}
+const shape = v => SCALE() === 'relative' ? Math.sqrt(v) : v
 const normalise = (rec, now) => {   // the range from the 10 s values so far (as the panel has them)
-  const loud = series(rec, 10, Math.max(now, 10)).filter(v => v > -69)
+  const loud = seriesDB(rec, 10, Math.max(now, 10)).filter(v => v > -69)
   const hi = loud.length ? Math.max(...loud) : 0, lo = Math.min(hi - 6, Math.max(hi - 36, (loud.length ? Math.min(...loud) : hi) - 3))
   return v => v > -69 ? Math.min(1, Math.max(0, (v - lo) / (hi - lo))) : 0
 }
@@ -150,13 +173,13 @@ const OPTIONS = [
   { row: 'ring: the hour as a clock (60′)' },
   { id: 'ring-now', name: 'ring · today', desc: 'as built: 60 spokes, one per minute (mean of six 10 s values), 8 cells',
     draw: (c, w, h, rec, now, K, fs) => {
-      const g = ringGeom(w, h), N = normalise(rec, now)
-      const ten = series(rec, 10, now).map(N), mins = []
+      const g = ringGeom(w, h)
+      const ten = vals(rec, 10, now), mins = []
       ten.forEach((v, i) => { const k = Math.floor(i / 6); (mins[k] ??= []).push(v) })
       const nowMin = Math.floor(now / 60), st = (g.R1 - g.R0) / RING_RINGS
       for (let k = 0; k < 60; k++) {
         const a = (-90 + (k + .5) * 6) * Math.PI / 180, mAbs = k <= nowMin % 60 ? nowMin - nowMin % 60 + k : nowMin - nowMin % 60 - 60 + k
-        const vals = mins[mAbs], on = vals ? Math.round(Math.sqrt(vals.reduce((a, b) => a + b, 0) / vals.length) * RING_RINGS) : 0
+        const vals = mins[mAbs], on = vals ? Math.round(shape(vals.reduce((a, b) => a + b, 0) / vals.length) * RING_RINGS) : 0
         for (let r = 0; r < RING_RINGS; r++) { const rad = g.R0 + (r + .5) * st, x = g.cx + rad * Math.cos(a), y = g.cy + rad * Math.sin(a), slot = rad * Math.PI / 30
           c.fillStyle = r < on ? (mAbs === nowMin ? K.now : ageColor(K, (nowMin - mAbs) * 60)) : K.off; c.beginPath()
           if (retro()) { const tw = slot * .85 / 2; c.save(); c.translate(x, y); c.rotate(a); c.roundRect(-st * .34, -tw / 2, st * .68, tw, Math.min(tw, st * .68) * .3); c.restore() }
@@ -165,11 +188,11 @@ const OPTIONS = [
       ringCentre(c, now, g, K, fs) } },
   { id: 'ring-10s', name: 'ring · 10 s, cells', desc: '360 thin spokes, one per 10 s, still 8 cells: a break shows as a notch within the minute',
     draw: (c, w, h, rec, now, K, fs) => {
-      const g = ringGeom(w, h), N = normalise(rec, now), v = series(rec, 10, now).map(N), st = (g.R1 - g.R0) / RING_RINGS
+      const g = ringGeom(w, h), v = vals(rec, 10, now), st = (g.R1 - g.R0) / RING_RINGS
       const cur = v.length - 1, lap = Math.floor(cur / 360) * 360
       c.lineCap = 'round'
       for (let k = 0; k < 360; k++) {
-        const idx = k <= cur - lap ? lap + k : lap - 360 + k, val = v[idx], on = val != null ? Math.round(Math.sqrt(val) * RING_RINGS) : 0
+        const idx = k <= cur - lap ? lap + k : lap - 360 + k, val = v[idx], on = val != null ? Math.round(shape(val) * RING_RINGS) : 0
         const a = (-90 + (k + .5)) * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a)
         for (let r = 0; r < RING_RINGS; r++) { const r0 = g.R0 + r * st + st * .18, r1 = g.R0 + (r + 1) * st - st * .18
           c.strokeStyle = r < on ? (idx === cur ? K.now : ageColor(K, (cur - idx) * 10)) : K.off
@@ -178,24 +201,24 @@ const OPTIONS = [
       ringCentre(c, now, g, K, fs) } },
   { id: 'ring-cont', name: 'ring · 10 s, continuous', desc: '360 wedges, one per 10 s, length = energy without steps',
     draw: (c, w, h, rec, now, K, fs) => {
-      const g = ringGeom(w, h), N = normalise(rec, now), v = series(rec, 10, now).map(N), cur = v.length - 1, lap = Math.floor(cur / 360) * 360
+      const g = ringGeom(w, h), v = vals(rec, 10, now), cur = v.length - 1, lap = Math.floor(cur / 360) * 360
       c.beginPath(); c.arc(g.cx, g.cy, g.R1, 0, Math.PI * 2); c.arc(g.cx, g.cy, g.R0, 0, Math.PI * 2, true); c.fillStyle = mix(K.bg, K.off, .5); c.fill('evenodd')
       for (let k = 0; k < 360; k++) {
         const idx = k <= cur - lap ? lap + k : lap - 360 + k, val = v[idx]; if (val == null) continue
-        const a0 = (-90 + k) * Math.PI / 180, a1 = a0 + Math.PI / 180 * 1.02, r = g.R0 + (g.R1 - g.R0) * Math.sqrt(val)
+        const a0 = (-90 + k) * Math.PI / 180, a1 = a0 + Math.PI / 180 * 1.02, r = g.R0 + (g.R1 - g.R0) * shape(val)
         c.beginPath(); c.arc(g.cx, g.cy, r, a0, a1); c.arc(g.cx, g.cy, g.R0, a1, a0, true); c.closePath()
         c.fillStyle = idx === cur ? K.now : ageColor(K, (cur - idx) * 10); c.fill() }
       ringCentre(c, now, g, K, fs) } },
   { row: 'recent: the last minute or two, updating every 1–2 s, the spectrum\'s grid' },
   { id: 'strip-dots', name: 'last minute · 2 s, dots', desc: 'the spectrum\'s dot grid (32 x 12; retro 24 x 12), one column per 2 s, newest right',
     draw: (c, w, h, rec, now, K, fs) => {
-      const cols = retro() ? 24 : 32, N = normalise(rec, now), v = lastN(series(rec, 2, now).map(N), cols), top = 2, H = h - fs * 1.6 - 4
+      const cols = retro() ? 24 : 32, v = lastN(vals(rec, 2, now), cols), top = 2, H = h - fs * 1.6 - 4
       dotGrid(c, 0, top, w, H, cols, 12, i => v[i] == null ? 0 : Math.round(v[i] * 12), i => i === cols - 1 ? K.now : K.cur, K)
       c.font = fs + 'px ' + getComputedStyle(document.body).fontFamily; c.textBaseline = 'bottom'
       label(c, '−' + cols * 2 + ' s', 0, h, K, 1); label(c, fmt(now), w, h, K, 1, 'right') } },
   { id: 'strip-line', name: 'last 2 min · 1 s, line', desc: 'continuous: one value per second, newest right; the dot on the right is now',
     draw: (c, w, h, rec, now, K, fs) => {
-      const N = normalise(rec, now), v = lastN(series(rec, 1, now).map(N), 120), top = 4, H = h - fs * 1.6 - 8
+      const v = lastN(vals(rec, 1, now), 120), top = 4, H = h - fs * 1.6 - 8
       c.strokeStyle = K.grid; c.lineWidth = 1; for (let s = 0; s <= 120; s += 30) { const x = s / 120 * w; c.beginPath(); c.moveTo(x, top); c.lineTo(x, top + H); c.stroke() }
       const first = v.findIndex(x => x != null), pts = v.slice(first)
       area(c, pts, (first / 119) * w, top, w - (first / 119) * w, H, K)
@@ -204,18 +227,18 @@ const OPTIONS = [
   { row: 'two scales: the last minute on top, the hour below' },
   { id: 'two-dots', name: 'two scales · dots', desc: 'top: last minute, 2 s per column (8 rows); below: last hour, 2 min per column (4 rows)',
     draw: (c, w, h, rec, now, K, fs) => {
-      const cols = retro() ? 24 : 32, N = normalise(rec, now), H = h - fs * 1.6 - 6, Ht = H * .62, Hb = H * .3, gap = H - Ht - Hb
-      const a = lastN(series(rec, 2, now).map(N), cols), hourStep = 3600 / cols, b = series(rec, hourStep, now, true).map(N)
+      const cols = retro() ? 24 : 32, H = h - fs * 1.6 - 6, Ht = H * .62, Hb = H * .3, gap = H - Ht - Hb
+      const a = lastN(vals(rec, 2, now), cols), hourStep = 3600 / cols, b = vals(rec, hourStep, now, true)
       dotGrid(c, 0, 0, w, Ht, cols, 8, i => a[i] == null ? 0 : Math.round(a[i] * 8), i => i === cols - 1 ? K.now : K.cur, K)
       dotGrid(c, 0, Ht + gap, w, Hb, cols, 4, i => b[i] == null ? 0 : Math.max(1, Math.round(b[i] * 4)), i => i === b.length - 1 ? K.now : K.old, K)
       c.font = fs + 'px ' + getComputedStyle(document.body).fontFamily; c.textBaseline = 'bottom'
       label(c, '−' + cols * 2 + ' s / 60′', 0, h, K, 1); label(c, fmt(now), w, h, K, 1, 'right') } },
   { id: 'two-cont', name: 'two scales · continuous', desc: 'top: last 2 min at 1 s; below: the hour at 10 s, unsmoothed',
     draw: (c, w, h, rec, now, K, fs) => {
-      const N = normalise(rec, now), H = h - fs * 1.6 - 6, Ht = H * .6, Hb = H * .3, gap = H - Ht - Hb
-      const v = lastN(series(rec, 1, now).map(N), 120), first = v.findIndex(x => x != null)
+      const H = h - fs * 1.6 - 6, Ht = H * .6, Hb = H * .3, gap = H - Ht - Hb
+      const v = lastN(vals(rec, 1, now), 120), first = v.findIndex(x => x != null)
       area(c, v.slice(first), first / 119 * w, 0, w - first / 119 * w, Ht, K)
-      const hr = series(rec, 10, now).map(N)
+      const hr = vals(rec, 10, now)
       c.strokeStyle = K.grid; c.lineWidth = 1; c.beginPath(); c.moveTo(0, Ht + gap + Hb + .5); c.lineTo(w, Ht + gap + Hb + .5); c.stroke()
       if (hr.length > 1) area(c, hr, 0, Ht + gap, Math.min(1, hr.length / 360) * w, Hb, K)
       c.font = fs + 'px ' + getComputedStyle(document.body).fontFamily; c.textBaseline = 'bottom'
@@ -268,6 +291,7 @@ addEventListener('dragleave', () => $('drop').classList.remove('over'))
 addEventListener('drop', e => { e.preventDefault(); $('drop').classList.remove('over'); load(e.dataTransfer.files) })
 $('rec').onchange = () => fillRecs(+$('rec').value)
 $('t').oninput = draw
+for (const id of ['scale', 'lo', 'hi']) $(id).oninput = draw
 const setTheme = t => { document.body.dataset.theme = t; $('theme').value = t; try { localStorage.setItem('ce.setOptionsTheme', t) } catch (e) {} draw() }
 $('theme').onchange = () => setTheme($('theme').value)
 try { setTheme(localStorage.getItem('ce.setOptionsTheme') || 'minimal-dark') } catch (e) { setTheme('minimal-dark') }
