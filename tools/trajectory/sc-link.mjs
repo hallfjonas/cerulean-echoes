@@ -15,8 +15,7 @@
 // load(id, slots) also takes a stem track's slots in place of its file's ({ '1:4': stem }); swap(slot, stem) puts a stem
 // on a slot of the stem track that plays → { live: true } (from the next bar) or { live: false, reason } (load it
 // instead). onLoaded(id, slots) is called after every load SC answers.
-// SC → here: /ce/save <json> (the Save button of a Sample Designer project) calls onSave(values); /ce/promote <slot>
-// (Promote of a Stem Designer project) calls onPromote(slot).
+// SC → here: /ce/save <json> (the Save button of a Sample Designer project) calls onSave(values).
 import { spawn, execFileSync } from 'child_process'
 import dgram from 'dgram'
 import fs from 'fs'
@@ -69,7 +68,7 @@ export const setSample = (args, t = Date.now()) => ({ t, e: round(+args[0], 2), 
 export const setFastSample = (args, t = Date.now()) => ({ t, e: round(+args[0], 2), g: args.slice(1, 13).map(v => round(clamp01(v), 3)) })
 export const FAST_KEEP = 3 * 3600   // fast samples kept: 3 hours
 
-export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = null, sclang = findSclang(), log = console.log,
+export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findSclang(), log = console.log,
   onLoaded = () => {} }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
   const viewFile = path.join(repo, 'sc', 'ui', 'index.html')
@@ -124,7 +123,6 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = nu
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
       case '/ce/save': onSave?.(json()); break
-      case '/ce/promote': onPromote?.(String(m.args[0])); break
       // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
       case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
       // one set sample every 10 s: kept, and passed on

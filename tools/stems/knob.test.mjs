@@ -11,6 +11,7 @@ test('a sound lists its parameters with bounds where it declares them, and the s
   assert.equal(params.find(p => p.param === 'lo').curve, 'exp')
   for (const stemParam of ['space', 'echo', 'pan']) assert.ok(params.some(p => p.param === stemParam))
   assert.throws(() => soundParams('nope'), /no sound/)
+  assert.throws(() => soundParams('../tracks/009-house/009-house'), /no sound/)
 })
 
 test('every preset builds a knob', () => {

@@ -144,7 +144,7 @@ test('npm run stems lists the repo library; a bad energy exits 1', () => {
 })
 
 test('GET /stems returns the filtered index as JSON, 400 on a bad filter', async () => {
-  const port = 8792
+  const port = 8793
   const server = spawn(process.execPath, [path.join(toolsDir, 'trajectory', 'server.mjs'), String(port)],
     { env: { ...process.env, CE_SC_PORT: '57161', CE_SC_SERVER_PORT: '57162' }, stdio: 'ignore' })
   const base = `http://localhost:${port}`

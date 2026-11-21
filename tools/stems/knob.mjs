@@ -6,6 +6,7 @@ import path from 'path'
 import { knobLabelErrors, repoRoot, soundInfo, STEM_PARAMS } from './check-stems.mjs'
 
 const PARAM = /^[a-z][A-Za-z0-9]*$/
+const SOUND_NAME = /^[a-z][A-Za-z0-9]*$/
 const LINE = /^\s*([A-Za-z]\w*):\s*\(default:\s*(-?[\d.]+)(?:,\s*spec:\s*\[([^\]]*)\])?(?:,\s*label:\s*"([^"]*)")?(?:,\s*about:\s*"([^"]*)")?/gm
 export const KNOB_NAME = { k1: 'Knob 1 (top row)', k2: 'Knob 2 (middle row)', k3: 'Knob 3 (bottom row)' }
 const STEM_RANGE = { space: [0, 1], echo: [0, 1], pan: [-1, 1] }
@@ -29,7 +30,7 @@ function specsOf(root, name) {
 }
 
 export function soundParams(sample, root = repoRoot) {
-  const info = soundInfo(root, sample)
+  const info = SOUND_NAME.test(sample ?? '') && soundInfo(root, sample)
   if (!info) throw new Error(`no sound "${sample}" in sc/sounds/`)
   const specs = specsOf(root, sample)
   const own = info.controllable.filter(param => PARAM.test(param) && param !== 'tone').map(param => ({
