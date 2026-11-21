@@ -12,7 +12,7 @@ import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { encode, decode } from '../../tools/trajectory/osc.mjs'
-import { setSample } from '../../tools/trajectory/sc-link.mjs'
+import { setSample, setFastSample, FAST_KEEP } from '../../tools/trajectory/sc-link.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const HTTP_PORT = Number(process.argv[2] ?? 7770), OSC_PORT = 57130
@@ -21,7 +21,7 @@ let sc = { address: '127.0.0.1', port: 57120 }   // learnt from SC's first messa
 // --- state cache (a browser that connects gets everything at once) ---
 const state = { layout: null, ccs: null, state: null, beat: null, midi: null, lk: null, sc: false }
 const clients = new Set()
-const setHistory = []   // set samples (every 10 s) since the bridge started, for the set view
+const setHistory = [], setFast = []   // set samples (every 10 s; fast ones every 1 s, the last 3 h) since the bridge started
 const broadcast = (type, data) => {
   const msg = 'data: ' + JSON.stringify({ type, data }) + '\n\n'
   for (const res of clients) res.write(msg)
@@ -55,6 +55,7 @@ udp.on('message', (buf, rinfo) => {
     // the master output's spectrum, ~20 frames a second: passed on, not kept for new browsers
     case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
     case '/ce/setsample': { const sample = setSample(m.args); setHistory.push(sample); broadcast('setsample', sample); break }
+    case '/ce/setfast': { const sample = setFastSample(m.args); setFast.push(sample); if (setFast.length > FAST_KEEP) setFast.shift(); broadcast('setfast', sample); break }
   }
 })
 udp.on('error', e => { console.error('OSC port ' + OSC_PORT + ': ' + e.message); process.exit(1) })
@@ -70,6 +71,7 @@ const server = http.createServer((req, res) => {
     for (const k of ['layout', 'ccs', 'state', 'beat', 'midi', 'lk']) if (state[k]) res.write('data: ' + JSON.stringify({ type: k, data: state[k] }) + '\n\n')
     res.write('data: ' + JSON.stringify({ type: 'sc', data: state.sc }) + '\n\n')
     res.write('data: ' + JSON.stringify({ type: 'sethistory', data: setHistory }) + '\n\n')
+    res.write('data: ' + JSON.stringify({ type: 'setfasthistory', data: setFast }) + '\n\n')
     clients.add(res)
     req.on('close', () => clients.delete(res))
     if (!state.layout) toSc('/ce/hello')
