@@ -25,8 +25,8 @@ of the track is a moving shape with its name. It also holds a recorder.
    auto-perform and the visuals do not work for SuperCollider tracks yet.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
-The sidebar holds the views (MIDI panel, Visualization), the track list, Play, Stop,
-Record, Save take, Auto-perform and the visual settings. Switching views keeps the sound playing. The top bar holds the
+The sidebar holds the views (MIDI panel, Visualization), the track list, Play / Pause, Stop,
+Record, Auto-perform and the settings. Switching views keeps the sound playing. The top bar holds the
 status line and **?** for help about the page.
 
 Keys:

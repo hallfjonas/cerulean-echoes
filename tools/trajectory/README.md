@@ -42,8 +42,8 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 
 - **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
 - **Sidebar** (left, **‹** or key **S** hides it): the views (MIDI panel, Visualization), **?** ("About this page",
-  closed on every load), the track list with Play, Stop, Record and Save take, the status line (what plays, MIDI
-  inputs, auto-perform bar), Auto-perform, Theme, and Visual settings (folded).
+  closed on every load), the track list with Play / Pause, Stop and Record (icon buttons), the status line (what plays, MIDI
+  inputs, auto-perform bar), Auto-perform, Theme, and Settings (folded; visual settings and Save take on record stop).
 - **Theme**: one look for the page and the SuperCollider MIDI panel (`theme.mjs`, `ui.css`): **Minimal** (calm, flat,
   Torso-like) or **Retro** (Teenage Engineering-like), each **Auto** (as the system), **Dark** or **Light**; key **T**
   switches the style. Set here only; the panel has no switch of its own. The Strudel tracks' LC view keeps its own look.
@@ -157,7 +157,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 
 **Record** (button in the sidebar, key **R**) writes what you hear, the master output, as a WAV file.
 
-- Human recording: from Record to **Stop rec** (or Stop, or another track). Auto-perform with **Record audio** ticked
+- Human recording: from Record to a second press of Record (or Stop, or another track). Auto-perform with **Record audio** ticked
   records from Start to the end of the script plus 4 s; Stop, another track or a new Start ends it earlier.
 - Files: `recordings/<track>/<YYYY-MM-DD>-<HHMMSS>-<human|auto>.wav` (16-bit PCM, stereo, the audio context's sample
   rate, 48 kHz in Chrome) and a `.json` sidecar of the same name (track, track hash, script, take, start cycle, cps,
@@ -173,8 +173,8 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 ### Takes and replay
 
 Every load (Play, auto-perform Start) opens a capture of all MIDI input: controllers, virtual inputs and Launchkey
-keys, pads, knobs and mod wheel (`take.mjs`). The capture before it is dropped. **Save take** (sidebar, under Play)
-turns the current capture into an auto-perform script and writes it, uncommitted (`tools/trajectory/perform/*/takes/`
+keys, pads, knobs and mod wheel (`take.mjs`). The capture before it is dropped. The setting **Save take on record stop** (sidebar, Settings)
+turns the current capture into an auto-perform script when a recording ends and writes it, uncommitted (`tools/trajectory/perform/*/takes/`
 is gitignored):
 
 - `perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<human|auto|mixed>.json`: a script v2 with a `take` field (source:

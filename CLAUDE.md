@@ -139,7 +139,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
 - Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
-  Visualization), the page links, track, Play/Stop/Record/Save take, auto-perform and the visual settings; **?** opens
+  Visualization), the page links, track, Play-Pause/Stop/Record, auto-perform and the settings; **?** opens
   the help.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
@@ -147,8 +147,8 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).
 - Record (key R) writes the master output to `recordings/<track>/` as a WAV (human set, or auto-perform with Record
   audio ticked); `node trajectory/check-recording.mjs` tests the endpoints.
-- Takes: every load captures all MIDI input; Save take writes it as a script v2 to `perform/<track>/takes/` (gitignored,
-  with the play's tapped events). Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
+- Takes: every load captures all MIDI input; the setting Save take on record stop writes it as a script v2 to `perform/<track>/takes/`
+  (gitignored, with the play's tapped events) when a recording ends. Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
   replay fidelity) compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
 - SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's Strudel file is

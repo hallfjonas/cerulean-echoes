@@ -18,6 +18,8 @@ export const SETTINGS = [
     apply: (value, { renderer }) => renderer.setRings(value) },
   { id: 'lcFrame', label: 'LC frame', kind: 'toggle', default: true, key: 'h',
     tip: 'Key H: frame around the controller used last in the LC view / MIDI panel', apply: () => {} },
+  { id: 'saveTake', label: 'Save take on record stop', kind: 'toggle', default: false, key: null,
+    tip: 'Saves what the controllers did since the last load as a take when a recording ends', apply: () => {} },
   { id: 'look', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',
     tip: 'Key V: cycles the looks', apply: (value, { renderer }) => renderer.setLook(value) },
   // the set view of the SuperCollider MIDI panel (UI-REDESIGN.md "Set view"): four candidate views, one browser setting
