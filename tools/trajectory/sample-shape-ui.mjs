@@ -8,7 +8,7 @@
 // Colours come from the page's CSS variables (the panel themes: --text, --off, --track, --accent).
 const css = name => getComputedStyle(document.body).getPropertyValue(name).trim()
 const ink = { fg: () => css('--text') || '#eee', dim: () => css('--off') || '#888', line: () => css('--track') || '#333',
-  accent: () => ink.accent() || '#4fb3e0', mark: () => '#D85A30' }
+  accent: () => css('--accent') || '#4fb3e0', mark: () => '#D85A30' }
 const note = hz => {
   const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
   const midi = Math.round(69 + 12 * Math.log2(hz / 440))
