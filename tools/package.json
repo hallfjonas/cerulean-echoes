@@ -15,7 +15,8 @@
     "scenario": "node strudel-sim/scenario.mjs",
     "audibility": "node strudel-sim/audibility.mjs",
     "shared": "node shared/sync.mjs",
-    "test": "node --test --test-concurrency=1 'trajectory/*.test.mjs' 'producer/*.test.mjs' 'sc-test/*.test.mjs'",
+    "test": "node --test --test-concurrency=1 'trajectory/*.test.mjs' 'producer/*.test.mjs' 'sc-test/*.test.mjs' 'launcher/*.test.mjs'",
+    "launcher": "bash launcher/build.sh",
     "producer": "node producer/make-track.mjs"
   },
   "dependencies": {
