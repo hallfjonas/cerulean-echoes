@@ -1,40 +1,7 @@
-# Sound Lab, Library und Tracks
+# Sound-Lab-Ideen (Maschinen, Algo-Sequencer, Würfel-Modus)
 
-> Status: **Planungsphase.** Hier steht, was im Gespräch festgelegt wurde. Umgesetzt ist davon noch nichts.
-
-Gehört zum Umstieg auf SuperCollider (`SC-MIGRATION.md`). Siehe auch: `sc/PLAN-UI.md`.
-
-## Überblick
-
-```
-lab/          → Werkstatt (Sound Lab): experimentieren, vergleichen, verwerfen
-sc/sounds/    → Sound-Bibliothek (existiert schon): einzelne Klänge, per Name referenziert
-sc/stems/     → Stem-Library (neu): fertige Stems = Klang + Muster + Macro
-sc/tracks/    → Tracks als kurze Textdateien: welche Stems, in welcher Reihenfolge
-```
-
-**Verhältnis zur bestehenden Sound-Bibliothek:** `sc/sounds/` enthält Klänge (ein SynthDef in festem Format, siehe `sc/sounds/README.md`). Ein Stem ist eine Ebene darüber: Er verweist per Name auf einen Klang und bringt dazu Muster, Rhythmus und die Macro-Belegung mit. Das Prinzip „per Name referenzieren statt Code kopieren“ wird damit von Klängen auf ganze Stems ausgeweitet.
-
-**Verhältnis zu den heutigen Tracks:** `sc/tracks/009-house` usw. enthalten heute noch Spalten, Muster und Harmonie als Code. Im neuen Modell wandern Muster und Spalten in die Stems, Harmonie wird global, und ein Track schrumpft auf eine Auswahlliste.
-
-Ein Track ist **keine Musik mehr, sondern eine Auswahl aus der Library**, ähnlich wie eine Plattentasche für einen Abend. Die ganze Logik liegt in der Library.
-
-## Sound Lab (Werkstatt)
-
-- Hier werden Stems entwickelt und verglichen (Vergleichs-Labs: pro Vergleich nur eine Sache ändern).
-- Hier wird auch **ausgedünnt**: Variationen, die nicht schön sind, werden gelöscht, statt sie als Option zu behalten.
-- Zufällige Variation nur in engen, getesteten Grenzen.
-- Ein Stem wandert erst in die Library, wenn er fertig ist und den Stem-Vertrag erfüllt.
-
-### Drei Stufen (Idee, noch offen)
-
-> Stand 19.11.2026, erstes Gespräch. Noch wenig Erfahrung damit; Zuschnitt und Reihenfolge können sich ändern.
-
-1. **Maschinen-Lab (low level):** Die ganze LC steuert **eine** Maschine, z. B. nur die Kick. Alle Parameter liegen offen (24 Encoder + 8 Fader, ggf. zweite Ebene). Ergebnis: Presets und die Wahl, welche Parameter (mit Bereich) später live noch bewegt werden dürfen.
-2. **Options-Lab:** Spalten = Varianten (Presets/Klänge) eines Stems. Dieselben Linien in jeder Spalte, dieselben Regler in jeder Spalte. Entspricht den bisherigen Vergleichs-Labs (`docs/features/lab-boards.md`).
-3. **Library:** Der Gewinner wandert als Stem in die Library (Stem-Vertrag, siehe unten). Die Spalte ist dort genauso belegt wie in Stufe 2: Was im Lab getestet wurde, spielt sich live genauso.
-
-Übergänge: In Stufe 1 speichert ein Button ein Preset, in Stufe 2 übernimmt ein „Promote“-Button die gewählte Spalte in die Library.
+> Stem, Library, Tracks und Lab sind umgesetzt: siehe `docs/features/stems.md` und `docs/features/sound-lab.md`.
+> Hier bleiben nur Ideen, die noch nicht gebaut sind. Siehe auch: `SC-MIGRATION.md`, `sc/PLAN-UI.md`.
 
 ### Würfel-Modus (RND-Idee)
 
@@ -48,19 +15,6 @@ Vorbild: Cyma Forma RND (siehe `docs/reference/gear-inspiration.md`). Bei uns ke
 
 Zweck: schnell viele Kandidaten erzeugen und aussortieren, passt zum Ausdünnen im Lab.
 
-### LC-Schema im Maschinen-Lab
-
-Die **Funktionalität** kommt von echten Geräten (gefunden statt ausgedacht), das **Layout** ist ein eigenes, für alle Maschinen gleiches Schema:
-
-- Spalten = Bausteine im Signalweg, von links nach rechts
-- Encoder oben / Mitte / unten = Hauptparameter / Form und Zeit / Feinheit und Modulation
-- Fader = Pegel des Bausteins
-- Button oben = Baustein an/aus, Button unten = Typ/Modus des Bausteins umschalten
-- Was nicht auf 8 Spalten passt: zweite Ebene (Shift oder Seite; beim XL 3 noch prüfen)
-- Referenz-A/B: zwischen Maschine und Original-Aufnahme umschalten
-- Optional „Original-Modus“: nur die Regler des Vorbilds aktiv (z. B. 909-Bassdrum: Tune, Level, Attack, Decay)
-
-Klassische Drum Machines haben pro Stimme nur wenige Regler. Als Vorbild für die volle LC taugen eher Drum-Synths mit vollem Panel pro Stimme.
 
 ### Maschinen (Kandidaten)
 
@@ -187,67 +141,9 @@ Offen: ob „Ramp“ (Repeats) und „Ramp“ (Style) eine zweite Ebene brauchen
 - Pmini (Mini-Notation in SC-Patterns), Bjorklund
 - Modality Toolkit (MKtl; für den XL 3 vermutlich eigene Beschreibung nötig) oder direkt `MIDIdef`
 
-## Library (kuratierter Stand)
-
-- Wird groß. Rechnung für 1h+ über mehrere Stile: eher 40–60 Stems.
-- Wird **per Referenz** in Tracks geladen, nicht kopiert. Verbesserungen kommen automatisch in allen Tracks an.
-- **Vor einem Gig den Stand einfrieren** (Git-Tag), damit sich nichts unbemerkt ändert.
-
-### Stem-Vertrag
-
-Jeder Stem in der Library erfüllt:
-
-- **Rolle:** z. B. Kick, Perc, Hats, Bass, Keys, Pad, Lead, Textur. Die Rolle bestimmt, in welche Spalte er passt.
-- **Tonhöhe relativ:** Bass relativ zum aktuellen Akkordgrundton, Pads mit den aktuellen Akkordtönen, Leads in Skalenstufen im aktuellen Modus. Grundton, Modus und Progression kommen global.
-- **Tempo und Swing global:** Ein Stem gibt höchstens an, ob er Swing mitmacht.
-- **Gleiche Lautheit:** auf einen gemeinsamen Zielpegel normalisiert.
-- **Gleiche Regler-Bedeutung:** Fader = Pegel, Macro 0→1 = Intensität (Dichte, Filter, Schichten), immer organisch und ohne Sprünge.
-- **Metadaten:** Rolle, Energie-Level, passende Stile (Ambient bis Techno), Harmonie-Verträglichkeit (z. B. „nur statisch“, „nicht in Dur“).
-
-Die Metadaten von Anfang an konsequent pflegen. Bei einer großen Library findet man Stems nur darüber wieder.
-
-## Tracks (kurze Textdateien)
-
-Ein Track legt nur fest:
-
-- pro Spalte die **Bank**: Liste von Stem-Referenzen, nach Energie/Stil sortiert
-- welcher Stem pro Spalte **beim Start** geladen ist
-- welche **Harmonie-Zustände** verfügbar sind (Modus, Progressionen)
-- **globale Regler:** Tempo-Bereich und Start-Tempo, ggf. Grundton
-
-Skizze (Format noch offen):
-
-```
-name: warmup-ambient-house
-tempo: 118 (112–122)
-harmony: [moll-statisch, dorisch-2akk, moll-4akk]
-
-rhythm:
-  1: [kick/soft-round, kick/dry-909]
-  2: [perc/shaker-loose, perc/congas-light]
-  ...
-melodic:
-  1: [bass/sub-roots, bass/rolling-8th]
-  2: [pad/warm-choir, pad/eno-tape]
-  ...
-```
-
-Folgen:
-
-- Ein neuer Track braucht keinen Code, nur eine Auswahl.
-- Ein Stem kann in mehreren Tracks vorkommen.
-- Mehrere Tracks hintereinander ergeben den Bogen über 1h+ (z. B. Warm-up → House → Techno).
-
-## Kapitel (bisher in den Tracks)
-
-Die bisherigen Kapitel wechseln vor allem die Harmonie (Dur/Moll/…, mit oder ohne Progression). Sie werden zum **globalen Harmonie-Zustand**, der nicht mehr an einen Track gebunden ist. Was die Kapitel sonst noch machen, übernehmen Stem-Wechsel (Patterns) und Macro (Intensität).
 
 ## Offene Fragen
 
-- „Track“ umbenennen in „Set“ oder „Crate“, damit klar ist, dass es eine Auswahl ist?
-- Format der Track-Datei (YAML, JSON, eigenes)?
-- Wo stehen die Metadaten: im Stem-Code selbst oder in einer Sidecar-Datei?
 - Welche Referenz-Progressionen und Referenz-Spektren nehmen wir aus echten Platten?
 - Maschinen-Lab: Wie viele Parameter pro Maschine, ab wann eine zweite Ebene?
 - Sind Noten-Generatoren (Arp, Grids, Turing Machine) eigene Spalten, oder hängen sie an einem Klang-Stem?
-- Wie viele Regler pro Stem bleiben live übrig? Der Stem-Vertrag sagt bisher: ein Macro (Intensität). Im Gespräch kamen auch 3 Makros pro Spalte vor.

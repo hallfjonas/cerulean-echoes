@@ -2,9 +2,10 @@
 
 ## What it is
 
-A web page on your own computer that plays any live track or lab board. It opens on the MIDI panel: both Launch
-Control pages and the Launchkey row with every control's name and value. Its second view draws the music: every part
-of the track is a moving shape with its name. It also holds a recorder.
+A web page on your own computer that plays any live track or lab project. It has three pages. **Live** (the start page) shows both Launch
+Control pages and the Launchkey row with every control's name and value, and lets you pick a live track and
+auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks and Sets are placeholders).
+**Visuals** draws the music: every part of the track is a moving shape with its name. It also holds a recorder.
 
 ## When to use it
 
@@ -25,10 +26,12 @@ of the track is a moving shape with its name. It also holds a recorder.
    auto-perform and the visuals do not work for SuperCollider tracks yet.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
-The sidebar holds the views (MIDI panel, Visuals), the track list, Play / Pause, Stop,
-Record and Auto-perform. The gear next to the views opens **Settings**: Theme, Visuals, MIDI panel, Recording and a list
-of the keyboard shortcuts, with a list of sections on the left to jump between them. Switching views keeps the sound playing. The top bar holds the
-status line and **?** for help about the page.
+The sidebar shows only what the page needs. **Live**: the live track list, Play / Pause, Stop, Record and
+Auto-perform. **Labs** (Samples, Stems): the project list, Play / Pause, Stop and the designer buttons; the waveform
+analysis shows under the controllers on Samples only. **Visuals**: Stop. Switching pages keeps the sound playing; a page
+has its own address (`#live`, `#labs/samples`, `#labs/stems`, `#labs/tracks`, `#labs/sets`, `#visuals`). The gear next to
+the pages opens **Settings** on top of the current page: Theme, Visuals, MIDI panel, Recording and a list of the keyboard
+shortcuts, with a list of sections on the left to jump between them.
 
 Keys:
 

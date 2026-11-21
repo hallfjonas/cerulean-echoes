@@ -1,0 +1,31 @@
+{
+  "format": 1,
+  "name": "kick-round",
+  "parent": null,
+  "about": "Round kick: sine drop, a soft click, a little drive.",
+  "setup": "drum",
+  "role": "kick",
+  "sources": [
+    { "id": "tone", "kind": "tone", "on": true, "type": "Sine", "k1": 0.2, "k2": 0.5, "k3": 0.4, "level": 0.9 },
+    { "id": "noise", "kind": "noise", "on": true, "type": "White", "k1": 0.5, "k2": 0.2, "k3": 0.6, "level": 0.2 },
+    { "id": "click", "kind": "click", "on": true, "type": "Pulse", "k1": 0.6, "k2": 0.2, "k3": 0, "level": 0.3 }
+  ],
+  "chain": [
+    { "id": "env", "kind": "env", "on": true, "type": "One-shot", "k1": 0, "k2": 0.58, "k3": 0, "level": 0.9 },
+    { "id": "filter", "kind": "filter", "on": true, "type": "Low-pass", "k1": 0.75, "k2": 0.1, "k3": 0.2, "level": 1 },
+    { "id": "drive", "kind": "drive", "on": true, "type": "Soft", "k1": 0.25, "k2": 0.6, "k3": 0, "level": 0.4 }
+  ],
+  "audition": {
+    "bpm": 124,
+    "pattern": 0,
+    "accent": 0.5,
+    "space": 0.1,
+    "length": 0.5,
+    "master": 0.8,
+    "patterns": [
+      { "label": "four", "rhythm": "x x x x" },
+      { "label": "pickup", "rhythm": "x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ x", "velocity": "1 1 1 [1 0.5]" },
+      { "label": "broken", "rhythm": "x ~ ~ x ~ ~ x ~ ~ ~ x ~ ~ ~ ~ ~", "velocity": "1 0.7 1 0.8" }
+    ]
+  }
+}

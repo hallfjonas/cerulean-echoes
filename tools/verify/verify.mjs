@@ -1,6 +1,10 @@
 // One check for edited tracks: transpile, compare with the HEAD version, sounds, @-tags (+ single version), tap, auto-perform
 // scripts (every CC in the track's @ctl, trajectory/check-perform.mjs).
-// usage (in tools/): node verify/verify.mjs [--online] [<file.strudel> …]
+// Stems: when a .stem / .track file is named, or anything under sc/stems, sc/sounds or a .track file changed, the whole
+// stem library is checked (stems/check-stems.mjs).
+// Sample Designer projects: when a .sample.json is named or anything under sc/lab/samples changed, every project is
+// checked (sound-lab/sample-project.mjs).
+// usage (in tools/): node verify/verify.mjs [--online] [<file.strudel|file.stem|file.track|file.sample.json> …]
 //   no files: every .strudel file changed vs HEAD (git status), and the track of every changed auto-perform script
 //   --online: check sounds online and update samples/sounds.json (default: offline against the list)
 // A compare difference is reported as "changed", not as a failure (the edit may be meant to change the sound).
@@ -15,6 +19,8 @@ import { makeSingle, singleOf } from '../lcxl-layout/make-single.mjs'
 import { tapSource } from '../trajectory/make-tapped.mjs'
 import { checkOffline } from '../strudel-sim/check-sounds.mjs'
 import { checkTrack, trackFileOf } from '../trajectory/check-perform.mjs'
+import { checkFiles, libraryFiles } from '../stems/check-stems.mjs'
+import { checkAll } from '../sound-lab/sample-project.mjs'
 
 const tools = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const root = path.resolve(tools, '..')
@@ -33,11 +39,36 @@ const changedFiles = () => {
 }
 const isTrack = file => file.startsWith(path.join(root, 'tracks') + path.sep)
 
+let failed = false
+const named = args.filter(a => /\.(strudel|stem|track)$/.test(a))
+const stemsChanged = named.length ? named.some(a => /\.(stem|track)$/.test(a))
+  : changed().some(f => /^sc\/(stems|sounds)\/|\.track$/.test(f))
+if (stemsChanged) {
+  const results = checkFiles(libraryFiles())
+  const broken = results.filter(r => r.errors.length)
+  failed = broken.length > 0
+  const detail = broken.length ? broken.map(r => `${path.basename(r.file)}: ${r.errors.join('; ')}`).join(' | ')
+    : `${results.length} stem and track files`
+  const status = (failed ? 'FAIL' : 'ok').padEnd(8)
+  console.log(`${'stem library'.padEnd(28)} ${'stems'.padEnd(10)} ${status}        ${detail}`)
+}
+
+const samplesNamed = args.filter(a => a.endsWith('.sample.json'))
+if (samplesNamed.length || (!named.length && changed().some(f => f.startsWith('sc/lab/samples/')))) {
+  const results = checkAll()
+  const broken = results.filter(r => r.errors.length)
+  failed ||= broken.length > 0
+  const detail = broken.length ? broken.map(r => `${path.basename(r.file)}: ${r.errors.join('; ')}`).join(' | ')
+    : `${results.length} projects`
+  const status = (broken.length ? 'FAIL' : 'ok').padEnd(8)
+  console.log(`${'Sample Designer'.padEnd(28)} ${'projects'.padEnd(10)} ${status}        ${detail}`)
+}
+
 const files = args.filter(a => a.endsWith('.strudel')).map(f => path.resolve(process.env.INIT_CWD ?? process.cwd(), f))
-if (!files.length) files.push(...changedFiles())
+if (!files.length && !named.length) files.push(...changedFiles())
 if (!files.length) {
-  console.log('no changed .strudel files')
-  process.exit(0)
+  if (!stemsChanged) console.log('no changed .strudel files')
+  process.exit(failed ? 1 : 0)
 }
 
 function transpile(file) {
@@ -96,7 +127,6 @@ function perform(file) {
 }
 
 const steps = { transpile, compare, sounds, tags, tap, perform }
-let failed = false
 for (const file of files) {
   const name = path.basename(file)
   if (!fs.existsSync(file)) {

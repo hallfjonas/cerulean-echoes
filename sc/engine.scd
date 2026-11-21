@@ -3,13 +3,18 @@
 // needed.
 // Talks OSC with the player's server on UDP <port> (default 57131; not 57130, the port of live.scd's LC view bridge,
 // so both can run), with the messages of the LC view (lib/ui.scd), plus:
-//   player → SC: /ce/load <track file path>   stop what plays, load that track, start it at bar 0
+//   player → SC: /ce/load <track file path> [slots]   stop what plays, load that track, start it at bar 0; slots (a
+//                                            stem track): JSON { "1:4": stem ref, … } in place of the file's
+//                /ce/swap <slot> <stem ref>   that stem takes over the slot at the next bar (~ce.swapSlot)
 //                /ce/stop                     stop what plays (the server keeps running)
 //                /ce/quit                     stop and end sclang (the server quits with it)
 //   SC → player: /ce/ready                    booted, waiting for a track
 //                /ce/loaded <name>            the track plays (bar 0 starts now)
 //                /ce/stopped                  nothing plays
 //                /ce/error <text>             a load failed
+//                /ce/swapped <slot> <ref>     the swap waits for the next bar line
+//                /ce/swapReload <slot> <why>  the stem cannot take over while the track plays: load it with the stem
+//                /ce/swapError <slot> <text>  the swap failed (nothing changed)
 // Controllers go straight to SC (MIDI), never through the player. Live play from the IDE stays sc/live.scd.
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;
@@ -43,17 +48,23 @@ stopTrack = {
 	~ceClock !? { |c| c.clear };
 	s.freeAll;
 };
-loadTrack = { |path|
+loadTrack = { |path, slots|
 	var old = ~ce, ce, track;
 	current = path;
 	stopTrack.value;
+	s.sync;
 	// a fresh core per track (latches, buttons, buses start clean); allocators from 0, so every load reuses the same
 	// buffer and bus numbers instead of running out after a few switches
 	s.newAllocators;
 	ce = (here +/+ "lib/ce.scd").load;
 	ce.trackFile = path;
 	ce.uiAddr = toPlayer;
-	track = path.load;
+	// a Sample Designer project (sc/lab/samples/*.sample.json) plays as a track (lib/designer.scd)
+	// a Stem Designer project (sc/lab/stems/*.stemlab.json) too (lib/stemlab.scd)
+	track = case
+	{ path.endsWith(".sample.json") } { (here +/+ "lib/designer.scd").load; ce.sampleProject(path) }
+	{ path.endsWith(".stemlab.json") } { (here +/+ "lib/stemlab.scd").load; ce.stemLabProject(path) }
+	{ ce.loadTrack(path, slots) };
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
 	old !? { ce.midiPorts = old.midiPorts; old.midiWatch !? (_.stop) };
@@ -70,9 +81,16 @@ loadTrack = { |path|
 	"▶ % — % BPM".format(track.name, track.bpm).postln;
 };
 
-OSCdef(\ce_host_load, { |msg| var path = msg[1].asString;
-	fork { { loadTrack.(path) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } }
+OSCdef(\ce_host_load, { |msg| var path = msg[1].asString, slots = msg[2] !? (_.asString);
+	fork { { loadTrack.(path, slots) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } }
 }, '/ce/load').permanent_(true);
+OSCdef(\ce_host_swap, { |msg| var slot = msg[1].asSymbol, ref = msg[2].asString;
+	fork { {
+		var ce = ~ce ?? { Error("nothing plays").throw }, why = ce.swapProblem(slot, ref);
+		if(why.notNil) { toPlayer.sendMsg('/ce/swapReload', slot, why) } {
+			ce.swapSlot(slot, ref, { |m, done| ce.sendInit(m); done.value; toPlayer.sendMsg('/ce/swapped', slot, ref) }) }
+	}.try { |e| e.reportError; toPlayer.sendMsg('/ce/swapError', slot, e.errorString) } }
+}, '/ce/swap').permanent_(true);
 OSCdef(\ce_host_stop, { current = nil; stopTrack.value; toPlayer.sendMsg('/ce/stopped') }, '/ce/stop').permanent_(true);
 OSCdef(\ce_host_quit, { stopTrack.value; s.quit; 0.exit }, '/ce/quit').permanent_(true);
 

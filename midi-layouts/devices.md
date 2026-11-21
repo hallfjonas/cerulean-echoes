@@ -28,6 +28,9 @@ One file for every combination of controllers, all optional:
 - Two LCs control the same sounds: per control, the controller moved last wins. Button presses count
   from both. Agree beforehand who plays which page.
 - No LC found: a warning in the console, everything stays silent.
+- Track ◄ ►, Page ▲ ▼, Record, Play, Solo/Arm and Mute/Select send nothing in the custom modes, on either port
+  (`MIDI Out`, `DAW Out`), and Components cannot assign them (measured 2026-11-21 with `sc/tools/midi-trace.scd`).
+  They report only in the device's DAW mode, which no track uses.
 
 ### Launchkey MK4 25
 

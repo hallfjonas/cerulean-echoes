@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "name": "sd-noise-brightness-space-motion-pattern-riser",
+  "parent": null,
+  "about": "Pink noise that pumps after every kick; own riser.",
+  "meta": {
+    "role": "fx",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "pump",
+      "noise",
+      "sidechain"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdNoise"
+  },
+  "gain": 3.67,
+  "pitch": "none",
+  "code": "noise-pump.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Pump"
+    },
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "16ths"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Motion",
+      "about": "still ↔ moving."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "noise that pumps with the kick."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pump → off-beat → 16ths."
+    },
+    "b2": {
+      "label": "Riser",
+      "about": "rising sweep while held.",
+      "mode": "hold"
+    }
+  }
+}

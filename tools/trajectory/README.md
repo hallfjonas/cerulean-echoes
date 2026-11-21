@@ -16,16 +16,16 @@ cd tools && node trajectory/server.mjs [port]
 ```
 
 Then open **http://localhost:8766** in Chrome. The player is the repo's main tool: it plays a track right on localhost
-(no strudel.cc needed) and shows its MIDI panel full size: both LC pages and the Launchkey row with every control's
+(no strudel.cc needed) and shows the Live page full size: both LC pages and the Launchkey row with every control's
 name and value (the track's LC view). The visuals (every stem with its name, tempo from Strudel's clock) are the
-second view of the same page.
+a page of their own (Visuals); Labs holds the Sample and Stem Designer.
 The server only answers to its own pages (Origin and Host are checked on the routes that run something).
 
 1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the boards from
    `lab/`. Boards without a master `stack(` cannot be tapped and are greyed out.
    SuperCollider tracks (`sc/tracks/`, listed under their plain id; a ported track's frozen Strudel file shows as
    `<id> (Strudel)`) play through SC: the server starts `sclang sc/engine.scd` on the first SC load (a few seconds) and
-   ends it with itself; the MIDI panel shows SC's LC view (`sc/ui/index.html` at `/sc/`); the controllers go straight to
+   ends it with itself; the Live and Labs pages show SC's LC view (`sc/ui/index.html` at `/sc/`); the controllers go straight to
    SC. Not yet for SC tracks: Record, auto-perform, visuals (sc-migration tasks 003-005).
 2. **Play**. The player taps the track file in memory each time it loads it, so editing a track and pressing Play
    plays the edit; there is no tapped copy on disk and no extra step. Picking another track while one plays stops it
@@ -41,20 +41,24 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 ### Layout
 
 - **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
-- **Sidebar** (left, **‹** or key **S** hides it): the views (MIDI panel, Visuals), the **⚙** gear (Settings),
-  **?** ("About this page", closed on every load), the track list with Play / Pause, Stop and Record (icon buttons), the
-  status line (what plays, MIDI inputs, auto-perform bar) and Auto-perform (with Record audio).
-- **Settings** (the gear): a third view beside the MIDI panel and Visuals; the sound keeps playing. A list of
-  sections on the left jumps to **Theme**, **Visuals**, **MIDI panel**, **Recording** and **Keyboard shortcuts**.
-  Every value is kept in `localStorage`.
-- **Theme** (Settings, Theme): one look for the page and the SuperCollider MIDI panel (`theme.mjs`, `ui.css`): **Minimal** (calm, flat,
-  Torso-like) or **Retro** (Teenage Engineering-like), each **Auto** (as the system), **Dark** or **Light**; key **T**
-  switches the style. Set in Settings only; the panel has no switch of its own. The Strudel tracks' LC view keeps its own look.
-- **MIDI panel** (the start view): the track's LC view, drawn into the page instead of its own window. A board
+- **Sidebar** (left, **‹** or key **S** hides it): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems,
+  Tracks, Sets), the **⚙** gear (Settings), **?** ("About this page", closed on every load) and the sections of the page
+  you are on: Live = the live track list with Play / Pause, Stop and Record (icon buttons), the status line (what plays,
+  MIDI inputs, auto-perform bar) and Auto-perform (with Record audio); Labs = the project list of the sub-tab, Play /
+  Pause, Stop and the designer's buttons; Visuals = Stop and the status line. Each element names its pages in
+  `data-pages`; `pages.mjs` holds the page table, the pickers (Strudel lab boards are not offered) and the URL hash
+  (`#live`, `#labs/<sub>`, `#visuals`).
+- **Settings** (the gear): lays over the current page; the sound keeps playing. A list of sections on the left jumps to
+  **Theme**, **Visuals**, **MIDI panel**, **Recording** and **Keyboard shortcuts**. Every value is kept in `localStorage`.
+- **Theme** (Settings, Theme): one look for the page and the SuperCollider panel (`theme.mjs`, `ui.css`): **Minimal**
+  (calm, flat, Torso-like) or **Retro** (Teenage Engineering-like), each **Auto** (as the system), **Dark** or **Light**;
+  key **T** switches the style. Set in Settings only; the panel has no switch of its own. The Strudel tracks' LC view
+  keeps its own look.
+- **Live** (the start page): the track's LC view, drawn into the page instead of its own window. A board
   without an LC view says so; its visuals still play.
 - **Visuals**: the visuals full screen behind the sidebar. Switching views keeps the sound playing; the visuals
-  pause while the MIDI panel shows. The track's status box
-  (bottom right) shows only in this view; its "▣ LC big" still opens the LC view in its own window, and the MIDI
+  pause while Live or Labs shows. The track's status box
+  (bottom right) shows only in this view; its "▣ LC big" still opens the LC view in its own window, and the Live
   panel takes it back when it shows again.
 
 ### Settings
@@ -266,7 +270,8 @@ it was retired on 2026-11-20):
 | `strudel-source.mjs` | Strudel events → lines, each event appears when it sounds (`delay`) |
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
 | `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
-| `player.html` | the player page: loads a track through the engine, the sidebar, the MIDI panel (the track's LC view in an iframe) and the visuals (`render.mjs`) and the Settings view |
+| `player.html` | the player page: loads a track through the engine, the sidebar, the Live / Labs panel (the track's LC view in an iframe), the visuals (`render.mjs`) and the Settings view |
+| `pages.mjs` | the pages (Live, Labs with Samples / Stems / Tracks / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
 | `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
 | `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the sidebar section |

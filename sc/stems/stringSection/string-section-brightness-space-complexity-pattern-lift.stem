@@ -1,0 +1,72 @@
+{
+  "format": 1,
+  "name": "string-section-brightness-space-complexity-pattern-lift",
+  "parent": null,
+  "about": "Disco strings: stabs, runs onto the one, a swell.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "disco",
+      "strings",
+      "section"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "stringSection"
+  },
+  "gain": 0.98,
+  "pitch": "scale",
+  "code": "string-section-figures.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Echo stab"
+    },
+    {
+      "label": "Run up"
+    },
+    {
+      "label": "Long run"
+    },
+    {
+      "label": "Stab + swell"
+    },
+    {
+      "label": "16th figure"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "unison → octave → thirds → celli."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "string section."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "5 figures."
+    },
+    "b2": {
+      "label": "Lift",
+      "about": "section grows while held.",
+      "mode": "hold"
+    }
+  }
+}

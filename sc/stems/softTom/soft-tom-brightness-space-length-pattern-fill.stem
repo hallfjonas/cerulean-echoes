@@ -1,0 +1,25 @@
+{
+  "format": 2,
+  "name": "soft-tom-brightness-space-length-pattern-fill",
+  "parent": null,
+  "about": "Soft tom: sine drop, short noise tail.",
+  "meta": { "role": "perc", "genres": ["house", "ambient-house"], "energy": 2, "tags": ["soft", "tom"], "harmony": "none" },
+  "sample": { "name": "softTom" },
+  "gain": 1,
+  "pitch": "none",
+  "frame": { "break": "stay" },
+  "patterns": [
+    { "label": "pulse", "rhythm": "x ~ ~ x ~ ~ x ~", "velocity": "1 ~ ~ 0.6 ~ ~ 0.8 ~" },
+    { "label": "roll", "rhythm": "x ~ x ~ x x x ~", "velocity": "1 ~ 0.6 ~ 0.7 0.8 1 ~" },
+    { "label": "single", "rhythm": "x ~ ~ ~ ~ ~ ~ ~" }
+  ],
+  "controls": {
+    "k1": { "label": "Brightness", "about": "dull ↔ bright.", "param": "bright", "range": [0.2, 1] },
+    "k2": { "label": "Space", "about": "dry ↔ room.", "param": "space", "range": [0, 1] },
+    "k3": { "label": "Length", "about": "short ↔ long fall.", "param": "envDecay", "range": [0.3, 0.9] },
+    "fader": { "label": "Level", "about": "soft tom." },
+    "b1": { "label": "Pattern", "about": "pulse → roll → single." },
+    "b2": { "label": "Fill", "about": "tom run while held.", "addon": "fill", "mode": "hold",
+      "args": { "rhythm": "x x x x x x x x" } }
+  }
+}

@@ -25,7 +25,7 @@ For rehearsal, for a projector behind you, or to see which voice is doing what.
 - Visuals change only the picture. The sound is untouched.
 - Settings are kept in your browser.
 - In this view the top bar hides after 3 seconds without the mouse.
-- The MIDI panel (the player's start view, or the window `▣ LC big`) shows both modes of the Launch Control and the
+- The Live page (the player's start page, or the window `▣ LC big`) shows both modes of the Launch Control and the
   Launchkey row.
 - Details and the data format: `tools/trajectory/README.md`.
 

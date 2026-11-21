@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "about": "Starting points for a knob in the knob editor: a stem knob is made from one of these or from a parameter of its sound.",
+  "knobs": {
+    "brightness": { "label": "Brightness", "about": "dull ↔ bright.", "param": "bright", "range": [0, 1], "default": 0 },
+    "space": { "label": "Space", "about": "dry ↔ room.", "param": "space", "range": [0, 1], "default": 0 },
+    "echo": { "label": "Echo", "about": "dry ↔ echo.", "param": "echo", "range": [0, 1], "default": 0 }
+  }
+}
