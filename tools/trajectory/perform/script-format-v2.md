@@ -49,6 +49,15 @@ this order: `keys`, `pad`, `lk`, `press`, else `cc`.
   map only while the script has Launchkey steps (`usesLaunchkey`). Both are also in the wrapped
   `navigator.requestMIDIAccess` (LC view). Not `Launchkey Auto`: that name would not match the tracks' lookup.
 
+## On SuperCollider tracks
+
+The same scripts and takes play on SC tracks (sc-migration 004), unchanged. Instead of the virtual inputs the steps go
+to SC through the player's server (`sc-auto.mjs`): LC control / press → `/ce/cc`, LK control → `/ce/lkcc`, keys and
+pads → `/ce/lknote` (note, velocity byte, channel 0-based: 9 = pads; no note-off, `length` only reaches the take).
+Bar 0 is sent with the load and set before the first note. `bar` follows SC's clock (`engine-sc.mjs` `cycle()`, from
+`/ce/beat`, when the beat sounds). A take of an SC play has `trackHash` = sha1 of the `.scd` file and keeps SC's state
+echoes per bar as its events (stems `sc cc`, `sc lk`, `sc state`, `sc keys`).
+
 ## Bar tolerance (performer)
 
 A step fires on the first performer tick where `step.bar <= bar + 1e-6`, with `bar = engine.cycle() - startBar`.
