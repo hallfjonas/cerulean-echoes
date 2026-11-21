@@ -319,7 +319,7 @@ const build = () => {
   root.className = 'board'
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
-    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Visual settings, key C)"></button></p>' +
+    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Settings, key C)"></button></p>' +
     '<div class="spec setbox"><canvas id=setv></canvas></div></div></div><div class=head id=head></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)

@@ -25,7 +25,7 @@ play.
 5. Press **Play**.
 6. Raise the master fader. Nothing sounds until it is up: the live tracks start with everything quiet on purpose.
    - With a controller: move the fader in the last column (column 8, the global column).
-   - Without a controller: open Settings (key **S**), pick a script in the Auto-perform section and press **Start**
+   - Without a controller: pick a script in the Auto-perform section of the sidebar and press **Start**
      (key **P**). The script moves the controls for you. See [auto-perform](features/auto-perform.md).
 7. Move a fader in another column to bring that part in, then turn its knobs.
 
@@ -34,7 +34,7 @@ virtual controller only. That is fine for a first try.
 
 ## What next
 
-- [Player](features/player.md): the top bar, the picture, the settings.
+- [Player](features/player.md): the sidebar, the picture, the settings.
 - [Live tracks](features/live-tracks.md): what each row and column does.
 - [Controllers](features/controllers.md): connecting and loading the layouts.
 - All pages: [features/README.md](features/README.md). Words you do not know: [glossary](reference/glossary.md).

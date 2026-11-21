@@ -16,11 +16,12 @@
   #sidebar button, #sidebar select { text-transform: inherit }
   body.side-closed #sidebar { display: none }
   #sidebar .top { display: flex; align-items: center; gap: 4px; margin: 0 0 14px }
-  #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1 }
+  #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1; min-width: 0 }
   #sidebar nav a { padding: 5px 6px; border-radius: var(--radius); white-space: nowrap }
   #sidebar nav a.here { background: var(--control) }
-  .icon { width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
-  .icon:hover { color: var(--fg) }
+  .icon { flex: none; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
+  .icon:hover, .icon.here { color: var(--fg) }
+  .icon.here { background: var(--control) }
   #sidebar section { border-top: 1px solid var(--line); padding: 14px 0 }
   #sidebar h2, #sidebar details summary { margin: 0 0 10px; font-size: 12px; font-weight: 500; color: var(--dim);
     letter-spacing: 0.04em; cursor: default }
@@ -29,14 +30,13 @@
   #sidebar output { display: block; margin-top: 6px; font-size: 12px; color: var(--dim) }
   #status { display: block; margin-top: 8px; font-size: 12px; color: var(--dim); overflow-wrap: anywhere }
   #track { width: 100% }
-  #sidebar label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
-  #sidebar label input[type=range] { grid-column: 1 / 3; width: 100% }
-  #sidebar label output { grid-row: 1; grid-column: 2; margin: 0 }
-  #sidebar label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
-  #sidebar label select { grid-column: 1 / 3 }
+  #sidebar label, #settingsPage label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
+  #sidebar label input[type=range], #settingsPage label input[type=range] { grid-column: 1 / 3; width: 100% }
+  #sidebar label output, #settingsPage label output { grid-row: 1; grid-column: 2; margin: 0; font-size: 12px; color: var(--dim) }
+  #sidebar label input[type=checkbox], #settingsPage label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
+  #sidebar label select, #settingsPage label select { grid-column: 1 / 3 }
   #sidebar label.inline { display: inline-flex; margin: 0 0 0 10px }
   #autoPerform label output { color: var(--fg) }
-  #settings { margin-top: 12px }
   .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 2px; background: var(--control);
     border-radius: var(--radius); margin-bottom: 8px }
   .seg button { background: none; padding: 5px 0; color: var(--dim) }
@@ -54,6 +54,29 @@
   body.side-closed #stage { left: 0 }
   body.help-open #stage { right: 320px }
   body.visuals #stage { display: none }
+  #settingsPage { position: absolute; inset: 0; overflow-y: auto; box-sizing: border-box; padding: 24px 32px 64px;
+    background: var(--bg); text-transform: lowercase; display: grid; grid-template-columns: 180px minmax(0, 560px); gap: 40px;
+    align-content: start; scroll-behavior: smooth }
+  #settingsPage[hidden] { display: none }
+  body.side-closed #settingsPage { padding-top: 56px }
+  body.settings-view #lcPanel, body.settings-view #scPanel, body.settings-view #panelEmpty { display: none }
+  #settingsNav { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 2px }
+  #settingsNav a { padding: 6px 10px; border-radius: var(--radius); color: var(--dim) }
+  #settingsNav a:hover { color: var(--fg) }
+  #settingsNav a.here { background: var(--control); color: var(--fg) }
+  #settingsPage section { padding: 0 0 28px; margin: 0 0 28px; border-bottom: 1px solid var(--line) }
+  #settingsPage section:last-child { border-bottom: 0 }
+  #settingsPage h2 { margin: 0 0 4px; font-size: 15px; font-weight: 500 }
+  #settingsPage section > p { margin: 0 0 16px; font-size: 13px; color: var(--dim) }
+  #shortcuts { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 8px 16px }
+  #shortcuts dt { color: var(--dim) }
+  #shortcuts dd { margin: 0; justify-self: end }
+  #shortcuts kbd { display: inline-block; min-width: 20px; padding: 1px 6px; text-align: center; font: inherit; font-size: 12px;
+    background: var(--control); border-radius: var(--radius) }
+  @media (max-width: 760px) {
+    #settingsPage { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px }
+    #settingsNav { position: static; flex-direction: row; flex-wrap: wrap }
+  }
   #lcPanel, #scPanel { width: 100%; height: 100%; border: 0; display: block }
   #lcPanel[hidden], #scPanel[hidden] { display: none }
   #panelEmpty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -76,10 +99,11 @@
 <!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here: no strudel.cc needed.
      Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
      DAW ports; the CC moved last per number); a control not moved yet reads 0.
-     Two views share the page, so the sound keeps playing when switching: the MIDI panel (the track's LC view, drawn
-     into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on the canvas).
-     The sidebar (key S) holds the page links, the track, Play-Pause / Stop / Record, auto-perform and the
-     settings (generated from settings.mjs, kept in localStorage). Two homotopy controls among them:
+     Three views share the page, so the sound keeps playing when switching: the MIDI panel (the track's LC view, drawn
+     into the iframe #lcPanel instead of its own window), the visuals (render.mjs on the canvas) and the settings.
+     The sidebar (key S) holds the page links, the settings gear, the track, Play-Pause / Stop / Record and auto-perform.
+     The gear opens the Settings view: Theme, then the settings generated from settings.mjs (kept in localStorage) in
+     sections, then the keyboard shortcuts. Two homotopy controls among the settings:
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
@@ -96,8 +120,11 @@
   <div class="top">
     <nav>
       <a href="#panel" data-view="panel">MIDI panel</a>
-      <a href="#visuals" data-view="visuals">Visualization</a>
+      <a href="#visuals" data-view="visuals">Visuals</a>
     </nav>
+    <button class="icon" data-view="settings" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
     <button id="sidebarToggle" class="icon" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
   </div>
   <section>
@@ -119,22 +146,28 @@
     <span id="status">loading Strudel …</span>
   </section>
   <section id="autoPerform"></section>
-  <section>
-    <h2>Theme</h2>
-    <div id="theme"></div>
-  </section>
-  <section>
-    <details>
-      <summary>Settings</summary>
-      <div id="settings"></div>
-    </details>
-  </section>
 </aside>
 <button id="sideOpen" class="icon" title="Show the sidebar (key S)" aria-label="Show the sidebar">☰</button>
 <main id="stage">
   <iframe id="lcPanel" title="MIDI panel"></iframe>
   <iframe id="scPanel" title="MIDI panel (SuperCollider)" hidden></iframe>
   <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
+  <div id="settingsPage" hidden>
+    <nav id="settingsNav" aria-label="Settings sections"></nav>
+    <div id="settingsBody">
+      <section id="settings-theme">
+        <h2>Theme</h2>
+        <p>The look of this page and the MIDI panel: a style, dark, light or as the system (Auto).</p>
+        <div id="theme"></div>
+      </section>
+      <div id="settings"></div>
+      <section id="settings-shortcuts">
+        <h2>Keyboard shortcuts</h2>
+        <p>Work in every view, not while typing in a text field.</p>
+        <dl id="shortcuts"></dl>
+      </section>
+    </div>
+  </div>
 </main>
 <script type="module">
 import { createRenderer } from './render.mjs'
@@ -143,7 +176,7 @@ import { createSmoother } from './smoothing.mjs'
 import * as midi from './midi.mjs'
 import { createEngine } from './engine-strudel.mjs'
 import { createScEngine } from './engine-sc.mjs'
-import { mountSettings } from './settings.mjs'
+import { mountSettings, SETTINGS } from './settings.mjs'
 import { mountHelp } from './help.mjs'
 import { mountTheme } from './theme.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
@@ -153,19 +186,19 @@ import { createRecorder as createAudioRecorder } from './recorder.mjs'
 const $ = id => document.getElementById(id)
 mountHelp([
   { heading: 'What it does', text: 'Plays a live track or lab board right here. The MIDI panel shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Visualization draws every stem with its name '
+    + 'pages and the Launchkey row with every control\'s name and value; Visuals draws every stem with its name '
     + 'and the tempo from Strudel\'s clock. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. With "Save take on record stop" ticked, a recording\'s end writes '
+  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. With "Save take on record stop" ticked (Settings), a recording\'s end writes '
     + 'what the controllers did since the last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
   { heading: 'How to use', text: ['Pick a track in the sidebar and press Play (the same button pauses and resumes).', 'Play the controllers, or start '
-    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visualization switch the view; the sound '
-    + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Settings '
-    + 'holds the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the MIDI '
-    + 'panel, dark, light or as the system (Auto).'] },
+    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visuals switch the view; the sound '
+    + 'keeps playing.', 'S hides the sidebar, F is fullscreen.', 'The gear opens Settings: Theme (T switches '
+    + 'Minimal / Retro; the look of this page and the MIDI panel, dark, light or as the system), Visuals, '
+    + 'MIDI panel and Recording, plus the list of keyboard shortcuts.'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
-    'With the setting "Save take on record stop" ticked, ending a recording writes the capture as a script; '
+    'With the setting "Save take on record stop" ticked (Settings, Recording), ending a recording writes the capture as a script; '
     + 'it shows up in the Auto-perform list as takes/<name>.',
     'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
     + 'captured too.',
@@ -315,7 +348,7 @@ const play = async script => {
     const trackHash = response.headers.get('X-Track-Hash')
     recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
     hasLcView = code.includes('globalThis.lcxlView')
-    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visualization.'
+    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visuals.'
     attachPanel()
     label = 'playing: ' + track
   } catch (error) {
@@ -459,6 +492,8 @@ const attachPanel = () => {
 const showView = name => {
   currentView = name
   document.body.classList.toggle('visuals', name === 'visuals')
+  document.body.classList.toggle('settings-view', name === 'settings')
+  $('settingsPage').hidden = name !== 'settings'
   renderer.setPaused(name !== 'visuals')
   for (const link of document.querySelectorAll('[data-view]')) link.classList.toggle('here', link.dataset.view === name)
   attachPanel()
@@ -468,6 +503,31 @@ for (const link of document.querySelectorAll('[data-view]')) link.onclick = even
   event.preventDefault()
   showView(link.dataset.view)
 }
+const FIXED_SHORTCUTS = [['Hide or show the sidebar', 'S'], ['Fullscreen', 'F'], ['Switch theme style', 'T'],
+  ['Start or stop auto-perform', 'P'], ['Record', 'R'], ['About this page', '?']]
+const shortcuts = [...FIXED_SHORTCUTS, ...SETTINGS.filter(setting => setting.key).map(setting => [setting.label, setting.key.toUpperCase()])]
+$('shortcuts').replaceChildren(...shortcuts.flatMap(([name, key]) => [
+  Object.assign(document.createElement('dt'), { textContent: name }),
+  Object.assign(document.createElement('dd'), { innerHTML: `<kbd>${key}</kbd>` }),
+]))
+const settingsSections = [...$('settingsBody').querySelectorAll('section')]
+$('settingsNav').replaceChildren(...settingsSections.map(section => {
+  const link = Object.assign(document.createElement('a'), { href: '#' + section.id,
+    textContent: section.querySelector('h2').textContent })
+  link.onclick = event => {
+    event.preventDefault()
+    section.scrollIntoView({ block: 'start' })
+  }
+  return link
+}))
+const markSettingsSection = () => {
+  const page = $('settingsPage'), line = page.scrollTop + 40
+  const atEnd = page.scrollTop + page.clientHeight >= page.scrollHeight - 2
+  const here = atEnd ? settingsSections.at(-1) : settingsSections.findLast(section => section.offsetTop <= line) ?? settingsSections[0]
+  for (const link of $('settingsNav').children) link.classList.toggle('here', link.hash === '#' + here.id)
+}
+$('settingsPage').addEventListener('scroll', markSettingsSection)
+new ResizeObserver(markSettingsSection).observe($('settingsPage'))
 const toggleSidebar = () => document.body.classList.toggle('side-closed')
 $('sidebarToggle').onclick = toggleSidebar
 $('sideOpen').onclick = toggleSidebar
