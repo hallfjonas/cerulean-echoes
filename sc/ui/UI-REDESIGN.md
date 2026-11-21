@@ -179,7 +179,18 @@ Same tokens and components as the active theme, on the same 8-column grid as the
 - 8 knobs (CC 31–38), one per column, each with its label; in TE the row-3 disc.
 - 16 drum pads as 2 × 8, two per column under its knob. Black: square outline in `off`, filled `text` while hit.
   TE: round, filled `track`, `#D85A30` while hit. Hit = short flash.
-- Keys: not in the mockup. Keep whatever the current view shows, restyled with the tokens.
+- Keys (on-screen keyboard, 25 keys) — decided 2026-11-20:
+  - Black: **white keys dim filled `#2C2C2A`, black keys cut out in the background colour `#0b0b0b`** (normal
+    light/dark order, so the 2-and-3 grouping reads at a glance); held keys, white or black, fill `#F1EFE8`.
+    Replaces the current inverted look (dark white keys, lighter black keys).
+  - TE: cream white keys `#F1EFE8` with a `#B4B2A9` outline, black keys `#2C2C2A`, held keys `#D85A30`.
+- Octave buttons (replace the grey `◀ oct` / `oct ▶` boxes; proposal, try in practice):
+  - Black: thin chevrons (stroke like the knob arcs) around five small LED dots showing the octave position
+    (current dot `#F1EFE8`, others `#2C2C2A`), the lowest note shown (`C3`) underneath.
+  - TE: two round buttons like the pads (`#B4B2A9` discs with a `#2C2C2A` chevron), the lowest note (`C3`) between
+    them.
+  - Fallback for both: thin chevrons with the note name between (`‹ C3 ›`).
+  - Clicking keeps the current step size of the existing buttons; only the look changes.
 - Show sample names under pads only if the current view already has them.
 
 ## Spectrum
