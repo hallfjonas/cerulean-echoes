@@ -1,52 +1,112 @@
 # UI redesign: controller mirror (brief for the implementing agent)
 
-Status: design decided in conversation on 2026-11-20 from sketches. **Implemented 2026-11-20** in `sc/ui/index.html`
-(see "Implementation notes" at the end).
+Status: design decided in conversation on 2026-11-20 from sketches and a rendered mockup. Not implemented.
 Belongs to the SuperCollider move (`SC-MIGRATION.md`, `sc/PLAN-UI.md`). The UI lives in `sc/ui/`.
+
+**Reference mockup:** `sc/ui/reference/layout-mockup.html` (open it in a browser). It is the agreed look and
+scaling, with demo data. Query parameters: `?theme=black|te`, `?spec=dots|segments|bars|line|area`, `?set=ring|map|energy|spectrogram`,
+`?nolk`; in the page, key `V` cycles the set view.
+Where this brief and the mockup disagree, ask.
 
 ## Goal
 
 The live view mirrors the hardware: every control is drawn where it sits on the device, in a calm, flat,
-minimalist style. The current look is felt as "2010". Only the **look** changes.
+minimalist style. The current look is felt as "2010". Only the **look** changes, plus a spectrum display.
 
 Out of scope, do not change without asking:
 - MIDI mapping, CC numbers, OSC messages, what a control does
-- which controllers are shown and in what arrangement (see "What is on screen")
+- which controllers are shown (see "What is on screen")
 - labels' wording rules from `CLAUDE.md` (English, short, one name per job)
 
 Before you start: read `sc/ui/` and find out how the current view is built and fed (OSC bridge, data model).
-Keep that data flow. If the current view lacks data this brief needs (e.g. pattern names), add it as a fallback
-and list it as an open point; do not invent a new protocol on your own.
+Keep that data flow. If the current view lacks data this brief needs (e.g. pattern names, spectrum), add it as a
+fallback and list it as an open point; do not invent a new protocol on your own.
 
 ## What is on screen
 
-The current view shows **two Launch Control XL 3 panels and one Launchkey (LK) row**. Keep all three.
+```
+ mode 1 · foundation              mode 2 · colour
+ ┌ LC panel (8 columns) ┐         ┌ LC panel (8 columns) ┐
+ └──────────────────────┘         └──────────────────────┘
+ launchkey                         spectrum               set view
+ mod │ 8 knobs over 2 × 8 pads     energy over frequency  set over time (4 views)
+```
 
 - **Two LC panels** side by side: Mode 1 (Jojo's foundation) and Mode 2 (Jonas' colour), as in the current LC
   view (`CLAUDE.md` "Live tracks"). Keep the existing "moved last" frame: the page the player touched last is
-  framed (see theme tokens: `frame`). Check in `sc/ui/` that the SC UI follows the same model.
+  framed. A small label above each panel (`mode 1 · foundation`, `mode 2 · colour`).
 - Each LC panel: 8 columns. Columns 1–7 are stems, column 8 is global (separated by a 1 px vertical line in
   `track` colour).
-- **LK row** below the two panels, same visual language (see "Launchkey row").
-- **Status strip** at the bottom (tempo, harmony state, chapter, phrase position). Keep what exists, restyle it.
+- **Bottom row**, same two-column grid as the panels:
+  - left, under Mode 1: the **Launchkey strip** (optional device, see below), on the same 8-column grid as the
+    panel above, mod wheel to its left
+  - right, under Mode 2: the **spectrum** (see below) and, right of it, the **set view**: a square-ish box,
+    300 units wide, 190 high, showing how the energy of the set evolved (see "Set view")
+- Without a Launchkey, its place stays empty (spectrum and set view stay where they are).
+- **Status strip** (tempo, harmony state, chapter, phrase position): not in the mockup. Keep what exists, as one
+  line under the board, restyled with the tokens, and inside the scaled board (see "Scaling").
+
+Physical reference: the LC XL 3 is 250 × 239 mm (almost square), the Launchkey 25 MK4 461 × 251 mm. The panels
+are deliberately **wider than the device (about 1.6 : 1)**, so two panels plus the bottom row fit a 16:9 or 16:10
+screen. Do not copy the physical ratio.
 
 ## One LC column, top to bottom
 
 | Element | Content | Notes |
 |---|---|---|
-| Column name | stem name, e.g. `kick` | 13 px, weight 500 |
-| Knob row 1 | Brightness | knob component |
-| Knob row 2 | Space | knob component |
-| Knob row 3 | per-track name (Length, Complexity …) | knob component |
+| Column name | stem name, e.g. `kick` | `--fs-name`, weight 500 |
+| Knob row 1 | Brightness | knob component, label `bright` under it |
+| Knob row 2 | Space | knob component, label `space` under it |
+| Knob row 3 | per-track name (Length, Complexity …) | knob component, its name under it (e.g. `length`, `decay`) |
 | Fader | Level | fader component |
-| Button 1 | **name of the active pattern**, e.g. `16th` | text only, 11 px |
-| Button 2 | name of its function, e.g. `lift`, `open` | text only, 11 px |
+| Button 1 | **name of the active pattern**, e.g. `16th` | text only, `--fs-btn` |
+| Button 2 | name of its function, e.g. `lift`, `open` | text only, `--fs-btn` |
 
-Global column 8: knobs Fog / Thin / Tension, fader Master, button 1 Chapter (shows the chapter name, e.g.
+Every knob has a **small label under it** in `off` colour at `--fs-knob`, one word, lower case (knob and label
+form one group, 3 units apart). Launchkey knobs get labels too (their sound parameter, e.g. `tone`, `drive`).
+
+Global column 8: knobs Fog / Thin / Tension (labels `fog`, `thin`, `tension`), fader Master, button 1 Chapter (shows the chapter name, e.g.
 `groove`), button 2 Break.
 
-Pattern names: each pattern needs a short name (one word, at most 6 characters, see "Rules"). If the track or stem does not provide one
-yet, fall back to `pat 1`, `pat 2` … and report which tracks need names.
+Pattern names: each pattern needs a short name (one word, at most 6 characters, see "Rules"). If the track or
+stem does not provide one yet, fall back to `pat 1`, `pat 2` … and report which tracks need names.
+
+## Scaling
+
+The whole board is laid out on a fixed **design board of 1600 × 900 units** and scaled as one piece, so it always
+fits the window in both directions and never scrolls:
+
+```
+--px: min(96vw / 1600, 94vh / 900)      /* one design unit in CSS px */
+```
+
+Every size below is in design units (`n × --px`). Proportions therefore stay identical on every screen. Only text
+has a floor and a ceiling:
+
+| Variable | Use | Value |
+|---|---|---|
+| `--fs-name` | column names | `clamp(13px, 20 × --px, 32px)` |
+| `--fs-btn` | button labels, `mod` | `clamp(11px, 18 × --px, 28px)` |
+| `--fs-lab` | panel labels, spectrum frequencies | `clamp(11px, 16 × --px, 24px)` |
+| `--fs-knob` | knob labels | `clamp(11px, 14 × --px, 21px)` |
+
+Line height 1.4 (knob labels 1.2), no uppercase, no letter-spacing changes. Checked in the mockup at 1280×800 (@2x), 1920×1080,
+2560×1440 and 3840×2160: no overflow, same proportions.
+
+Design-unit sizes:
+
+| Element | Size (units) |
+|---|---|
+| Gap between the two panels / between the two bottom boxes | 40 |
+| Gap between panel row and bottom row | 32 |
+| Panel padding | 14 vertical, 12 horizontal; frame radius 10 |
+| Gap between columns | 4 |
+| Gap between elements in a column | 10 (knob to its label: 3) |
+| Knob | 48 (TE disc: 52) |
+| Fader | 28 wide, 150 high; track `max(2px, 4)` wide; handle 28 × 12, radius 1 |
+| Launchkey: mod wheel fader | 28 × 130 |
+| Launchkey: pad | 36 |
+| Spectrum canvas | full box width, 190 high |
 
 ## Two themes
 
@@ -59,13 +119,12 @@ existing settings drawer (`Black` default, `TE`). Persist the choice in `localSt
 |---|---|
 | `bg` | `#0b0b0b` |
 | `text` (names, active button text, arcs, fader handle) | `#F1EFE8` |
-| `off` (button text of a column that is off) | `#5F5E5A` |
-| `track` (knob track, fader track, column 8 divider) | `#2C2C2A` |
+| `off` (button text of a column that is off, labels) | `#5F5E5A` |
+| `track` (knob track, fader track, dividers, frame) | `#2C2C2A` |
 | `accent` (button 2 active) | `#F1EFE8` |
-| `frame` (panel moved last) | 1 px `#F1EFE8` |
 | font | monospace |
 
-Knob = **arc**: 24 px box, radius 9, stroke 3, round caps. Track arc from 135° to 405° (7 to 5 o'clock) in
+Knob = **arc** (SVG viewBox 24): radius 9, stroke 3, round caps. Track arc from 135° to 405° (7 to 5 o'clock) in
 `track`; value arc from 135° to 135° + 270° × value in `text`. Value 0 draws no value arc.
 
 ### Theme "TE" (Teenage Engineering-like)
@@ -78,25 +137,20 @@ Knob = **arc**: 24 px box, radius 9, stroke 3, round caps. Track arc from 135° 
 | `track` | `#B4B2A9` |
 | fader handle | `#D85A30` |
 | `accent` (button 2 active) | `#D85A30` |
-| `frame` | 1 px `#2C2C2A` |
+| frame | 1 px `#2C2C2A` |
 | font | sans |
 
-Knob = **disc with pointer**: 26 px box, circle radius 12, 1 px ring. Pointer is a 2.5 px round-capped line from
+Knob = **disc with pointer** (SVG viewBox 26): circle radius 12, 1 px ring. Pointer is a 2.5 round-capped line from
 radius 4 to radius 10 at angle 135° + 270° × value.
 
 | Row | Fill | Ring | Pointer |
 |---|---|---|---|
 | 1 Brightness | `#378ADD` | `#378ADD` | `#F1EFE8` |
 | 2 Space | `#1D9E75` | `#1D9E75` | `#F1EFE8` |
-| 3 | `#F1EFE8` | `#888780` | `#2C2C2A` |
+| 3 (and all Launchkey knobs) | `#F1EFE8` | `#888780` | `#2C2C2A` |
 
 Known trade-off, accepted on purpose: the pointer is less precise to read than the arc. Do not "fix" it by adding
 an arc; a possible later idea is to show the value briefly while a knob moves (not in this task).
-
-## Fader (both themes)
-
-Vertical, 14 px wide: a 2 px track (`track`) centred, a 14 × 6 px handle (radius 1) whose bottom sits at
-value × (height − 6). Black: handle `text`; TE: handle `#D85A30`.
 
 ## States
 
@@ -118,24 +172,115 @@ and has no "off" state. Then button 1 text is always in `text`, the fader alone 
 the "column off" row above never applies. Find out per track how button 1 works and report it; do not invent an
 off state.
 
-## Launchkey row
+## Launchkey strip
 
-Same tokens and components as the active theme:
-- 8 knobs (CC 31–38) with the theme's knob component; in TE use the row-3 disc for all eight.
-- Mod wheel (CC 1, keys level) as a fader.
-- 16 drum pads as a 2 × 8 grid of 12 px circles: filled in `text` while hit (short flash), otherwise `track`.
-  Show the sample name under each pad only if the current view already has it.
-- Keys: keep whatever the current view shows, restyled with the tokens.
+Same tokens and components as the active theme, on the same 8-column grid as the LC panel above it:
+- Mod wheel (CC 1, keys level) as a fader, labelled `mod`, left of the grid.
+- 8 knobs (CC 31–38), one per column, each with its label; in TE the row-3 disc.
+- 16 drum pads as 2 × 8, two per column under its knob. Black: square outline in `off`, filled `text` while hit.
+  TE: round, filled `track`, `#D85A30` while hit. Hit = short flash.
+- Keys: not in the mockup. Keep whatever the current view shows, restyled with the tokens.
+- Show sample names under pads only if the current view already has them.
+
+## Spectrum
+
+Live energy over frequency of the master output, under Mode 2.
+
+- Data: magnitudes of the master bus from SuperCollider (e.g. an FFT/analyser on the master, sent over the
+  existing OSC bridge). If no such data exists yet, add it as the smallest possible addition to the bridge and
+  list it as an open point. The mockup uses a fake signal (`energy()`); replace only that function.
+- 48 bands, logarithmic from 20 Hz to 20 kHz. Frequency labels `60`, `250`, `1k`, `4k`, `12k` under the display in
+  `off`, at `--fs-lab`.
+- Draw on a **canvas sized with `devicePixelRatio`** (backing store = CSS size × dpr), redraw on resize, update in
+  `requestAnimationFrame`.
+- Peaks fall back slowly (about 0.6 % of full scale per frame); a slow average follows with factor 0.05.
+
+| Theme | Default style | Look |
+|---|---|---|
+| Black | **LED dots** | 32 columns × 12 rows of dots; lit `text`, unlit `track` |
+| TE | **Segments** | 24 columns × 12 rows of rounded bars; lit by range: below 250 Hz `#D85A30`, 250 Hz–4 kHz `#1D9E75`, above `#378ADD`; unlit `track` |
+
+The other styles in the mockup (`bars`, `line`, `area`, TE `dots`) were alternatives; build only the defaults.
+
+## Set view (energy of the set over time)
+
+Status: **four candidate views, all to be built and switchable.** The players have to try them in practice before
+one is chosen, so none of them is the default for good. The mockup draws all four from invented demo data
+(`set view` script in `layout-mockup.html`); only the drawing is a reference, not the data.
+
+### Switching
+
+- One box, one view at a time. The view is a setting (settings drawer) **and** can be cycled live without the
+  laptop: propose a controller combination (e.g. Shift + a global button) and list it as an open point; do not
+  take a button that is already mapped. Persist the choice in `localStorage` (try/catch).
+- Label above the box: `set · <view>` (e.g. `set · ring`), in `--fs-lab`.
+- Same size, position and tokens for all four views; switching must not move anything else.
+
+### Data (all views)
+
+- One sample every **10 s** of the master output, kept for the whole set in memory (a 2-hour set is 720
+  samples): `energy` (short-term loudness, 0..1 after normalising to the set's range), `punch` (dynamics left,
+  e.g. crest factor or short-term loudness range, 0..1), `tension` (see open points), and a 64-band log spectrum
+  (20 Hz–20 kHz) for the spectrogram.
+- Computed in SuperCollider and sent over the existing OSC bridge; if that does not exist yet, add the smallest
+  possible addition and list it as an open point. Smooth on display, not on capture.
+
+### Colour rule (all views)
+
+One meaning per colour: the theme's `now` colour (Black `#F1EFE8`, TE `#D85A30`) only for "now" (needle, dot,
+latest trail, now line); all data in one ink (Black `#888780`, TE `#2C2C2A`); "flat" in Black `#F1EFE8`, TE
+`#378ADD`. No chapter names in any view (decided: they repeat what the shape shows and clutter).
+
+### The four views
+
+| View | Time model | What it shows |
+|---|---|---|
+| `ring` | **fixed 60′ clock**, 12 o'clock = full hour; in the second hour the new lap **paints over** the first | **grid ring** in the spectrum's language (decided): 60 spokes, one per minute, 8 cells from inside to outside; lit cells = round(√energy · 8); current minute's spoke in `now` colour; current hour, previous lap (ahead of the needle) and unlit cells in three steps (see below); current minute (`72′`) in the centre in `now` colour |
+| `map` | **no window**: the trail simply fades with age (alpha = e^(−age/12′), dropped below 0.05) | 2D path, x = energy, y = tension; corner labels `calm`, `tense`, `full`, `driving`; last 90 s and the dot in `now` colour, older trail in data ink |
+| `energy` | **last 60′**, now at the right edge | area, height = energy; a band along the top edge, clipped to the area, where punch < 0.35 (`flat` colour) |
+| `spectrogram` | **last 60′**, now at the right edge | 64 log-frequency rows, bottom 20 Hz → top 20 kHz; intensity = ink alpha, each row scaled to its own maximum, curve ^1.4, ~30 s soft smoothing; labels `100`, `1k`, `10k` on the left |
+
+Grid ring details (cells must **grow with the radius** in both themes):
+
+| | Black | TE |
+|---|---|---|
+| cell shape | dot, radius = min(0.32 × radial step, 0.55 × half the tangential slot) | rounded bar along the spoke: length 0.68 × radial step, width 0.85 × tangential slot, corner radius 0.3 × the smaller side |
+| current hour | `#B4B2A9` | `#2C2C2A` |
+| previous lap | `#5F5E5A` | `#5F5E5A` |
+| unlit | `#2C2C2A` | `#B4B2A9` |
+| now (current minute) | `#F1EFE8` | `#D85A30` |
+
+Inner radius 0.4 × outer radius; tangential slot = 2π·r / 60 at the cell's radius.
+
+Strips: time labels `−60′`, `−30′`, `now` under the plot; a 2.5 unit now line at the right edge.
+
+Drawing rules: canvas with `devicePixelRatio`; draw
+trails as a few continuous paths per alpha step (no per-segment round caps, they look beaded); never let a label
+cross data (halo in background colour if it must sit on top).
+
+### Open points (set view)
+
+- **Tension** has no measurement yet. Candidates: share of high-frequency energy, onset density, or the Tension
+  control of column 8. Decide with the players; until then use the Tension control.
+- **Punch**: crest factor vs. loudness range; check on real recordings which one matches "it got flat".
+- **TE colour clash**: the live spectrum (segments) uses orange for the bass range, while orange means "now" in
+  the set view. Leave as is for the first test; if it confuses, make the spectrum segments ink with the peak
+  segment in orange.
+- Controller combination for switching views.
+- Judge all four views on a recorded real set before choosing (the mockup data is invented).
+- Tried and dropped for now: a smooth filled ring (replaced by the grid ring); grid versions of the mood map (the path
+  turns into a cloud). Energy and spectrogram as grids (30 two-minute columns) were rendered too and are an option to
+  test; the brief keeps them smooth.
 
 ## Rules
 
 - Flat: no gradients, shadows, glow or blur.
-- Minimum text size 11 px; sentence case or lower case for labels as in the sketches.
+- Minimum text size 11 px; lower case labels as in the mockup.
 - Draw knobs as SVG. Update values in a `requestAnimationFrame` loop, not on every MIDI message.
 - **Every label is one line, one or two words, as short as possible.** Never wrap, never shrink the font to fit.
   Limits: column name ≤ 7 characters, pattern name ≤ 6, button 2 name ≤ 6, knob row names ≤ 10.
   A label over its limit is not truncated silently: list it in your report so a shorter name can be chosen.
-- No element may overlap at the smallest window size you support.
+- No element may overlap or overflow at any window size; check 1280×800, 1920×1080, 2560×1440, 3840×2160.
 - Labels follow `CLAUDE.md` ("Labels").
 
 ## Decided and dropped
@@ -143,26 +288,146 @@ Same tokens and components as the active theme:
 - Knob as brightness only: dropped (hard to read). Dots-only buttons: dropped. Underlines for state: dropped.
 - Hybrid (colours on black): dropped. Grey-out of off columns: dropped.
 - Round LED buttons were liked but lose the pattern name; text only for now.
+- Scaling each element type separately (knobs and fonts on their own curves): dropped, it broke the proportions.
+  The board scales as one piece; only text is clamped.
+- Physical aspect ratio of the LC: dropped, see "What is on screen".
+
+## Open points
+
+- How button 1 works per track (see "States").
+- In TE, orange now means fader handle, button 2 active, pad hit and the bass range of the spectrum. Accepted for
+  now; if it gets confusing, pads light dark instead.
+- Where the status strip sits exactly (not in the mockup).
+- Spectrum data from SC (see "Spectrum").
+- Set view: see "Open points (set view)".
 
 ## Done when
 
-- Both themes render the two LC panels, the LK row and the status strip.
-- Screenshots of both themes with: a column on, off, waiting on, waiting off, button 2 active, fader at 0 and 1,
-  knob at 0 and 1, the "moved last" frame on each panel.
+- Both themes render the two LC panels, the Launchkey strip, the spectrum, the set view (all four views,
+  switchable) and the status strip, with and without a Launchkey.
+- Screenshots of both themes at the four sizes above, with: a column on, off, waiting on, waiting off, button 2
+  active, fader at 0 and 1, knob at 0 and 1, the "moved last" frame on each panel, a pad hit.
 - The view still plays a track end to end with real controllers and without them (auto-perform).
 - Open points listed: tracks without pattern names, data the view was missing.
 
 ## Implementation notes (2026-11-20)
 
-- Theme switch: the player's Visual settings ("Panel theme", key T) and a `Black / TE` switch in the view's status
-  strip (for `live.scd` without the player). One browser setting, `localStorage` key `ce.panelTheme`.
-- Button 1 cycles patterns in every SC track (`ce.change`), so it has no off state: its text is always `text`. While
-  a switch waits for the bar / phrase, it shows the **next** pattern's name, blinking.
-- No value numbers under knobs and faders (the sketches have none); the track's "dim" hint is ignored (rule: nothing
-  dims except button text).
-- Launchkey knobs are on CC 21–28 (not 31–38 as above; changed on 2026-11-20).
-- Labels over the limits (009, shown in full where they fit, cut where they do not; shorter names needed):
-  column names over 7: `Noise Pump`, `Hats / Shaker`, `Vibraphone`; row-3 names over 10: `Hats ↔ Shaker`,
-  `Strings ↔ B3`; button 2 over 6: `Echo throw`, `Lift 0 %`; pad names that do not fit: `Crash reverse`.
-  Other tracks not checked yet.
+- **Where things went.** Board 1600 × 900 units as in the mockup (`--px`, clamped fonts). The Launchkey box holds the
+  mod wheel (`mod`, 28 × 130) left of the 8-column grid (knob over two pads per column, pads in device order: top
+  40-43 + 48-51, bottom 36-39 + 44-47), and under the pads the **keys**: two octaves from C laid out like a keyboard
+  (black keys shorter, between the whites), 44 units high, the octave buttons (`oct ◀ ▶`) under the mod wheel. The
+  **status strip** is one line under the spectrum, bottom-aligned with the Launchkey box (a full-width line under the
+  board would push it past 900 units): chapter / chords / break from the track, bar `n/8` with 4 beat dots and the
+  bar's chord, the `Black / TE` switch. The controller count moved to the right end of the `mode 1` label line
+  (`no Launch Control: mouse only`), the computer-keyboard hint to the right of the `launchkey` label, the mouse help
+  into the status strip's tooltip. The name of the pad hit last shows for 2 s after `launchkey ·`.
+- **Spectrum data path.** `sc/lib/ui.scd` (`uiSpecStart`, called by `startUI`, freed by `stopUI`): a synth at the tail
+  of the server's root group reads `In.ar(0, 2)` (mono sum), 48 `BPF` + `Amplitude.kr` bands log 20 Hz-20 kHz, level
+  mapped -60…0 dB → 0..1 (0 dB = a full-scale sine in the band; bands above 0.45 × sample rate read 0), `SendReply` 20×/s
+  → `OSCdef` → `/ce/spectrum` (48 floats) to the UI address. The engine frees all nodes on a load and calls
+  `startUI` again, so it comes back after every switch (asserted in `tools/trajectory/sc-link.test.mjs`).
+  `sc-link.mjs` and `bridge.mjs` pass it on as SSE `spectrum` (rounded to 3 decimals, not cached for new pages).
+  The panel draws the latest frame (falls to 0 without frames), peaks fall back 0.6 % per frame; only the defaults
+  are built (Black dots 32 × 12, TE segments 24 × 12).
+- **Deviations from brief / mockup.**
+  - Every controller panel (both LCs, the Launchkey) has a subtle 1 px edge (`track` colour) always; the "moved last"
+  frame is `text` colour in both themes (brief: `track` in Black, which would equal the edge) and shows only while
+  the player's LC frame setting is on.
+  - Launchkey knobs are CC 21-28 (the brief's 31-38 is outdated). Launchkey box: inner gaps 10 / 6 (mockup 12) and keys
+  44 units, so the board stays under 900 units with the brief's 14-unit column gap (the mockup uses 10).
+  - Labels are clipped with an ellipsis (visible, not silent) when over their width; names, knob labels and button 2
+  are shown in lower case, and since 2026-11-20 button 1 (pattern / chapter / chord names) and everything else too.
+  - Fader names (Level, Master, Overtones) are not drawn (as in the mockup), they are in the tooltip. Pad sample
+  names are in the pad tooltip and after `launchkey ·` when hit, not under the pads (no room on the board).
+  - Unported cells are hidden (as before), not greyed.
+  - Button 1 dims (`off`) only where the track marks it unused (`state.dim`, 009 keys with Sound on).
+- **How button 1 works.** In all SC tracks (007-010, 016) button 1 cycles patterns (`ce.change`) and has no off
+  state, so "column off" never applies; a switch waiting for its bar / phrase blinks with the coming name. 008's
+  kick button 1 is a hold (one name `4/4 (held: 8/4)`).
+- **Fonts at small sizes.** In the player at 1280 × 800 with the sidebar open the panel gets 980 × 754 px
+  (`--px` 0.59): the 11-13 px floors then make knob labels like `brightness` and 7-character names clip with an
+  ellipsis (the board still fits, no scrollbars). With the sidebar closed, or at 1920 and up, only the labels over
+  their limits below clip.
+- **Labels over the limits** (column ≤ 7, pattern ≤ 6, button 2 ≤ 6, knob ≤ 10). Runtime = loaded in SC (the state
+  at load), static = from the track file.
+  - 007: columns `Sea / Wind`, `Wood / Drops`, `Eno / Shimmer`; button 2 `Drop out`, `Echo throw` (×3), `Full choir`,
+  `Stutter`; patterns `Heartbeat`, `Quarters`, `Very high`, `Rocking 3-3-2`, `I–iii–IV–ii`, `I–vi–IV–vii`; chapter
+  `D Floating` (and the other `D …` moods). Without names: jojo 2, 4, 5, 7.
+  - 008: columns `Bassline`, `Percussion`, `Sequence`, `Dark Perc`, `FX / Breath`; button 2 `Drop out`, `Echo throw`
+  (×2); patterns `4/4 (held: 8/4)`, `Fm → D♭`, `Driving`, `Open + 16ths`, `Rolling`, `Syncopated`. Without names:
+  jonas 1, 3, 4, 5, 6.
+  - 009: columns `Noise Pump`, `Hats / Shaker`, `Vibraphone`; knobs `Hats ↔ Shaker`, `Strings ↔ B3`; button 2
+  `Echo throw` (×3), texts `Lift 0 %` (cols 5-7, Mode 2); patterns `Off-beat`, `Echo stab`, `Stardust`, `+ 16ths`,
+  `Driving`, `Rolling`; knob renames with Sound on `Piano → Rhodes` etc.
+  - 010: columns `Noise Pump`, `Bassline`, `Clap / Rim`, `Deep Chords`, `Pluck Arp`, `Glockenspiel`; button 2
+  `Drop out`, `Echo throw`; patterns `Straight`, `Rolling`, `Off-beat`, `Melodic`, `Shuffle`. Without names: jonas 2-7.
+  - 016 (static only, not on this branch): columns `Percussion`, `Stab Shape`; button 2 `Drop out`, `Echo throw` (×2),
+  `Ratchet`; patterns `Syncopated`, `Stab in`, `Stab out`, `16 bars`. Without names: Stab, Answer, Accents.
+  - Launchkey knobs (008, 009, 010, 016): `Piano → Rhodes`, `Vibes → Marimba`.
+- **Open points.** Shorter names for the labels above (and names for the unnamed patterns). The live spectrum with
+  sound was not looked at (tests ran with the master fader at 0; the data path and the drawing were checked
+  separately); the -60…0 dB mapping may need a calibration by ear/eye. On a phone the 11 px floors do not fit the
+  board (no special small-screen layout any more). With the SC server running in Bluetooth call mode (16 kHz) the
+  spectrum arrives ~7×/s instead of 20×/s (control rate follows the device).
+- 2026-11-20, user feedback: the status strip is back to its old content (8 bar marks, 4 beat dots, the global knobs'
+  values once above 0), on two lines under the spectrum (spectrum canvas 160 units instead of 190); the keyboard
+  is back to its look before the rebuild (distinct white / black key colours, taller, `◀ oct` / `oct ▶` beside it);
+  faders 130 units high so the board stays within 900 units.
+- 2026-11-20, Launchkey reworked in three critique rounds: knobs 30 units over a tight 2 × 8 pad block, keys 130
+  units (about 3:1, real gaps on whole pixels, black keys slightly off-centre), mod wheel left of pads + keys,
+  `oct ◀ 0 ▶` with the current shift; black theme Launchkey in neutral greys.
+- 2026-11-20, user: a theme switch moves nothing (knobs the same size in both themes; only text width differs with
+  the font). The keys level uses the stems' fader. In black every fader is a slim slot filling from the bottom (12
+  units wide, a sliver at 0); in TE track + handle. Status strip on one line without chapter and break (both shown
+  in the global column).
+- Open (user's call): neutral greys for the whole black theme; neutral fader caps so only hits use the accent;
+  shorter names for `piano → rhodes`, `vibes → marimba`.
+
+- 2026-11-20, **set view built** (all four views, switchable):
+  - **Where.** Right of the spectrum under Mode 2: a box 300 units wide (outer, same edge and padding as the spectrum
+    box, both stretched to the Launchkey's height), canvas 190 units high; 28 units between the boxes (mockup). The
+    spectrum box got narrower (452 units). The status strip is one line under both boxes, inside the right column,
+    ending level with the Launchkey box. The controller count (`no launch control: mouse only` / `n launch controls`)
+    moved to the top-right corner of the board (right end of the `mode 2` label line; user request).
+  - **Labels (user):** the default view is the ring, labelled `energy`; the others are labelled `energy · area` (the
+    energy strip), `map`, `spectrogram`. The label is the click target that cycles the views (ring → map → energy area →
+    spectrogram).
+  - **Data path.** `sc/lib/ui.scd`: the existing spectrum analyser (no new synth) also sends `/ce/lvl` 10×/s: loudness
+    power of both channels (roughly K-weighted: +4 dB shelf above 1.5 kHz, high-pass 40 Hz, ~100 ms window), peak and
+    RMS of the mono sum over the last 100 ms. `uiSetFrame` sums 100 such frames (10 s) plus the 20 spectrum frames a
+    second and sends `/ce/setsample energy punch tension b1..b64`: energy = mean power in dB (−0.691 as in LUFS, floor
+    −70), punch = mean crest factor (peak/RMS per 100 ms, frames above −60 dB) mapped 3…18 dB → 0..1, tension = the
+    Tension control (CC 36) averaged, bands = the 48 analyser bands averaged and resampled to 64 (same log range). The
+    running sums live in `topEnvironment[\ceSetAcc]`, so a track load does not lose the 10 s in progress (a pause > 5 s
+    starts afresh); the analyser comes back with `startUI` after every load like the spectrum. `sc-link.mjs` (and
+    `bridge.mjs` the same way) stamps each sample with its arrival time and keeps the whole history in memory for the
+    server session (track loads and SC restarts keep it; a server restart clears it): a page that connects gets one
+    `sethistory` event (all samples), then each `setsample`. Sample: `{ t ms, e dB, p, x, s[64] }` (~200 KB JSON for
+    2 hours). Tested in `tools/trajectory/sc-link.test.mjs` (without SC: fake OSC → live event + history for a later
+    page; with SC: a sample arrives within 10 s of a load).
+  - **On display.** Minutes count from the first sample (the ring's centre number); energy is normalised to the set's
+    range (top = loudest sample, bottom 3 dB under the quietest non-silent one, 6…36 dB below the top; silence = 0).
+    Ring minutes are the mean of the samples in that minute. Paths and areas break at gaps > 30 s (stopped).
+  - **Setting.** Player: Visual settings → `Set view` (ring / map / energy / spectrogram), **key C** (free in the
+    player and in the panel's computer keyboard), saved, sent to the panel by `postMessage({ setView })` like
+    `panelTheme`; the panel keeps `ce.setView` in `localStorage` and tells the player when its label is clicked.
+  - **Deviations from the mockup / brief.** Boxed like the spectrum (edge + padding), so the canvas is 274 × 190, not
+    300 × 190. TE ring bars are 0.425 × the tangential slot wide as drawn in the mockup (brief table: 0.85). The 64
+    spectrogram rows are interpolated from the 48 analyser bands (no extra filters, CPU); intensity is scaled in the
+    dB domain (0..1 = −60…0 dB) per row. Energy area and punch are smoothed over ±1 sample (30 s) on display, the map
+    over ±12 samples (2′) as in the mockup. Map corner labels sit on top of the trail with a background halo. Line
+    widths, dot and now line scale with the board unit.
+  - **Measured.** Switching the view moves nothing (0 px on every element at 1280×800, 1920×1080, 2560×1440,
+    3840×2160, both themes); switching the theme moves no box (≤ 0.02 px; text rows ≤ 1 px from font metrics, fader
+    track / handle differ by design inside the same fader box). No scrollbars at any size. The board is 900 units high
+    at 16:9 and 904 at 1280×800 (font floors), the same as before this change.
+  - **Open points.** Punch measure (crest factor chosen) and the energy weighting need a check on a real recorded set
+    (all tests ran with the master fader at 0: energy sat at the −70 dB floor, punch 0). Tension = the control until
+    the players decide. Controller combination to cycle the view live, proposed, not mapped: Launchkey **Shift + track
+    ▶** (not used by any track; check what the MK4 sends for it on its MIDI port, maybe only on the DAW port), else LC
+    XL 3 Shift + page ▶ if the custom mode leaves it free. Whether to keep map / energy area / spectrogram (user asked).
+    The ring's centre number counts minutes since the first sample of this server session, not since a set start.
+- 2026-11-20, user: in the ring, a cell's brightness follows its minute's age (newest = current-hour colour → 60′ old
+  = previous-lap colour, blended), instead of two steps by lap. So the only edge is at the needle (newest next to
+  oldest); there is no cut at 12 o'clock when the second hour starts.
 
