@@ -5,7 +5,7 @@
 //   POST /lab/sample/save-as  { id, name }        copy to sc/lab/samples/<name>.sample.json           → { id, file }
 //   POST /lab/sample/export   { id, sound? }      sc/sounds/<sound>.scd + samples/sound-lab/<sound>.wav
 //                                                 → { sound, wav }
-//   POST /lab/sample/shape    { id }              one hit of the sound, rendered dry and measured (sample-shape.mjs)
+//   POST /lab/sample/shape    { id? }             (default: the project that plays) one hit of the sound, rendered dry and measured (sample-shape.mjs)
 //                                                 → { peakDb, attackMs, …, waveform, envelope, spectrum, spectrogram }
 // The LC's Save button (column 8, button 2) arrives as onSave(values) from sc-link.mjs.
 import path from 'path'
@@ -48,8 +48,9 @@ export const createSampleLab = ({ getSc, root = repoRoot, sclang = findSclang(),
     if (request.method !== 'POST' || !fromOwnPage(request)) return response.writeHead(403).end('forbidden')
     try {
       const body = JSON.parse(await readBody(request) || '{}')
-      const name = projectOf(body.id)
       const route = url.pathname.slice('/lab/sample/'.length)
+      const name = route === 'shape' && !body.id ? playing() : projectOf(body.id)
+      if (!name) throw new Error('no Sample Designer project plays')
       if (route === 'save') return json(200, { file: relative(saveProject(name, valuesOf(name), root)) })
       if (route === 'save-as') {
         const file = saveAs(name, body.name, valuesOf(name), root)

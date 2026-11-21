@@ -112,7 +112,6 @@
     </details>
   </section>
 </aside>
-<div id="shapePanel" hidden></div>
 <header>
   <button id="sidebarToggle" title="Sidebar (key S)">☰</button>
   <span id="status">loading Strudel …</span>
@@ -137,7 +136,6 @@ import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
-import { mountShapePanel } from './sample-shape-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
 
 const $ = id => document.getElementById(id)
@@ -221,7 +219,7 @@ const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(en
 })
 loadCatalogue()
 const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entryOf($('track').value),
-  play: () => play(), refresh: loadCatalogue, shapePanel: mountShapePanel({ panel: $('shapePanel') }) })
+  play: () => play(), refresh: loadCatalogue })
 const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($('track').value),
   play: () => play(), refresh: loadCatalogue })
 

@@ -71,11 +71,22 @@ body[data-theme=te] .kb-arc{display:none}body:not([data-theme=te]) .kb-disc{disp
 .lk .knob svg{width:26px;height:26px}
 /* interactive */
 .ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}
+body.shape-on #lc{height:calc(100% - 230px)}
+#shape{display:none;box-sizing:border-box;height:230px;padding:4px 10px 10px;font:11px var(--font);color:var(--text)}
+body.shape-on #shape{display:flex;flex-direction:column;gap:4px}
+#shape .numbers{display:flex;flex-wrap:wrap;gap:2px 16px;font-variant-numeric:tabular-nums}
+#shape .numbers b{color:var(--off);font-weight:500;margin-right:4px}
+#shape .numbers .busy{color:var(--off)}
+#shape .plots{flex:1;display:flex;gap:12px;min-height:0}
+#shape figure{margin:0}
+#shape figcaption{color:var(--off);margin-bottom:2px}
+#shape canvas{display:block;background:var(--panel);border:1px solid var(--edge);border-radius:4px}
 @media (max-width:900px){#lc{height:auto;overflow:visible}.pages{flex-direction:column}.page{min-height:80vh}.help{display:none}}
 </style>
 </head>
 <body>
 <div id=lc><div class=head><span class=warn>Waiting for the bridge …</span></div></div>
+<div id=shape><div class=numbers></div><div class=plots></div></div>
 <script>
 // LC view for the SuperCollider version, interactive: drag knobs (up/down; Shift = fine; double-click = 0), click or
 // drag faders, press buttons (Shift-click = keep the button held until the next click). Same look as the ▣ LC big
@@ -379,7 +390,7 @@ const connect = () => {
     else if (type === 'cc') {
       for (const [cc, v] of Object.entries(data)) if (!(performance.now() - (mine[cc] ?? -1e9) < 300)) { S.cc[+cc] = v; S.page = pageOfCc(+cc) }
     }
-    else if (type === 'state') S.state = data
+    else if (type === 'state') { S.state = data; dispatchEvent(new CustomEvent('ce-state', { detail: data })) }
     else if (type === 'beat') S.beat = data
     else if (type === 'midi') S.midi = data
     else if (type === 'sc') S.sc = data
@@ -396,6 +407,40 @@ const connect = () => {
 }
 document.addEventListener('click', e => { if (e.target.closest?.('#theme')) setTheme(document.body.dataset.theme === 'te' ? 'black' : 'te') })
 connect()
+</script>
+<script type=module>
+// Sample Designer: the shape of the sound under the LCs (one hit rendered by the player's server, sample-shape.mjs),
+// again after every move of a control. One render at a time; moves during a render ask for one more with the newest
+// values. Only in the player (the standalone bridge has no /lab route).
+import { drawShape } from '/sample-shape-ui.mjs'
+const box = document.getElementById('shape')
+let busy = false, wanted = null, drawn = null, last = null
+const render = async () => {
+  if (busy || wanted === drawn) return
+  busy = true
+  const key = wanted
+  box.querySelector('.numbers').insertAdjacentHTML('beforeend', '<span class=busy>rendering …</span>')
+  try {
+    const response = await fetch('/lab/sample/shape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    const shape = await response.json()
+    if (!response.ok) throw new Error(shape.error ?? response.status)
+    last = shape
+    drawShape(box, shape)
+  } catch (error) {
+    box.querySelector('.numbers').textContent = 'Shape: ' + error.message
+  }
+  drawn = key
+  busy = false
+  render()
+}
+addEventListener('ce-state', ({ detail }) => {
+  const on = !!detail?.designer
+  document.body.classList.toggle('shape-on', on)
+  if (!on) { wanted = drawn = last = null; return }
+  wanted = JSON.stringify(detail.designer)
+  render()
+})
+addEventListener('resize', () => { if (last) drawShape(box, last) })
 </script>
 </body>
 </html>

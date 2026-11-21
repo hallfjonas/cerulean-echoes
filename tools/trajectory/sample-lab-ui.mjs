@@ -1,13 +1,11 @@
 // The player's Sample Designer section (sidebar): shown while a Sample Designer project is picked under Lab.
 // Load plays the project from its file (as Play); Save writes the playing values into it; Save as copies it (with the
-// playing values) under a new name; Export writes the library sound and its WAV; Shape renders one hit and draws it
-// (waveform, envelope, spectrum, spectrogram: sample-shape-ui.mjs) (server: sample-lab.mjs).
-export const mountSampleLab = ({ section, selected, play, refresh, shapePanel }) => {
+// playing values) under a new name; Export writes the library sound and its WAV (server: sample-lab.mjs).
+// The sound's shape shows under the LCs in the MIDI panel (sc/ui/index.html, sample-shape-ui.mjs).
+export const mountSampleLab = ({ section, selected, play, refresh }) => {
   section.innerHTML = '<h2>Sample Designer</h2><div class="row"><button data-act="load">Load</button>' +
     '<button data-act="save" title="Also the LC: column 8, button 2">Save</button>' +
-    '<button data-act="saveAs">Save as</button><button data-act="export">Export</button>' +
-    '<button data-act="shape" title="Render one hit and show its waveform, envelope and spectrum">Shape</button>' +
-    '</div><output></output>'
+    '<button data-act="saveAs">Save as</button><button data-act="export">Export</button></div><output></output>'
   const out = section.querySelector('output')
   const post = async (route, body) => {
     const response = await fetch('lab/sample/' + route,
@@ -33,15 +31,6 @@ export const mountSampleLab = ({ section, selected, play, refresh, shapePanel })
       out.textContent = 'exporting (renders the WAV) …'
       const { sound: file, wav } = await post('export', { id: selected().id, sound })
       return 'wrote ' + [file, wav].filter(Boolean).join(', ')
-    },
-    shape: async () => {
-      const name = selected().project
-      shapePanel.busy(name)
-      try { shapePanel.show(await post('shape', { id: selected().id }), name) } catch (error) {
-        shapePanel.error(error.message)
-        throw error
-      }
-      return 'shape of ' + name
     },
   }
   section.addEventListener('click', async event => {
