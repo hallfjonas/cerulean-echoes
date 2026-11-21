@@ -23,7 +23,7 @@ import { fileURLToPath } from 'url'
 import { tapSource } from './make-tapped.mjs'
 import { find, scan, toPublic } from './catalogue.mjs'
 import { handleTake } from './take-save.mjs'
-import { handleRecording } from './recording.mjs'
+import { handleRecording, useScLink } from './recording.mjs'
 import { createScLink } from './sc-link.mjs'
 import { repo } from './catalogue.mjs'
 
@@ -40,6 +40,7 @@ const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods
 const clients = new Set()
 let received = 0
 const sc = createScLink({ repo, resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null } })
+useScLink(sc)
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`)
