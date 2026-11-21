@@ -127,6 +127,9 @@
 				\rDirect, (ln[\roomR] ? st[\roomR]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? -1,
 				\dDirect, (ln[\echoSend] ? st[\echoSend]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? -1,
 				\tEchoOn, ((ln[\tensionEcho] ? st[\tensionEcho]) != false).asInteger,
+				// Tension's echo (at half the knob) and room opening: the lane's, the stem's, the track's, else 0.45 / 1
+				\tEchoAmt, ln[\tensionEchoAmt] ? st[\tensionEchoAmt] ? track[\tensionEchoAmt] ? 0.45,
+				\tRoomAmt, ln[\tensionRoomAmt] ? st[\tensionRoomAmt] ? track[\tensionRoomAmt] ? 1,
 				\trim, val.(st.trim ? 1),
 				\thinF, ("c" ++ self.thinBus).asSymbol,
 				// space: a CC, or a fixed number when given as (fixed: 0.3)
