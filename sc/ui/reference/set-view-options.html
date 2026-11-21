@@ -39,8 +39,9 @@ through fast; the hour views fill only as far as the recording goes.</p>
 <div class=bar>
   <span id=drop>drop audio files · or <label class=file>choose<input id=pick type=file accept="audio/*" multiple hidden></label></span>
   <select id=rec></select>
-  <select id=scale title="how loudness becomes height"><option value=fixed>scale: fixed (lufs)</option><option value=punch>scale: fixed + punch</option><option value=relative>scale: relative (as built)</option></select>
+  <select id=scale title="how loudness becomes height"><option value=fixed>scale: fixed (lufs)</option><option value=punch>scale: fixed + punch</option><option value=low>scale: low end (kick + bass), fixed</option><option value=change>scale: vs. last 2 min (±6 db)</option><option value=relative>scale: relative (as built)</option></select>
   <label title="loudness at the bottom / top of the fixed scale (lufs)">lufs <input id=lo type=number value=-36 step=1 style="width:4.5em"> … <input id=hi type=number value=-6 step=1 style="width:4.5em"></label>
+  <button id=fit title="bottom / top of the fixed scale = 5 % / 95 % of this recording's 1 s values (of the low end for that scale)">fit to recording</button>
   <select id=theme><option>minimal-dark</option><option>minimal-light</option><option>retro-light</option><option>retro-dark</option></select>
 </div>
 <div class=bar>
@@ -74,11 +75,18 @@ const analyse = async (name, data) => {
   const sh = off.createBiquadFilter(); sh.type = 'highshelf'; sh.frequency.value = 1500; sh.gain.value = 4
   src.connect(hp).connect(sh).connect(off.destination); src.start()
   const kw = await off.startRendering()
-  const fl = Math.round(sr * FRAME), nF = Math.floor(len / fl), power = new Float32Array(nF), crest = new Float32Array(nF).fill(NaN)
+  const off2 = new OfflineAudioContext(chs, len, sr), src2 = off2.createBufferSource(); src2.buffer = dec
+  const hp2 = off2.createBiquadFilter(); hp2.type = 'highpass'; hp2.frequency.value = 40; hp2.Q.value = 0.5
+  const lp2 = off2.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 150; lp2.Q.value = 0.5
+  src2.connect(hp2).connect(lp2).connect(off2.destination); src2.start()
+  const lowBuf = await off2.startRendering(), LO = [...Array(chs)].map((_, c) => lowBuf.getChannelData(c))
+  const fl = Math.round(sr * FRAME), nF = Math.floor(len / fl), power = new Float32Array(nF), low = new Float32Array(nF), crest = new Float32Array(nF).fill(NaN)
   const K = [...Array(chs)].map((_, c) => kw.getChannelData(c)), R = [...Array(chs)].map((_, c) => dec.getChannelData(c))
   for (let f = 0; f < nF; f++) { let s = 0
     for (const ch of K) for (let i = f * fl, e = i + fl; i < e; i++) s += ch[i] * ch[i]
     power[f] = s / fl
+    let sl = 0; for (const ch of LO) for (let i = f * fl, e = i + fl; i < e; i++) sl += ch[i] * ch[i]
+    low[f] = sl / fl
     let pk = 0, sq = 0; for (let i = f * fl, e = i + fl; i < e; i++) { const m = R.reduce((a, ch) => a + ch[i], 0) / chs; sq += m * m; pk = Math.max(pk, Math.abs(m)) }
     const rms = Math.sqrt(sq / fl); if (rms > 0.001) crest[f] = 20 * Math.log10(pk / rms) }
   const N = 4096, bands = [], win = new Float32Array(N).map((_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N))
@@ -91,14 +99,14 @@ const analyse = async (name, data) => {
     for (let k = 1; k < N / 2; k++) { const f = k * sr / N, j = edges.findIndex(e => e > f) - 1; if (j >= 0 && j < NB) b[j] += re[k] * re[k] + im[k] * im[k] }
     bands.push(b.map(v => Math.min(1, Math.max(0, (10 * Math.log10(v / (N * N / 16) + 1e-12) + 60) / 60))))
   }
-  recs.push({ name, dur: nF * FRAME, power, crest, bands }); fillRecs(recs.length - 1)
+  recs.push({ name, dur: nF * FRAME, power, low, crest, bands }); fillRecs(recs.length - 1)
 }
 
 // ---------- data at a resolution: one value per `step` seconds up to `now`, energy in dB → 0..1 like the panel's
 // setData (range = the loudest value so far down to the quietest, at least 6 dB and at most 36 dB) ----------
-const seriesDB = (rec, step, now, partial = false) => {   // partial: the value in progress counts (mean so far)
+const seriesDB = (rec, step, now, partial = false, key = 'power') => {   // partial: the value in progress counts (mean so far)
   const per = Math.max(1, Math.round(step / FRAME)), F = Math.floor(Math.min(now, rec.dur) / FRAME), n = (partial ? Math.ceil : Math.floor)(F / per), dB = []
-  for (let i = 0; i < n; i++) { let s = 0, k = 0; for (let f = i * per; f < Math.min(F, (i + 1) * per); f++) { s += rec.power[f]; k++ }
+  for (let i = 0; i < n; i++) { let s = 0, k = 0; for (let f = i * per; f < Math.min(F, (i + 1) * per); f++) { s += rec[key][f]; k++ }
     const m = s / Math.max(1, k); dB.push(m > 0 ? Math.max(-70, 10 * Math.log10(m) - 0.691) : -70) }
   return dB
 }
@@ -116,6 +124,13 @@ const fixed = v => v > -69 ? Math.min(1, Math.max(0, (v - +$('lo').value) / (+$(
 const vals = (rec, step, now, partial = false) => {
   const dB = seriesDB(rec, step, now, partial), mode = SCALE()
   if (mode === 'relative') return dB.map(normalise(rec, now))
+  if (mode === 'low') return seriesDB(rec, step, now, partial, 'low').map(fixed)
+  if (mode === 'change') {   // each value against the mean power of the 2 minutes before it: −6 dB = 0, same = .5, +6 dB = 1
+    const per = Math.max(1, Math.round(step / FRAME)), W = Math.round(120 / FRAME)
+    return dB.map((v, i) => { const end = i * per, from = Math.max(0, end - W); if (v <= -69) return 0
+      if (end - from < 10 / FRAME) return .5
+      let s = 0; for (let f = from; f < end; f++) s += rec.power[f]; const ref = 10 * Math.log10(s / (end - from) + 1e-12) - 0.691
+      return Math.min(1, Math.max(0, .5 + (v - ref) / 12)) }) }
   if (mode === 'punch') { const p = punchSeries(rec, step, now, partial); return dB.map((v, i) => v > -69 ? .7 * fixed(v) + .3 * p[i] : 0) }
   return dB.map(fixed)
 }
@@ -292,6 +307,9 @@ addEventListener('drop', e => { e.preventDefault(); $('drop').classList.remove('
 $('rec').onchange = () => fillRecs(+$('rec').value)
 $('t').oninput = draw
 for (const id of ['scale', 'lo', 'hi']) $(id).oninput = draw
+$('fit').onclick = () => { const rec = recs[$('rec').value]; if (!rec) return
+  const v = seriesDB(rec, 1, rec.dur, false, SCALE() === 'low' ? 'low' : 'power').filter(x => x > -69).sort((a, b) => a - b); if (!v.length) return
+  $('lo').value = Math.floor(v[Math.floor(v.length * .05)]); $('hi').value = Math.ceil(v[Math.floor(v.length * .95)]); draw() }
 const setTheme = t => { document.body.dataset.theme = t; $('theme').value = t; try { localStorage.setItem('ce.setOptionsTheme', t) } catch (e) {} draw() }
 $('theme').onchange = () => setTheme($('theme').value)
 try { setTheme(localStorage.getItem('ce.setOptionsTheme') || 'minimal-dark') } catch (e) { setTheme('minimal-dark') }
