@@ -63,6 +63,15 @@ f = File(prefix ++ ".buffers.json", "w");
 f.write("{" ++ ce.sampleBuffers.keys.asArray.sort.collect { |rel|
 	"\"%\":\"%\"".format(ce.sampleBuffers[rel], rel) }.join(",") ++ "}\n");
 f.close;
+// instrument → the inputs its SynthDef reads (<out-prefix>.controls.json): a comparison ignores every other key
+f = File(prefix ++ ".controls.json", "w");
+f.write("{" ++ ce.log.collect { |l| l[2][\instrument] }.asSet.asArray.reject(_.isNil).collect { |name|
+	var snd = ce.sounds.values.detect { |x| x.def.name.asSymbol == name.asSymbol };
+	var names = snd !? { |x| x.def.allControlNames.collect(_.name) } ?? {
+		SynthDescLib.global[name.asSymbol] !? { |d| d.controlNames } } ? [];
+	"\"%\":[%]".format(name, names.collect { |c| "\"%\"".format(c) }.join(","))
+}.join(",") ++ "}\n");
+f.close;
 // CE_NO_AUDIO=1: the event log only, no audio render
 if("CE_NO_AUDIO".getenv.notNil) { "rendered % (events only)".format(prefix).postln; 0.exit };
 // the command file next to the output (recordNRT's default temp name is the same in every sclang process: two

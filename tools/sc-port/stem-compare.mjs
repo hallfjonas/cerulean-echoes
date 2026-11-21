@@ -1,7 +1,7 @@
 // Event-by-event comparison of a hand-written SC track (.scd) and its stem track (.track) over an auto-perform script:
 // both are rendered with the same controller moves (sc/tools/render.scd, events only), then every note is compared
-// with all its parameters (sample buffers by file, bus mappings as "bus"; the log labels tag, g, len16 and vel, which
-// no SynthDef reads, are left out). Stems are matched by name (--map).
+// with every parameter its SynthDef reads (sample buffers by file, bus mappings as "bus"; keys no SynthDef input reads,
+// such as the log labels tag and g, are left out). Stems are matched by name (--map).
 // usage (in tools/): node sc-port/stem-compare.mjs <script.json> <workdir> [--track 009-house] [--bars 0-192]
 //   [--cc '{"61":0.6}'] [--audio]
 // --track: sc/tracks/<id>/<id>.scd and <id>.track; --cc: controls at bar 0 on both sides (start values);
@@ -22,8 +22,6 @@ const audio = args.includes('--audio')
 const nameMap = JSON.parse(opt('--map', JSON.stringify({ kick: 's1_1', noise: 's1_2', sub: 's1_3', bass: 's1_4',
   clap: 's1_5', hats: 's1_6', perc: 's1_7', harm: 's2_1', keys: 's2_2', vibes: 's2_3', flute: 's2_4', brass: 's2_5',
   strings: 's2_6', guitar: 's2_7', lk: 'lk' })))
-
-const LOG_LABELS = ['tag', 'g', 'len16', 'vel']
 
 const noteNumber = name => {
   if (/^\d+$/.test(name)) return Number(name)
@@ -65,10 +63,12 @@ const render = (scenFile, prefix, track) => {
 
 const norm = (prefix, map) => {
   const bufs = JSON.parse(fs.readFileSync(prefix + '.buffers.json', 'utf8'))
+  const inputs = JSON.parse(fs.readFileSync(prefix + '.controls.json', 'utf8'))
   return JSON.parse(fs.readFileSync(prefix + '.events.json', 'utf8')).map(e => {
     const v = {}
+    const reads = inputs[e.v.instrument]?.length ? new Set(inputs[e.v.instrument]) : null
     for (const [k, x] of Object.entries(e.v)) {
-      if (['instrument', 'id', 'isPlaying', 'hasGate', 'msgFunc', ...LOG_LABELS].includes(k)) continue
+      if (['instrument', 'id', 'isPlaying', 'hasGate', 'msgFunc'].includes(k) || (reads && !reads.has(k))) continue
       v[k] = (/buf$/i.test(k) || k === 'bd') ? bufs[x] ?? x : (typeof x === 'string' && /^c\d+$/.test(x)) ? 'bus' : x
     }
     return { b: e.b, stem: map[e.stem] ?? e.stem, inst: e.v.instrument, v }

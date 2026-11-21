@@ -1,5 +1,5 @@
 {
-  "format": 1,
+  "format": 2,
   "name": "clap909-brightness-space-complexity-pattern-roll",
   "parent": null,
   "about": "909 clap on 2 and 4, rim ghosts, snare rolls.",
@@ -16,33 +16,77 @@
     "harmony": "none"
   },
   "sample": {
-    "name": "clap909"
+    "name": "clap909",
+    "preset": {
+      "amp": 0.8,
+      "lpOn": 1,
+      "lo": 3500,
+      "hi": 14000,
+      "hp": 300,
+      "pan": 0.48
+    },
+    "kit": {
+      "cp": "tr909/cp-00.wav",
+      "rim": "tr909/rim-00.wav",
+      "sd": "tr909/sd-00.wav"
+    }
   },
   "gain": 1.57,
   "pitch": "none",
-  "code": "clap909-ghosts.scd",
   "frame": {
-    "break": "stay"
+    "break": "stay",
+    "swing": false,
+    "tensionFilter": false
   },
   "patterns": [
     {
-      "label": "2 + 4"
+      "label": "2 + 4",
+      "rhythm": "~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~",
+      "notes": "cp",
+      "velocity": "0.8"
     },
     {
-      "label": "Pickup"
+      "label": "Pickup",
+      "rhythm": "~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ x ~ ~ x",
+      "notes": "cp",
+      "velocity": "~ ~ ~ ~ 0.8 ~ ~ ~ ~ ~ ~ ~ 0.8 ~ ~ 0.35"
     },
     {
-      "label": "Fill 4"
+      "label": "Fill 4",
+      "rhythm": "<[~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~]!3 [~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ x ~ x ~]>",
+      "notes": "cp",
+      "velocity": "<[~ ~ ~ ~ 0.8 ~ ~ ~ ~ ~ ~ ~ 0.8 ~ ~ ~]!3 [~ ~ ~ ~ 0.8 ~ ~ ~ ~ ~ ~ ~ 0.8 ~ 0.5 ~]>"
     }
   ],
   "controls": {
     "k1": {
       "label": "Brightness",
-      "about": "soft ↔ sharp."
+      "about": "soft ↔ sharp.",
+      "param": "bright",
+      "range": [
+        0,
+        1
+      ]
     },
     "k2": {
       "label": "Space",
-      "about": "dry ↔ room."
+      "about": "dry ↔ room.",
+      "targets": [
+        {
+          "param": "space",
+          "range": [
+            0,
+            1
+          ]
+        },
+        {
+          "param": "echo",
+          "range": [
+            0,
+            0.4
+          ]
+        }
+      ]
     },
     "k3": {
       "label": "Complexity",
@@ -61,5 +105,97 @@
       "about": "snare roll while held.",
       "mode": "hold"
     }
-  }
+  },
+  "layers": [
+    {
+      "name": "Clap"
+    },
+    {
+      "name": "Rim",
+      "rhythm": "~ ~ ~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~",
+      "notes": "rim",
+      "velocity": "1",
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0,
+            0
+          ],
+          [
+            0.5,
+            0.25
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Rim ghosts",
+      "rhythm": "~ ~ ~ ~ ~ ~ x ~ ~ ~ ~ ~ ~ ~ x ~",
+      "notes": "rim",
+      "velocity": "~ ~ ~ ~ ~ ~ 0.18 ~ ~ ~ ~ ~ ~ ~ 0.15 ~",
+      "amount": {
+        "source": "k3",
+        "points": [
+          [
+            0.5,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Roll",
+      "rhythm": "x!16",
+      "notes": "sd",
+      "velocity": "0.1 0.125 0.15 0.175 0.2 0.225 0.25 0.275 0.3 0.325 0.35 0.375 0.4 0.425 0.45 0.475",
+      "amount": {
+        "source": "b2"
+      }
+    },
+    {
+      "name": "Tension roll",
+      "rhythm": "x!16",
+      "notes": "sd",
+      "velocity": "1",
+      "amount": {
+        "source": "tension",
+        "points": [
+          [
+            0.5,
+            0
+          ],
+          [
+            0.5,
+            0.1
+          ],
+          [
+            1,
+            0.45
+          ]
+        ]
+      },
+      "chance": {
+        "source": "tension",
+        "points": [
+          [
+            0.5,
+            0
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    }
+  ]
 }

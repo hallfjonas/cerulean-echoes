@@ -106,7 +106,7 @@
 		pats: stem[\patterns].collect { |p| self.stemPart(p) },
 		layers: layers,
 		kit: stem[\sample][\kit],
-		register: stem[\register] !? { |r| self.numOf(r) },
+		register: stem[\register] !? { |r| self.numOf(r).asInteger },
 		push: stem[\push] == "true" or: { stem[\push] == true },
 		ungated: layers.any { |l| l[\pats].any { |p| p[\strike].notNil } },
 		echoOwn: stem[\echo] !? { |e| [self.numOf(e[\beats] ? 0.75), self.numOf(e[\feedback] ? 0.3)] },
