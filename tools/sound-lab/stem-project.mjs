@@ -107,7 +107,8 @@ const guardDraft = (project, slot, verb) => {
 export function addColumn(name, ref, wanted, root = repoRoot) {
   const project = readProject(name, root)
   const slot = wanted ?? SLOTS.find(candidate => !project.columns[candidate])
-  if (!slot || !SLOTS.includes(slot)) throw new Error(`"${name}" has all ${SLOTS.length} columns`)
+  if (!slot) throw new Error(`"${name}" has all ${SLOTS.length} columns`)
+  if (!SLOTS.includes(slot)) throw new Error(`no slot ${slot}: 1:1 to 2:7`)
   if (project.columns[slot]) throw new Error(`slot ${slot} holds a stem already: replace it`)
   project.columns[slot] = ref
   writeProject(project, root)

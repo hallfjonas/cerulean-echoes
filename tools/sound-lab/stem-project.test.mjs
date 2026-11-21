@@ -126,6 +126,7 @@ test('add takes the slot asked for, replace keeps the slot, remove leaves the sl
   assert.deepEqual(addColumn('flute-explore', FLUTE, undefined, root), { slot: '1:5' })
   assert.deepEqual(addColumn('flute-explore', FLUTE, '2:3', root), { slot: '2:3' })
   assert.throws(() => addColumn('flute-explore', FLUTE, '2:3', root), /holds a stem already/)
+  assert.throws(() => addColumn('flute-explore', FLUTE, '3:1', root), /no slot 3:1/)
   assert.deepEqual(replaceColumn('flute-explore', '1:5', stems[0], root), { slot: '1:5' })
   assert.equal(readProject('flute-explore', root).columns['1:5'], stems[0])
   removeColumn('flute-explore', '1:2', root)
