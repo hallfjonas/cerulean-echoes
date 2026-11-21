@@ -11,6 +11,9 @@
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
 //   POST /sc/load     { id } start the track (SC is started first if needed) → { track }      (own pages only)
+//   (recording: recording.mjs asks `record.start(path)` / `record.stop()` of this link: OSC /ce/record start|stop, the
+//   answers /ce/recording, /ce/recorded, /ce/recerror; `record.onEnd(fn)` is told when SC closed the WAV, also when a
+//   load or SC ending did it; the master's peak comes as SSE `level`, 0..1, 10 times a second)
 //   POST /sc/stop     stop what plays (SC keeps running)                                      (own pages only)
 import { spawn, execFileSync } from 'child_process'
 import dgram from 'dgram'
@@ -70,6 +73,8 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     waiters.add(waiter)
   })
 
+  let recordEndHandler = () => {}
+  const recordEnded = () => recordEndHandler()
   let ccBatch = {}, ccTimer = null
   const queueCc = (cc, v) => {
     ccBatch[cc] = v
@@ -98,6 +103,8 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
+      case '/ce/level': broadcast('level', Math.round(m.args[0] * 1000) / 1000); break
+      case '/ce/recorded': recordEnded(); break
       // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
       case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
       // one set sample every 10 s: kept, and passed on
@@ -127,6 +134,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     child.on('exit', code => {
       child = null
       starting = null
+      recordEnded()
       setHost({ running: false, ready: false, track: null, error: code ? `sclang ended (code ${code}), log: ${logFile}` : null })
     })
     starting = waitFor(m => m.address === '/ce/ready', BOOT_TIMEOUT, 'boot').finally(() => { starting = null })
@@ -144,6 +152,27 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     return answer.args[0]
   }
   const stop = () => { if (host.ready) toSc('/ce/stop') }
+
+  // the WAV is written by SC itself (DiskOut), at the path given
+  const record = {
+    // resolves with the sample rate SC records at; rejects when SC is not running or cannot start
+    start: async file => {
+      if (!host.ready) throw Object.assign(new Error('SuperCollider is not running: start a track first'), { status: 409 })
+      const answer = waitFor(m => m.address === '/ce/recording' || m.address === '/ce/recerror', 10e3, 'answer to the recording start')
+      toSc('/ce/record', 'start', file)
+      const m = await answer
+      if (m.address === '/ce/recerror') throw Object.assign(new Error('SuperCollider: ' + m.args[0]), { status: 409 })
+      return Number(m.args[1])
+    },
+    // resolves when SC has closed the file (at once when SC is not running); a stop is also an end that SC reports by itself
+    stop: () => {
+      if (!host.ready) return Promise.resolve()
+      const closed = waitFor(m => m.address === '/ce/recorded', 5e3, 'recording end').catch(() => {})
+      toSc('/ce/record', 'stop')
+      return closed
+    },
+    onEnd: fn => { recordEndHandler = fn },
+  }
 
   // end sclang (and with it the sound server); waits up to 3 s, then kills
   const quit = () => new Promise(resolve => {
@@ -203,5 +232,5 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
   // keep the event streams open through proxies and sleep
   setInterval(() => { for (const res of clients) res.write(': ping\n\n') }, 15000).unref()
 
-  return { handle, load, stop, quit, close, host, state, setHistory, logFile }
+  return { handle, load, stop, quit, close, record, host, state, setHistory, logFile }
 }

@@ -10,7 +10,7 @@ import { spawn } from 'child_process'
 import { fileURLToPath } from 'url'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
-const TRACK = '010-ambient-house'
+const TRACK = '010-ambient-house-strudel'
 const SAMPLE_RATE = 48000
 const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'check-recording-'))
 const port = await new Promise(resolve => {
@@ -50,6 +50,12 @@ try {
   expect((await post(TRACK, { source: 'robot', sampleRate: SAMPLE_RATE })).status === 400, 'a bad source is refused')
   expect((await fetch(base + `${TRACK}/2026-01-01-000000-human`, { method: 'PUT', body: sine(10, 0) })).status === 404,
     'a name the server did not open is refused')
+
+  expect((await post(TRACK, { engine: 'sc', source: 'human' })).status === 400, 'engine sc needs an SC track')
+  expect((await post('009-house', { source: 'human', sampleRate: SAMPLE_RATE })).status === 400,
+    'an SC track does not record through the page')
+  expect((await post('009-house', { engine: 'sc', source: 'human' })).status === 409,
+    'SC recording refused while SuperCollider is not running')
 
   const started = await post(TRACK, { source: 'auto', script: 'every-button', startCycle: 0.123456, cps: 0.5,
     sampleRate: SAMPLE_RATE })
