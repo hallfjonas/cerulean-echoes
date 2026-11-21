@@ -16,7 +16,7 @@ gave the player a Sample Designer and a Stem Designer. Two steps are missing to 
   swing, genre and the harmony frame, and set up the Launchkey: keys sound, the 8 knobs and the 16 drum pads.
 - **Set Designer**: choose stem tracks, order them, and play them as one set. Between two tracks the next track's
   stems take over column by column at bar lines, tempo and harmony move with them. The next track is picked live
-  with the LC XL 3 Track ◄ ► buttons.
+  with column 8 button 1 on Mode 2 (Next track).
 
 SuperCollider only (Strudel is deprecated, `DEPRECATION.md`). Builds on `epic/sound-lab`.
 
@@ -56,7 +56,7 @@ SuperCollider only (Strudel is deprecated, `DEPRECATION.md`). Builds on `epic/so
      the frame code (`tools/sc-port` comparison).
 4. **As a performer** I build a set from stem tracks in the player's Set Designer, save it, and play it.
    - Acceptance: a set of 2+ tracks saves to `sc/sets/<id>/<id>.set`, loads in the player and plays its first track.
-5. **As a performer** I press Track ► / ◄ during the set to pick the next track; the LC view shows it; at the next
+5. **As a performer** I press Next track (Mode 2, column 8, button 1) during the set to pick the next track; the LC view shows it; at the next
    phrase the transition starts and the new track takes over column by column, no gap, tempo gliding.
    - Acceptance: in a set of 3 tracks, picking track 3 from track 1 starts the transition at the next phrase; every
      slot of track 3 plays after the transition; no slot falls silent for more than one bar unless the new track
@@ -93,9 +93,9 @@ SuperCollider only (Strudel is deprecated, `DEPRECATION.md`). Builds on `epic/so
     transition swaps slot by slot at bar lines, switches the frame (chords, chapters) and the rig at one bar, glides
     the tempo. A slot whose strip differs gets a new strip and crossfades over one bar, no reload.
 12. Global column 8 keeps its meaning in the set (Fog, Thin, Tension, Master, Chapter, Break of the playing track).
-13. Live pick: Track ► / ◄ cycle the pending next track in set order (wraps; landing on the playing track again =
-    stay, no transition). The pick applies at the next phrase, like Chapter. If the spike shows the buttons send no
-    usable MIDI, the fallback is decided with the user (see epic).
+13. Live pick: Next track (Mode 2, column 8, button 1, CC 92) cycles the pending next track in set order
+    (wraps; landing on the playing track again = stay, no transition). The pick applies at the next phrase, like
+    Chapter. Mode 1 column 8 button 1 (CC 44) stays Chapter; in a set the two no longer alias.
 14. LC view and SC panel: playing track, pending next track, transition progress.
 15. Player: Set Designer under Lab (pick, order, save, Save as); sets listed in the catalogue and played under Live.
 16. Skill `/set-designer`.
@@ -113,7 +113,7 @@ SuperCollider only (Strudel is deprecated, `DEPRECATION.md`). Builds on `epic/so
 
 - A track built in the Track Designer from empty columns plays in the player and passes `check-stems`.
 - 009's Launchkey plays from a rig, equal to the frame code.
-- A set of 3 stem tracks plays live; Track ► picks the next one; the transition has no gap.
+- A set of 3 stem tracks plays live; Next track picks the next one; the transition has no gap.
 - `npm run path-lint` shows no new missing paths.
 
 ## Constraints & Assumptions
@@ -124,7 +124,8 @@ SuperCollider only (Strudel is deprecated, `DEPRECATION.md`). Builds on `epic/so
   tests the set engine with 009, 090 and tracks made in the Track Designer.
 - Frames stay SC code (harmony, chapters, progressions); the Track Designer copies a frame from a template track.
   Harmony as data is a later epic.
-- The LC XL 3 Track ◄ ► buttons are not measured yet; task 001 finds out what they send.
+- The LC XL 3 stays in standalone (MIDI) mode. Its Track ◄ ► and Page ▲ ▼ buttons send nothing there (measured in
+  001); DAW mode is a separate proposal (PR #75), not used by this epic.
 
 ## Out of Scope
 
