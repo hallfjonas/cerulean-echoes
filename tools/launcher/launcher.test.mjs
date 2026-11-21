@@ -19,7 +19,9 @@ const app = path.join(repo, 'Cerulean Echoes.app')
 const PORT = 8796, OSC = 57176, SERVER = 57177
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'launcher-test-'))
 const env = { ...process.env, CE_PORT: String(PORT), CE_NO_BROWSER: '1', CE_LOG: path.join(scratch, 'launcher.log'),
-  CE_STATE_DIR: path.join(scratch, 'state'), CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER) }
+  CE_STATE_DIR: path.join(scratch, 'state'), CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER),
+  // SuperCollider plays into a silent bus (sc/engine.scd): a test never sounds on the speakers
+  CE_SC_MUTE: '1' }
 const run = (args, extra = {}) => spawnSync('/bin/bash', [script, ...args], { env: { ...env, ...extra }, encoding: 'utf8' })
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const answers = async () => { try { return (await fetch(`http://localhost:${PORT}/`)).ok } catch { return false } }
@@ -120,6 +122,8 @@ test('the app: one double-click starts the player, SuperCollider plays on a load
         body: JSON.stringify({ id: '009-house', cc: [[12, 0]] }) })
       assert.equal(response.status, 200, await response.clone().text())
       assert.ok(leftovers().some(line => line.trim().startsWith('sclang')), 'SuperCollider runs')
+      const scLog = path.join(os.tmpdir(), `cerulean-sc-engine-${OSC}.log`)
+      if (fs.existsSync(scLog)) assert.match(fs.readFileSync(scLog, 'utf8'), /SC engine muted/, 'CE_SC_MUTE reaches SuperCollider')
     }
     quitApp(pid)
     assert.ok(await until(() => !appPids().includes(pid) && leftovers().length === 0, 20e3),
