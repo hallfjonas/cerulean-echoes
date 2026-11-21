@@ -139,7 +139,7 @@
 				\echo, val.(ln[\echo] ? st[\echo] ? 0)]);
 		};
 	};
-	msgs.add([\s_new, \ce_master, node.(), 0, self.groups.master, \in, self.masterIn, \trimDb, self.trimDb, \limit, self.limit]);
+	msgs.add([\s_new, \ce_master, node.(), 0, self.groups.master, \in, self.masterIn, \out, self.mainOut ? 0, \trimDb, self.trimDb, \limit, self.limit]);
 	msgs.asArray
 };
 

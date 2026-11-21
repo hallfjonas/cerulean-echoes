@@ -106,7 +106,7 @@ const engineProcesses = () => {
 test('SuperCollider in the player: start, play, click, switch, stop, quit', { skip: findSclang() ? false : 'sclang not installed', timeout: 180e3 }, async () => {
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'sc-link-recordings-'))
   const server = spawn(process.execPath, [path.join(here, 'server.mjs'), String(PORT)],
-    { env: { ...process.env, CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER), RECORDINGS_DIR: folder }, stdio: 'ignore' })
+    { env: { ...process.env, CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER), CE_SC_MUTE: '1', RECORDINGS_DIR: folder }, stdio: 'ignore' })
   const base = `http://localhost:${PORT}`
   const post = (route, body) => fetch(base + '/sc/' + route, { method: 'POST', headers: { Origin: base },
     body: JSON.stringify(body ?? {}) })
