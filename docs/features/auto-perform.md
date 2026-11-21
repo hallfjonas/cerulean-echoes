@@ -28,7 +28,7 @@ to 1. The full format is in `tools/trajectory/perform/script-format-v2.md`.
 - The virtual controllers are called `LCXL3 Auto` and `Launchkey MK4 25 Auto`. A track treats them like the real
   devices ([controllers](controllers.md)).
 - A real Launchkey plays along with the script. Its keys only sound while the mod wheel is up.
-- The player also keeps a take of everything you play, and can save it as a new script (**Save take**). Details are in
+- The player also keeps a take of everything you play, and can save it as a new script (setting **Save take on record stop**). Details are in
   the Auto-perform and Takes sections of `tools/trajectory/README.md`.
 - Check scripts with `cd tools && node trajectory/check-perform.mjs`; `npm run verify` runs it too. A new control or a
   changed `@ctl` text means the scripts need a check.

@@ -59,6 +59,8 @@
   #panelEmpty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     color: var(--dim); text-align: center; padding: 24px; background: var(--bg); text-transform: lowercase }
   #panelEmpty[hidden] { display: none }
+  .icon.transport { background: var(--control); color: var(--fg) }
+  .icon.transport:hover:not(:disabled) { background: var(--control-hi) }
   #record.recording { background: var(--rec); color: #F1EFE8 }
   #recInfo { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-variant-numeric: tabular-nums }
   #recInfo[hidden] { display: none }
@@ -76,14 +78,14 @@
      DAW ports; the CC moved last per number); a control not moved yet reads 0.
      Two views share the page, so the sound keeps playing when switching: the MIDI panel (the track's LC view, drawn
      into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on the canvas).
-     The sidebar (key S) holds the page links, the track, Play / Stop / Record / Save take, auto-perform and the visual
+     The sidebar (key S) holds the page links, the track, Play-Pause / Stop / Record, auto-perform and the
      settings (generated from settings.mjs, kept in localStorage). Two homotopy controls among them:
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
      Auto-perform (key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start reloads the
      track so the script begins from silence.
-     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" posts
+     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); the setting "Save take on record stop" posts
      it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
      Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
@@ -102,14 +104,17 @@
     <h2>Track</h2>
     <select id="track"></select>
     <div class="row">
-      <button id="play">Play</button>
-      <button id="stop">Stop</button>
-      <button id="record" title="Key R">Record</button>
+      <button id="play" class="icon transport" title="Play" aria-label="Play"></button>
+      <button id="stop" class="icon transport" title="Stop" aria-label="Stop">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
+      </button>
+      <button id="record" class="icon transport" title="Record (key R)" aria-label="Record">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg>
+      </button>
       <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
     </div>
     <output id="recFile"></output>
     <span id="recError"></span>
-    <div class="row"><button id="saveTake">Save take</button></div>
     <output id="takeState"></output>
     <span id="status">loading Strudel …</span>
   </section>
@@ -120,7 +125,7 @@
   </section>
   <section>
     <details>
-      <summary>Visual settings</summary>
+      <summary>Settings</summary>
       <div id="settings"></div>
     </details>
   </section>
@@ -152,23 +157,24 @@ mountHelp([
     + 'and the tempo from Strudel\'s clock. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. Save take writes what the controllers did since the '
-    + 'last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
-  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play.', 'Play the controllers, or start '
+  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. With "Save take on record stop" ticked, a recording\'s end writes '
+    + 'what the controllers did since the last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
+  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play (the same button pauses and resumes).', 'Play the controllers, or start '
     + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visualization switch the view; the sound '
-    + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Visual '
-    + 'settings hold the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the MIDI '
+    + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Settings '
+    + 'holds the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the MIDI '
     + 'panel, dark, light or as the system (Auto).'] },
   { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
-    'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
+    'With the setting "Save take on record stop" ticked, ending a recording writes the capture as a script; '
+    + 'it shows up in the Auto-perform list as takes/<name>.',
     'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
     + 'captured too.',
-    'Save take after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
+    'A take saved after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
     + 'lists every differing bar.',
     'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
     'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
     + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
-  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
+  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; pressing it again ends it.',
     'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
     'Stop or another track ends a recording. Recordings stay out of git.'] }
 ], { title: 'About this page', button: '?', startOpen: false, parent: document.querySelector('#sidebar .top') })
@@ -216,11 +222,13 @@ fetch('catalogue').then(r => r.json()).then(entries => {
 $('track').onchange = () => {
   showScripts()
   stopRecording()
+  if (transport === 'paused') stopTransport()
 }
 
 const TAIL_SECONDS = 4
 let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecording = false, tailTimer = null
 let performing = null
+let transport = 'stopped'
 const queueRecord = task => (recordQueue = recordQueue.then(task))
 const audio = createAudioRecorder({ engine, onError: error => {
   recordError = error.message
@@ -248,6 +256,7 @@ const stopRecording = (endedBy = 'stop') => {
     try {
       await audio.stop(endedBy)
       lastFile = file
+      if (settings.get('saveTake')) await saveTake()
     } catch (error) {
       recordError = error.message
     }
@@ -287,6 +296,7 @@ const playSc = async (track, script) => {
     attachPanel()
     return false
   }
+  transport = 'playing'
   attachPanel()
   return true
 }
@@ -314,10 +324,29 @@ const play = async script => {
     label = 'Error: ' + error.message
     return false
   }
+  transport = 'playing'
   return true
 }
-$('play').onclick = () => play()
-$('stop').onclick = () => { stopPerformer(); engine.stop(); stopRecording(); label = 'stopped' }
+const stopTransport = () => {
+  stopPerformer()
+  engine.stop()
+  stopRecording()
+  transport = 'stopped'
+  label = 'stopped'
+}
+const togglePlay = () => {
+  if (transport === 'playing' && !onSc()) {
+    strudelEngine.pause()
+    transport = 'paused'
+    label = 'paused'
+  } else if (transport === 'paused') {
+    strudelEngine.resume()
+    transport = 'playing'
+    label = 'playing: ' + $('track').value
+  } else if (transport === 'stopped') play()
+}
+$('play').onclick = togglePlay
+$('stop').onclick = stopTransport
 
 const startScript = async id => {
   const track = $('track').value
@@ -365,15 +394,32 @@ const saveTake = async () => {
     + (result.problems.length ? ` · check: ${result.problems.join('; ')}` : '')
     + (result.replay ? ` · replay: ${result.replay}` : '')
 }
-$('saveTake').onclick = saveTake
 
 const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
 const meterWidth = peak => Math.max(0, Math.min(1, 1 + Math.log10(Math.max(peak, 1e-6)) / 3)) * 100
 const setText = (element, text) => { if (element.textContent !== text) element.textContent = text }
+const ICONS = {
+  play: '<path d="M8 5v14l11-7z"/>',
+  pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+}
+const showTransport = () => {
+  const state = transport === 'playing' ? 'pause' : 'play'
+  const button = $('play')
+  if (button.dataset.transport !== transport) {
+    button.dataset.transport = transport
+    const text = state === 'pause' ? 'Pause' : transport === 'paused' ? 'Resume' : 'Play'
+    button.title = text
+    button.setAttribute('aria-label', text)
+    button.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">${ICONS[state]}</svg>`
+  }
+  button.disabled = state === 'pause' && onSc()
+  $('record').disabled = onSc()
+}
 const showRecording = () => {
   const on = audio.recording
   $('record').classList.toggle('recording', on)
-  setText($('record'), on ? 'Stop rec' : 'Record')
+  $('record').title = on ? 'Stop recording (key R)' : 'Record (key R)'
+  $('record').setAttribute('aria-label', on ? 'Stop recording' : 'Record')
   $('recInfo').hidden = !on
   setText($('recError'), recordError && 'Rec error: ' + recordError)
   if (on) {
@@ -455,6 +501,7 @@ const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
   if (settings.get('lcFrame') !== sentLcFrame) sendLcFrame()
+  showTransport()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
   $('status').textContent = [label, midiText, autoLabel, onSc() ? '' : visuals].filter(Boolean).join(' · ')
