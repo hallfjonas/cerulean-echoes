@@ -5,7 +5,8 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { checkFiles, repoRoot, stemBaseName, validate } from '../stems/check-stems.mjs'
+import { checkFiles, kebab, repoRoot, stemBaseName, validate } from '../stems/check-stems.mjs'
+import { withKnob } from '../stems/knob.mjs'
 import { pretty } from './sample-project.mjs'
 
 export { repoRoot }
@@ -18,6 +19,8 @@ const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8'))
 export const listProjects = (root = repoRoot) => fs.existsSync(stemLabDir(root))
   ? fs.readdirSync(stemLabDir(root)).filter(f => f.endsWith('.stemlab.json')).map(f => f.slice(0, -13)).sort()
   : []
+export const SLOTS = ['1:1', '1:2', '1:3', '1:4', '1:5', '1:6', '1:7', '2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7']
+
 export const readProject = (name, root = repoRoot) => readJson(projectFile(name, root))
 
 const draftErrors = (id, draft, root) => {
@@ -28,8 +31,14 @@ const draftErrors = (id, draft, root) => {
     stem.name = stemBaseName(stem)
     const file = path.join(dir, stem.sample.name, `${stem.name}.stem`)
     fs.mkdirSync(path.dirname(file))
+    const home = path.join(root, 'sc', 'stems', draft.parent ? path.dirname(draft.parent) : draft.sample.name)
+    if (fs.existsSync(home)) {
+      for (const sibling of fs.readdirSync(home).filter(name => !name.endsWith('.stem'))) {
+        fs.copyFileSync(path.join(home, sibling), path.join(path.dirname(file), sibling))
+      }
+    }
     fs.writeFileSync(file, JSON.stringify(stem))
-    return checkFiles([file], root)[0].errors.map(e => `draft "${id}": ${e}`)
+    return checkFiles([file], root)[0].errors.filter(e => !/ label /.test(e)).map(e => `draft "${id}": ${e}`)
   } catch (error) {
     return [`draft "${id}": ${error.message}`]
   } finally {
@@ -87,6 +96,77 @@ const withValues = (project, values) => {
   const out = structuredClone(project)
   if (values?.select && out.columns[values.select]) out.select = values.select
   return out
+}
+
+const guardDraft = (project, slot, verb) => {
+  const ref = project.columns[slot]
+  if (!ref) throw new Error(`no column ${slot} in "${project.name}"`)
+  if (ref.startsWith('draft:')) throw new Error(`column ${slot} holds a draft: promote it before you ${verb} it`)
+}
+
+export function addColumn(name, ref, wanted, root = repoRoot) {
+  const project = readProject(name, root)
+  const slot = wanted ?? SLOTS.find(candidate => !project.columns[candidate])
+  if (!slot || !SLOTS.includes(slot)) throw new Error(`"${name}" has all ${SLOTS.length} columns`)
+  if (project.columns[slot]) throw new Error(`slot ${slot} holds a stem already: replace it`)
+  project.columns[slot] = ref
+  writeProject(project, root)
+  return { slot }
+}
+
+export function replaceColumn(name, slot, ref, root = repoRoot) {
+  const project = readProject(name, root)
+  guardDraft(project, slot, 'replace')
+  project.columns[slot] = ref
+  writeProject(project, root)
+  return { slot }
+}
+
+const freeDraftId = (project, base) => {
+  let id = base
+  for (let n = 2; project.drafts?.[id]; n++) id = `${base}-${n}`
+  return id
+}
+
+export function stemOf(name, slot, root = repoRoot) {
+  const project = readProject(name, root)
+  const ref = project.columns[slot]
+  if (!ref) throw new Error(`no column ${slot} in "${name}"`)
+  const draft = ref.startsWith('draft:')
+  return { ref, draft, stem: draft ? project.drafts[ref.slice(6)] : readJson(path.join(root, 'sc', 'stems', ref)) }
+}
+
+// the knob of a column replaced: a library stem becomes a draft of the project (parent = that version), a draft is
+// changed in place; Promote writes a draft into the library
+export function setKnob(name, slot, key, knob, root = repoRoot) {
+  const project = readProject(name, root)
+  const { ref, draft, stem } = stemOf(name, slot, root)
+  const next = withKnob(stem, key, knob)
+  const id = draft ? ref.slice(6) : freeDraftId(project, `${kebab(stem.sample.name)}-${slot.replace(':', '-')}`)
+  if (!draft) next.parent = ref
+  project.drafts = { ...project.drafts, [id]: next }
+  project.columns[slot] = `draft:${id}`
+  writeProject(project, root)
+  return { slot, draft: id }
+}
+
+export function removeColumn(name, slot, root = repoRoot, { discard = false } = {}) {
+  const project = readProject(name, root)
+  if (!discard) guardDraft(project, slot, 'remove')
+  const ref = project.columns[slot]
+  if (!ref) throw new Error(`no column ${slot} in "${name}"`)
+  if (discard && ref.startsWith('draft:')) {
+    delete project.drafts[ref.slice(6)]
+    if (!Object.keys(project.drafts).length) delete project.drafts
+  }
+  delete project.columns[slot]
+  if (project.select === slot) {
+    const [first] = Object.keys(project.columns).sort()
+    if (first) project.select = first
+    else delete project.select
+  }
+  writeProject(project, root)
+  return { slot }
 }
 
 export const saveProject = (name, values, root = repoRoot) => writeProject(withValues(readProject(name, root), values), root)

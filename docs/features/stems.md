@@ -117,6 +117,10 @@ control does, no ranges or history), the same texts as a track's `@ctl` lines.
 | `b1` | `Pattern` (`Chords` on a chords stem) | the next pattern at the next bar, or `code` |
 | `b2` | named for its add-on | an add-on from `sc/stems/addons.json` (`addon`) or `code` |
 
+A knob may have a `default` (0..1): where the knob starts before a controller moves it (nothing set: 0). The shared
+starting points for a knob are in `sc/stems/knobs.json` (the Stem Designer's knob editor uses them, and the parameters of
+the sound: `tools/stems/knob.mjs`).
+
 A knob maps its value 0..1 in exactly one way:
 - `param` + `range` (+ `curve`: `lin` default or `exp`): one parameter from `range[0]` (knob at 0) to `range[1]`.
 - `targets`: a list of `{ param, range, curve }` moved together.

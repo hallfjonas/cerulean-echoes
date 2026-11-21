@@ -52,6 +52,7 @@ loadTrack = { |path, slots|
 	var old = ~ce, ce, track;
 	current = path;
 	stopTrack.value;
+	s.sync;
 	// a fresh core per track (latches, buttons, buses start clean); allocators from 0, so every load reuses the same
 	// buffer and bus numbers instead of running out after a few switches
 	s.newAllocators;

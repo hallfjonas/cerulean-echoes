@@ -1,6 +1,6 @@
 // Feature tests for the Stem Designer (sc/lib/stemlab.scd): every project in sc/lab/stems/ loads, plays its columns
-// and its backing stems, shows labels, selects the column moved last, A/B swaps a column against the context track's
-// stem, a draft column plays, Promote reaches the player, 14 columns load.
+// and its backing stems, shows labels, selects the column moved last, Add / Remove / Replace reach the player, a
+// draft column plays, Promote of a library stem sends nothing, 14 columns load.
 // No sound server: the project is played into a score in the language (as tools/sc-test/run.scd).
 // usage: sclang tools/sc-test/stem-designer.scd   → one line per check (PASS / FAIL), exit code 0 = all passed
 (
@@ -44,37 +44,46 @@ writeProject = { |name, body| var file = tmp +/+ (name ++ ".stemlab.json"); File
 		check.("% plays its backing stems without a controller".format(name), {
 			(ce.track.backing.size == (project[\context][\backing] ? []).size)
 				and: { ce.track.backing.values.every { |col| log.any { |l| l[1] == col[\stemName] } } } });
-		check.("% shows a label on every column control and A/B and Promote on column 8".format(name), {
+		check.("% keeps its slots, tells which are free or drafts, and columns and backing have their own levels".format(name), {
+			var slots = ce.track.uiCols(ce)[\designer][\slots], masters = ce.track.stems.collect { |st| st[\master] };
+			ce.stemSlots.every { |slot| slots[slot] == if(ce.track.columns[slot].isNil) { "free" } { if(ce.track.slots[slot].beginsWith("draft:")) { "draft" } { "library" } } }
+				and: { masters.count { |m| m == ce.labLevelCc[\context] } == ce.track.backing.size }
+				and: { masters.count { |m| m == ce.labLevelCc[\stems] } == ce.track.columns.size } });
+		check.("% shows a label on every column control and Volume on column 8".format(name), {
 			var tags = ce.uiTags.keys.asArray.collect(_.asString), tag = { |key| var out = ""; ce.uiTags.keysValuesDo { |k, v| if(k.asString == key) { out = v.asString } }; out };
 			project[\columns].keys.every { |slot| var s = slot.asString;
 				["k1", "k2", "k3", "fader", "b1", "b2"].every { |r|
 					tags.includesEqual((if(s[0] == $1) { "16:" } { "2:" }) ++ s[2] ++ "." ++ r) } }
-				and: { tag.("g.b1").beginsWith("A/B") and: { tag.("g.b2").beginsWith("Promote") } } });
+				and: { tag.("g.b1").beginsWith("Volume") } });
 		check.("% the column moved last is the selection".format(name), {
 			var slot = project[\columns].keys.asArray.sort.last, cc = ce.slotCCs(slot)[\k1];
 			#ce, log = play.(file, 1, [[0.25, cc, 0.5]]);
 			ce.track.labSelected == slot.asSymbol });
-		check.("% A/B swaps the selected column to the context track's stem at the next bar".format(name), {
-			var slot = project[\select].asSymbol;
-			#ce, log = play.(file, 2, [[0.25, ce.stemGlobal[\chapter]]]);
-			(ce.track.labShowing[slot] == \original) and: { ce.track.pending[slot].isNil }
-				and: { ce.track.slots[slot] == (ce.readJSON(root +/+ "sc/tracks/009-house/009-house.track")[\slots][slot]) } });
-		check.("% Promote tells the player the selected column".format(name), {
-			var sent = nil;
-			ce = loadCe.value; ce.uiOn = true; ce.uiAddr = (sendMsg: { |self ... msg| sent = msg });
+		check.("% column 8 is the same in both modes and button 1 cycles global, stems, context volume".format(name), {
+			var glob = ce.stemGlobal, levels, set;
+			ce = loadCe.value;
 			ce.prepare(ScoreStreamPlayer.new, ce.stemLabProject(file));
 			ce.track.build(ce);
-			ce.pressFns[ce.stemGlobal[\break]].do(_.value);
-			sent.notNil and: { sent[0] == '/ce/promote' } });
+			set = { |cc, v| ce.setCC(cc, v, { |m| }) };
+			levels = { [ce.val(ce.labLevelCc[\stems]), ce.val(ce.labLevelCc[\context])] };
+			set.(glob[\master], 0.5);
+			set.(glob[\master] + 48, 0.5);
+			(ce.ccAlias[glob[\master] + 48] == glob[\master] and: { ce.ccAlias[glob[\chapter] + 48] == glob[\chapter] })
+				and: { levels.value == [0.5, 0.5] }
+				and: { ce.pressFns[glob[\chapter]].do(_.value); ce.track.labTarget == \stems }
+				and: { set.(glob[\master], 0.5); set.(glob[\master], 0.2); levels.value == [0.1, 0.5] }
+				and: { ce.pressFns[glob[\chapter]].do(_.value); ce.track.labTarget == \context }
+				and: { set.(glob[\master], 0.4); levels.value == [0.1, 0.2] } });
 	};
 	check.("a draft column plays and its stem comes from the project", {
 		var text = File.readAllString(root +/+ "sc/stems" +/+ flute).replace("\"parent\": null", "\"parent\": \"" ++ flute ++ "\""), file, ce, log;
 		file = writeProject.("draft-test", "{\"format\":1,\"name\":\"draft-test\",\"about\":\"t\","
-			++ "\"context\":{\"track\":\"009-house\"},\"columns\":{\"2:4\":\"draft:airy\"},"
+			++ "\"context\":{\"track\":\"009-house\"},\"columns\":{\"1:1\":\"draft:airy\"},"
 			++ "\"drafts\":{\"airy\":" ++ text ++ "}}");
 		#ce, log = play.(file, 8);
-		(0..127).any { |k| ce.track.columns['2:4'].stepNotes(k).reject { |n| n[\msg].notNil }.notEmpty }
-			and: { ce.track.slots['2:4'] == "draft:airy" } });
+		(0..127).any { |k| ce.track.columns['1:1'].stepNotes(k).reject { |n| n[\msg].notNil }.notEmpty }
+			and: { ce.track.slots['1:1'] == "draft:airy" }
+			and: { ce.track.uiCols(ce)[\designer][\slots]['1:1'] == "draft" } });
 	check.("fourteen columns load and play", {
 		var slots = File.readAllString(root +/+ "sc/tracks/009-house/009-house.track").parseJSON["slots"], file, ce, log;
 		file = writeProject.("fourteen", "{\"format\":1,\"name\":\"fourteen\",\"about\":\"t\","

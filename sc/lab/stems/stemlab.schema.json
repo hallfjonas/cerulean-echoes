@@ -27,7 +27,6 @@
     "select": { "type": "string", "pattern": "^[12]:[1-7]$" },
     "columns": {
       "type": "object",
-      "minProperties": 1,
       "propertyNames": { "pattern": "^[12]:[1-7]$" },
       "additionalProperties": {
         "type": "string",

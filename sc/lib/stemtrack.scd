@@ -27,8 +27,15 @@
 // slots (stem tracks only): a JSON object { "1:4": ref, … } that replaces those slots of the file (the player's swaps)
 // A Stem Designer project (stemlab.scd) hands loadStemTrack the track Event it made (json) instead of a file:
 //   dir (where the frame lies), backing: { 'b:1': ref, … } stems that play without a controller, ccCount, lab: true
-//   (the Chapter and Break buttons stay free for the designer), chapter (the start chapter)
+//   (the Chapter and Break buttons stay free for the designer, the master fader and button 1 of column 8 set the
+//   level of everything, of the columns or of the backing, see stemlab.scd), chapter (the start chapter)
 ~ce.loadTrack = { |self, path, slots| if(path.endsWith(".track")) { self.loadStemTrack(path, slots) } { path.load } };
+// A Stem Designer project (track.lab) has the global level (the master fader) and one of its own for the columns and
+// one for the backing: virtual CCs the designer sets from the master fader (stemlab.scd), the strips and the gate read them
+~ce.labLevelCc = (stems: 200, context: 201);
+~ce.masterCcOf = { |self, col|
+	if(col[\track][\lab] == true) { self.labLevelCc[if(col[\slot].asString[0] == $b) { \context } { \stems }] }
+};
 ~ce.stemSlots = ['1:1', '1:2', '1:3', '1:4', '1:5', '1:6', '1:7', '2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7'];
 ~ce.stemGlobal = (fog: 20, thin: 28, tension: 36, master: 12, chapter: 44, break: 52);
 
@@ -120,6 +127,9 @@
 		col[\ccs].values.do { |c| track.ccStart[c] = 0 };
 		track.ccStart[col[\ccs][\fader]] = 1
 	};
+	track.columns.do { |col| [\k1, \k2, \k3].do { |kk|
+		col[\stem][\controls][kk][\default] !? { |d| track.ccStart[col[\ccs][kk]] = self.numOf(d) } } };
+	if(track.lab) { track.ccStart[glob.master] = 1; track.ccStart[self.labLevelCc[\stems]] = 1; track.ccStart[self.labLevelCc[\context]] = 1 };
 	track.stems = self.stemSlots.select { |slot| track.columns[slot].notNil }.collect { |slot|
 		self.columnStem(track.columns[slot], track) } ++ track.backing.values.collect { |col|
 		self.columnStem(col, track) } ++ (frame[\stems] ? []);
@@ -140,7 +150,7 @@
 ~ce.columnStem = { |self, col, track|
 	var slot = col[\slot], strip = col[\colCode] !? { |c| c[\strip] }, ref = { |x| col.stripRef(x) };
 	var entry = (name: col[\stemName], sounds: col[\sounds], level: col[\ccs][\fader], orbit: col[\orbit],
-		hpOwn: col[\hpOwn], roomR: col.stateName(\room), echoSend: if(col[\echoOn]) { col.stateName(\echo) },
+		hpOwn: col[\hpOwn], master: self.masterCcOf(col), roomR: col.stateName(\room), echoSend: if(col[\echoOn]) { col.stateName(\echo) },
 		thin: col.thinOnStrip, trim: col[\gain], tension: col[\tension], tensionEcho: col[\tension],
 		notes: { |k| track.slotStep(slot, k) });
 	if(col[\boostOn] == true) { entry[\level] = col.stateName(\boost) };

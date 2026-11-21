@@ -1,0 +1,3 @@
+- create an app for iPad
+- DAW control instead of midi
+- automatically assign control titles for the LC displays

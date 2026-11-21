@@ -1,18 +1,25 @@
 // Stem Designer: a project file (sc/lab/stems/<name>.stemlab.json, format: sc/lab/stems/stemlab.schema.json) as a stem
-// track. The columns of the project are stem versions (library files or drafts of the project) on the 14 slots; the
-// context track (default 090-stem-demo) gives tempo, frame (chords, chapters, global column) and, as backing, the stems
-// of the slots named in context.backing, which play without a controller. Controls as in a stem track, except column 8:
-//   button 1  A/B     the column moved last swaps at the next bar between its candidate and the context track's stem
-//                     of the same slot (when both need the same mixer strip, ~ce.swapProblem)
-//   button 2  Promote the player's server writes the column's draft into the library (/ce/promote, a library stem
-//                     is there already)
-// The column moved last is the selection (Save writes it into the project). Loaded by sc/engine.scd and
-// sc/tools/render.scd for a .stemlab.json path.
+// track. The columns of the project are stem versions (library files or drafts of the project) on the slots the
+// file names (a slot without a column is free). The context track (default 090-stem-demo) gives
+// tempo, frame (chords, chapters, global column) and, as backing, the stems of the slots named in context.backing,
+// which play without a controller. Controls as in a stem track, except column 8:
+//   master fader, button 1  as everywhere, column 8 is the same in both modes. Button 1 cycles what the fader sets:
+//                              the level of everything (Global), of the columns (Stems) or of the backing (Context);
+//                              each keeps its own level, the strips play Global x Stems and Global x Context
+//   Add, Remove and Promote are in the player's panel: a free slot shows "+ Add", a column the trash symbol and the
+//   promote symbol (active while the column holds a draft). The panel posts them to the player's server. Replace: a
+//   click on a stem's title opens the player's stem drawer.
+// The column moved last is the selection (Save writes it into the project). Loaded by sc/engine.scd and sc/tools/render.scd for a .stemlab.json path.
 (
 ~ce.stemLabProject = { |self, path|
 	var project = self.readJSON(path), context = project[\context] ? (track: "090-stem-demo");
 	var contextPath = self.root +/+ "tracks" +/+ context[\track] +/+ (context[\track] ++ ".track");
 	var base = self.readJSON(contextPath), json, track, buildBase, backing = (), number = 0;
+	var fileSlots = project[\columns].keys.asArray.sort;
+	if(fileSlots.any { |slot| self.stemSlots.includes(slot).not }) {
+		Error("a Stem Designer project holds columns on slots 1:1 to 2:7 only").throw };
+	project[\select] = if(project[\columns][(project[\select] ? \none).asSymbol].notNil) { project[\select] } {
+		fileSlots[0] ? self.stemSlots[0] };
 	self.stemDrafts = project[\drafts] ? ();
 	(context[\backing] ? []).do { |slot| number = number + 1; backing[("b:" ++ number).asSymbol] = base[\slots][slot.asSymbol] };
 	json = (name: "stems-" ++ project[\name], tempo: base[\tempo], swing: base[\swing], frame: base[\frame],
@@ -20,38 +27,39 @@
 		lab: true, chapter: self.numOf(context[\chapter] ? 0));
 	track = self.loadStemTrack(contextPath, nil, json);
 	track.project = project;
-	track.labSelected = (project[\select] ? project[\columns].keys.asArray.sort[0]).asSymbol;
-	track.labShowing = ();
+	track.labSelected = project[\select].asSymbol;
+	track.labTargets = [\global, \stems, \context];
+	track.labTarget = \global;
+	track.labLevels = (global: 1, stems: 1, context: 1);
 	track.labTags = { |lines|
-		lines.reject { |l| l.contains(" g.b1 ") or: { l.contains(" g.b2 ") } }
-			++ ["// @ctl g.b1 A/B | candidate ↔ the context track's stem.", "// @ctl g.b2 Promote | draft into the library."] };
+		lines.reject { |l| [" g.b1 ", " g.b2 ", " g.fader "].any { |tag| l.contains(tag) } }
+			++ ["// @ctl g.fader Level | the level of the volume shown on button 1.",
+				"// @ctl g.b1 Volume | next: Global (everything), Stems (the columns), Context (the backing)."] };
 	track.tagLines = self.stemTrackTags(track);
 	buildBase = track[\build];
-	track[\build] = { |t, ce| buildBase.(t, ce); ce.stemLabBuild(t, base[\slots]) };
+	track[\build] = { |t, ce| buildBase.(t, ce); ce.stemLabBuild(t) };
 	track[\uiHead] = { |t, ce|
 		[["Column", t.labSelected.asString], ["Chord", t.chordAt(TempoClock.default.bar.max(0)).name]] };
-	track[\uiGlobal] = { |t, ce| var shown = (t.labShowing[t.labSelected] ? \candidate).asString;
-		(b1: [shown[0].toUpper ++ shown.drop(1)] ! 2, b2: ["Promote"] ! 2) };
-	track[\uiCols] = { |t, ce| (designer: (select: t.labSelected.asString)) };
+	track[\uiGlobal] = { |t, ce| var name = t.labTarget.asString;
+		(b1: [name[0].toUpper ++ name.drop(1)] ! 2) };
+	track[\uiCols] = { |t, ce|
+		var slots = ();
+		ce.stemSlots.do { |slot| slots[slot] = t.slots[slot] !? { |ref| if(ref.beginsWith("draft:")) { "draft" } { "library" } } ? "free" };
+		(designer: (select: t.labSelected.asString, slots: slots)) };
 	track
 };
 
-~ce.stemLabBuild = { |self, t, original|
-	var ce = self, projectColumns = t.project[\columns];
+~ce.stemLabBuild = { |self, t|
+	var ce = self, glob = ce.stemGlobal, setLevels = { |send|
+		var g = t.labLevels[\global];
+		ce.setCC(ce.labLevelCc[\stems], g * t.labLevels[\stems], send);
+		ce.setCC(ce.labLevelCc[\context], g * t.labLevels[\context], send) };
 	ce.stemSlots.do { |slot| t.columns[slot] !? {
 		ce.slotCCs(slot).values.do { |cc| ce.onCC(cc, { t.labSelected = slot; ce.uiPush }) } } };
-	ce.onPress(ce.stemGlobal[\chapter], {
-		var slot = t.labSelected, shown = t.labShowing[slot] ? \candidate, other, ref, why;
-		other = if(shown == \candidate) { \original } { \candidate };
-		ref = if(other == \original) { original[slot] } { projectColumns[slot] };
-		why = if(ref.isNil) { "no context stem on %".format(slot) } { ce.swapProblem(slot, ref) };
-		if(why.notNil) { ce.status("A/B", why) } {
-			ce.swapSlot(slot, ref);
-			t.labShowing[slot] = other;
-			ce.status("A/B", "% %".format(slot, other)) };
-		ce.uiPush });
-	ce.onPress(ce.stemGlobal[\break], {
-		ce.uiSend('/ce/promote', t.labSelected.asString);
-		ce.status("Promote", t.labSelected.asString) })
+	ce.onCC(glob[\master], { |v, send| t.labLevels[t.labTarget] = v; setLevels.(send) });
+	ce.onPress(glob[\chapter], {
+		t.labTarget = t.labTargets.wrapAt(t.labTargets.indexOf(t.labTarget) + 1);
+		ce.status("Volume", t.labTarget.asString);
+		ce.uiPush })
 };
 )

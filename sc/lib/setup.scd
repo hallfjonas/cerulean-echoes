@@ -126,7 +126,7 @@
 				// sounding notes (a crossfade between layers): a state bus (symbol) or a number
 				\level, (ln[\fade] ? st[\fade]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? 1,
 				// master: a CC; a track without a master fader (global.master nil, e.g. 016: its column 8 fader is Wumms) = 1
-				\master, track.global.master !? { |m| self.ccMap(m) } ? 1,
+				\master, (st[\master] ? track.global.master) !? { |m| self.ccMap(m) } ? 1,
 				// room / echo amount of a lab column: a state bus (symbol) or a fixed number
 				\rDirect, (ln[\roomR] ? st[\roomR]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? -1,
 				\dDirect, (ln[\echoSend] ? st[\echoSend]) !? { |x| if(x.isKindOf(Symbol)) { self.stateMap(x) } { x } } ? -1,

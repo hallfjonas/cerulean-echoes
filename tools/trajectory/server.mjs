@@ -17,7 +17,8 @@
 //   /sc/…            SuperCollider tracks: their LC view, live state, load / stop (see sc-link.mjs); sclang is
 //                    started on the first SC load and ended with this server
 //   /lab/sample/…    Sample Designer projects: save, save as, export (see sample-lab.mjs)
-//   /lab/stems/…     Stem Designer projects: save, save as, promote (see stem-lab.mjs)
+//   /lab/stems/…     Stem Designer projects: save, save as, add, replace, remove, promote, knob (see stem-lab.mjs)
+//   GET /sound-params?sample=<name>, GET /knobs   the parameters a knob can drive on that sound, the knob presets
 // strudel.cc is a public https page; Chrome lets it reach localhost only with the CORS and private-network headers.
 import crypto from 'crypto'
 import http from 'http'
@@ -33,6 +34,7 @@ import { createSampleLab } from './sample-lab.mjs'
 import { createStemLab } from './stem-lab.mjs'
 import { repo } from './catalogue.mjs'
 import { stemIndex } from '../stems/stem-index.mjs'
+import { knobPresets, soundParams } from '../stems/knob.mjs'
 import { createStemSwap } from './stem-swap.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
@@ -49,7 +51,7 @@ const clients = new Set()
 let received = 0
 const sampleLab = createSampleLab({ getSc: () => sc })
 const stemLab = createStemLab({ getSc: () => sc })
-const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values), onPromote: slot => stemLab.onPromote(slot),
+const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
   resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null },
   onLoaded: (id, slots) => swaps.loaded(id, slots) })
 const swaps = createStemSwap({ repo, find, sc })
@@ -98,6 +100,14 @@ const server = http.createServer((request, response) => {
       const body = JSON.stringify(stemIndex(filters))
       return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
         .end(body)
+    } catch (error) {
+      return response.writeHead(400, CORS).end(error.message)
+    }
+  }
+  if (url.pathname === '/sound-params' || url.pathname === '/knobs') {
+    try {
+      const body = JSON.stringify(url.pathname === '/knobs' ? knobPresets(repo) : soundParams(url.searchParams.get('sample'), repo))
+      return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(body)
     } catch (error) {
       return response.writeHead(400, CORS).end(error.message)
     }

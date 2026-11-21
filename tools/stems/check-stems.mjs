@@ -10,8 +10,8 @@ import { fileURLToPath } from 'url'
 
 export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-const STEM_PARAMS = ['space', 'echo', 'pan']
-const STEM_PARAMS_2 = [...STEM_PARAMS, 'room', 'length', 'boost', 'trim', 'transpose', 'echoTime', 'echoFeedback']
+export const STEM_PARAMS = ['space', 'echo', 'pan']
+export const STEM_PARAMS_2 = [...STEM_PARAMS, 'room', 'length', 'boost', 'trim', 'transpose', 'echoTime', 'echoFeedback']
 const FORMAT_2_FIELDS = ['register', 'push', 'orbit', 'echo', 'layers']
 const FORMAT_2_PART = ['length', 'params', 'env', 'voices', 'strike']
 const ENGINE_ARGS = ['out', 'post', 'freq']
@@ -131,18 +131,29 @@ function nameErrors(file, stem) {
   return errors
 }
 
-function labelErrors(stem) {
+const CONVENTIONAL = { k1: { label: 'Brightness', param: 'bright' }, k2: { label: 'Space', param: 'space' } }
+
+// The name of a knob follows its job: knob 1 and 2 are Brightness and Space, unless the knob drives another parameter
+// (then they are named like knob 3); knob 3 and button 2 are named for what they do, never with a name that is
+// reserved for another job.
+export function knobLabelErrors(key, knob) {
   const errors = []
-  const { controls, meta } = stem
-  if (controls.k1.label !== 'Brightness') errors.push('k1 label must be "Brightness"')
-  if (controls.k2.label !== 'Space') errors.push('k2 label must be "Space"')
-  if (controls.b1.label === 'Chords' && meta.role !== 'chords') errors.push('b1 "Chords" only on a chords stem')
-  for (const key of ['k3', 'b2']) {
-    const { label } = controls[key]
-    if (RESERVED.includes(label)) errors.push(`${key} label "${label}" is reserved for another job`)
-    if (!/^[A-Z0-9]/.test(label)) errors.push(`${key} label "${label}" must start with a capital letter`)
-    if (!kebab(label)) errors.push(`${key} label "${label}" has no letters for the file name`)
+  const { label, param } = knob
+  const convention = CONVENTIONAL[key]
+  if (convention && (param === undefined || param === convention.param)) {
+    if (label !== convention.label) errors.push(`${key} label must be "${convention.label}" while it drives ${convention.param}`)
+    return errors
   }
+  if (RESERVED.includes(label)) errors.push(`${key} label "${label}" is reserved for another job`)
+  if (!/^[A-Z0-9]/.test(label)) errors.push(`${key} label "${label}" must start with a capital letter`)
+  if (!kebab(label)) errors.push(`${key} label "${label}" has no letters for the file name`)
+  return errors
+}
+
+function labelErrors(stem) {
+  const { controls, meta } = stem
+  const errors = ['k1', 'k2', 'k3', 'b2'].flatMap(key => knobLabelErrors(key, controls[key]))
+  if (controls.b1.label === 'Chords' && meta.role !== 'chords') errors.push('b1 "Chords" only on a chords stem')
   return errors
 }
 

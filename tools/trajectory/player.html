@@ -162,50 +162,20 @@ import { createEngine } from './engine-strudel.mjs'
 import { createScEngine } from './engine-sc.mjs'
 import { mountSettings } from './settings.mjs'
 import { mountHelp } from './help.mjs'
+import { helpFor } from './page-help.mjs'
 import { mountTheme } from './theme.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
+import { mountKnobEditor } from './knob-editor.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
 import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
 const $ = id => document.getElementById(id)
-mountHelp([
-  { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample and Stem Designer '
-    + '(Tracks and Sets are planned); Visualization draws every stem with its name and the tempo. The sidebar shows '
-    + 'only what the page needs. No strudel.cc needed.' },
-  { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
-    + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound, the Live panel and visuals. Save take writes what the controllers did since the '
-    + 'last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
-  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play.', 'Play the controllers, or start '
-    + 'Auto-perform (P) to try the track without hardware.', 'Live, Labs and Visualization switch the page; the sound '
-    + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Visual '
-    + 'settings (Visualization page) hold the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the '
-    + 'panel, dark, light or as the system (Auto).'] },
-  { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
-    'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
-    'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
-    + 'captured too.',
-    'Save take after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
-    + 'lists every differing bar.',
-    'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
-    'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
-    + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
-  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
-    'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
-    'Stop or another track ends a recording. Recordings stay out of git.'] },
-  { heading: 'Stem swap', text: ['Stem tracks only: click a column\'s name in the Live panel.',
-    'The drawer lists the library stems of that column\'s role; filter by genre, energy and tag.',
-    'Pick one: it plays from the next bar, the other columns play on. A stem that needs another mixer strip loads '
-    + 'the track again with it (a short gap; the drawer says so).',
-    'The track file is not changed. Revert puts the file\'s stems back; Save as writes a new track with the stems '
-    + 'that play. Play reloads the file.'] }
-], { title: 'About this page', button: '?', startOpen: false, parent: document.querySelector('#sidebar .top') })
+const help = mountHelp(helpFor(pageKey(parseHash(location.hash))), { title: 'About this page', button: '?', startOpen: false, parent: document.querySelector('#sidebar .top') })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
@@ -263,18 +233,37 @@ const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($(
 // stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
 const selection = createSelection()
 mountStemDrawer({ selection, onSaved: () => loadCatalogue() })
+const knobEditor = mountKnobEditor({ onOpen: () => selection.clear() })
+selection.on('column', item => { if (item) knobEditor.close() })
 let playingId = null
-const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns: page.id === 'live' && !!entryOf(playingId)?.stems },
-  location.origin)
+const isLab = id => entryOf(id)?.lab === 'stems'
+const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns:
+  (page.id === 'live' && !!entryOf(playingId)?.stems) || (page.id === 'labs' && page.sub === 'stems' && isLab(playingId)) },
+location.origin)
 const sendShape = () => $('scPanel').contentWindow?.postMessage({ shapeOn: showsShape(page) }, location.origin)
 const setPlaying = id => {
   playingId = id
   selection.clear()
   sendPick()
 }
+const selectLabColumn = async (slot, adding) => {
+  const { columns } = await fetch('lab/stems/columns', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: playingId }) }).then(r => r.json())
+  const stem = adding ? 'none' : columns?.[slot]
+  if (stem) selection.select({ kind: 'column', track: playingId, slot, stem, lab: true, ...adding && { adding: true } })
+}
 addEventListener('message', async event => {
+  if (event.source !== $('scPanel').contentWindow) return
+  const knob = event.data?.labKnob
+  if (knob && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') return knobEditor.open({ track: playingId, ...knob })
+  const pick = event.data?.labPick
+  if (pick && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') {
+    return selectLabColumn(pick.slot, pick.action === 'add')
+  }
   const slot = event.data?.select?.slot
-  if (event.source !== $('scPanel').contentWindow || !slot || !entryOf(playingId)?.stems) return
+  if (!slot) return
+  if (isLab(playingId)) return selectLabColumn(slot, false)
+  if (!entryOf(playingId)?.stems) return
   const state = await fetch('swap?track=' + encodeURIComponent(playingId), { cache: 'no-store' }).then(r => r.json())
   const stem = state.slots?.[slot]?.stem
   if (stem) selection.select(columnSelection({ track: playingId, slot, stem }))
@@ -480,6 +469,7 @@ const attachPanel = () => {
 }
 const showPage = next => {
   page = next
+  help.setSections(helpFor(pageKey(page)))
   currentView = page.id === 'visuals' ? 'visuals' : 'panel'
   document.body.classList.toggle('visuals', currentView === 'visuals')
   renderer.setPaused(currentView !== 'visuals')

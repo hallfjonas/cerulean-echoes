@@ -251,7 +251,7 @@
 		// on; notes at level 0 are not played)
 		gated: { |col, bar|
 			var ce = col[\ce], always = col[\colCode] !? { |c| c[\gate] == false } ? col[\ungated];
-			(always.not and: { (ce.val(col[\ccs][\fader]) <= 0) or: { ce.val(col[\track].global.master) <= 0 } })
+			(always.not and: { (ce.val(col[\ccs][\fader]) <= 0) or: { ce.val(ce.masterCcOf(col) ? col[\track].global.master) <= 0 } })
 				or: { col[\breakOut] and: { col[\track].breakAt(bar) } }
 		},
 		miniOf: { |col, str| var key = str.asSymbol, cache = col[\miniCache];

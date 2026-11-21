@@ -149,7 +149,8 @@
         "curve": {"enum": ["lin", "exp"]},
         "targets": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/target"}},
         "code": {"$ref": "#/$defs/codeFile"},
-        "points": {"$ref": "#/$defs/points"}
+        "points": {"$ref": "#/$defs/points"},
+        "default": {"type": "number", "minimum": 0, "maximum": 1}
       }
     },
     "fader": {
