@@ -25,16 +25,20 @@
 		scale: scale.split($ ).collect { |n| self.noteNumber(n ++ "4") % 12 })
 };
 // slots (stem tracks only): a JSON object { "1:4": ref, … } that replaces those slots of the file (the player's swaps)
+// A Stem Designer project (stemlab.scd) hands loadStemTrack the track Event it made (json) instead of a file:
+//   dir (where the frame lies), backing: { 'b:1': ref, … } stems that play without a controller, ccCount, lab: true
+//   (the Chapter and Break buttons stay free for the designer), chapter (the start chapter)
 ~ce.loadTrack = { |self, path, slots| if(path.endsWith(".track")) { self.loadStemTrack(path, slots) } { path.load } };
 ~ce.stemSlots = ['1:1', '1:2', '1:3', '1:4', '1:5', '1:6', '1:7', '2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7'];
 ~ce.stemGlobal = (fog: 20, thin: 28, tension: 36, master: 12, chapter: 44, break: 52);
 
-~ce.loadStemTrack = { |self, path, slots|
-	var json = self.readJSON(path), dir = path.dirname, frameFile = dir +/+ json[\frame], frame = frameFile.load;
+~ce.loadStemTrack = { |self, path, slots, project|
+	var json = project ?? { self.readJSON(path) }, dir = json[\dir] ? path.dirname, frameFile = dir +/+ json[\frame], frame = frameFile.load;
 	var bpm = self.numOf(json[\tempo]), glob = self.stemGlobal, chapters = json[\chapters];
 	var track = (
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
-		slots: (), columns: (), pending: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkPadNames: frame[\lkPadNames],
+		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
+		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkPadNames: frame[\lkPadNames],
 		global: (fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master),
 		aliases: [\fog, \thin, \tension, \master, \chapter, \break].collect { |r| (glob[r] + 48) -> glob[r] }.asDict,
 		orbits: frame[\orbits] ?? { (1: (ir: "ir/orbit-0.6.wav", delay: [0.75 * 60 / bpm, 0.2]),
@@ -59,7 +63,7 @@
 		// the step engine asks a slot, not a column: a swap waiting for this slot takes over on the bar line
 		slotStep: { |self, slot, k|
 			var msgs = if(k % 16 == 0 and: { self.pending[slot].notNil }) { self.switchSlot(slot) } { [] };
-			msgs ++ self.columns[slot].stepNotes(k)
+			msgs ++ (self.columns[slot] ?? { self.backing[slot] }).stepNotes(k)
 		},
 		// the outgoing column's own hooks and latches leave with it; the strip takes the new stem's settings (its shape
 		// is the same, ~ce.swapProblem)
@@ -88,11 +92,14 @@
 		},
 		build: { |self, ce|
 			self.ce = ce;
-			self.chapter = ce.latch(frame[\chapterBars] ? 4, 0, { |i| ce.status("Chapter", chapters[i]); ce.uiPush });
-			ce.cycleButton(glob.chapter, chapters.size, { |s|
-				self.chapter.pending = s; ce.status("Chapter (next)", chapters[s]) });
+			self.chapter = ce.latch(frame[\chapterBars] ? 4, json[\chapter] ? 0, { |i| ce.status("Chapter", chapters[i]); ce.uiPush });
 			self.breakL = ce.latch(1, 0, { |i| ce.status("Break", i); ce.uiPush });
-			ce.cycleButton(glob.break, 2, { |s| self.breakL.pending = s });
+			if(self.lab.not) {
+				ce.cycleButton(glob.chapter, chapters.size, { |s|
+					self.chapter.pending = s; ce.status("Chapter (next)", chapters[s]) });
+				ce.cycleButton(glob.break, 2, { |s| self.breakL.pending = s })
+			};
+			self.backing.do { |col| col.startCol(ce) };
 			self.columns.do { |col| col.startCol(ce); col.showRow };
 			// the controls reach whatever column the slot holds now (a swap replaces the column, not the hooks)
 			self.columns.keysDo { |slot| var cc = ce.slotCCs(slot);
@@ -107,12 +114,21 @@
 	slots !? { self.jsonEvent(slots.parseJSON).keysValuesDo { |slot, ref| track.slots[slot] = ref } };
 	self.stemSlots.do { |slot| track.slots[slot] !? { |ref|
 		track.columns[slot] = self.stemColumn(self.loadStem(ref), slot, track) } };
+	(json[\backing] ? ()).keysValuesDo { |slot, ref|
+		var col = self.stemColumn(self.loadStem(ref), slot, track);
+		track.backing[slot.asSymbol] = col;
+		col[\ccs].values.do { |c| track.ccStart[c] = 0 };
+		track.ccStart[col[\ccs][\fader]] = 1
+	};
 	track.stems = self.stemSlots.select { |slot| track.columns[slot].notNil }.collect { |slot|
-		self.columnStem(track.columns[slot], track) } ++ (frame[\stems] ? []);
+		self.columnStem(track.columns[slot], track) } ++ track.backing.values.collect { |col|
+		self.columnStem(col, track) } ++ (frame[\stems] ? []);
 	track.states = (frame[\states] ? ()).copy;
 	track.columns.do { |col| track.states.putAll(col.stateValues) };
+	track.backing.do { |col| track.states.putAll(col.stateValues) };
 	track.maps = (frame[\maps] ? ()).copy;
 	track.columns.do { |col| track.maps.putAll(col[\maps]) };
+	track.backing.do { |col| track.maps.putAll(col[\maps]) };
 	track.tagLines = self.stemTrackTags(track);
 	track
 };
@@ -156,7 +172,8 @@
 		[\k1, \k2, \k3, \fader, \b1, \b2].do { |kk| var c = stem[\controls][kk];
 			lines.add("// @ctl %:%.% % | %".format(mode, n, kk, c[\label], c[\about])) }
 	} };
-	lines ++ File.readAllString(track[\frameFile]).split($\n).select { |l| l.beginsWith("// @") }
+	lines = lines ++ File.readAllString(track[\frameFile]).split($\n).select { |l| l.beginsWith("// @") };
+	track[\labTags] !? { |f| f.(lines) } ? lines
 };
 
 // Swap hook (the stem swap in the player): the stem `ref` takes over `slot` at the next bar line, the other columns
@@ -170,6 +187,7 @@
 		Error("slot % holds no stem: load the track with it instead".format(slot)).throw };
 	col = self.stemColumn(self.loadStem(ref), slot, track);
 	col.startCol(self);
+	load = load ? self[\swapLoad];
 	fresh = col[\sounds].reject { |s| known.includes(s) }.asSet.asArray;
 	msgs = self.soundMsgs(fresh) ++ self.stateMsgs(col.stateValues);
 	known.addAll(fresh);

@@ -9,7 +9,8 @@
 	self.server = server;
 	self.track = track;
 	self.pressFns = (); self.latches = List[]; self.ccAlias = (); self.uiRows = (); self.ccHooks = ();   // a fresh session (re-running starts clean)
-	self.ccBase = ctl.(128);
+	self.ccBase = ctl.(track[\ccCount] ? 128);
+	(track[\ccStart] ? ()).keysValuesDo { |c, v| self.cc[c] = v; msgs.add([\c_set, self.ccBase + c, v]) };
 	self.toneBus = ctl.(); self.fogBus = ctl.(); self.thinBus = ctl.();
 	self.masterIn = aud.();
 	self.groups = (ctl: node.(), src: node.(), strips: node.(), fx: node.(), master: node.());

@@ -14,7 +14,8 @@
 // load(id, slots) also takes a stem track's slots in place of its file's ({ '1:4': stem }); swap(slot, stem) puts a stem
 // on a slot of the stem track that plays → { live: true } (from the next bar) or { live: false, reason } (load it
 // instead). onLoaded(id, slots) is called after every load SC answers.
-// SC → here: /ce/save <json> (the Save button of a Sample Designer project) calls onSave(values).
+// SC → here: /ce/save <json> (the Save button of a Sample Designer project) calls onSave(values); /ce/promote <slot>
+// (Promote of a Stem Designer project) calls onPromote(slot).
 import { spawn, execFileSync } from 'child_process'
 import dgram from 'dgram'
 import fs from 'fs'
@@ -44,7 +45,7 @@ const readBody = request => new Promise((resolve, reject) => {
 })
 const clamp01 = v => Math.min(1, Math.max(0, +v))
 
-export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findSclang(), log = console.log,
+export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = null, sclang = findSclang(), log = console.log,
   onLoaded = () => {} }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
   const viewFile = path.join(repo, 'sc', 'ui', 'index.html')
@@ -95,6 +96,7 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
       case '/ce/save': onSave?.(json()); break
+      case '/ce/promote': onPromote?.(String(m.args[0])); break
     }
     for (const waiter of [...waiters]) if (waiter.test(m)) {
       clearTimeout(waiter.timer)

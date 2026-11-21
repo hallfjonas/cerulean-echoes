@@ -52,3 +52,13 @@ test('Sample Designer: projects load and play, an export writes a sound that loa
       if (fs.existsSync(dir) && !fs.readdirSync(dir).length) fs.rmdirSync(dir)
     }
   })
+
+// Stem Designer (stem-designer.scd): projects load and play their columns and backing stems, A/B, Promote, drafts,
+// fourteen columns.
+test('Stem Designer: projects load and play, A/B swaps, Promote reaches the player',
+  { skip: sclang ? false : 'sclang not installed' }, () => {
+    const run = spawnSync(sclang, [path.join(here, 'stem-designer.scd')], { encoding: 'utf8', timeout: 280e3 })
+    const lines = `${run.stdout}\n${run.stderr}`.split('\n')
+    const summary = lines.find(line => /passed, \d+ failed$/.test(line)) ?? 'no summary (sclang crashed?)'
+    assert.equal(run.status, 0, `${summary}\n${lines.filter(line => /^FAIL/.test(line)).join('\n')}`)
+  })

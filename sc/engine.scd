@@ -54,8 +54,11 @@ loadTrack = { |path, slots|
 	ce.trackFile = path;
 	ce.uiAddr = toPlayer;
 	// a Sample Designer project (sc/lab/samples/*.sample.json) plays as a track (lib/designer.scd)
-	track = if(path.endsWith(".sample.json")) { (here +/+ "lib/designer.scd").load; ce.sampleProject(path) } {
-		ce.loadTrack(path, slots) };
+	// a Stem Designer project (sc/lab/stems/*.stemlab.json) too (lib/stemlab.scd)
+	track = case
+	{ path.endsWith(".sample.json") } { (here +/+ "lib/designer.scd").load; ce.sampleProject(path) }
+	{ path.endsWith(".stemlab.json") } { (here +/+ "lib/stemlab.scd").load; ce.stemLabProject(path) }
+	{ ce.loadTrack(path, slots) };
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
 	old !? { ce.midiPorts = old.midiPorts; old.midiWatch !? (_.stop) };

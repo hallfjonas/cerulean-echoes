@@ -35,16 +35,25 @@
 ~ce.readJSON = { |self, path| self.jsonEvent(File.readAllString(path).parseJSON) };
 ~ce.numOf = { |self, x| if(x.isString) { x.asFloat } { x } };
 
+// ref "draft:<id>": a stem inside a Stem Designer project (self.stemDrafts, stemlab.scd); its code files lie next to
+// its parent stem, else next to the project
 ~ce.loadStem = { |self, ref|
-	var path = self.root +/+ "stems" +/+ ref, stem = self.readJSON(path);
+	var path = self.root +/+ "stems" +/+ ref, stem;
+	if(ref.beginsWith("draft:")) {
+		stem = self.stemDrafts[ref.drop(6).asSymbol].deepCopy;
+		stem[\dir] = stem[\parent] !? { |p| (self.root +/+ "stems" +/+ p).dirname } ? (self.root +/+ "lab" +/+ "stems")
+	} {
+		stem = self.readJSON(path);
+		stem[\dir] = path.dirname
+	};
 	stem[\ref] = ref;
-	stem[\dir] = path.dirname;
 	stem
 };
 
 // The CCs of a slot ('1:4' = Mode 1 column 4, '2:1' = Mode 2 column 1; Mode 2 = CC + 48)
+// A slot 'b:n' (a Stem Designer's backing stem) has CCs above 127 that no controller sends: it plays as it is.
 ~ce.slotCCs = { |self, slot|
-	var s = slot.asString, n = s[2].digit, plus = if(s[0] == $2) { 48 } { 0 };
+	var s = slot.asString, n = s[2].digit, plus = case { s[0] == $2 } { 48 } { s[0] == $b } { 152 } { 0 };
 	(k1: 12 + n + plus, k2: 20 + n + plus, k3: 28 + n + plus, fader: 4 + n + plus, b1: 36 + n + plus, b2: 44 + n + plus)
 };
 

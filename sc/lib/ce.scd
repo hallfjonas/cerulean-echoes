@@ -9,7 +9,7 @@ var dir = thisProcess.nowExecutingPath.dirname;
 	root: dir.dirname,            // sc/
 	sounds: (),                   // name → sound description (sounds/*.scd, see sounds/README.md)
 	defs: (),                     // SynthDef name → SynthDef (sounds + mixer), sent to the server by init
-	cc: 0 ! 128,                  // language-side copy of every CC (0..1): patterns read buttons and latches from here
+	cc: 0 ! 256,                  // language-side copy of every CC (0..1; 128-255: stems no controller moves, stemlab.scd)
 	ccAlias: (),                  // cc → cc whose bus it shares (column 8: Mode 2 CC + 48 → Mode 1 CC)
 	pressFns: (),                 // cc → [functions] called on every press (rising edge)
 	log: nil,                     // an Array while rendering: every note played, for the event comparison

@@ -103,6 +103,7 @@
     <output id="takeState"></output>
   </section>
   <section id="sampleLab" hidden></section>
+  <section id="stemLab" hidden></section>
   <section id="autoPerform"></section>
   <section>
     <details>
@@ -135,6 +136,7 @@ import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
+import { mountStemLab } from './stem-lab-ui.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -194,6 +196,7 @@ let catalogue = []
 const showScripts = () => {
   autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
   sampleLab.show(entryOf($('track').value))
+  stemLab.show(entryOf($('track').value))
 }
 const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
   const picked = $('track').value
@@ -216,6 +219,8 @@ const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(en
 })
 loadCatalogue()
 const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entryOf($('track').value),
+  play: () => play(), refresh: loadCatalogue })
+const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($('track').value),
   play: () => play(), refresh: loadCatalogue })
 
 // stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
