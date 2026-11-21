@@ -40,8 +40,7 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 
 ### Layout
 
-- **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back
-  (it fades after 3 s without the mouse).
+- **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
 - **Sidebar** (left, **‹** or key **S** hides it): the views (MIDI panel, Visualization), **?** ("About this page",
   closed on every load), the track list with Play, Stop, Record and Save take, the status line (what plays, MIDI
   inputs, auto-perform bar), Auto-perform, Theme, and Visual settings (folded).
