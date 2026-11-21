@@ -12,8 +12,6 @@ When you work with Claude Code in this repo and the job is one of the ones below
 |---|---|---|
 | `strudel-optimize` | Makes a track cheaper to compute without changing the sound, and proves it event by event | "it drops out", "compare old and new" |
 | `strudel-mix` | Measures levels and sets faders and gains in balance | "too quiet", "it clips", "balance the stems" |
-| `lab-board` | Builds a lab board or the next round of one | "new board", "candidates for bass", "next round" |
-| `lab-to-track` | Moves a finished lab column into a track unchanged | "put the winner into 009" |
 | `add-sample` | Adds an audio file, puts it on a Launchkey pad, levels it and checks that it loads | "put this sample on pad E1" |
 | `auto-perform` | Designs, scripts and reviews an auto-performance | "new performance for 008" |
 | `workflow-review` | Reviews past sessions and proposes ranked repo changes | "workflow review for last week" |

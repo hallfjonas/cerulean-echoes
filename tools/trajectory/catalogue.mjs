@@ -5,7 +5,7 @@
 // Every entry has engine 'strudel' or 'sc'.
 // scan() returns internal entries { id, kind, label, path, taps, noTapReason?, scripts }; path stays on the server,
 // toPublic() drops it. Ids are derived from the file location, so they stay the same between scans: a live track is its
-// file name ('010-ambient-house'), a lab board its folder and file joined by '-' ('lab-kick-kick-lab'); a clash gets '-2'.
+// file name ('010-ambient-house'), a lab board its folder and file joined by '-' ('lab-tutorials-harmony-tutorial'); a clash gets '-2'.
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
