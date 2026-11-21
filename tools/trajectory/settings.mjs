@@ -20,13 +20,6 @@ export const SETTINGS = [
     tip: 'Key H: frame around the controller used last in the LC view / MIDI panel', apply: () => {} },
   { id: 'look', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',
     tip: 'Key V: cycles the looks', apply: (value, { renderer }) => renderer.setLook(value) },
-  // the look of the SuperCollider MIDI panel (sc/ui/index.html, UI-REDESIGN.md); one browser setting it reads too
-  { id: 'panelTheme', label: 'Panel theme', kind: 'choice', options: ['black', 'te'], default: 'black', key: 't',
-    tip: 'Key T: Black (Torso-like) or TE (Teenage Engineering-like), for SuperCollider tracks',
-    apply: value => {
-      try { localStorage.setItem('ce.panelTheme', value) } catch {}
-      document.getElementById('scPanel')?.contentWindow?.postMessage({ panelTheme: value }, location.origin)
-    } },
   // the set view of the SuperCollider MIDI panel (UI-REDESIGN.md "Set view"): four candidate views, one browser setting
   // the panel reads too; a click on the panel's label (the view's name) cycles it and the panel tells the player
   { id: 'setView', label: 'Set view', kind: 'choice', options: ['ring', 'map', 'energy', 'spectrogram'], default: 'ring', key: 'c',

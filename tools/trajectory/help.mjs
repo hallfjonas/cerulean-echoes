@@ -1,5 +1,5 @@
 // Collapsible help panel on the right of every page: what the page or tool does, its inputs and outputs, how to use it.
-// mountHelp(sections) adds a Help button (key ?) to the header and returns { setSections } to swap the content. A section is { heading, text } with text a string or a list of
+// mountHelp(sections) adds a Help button (key ?) to the header (or to `parent`) and returns { setSections } to swap the content. A section is { heading, text } with text a string or a list of
 // strings (shown as numbered steps). Open by default and opening or closing it is remembered across pages; a page that
 // passes startOpen: false always starts with it closed.
 const STORAGE_KEY = 'trajectory-help-open'
@@ -33,7 +33,7 @@ const renderSection = ({ heading, text }) => {
   return section
 }
 
-export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen = readOpen() } = {}) => {
+export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen = readOpen(), parent = null } = {}) => {
   const panel = document.createElement('aside')
   panel.id = 'help'
   const heading = Object.assign(document.createElement('h2'), { textContent: title })
@@ -58,7 +58,7 @@ export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen
 
   setSections(sections)
   document.body.append(panel)
-  document.querySelector('header')?.append(toggle)
+  ;(parent ?? document.querySelector('header'))?.append(toggle)
   setOpen(startOpen, false)
   return { setSections }
 }

@@ -7,16 +7,22 @@
 <style>
 /* Controller mirror after UI-REDESIGN.md and reference/layout-mockup.html: two LC panels (Mode 1, Mode 2), the Launchkey
    under Mode 1, the spectrum and the status strip under Mode 2. Everything is laid out on a design board of 1600 x 900
-   units and scaled as one piece (--px = one unit in CSS px); only text has a floor and a ceiling. Two themes, "black"
-   (Torso-like, default) and "te" (Teenage Engineering-like): only tokens and the knob component differ.
+   units and scaled as one piece (--px = one unit in CSS px); only text has a floor and a ceiling. Two styles, "minimal"
+   (Torso-like, default) and "retro" (Teenage Engineering-like), each dark or light (data-tone): only tokens and the knob
+   component differ.
    Flat: no gradients, shadows, glow or blur. Nothing dims except button text. */
 :root{--W:1600;--H:900}
-body,body[data-theme=black]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;
+body,body[data-theme=minimal]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;
   --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:#2C2C2A;--keyB:#0b0b0b;--keyLine:transparent;--keyLab:#8A8A8A;--padF:#2C2C2A;--padLine:transparent;--wheelF:#8A8A8A;
   --font:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-body[data-theme=te]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;
+body[data-theme=retro]{--bg:#D3D1C7;--text:#2C2C2A;--off:#888780;--track:#B4B2A9;--accent:#D85A30;--handle:#D85A30;
   --edge:#B4B2A9;--frame:#2C2C2A;--hit:#D85A30;--keyW:#F1EFE8;--keyB:#2C2C2A;--keyLine:#B4B2A9;--keyLab:#888780;--padF:#B4B2A9;--padLine:transparent;--wheelF:#2C2C2A;
   --font:-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,"DejaVu Sans",sans-serif}
+/* light minimal and dark retro (user, 2026-11-21): same components, other tokens */
+body[data-theme=minimal][data-tone=light]{--bg:#F4F3EE;--text:#1A1A18;--off:#8A8984;--track:#DCDAD3;--accent:#1A1A18;--handle:#1A1A18;
+  --edge:#DCDAD3;--frame:#1A1A18;--hit:#1A1A18;--keyW:#FFFFFF;--keyB:#3A3A37;--keyLine:#DCDAD3;--keyLab:#8A8984;--padF:#E6E4DD;--padLine:transparent;--wheelF:#8A8984}
+body[data-theme=retro][data-tone=dark]{--bg:#232321;--text:#F1EFE8;--off:#888780;--track:#3D3C39;--accent:#D85A30;--handle:#D85A30;
+  --edge:#3D3C39;--frame:#F1EFE8;--hit:#D85A30;--keyW:#D3D1C7;--keyB:#232321;--keyLine:transparent;--keyLab:#888780;--padF:#3D3C39;--padLine:transparent;--wheelF:#F1EFE8}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
 /* everything on the panel is lower case (user, 2026-11-20): pattern and chord names, status, Launchkey, pads */
@@ -47,7 +53,7 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 .name,.kl,.b2{text-transform:lowercase}
 .kw{display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--px));min-width:0;max-width:100%}
 .kl{font-size:var(--fs-knob);line-height:1.2;color:var(--off);max-width:100%}
-/* knob: Black = arc (viewBox 24), TE = disc with pointer (viewBox 26) */
+/* knob: Minimal = arc (viewBox 24), Retro = disc with pointer (viewBox 26) */
 .knob{width:calc(48 * var(--px));aspect-ratio:1;display:block;flex:none}
 .kb-track,.kb-val{fill:none;stroke-width:3;stroke-linecap:round}.kb-track{stroke:var(--track)}.kb-val{stroke:var(--text)}
 .kb-ptr{stroke-width:2.5;stroke-linecap:round}.kb-disc{stroke-width:1}
@@ -58,10 +64,10 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 .fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
 .fader .handle{position:absolute;left:0;width:100%;height:calc(12 * var(--px));border-radius:1px;background:var(--handle);
   bottom:calc(var(--v, 0) * (100% - 12 * var(--px)))}
-/* black (minimal): the fader is a slim slot that fills from the bottom (a sliver at 0); same box as TE, so a theme
+/* minimal: the fader is a slim slot that fills from the bottom (a sliver at 0); same box as Retro, so a theme
    switch moves nothing */
-body:not([data-theme=te]) .fader .bar{width:calc(12 * var(--px));background:var(--track);border-radius:calc(6 * var(--px))}
-body:not([data-theme=te]) .fader .handle{left:50%;transform:translateX(-50%);width:calc(12 * var(--px));bottom:0;
+body:not([data-theme=retro]) .fader .bar{width:calc(12 * var(--px));background:var(--track);border-radius:calc(6 * var(--px))}
+body:not([data-theme=retro]) .fader .handle{left:50%;transform:translateX(-50%);width:calc(12 * var(--px));bottom:0;
   height:calc(var(--v, 0) * 100%);border-radius:calc(6 * var(--px));background:var(--handle)}
 /* buttons: text only; button 1 = the active pattern, button 2 = its function */
 .btns{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--px));min-width:0;max-width:100%}
@@ -73,7 +79,7 @@ body:not([data-theme=te]) .fader .handle{left:50%;transform:translateX(-50%);wid
 .lk{display:grid;grid-template-columns:calc(56 * var(--px)) minmax(0,1fr);grid-template-rows:auto auto auto;
   grid-template-areas:"oct knobs" "wheel pads" "wheel keys";column-gap:calc(16 * var(--px));row-gap:calc(6 * var(--px));
   padding:calc(12 * var(--px)) calc(12 * var(--px))}
-.lkknobs{grid-area:knobs}.lk .kb-track,.lk .kb-val{stroke-width:4}body:not([data-theme=te]) .lk .kl{letter-spacing:-.03em}.lk .knob{width:calc(30 * var(--px))}
+.lkknobs{grid-area:knobs}.lk .kb-track,.lk .kb-val{stroke-width:4}body:not([data-theme=retro]) .lk .kl{letter-spacing:-.03em}.lk .knob{width:calc(30 * var(--px))}
 .lkpads{grid-area:pads;grid-template-rows:repeat(2,calc(30 * var(--px)));gap:calc(4 * var(--px));margin-top:calc(2 * var(--px))}
 .oct{grid-area:oct}.wheel{grid-area:wheel}.keys{grid-area:keys;margin-top:calc(2 * var(--px))}
 /* one corner radius for the whole Launchkey: 3 units */
@@ -124,7 +130,6 @@ body.no-lk .lkbox{visibility:hidden}
 .marks.bars i{width:max(7px, calc(14 * var(--px)));height:max(3px, calc(6 * var(--px)));border-radius:1px}
 .marks i.on{background:var(--text)}
 .marks,.chord{margin-left:.5em}
-.theme{font:inherit;background:none;border:0;color:var(--off);cursor:pointer;padding:0}.theme b{color:var(--text);font-weight:500}
 .ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.fader.ctl,.wheel.ctl{cursor:pointer}
 </style>
 </head>
@@ -135,31 +140,39 @@ body.no-lk .lkbox{visibility:hidden}
 // drag faders, press buttons (Shift-click = keep the button held until the next click). Values come from SuperCollider
 // (also every move on a Launch Control); a click sends the same CC a Launch Control would send, so for the track it
 // makes no difference where a move comes from. Layout and look: UI-REDESIGN.md.
-// ---- theme (UI-REDESIGN.md): 'black' (default) or 'te'; one browser setting shared with the player's Panel theme ----
-const THEME_KEY = 'ce.panelTheme', THEMES = ['black', 'te']
-const readTheme = () => { try { return THEMES.includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : 'black' } catch (e) { return 'black' } }
-const themeLabel = () => THEMES.map(t => t === document.body.dataset.theme ? '<b>' + (t === 'te' ? 'TE' : 'Black') + '</b>' : (t === 'te' ? 'TE' : 'Black')).join(' / ')
-const applyTheme = t => {
-  const changed = document.body.dataset.theme !== t
-  document.body.dataset.theme = t
-  const b = document.getElementById('theme'); if (b) b.innerHTML = themeLabel()
-  if (changed && S.layout) build()   // the knob component differs per theme
+// ---- theme: style 'minimal' or 'retro' (body data-theme), tone 'auto' | 'dark' | 'light'. Chosen on the player's
+// page only (sidebar, Theme), saved in localStorage ce.style / ce.tone; the panel follows (message, storage event).
+const STYLES = ['minimal', 'retro'], TONES = ['auto', 'dark', 'light']
+const store = k => { try { return localStorage.getItem(k) } catch (e) { return null } }
+const readTheme = () => {
+  const old = store('ce.panelTheme')   // before 2026-11-21: black / te
+  const style = STYLES.includes(store('ce.style')) ? store('ce.style') : old === 'te' ? 'retro' : 'minimal'
+  return { style, tone: TONES.includes(store('ce.tone')) ? store('ce.tone') : 'auto' }
 }
-const setTheme = t => { try { localStorage.setItem(THEME_KEY, t) } catch (e) {} applyTheme(t) }
-addEventListener('storage', e => { if (e.key === THEME_KEY) applyTheme(readTheme()) })
+const darkScheme = matchMedia('(prefers-color-scheme: dark)')
+let theme = readTheme()
+const applyTheme = (t = theme) => {
+  theme = t
+  const name = STYLES.includes(t.style) ? t.style : 'minimal', tone = t.tone === 'auto' ? (darkScheme.matches ? 'dark' : 'light') : t.tone
+  const changed = document.body.dataset.theme !== name || document.body.dataset.tone !== tone
+  document.body.dataset.theme = name; document.body.dataset.tone = tone
+  if (changed && S.layout) build()   // the knob component differs per style; canvases redraw with the tone's colours
+}
+darkScheme.addEventListener('change', () => applyTheme())
+addEventListener('storage', e => { if (e.key === 'ce.style' || e.key === 'ce.tone') applyTheme(readTheme()) })
 addEventListener('message', e => {
   if (e.origin !== location.origin) return
-  if (THEMES.includes(e.data?.panelTheme)) applyTheme(e.data.panelTheme)
+  if (STYLES.includes(e.data?.theme?.style) && TONES.includes(e.data.theme.tone)) applyTheme(e.data.theme)
   // the player's "LC frame" setting (key H): frame the controller moved last, or not
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
 })
-const te = () => document.body.dataset.theme === 'te'
+const retro = () => document.body.dataset.theme === 'retro', light = () => document.body.dataset.tone === 'light'
 
-// ---- knob: Black = arc (viewBox 24, radius 9, 135° → 405°), TE = disc with pointer (viewBox 26, radius 12) ----
+// ---- knob: Minimal = arc (viewBox 24, radius 9, 135° → 405°), Retro = disc with pointer (viewBox 26, radius 12) ----
 const polar = (c, r, deg) => { const a = deg * Math.PI / 180; return [c + r * Math.cos(a), c + r * Math.sin(a)] }
 const arc = (a0, a1) => { const [x0, y0] = polar(12, 9, a0), [x1, y1] = polar(12, 9, a1)
   return 'M' + x0.toFixed(2) + ' ' + y0.toFixed(2) + 'A9 9 0 ' + (a1 - a0 > 180 ? 1 : 0) + ' 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) }
-const knobSvg = () => te()
+const knobSvg = () => retro()
   ? '<svg class=knob viewBox="0 0 26 26" aria-hidden="true"><circle class=kb-disc cx=13 cy=13 r=12 /><line class=kb-ptr x1=13 y1=13 x2=13 y2=13 /></svg>'
   : '<svg class=knob viewBox="0 0 24 24" aria-hidden="true"><path class=kb-track d="' + arc(135, 405) + '"/><path class=kb-val d=""/></svg>'
 const setKnob = (el, v) => {
@@ -443,13 +456,12 @@ const draw = () => {
     // the global knobs once they are up (fog / thin / tension), as before the rebuild
     ['k1', 'k2', 'k3'].map(rw => [(tags()['g.' + rw] ?? rw).split(' | ')[0], S.cc[CC_ROW[rw] + 8]]).filter(([, v]) => v > 0.01)
       .map(([k, v]) => '<div class="next keep"><span class=k>' + esc(k) + '</span>' + Math.round(v * 100) + '</div>').join('') +
-    '<div class=keep><span class=k>bar</span>' + beat + '</div>' +
-    '<div class=keep style="margin-left:auto"><button class=theme id=theme title="Panel theme (also in the player: Visual settings, key T)">' + themeLabel() + '</button></div></div>'
+    '<div class=keep><span class=k>bar</span>' + beat + '</div></div>'
   if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
 
 // ---- spectrum: the master output from SC (/ce/spectrum, 48 bands 0..1), drawn on a canvas sized with devicePixelRatio
-// Black = LED dots (32 x 12), TE = segments (24 x 12, coloured by range). Peaks fall back 0.6 % of full scale per frame;
+// Minimal = LED dots (32 x 12), Retro = segments (24 x 12, coloured by range). Peaks fall back 0.6 % of full scale per frame;
 // without frames (SC stopped, no data) the bands fall to 0.
 const N = 48, FMIN = 20, FMAX = 20000
 const fAt = i => FMIN * Math.pow(FMAX / FMIN, (i + .5) / N)
@@ -479,12 +491,12 @@ const layoutKeys = () => {
   }
 }
 addEventListener('resize', () => requestAnimationFrame(layoutKeys))
-const colors = () => te()
-  ? { dim: '#B4B2A9', lab: '#888780', low: '#D85A30', mid: '#1D9E75', high: '#378ADD' }
-  : { fg: '#F1EFE8', dim: '#2C2C2A', lab: '#5F5E5A' }
+const colors = () => retro()
+  ? { dim: light() ? '#B4B2A9' : '#3D3C39', lab: '#888780', low: '#D85A30', mid: '#1D9E75', high: '#378ADD' }
+  : light() ? { fg: '#1A1A18', dim: '#DCDAD3', lab: '#8A8984' } : { fg: '#F1EFE8', dim: '#2C2C2A', lab: '#5F5E5A' }
 const drawSpectrum = () => {
   if (!cv || !ctx || !cv.isConnected) return
-  const r = cv.getBoundingClientRect(), w = r.width, h = r.height, C = colors(), dots = !te()
+  const r = cv.getBoundingClientRect(), w = r.width, h = r.height, C = colors(), dots = !retro()
   if (!w || !h) return
   if (Math.abs(cv.width - Math.round(w * (window.devicePixelRatio || 1))) > 1) spectrumResize()
   ctx.clearRect(0, 0, w, h)
@@ -554,7 +566,13 @@ const smooth = (arr, k) => arr.map((_, i) => { let sum = 0, n = 0; for (let j = 
 const runs = D => { const out = []; let cur = []
   D.forEach((s, i) => { if (i && s.m - D[i - 1].m > 0.5) { out.push(cur); cur = [] } cur.push(i) }); if (cur.length) out.push(cur); return out }
 
-const setColors = () => te()
+const setColors = () => retro() && !light()
+  ? { now: '#D85A30', data: '#F1EFE8', flat: '#378ADD', lab: '#888780', grid: '#3D3C39', bg: '#232321', bgRgb: [35, 35, 33], ink: [241, 239, 232],
+      cur: '#F1EFE8', old: '#888780', off: '#3D3C39' }
+  : !retro() && light()
+  ? { now: '#1A1A18', data: '#6E6D68', flat: '#1A1A18', lab: '#8A8984', grid: '#DCDAD3', bg: '#F4F3EE', bgRgb: [244, 243, 238], ink: [26, 26, 24],
+      cur: '#5F5E5A', old: '#B4B2A9', off: '#DCDAD3' }
+  : retro()
   ? { now: '#D85A30', data: '#2C2C2A', flat: '#378ADD', lab: '#888780', grid: '#B4B2A9', bg: '#D3D1C7', bgRgb: [211, 209, 199], ink: [44, 44, 42],
       cur: '#2C2C2A', old: '#5F5E5A', off: '#B4B2A9' }
   : { now: '#F1EFE8', data: '#888780', flat: '#F1EFE8', lab: '#5F5E5A', grid: '#2C2C2A', bg: '#0b0b0b', bgRgb: [11, 11, 11], ink: [241, 239, 232],
@@ -593,7 +611,7 @@ const setDraw = () => {
         const rad = R0 + (rr + .5) * st, x = cx + rad * Math.cos(a), y = cy + rad * Math.sin(a), slot = rad * Math.PI / 30
         c.fillStyle = rr < on ? (isNow ? K.now : lit) : K.off
         c.beginPath()
-        if (te()) { const tw = slot * .85 / 2; c.save(); c.translate(x, y); c.rotate(a); c.roundRect(-st * .34, -tw / 2, st * .68, tw, Math.min(tw, st * .68) * .3); c.restore() }
+        if (retro()) { const tw = slot * .85 / 2; c.save(); c.translate(x, y); c.rotate(a); c.roundRect(-st * .34, -tw / 2, st * .68, tw, Math.min(tw, st * .68) * .3); c.restore() }
         else c.arc(x, y, Math.min(st * .32, slot / 2 * .55), 0, Math.PI * 2)
         c.fill()
       }
@@ -694,7 +712,6 @@ const connect = () => {
     update()
   }
 }
-document.addEventListener('click', e => { if (e.target.closest?.('#theme')) setTheme(te() ? 'black' : 'te') })
 applyTheme(readTheme())
 connect()
 </script>
