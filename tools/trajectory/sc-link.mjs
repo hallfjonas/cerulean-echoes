@@ -11,7 +11,8 @@
 //                     and notes: [[stem, instrument, Hz, pan, level, seconds, room], …] per 25 ms (the sounding notes, for the visuals)
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
-//   POST /sc/load     { id } start the track (SC is started first if needed) → { track }      (own pages only)
+//   POST /sc/load     { id, cc?, lk? } start the track (SC is started first if needed) → { track }  (own pages only)
+//                     cc / lk: [[number, value]] set before the first note (an auto-perform script's bar 0)
 //   (recording: recording.mjs asks `record.start(path)` / `record.stop()` of this link: OSC /ce/record start|stop, the
 //   answers /ce/recording, /ce/recorded, /ce/recerror; `record.onEnd(fn)` is told when SC closed the WAV, also when a
 //   load or SC ending did it; the master's peak comes as SSE `level`, 0..1, 10 times a second)
@@ -151,12 +152,14 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     return starting
   }
 
-  const load = async id => {
+  // init: { cc, lk } as [[number, value]], sent as /ce/load <file> cc <n> <v> … lk <n> <v> …
+  const load = async (id, init = {}) => {
     const file = resolveTrack(id)
     if (!file) throw new Error(`no SuperCollider track '${id}'`)
     await start()
     const loaded = waitFor(m => m.address === '/ce/loaded' || m.address === '/ce/error', LOAD_TIMEOUT, 'answer to the load')
-    toSc('/ce/load', file)
+    const values = kind => (init[kind] ?? []).flatMap(([n, v]) => [{ i: n | 0 }, { f: clamp01(v) }])
+    toSc('/ce/load', file, 'cc', ...values('cc'), 'lk', ...values('lk'))
     const answer = await loaded
     if (answer.address === '/ce/error') throw new Error('SuperCollider: ' + answer.args[0])
     return answer.args[0]
@@ -231,7 +234,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
         if (b.note) toSc('/ce/lknote', { i: b.note[0] | 0 }, { i: b.note[1] | 0 }, { i: b.note[2] | 0 })
         return response.writeHead(204).end()
       }
-      if (route === '/load') return json(200, { track: await load(JSON.parse(body).id) })
+      if (route === '/load') { const b = JSON.parse(body); return json(200, { track: await load(b.id, b) }) }
       if (route === '/stop') { stop(); return json(200, { stopped: true }) }
       return response.writeHead(404).end('not found')
     } catch (error) {

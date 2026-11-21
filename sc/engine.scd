@@ -3,7 +3,9 @@
 // needed.
 // Talks OSC with the player's server on UDP <port> (default 57131; not 57130, the port of live.scd's LC view bridge,
 // so both can run), with the messages of the LC view (lib/ui.scd), plus:
-//   player → SC: /ce/load <track file path>   stop what plays, load that track, start it at bar 0
+//   player → SC: /ce/load <track file path> [cc <n> <v> … lk <n> <v> …]
+//                                             stop what plays, load that track, start it at bar 0; the CCs (0..1) after
+//                                             cc / lk are set before the first note (an auto-perform script's bar 0)
 //                /ce/stop                     stop what plays (the server keeps running)
 //                /ce/quit                     stop and end sclang (the server quits with it)
 //                /ce/record start <wav path>  record the master output (bus 0, 2 channels, 16 bit, the server's own sample
@@ -19,7 +21,7 @@
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;
 var serverPort = (thisProcess.argv[1] ? "57140").asInteger;
-var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, current, recorder, recStart, recStop;
+var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, setInit, current, recorder, recStart, recStop;
 // its own sound server on its own port: never the IDE's default server (localhost:57110), so the engine and a
 // SuperCollider IDE session (live.scd) can run side by side without taking over each other's server
 s = Server(\ceEngine, NetAddr("127.0.0.1", serverPort));
@@ -82,8 +84,19 @@ stopTrack = {
 	~ceClock !? { |c| c.clear };
 	s.freeAll;
 };
-loadTrack = { |path|
-	var old = ~ce, ce, track;
+// the values a load starts with: init = [cc, n, v, …, lk, n, v, …] as /ce/load sends them (LC CCs, Launchkey CCs)
+setInit = { |ce, init|
+	var kind = \cc, i = 0, send = { |m| s.sendMsg(*m) };
+	while { i < init.size } {
+		if(init[i].isKindOf(Symbol) or: { init[i].isString }) { kind = init[i].asSymbol; i = i + 1 } {
+			var n = init[i].asInteger, v = init[i + 1].asFloat.clip(0, 1);
+			if(kind == \lk) { ce.setLkCC(n, v, send) } { ce.setCC(n, v, send) };
+			i = i + 2
+		}
+	}
+};
+loadTrack = { |path, init|
+	var old = ~ce, ce, track, pattern;
 	current = path;
 	stopTrack.value;
 	// a fresh core per track (latches, buttons, buses start clean); allocators from 0, so every load reuses the same
@@ -102,15 +115,18 @@ loadTrack = { |path|
 	~ceClock = TempoClock(track.bpm / 60).permanent_(true);
 	TempoClock.default = ~ceClock;
 	old !? { |c| c.stop };
-	ce.player = ce.patterns.play(~ceClock, quant: 1);
+	// build the track (latches, buttons, control hooks), then set the load's values, then the first note
+	pattern = ce.patterns;
+	setInit.(ce, init ? []);
+	ce.player = pattern.play(~ceClock, quant: 1);
 	ce.startUI;
 	~ce = ce;
 	toPlayer.sendMsg('/ce/loaded', track.name.asString);
 	"▶ % — % BPM".format(track.name, track.bpm).postln;
 };
 
-OSCdef(\ce_host_load, { |msg| var path = msg[1].asString;
-	fork { { loadTrack.(path) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } }
+OSCdef(\ce_host_load, { |msg| var path = msg[1].asString, init = msg.drop(2);
+	fork { { loadTrack.(path, init) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } }
 }, '/ce/load').permanent_(true);
 OSCdef(\ce_host_record, { |msg|
 	if(msg[1].asString == "start") { recStart.(msg[2].asString) } { recStop.value }
