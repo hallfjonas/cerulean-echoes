@@ -2,8 +2,8 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-20T18:11:25Z
-progress: 27%
+updated: 2026-11-21T14:41:10Z
+progress: 55%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -95,12 +95,12 @@ Biggest items: 002 (engine) and the ports (007, 008).
 ## Tasks Created
 - [x] 001.md - Feature-test harness and SC core tests (parallel: false)
 - [x] 002.md - SC engine in the player (parallel: false)
-- [ ] 003.md - Visuals from SC, playground (parallel: true)
-- [ ] 004.md - Auto-perform and takes on SC (parallel: true)
-- [ ] 005.md - Recording in SC (parallel: true)
+- [x] 003.md - Visuals from SC, playground (parallel: true) — PR #78
+- [x] 004.md - Auto-perform and takes on SC (parallel: true) — PR #80
+- [x] 005.md - Recording in SC (parallel: true) — PR #79
 - [ ] 006.md - Launcher (parallel: true)
 - [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true)
-- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true)
+- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true) — ported (#64), live check done (#77); waits for the players' ear approval
 - [ ] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
 - [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
 - [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
@@ -109,3 +109,12 @@ Total tasks: 11
 Parallel tasks: 8
 Sequential tasks: 3
 Estimated total effort: 107 hours
+
+## Status (2026-11-21)
+- Closed: 001, 002, 011 (merged); 003, 004, 005 (PRs #78, #80, #79, built in parallel on `epic/sc-migration-base`).
+- 008: ported and live-checked; open only for the players' ear approval.
+- Open: 006 launcher, 007 port 001/002, 009 Strudel lab archive (SC lab moved to `sound-lab`), 010 retire Strudel parts.
+- Merge order: #63 (panel, engine fixes; base of the rest) → #78, #79, #80 (#79 and #80 touch the same load / clock /
+  player code: resolve the second one) → this PR. With #80, `npm test` starts several SC servers at once: run the SC
+  tests one after another (machine rule: one heavy job).
+
