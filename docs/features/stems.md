@@ -437,7 +437,7 @@ would name the tracks in order and the length of each change. There is no set fi
   `tools/trajectory/stem-swap.test.mjs` (without SC) and `tools/trajectory/sc-link.test.mjs` (with SC).
 - `tools/sc-port/stem-compare.mjs` compares every input a note's SynthDef reads (`<prefix>.controls.json` from
   `sc/tools/render.scd`); log labels such as `tag` and `g` are left out.
-- Not built yet: Sample Designer and Stem Designer (`.claude/epics/sound-lab/epic.md`).
+- Not built yet: Stem Designer (`.claude/epics/sound-lab/epic.md`).
 
 ## Stem swap in the player
 - Play a stem track, click a column's name in the MIDI panel: the stem drawer lists the library stems of that
