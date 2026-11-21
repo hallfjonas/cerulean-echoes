@@ -471,6 +471,12 @@ const applyLcFrame = () => {
 let sentLcFrame = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
 $('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick() })
+// a click on the panel's set view label cycles the view there: keep the setting in step
+addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
+  const view = event.data?.setView
+  if (['ring', 'map', 'energy', 'spectrogram'].includes(view) && view !== settings.get('setView')) settings.set('setView', view)
+})
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()

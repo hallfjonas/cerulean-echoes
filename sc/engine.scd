@@ -19,18 +19,22 @@
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;
 var serverPort = (thisProcess.argv[1] ? "57140").asInteger;
-var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack;
+var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, current;
 // its own sound server on its own port: never the IDE's default server (localhost:57110), so the engine and a
 // SuperCollider IDE session (live.scd) can run side by side without taking over each other's server
 s = Server(\ceEngine, NetAddr("127.0.0.1", serverPort));
 Server.default = s;
-// the server settings of live.scd, except the input device
-s.options.sampleRate = 48000;
+// the server settings of live.scd, except the input device and the sample rate: the device's own rate (asking for
+// 48 kHz makes the server quit when the device offers 44.1 kHz, or 16 kHz for a Bluetooth headset in call mode);
+// samples and reverbs follow the rate, the warning below says when it is too low
+s.options.sampleRate = nil;
 s.options.numInputBusChannels = 0;
-// no input device pinned (live.scd pins the built-in mic): started headless, opening that device waits for a
-// microphone permission that never comes, and the boot hangs. A Bluetooth headset may then drop to call quality:
-// the warning below says so.
-s.options.inDevice = nil;
+// No microphone is ever opened: a Bluetooth headset (MOMENTUM 4 …) whose mic is opened switches to call mode,
+// 16 kHz, and everything sounds dull. live.scd pins the built-in mic; started headless, that can wait for a
+// microphone permission. So the input is an output-only built-in device (the speakers): nothing to record, no mic,
+// no permission. Fallback: the built-in mic, as in live.scd.
+s.options.inDevice = ServerOptions.outDevices.detect { |d| d.containsi("MacBook") or: { d.containsi("Built-in") } or: { d.containsi("Speakers") } }
+	?? { ServerOptions.inDevices.detect { |d| d.containsi("MacBook") or: { d.containsi("Built-in") } } };
 s.options.hardwareBufferSize = 128;
 s.options.memSize = 65536;
 s.options.numWireBufs = 256;
@@ -46,6 +50,7 @@ stopTrack = {
 };
 loadTrack = { |path, slots|
 	var old = ~ce, ce, track;
+	current = path;
 	stopTrack.value;
 	// a fresh core per track (latches, buttons, buses start clean); allocators from 0, so every load reuses the same
 	// buffer and bus numbers instead of running out after a few switches
@@ -85,8 +90,25 @@ OSCdef(\ce_host_swap, { |msg| var slot = msg[1].asSymbol, ref = msg[2].asString;
 			ce.swapSlot(slot, ref, { |m, done| ce.sendInit(m); done.value; toPlayer.sendMsg('/ce/swapped', slot, ref) }) }
 	}.try { |e| e.reportError; toPlayer.sendMsg('/ce/swapError', slot, e.errorString) } }
 }, '/ce/swap').permanent_(true);
-OSCdef(\ce_host_stop, { stopTrack.value; toPlayer.sendMsg('/ce/stopped') }, '/ce/stop').permanent_(true);
+OSCdef(\ce_host_stop, { current = nil; stopTrack.value; toPlayer.sendMsg('/ce/stopped') }, '/ce/stop').permanent_(true);
 OSCdef(\ce_host_quit, { stopTrack.value; s.quit; 0.exit }, '/ce/quit').permanent_(true);
+
+// After the laptop slept, the language catches up on everything it missed and floods the server ("scheduler queue
+// is full"): no more sound, keys and pads stay dark. A watchdog notices the jump in time (> 4 s between its 1 s
+// ticks), clears the server's queue and starts the current track again, cleanly at bar 0.
+~ceWake.stop;
+~ceWake = Routine { var last = Main.elapsedTime, now;
+	loop {
+		1.wait;
+		now = Main.elapsedTime;
+		if((now - last) > 4 and: { current.notNil } and: { s.serverRunning }) {
+			"woke up after % s: clearing the server queue, starting % again".format((now - last).round(0.1), current.basename).postln;
+			s.sendMsg('/clearSched');
+			fork { { loadTrack.(current) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } };
+		};
+		last = now;
+	}
+}.play(SystemClock);
 
 s.waitForBoot {
 	toPlayer.sendMsg('/ce/ready');

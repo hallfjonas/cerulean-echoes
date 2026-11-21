@@ -53,10 +53,10 @@
 // @col 16:1 1 Kick
 // @col 16:2 2 Rumble
 // @col 16:3 3 Sub
-// @col 16:4 4 Bassline
+// @col 16:4 4 Bass
 // @col 16:5 5 Clap
 // @col 16:6 6 Hats
-// @col 16:7 7 Percussion
+// @col 16:7 7 Perc
 // @row 16:k1 Row 1 \ Brightness
 // @row 16:k2 Row 2 \ Space
 // @row 16:k3 Row 3 \ Character
@@ -66,11 +66,11 @@
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Pads
 // @col 2:2 2 Strings
-// @col 2:3 3 Sequence
+// @col 2:3 3 Seq
 // @col 2:4 4 Stab
 // @col 2:5 5 Answer
-// @col 2:6 6 Dark Perc
-// @col 2:7 7 FX / Breath
+// @col 2:6 6 Dark
+// @col 2:7 7 FX
 // @col 2:8 8 Global
 // @row 2:k1 Row 1 \ Brightness
 // @row 2:k2 Row 2 \ Space
@@ -1338,8 +1338,8 @@ const LK_SHOTS = [
   { name: 'Brace', s: 'brace' },
   { name: 'Paper', s: 'paper', gain: 0.99 },
   { name: 'Wine', s: 'wine', gain: 0.98, once: 5.33 },
-  { name: 'Plaenterwald', s: 'plaenterwald', gain: 1.45 },
-  { name: 'Wiese', s: 'lw', gain: 0.56 },
+  { name: 'Forest', s: 'plaenterwald', gain: 1.45 },
+  { name: 'Meadow', s: 'lw', gain: 0.56 },
   { name: 'Creatures', s: 'creatures', once: 4.52 },
   { name: 'No end', s: 'noend', gain: 0.76, once: 10.19 },
   { name: 'Vast', s: 'vast', once: 14.6 },
