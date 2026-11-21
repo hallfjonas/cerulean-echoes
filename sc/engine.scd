@@ -108,7 +108,7 @@ loadTrack = { |path, init|
 	track = path.load;
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
-	old !? { ce.midiPorts = old.midiPorts; old.midiWatch !? (_.stop) };
+	old !? { ce.midiPorts = old.midiPorts; ce.lcRaw = old.lcRaw; old.midiWatch !? (_.stop) };
 	{ ce.connectMidi } .try { |e| "MIDI not available (%): the track plays, no controller".format(e.errorString).warn };
 	// a new clock per load: bar 0 = now, as the player expects (scripts and takes count bars from the load)
 	old = ~ceClock;

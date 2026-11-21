@@ -54,12 +54,19 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		var ce = loadCe.value.ccBase_(0), l = ce.change(37, 3, "test"), press = { ce.setCC(37, 1, {}); ce.setCC(37, 0, {}) };
 		press.value; l.atBar(1); press.value; l.atBar(2); press.value; l.atBar(3);
 		l.now == 0 });
-	check.("two Launch Controls: the one moved last wins", {
+	check.("two Launch Controls: a fader follows the one moved last", {
 		var ce = loadCe.value.ccBase_(0);
 		ce.server = (sendMsg: { });
 		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
-		ce.midiCC(127, 13, 1); ce.midiCC(0, 13, 2);
-		ce.val(13) == 0 });
+		ce.midiCC(127, 5, 1); ce.midiCC(0, 5, 2);
+		ce.val(5) == 0 });
+	check.("knobs: turning the other Launch Control moves on from the shared value, no jump", {
+		var ce = loadCe.value.ccBase_(0);
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
+		ce.midiCC(0, 13, 1); ce.midiCC(72, 13, 1);            // LC 1: 0 → 72
+		ce.midiCC(0, 13, 2); ce.midiCC(1, 13, 2);             // LC 2 sits at 0, turned one step up
+		((ce.val(13) - (73 / 127)).abs < 1e-6) and: { ce.midiCC(5, 5, 2); ce.val(5) == (5 / 127) } });   // faders stay absolute
 	check.("Launch Control ports are found by name, DAW ports are not", {
 		var ce = loadCe.value;
 		(ce.midiKindOf("LCXL3 1 MIDI") == \lc) and: { ce.midiKindOf("LCXL3 1 DAW") != \lc } });

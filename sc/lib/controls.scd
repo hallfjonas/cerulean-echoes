@@ -80,9 +80,23 @@
 ~ce.midiPorts = ();    // uid → (name, kind)
 ~ce.lkCC = 0 ! 128;
 // One CC message from a port (also usable without hardware, for tests)
+// The LC XL 3 knobs are endless but each device keeps its own value and sends it absolutely: with two Launch Controls
+// (or a knob moved in the web view), turning a knob on the other device would jump the value to that device's own
+// number. So a knob message counts as a MOVE: the difference to what this device sent last for this knob is added to
+// the shared value. A device's first message for a knob only sets its reference (no change). Limit: a device whose
+// own value sits at 0 (or 127) sends nothing when turned further that way. Faders stay absolute (physical position).
+~ce.lcRaw = ();   // uid → (cc → the last raw value 0..127 this Launch Control sent)
+~ce.isKnobCC = { |self, cc| (cc >= 13 and: { cc <= 36 }) or: { cc >= 61 and: { cc <= 84 } } };
 ~ce.midiCC = { |self, val, num, uid|
 	switch(self.midiPorts[uid] !? { |p| p.kind },
-		\lc, { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) },
+		\lc, {
+			if(self.isKnobCC(num)) {
+				var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e }, last = raw[num];
+				raw[num] = val;
+				if(last.notNil and: { val != last }) {
+					self.setCC(num, (self.val(num) + ((val - last) / 127)).clip(0, 1), { |msg| self.server.sendMsg(*msg) }) }
+			} { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }
+		},
 		\launchkey, { self.setLkCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }
 	)
 };
