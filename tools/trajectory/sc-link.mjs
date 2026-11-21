@@ -5,8 +5,9 @@
 // The controllers never go through here: MIDI goes straight to SC, so a crash of Node or the browser stops neither
 // the music nor the controllers.
 //   GET  /sc/         the LC view of the SC track (sc/ui/index.html), shown in the player's MIDI panel
-//   GET  /sc/events   live state: layout, ccs, cc, state, beat, midi, lk, lkcc, lknote, plus host
-//                     ({ running, ready, track, error })
+//   GET  /sc/events   live state: layout, ccs, cc, state, beat, midi, lk, lkcc, lknote, spectrum (48 bands 0..1), plus host
+//                     ({ running, ready, track, error }); for the set view: sethistory (every set sample of this server
+//                     session, sent once on connect) and setsample (each new one, every 10 s; see setSample below)
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
 //   POST /sc/load     { id } start the track (SC is started first if needed) → { track }      (own pages only)
@@ -39,6 +40,11 @@ const readBody = request => new Promise((resolve, reject) => {
   request.on('error', reject)
 })
 const clamp01 = v => Math.min(1, Math.max(0, +v))
+const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits
+// a set sample from SC's /ce/setsample (sc/lib/ui.scd uiSetFrame) as the pages get it: t = when it came (ms since
+// 1970), e = energy in dB (loudness power, floor -70), p = punch 0..1, x = tension 0..1, s = 64 bands 0..1 (20 Hz-20 kHz)
+export const setSample = (args, t = Date.now()) => ({ t, e: round(+args[0], 2), p: round(clamp01(args[1]), 3),
+  x: round(clamp01(args[2]), 3), s: args.slice(3, 67).map(v => round(clamp01(v), 3)) })
 
 export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = console.log }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
@@ -50,6 +56,9 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
   const host = { running: false, ready: false, track: null, error: null }
   const clients = new Set()
   const waiters = new Set()
+  // the set's history for the set view: kept for the whole server session (survives track loads and SC restarts),
+  // ~720 samples for a 2-hour set
+  const setHistory = []
 
   const send = (res, type, data) => res.write('data: ' + JSON.stringify({ type, data }) + '\n\n')
   const broadcast = (type, data) => { for (const res of clients) send(res, type, data) }
@@ -89,6 +98,10 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
+      // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
+      case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
+      // one set sample every 10 s: kept, and passed on
+      case '/ce/setsample': { const sample = setSample(m.args); setHistory.push(sample); broadcast('setsample', sample); break }
     }
     for (const waiter of [...waiters]) if (waiter.test(m)) {
       clearTimeout(waiter.timer)
@@ -159,6 +172,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       for (const k of ['layout', 'ccs', 'state', 'beat', 'midi', 'lk']) if (state[k]) send(response, k, state[k])
       send(response, 'sc', host.ready)
       send(response, 'host', host)
+      send(response, 'sethistory', setHistory)
       clients.add(response)
       request.on('close', () => clients.delete(response))
       if (host.ready && !state.layout) toSc('/ce/hello')
@@ -189,5 +203,5 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
   // keep the event streams open through proxies and sleep
   setInterval(() => { for (const res of clients) res.write(': ping\n\n') }, 15000).unref()
 
-  return { handle, load, stop, quit, close, host, state, logFile }
+  return { handle, load, stop, quit, close, host, state, setHistory, logFile }
 }

@@ -27,6 +27,14 @@ export const SETTINGS = [
       try { localStorage.setItem('ce.panelTheme', value) } catch {}
       document.getElementById('scPanel')?.contentWindow?.postMessage({ panelTheme: value }, location.origin)
     } },
+  // the set view of the SuperCollider MIDI panel (UI-REDESIGN.md "Set view"): four candidate views, one browser setting
+  // the panel reads too; a click on the panel's label (the view's name) cycles it and the panel tells the player
+  { id: 'setView', label: 'Set view', kind: 'choice', options: ['ring', 'map', 'energy', 'spectrogram'], default: 'ring', key: 'c',
+    tip: 'Key C: how the box right of the spectrum shows the set so far: ring (labelled energy), map, energy area, spectrogram (SuperCollider tracks)',
+    apply: value => {
+      try { localStorage.setItem('ce.setView', value) } catch {}
+      document.getElementById('scPanel')?.contentWindow?.postMessage({ setView: value }, location.origin)
+    } },
   { id: 'widen', label: 'Pan width', kind: 'toggle', default: true, key: 'w',
     tip: 'Key W: widen the pan range the music used', apply: (value, { renderer }) => renderer.setWiden(value) },
 ]
