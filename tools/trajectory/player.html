@@ -449,7 +449,7 @@ $('scPanel').addEventListener('load', sendLcFrame)
 addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
   const view = event.data?.setView
-  if (['ring', 'map', 'energy', 'spectrogram'].includes(view) && view !== settings.get('setView')) settings.set('setView', view)
+  if (typeof view === 'string' && view !== settings.get('setView')) settings.set('setView', view)
 })
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
