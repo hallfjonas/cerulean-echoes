@@ -1,36 +1,42 @@
-:root { --bg: #071521; --fg: #eef4f2; --dim: #7fa3b2; --line: #2c4e63; --accent: #4fb3e0; --err: #f5a55a;
-  --panel: rgba(4, 10, 18, 0.88); --control: #163449 }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 15px system-ui, sans-serif }
-a { color: var(--accent) }
-header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 10px 16px;
-  border-bottom: 1px solid var(--line) }
-body.overlay { overflow: hidden }
-body.overlay header { position: fixed; top: 0; left: 0; right: 0; background: var(--panel); border-bottom: 0; z-index: 1;
-  transition: opacity 0.6s }
-body.idle header { opacity: 0; pointer-events: none }
-body.idle { cursor: none }
+/* One design for the player page and the SuperCollider MIDI panel (sc/ui/index.html): the same colours, fonts and flat
+   controls. html[data-style] = minimal | retro, html[data-tone] = dark | light (theme.mjs). Flat: no gradients or glow. */
+:root, :root[data-style=minimal][data-tone=dark] {
+  --bg: #0b0b0b; --fg: #F1EFE8; --dim: #8A8984; --faint: #5F5E5A; --line: #2C2C2A; --control: #1E1E1C; --control-hi: #2C2C2A;
+  --accent: #F1EFE8; --on-accent: #0b0b0b; --panel: #0b0b0b; --err: #D85A30; --rec: #D85A30; --radius: 3px;
+  --font: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace }
+:root[data-style=minimal][data-tone=light] {
+  --bg: #F4F3EE; --fg: #1A1A18; --dim: #6E6D68; --faint: #A6A49D; --line: #DCDAD3; --control: #E6E4DD; --control-hi: #DCDAD3;
+  --accent: #1A1A18; --on-accent: #F4F3EE; --panel: #F4F3EE }
+:root[data-style=retro] { --radius: 6px;
+  --font: -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, "DejaVu Sans", sans-serif }
+:root[data-style=retro][data-tone=light] {
+  --bg: #D3D1C7; --fg: #2C2C2A; --dim: #5F5E5A; --faint: #888780; --line: #B4B2A9; --control: #E6E4DC; --control-hi: #F1EFE8;
+  --accent: #D85A30; --on-accent: #F1EFE8; --panel: #CAC8BD }
+:root[data-style=retro][data-tone=dark] {
+  --bg: #232321; --fg: #F1EFE8; --dim: #9A9890; --faint: #5F5E5A; --line: #3D3C39; --control: #3D3C39; --control-hi: #4A4945;
+  --accent: #D85A30; --on-accent: #F1EFE8; --panel: #1B1B1A }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 var(--font) }
+a { color: var(--fg) }
 nav { display: flex; gap: 14px; margin-right: 8px }
-nav a { color: var(--dim); text-decoration: none; font-size: 14px }
+nav a { color: var(--dim); text-decoration: none }
 nav a:hover { color: var(--fg) }
-nav a.here { color: var(--fg); font-weight: 600 }
-button, select, label.file { background: var(--control); color: var(--fg); border: 1px solid var(--line);
-  border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer }
+nav a.here { color: var(--fg) }
+button, select, label.file { background: var(--control); color: var(--fg); border: 0; border-radius: var(--radius);
+  padding: 6px 10px; font: inherit; cursor: pointer }
+button:hover:not(:disabled), select:hover:not(:disabled) { background: var(--control-hi) }
 button:disabled, select:disabled { opacity: 0.4; cursor: default }
-button.on { background: #b5651d; border-color: var(--err) }
+button.on, button[aria-pressed=true] { background: var(--accent); color: var(--on-accent) }
 label { display: flex; align-items: center; gap: 8px; color: var(--dim); font-size: 13px }
-input[type=range] { width: 140px; accent-color: var(--accent) }
+input[type=range], input[type=checkbox] { accent-color: var(--accent) }
+input[type=range] { width: 140px }
 output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em }
-#status { color: var(--dim); margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px }
 #help { position: fixed; top: 0; right: 0; bottom: 0; width: 320px; box-sizing: border-box; padding: 16px;
-  background: var(--panel); border-left: 1px solid var(--line); z-index: 2; overflow-y: auto; font-size: 14px }
+  background: var(--panel); border-left: 1px solid var(--line); z-index: 3; overflow-y: auto; font-size: 13px }
 #help[hidden] { display: none }
-#help h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600 }
-#help h3 { margin: 14px 0 4px; font-size: 12px; font-weight: 600; color: var(--dim); text-transform: uppercase;
-  letter-spacing: 0.04em }
-#help p, #help ol { margin: 0; line-height: 1.45 }
+#help h2 { margin: 0 0 12px; font-size: 14px; font-weight: 500 }
+#help h3 { margin: 14px 0 4px; font-size: 12px; font-weight: 500; color: var(--dim); text-transform: lowercase }
+#help p, #help ol { margin: 0; line-height: 1.5 }
 #help ol { padding-left: 20px }
-body.help-open:not(.overlay) { margin-right: 320px }
-body.help-open.overlay header { right: 320px }
 #stemDrawer { position: fixed; top: 0; right: 0; bottom: 0; width: 340px; box-sizing: border-box; padding: 16px;
   background: var(--panel); border-left: 1px solid var(--line); z-index: 3; overflow-y: auto; font-size: 14px }
 #stemDrawer[hidden] { display: none }

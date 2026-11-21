@@ -118,9 +118,9 @@
 // @ctl 2:7.b2 Flock | a whole flock calls while held.
 // @lk level Keys Level | mod wheel: volume of the keys (× master).
 // @lk k1 Brightness | dull ↔ bright; harder keys brighter.
-// @lk k2 Piano → Rhodes | off → piano → Rhodes → off.
-// @lk k3 B3 → M1 | off → organ B3 → M1 → off.
-// @lk k4 Vibes → Marimba | off → vibraphone → marimba → off.
+// @lk k2 Piano | off → piano → Rhodes → off.
+// @lk k3 Organ | off → organ B3 → M1 → off.
+// @lk k4 Mallets | off → vibraphone → marimba → off.
 // @lk k5 Length | short notes ↔ long.
 // @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.

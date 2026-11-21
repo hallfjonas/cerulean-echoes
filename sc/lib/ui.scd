@@ -99,7 +99,20 @@
 // control (column 8 knob row 3, CC 36) averaged, and the 48 spectrum bands averaged and resampled to 64 (same log
 // range). The history itself is kept by the player's link (sc-link.mjs) / bridge.mjs, not here.
 ~ce.uiSetFrame = { |self, kind, vals|
-	var acc = topEnvironment[\ceSetAcc], now = Main.elapsedTime;
+	var acc = topEnvironment[\ceSetAcc], now = Main.elapsedTime, fast = topEnvironment[\ceFastAcc];
+	// every second as well (10 level frames): /ce/setfast energy (dB, as below) and 12 band groups (4 of the 48 each),
+	// for the set view's fine views (last minute at 1-2 s, spectrogram in 12 rows)
+	if(fast.isNil or: { now - fast[\lastAt] > 5 }) { fast = (lastAt: now, frames: 0, powSum: 0, bandSum: 0 ! 48, bandN: 0); topEnvironment[\ceFastAcc] = fast };
+	fast[\lastAt] = now;
+	if(kind == \spec) { fast[\bandSum] = fast[\bandSum] + vals.keep(48); fast[\bandN] = fast[\bandN] + 1 } {
+		fast[\frames] = fast[\frames] + 1; fast[\powSum] = fast[\powSum] + vals[0];
+		if(fast[\frames] >= 10) {
+			var mean = fast[\powSum] / fast[\frames], avg = fast[\bandSum] / fast[\bandN].max(1);
+			self.uiSend('/ce/setfast', if(mean > 0) { (10 * mean.log10 - 0.691).max(-70) } { -70 },
+				*12.collect { |g| avg.copyRange(g * 4, g * 4 + 3).sum / 4 });
+			topEnvironment[\ceFastAcc] = nil;
+		};
+	};
 	if(acc.isNil or: { now - acc[\lastAt] > 5 }) {
 		acc = (lastAt: now, frames: 0, powSum: 0, crestSum: 0, crestN: 0, tensSum: 0, bandSum: 0 ! 48, bandN: 0);
 		topEnvironment[\ceSetAcc] = acc };

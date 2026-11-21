@@ -40,14 +40,19 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 
 ### Layout
 
-- **Sidebar** (left, **☰** or key **S** hides and shows it): the views (MIDI panel, Visualization), the track list with Play, Stop, Record and Save take, Auto-perform, and Visual settings (folded).
+- **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
+- **Sidebar** (left, **‹** or key **S** hides it): the views (MIDI panel, Visualization), **?** ("About this page",
+  closed on every load), the track list with Play, Stop, Record and Save take, the status line (what plays, MIDI
+  inputs, auto-perform bar), Auto-perform, Theme, and Visual settings (folded).
+- **Theme**: one look for the page and the SuperCollider MIDI panel (`theme.mjs`, `ui.css`): **Minimal** (calm, flat,
+  Torso-like) or **Retro** (Teenage Engineering-like), each **Auto** (as the system), **Dark** or **Light**; key **T**
+  switches the style. Set here only; the panel has no switch of its own. The Strudel tracks' LC view keeps its own look.
 - **MIDI panel** (the start view): the track's LC view, drawn into the page instead of its own window. A board
   without an LC view says so; its visuals still play.
 - **Visualization**: the visuals full screen behind the sidebar. Switching views keeps the sound playing; the visuals
-  pause while the MIDI panel shows. The top bar hides after 3 s without the mouse here. The track's status box
+  pause while the MIDI panel shows. The track's status box
   (bottom right) shows only in this view; its "▣ LC big" still opens the LC view in its own window, and the MIDI
   panel takes it back when it shows again.
-- **Top bar**: ☰, the status line and **?**, which opens "About this page" (closed on every load).
 
 ### Visual settings
 
@@ -139,7 +144,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   virtual inputs back to 0 before the track loads, then sets the script's bar-0 values.
 - Takes you saved (below) are listed with the scripts as `takes/<name>` and play the same way.
 - While a script plays, the sidebar shows its title, mood and sections (the current one in bold, `intent` on hover),
-  and the top bar the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
+  and the status line the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
   step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 21-28, keys that parse,
   and the `take` meta field of a take. `npm run verify` runs it.
@@ -267,7 +272,7 @@ it was retired on 2026-11-20):
 | `catalogue.mjs` | scans live tracks (Strudel and SuperCollider, field `engine`) and lab boards, their auto-perform scripts |
 | `engine-sc.mjs` | the SuperCollider engine in the page: load / stop over `/sc/…`, `cycle()` from SC's beats, no audio output in the page |
 | `sc-link.mjs`, `osc.mjs` | the server's link to SC: starts `sc/engine.scd`, OSC on UDP 57131 (SC's own server on 57140, not the IDE's 57110), `/sc/` routes and live state for the pages |
-| `help.mjs`, `ui.css` | the Help panel and the look |
+| `help.mjs`, `ui.css`, `theme.mjs` | the Help panel; the look (colour tokens per style and tone); the Theme switch |
 | `banks.mjs` | sample banks and soundfonts the player loads, as strudel.cc does |
 
 ## What we learned
