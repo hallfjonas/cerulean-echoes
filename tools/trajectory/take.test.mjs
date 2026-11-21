@@ -151,7 +151,7 @@ test('POST /take: a live track gets a take in perform/<track>/takes/ that the ca
   const button = [...real].find(([, c]) => c.button)[0]
   const s = session([[LC, 0xbf, button, 127, 3], [LK, 0x99, 40, 100, 5], [LK, 0x90, 62, 90, 6]])
   s.trackHash = 'a'.repeat(40)
-  assert.equal(saveTake('lab-kick-kick-lab', s).status, 404)
+  assert.equal(saveTake('lab-tutorials-harmony-tutorial', s).status, 404)
   assert.equal(saveTake(track, { messages: [] }).status, 400)
   const { status, body } = saveTake(track, s)
   assert.equal(status, 200)
