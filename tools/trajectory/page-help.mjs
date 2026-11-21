@@ -43,7 +43,8 @@ const SAMPLES = [
   { heading: 'Output', text: 'Sound and four figures of one hit, drawn when the project loads and after every move of a '
     + 'control: waveform, envelope (attack and decay), spectrum (strongest frequency, centroid) and spectrogram. '
     + 'Export writes the sound to sc/sounds/ with its WAV.' },
-  { heading: 'How to use', text: ['Pick a project and press Load.', 'Move a control: the figures follow.',
+  { heading: 'How to use', text: ['Pick a project and press Load (folder symbol; Save is the disk, Save as the disk with a '
+    + 'plus, Export the arrow; hover for the name).', 'Move a control: the figures follow.',
     'Save writes the values into the project (also LC column 8, button 2); Save as copies it under a new name.',
     'Export turns the sound into a library sound once it is right.'] }
 ]
@@ -56,7 +57,8 @@ const STEMS = [
   { heading: 'Output', text: 'Sound, and the project file. Column 8 is the same in both modes: button 1 picks what the fader '
     + 'sets, the level of everything (Global), of the stems you explore (Stems) or of the context sound (Context); '
     + 'each keeps its own level.' },
-  { heading: 'How to use', text: ['Pick a project and press Load.', 'Move a control of a column to select it.',
+  { heading: 'How to use', text: ['Pick a project and press Load (folder symbol; Save is the disk, Save as the disk with a '
+    + 'plus; hover for the name).', 'Move a control of a column to select it.',
     'Every free slot shows + Add: click it, pick a stem in the drawer (the Live page\'s), it goes on that slot.',
     'Above a stem\'s title: the export symbol (active only for a changed stem, see Promote) and the trash symbol '
     + '(the slot is free again).',

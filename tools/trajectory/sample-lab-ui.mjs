@@ -2,10 +2,14 @@
 // Load plays the project from its file (as Play); Save writes the playing values into it; Save as copies it (with the
 // playing values) under a new name; Export writes the library sound and its WAV (server: sample-lab.mjs).
 // The sound's shape shows under the LCs in the MIDI panel (sc/ui/index.html, sample-shape-ui.mjs).
+import { ICONS, iconButton } from './sidebar-icons.mjs'
+
 export const mountSampleLab = ({ section, selected, play, refresh }) => {
-  section.innerHTML = '<h2>Sample Designer</h2><div class="row"><button data-act="load">Load</button>' +
-    '<button data-act="save" title="Also the LC: column 8, button 2">Save</button>' +
-    '<button data-act="saveAs">Save as</button><button data-act="export">Export</button></div><output></output>'
+  section.innerHTML = '<h2>Sample Designer</h2><div class="row">' +
+    iconButton('load', 'Load', ICONS.load) +
+    iconButton('save', 'Save', ICONS.save, 'Save (also the LC: column 8, button 2)') +
+    iconButton('saveAs', 'Save as', ICONS.saveAs) +
+    iconButton('export', 'Export', ICONS.export) + '</div><output></output>'
   const out = section.querySelector('output')
   const post = async (route, body) => {
     const response = await fetch('lab/sample/' + route,
@@ -34,7 +38,7 @@ export const mountSampleLab = ({ section, selected, play, refresh }) => {
     },
   }
   section.addEventListener('click', async event => {
-    const act = event.target.dataset?.act
+    const act = event.target.closest('[data-act]')?.dataset.act
     if (!act) return
     try { out.textContent = await actions[act]() } catch (error) { out.textContent = 'Error: ' + error.message }
   })
