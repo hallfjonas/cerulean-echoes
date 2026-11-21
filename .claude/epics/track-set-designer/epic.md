@@ -3,7 +3,7 @@ name: track-set-designer
 status: backlog
 created: 2026-11-21T14:00:00Z
 updated: 2026-11-21T14:00:00Z
-progress: 0%
+progress: 12%
 prd: .claude/prds/track-set-designer.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -15,7 +15,7 @@ github: (not synced; issue sync is off, see CONTRIBUTING.md)
 Two designers on top of the sound lab. The **Track Designer** builds a stem track in the player: stems onto the 14
 LC slots, tempo, swing, genre, a frame from a template track, and the Launchkey as a **rig** file (keys, knobs 1-8,
 16 pads). The **Set Designer** orders stem tracks into a set file; the **set engine** plays it as one session, the next
-track picked live with the LC XL 3 Track ◄ ► buttons and taking over column by column at bar lines.
+track picked live with Next track (Mode 2, column 8, button 1) and taking over column by column at bar lines.
 
 ## Architecture Decisions (user, 2026-11-21)
 
@@ -23,9 +23,11 @@ track picked live with the LC XL 3 Track ◄ ► buttons and taking over column 
 - **Transition column by column.** The picked track's stems swap in slot by slot at bar lines (default slot order by
   role: pad / texture → sub / bass → drums → lead / keys / chords), built on `~ce.swapSlot`. Frame (chords,
   chapters) and rig switch at one bar in the middle; tempo glides over the transition. Not a dual-load crossfade.
-- **Next track = Track ◄ ►.** The LC XL 3 Track buttons cycle the pending next track; it applies at the next phrase,
-  like Chapter. Unmeasured: task 001 is a spike with the device. Fallback, only if the spike fails: decided with the
-  user then (candidates: column 8 button 1 on Mode 2, or a hold on Chapter).
+- **Next track = Mode 2, column 8, button 1 (CC 92), MIDI mode.** Decided after the 001 spike: the LC XL 3 Track
+  ◄ ► and Page ▲ ▼ buttons send nothing in standalone (MIDI) mode and Components cannot assign them; they report only
+  in DAW mode, which this epic does not use (separate proposal: PR #75, `docs/reference/lcxl3-daw-mode.md`). In a set
+  CC 92 cycles the pending next track, applied at the next phrase like Chapter; Mode 1 column 8 button 1 (CC 44)
+  stays Chapter, so in a set these two no longer alias (every other column 8 control still does).
 - **Launchkey as data.** A rig JSON (`sc/launchkey/<name>.lk`, versions as files like stems) replaces the frame's
   Launchkey code for new tracks; a frame with Launchkey code keeps working. A track names its rig
   (`"launchkey": "<ref>"`).
@@ -45,7 +47,7 @@ track picked live with the LC XL 3 Track ◄ ► buttons and taking over column 
 - `tracklab.scd`: Track Designer project → track Event (like `stemlab.scd`).
 - `stemset.scd`: set file → one session: all tracks' frames and rigs loaded, the playing track's columns live,
   preload on pick, the transition scheduler (slot order, bar per step, frame and rig switch, tempo glide), live strip
-  replacement, the Track ◄ ► latch.
+  replacement, the Next track latch on CC 92.
 - `engine.scd`, `render.scd`: load `.tracklab.json` and `.set`.
 
 ### Player (`tools/trajectory/`)
@@ -67,7 +69,6 @@ track picked live with the LC XL 3 Track ◄ ► buttons and taking over column 
 `epic/sound-lab` until that merges, then off `origin/main`.
 
 Risks:
-- Track ◄ ► may send nothing usable in custom mode (DAW port only): the spike decides; fallback with the user.
 - Strip replacement while playing (new node, crossfade, free the old) is new in the mixer; test it alone first.
 - CPU during a transition (two tracks' sounds, preload): gate finished slots, measure on the M2 Air.
 - Few stem tracks exist (009, 090): the set needs tracks from the Track Designer to be tested in earnest.
@@ -77,12 +78,12 @@ Risks:
 
 | # | Task | Parallel |
 |---|---|---|
-| 001 | Spike: what the LC XL 3 Track ◄ ► (and Page) buttons send in custom mode | first, with the user's device |
+| 001 | Spike: what the LC XL 3 Track ◄ ► (and Page) buttons send in custom mode (done: nothing) | first, with the user's device |
 | 002 | Launchkey rig: format, schema, check, SC loader, 009's Launchkey extracted and proven equal | first |
 | 003 | Track Designer: project format, SC loader, player (slots, settings, Launchkey panel), Publish | after 002 |
 | 004 | `/track-designer` skill | after 003 |
 | 005 | Set format and SC set engine (preload, column-by-column transition, frame/rig switch, tempo glide, strip crossfade) | after 002, parallel to 003 |
-| 006 | Live next track: Track ◄ ► latch, LC view and SC panel set head | after 001, 005 |
+| 006 | Live next track: Next track latch (CC 92), LC view and SC panel set head | after 001, 005 |
 | 007 | Set Designer in the player, sets in the catalogue | after 005 |
 | 008 | `/set-designer` skill, docs (sets, stems, devices, sound-lab), CLAUDE.md pointers | last |
 
@@ -96,7 +97,7 @@ Risks:
 
 - `check-stems` green on rigs, tracks and sets; `npm test` covers rig load and equivalence, project load and publish,
   set load, a full transition (every slot of the new track plays, no slot silent more than one bar unless empty in the
-  new track), the Track ◄ ► latch.
+  new track), the Next track latch.
 - 009 with its rig matches the frame-code Launchkey event by event (`tools/sc-port`).
 - A 3-track set plays on the M2 Air without dropouts through a transition (measured).
 - `npm run path-lint` shows no new missing paths.
@@ -107,7 +108,7 @@ Risks:
 Designer).
 
 ## Tasks Created
-- [ ] 001.md - Spike: LC XL 3 Track ◄ ► buttons (parallel: true)
+- [x] 001.md - Spike: LC XL 3 Track ◄ ► buttons (parallel: true)
 - [ ] 002.md - Launchkey rig (parallel: true)
 - [ ] 003.md - Track Designer (parallel: false)
 - [ ] 004.md - /track-designer skill (parallel: true)
