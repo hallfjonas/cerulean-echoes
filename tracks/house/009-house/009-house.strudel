@@ -36,11 +36,11 @@
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
 // @col 16:8 8 Global
 // @col 16:1 1 Kick
-// @col 16:2 2 Noise Pump
+// @col 16:2 2 Pump
 // @col 16:3 3 Sub
 // @col 16:4 4 Bass
 // @col 16:5 5 Clap
-// @col 16:6 6 Hats / Shaker
+// @col 16:6 6 Hats
 // @col 16:7 7 Congas
 // @row 16:k1 Row 1 \ Brightness
 // @row 16:k2 Row 2 \ Space
@@ -51,7 +51,7 @@
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Harmony
 // @col 2:2 2 Keys
-// @col 2:3 3 Vibraphone
+// @col 2:3 3 Vibes
 // @col 2:4 4 Flute
 // @col 2:5 5 Brass
 // @col 2:6 6 Strings
@@ -1992,7 +1992,7 @@ const LK_SHOTS = [
   { name: 'Paper', s: 'paper', gain: 0.99 },
   { name: 'Wine', s: 'wine', gain: 0.98, once: 5.33 },
   { name: 'Evening', s: 'evening', gain: 1.04, once: 9.25 },
-  { name: 'Wiese', s: 'lw', gain: 0.56 },
+  { name: 'Meadow', s: 'lw', gain: 0.56 },
   { name: 'Creatures', s: 'creatures', once: 4.52 },
   { name: 'No end', s: 'noend', gain: 0.76, once: 10.19 },
   { name: 'Vast', s: 'vast', once: 14.6 },

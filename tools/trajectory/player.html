@@ -119,6 +119,7 @@
 <script type="module">
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
+import { createScSource } from './sc-source.mjs'
 import { createSmoother } from './smoothing.mjs'
 import * as midi from './midi.mjs'
 import { createEngine } from './engine-strudel.mjs'
@@ -160,6 +161,8 @@ const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
 createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text },
   onBatch: batch => recorder.addEvents(batch) })
+let scVisuals = ''
+createScSource({ onLine: smoother.push, onStatus: text => { scVisuals = text } })
 
 // Two engines: Strudel in this page, SuperCollider through the server (catalogue entry engine 'sc'). `engine` forwards
 // to the one that plays, so takes, auto-perform and the recorder read one clock.
@@ -425,13 +428,19 @@ const applyLcFrame = () => {
 let sentLcFrame = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
 $('scPanel').addEventListener('load', sendLcFrame)
+// a click on the panel's set view label cycles the view there: keep the setting in step
+addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
+  const view = event.data?.setView
+  if (['ring', 'map', 'energy', 'spectrogram'].includes(view) && view !== settings.get('setView')) settings.set('setView', view)
+})
 const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
   if (settings.get('lcFrame') !== sentLcFrame) sendLcFrame()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
-  $('status').textContent = [label, midiText, autoLabel, onSc() ? '' : visuals].filter(Boolean).join(' · ')
+  $('status').textContent = [label, midiText, autoLabel, onSc() ? scVisuals : visuals].filter(Boolean).join(' · ')
   requestAnimationFrame(showStatus)
 }
 showStatus()

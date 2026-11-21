@@ -265,6 +265,7 @@ it was retired on 2026-11-20):
 | `check-recording.mjs` | end-to-end test of the recording endpoints |
 | `settings.mjs` | every visual setting as data; builds the Visual settings and the keys |
 | `catalogue.mjs` | scans live tracks (Strudel and SuperCollider, field `engine`) and lab boards, their auto-perform scripts |
+| `sc-source.mjs` | SuperCollider notes (SSE `notes`, sent by `sc/lib/steps.scd` when each note sounds) → lines |
 | `engine-sc.mjs` | the SuperCollider engine in the page: load / stop over `/sc/…`, `cycle()` from SC's beats, no audio output in the page |
 | `sc-link.mjs`, `osc.mjs` | the server's link to SC: starts `sc/engine.scd`, OSC on UDP 57131 (SC's own server on 57140, not the IDE's 57110), `/sc/` routes and live state for the pages |
 | `help.mjs`, `ui.css` | the Help panel and the look |

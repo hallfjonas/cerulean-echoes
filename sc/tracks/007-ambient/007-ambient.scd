@@ -9,16 +9,16 @@
 // @layout Track 007 — ambient moods (SuperCollider)
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
 // @col 16:1 1 Pulse
-// @col 16:2 2 Sea / Wind
+// @col 16:2 2 Sea
 // @col 16:3 3 Drone
 // @col 16:4 4 Bass
 // @col 16:5 5 Rim
 // @col 16:6 6 Shaker
-// @col 16:7 7 Wood / Drops
+// @col 16:7 7 Wood
 // @col 16:8 8 Global
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Pad
-// @col 2:2 2 Eno / Shimmer
+// @col 2:2 2 Shimmer
 // @col 2:3 3 Marimba
 // @col 2:4 4 Toms
 // @col 2:5 5 Choir
@@ -348,7 +348,7 @@ lkNote: { |ce, note, vel, chan|
 	}
 },
 // web UI: the names of the 16 drum pads (pads 1-8 = notes 36-43, 9-16 = 44-51)
-lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Wiese", "Creatures", "No end", "Vast", "Glockenspiel", "Bowed vibe",
+lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Meadow", "Creatures", "No end", "Vast", "Glockenspiel", "Bowed vibe",
 	"Choir aah", "Voice ooh", "Wind", "Space", "Noise swell", "Crash reverse"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)

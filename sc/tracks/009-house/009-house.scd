@@ -7,17 +7,17 @@
 // @layout Track 009 — house (SuperCollider)
 // @mode 16 Mode 1 — Jojo: Foundation (beat + bass) · same CCs as Mode 16
 // @col 16:1 1 Kick
-// @col 16:2 2 Noise Pump
+// @col 16:2 2 Pump
 // @col 16:3 3 Sub
 // @col 16:4 4 Bass
 // @col 16:5 5 Clap
-// @col 16:6 6 Hats / Shaker
+// @col 16:6 6 Hats
 // @col 16:7 7 Congas
 // @col 16:8 8 Global
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Harmony
 // @col 2:2 2 Keys
-// @col 2:3 3 Vibraphone
+// @col 2:3 3 Vibes
 // @col 2:4 4 Flute
 // @col 2:5 5 Brass
 // @col 2:6 6 Strings
@@ -435,7 +435,7 @@ lkNote: { |ce, note, vel, chan|
 	}
 },
 // web UI: the names of the 16 drum pads (pads 1-8 = notes 36-43, 9-16 = 44-51)
-lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Wiese", "Creatures", "No end", "Vast", "Clap", "Open hat", "Rim echo",
+lkPadNames: ["Brace", "Paper", "Wine", "Evening", "Meadow", "Creatures", "No end", "Vast", "Clap", "Open hat", "Rim echo",
 	"Low tom", "Voice ooh", "Crash reverse", "Vibraphone", "Snare"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)

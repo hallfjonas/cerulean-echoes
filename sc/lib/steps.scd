@@ -27,6 +27,14 @@ Event.addEventType(\ceMulti, { |server|
 		// nolog: a layer that is silent right now (live mix at 0, Strudel would not play it): not in the event log
 		if(e.removeAt(\nolog) != true) { topEnvironment[\ce].log !? { |log| log.add([beats + at, parent[\stem], e]) } };
 		e.play;
+		// the visuals: one /ce/note per sounding note, sent when it sounds (latency + offset), not when it is scheduled
+		// (stem, instrument, Hz or 0 for a sample, pan 0..1, level, seconds, room share)
+		if(topEnvironment[\ce].uiOn) {
+			var msg = ['/ce/note', parent[\stem].asString, (e[\instrument] ? \none).asString,
+				(e[\freq] ?? { e[\midi] !? { |m| m.midicps } } ? 0).asFloat, (e[\pan] ? 0.5).asFloat,
+				((e[\amp] ? 0.3) * lv).asFloat, e[\hold].asFloat, (e[\room] ? 0).asFloat];
+			SystemClock.sched((parent[\latency] ? 0.2) + (at / bps), { topEnvironment[\ce].uiSend(*msg); nil });
+		};
 		};
 	};
 });
