@@ -19,6 +19,7 @@
     "check-stems": "node stems/check-stems.mjs",
     "stems": "node stems/stems.mjs",
     "sample-lab": "node sound-lab/sample-lab.mjs",
+    "stem-lab": "node sound-lab/stem-lab.mjs",
     "producer": "node producer/make-track.mjs"
   },
   "dependencies": {

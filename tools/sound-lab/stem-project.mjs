@@ -130,3 +130,30 @@ export function promote(name, slot, root = repoRoot) {
   writeProject(next, root)
   return { file, ref: libraryRef }
 }
+
+const TRACK_NAME = /^[0-9]{3}-[a-z0-9]+(-[a-z0-9]+)*$/
+
+export function trackWith(trackName, newName, slots, root = repoRoot) {
+  if (!TRACK_NAME.test(newName ?? '')) throw new Error(`"${newName}": three digits, a dash, lowercase words (009-house-v2)`)
+  const dir = path.join(root, 'sc', 'tracks', newName)
+  if (fs.existsSync(dir)) throw new Error(`sc/tracks/${newName} exists: pick another name`)
+  const source = path.join(root, 'sc', 'tracks', trackName, `${trackName}.track`)
+  const json = readJson(source)
+  for (const [slot, ref] of Object.entries(slots)) {
+    if (!json.slots[slot]) throw new Error(`slot ${slot} holds no stem in ${trackName}`)
+    if (ref.startsWith('draft:')) throw new Error(`slot ${slot}: promote the draft first`)
+    json.slots[slot] = ref
+  }
+  const frame = `${newName}-frame.scd`
+  fs.mkdirSync(dir)
+  fs.copyFileSync(path.join(path.dirname(source), json.frame), path.join(dir, frame))
+  const file = path.join(dir, `${newName}.track`)
+  const sorted = Object.fromEntries(Object.entries(json.slots).sort(([a], [b]) => a.localeCompare(b)))
+  fs.writeFileSync(file, JSON.stringify({ ...json, name: newName, frame, slots: sorted }, null, 2) + '\n')
+  const errors = checkFiles([file], root)[0].errors
+  if (errors.length) {
+    fs.rmSync(dir, { recursive: true })
+    throw new Error(`${newName}: ${errors.join('; ')}`)
+  }
+  return file
+}

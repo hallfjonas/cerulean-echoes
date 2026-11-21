@@ -195,7 +195,7 @@ Designer), 007 (Stem Designer).
 - [x] 005.md - Sample Designer (parallel: true)
 - [x] 006.md - /sample-designer skill (parallel: true)
 - [x] 007.md - Stem Designer (parallel: false; in review; live CPU measurement open)
-- [ ] 008.md - /stem-designer skill (parallel: true)
+- [x] 008.md - /stem-designer skill (parallel: true; in review)
 - [x] 009.md - Stem swap in the player (parallel: true; in review)
 - [x] 013.md - Stem format 2 (parallel: false)
 - [ ] 010.md - Docs, skills hand-over, sound-lab wrap-up (parallel: false)

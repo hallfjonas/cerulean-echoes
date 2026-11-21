@@ -8,7 +8,7 @@ import os from 'os'
 import path from 'path'
 import { checkFiles } from '../stems/check-stems.mjs'
 import { scan } from '../trajectory/catalogue.mjs'
-import { checkAll, listProjects, projectErrors, projectFile, promote, readProject, repoRoot, saveAs, saveProject }
+import { checkAll, listProjects, projectErrors, projectFile, promote, readProject, repoRoot, saveAs, saveProject, trackWith }
   from './stem-project.mjs'
 
 const sandboxes = []
@@ -81,6 +81,21 @@ test('Promote writes a new stem version with the parent, never overwrites', () =
   assert.throws(() => promote('flute-explore', '2:4', root), /in the library already/)
   fs.writeFileSync(projectFile('flute-explore', root), JSON.stringify(withDraft(project)))
   assert.notEqual(promote('flute-explore', '2:4', root).ref, first.ref)
+})
+
+test('the flute story: draft → promote → a new track with the new version, all checks pass', () => {
+  const root = sandbox()
+  fs.writeFileSync(projectFile('flute-explore', root), JSON.stringify(withDraft(readProject('flute-explore', root))))
+  const { ref } = promote('flute-explore', '2:4', root)
+  const file = trackWith('009-house', '009-house-v2', { '2:4': ref }, root)
+  const track = JSON.parse(fs.readFileSync(file, 'utf8'))
+  assert.equal(track.slots['2:4'], ref)
+  assert.equal(track.slots['2:5'], JSON.parse(fs.readFileSync(
+    path.join(repoRoot, 'sc', 'tracks', '009-house', '009-house.track'), 'utf8')).slots['2:5'])
+  assert.deepEqual(checkFiles([file], root)[0].errors, [])
+  assert.throws(() => trackWith('009-house', '009-house-v2', {}, root), /exists/)
+  assert.throws(() => trackWith('009-house', '009-house-v3', { '2:4': 'draft:x' }, root), /promote the draft/)
+  assert.ok(!fs.existsSync(path.join(root, 'sc', 'tracks', '009-house-v3')))
 })
 
 test('the player lists the projects under Lab', () => {

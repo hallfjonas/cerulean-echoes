@@ -5,6 +5,9 @@ description: Build or run a new round of a lab board (candidate columns for an i
 
 # Lab board: candidate columns, played on the LC XL 3
 
+> SuperCollider work (stems, tracks in `sc/`): use `/stem-designer` (compare stem versions against a track) and
+> `/sample-designer` (new sounds); Strudel is deprecated (`DEPRECATION.md`).
+
 A board is NOT a track with columns swapped. It is a comparison of candidates (or one sound tuned on its own),
 each column built like a track column, played live; the user picks by ear and the next round narrows down. The winners
 go into the tracks (see `lab-to-track`). Folder names say what the board is (`lab/harmony/`, `lab/drums/`), file names
