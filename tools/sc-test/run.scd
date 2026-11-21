@@ -66,7 +66,13 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
 		ce.midiCC(0, 13, 1); ce.midiCC(72, 13, 1);            // LC 1: 0 → 72
 		ce.midiCC(0, 13, 2); ce.midiCC(1, 13, 2);             // LC 2 sits at 0, turned one step up
-		((ce.val(13) - (73 / 127)).abs < 1e-6) and: { ce.midiCC(5, 5, 2); ce.val(5) == (5 / 127) } });   // faders stay absolute
+		ce.midiCC(100, 14, 1); ce.midiCC(101, 14, 1);          // LC 1 knob 14 sits high, …
+		ce.midiCC(0, 14, 2); ce.midiCC(30, 14, 2);            // … LC 2 sets it low (30 steps up from 0)
+		ce.midiCC(127, 14, 1);                                 // LC 1 turned to its end: the shared value reaches the top
+		((ce.val(13) - (72 / 127)).abs < 0.02) and: { ce.val(13) > (72 / 127) }   // LC 2's step continued, no jump to 1/127
+			and: { (ce.val(14) - 1).abs < 1e-6 }
+			and: { ce.midiCC(0, 14, 1); ce.val(14).abs < 1e-6 }                     // and down to the bottom
+			and: { ce.midiCC(5, 5, 2); ce.val(5) == (5 / 127) } });                // faders stay absolute
 	check.("Launch Control ports are found by name, DAW ports are not", {
 		var ce = loadCe.value;
 		(ce.midiKindOf("LCXL3 1 MIDI") == \lc) and: { ce.midiKindOf("LCXL3 1 DAW") != \lc } });
