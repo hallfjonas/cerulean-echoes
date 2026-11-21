@@ -8,6 +8,7 @@
 //   GET  /sc/events   live state: layout, ccs, cc, state, beat, midi, lk, lkcc, lknote, spectrum (48 bands 0..1), plus host
 //                     ({ running, ready, track, error }); for the set view: sethistory (every set sample of this server
 //                     session, sent once on connect) and setsample (each new one, every 10 s; see setSample below)
+//                     and notes: [[stem, instrument, Hz, pan, level, seconds, room], …] per 25 ms (the sounding notes, for the visuals)
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
 //   POST /sc/load     { id } start the track (SC is started first if needed) → { track }      (own pages only)
@@ -77,6 +78,14 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     ccTimer ??= setTimeout(() => { broadcast('cc', ccBatch); ccBatch = {}; ccTimer = null }, 25)
   }
 
+  // /ce/note (sc/lib/steps.scd): one per sounding note, passed on in batches of 25 ms as the SSE event 'notes':
+  // [[stem, instrument, Hz (0 = a sample), pan 0..1, level, seconds, room 0..1], …]
+  let noteBatch = [], noteTimer = null
+  const queueNote = args => {
+    noteBatch.push([args[0], args[1], round(+args[2], 1), round(+args[3], 3), round(+args[4], 3), round(+args[5], 3), round(+args[6], 3)])
+    noteTimer ??= setTimeout(() => { broadcast('notes', noteBatch); noteBatch = []; noteTimer = null }, 25)
+  }
+
   const udp = dgram.createSocket('udp4')
   const toSc = (address, ...args) => udp.send(encode(address, args), sc.port, sc.address)
   udp.on('message', (buf, rinfo) => {
@@ -93,6 +102,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       case '/ce/ccs': state.ccs = json(); broadcast('ccs', state.ccs); break
       case '/ce/cc': queueCc(m.args[0], m.args[1]); break
       case '/ce/state': state.state = json(); broadcast('state', state.state); break
+      case '/ce/note': queueNote(m.args); break
       case '/ce/beat': state.beat = { bar: m.args[0], beat: m.args[1], chord: m.args[2] }; broadcast('beat', state.beat); break
       case '/ce/midi': state.midi = json(); broadcast('midi', state.midi); break
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
