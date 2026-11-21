@@ -25,7 +25,8 @@
 // Layout tags from the track file: // @mode, @col, @ctl lines (same format as the Strudel tracks); a stem track
 // brings them as tagLines (made from its stems and frame, see stemtrack.scd)
 ~ce.uiTags = { |self|
-	var tags = (), lines = self.track[\tagLines] ?? {
+	var tags = (self.track !? { |t| t[\tags] } ? ()).copy;   // a track without a file of its own (Sample Designer)
+	var lines = self.track !? { |t| t[\tagLines] } ?? {
 		if(self.trackFile.notNil) { File.readAllString(self.trackFile).split($\n) } { [] } };
 	lines.do { |line|
 		var m = line.findRegexp("^// @(layout|mode|col|ctl|lk) ([^ ]+) (.*)$");

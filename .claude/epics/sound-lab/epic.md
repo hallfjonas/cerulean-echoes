@@ -3,7 +3,7 @@ name: sound-lab
 status: backlog
 created: 2026-11-20T18:11:25Z
 updated: 2026-11-21T00:40:00Z
-progress: 55%
+progress: 64%
 prd: .claude/prds/sound-lab.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -192,7 +192,7 @@ Designer), 007 (Stem Designer).
 - [x] 002.md - SC stem loader and add-on library (parallel: false)
 - [x] 003.md - Pilot: 009-house as a stem track (parallel: false; in review: differences to accept)
 - [x] 004.md - Stem library index (parallel: true)
-- [ ] 005.md - Sample Designer (parallel: true)
+- [x] 005.md - Sample Designer (parallel: true)
 - [ ] 006.md - /sample-designer skill (parallel: true)
 - [ ] 007.md - Stem Designer (parallel: false)
 - [ ] 008.md - /stem-designer skill (parallel: true)

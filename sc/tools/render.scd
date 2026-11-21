@@ -17,7 +17,9 @@ ce = (here.dirname +/+ "lib/ce.scd").load;
 ce.quiet = true; ce.trimDb = 0; ce.limit = 0;
 // comparisons: the FM modulator starts where superdough's offline render has it; "livePhase": true = random as live
 ce.webaudioPhase = (scen["livePhase"] != true) and: { scen["livePhase"] != "true" };
-track = ce.loadTrack(trackFile);
+// a Sample Designer project: scenario "sound" plays its exported library sound instead of the machine
+track = if(trackFile.endsWith(".sample.json")) {
+	(here.dirname +/+ "lib/designer.scd").load; ce.sampleProject(trackFile, scen["sound"]) } { ce.loadTrack(trackFile) };
 if(only.notNil) { var names = only.split($,).collect(_.asSymbol); track.stems = track.stems.select { |s| names.includes(s.name) } };
 server = ScoreStreamPlayer.new;
 bps = num.(scen["bpm"] ? track.bpm) / 60;

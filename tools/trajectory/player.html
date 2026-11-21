@@ -102,6 +102,7 @@
     <div class="row"><button id="saveTake">Save take</button></div>
     <output id="takeState"></output>
   </section>
+  <section id="sampleLab" hidden></section>
   <section id="autoPerform"></section>
   <section>
     <details>
@@ -133,6 +134,7 @@ import { createRecorder } from './take.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
+import { mountSampleLab } from './sample-lab-ui.mjs'
 
 const $ = id => document.getElementById(id)
 mountHelp([
@@ -189,8 +191,11 @@ const entryOf = id => catalogue.find(entry => entry.id === id)
 const recorder = createRecorder({ midi, engine })
 strudelEngine.ready.then(() => { label = 'ready' })
 let catalogue = []
-const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
-const loadCatalogue = () => fetch('catalogue').then(r => r.json()).then(entries => {
+const showScripts = () => {
+  autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
+  sampleLab.show(entryOf($('track').value))
+}
+const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
   const picked = $('track').value
   catalogue = entries
   const group = (label, kind) => {
@@ -205,14 +210,17 @@ const loadCatalogue = () => fetch('catalogue').then(r => r.json()).then(entries 
     return optgroup
   }
   $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
-  $('track').value = [picked, '010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
+  $('track').value = [selectId, picked, '010-ambient-house', ...entries.map(entry => entry.id)]
+    .find(id => entries.some(entry => entry.id === id && entry.taps))
   showScripts()
 })
 loadCatalogue()
+const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entryOf($('track').value),
+  play: () => play(), refresh: loadCatalogue })
 
 // stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
 const selection = createSelection()
-mountStemDrawer({ selection, onSaved: loadCatalogue })
+mountStemDrawer({ selection, onSaved: () => loadCatalogue() })
 let playingId = null
 const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns: !!entryOf(playingId)?.stems }, location.origin)
 const setPlaying = id => {

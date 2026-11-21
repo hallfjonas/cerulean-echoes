@@ -15,9 +15,10 @@
     "scenario": "node strudel-sim/scenario.mjs",
     "audibility": "node strudel-sim/audibility.mjs",
     "shared": "node shared/sync.mjs",
-    "test": "node --test 'trajectory/*.test.mjs' 'producer/*.test.mjs' 'sc-test/*.test.mjs' 'stems/*.test.mjs'",
+    "test": "node --test 'trajectory/*.test.mjs' 'producer/*.test.mjs' 'sc-test/*.test.mjs' 'stems/*.test.mjs' 'sound-lab/*.test.mjs'",
     "check-stems": "node stems/check-stems.mjs",
     "stems": "node stems/stems.mjs",
+    "sample-lab": "node sound-lab/sample-lab.mjs",
     "producer": "node producer/make-track.mjs"
   },
   "dependencies": {

@@ -3,7 +3,8 @@
 // a stem track (sc/tracks/*/<name>.track, stems: true) too, or '<name>-stems' beside an .scd of the same name;
 // once a track is ported, its SC version is the source of truth. The frozen Strudel file of a ported track stays
 // playable as '<id>-strudel' (label '… (Strudel)'), its scripts still come from perform/<id>/ (base).
-// Every entry has engine 'strudel' or 'sc'.
+// Every entry has engine 'strudel' or 'sc'. Sample Designer projects (sc/lab/samples/<name>.sample.json) are lab
+// entries 'sample-<name>' with engine 'sc', lab 'sample' and project <name>.
 // scan() returns internal entries { id, kind, label, path, taps, noTapReason?, scripts }; path stays on the server,
 // toPublic() drops it. Ids are derived from the file location, so they stay the same between scans: a live track is its
 // file name ('010-ambient-house'), a lab board its folder and file joined by '-' ('lab-kick-kick-lab'); a clash gets '-2'.
@@ -11,6 +12,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { tapSource } from './make-tapped.mjs'
+import { listProjects, projectFile } from '../sound-lab/sample-project.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 export const repo = path.resolve(root, '..', '..')
@@ -106,6 +108,10 @@ export const scan = () => {
   for (const file of listFiles(path.join(repo, 'lab'))) {
     const relative = path.relative(path.join(repo, 'lab'), file)
     add('lab', file, 'lab-' + slug(relative), relative.replace(/\.strudel$/, ''))
+  }
+  for (const name of listProjects(repo)) {
+    entries.push({ id: unique('sample-' + name), kind: 'lab', label: 'Sample: ' + name, path: projectFile(name, repo),
+      taps: true, scripts: [], engine: 'sc', lab: 'sample', project: name })
   }
   for (const entry of entries) if (entry.kind === 'live') entry.scripts = scriptsOf(entry.base ?? entry.id)
   return entries.sort((a, b) => a.kind === b.kind && a.kind === 'live' ? a.id.localeCompare(b.id) : 0)
