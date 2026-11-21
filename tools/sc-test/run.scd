@@ -73,6 +73,14 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 			and: { (ce.val(14) - 1).abs < 1e-6 }
 			and: { ce.midiCC(0, 14, 1); ce.val(14).abs < 1e-6 }                     // and down to the bottom
 			and: { ce.midiCC(5, 5, 2); ce.val(5) == (5 / 127) } });                // faders stay absolute
+	check.("knobs: far from the shared value, every step still moves it at least 1:1", {
+		var ce = loadCe.value.ccBase_(0), first;
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc);
+		ce.setCC(15, 0.1, { }); ce.midiCC(120, 15, 1);           // the device sits at 120, the shared value at 0.1
+		ce.midiCC(119, 15, 1); first = 0.1 - ce.val(15);          // one step down
+		(110..107).do { |v| ce.midiCC(v, 15, 1) };                // 13 steps down in all
+		(first >= (1 / 127 - 1e-6)) and: { ce.val(15) < 1e-6 } });
 	check.("Launch Control ports are found by name, DAW ports are not", {
 		var ce = loadCe.value;
 		(ce.midiKindOf("LCXL3 1 MIDI") == \lc) and: { ce.midiKindOf("LCXL3 1 DAW") != \lc } });

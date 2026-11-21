@@ -84,7 +84,8 @@
 // (or a knob moved in the web view), turning a knob on the other device would jump the value to that device's own
 // number. So a knob message counts as a MOVE, scaled to what is left ("value scaling"): turning up, the device's
 // remaining travel to 127 is spread over the shared value's remaining range to 1 (turning down: to 0 over to 0), so
-// both ends are always reachable and nothing jumps; where device and shared value agree it is 1:1. A device's first
+// both ends are always reachable and nothing jumps; where device and shared value agree it is 1:1, and a step never
+// moves less than 1:1 (user, 2026-11-21: far apart, the short side felt dead for many steps). A device's first
 // message for a knob only sets its reference (no change). Faders stay absolute (physical position).
 ~ce.lcRaw = ();   // uid → (cc → the last raw value 0..127 this Launch Control sent)
 ~ce.isKnobCC = { |self, cc| (cc >= 13 and: { cc <= 36 }) or: { cc >= 61 and: { cc <= 84 } } };
@@ -95,9 +96,10 @@
 				var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e }, last = raw[num];
 				raw[num] = val;
 				if(last.notNil and: { val != last }) {
+					// at least 1:1 per step (the short side never feels dead), faster where the shared value must catch up
 					var cur = self.val(num), next = if(val > last) {
-						cur + ((val - last) * (1 - cur) / (127 - last))
-					} { cur - ((last - val) * cur / last) };
+						cur + ((val - last) * max((1 - cur) / (127 - last), 1 / 127))
+					} { cur - ((last - val) * max(cur / last, 1 / 127)) };
 					self.setCC(num, next.clip(0, 1), { |msg| self.server.sendMsg(*msg) }) }
 			} { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }
 		},
