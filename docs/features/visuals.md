@@ -10,16 +10,16 @@ For rehearsal, for a projector behind you, or to see which voice is doing what.
 
 ## How to use it
 1. Start the [player](player.md), press Play and pick **Visualization** in the sidebar.
-2. Open **Visual settings** in the sidebar; **S** hides the sidebar. Press **F** for fullscreen.
+2. Open **Settings** (the gear in the sidebar) and find **Visualization**; **S** hides the sidebar. Press **F** for fullscreen.
 3. Press **V** to change the look:
    - **deck** (default): glowing comets with tails, rings from the kick, axes.
    - **ocean**: the stems as liquid layers, time going into depth, a floating camera.
    - **clean**: plain comets and rings.
-4. Use the two sliders in Visual settings:
+4. Use the two sliders in Settings, Visualization:
    - **Hard to Soft**: sharp and quick at 0, round and slow at 1.
    - **Raw to Smooth**: how much the picture averages over time. The sound is never changed.
-5. Switches with keys: **A** axes, **L** labels (stem names), **B** beat rings, **H** frame around the controller page
-   you moved last, **W** pan width.
+5. Switches with keys: **A** axes, **L** labels (stem names), **B** beat rings, **W** pan width (**H**, the frame around the controller page
+   you moved last, is in the MIDI panel section).
 
 ## Good to know
 - Visuals change only the picture. The sound is untouched.

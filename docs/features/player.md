@@ -26,7 +26,8 @@ of the track is a moving shape with its name. It also holds a recorder.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
 The sidebar holds the views (MIDI panel, Visualization), the track list, Play / Pause, Stop,
-Record, Auto-perform and the settings. Switching views keeps the sound playing. The top bar holds the
+Record and Auto-perform. The gear next to the views opens **Settings**: Theme, Visualization, MIDI panel, Recording and a list
+of the keyboard shortcuts, with a list of sections on the left to jump between them. Switching views keeps the sound playing. The top bar holds the
 status line and **?** for help about the page.
 
 Keys:
@@ -45,7 +46,7 @@ Keys:
 - The player reads the track file again on every load. Edit a track, press Play, and you hear the edit. There is no
   extra step and no copy of the track on disk.
 - A track never needs the player. The same file plays pasted into [strudel.cc](strudel-cc.md).
-- The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Visual settings change the visuals, never the
+- The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Settings (Visualization) change the visuals, never the
   sound.
 - Recordings go to `recordings/<track>/` in the repo root and are not part of git.
 - A tab in the background slows its timers down. Keep the player tab visible while a script or a replay runs.

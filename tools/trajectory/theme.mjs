@@ -1,6 +1,6 @@
 // The look of the whole player page and of the SuperCollider MIDI panel (sc/ui/index.html): a style, Minimal (calm,
 // flat, Torso-like; data-theme black in the panel) or Retro (Teenage Engineering-like; te), each dark or light; tone
-// Auto follows the system. Chosen only here, in the sidebar (Theme), not in the panel. Saved in localStorage
+// Auto follows the system. Chosen only in the player's Settings view (Theme), not in the panel. Saved in localStorage
 // ce.style / ce.tone, which the panel reads too; the panel also gets { theme } by message (sendTheme).
 export const STYLES = ['minimal', 'retro']
 export const TONES = ['auto', 'dark', 'light']

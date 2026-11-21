@@ -12,7 +12,7 @@ plays what the script says, bar by bar.
 
 ## How to use it
 1. Start the player (`cd tools && node trajectory/server.mjs`) and open http://localhost:8766.
-2. Pick a live track. Open **Settings** (key **S**) and find the **Auto-perform** section.
+2. Pick a live track. Find the **Auto-perform** section in the sidebar (key **S** shows it).
 3. Pick a script from the list and press **Start** (or key **P**). The track reloads, so the script begins from
    silence at bar 0. The top bar shows the current section and the bars left in it.
 4. Press **Stop** (or **P**) to end it. The controls keep their values; held keys are released.
