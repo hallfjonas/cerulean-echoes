@@ -15,8 +15,8 @@ of the track is a moving shape with its name. It also holds a recorder.
 
 ## How
 
-1. Start it: `cd tools && node trajectory/server.mjs`, then open http://localhost:8766 in Chrome. Steps in
-   [getting started](../getting-started.md).
+1. Start it: double-click `Cerulean Echoes.app` in the repo folder, or `cd tools && node trajectory/server.mjs`, then
+   open http://localhost:8766 in Chrome. Steps in [getting started](../getting-started.md).
 2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the [lab boards](lab-boards.md). Boards
    without a master `stack(` are greyed out.
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
