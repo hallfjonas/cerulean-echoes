@@ -319,7 +319,7 @@ const build = () => {
   root.className = 'board'
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
-    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: click cycles ring (energy) / map / area / spectrogram (also in the player: Visual settings, key C)"></button></p>' +
+    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Visual settings, key C)"></button></p>' +
     '<div class="spec setbox"><canvas id=setv></canvas></div></div></div><div class=head id=head></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
@@ -528,11 +528,16 @@ requestAnimationFrame(loop)
 // sethistory on connect, then setsample. A sample: t (ms), e (energy dB), p (punch 0..1), x (tension 0..1), s (64 bands).
 // The view is a browser setting (the player's "Set view", key C, sends it by postMessage); a click on the label cycles it.
 // Default: the ring, labelled 'energy' (it shows the set's energy); the other labels after SET_LABELS (user, 2026-11-20).
-const SET_KEY = 'ce.setView', SET_VIEWS = ['ring', 'map', 'energy', 'spectrogram'], SET_STEP = 10 / 60   // minutes per sample
+// 2026-11-21 (user): candidates for reading short times (sc/ui/reference/set-view-options.html), from SC's fast samples
+// (/ce/setfast, every second: energy dB + 12 band groups): ring10 (the hour in 10 s wedges), minute (last minute, 2 s
+// per column, dots), line2 (last 2 min at 1 s), two / two-line (the minute over the hour), spectro (last minute, 12 band
+// rows, dots) and spectro-line (same, continuous). All views share one scale: 5-95 % of the set's 1 s values so far.
+const SET_KEY = 'ce.setView', SET_VIEWS = ['ring', 'ring10', 'minute', 'line2', 'two', 'two-line', 'spectro', 'spectro-line', 'map', 'energy', 'spectrogram'], SET_STEP = 10 / 60   // minutes per sample
 const readSetView = () => { try { const v = localStorage.getItem(SET_KEY); return SET_VIEWS.includes(v) ? v : 'ring' } catch (e) { return 'ring' } }
-const SET_LABELS = { ring: 'energy', energy: 'energy · area', map: 'map', spectrogram: 'spectrogram' }
+const SET_LABELS = { ring: 'energy', ring10: 'energy · 10 s', minute: 'last minute', line2: 'last 2 min', two: 'minute · hour',
+  'two-line': 'minute · hour · line', spectro: 'bands · minute', 'spectro-line': 'bands · minute · line', energy: 'energy · area', map: 'map', spectrogram: 'spectrogram' }
 let setView = readSetView()
-S.setHist = []
+S.setHist = []; S.setFast = []
 const applySetView = v => { if (SET_VIEWS.includes(v) && v !== setView) { setView = v; setDraw() } }
 const cycleSetView = () => {
   const v = SET_VIEWS[(SET_VIEWS.indexOf(setView) + 1) % SET_VIEWS.length]
@@ -545,16 +550,32 @@ addEventListener('storage', e => { if (e.key === SET_KEY) applySetView(readSetVi
 document.addEventListener('click', e => { if (e.target.closest?.('#setlab')) cycleSetView() })
 addEventListener('resize', () => setDraw())
 
-// samples → minutes since the set began (the first sample ends its first 10 s); energy normalised to the set's range:
-// top = the loudest sample, bottom 3 dB under the quietest one that is not silent, at most 36 and at least 6 dB below
-// the top; silence (the -70 dB floor) is 0
+// one scale for every view (user, 2026-11-21): bottom / top = the 5 % / 95 % values of the set's loudness so far (1 s
+// samples, or the 10 s ones before any arrived), at least 12 dB apart; silence (the -70 dB floor) is 0. No square root.
+const setScale = () => {
+  const v = (S.setFast.length ? S.setFast : S.setHist).map(s => s.e).filter(e => e > -69).sort((a, b) => a - b)
+  if (!v.length) return e => 0
+  const hi = v[Math.min(v.length - 1, Math.floor(v.length * .95))], lo = Math.min(v[Math.floor(v.length * .05)], hi - 12)
+  return e => e > -69 ? Math.min(1, Math.max(0, (e - lo) / (hi - lo))) : 0
+}
+// samples → minutes since the set began (the first sample ends its first 10 s), energy on the scale above
 const setData = () => {
   const H = S.setHist
   if (!H.length) return { D: [], NOW: 0 }
-  const t0 = H[0].t - 10000, loud = H.filter(s => s.e > -69).map(s => s.e)
-  const hi = loud.length ? Math.max(...loud) : 0, lo = Math.min(hi - 6, Math.max(hi - 36, (loud.length ? Math.min(...loud) : hi) - 3))
-  const D = H.map(s => ({ m: (s.t - t0) / 60000, e: s.e > -69 ? Math.min(1, Math.max(0, (s.e - lo) / (hi - lo))) : 0, t: s.x, d: s.p, s: s.s }))
+  const t0 = H[0].t - 10000, N = setScale()
+  const D = H.map(s => ({ m: (s.t - t0) / 60000, e: N(s.e), t: s.x, d: s.p, s: s.s }))
   return { D, NOW: D[D.length - 1].m }
+}
+// the last n buckets of `step` seconds from the fast samples, newest last (null = nothing yet): { e (0..1), g (12 bands) }
+const fastBuckets = (step, n) => {
+  const F = S.setFast, out = Array(n).fill(null)
+  if (!F.length) return out
+  const N = setScale(), tEnd = F[F.length - 1].t, acc = Array.from({ length: n }, () => ({ p: 0, k: 0, g: Array(12).fill(0) }))
+  for (let i = F.length - 1; i >= 0; i--) {
+    const b = n - 1 - Math.floor((tEnd - F[i].t) / 1000 / step); if (b < 0) break
+    const a = acc[b]; a.p += 10 ** (F[i].e / 10); a.k++; F[i].g.forEach((v, j) => a.g[j] += v)
+  }
+  return acc.map(a => a.k ? { e: N(a.p > 0 ? 10 * Math.log10(a.p / a.k) : -70), g: a.g.map(v => v / a.k) } : null)
 }
 const smooth = (arr, k) => arr.map((_, i) => { let sum = 0, n = 0; for (let j = Math.max(0, i - k); j <= Math.min(arr.length - 1, i + k); j++) { sum += arr[j]; n++ } return sum / n })
 // runs of samples without a gap of more than 30 s (a stop): paths break there
@@ -590,7 +611,64 @@ const setDraw = () => {
   // a label on top of data gets a halo in the background colour
   const label = (text, x, y, color) => { c.lineWidth = 3 * u + 2; c.strokeStyle = K.bg; c.strokeText(text, x, y); c.fillStyle = color; c.fillText(text, x, y) }
   const { D, NOW } = setData()
-  if (setView === 'ring') {
+  // the fine views: a dot grid like the spectrum's (Minimal dots 32 columns, Retro segments 24), or continuous lines
+  const cols = retro() ? 24 : 32, foot = fs * 1.6 + 4 * u, GH = h - foot
+  const cell = (cx, cy, cw, rh) => { c.beginPath(); if (retro()) c.roundRect(cx - cw * .38, cy - rh * .3, cw * .76, rh * .6, rh * .2); else c.arc(cx, cy, Math.min(cw, rh) * .3, 0, Math.PI * 2); c.fill() }
+  const dots = (y0, H, rows, vals, color) => { const cw = w / cols, rh = H / rows
+    vals.forEach((v, i) => { const on = v == null ? 0 : Math.max(v > 0 ? 1 : 0, Math.round(v * rows))
+      for (let r = 0; r < rows; r++) { c.fillStyle = r < on ? color(i) : K.off; cell((i + .5) * cw, y0 + H - (r + .5) * rh, cw, rh) } }) }
+  const line = (x0, y0, W, H, vals) => {   // vals 0..1 or null, evenly over W; area + line + now dot
+    const first = vals.findIndex(v => v != null); if (first < 0 || vals.length - first < 2) return
+    const n = vals.length - 1, X = i => x0 + i / n * W, Y = v => y0 + H - (v ?? 0) * H
+    c.beginPath(); c.moveTo(X(first), y0 + H); for (let i = first; i <= n; i++) c.lineTo(X(i), Y(vals[i])); c.lineTo(X(n), y0 + H)
+    c.fillStyle = mix(K.bg, K.data, .3); c.fill()
+    c.beginPath(); for (let i = first; i <= n; i++) i === first ? c.moveTo(X(i), Y(vals[i])) : c.lineTo(X(i), Y(vals[i]))
+    c.strokeStyle = K.data; c.lineWidth = 1.5 * u + .5; c.stroke()
+    c.fillStyle = K.now; c.beginPath(); c.arc(X(n), Y(vals[n]), 3.5 * u + 1, 0, Math.PI * 2); c.fill() }
+  const foots = (left, right) => { c.textBaseline = 'bottom'; c.fillStyle = K.lab; c.textAlign = 'left'; c.fillText(left, 0, h)
+    c.fillStyle = K.now; c.textAlign = 'right'; c.fillText(right, w, h) }
+  const hourCols = () => { const step = 60 / cols, out = Array(cols).fill(null)   // the last 60′ in columns of 60/cols minutes, 10 s data
+    for (const s of D) { const k = cols - 1 - Math.floor((NOW - s.m) / step); if (k >= 0) out[k] = out[k] == null ? [s.e, 1] : [out[k][0] + s.e, out[k][1] + 1] }
+    return out.map(v => v && v[0] / v[1]) }
+  if (setView === 'minute') {
+    dots(0, GH, 12, fastBuckets(2, cols).map(b => b?.e ?? null), i => i === cols - 1 ? K.now : K.cur); foots('−' + cols * 2 + ' s', 'now')
+  } else if (setView === 'line2') {
+    c.fillStyle = K.grid; for (const q of [0, 30, 60, 90]) c.fillRect(q / 120 * w, 0, 1, GH)
+    line(0, 2 * u, w, GH - 2 * u, fastBuckets(1, 120).map(b => b?.e ?? null)); foots('−2′', 'now')
+  } else if (setView === 'two') {
+    const Ht = GH * .62, Hb = GH * .3
+    dots(0, Ht, 8, fastBuckets(2, cols).map(b => b?.e ?? null), i => i === cols - 1 ? K.now : K.cur)
+    dots(GH - Hb, Hb, 4, hourCols(), i => i === cols - 1 ? K.now : K.old); foots('−' + cols * 2 + ' s · 60′', 'now')
+  } else if (setView === 'two-line') {
+    const Ht = GH * .6, Hb = GH * .3
+    line(0, 2 * u, w, Ht - 2 * u, fastBuckets(1, 120).map(b => b?.e ?? null))
+    c.fillStyle = K.grid; c.fillRect(0, GH, w, 1)
+    const hr = D.filter(s => s.m > NOW - 60)
+    if (hr.length > 1) { const x0 = Math.max(0, (hr[0].m - (NOW - 60)) / 60) * w; line(x0, GH - Hb, w - x0, Hb, hr.map(s => s.e)) }
+    foots('−2′ · 60′', 'now')
+  } else if (setView === 'spectro' || setView === 'spectro-line') {
+    // 12 band groups (low at the bottom) over the last minute, brightness = level; scaled to the loudest cell shown
+    const n = setView === 'spectro' ? cols : 60, B = fastBuckets(setView === 'spectro' ? 2 : 1, n)
+    const all = B.flatMap(b => b ? b.g : []), hi = Math.max(.01, ...all), lo = Math.max(0, hi - .45), lv = v => Math.min(1, Math.max(0, (v - lo) / (hi - lo)))
+    const cw = w / n, rh = GH / 12
+    B.forEach((b, i) => { if (!b) return; for (let r = 0; r < 12; r++) {
+      c.fillStyle = mix(K.off, i === n - 1 ? K.now : K.cur, lv(b.g[r]))
+      if (setView === 'spectro') cell((i + .5) * cw, GH - (r + .5) * rh, cw, rh)
+      else c.fillRect(i * cw, GH - (r + 1) * rh, cw + .6, rh + .6) } })
+    foots('−' + (setView === 'spectro' ? cols * 2 : 60) + ' s', 'now')
+  } else if (setView === 'ring10') {
+    // the hour as 360 wedges of 10 s, length = energy (linear), brightness by age; the second hour paints over the first
+    const cx = w / 2, cy = h / 2, R1 = Math.min(w, h) / 2 - 2, R0 = R1 * .4
+    c.beginPath(); c.arc(cx, cy, R1, 0, Math.PI * 2); c.arc(cx, cy, R0, 0, Math.PI * 2, true); c.fillStyle = K.off; c.fill('evenodd')
+    const cur = D.length - 1, lap = Math.floor(cur / 360) * 360
+    for (let k = 0; k < 360; k++) {
+      const idx = k <= cur - lap ? lap + k : lap - 360 + k, s = D[idx]; if (!s) continue
+      const a0 = (-90 + k) * Math.PI / 180, a1 = a0 + Math.PI / 180 * 1.02, r = R0 + (R1 - R0) * s.e
+      c.beginPath(); c.arc(cx, cy, r, a0, a1); c.arc(cx, cy, R0, a1, a0, true); c.closePath()
+      c.fillStyle = idx === cur ? K.now : mix(K.cur, K.old, Math.min(1, (cur - idx) / 359)); c.fill() }
+    c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (fs * 1.5) + 'px ' + F; c.fillStyle = K.now
+    c.fillText(Math.floor(NOW) + '′', cx, cy)
+  } else if (setView === 'ring') {
     // fixed 60′ clock in the spectrum's grid language: 60 spokes (one per minute) x 8 cells, lit = round(√energy · 8);
     // cells grow with the radius; the second hour paints over the first. Brightness follows each minute's AGE, from
     // the newest (cur) to 60' old (old), so the only edge is at the needle (newest next to oldest), none at 12 o'clock
@@ -601,7 +679,7 @@ const setDraw = () => {
     for (let k = 0; k < 60; k++) {
       const a = (-90 + (k + .5) * 6) * Math.PI / 180, mAbs = k <= nowMin - lap ? lap + k : lap - 60 + k
       const lit = mix(K.cur, K.old, Math.min(1, Math.max(0, (nowMin - mAbs) / 59)))
-      const sm = sums.get(mAbs), on = sm ? Math.round(Math.sqrt(sm[0] / sm[1]) * RINGS) : 0, isNow = D.length > 0 && mAbs === nowMin
+      const sm = sums.get(mAbs), on = sm ? Math.round(sm[0] / sm[1] * RINGS) : 0, isNow = D.length > 0 && mAbs === nowMin
       for (let rr = 0; rr < RINGS; rr++) {
         const rad = R0 + (rr + .5) * st, x = cx + rad * Math.cos(a), y = cy + rad * Math.sin(a), slot = rad * Math.PI / 30
         c.fillStyle = rr < on ? (isNow ? K.now : lit) : K.off
@@ -615,7 +693,8 @@ const setDraw = () => {
     c.fillText(Math.floor(NOW) + '′', cx, cy)
   } else if (setView === 'map') {
     // mood map, x = energy, y = tension; no window: the trail fades with age (alpha = e^(−age/12′), gone below 0.05)
-    const side = Math.min(w, h), x0 = (w - side) / 2, y0 = (h - side) / 2, X = e => x0 + e * side, Y = t => y0 + side - t * side
+    // labels outside the square (user, 2026-11-21): above it tense / full, under it calm / driving
+    const lh = fs * 1.35, side = Math.min(w, h - 2 * lh), x0 = (w - side) / 2, y0 = (h - side) / 2, X = e => x0 + e * side, Y = t => y0 + side - t * side
     c.strokeStyle = K.grid; c.lineWidth = 1; c.strokeRect(x0 + .5, y0 + .5, side - 1, side - 1)
     c.fillStyle = K.grid; c.fillRect(x0 + side / 2, y0, 1, side); c.fillRect(x0, y0 + side / 2, side, 1)
     if (D.length) {
@@ -633,9 +712,8 @@ const setDraw = () => {
       c.stroke(); c.lineCap = 'butt'
       c.fillStyle = K.now; c.beginPath(); c.arc(X(Ex[n]), Y(Tx[n]), 6 * u, 0, Math.PI * 2); c.fill()
     }
-    const pad = 6 * u
-    c.textBaseline = 'top'; c.textAlign = 'left'; label('tense', x0 + pad, y0 + pad / 2, K.lab); c.textAlign = 'right'; label('full', x0 + side - pad, y0 + pad / 2, K.lab)
-    c.textBaseline = 'bottom'; label('driving', x0 + side - pad, y0 + side - pad / 2, K.lab); c.textAlign = 'left'; label('calm', x0 + pad, y0 + side - pad / 2, K.lab)
+    c.fillStyle = K.lab; c.textBaseline = 'bottom'; c.textAlign = 'left'; c.fillText('tense', x0, y0 - 2 * u); c.textAlign = 'right'; c.fillText('full', x0 + side, y0 - 2 * u)
+    c.textBaseline = 'top'; c.fillText('driving', x0 + side, y0 + side + 2 * u); c.textAlign = 'left'; c.fillText('calm', x0, y0 + side + 2 * u)
   } else {
     // strips: the last 60′, now at the right edge
     const L = setView === 'spectrogram' ? fs * 2.2 : 0, top = 4 * u, H = h - fs * 1.6 - 6 * u, t0 = NOW - 60, X = m => L + (m - t0) / 60 * (w - L)
@@ -687,6 +765,8 @@ const connect = () => {
     if (type === 'spectrum') { if (Array.isArray(data)) { S.spec.set(data.slice(0, N)); S.specAt = performance.now() } return }
     if (type === 'sethistory') { if (Array.isArray(data)) { S.setHist = data; setDraw() } return }
     if (type === 'setsample') { if (data && typeof data.t === 'number') { S.setHist.push(data); setDraw() } return }
+    if (type === 'setfasthistory') { if (Array.isArray(data)) { S.setFast = data; setDraw() } return }
+    if (type === 'setfast') { if (data && typeof data.t === 'number') { S.setFast.push(data); if (S.setFast.length > 3 * 3600) S.setFast.shift(); setDraw() } return }
     if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) build() }
     else if (type === 'ccs') { data.forEach((v, i) => { if (!(performance.now() - (mine[i] ?? -1e9) < 300)) S.cc[i] = v }) }
     else if (type === 'cc') {

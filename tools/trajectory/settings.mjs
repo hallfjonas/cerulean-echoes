@@ -22,8 +22,8 @@ export const SETTINGS = [
     tip: 'Key V: cycles the looks', apply: (value, { renderer }) => renderer.setLook(value) },
   // the set view of the SuperCollider MIDI panel (UI-REDESIGN.md "Set view"): four candidate views, one browser setting
   // the panel reads too; a click on the panel's label (the view's name) cycles it and the panel tells the player
-  { id: 'setView', label: 'Set view', kind: 'choice', options: ['ring', 'map', 'energy', 'spectrogram'], default: 'ring', key: 'c',
-    tip: 'Key C: how the box right of the spectrum shows the set so far: ring (labelled energy), map, energy area, spectrogram (SuperCollider tracks)',
+  { id: 'setView', label: 'Set view', kind: 'choice', options: ['ring', 'ring10', 'minute', 'line2', 'two', 'two-line', 'spectro', 'spectro-line', 'map', 'energy', 'spectrogram'], default: 'ring', key: 'c',
+    tip: 'Key C: how the box right of the spectrum shows the set so far (SuperCollider tracks); candidates, see sc/ui/reference/set-view-options.html',
     apply: value => {
       try { localStorage.setItem('ce.setView', value) } catch {}
       document.getElementById('scPanel')?.contentWindow?.postMessage({ setView: value }, location.origin)

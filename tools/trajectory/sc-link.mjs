@@ -52,6 +52,10 @@ const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits
 export const setSample = (args, t = Date.now()) => ({ t, e: round(+args[0], 2), p: round(clamp01(args[1]), 3),
   x: round(clamp01(args[2]), 3), s: args.slice(3, 67).map(v => round(clamp01(v), 3)) })
 
+// a fast sample from /ce/setfast (every second): t (ms since 1970), e = energy in dB, g = 12 band groups 0..1
+export const setFastSample = (args, t = Date.now()) => ({ t, e: round(+args[0], 2), g: args.slice(1, 13).map(v => round(clamp01(v), 3)) })
+export const FAST_KEEP = 3 * 3600   // fast samples kept: 3 hours
+
 export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = console.log }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
   const viewFile = path.join(repo, 'sc', 'ui', 'index.html')
@@ -64,7 +68,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
   const waiters = new Set()
   // the set's history for the set view: kept for the whole server session (survives track loads and SC restarts),
   // ~720 samples for a 2-hour set
-  const setHistory = []
+  const setHistory = [], setFast = []
 
   const send = (res, type, data) => res.write('data: ' + JSON.stringify({ type, data }) + '\n\n')
   const broadcast = (type, data) => { for (const res of clients) send(res, type, data) }
@@ -132,6 +136,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
       // one set sample every 10 s: kept, and passed on
       case '/ce/setsample': { const sample = setSample(m.args); setHistory.push(sample); broadcast('setsample', sample); break }
+      case '/ce/setfast': { const sample = setFastSample(m.args); setFast.push(sample); if (setFast.length > FAST_KEEP) setFast.shift(); broadcast('setfast', sample); break }
     }
     for (const waiter of [...waiters]) if (waiter.test(m)) {
       clearTimeout(waiter.timer)
@@ -227,6 +232,7 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       send(response, 'sc', host.ready)
       send(response, 'host', host)
       send(response, 'sethistory', setHistory)
+      send(response, 'setfasthistory', setFast)
       clients.add(response)
       request.on('close', () => clients.delete(response))
       if (host.ready && !state.layout) toSc('/ce/hello')
