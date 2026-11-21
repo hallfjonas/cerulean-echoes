@@ -42,14 +42,25 @@
   .seg button { background: none; padding: 5px 0; color: var(--dim) }
   .seg button:hover { background: var(--control-hi) }
   .seg button[aria-pressed=true] { background: var(--accent); color: var(--on-accent) }
+  #stemLab [data-slot] { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; font-size: 12px }
+  #stemLab [data-slot] .seg { margin-bottom: 4px }
+  #stemLab label input:not([type=checkbox]) { grid-column: 1 / 3 }
+  #sidebar #stemLab details > summary { margin: 0 0 10px; padding: 7px 10px; background: var(--accent); color: var(--on-accent);
+    border-radius: var(--radius); font-size: 13px; font-weight: 500; text-align: center; list-style: none }
+  #sidebar #stemLab details > summary::-webkit-details-marker { display: none }
+  #sidebar #stemLab details > summary::before { content: '+ ' }
+  #sidebar #stemLab details[open] > summary::before { content: '– ' }
+  #stemLab [data-part=project] .row { margin-top: 0 }
   .script-info { margin-top: 12px; font-size: 13px }
   .script-title { font-weight: 500 }
   .script-mood { color: var(--dim); margin-top: 2px }
   .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
   .script-sections li.now { color: var(--fg) }
-  /* sidebar closed: one small button top left, always there */
-  #sideOpen { position: fixed; top: 10px; left: 10px; z-index: 2; display: none }
-  body.side-closed #sideOpen { display: grid }
+  #sideHandle { position: fixed; top: 29px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3; width: 17px; height: 38px;
+    padding: 0; display: grid; place-items: center; background: var(--panel); color: var(--dim); border: 1px solid var(--line);
+    border-left: 0; border-radius: 0 6px 6px 0 }
+  #sideHandle:hover { color: var(--fg); background: var(--control) }
+  body.side-closed #sideHandle { left: 0 }
   #stage { position: fixed; top: 0; left: var(--side); right: 0; bottom: 0; background: var(--bg) }
   body.side-closed #stage { left: 0 }
   body.help-open #stage { right: 320px }
@@ -59,7 +70,6 @@
     background: var(--bg); text-transform: lowercase; display: grid; grid-template-columns: 180px minmax(0, 560px); gap: 40px;
     align-content: start; scroll-behavior: smooth }
   #settingsPage[hidden] { display: none }
-  body.side-closed #settingsPage { padding-top: 56px }
   body.settings-view #lcPanel, body.settings-view #scPanel, body.settings-view #panelEmpty { display: none }
   #settingsNav { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 2px }
   #settingsNav a { padding: 6px 10px; border-radius: var(--radius); color: var(--dim) }
@@ -108,7 +118,7 @@
      Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
      DAW ports; the CC moved last per number); a control not moved yet reads 0.
      Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
-     #labs/stems, #labs/tracks, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
+     #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
      show the track's LC view (drawn into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on
      the canvas). The Settings view (the gear) lays over the current page.
      The sidebar (key S) holds the page links, the settings gear, the track, Play-Pause / Stop / Record and auto-perform.
@@ -138,7 +148,6 @@
     <button class="icon" data-view="settings" title="Settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
     </button>
-    <button id="sidebarToggle" class="icon" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
   </div>
   <nav id="subnav" data-pages="labs"></nav>
   <section>
@@ -162,11 +171,11 @@
     <span id="status">loading Strudel …</span>
   </section>
   <section id="sampleLab" data-pages="labs/samples" hidden></section>
-  <section id="stemLab" data-pages="labs/stems" hidden></section>
+  <section id="stemLab" data-pages="labs/stems"></section>
   <section id="autoPerform" data-pages="live"></section>
-  <section id="placeholderNote" data-pages="labs/tracks labs/sets"></section>
+  <section id="placeholderNote" data-pages="labs/sets"></section>
 </aside>
-<button id="sideOpen" class="icon" title="Show the sidebar (key S)" aria-label="Show the sidebar">☰</button>
+<button id="sideHandle" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
 <main id="stage">
   <iframe id="lcPanel" title="Live"></iframe>
   <iframe id="scPanel" title="Live (SuperCollider)" hidden></iframe>
@@ -208,6 +217,7 @@ import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountKnobEditor } from './knob-editor.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
+import { toast } from './toast.mjs'
 import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
 const $ = id => document.getElementById(id)
@@ -292,6 +302,17 @@ addEventListener('message', async event => {
   if (event.source !== $('scPanel').contentWindow) return
   const knob = event.data?.labKnob
   if (knob && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') return knobEditor.open({ track: playingId, ...knob })
+  if (event.data?.labNotice) return void toast(event.data.labNotice, { kind: 'error' })
+  const discard = event.data?.labDiscard
+  if (discard && isLab(playingId)) {
+    const answer = await toast('This stem has changes that are not exported yet. Remove it and lose them?',
+      { kind: 'ask', actions: ['Remove and lose changes'] })
+    if (!answer) return
+    const response = await fetch('lab/stems/remove', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: playingId, slot: discard.slot, discard: true }) })
+    if (!response.ok) toast((await response.json().catch(() => ({}))).error ?? 'Remove failed', { kind: 'error' })
+    return
+  }
   const pick = event.data?.labPick
   if (pick && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') {
     return selectLabColumn(pick.slot, pick.action === 'add')
@@ -617,9 +638,14 @@ const markSettingsSection = () => {
 }
 $('settingsPage').addEventListener('scroll', markSettingsSection)
 new ResizeObserver(markSettingsSection).observe($('settingsPage'))
-const toggleSidebar = () => document.body.classList.toggle('side-closed')
-$('sidebarToggle').onclick = toggleSidebar
-$('sideOpen').onclick = toggleSidebar
+const toggleSidebar = () => {
+  const closed = document.body.classList.toggle('side-closed')
+  const handle = $('sideHandle')
+  handle.textContent = closed ? '›' : '‹'
+  handle.title = closed ? 'Show the sidebar (key S)' : 'Hide the sidebar (key S)'
+  handle.setAttribute('aria-label', closed ? 'Show the sidebar' : 'Hide the sidebar')
+}
+$('sideHandle').onclick = toggleSidebar
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement

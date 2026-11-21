@@ -1,9 +1,9 @@
 // The "About this page" text of every player page, by page key (pages.mjs pageKey): Live, Labs / Samples,
-// Labs / Stems, the planned Labs pages and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
+// Labs / Stems & Tracks, the planned Labs page and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
 const LIVE = [
   { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample and Stem Designer '
-    + '(Tracks and Sets are planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
+    + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample Designer and Stems & '
+    + 'Tracks (Sets is planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
     + 'only what the page needs. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
@@ -28,7 +28,7 @@ const LIVE = [
     'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
     'Stop or another track ends a recording. Recordings stay out of git.'] },
   { heading: 'Stem swap', text: ['Stem tracks only: click a column\'s name in the Live panel.',
-    'The drawer lists the library stems of that column\'s role; filter by genre, energy and tag.',
+    'The drawer lists the library stems of that column\'s role; filter by role (any shows every role), genre, energy and tag.',
     'Pick one: it plays from the next bar, the other columns play on. A stem that needs another mixer strip loads '
     + 'the track again with it (a short gap; the drawer says so).',
     'The track file is not changed. Revert puts the file\'s stems back; Save as writes a new track with the stems '
@@ -43,22 +43,21 @@ const SAMPLES = [
   { heading: 'Output', text: 'Sound and four figures of one hit, drawn when the project loads and after every move of a '
     + 'control: waveform, envelope (attack and decay), spectrum (strongest frequency, centroid) and spectrogram. '
     + 'Export writes the sound to sc/sounds/ with its WAV.' },
-  { heading: 'How to use', text: ['Pick a project and press Load (folder symbol; Save is the disk, Save as the disk with a '
-    + 'plus, Export the arrow; hover for the name).', 'Move a control: the figures follow.',
+  { heading: 'How to use', text: ['Pick a project and press Load.', 'Move a control: the figures follow.',
     'Save writes the values into the project (also LC column 8, button 2); Save as copies it under a new name.',
     'Export turns the sound into a library sound once it is right.'] }
 ]
 
 const STEMS = [
-  { heading: 'What it does', text: 'The Stem Designer: stems side by side on the controller columns, played against a '
-    + 'context track, to find the stem that fits.' },
+  { heading: 'What it does', text: 'Stems & Tracks: stems side by side on the controller columns, played against a '
+    + 'context track, to find the stem that fits; a project made from a track, and a project written back as a track.' },
   { heading: 'Input', text: 'A project from the list (sc/lab/stems/<name>.stemlab.json): its columns on '
-    + 'their slots, and the context track that plays the rest.' },
-  { heading: 'Output', text: 'Sound, and the project file. Column 8 is the same in both modes: button 1 picks what the fader '
-    + 'sets, the level of everything (Global), of the stems you explore (Stems) or of the context sound (Context); '
+    + 'their slots, and the context track that plays the rest. New from track starts from a stem track instead.' },
+  { heading: 'Output', text: 'Sound, the project file, and with Export track a stem track in sc/tracks/. Column 8 is the same in both modes: button 1 picks what the fader '
+    + 'sets, the level of the stems you explore (Stems) or of the context sound (Context); '
     + 'each keeps its own level.' },
   { heading: 'How to use', text: ['Pick a project and press Load (folder symbol; Save is the disk, Save as the disk with a '
-    + 'plus; hover for the name).', 'Move a control of a column to select it.',
+    + 'plus, Export track the arrow; hover for the name).', 'Move a control of a column to select it.',
     'Every free slot shows + Add: click it, pick a stem in the drawer (the Live page\'s), it goes on that slot.',
     'Above a stem\'s title: the export symbol (active only for a changed stem, see Promote) and the trash symbol '
     + '(the slot is free again).',
@@ -67,6 +66,14 @@ const STEMS = [
     'Add, trash and Apply load the project again (a short gap); Replace plays from the next bar when the stem fits '
     + 'the column\'s mixer strip. All change the project file: Save as first to keep a copy.',
     'Save writes the selected column into the project; Save as copies the project.'] },
+  { heading: 'From a track', text: ['Open New from track and pick a stem track.',
+    'Each stem goes into the lab (a column you play), the backing (plays along without a controller) or is left '
+    + 'off. All stems in lab sets every stem to Lab; off, every stem to Off.',
+    'Create writes the project (default name <track>-stems) and plays it.'] },
+  { heading: 'Export track', text: ['Writes the project as a stem track sc/tracks/<name>/: the context track\'s frame, '
+    + 'tempo, chapters and backing stems, the project\'s columns on their slots.',
+    'A changed stem (a draft) cannot go into a track: the player offers to export it to the library first.',
+    'The new track shows on the Live page.'] },
   { heading: 'Knobs', text: 'The knob editor picks a parameter of the stem\'s sound (or Space, Echo, Pan), the two '
     + 'bounds the knob moves it between, the curve, the default position of the knob and its name. A preset fills the '
     + 'fields. Apply writes it into a draft of that stem: the library stem stays as it is. Knob 1 and 2 keep the '
@@ -88,7 +95,6 @@ const VISUALS = [
     'S hides the sidebar, F is fullscreen.'] }
 ]
 
-const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/tracks': PLANNED,
-  'labs/sets': PLANNED, visuals: VISUALS }
+const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/sets': PLANNED, visuals: VISUALS }
 
 export const helpFor = key => BY_PAGE[key] ?? LIVE

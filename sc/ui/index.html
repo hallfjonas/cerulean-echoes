@@ -882,17 +882,26 @@ const labAction = async (route, slot, extra = {}) => {
   try {
     const response = await fetch('/lab/stems/' + route, { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: S.layout?.name, slot, ...extra }) })
-    if (!response.ok) alert((await response.json().catch(() => ({}))).error ?? 'Stem Designer: ' + route + ' failed (' + response.status + ')')
+    if (!response.ok) notify((await response.json().catch(() => ({}))).error ?? 'Stem Designer: ' + route + ' failed (' + response.status + ')')
   } catch (error) {
-    alert('Stem Designer: ' + error.message)
+    notify('Stem Designer: ' + error.message)
   }
+}
+const notify = text => parent !== window ? parent.postMessage({ labNotice: text }, location.origin) : alert(text)
+const restoreName = (cl, page, index) => {
+  const name = cl.querySelector('.name')
+  if (!name?.classList.contains('add')) return
+  name.classList.remove('add')
+  delete name.dataset.slot
+  name.textContent = (tags()[PREFIX[page] + ':' + (index + 1)] ?? '').replace(/^\d+\s*/, '')
+  if (name.textContent) name.dataset.col = page === 'jojo' ? '1:' + (index + 1) : '2:' + (index + 1)
 }
 const labHeaders = () => {
   const slots = S.state?.designer?.slots
   document.body.classList.toggle('stemlab', !!slots)
   for (const pn of document.querySelectorAll('.pn')) [...pn.querySelectorAll('.cl')].forEach((cl, index) => {
     let bar = cl.querySelector('.slotbar')
-    if (!slots) { bar?.remove(); return }
+    if (!slots) { bar?.remove(); if (!cl.classList.contains('global')) restoreName(cl, pn.dataset.page, index); return }
     if (!bar) { bar = document.createElement('div'); bar.className = 'slotbar'; cl.prepend(bar) }
     if (cl.classList.contains('global')) return
     const page = pn.dataset.page, slot = (page === 'jojo' ? 1 : 2) + ':' + (index + 1), kind = slots[slot]
@@ -936,8 +945,10 @@ document.addEventListener('click', event => {
   if (!button || button.disabled) return
   const draft = button.parentElement.dataset.kind === 'draft'
   if (button.dataset.act === 'remove' && draft) {
-    if (confirm('This stem has changes that are not exported yet. Remove it and lose them?')) {
-      labAction('remove', button.parentElement.dataset.slot, { discard: true })
+    const slot = button.parentElement.dataset.slot
+    if (parent !== window) parent.postMessage({ labDiscard: { slot } }, location.origin)
+    else if (confirm('This stem has changes that are not exported yet. Remove it and lose them?')) {
+      labAction('remove', slot, { discard: true })
     }
   } else labAction(button.dataset.act, button.parentElement.dataset.slot)
 })

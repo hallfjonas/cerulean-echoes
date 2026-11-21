@@ -3,6 +3,7 @@
 // playing values) under a new name; Export writes the library sound and its WAV (server: sample-lab.mjs).
 // The sound's shape shows under the LCs in the MIDI panel (sc/ui/index.html, sample-shape-ui.mjs).
 import { ICONS, iconButton } from './sidebar-icons.mjs'
+import { askText } from './toast.mjs'
 
 export const mountSampleLab = ({ section, selected, play, refresh }) => {
   section.innerHTML = '<h2>Sample Designer</h2><div class="row">' +
@@ -22,14 +23,14 @@ export const mountSampleLab = ({ section, selected, play, refresh }) => {
     load: async () => { await play(); return 'loaded ' + selected().project },
     save: async () => 'saved ' + (await post('save', { id: selected().id })).file,
     saveAs: async () => {
-      const name = prompt('Save as (lowercase words joined by "-"):', selected().project + '-2')
+      const name = await askText('Save as (lowercase words joined by "-"):', selected().project + '-2')
       if (!name) return ''
       const { id, file } = await post('save-as', { id: selected().id, name })
       await refresh(id)
       return 'wrote ' + file + ' (picked: Load plays it)'
     },
     export: async () => {
-      const sound = prompt('Sound name in sc/sounds/ (camelCase):',
+      const sound = await askText('Sound name in sc/sounds/ (camelCase):',
         selected().project.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase()))
       if (!sound) return ''
       out.textContent = 'exporting (renders the WAV) …'

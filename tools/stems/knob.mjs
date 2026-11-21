@@ -74,7 +74,7 @@ export function buildKnob(key, definition, root = repoRoot) {
   if (knob.curve === 'lin') delete knob.curve
   const errors = knobErrors(key, knob)
   if (errors.length) throw new Error(`${KNOB_NAME[key] ?? key}: ${errors.join('; ')}`)
-  return Object.fromEntries(['label', 'about', 'param', 'range', 'curve', 'default']
+  return Object.fromEntries(['label', 'about', 'param', 'range', 'curve', 'default', 'override']
     .filter(field => knob[field] !== undefined).map(field => [field, knob[field]]))
 }
 
