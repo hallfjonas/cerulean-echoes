@@ -164,7 +164,11 @@ test('auto-perform and takes on SuperCollider tracks', { skip: findSclang() ? fa
         const lastSent = new Map(ccsSent.map(([cc, v]) => [alias(cc), v]))
         const holds = st => [...lastSent].every(([cc, value]) => near(st.cc.get(cc) ?? 0, value)) &&
           [...new Map(lkSent)].every(([number, value]) => near(st.lk.get(number) ?? 0, value)) && st.notes === notesSent
-        for (let waited = 0; waited < 5000 && !holds(echo.stateSince(mark)); waited += 100) await sleep(100)
+        // under load an echo itself can be lost: after 1 s, ask SC for its full state (a fresh snapshot is the truth)
+        for (let waited = 0; waited < 5000 && !holds(echo.stateSince(mark)); waited += 100) {
+          if (waited === 1000) await post('hello', {})
+          await sleep(100)
+        }
         const state = echo.stateSince(mark)
         for (const [cc, value] of lastSent) assert.ok(near(state.cc.get(cc) ?? 0, value), `${at}: SC holds cc ${cc} = ${value} (has ${state.cc.get(cc)})`)
         for (const [number, value] of new Map(lkSent)) assert.ok(near(state.lk.get(number) ?? 0, value), `${at}: SC holds lk ${number}`)

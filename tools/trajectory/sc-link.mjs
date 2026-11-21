@@ -16,6 +16,7 @@
 //   (recording: recording.mjs asks `record.start(path)` / `record.stop()` of this link: OSC /ce/record start|stop, the
 //   answers /ce/recording, /ce/recorded, /ce/recerror; `record.onEnd(fn)` is told when SC closed the WAV, also when a
 //   load or SC ending did it; the master's peak comes as SSE `level`, 0..1, 10 times a second)
+//   POST /sc/hello    SC sends its full state again (own pages only)
 //   POST /sc/stop     stop what plays (SC keeps running)                                      (own pages only)
 import { spawn, execFileSync } from 'child_process'
 import dgram from 'dgram'
@@ -94,6 +95,17 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
 
   const udp = dgram.createSocket('udp4')
   const toSc = (address, ...args) => udp.send(encode(address, args), sc.port, sc.address)
+  // OSC goes over UDP, which can drop a packet when SC is busy (a fast ramp): 150 ms after the last change of a
+  // control, its latest value is sent once more. Repeating a value changes nothing in SC (a press counts only on the
+  // rising edge); a lost last value gets corrected. Pending repeats are dropped on a load (no value of the previous
+  // track carries over).
+  const settling = new Map()
+  const settle = (address, n, v) => {
+    const key = address + n
+    clearTimeout(settling.get(key))
+    settling.set(key, setTimeout(() => { settling.delete(key); toSc(address, { i: n }, { f: v }) }, 150))
+  }
+  const dropSettle = () => { for (const timer of settling.values()) clearTimeout(timer); settling.clear() }
   udp.on('message', (buf, rinfo) => {
     let m
     try { m = decode(buf) } catch { return }
@@ -225,16 +237,18 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     try {
       const body = await readBody(request)
       if (route === '/cc') {
-        for (const [cc, v] of JSON.parse(body)) toSc('/ce/cc', { i: cc | 0 }, { f: clamp01(v) })
+        for (const [cc, v] of JSON.parse(body)) { toSc('/ce/cc', { i: cc | 0 }, { f: clamp01(v) }); settle('/ce/cc', cc | 0, clamp01(v)) }
         return response.writeHead(204).end()
       }
+      // ask SC for its full state again (layout, all CCs, Launchkey, rows): a page or test that may have missed echoes
+      if (route === '/hello') { if (host.ready) toSc('/ce/hello'); return response.writeHead(204).end() }
       if (route === '/lk') {
         const b = JSON.parse(body)
-        for (const [n, v] of b.cc ?? []) toSc('/ce/lkcc', { i: n | 0 }, { f: clamp01(v) })
+        for (const [n, v] of b.cc ?? []) { toSc('/ce/lkcc', { i: n | 0 }, { f: clamp01(v) }); settle('/ce/lkcc', n | 0, clamp01(v)) }
         if (b.note) toSc('/ce/lknote', { i: b.note[0] | 0 }, { i: b.note[1] | 0 }, { i: b.note[2] | 0 })
         return response.writeHead(204).end()
       }
-      if (route === '/load') { const b = JSON.parse(body); return json(200, { track: await load(b.id, b) }) }
+      if (route === '/load') { const b = JSON.parse(body); dropSettle(); return json(200, { track: await load(b.id, b) }) }
       if (route === '/stop') { stop(); return json(200, { stopped: true }) }
       return response.writeHead(404).end('not found')
     } catch (error) {
