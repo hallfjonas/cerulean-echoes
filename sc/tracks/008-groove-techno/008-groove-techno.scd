@@ -10,19 +10,19 @@
 // @col 16:1 1 Kick
 // @col 16:2 2 Rumble
 // @col 16:3 3 Sub
-// @col 16:4 4 Bassline
+// @col 16:4 4 Bass
 // @col 16:5 5 Clap
 // @col 16:6 6 Hats
-// @col 16:7 7 Percussion
+// @col 16:7 7 Perc
 // @col 16:8 8 Global
 // @mode 2 Mode 2 — Jonas: Colour (chords + melodies) · CC + 48
 // @col 2:1 1 Pads
 // @col 2:2 2 Strings
-// @col 2:3 3 Sequence
+// @col 2:3 3 Seq
 // @col 2:4 4 Stab
 // @col 2:5 5 Answer
-// @col 2:6 6 Dark Perc
-// @col 2:7 7 FX / Breath
+// @col 2:6 6 Dark
+// @col 2:7 7 FX
 // @col 2:8 8 Global
 // @ctl g.k1 Fog | clear ↔ muffled (all low-passes down).
 // @ctl g.k2 Thin | full ↔ thin (all high-passes up).
@@ -295,7 +295,7 @@ lkNote: { |ce, note, vel, chan|
 	}
 },
 // web UI: the names of the 16 drum pads (pads 1-8 = notes 36-43, 9-16 = 44-51)
-lkPadNames: ["Brace", "Paper", "Wine", "Plaenterwald", "Wiese", "Creatures", "No end", "Vast", "Low tom", "Rim echo",
+lkPadNames: ["Brace", "Paper", "Wine", "Forest", "Meadow", "Creatures", "No end", "Vast", "Low tom", "Rim echo",
 	"Braaam", "Open hat", "Crash reverse", "Shaker", "Space", "Wind"],
 
 // Language side: buttons, latches, and each stem's notes (k = 16th number)
