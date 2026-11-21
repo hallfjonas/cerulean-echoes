@@ -79,10 +79,18 @@ body:not([data-theme=te]) .fader .handle{left:50%;transform:translateX(-50%);wid
 /* one corner radius for the whole Launchkey: 3 units */
 .pad{width:100%;height:100%;border:0;background:var(--padF);box-shadow:inset 0 0 0 1px var(--padLine);border-radius:calc(3 * var(--px));cursor:pointer}
 .pad.on{background:var(--hit);box-shadow:none}
-/* octave: the label, then ◀ shift ▶ on one line, secondary colour */
-.oct{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:calc(1 * var(--px));white-space:nowrap;min-width:0;font-size:var(--fs-knob);line-height:1.2;color:var(--off)}
-.oct button{font:inherit;line-height:1.2;background:none;border:0;padding:0;color:var(--keyLab);cursor:pointer}
-.oct b{font-weight:400;color:var(--text)}
+/* octave: 'oct' and its value on one line, under it two buttons drawn like the pads (as on the Launchkey: two rubber
+   buttons); the button in the direction the keys are shifted is lit, as the device's LEDs are; at a limit it dims */
+.oct{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:calc(5 * var(--px));white-space:nowrap;min-width:0;font-size:var(--fs-knob);line-height:1.2;color:var(--off)}
+.oct .ol{display:flex;justify-content:space-between}
+.oct .row{display:grid;grid-template-columns:1fr 1fr;gap:calc(4 * var(--px))}
+.oct button{display:grid;place-items:center;height:calc(22 * var(--px));background:var(--padF);border:0;padding:0;color:var(--text);cursor:pointer;
+  box-shadow:inset 0 0 0 1px var(--padLine);border-radius:calc(3 * var(--px))}
+.oct button svg{width:calc(6 * var(--px));height:calc(10 * var(--px));overflow:visible}
+.oct button polyline{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.oct button.on{background:var(--hit);color:var(--bg)}
+.oct button:disabled{cursor:default;opacity:.35}
+.oct b{font-weight:400;color:var(--text);font-variant-numeric:tabular-nums}
 /* mod wheel: a rounded slot that fills from the bottom, its label under it */
 .wheel{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--px));margin-top:calc(2 * var(--px))}
 .wheel .btn{color:var(--off);font-size:var(--fs-knob);line-height:1.2}
@@ -246,7 +254,7 @@ const lkHtml = () => {
   return '<section class=lkbox><p class=lab><span>launchkey</span><span class=pad-name id=lkPad></span>' +
     '<span class=hint>computer keys A–K · octave Z / X</span></p><div class="pn lk" id=lk>' +
     // as on the Launchkey 25: knobs over a tight 2 x 8 pad block, the keys at the bottom with the mod wheel left of them
-    '<div class=oct><span>oct <b id=octv>0</b></span><button data-oct="-24" title="two octaves down (Z)">◀ −2</button><button data-oct="24" title="two octaves up (X)">+2 ▶</button></div>' +
+    '<div class=oct><span class=ol>oct <b id=octv>0</b></span><div class=row><button id=octDown data-oct="-24" title="two octaves down (Z)" aria-label="two octaves down"><svg viewBox="0 0 7 12"><polyline points="6,1 1,6 6,11"/></svg></button><button id=octUp data-oct="24" title="two octaves up (X)" aria-label="two octaves up"><svg viewBox="0 0 7 12"><polyline points="1,1 6,6 1,11"/></svg></button></div></div>' +
     '<div class="gr lkknobs">' + LK_KNOBS.map(knob).join('') + '</div>' +
     '<div class="gr lkpads">' + [...PADS_TOP, ...PADS_BOTTOM].map(pad).join('') + '</div>' +
     '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '">' +
@@ -412,6 +420,8 @@ const draw = () => {
     }
     for (const el of lk.querySelectorAll('[data-pad]')) el.classList.toggle('on', lit('p' + el.dataset.pad))
     const o = (S.lkBase - 48) / 12; setText(document.getElementById('octv'), o > 0 ? '+' + o : String(o))
+    const dn = document.getElementById('octDown'), up = document.getElementById('octUp')
+    dn.disabled = S.lkBase <= 24; up.disabled = S.lkBase >= 96; dn.classList.toggle('on', o < 0); up.classList.toggle('on', o > 0)
     // the name of the pad hit last, for 2 s, in the label line
     const pad = S.lkPad && now - S.lkPad[1] < 2000 ? S.lkPad[0] : null
     setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
