@@ -21,7 +21,7 @@
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;
 var serverPort = (thisProcess.argv[1] ? "57140").asInteger;
-var toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, setInit, current, recorder, recStart, recStop;
+var mute = "CE_SC_MUTE".getenv == "1", toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, setInit, current, recorder, recStart, recStop;
 // its own sound server on its own port: never the IDE's default server (localhost:57110), so the engine and a
 // SuperCollider IDE session (live.scd) can run side by side without taking over each other's server
 s = Server(\ceEngine, NetAddr("127.0.0.1", serverPort));
@@ -105,6 +105,9 @@ loadTrack = { |path, init|
 	ce = (here +/+ "lib/ce.scd").load;
 	ce.trackFile = path;
 	ce.uiAddr = toPlayer;
+	// tests and agents' trial runs (CE_SC_MUTE=1): the master goes to a bus no speaker hears, so nothing plays beside
+	// the user's own set (the groups sit at the tail of the root group, after Server.volume: muting that would not reach them)
+	if(mute) { ce.mainOut = s.options.numAudioBusChannels - 2 };   // the last two buses: the allocators never get there
 	track = path.load;
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
@@ -152,6 +155,7 @@ OSCdef(\ce_host_quit, { fork { stopTrack.value; s.sync; s.quit; 0.exit } }, '/ce
 }.play(SystemClock);
 
 s.waitForBoot {
+	if(mute) { "SC engine muted (CE_SC_MUTE=1): the master plays into a private bus".postln };
 	toPlayer.sendMsg('/ce/ready');
 	"SC engine ready: waiting for the player (UDP %)".format(NetAddr.langPort).postln;
 	if(s.actualSampleRate < 44000) {

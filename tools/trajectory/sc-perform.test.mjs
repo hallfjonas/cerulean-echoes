@@ -102,7 +102,7 @@ const whenDone = done => new Promise(resolve => { done.resolve = resolve })
 
 test('auto-perform and takes on SuperCollider tracks', { skip: findSclang() ? false : 'sclang not installed', timeout: 900e3 }, async t => {
   const server = spawn(process.execPath, [path.join(here, 'server.mjs'), String(PORT)],
-    { env: { ...process.env, CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER) }, stdio: 'ignore' })
+    { env: { ...process.env, CE_SC_PORT: String(OSC), CE_SC_SERVER_PORT: String(SERVER), CE_SC_MUTE: '1' }, stdio: 'ignore' })
   const restore = pageGlobals()
   try {
     for (let i = 0; i < 50; i++) {

@@ -702,7 +702,11 @@ const setDraw = () => {
     c.fillStyle = K.grid; c.fillRect(Math.round(X(.5)), y0, 1, H); c.fillRect(x0, Math.round(Y(.5)), W, 1)
     let qx = -1, qy = -1
     if (D.length) {
-      const Ex = smooth(D.map(s => s.e), 6), Tx = smooth(D.map(s => s.t), 6), n = D.length - 1, TAU = 12
+      // tension on the set's own range (5-95 % so far, at least 0.2 wide), like energy: raw tension sits low in most
+      // tracks and the trail stuck at the bottom (user, 2026-11-21); ±2′ smoothing so the trail does not jump
+      const tv = D.map(s => s.t).filter(Number.isFinite).sort((p, q) => p - q), thi = tv.length ? tv[Math.floor((tv.length - 1) * .95)] : 1
+      const tlo = tv.length ? Math.min(tv[Math.floor((tv.length - 1) * .05)], thi - .2) : 0, tn = t => Math.min(1, Math.max(0, (t - tlo) / (thi - tlo)))
+      const Ex = smooth(D.map(s => s.e), 12), Tx = smooth(D.map(s => tn(s.t ?? 0)), 12), n = D.length - 1, TAU = 12
       const P = i => [X(Ex[i]), Y(Tx[i])], mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]
       c.lineCap = 'round'; c.lineJoin = 'round'
       for (const run of runs(D)) for (let k = 0; k < run.length; k++) {
