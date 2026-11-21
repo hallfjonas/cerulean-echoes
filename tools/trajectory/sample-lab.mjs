@@ -5,11 +5,14 @@
 //   POST /lab/sample/save-as  { id, name }        copy to sc/lab/samples/<name>.sample.json           → { id, file }
 //   POST /lab/sample/export   { id, sound? }      sc/sounds/<sound>.scd + samples/sound-lab/<sound>.wav
 //                                                 → { sound, wav }
+//   POST /lab/sample/shape    { id }              one hit of the sound, rendered dry and measured (sample-shape.mjs)
+//                                                 → { peakDb, attackMs, …, waveform, envelope, spectrum, spectrogram }
 // The LC's Save button (column 8, button 2) arrives as onSave(values) from sc-link.mjs.
 import path from 'path'
 import { find } from './catalogue.mjs'
 import { findSclang } from './sc-link.mjs'
 import { exportSound, repoRoot, saveAs, saveProject } from '../sound-lab/sample-project.mjs'
+import { analyzeHit, renderHit } from '../sound-lab/sample-shape.mjs'
 
 const readBody = request => new Promise((resolve, reject) => {
   let body = ''
@@ -56,6 +59,10 @@ export const createSampleLab = ({ getSc, root = repoRoot, sclang = findSclang(),
         const out = await exportSound(name,
           { ...body.sound && { soundName: body.sound }, values: valuesOf(name), sclang, root })
         return json(200, { sound: relative(out.sound), wav: relative(out.wav) })
+      }
+      if (route === 'shape') {
+        const { samples, sampleRate } = await renderHit(name, { values: valuesOf(name), sclang, root })
+        return json(200, analyzeHit(samples, sampleRate))
       }
       return response.writeHead(404).end('not found')
     } catch (error) {

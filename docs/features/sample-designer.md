@@ -20,6 +20,17 @@ project file, `sc/lab/samples/<name>.sample.json`: save it, copy it, export it a
    **Save as** copies the project under a new name (its `parent` is the old one) and picks the copy.
 5. **Export** asks for a sound name (camelCase, e.g. `kickRound`) and writes `sc/sounds/<sound>.scd` and
    `samples/sound-lab/<sound>.wav` (two bars of the audition). Existing files are never overwritten.
+6. **Shape** renders one hit of the sound (the first note of the picked audition pattern, full velocity, no room, the
+   knob values that play now) and opens a panel with four pictures and the numbers under them:
+   - **Waveform**: the hit over time.
+   - **Envelope**: loudness in dB over time. The orange band is the attack (10 → 90 % of the peak), the blue band the
+     decay down to -20 dB.
+   - **Spectrum**: which frequencies the hit has, low on the left. The dashed line is the centroid: the higher it is,
+     the brighter the sound.
+   - **Spectrogram**: how those frequencies change over time; bright = loud. A pluck's top fades first, a drop slides
+     down.
+   Numbers: Peak (dB), Attack, Decay, Length (to -60 dB), Strongest frequency (with its note name), Centroid. Turn a
+   knob and press Shape again to compare. They are measurements, not a verdict.
 
 From the terminal (in `tools/`): `npm run sample-lab -- check`, `npm run sample-lab -- save-as kick-round kick-deep`,
 `npm run sample-lab -- export kick-deep [--as kickDeep] [--no-wav]`.
