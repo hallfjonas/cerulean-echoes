@@ -56,9 +56,11 @@
   .script-mood { color: var(--dim); margin-top: 2px }
   .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
   .script-sections li.now { color: var(--fg) }
-  /* sidebar closed: one small button top left, always there */
-  #sideOpen { position: fixed; top: 10px; left: 10px; z-index: 2; display: none }
-  body.side-closed #sideOpen { display: grid }
+  #sideHandle { position: fixed; top: 29px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3; width: 17px; height: 38px;
+    padding: 0; display: grid; place-items: center; background: var(--panel); color: var(--dim); border: 1px solid var(--line);
+    border-left: 0; border-radius: 0 6px 6px 0 }
+  #sideHandle:hover { color: var(--fg); background: var(--control) }
+  body.side-closed #sideHandle { left: 0 }
   #stage { position: fixed; top: 0; left: var(--side); right: 0; bottom: 0; background: var(--bg) }
   body.side-closed #stage { left: 0 }
   body.help-open #stage { right: 320px }
@@ -68,7 +70,6 @@
     background: var(--bg); text-transform: lowercase; display: grid; grid-template-columns: 180px minmax(0, 560px); gap: 40px;
     align-content: start; scroll-behavior: smooth }
   #settingsPage[hidden] { display: none }
-  body.side-closed #settingsPage { padding-top: 56px }
   body.settings-view #lcPanel, body.settings-view #scPanel, body.settings-view #panelEmpty { display: none }
   #settingsNav { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 2px }
   #settingsNav a { padding: 6px 10px; border-radius: var(--radius); color: var(--dim) }
@@ -147,7 +148,6 @@
     <button class="icon" data-view="settings" title="Settings" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
     </button>
-    <button id="sidebarToggle" class="icon" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
   </div>
   <nav id="subnav" data-pages="labs"></nav>
   <section>
@@ -175,7 +175,7 @@
   <section id="autoPerform" data-pages="live"></section>
   <section id="placeholderNote" data-pages="labs/sets"></section>
 </aside>
-<button id="sideOpen" class="icon" title="Show the sidebar (key S)" aria-label="Show the sidebar">☰</button>
+<button id="sideHandle" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
 <main id="stage">
   <iframe id="lcPanel" title="Live"></iframe>
   <iframe id="scPanel" title="Live (SuperCollider)" hidden></iframe>
@@ -638,9 +638,14 @@ const markSettingsSection = () => {
 }
 $('settingsPage').addEventListener('scroll', markSettingsSection)
 new ResizeObserver(markSettingsSection).observe($('settingsPage'))
-const toggleSidebar = () => document.body.classList.toggle('side-closed')
-$('sidebarToggle').onclick = toggleSidebar
-$('sideOpen').onclick = toggleSidebar
+const toggleSidebar = () => {
+  const closed = document.body.classList.toggle('side-closed')
+  const handle = $('sideHandle')
+  handle.textContent = closed ? '›' : '‹'
+  handle.title = closed ? 'Show the sidebar (key S)' : 'Hide the sidebar (key S)'
+  handle.setAttribute('aria-label', closed ? 'Show the sidebar' : 'Hide the sidebar')
+}
+$('sideHandle').onclick = toggleSidebar
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement

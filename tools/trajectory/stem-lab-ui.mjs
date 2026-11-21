@@ -10,16 +10,16 @@ const CHOICES = [['lab', 'Lab'], ['backing', 'Backing'], ['off', 'Off']]
 
 export const mountStemLab = ({ section, selected, play, refresh }) => {
   section.innerHTML = '<h2>Stems &amp; Tracks</h2>' +
+    '<div data-part="project"><div class="row">' +
+    iconButton('load', 'Load', ICONS.load) + iconButton('save', 'Save', ICONS.save) +
+    iconButton('saveAs', 'Save as', ICONS.saveAs) + iconButton('exportTrack', 'Export track', ICONS.export) +
+    '</div></div>' +
     '<details data-part="fromTrack"><summary>New from track</summary>' +
     '<label>Track <select data-field="track"></select></label>' +
     '<label>All stems in lab <input type="checkbox" data-field="all" checked></label>' +
     '<div data-field="stems"></div>' +
     '<label>Project name <input data-field="name"></label>' +
-    '<div class="row"><button data-act="create">Create</button></div></details>' +
-    '<div data-part="project"><div class="row">' +
-    iconButton('load', 'Load', ICONS.load) + iconButton('save', 'Save', ICONS.save) +
-    iconButton('saveAs', 'Save as', ICONS.saveAs) + iconButton('exportTrack', 'Export track', ICONS.export) +
-    '</div></div>'
+    '<div class="row"><button data-act="create">Create</button></div></details>'
   const fail = error => toast(error.message, { kind: 'error' })
   const field = name => section.querySelector(`[data-field="${name}"]`)
   const post = async (route, body) => {
