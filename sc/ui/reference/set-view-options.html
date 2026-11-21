@@ -39,7 +39,7 @@ through fast; the hour views fill only as far as the recording goes.</p>
 <div class=bar>
   <span id=drop>drop audio files · or <label class=file>choose<input id=pick type=file accept="audio/*" multiple hidden></label></span>
   <select id=rec></select>
-  <select id=scale title="how loudness becomes height"><option value=fixed>scale: fixed (lufs)</option><option value=punch>scale: fixed + punch</option><option value=low>scale: low end (kick + bass), fixed</option><option value=change>scale: vs. last 2 min (±6 db)</option><option value=relative>scale: relative (as built)</option></select>
+  <select id=scale title="how loudness becomes height"><option value=norm selected>scale: normalized (5–95 % of the set so far)</option><option value=fixed>scale: fixed (lufs)</option><option value=punch>scale: fixed + punch</option><option value=low>scale: low end (kick + bass), fixed</option><option value=change>scale: vs. last 2 min (±6 db)</option><option value=relative>scale: relative (as built)</option></select>
   <label title="loudness at the bottom / top of the fixed scale (lufs)">lufs <input id=lo type=number value=-36 step=1 style="width:4.5em"> … <input id=hi type=number value=-6 step=1 style="width:4.5em"></label>
   <button id=fit title="bottom / top of the fixed scale = 5 % / 95 % of this recording's 1 s values (of the low end for that scale)">fit to recording</button>
   <select id=theme><option>minimal-dark</option><option>minimal-light</option><option>retro-light</option><option>retro-dark</option></select>
@@ -124,6 +124,7 @@ const fixed = v => v > -69 ? Math.min(1, Math.max(0, (v - +$('lo').value) / (+$(
 const vals = (rec, step, now, partial = false) => {
   const dB = seriesDB(rec, step, now, partial), mode = SCALE()
   if (mode === 'relative') return dB.map(normalise(rec, now))
+  if (mode === 'norm') { const r = setRange(rec, now); return dB.map(v => v > -69 ? Math.min(1, Math.max(0, (v - r.lo) / (r.hi - r.lo))) : 0) }
   if (mode === 'low') return seriesDB(rec, step, now, partial, 'low').map(fixed)
   if (mode === 'change') {   // each value against the mean power of the 2 minutes before it: −6 dB = 0, same = .5, +6 dB = 1
     const per = Math.max(1, Math.round(step / FRAME)), W = Math.round(120 / FRAME)
@@ -133,6 +134,14 @@ const vals = (rec, step, now, partial = false) => {
       return Math.min(1, Math.max(0, .5 + (v - ref) / 12)) }) }
   if (mode === 'punch') { const p = punchSeries(rec, step, now, partial); return dB.map((v, i) => v > -69 ? .7 * fixed(v) + .3 * p[i] : 0) }
   return dB.map(fixed)
+}
+// normalized (default): the set's own range so far, from the 1 s values: 5 % .. 95 %, at least 12 dB wide
+const setRange = (rec, now) => {
+  const v = seriesDB(rec, 1, Math.max(now, 1)).filter(x => x > -69).sort((a, b) => a - b)
+  if (!v.length) return { lo: -40, hi: -28 }
+  let lo = v[Math.floor(v.length * .05)], hi = v[Math.min(v.length - 1, Math.floor(v.length * .95))]
+  if (hi - lo < 12) lo = hi - 12
+  return { lo, hi }
 }
 const shape = v => SCALE() === 'relative' ? Math.sqrt(v) : v
 const normalise = (rec, now) => {   // the range from the 10 s values so far (as the panel has them)
