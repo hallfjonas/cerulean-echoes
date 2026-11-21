@@ -27,6 +27,8 @@ pads). The follow-up epic `set-designer` starts when this one is done and merged
 - **Launchkey as data.** A rig JSON (`sc/launchkey/<name>.lk`) replaces the frame's Launchkey code; a track names its
   rig (`"launchkey": "<ref>"`). A frame with Launchkey code keeps working. Knobs load from the rig but have no editor.
 - **Frames stay code.** A copy copies the frame unchanged; harmony as data is out of scope.
+- **Tab:** the view lives in Labs / Stems & Tracks (the Stem Designer tab; it already makes a project from a track
+  and exports a project as a track). There is no separate Tracks tab.
 - **Save writes only the opened track's own files.** Save as copy refuses an existing id; git is the undo for Save.
 
 ## Technical Approach

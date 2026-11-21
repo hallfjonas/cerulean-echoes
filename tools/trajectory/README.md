@@ -41,7 +41,7 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 ### Layout
 
 - **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
-- **Sidebar** (left, **‹** or key **S** hides it): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems,
+- **Sidebar** (left, **‹** or key **S** hides it): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems &
   Tracks, Sets), the **⚙** gear (Settings), **?** ("About this page", closed on every load) and the sections of the page
   you are on: Live = the live track list with Play / Pause, Stop and Record (icon buttons), the status line (what plays,
   MIDI inputs, auto-perform bar) and Auto-perform (with Record audio); Labs = the project list of the sub-tab, Play /
@@ -271,7 +271,7 @@ it was retired on 2026-11-20):
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
 | `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
 | `player.html` | the player page: loads a track through the engine, the sidebar, the Live / Labs panel (the track's LC view in an iframe), the visuals (`render.mjs`) and the Settings view |
-| `pages.mjs` | the pages (Live, Labs with Samples / Stems / Tracks / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
+| `pages.mjs` | the pages (Live, Labs with Samples / Stems & Tracks / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
 | `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
 | `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the sidebar section |

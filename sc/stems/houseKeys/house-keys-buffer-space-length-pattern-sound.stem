@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "name": "house-keys-buffer-space-length-pattern-sound",
+  "parent": "houseKeys/house-keys-brightness-space-length-pattern-sound.stem",
+  "about": "Kerri Chandler stabs; riffs bring their own chords.",
+  "meta": {
+    "role": "keys",
+    "genres": ["house"],
+    "energy": 3,
+    "tags": ["piano", "rhodes", "organ", "stabs"],
+    "harmony": "chords"
+  },
+  "sample": { "name": "houseKeys", "extra": ["sdSynth", "sdFont"] },
+  "gain": 1.82,
+  "pitch": "chord",
+  "code": "house-keys-riffs.scd",
+  "frame": { "break": "stay" },
+  "patterns": [
+    { "label": "Chain" },
+    { "label": "Shifted chain" },
+    { "label": "Pairs" },
+    { "label": "3-3-2" },
+    { "label": "Kerri syncopation" },
+    { "label": "Kerri-Riff" },
+    { "label": "Kerri video" },
+    { "label": "Checkmate" },
+    { "label": "Atmosphere" },
+    { "label": "Turn Off" },
+    { "label": "Chicago" }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Buffer",
+      "about": "dull ↔ bright.",
+      "param": "pan",
+      "range": [-1, 1],
+      "default": 0.72,
+      "override": true
+    },
+    "k2": { "label": "Space", "about": "dry ↔ echo + room." },
+    "k3": { "label": "Length", "about": "short ↔ long." },
+    "fader": { "label": "Level", "about": "piano, Rhodes, organs, mallets." },
+    "b1": { "label": "Pattern", "about": "6 rhythms on Am9 → 5 riffs with own chords." },
+    "b2": { "label": "Sound", "about": "on: knobs = sound mix, fader = overtones.", "mode": "toggle" }
+  }
+}

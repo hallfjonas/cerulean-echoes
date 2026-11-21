@@ -109,6 +109,7 @@
 		fog: opt.(\fog), thin: opt.(\thin), tension: opt.(\tension), swing: opt.(\swing), breakOut: frame[\break] == "out",
 		tensionFilter: opt.(\tensionFilter),
 		targets: targets, knobCode: knobCode,
+		overridden: if(colCode.isNil) { [] } { [\k1, \k2, \k3].select { |kk| controls[kk][\override].asString == "true" } },
 		holdKnob: targets.values.flatten(1).any { |t| t[\param] == \hold },
 		boostOn: targets.values.flatten(1).any { |t| t[\param] == \boost },
 		busParams: busParams,
@@ -128,7 +129,9 @@
 		// the sound's thin input does Thin per note (sd voices); else the strip does it
 		thinOnStrip: { |col| col[\thin] and: { col[\inputs].includes(\thinF).not } },
 		stateName: { |col, param| (col[\stemName] ++ "_" ++ param).asSymbol },
-		knob: { |col, kk| col[\ce].val(col[\ccs][kk]) },
+		rawKnob: { |col, kk| col[\ce].val(col[\ccs][kk]) },
+		// what column code reads: a knob the designer gave another job ("override") reads as its middle position
+		knob: { |col, kk| if(col[\overridden].includes(kk)) { 0.5 } { col.rawKnob(kk) } },
 		held: { |col, kk| col[\ce].held(col[\ccs][kk]) },
 		chordAt: { |col, bar| col[\track].chordAt(bar) },
 		// the chord at 16th k; push: the next bar's chord two 16ths early (the frame's chordAtK, else the bar's chord)
@@ -207,7 +210,7 @@
 		// the preset, the knobs, then the add-on: parameter → value; space becomes the room send (a knob on room sets it)
 		knobValues: { |col, on|
 			var p = col[\preset].copy;
-			col[\targets].keysValuesDo { |kk, list| var v = col.knob(kk); list.do { |t| p[t[\param]] = col.mapKnob(t, v) } };
+			col[\targets].keysValuesDo { |kk, list| var v = col.rawKnob(kk); list.do { |t| p[t[\param]] = col.mapKnob(t, v) } };
 			if(p[\space].notNil or: { p[\room].isNil }) { p[\room] = 0.9 * (p.removeAt(\space) ? 0) };
 			p[\echo] = p[\echo] ? 0;
 			if(on) { col[\addon][\params] !? { |f| f.(col[\addonState], col, p) } };
@@ -343,7 +346,7 @@
 				[\room, \echo, \hold, \space, \length, \boost, \trim, \transpose, \echoTime, \echoFeedback].do { |key|
 					args.removeAt(key) };
 				l[\busParams].do { |param| args[param] = ce.stateMap(col.stateName(param)) };
-				col[\knobCode].keysValuesDo { |kk, f| args.putAll(f.(col.knob(kk), col) ? ()) };
+				col[\knobCode].keysValuesDo { |kk, f| args.putAll(f.(col.rawKnob(kk), col) ? ()) };
 				l[\toneArg] !? { |x| args[\tone] = x };
 				l[\thinArg] !? { |x| args[\thinF] = x };
 				file !? { args[\buf] = ce.sampleBuffers[file]; args[\stereoIn] = (ce.sampleMono[file] != true).asInteger };
@@ -360,16 +363,24 @@
 				ce.note(l[\sound], args)
 			}
 		},
+		// the parameters of the overriding knobs on every note column code made: pan moves the note's own pan, the rest
+		// replaces it (space, echo and trim are strip settings of the code and stay with it)
+		overrideNotes: { |col, notes|
+			col[\overridden].do { |kk| col[\targets][kk].do { |t| var v = col.mapKnob(t, col.rawKnob(kk));
+				if([\space, \echo, \trim, \hold, \boost].includes(t[\param]).not) { notes.do { |n|
+					if(n.isKindOf(Event) and: { n[\instrument].notNil }) {
+						n[t[\param]] = if(t[\param] == \pan) { ((n[\pan] ? 0) + v).clip(-1, 1) } { v } } } } } };
+			notes
+		},
 		// the notes of 16th k (asked by the step engine through the stem track's slot)
 		// every layer: its amount (0: no notes, unless a live amount plays on), hits, chance, voices; the add-on's hits
-		// change the first layer
 		stepNotes: { |col, k|
 			var bar = (k / 16).floor, on, a = col[\addonState], ad = col[\addon], out = List[], p;
 			on = col[\colCode].isNil and: { col.addonOn(bar) };
 			if(on) { a[\since] = a[\since] ? k } { a[\since] = nil };
 			case
 			{ col.gated(bar) or: { on and: { ad[\mute] == true } } } { [] }
-			{ col[\colCode].notNil } { col[\colCode][\notes].(col, k) ? [] }
+			{ col[\colCode].notNil } { col.overrideNotes(col[\colCode][\notes].(col, k) ? []) }
 			{
 				col[\layers].do { |l, i|
 					var amt = l[\amount] !? { |x| col.amountOf(x, bar) } ? 1, hits, c;

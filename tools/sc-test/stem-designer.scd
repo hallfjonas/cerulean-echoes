@@ -59,7 +59,7 @@ writeProject = { |name, body| var file = tmp +/+ (name ++ ".stemlab.json"); File
 			var slot = project[\columns].keys.asArray.sort.last, cc = ce.slotCCs(slot)[\k1];
 			#ce, log = play.(file, 1, [[0.25, cc, 0.5]]);
 			ce.track.labSelected == slot.asSymbol });
-		check.("% column 8 is the same in both modes and button 1 cycles global, stems, context volume".format(name), {
+		check.("% column 8 is the same in both modes and button 1 cycles stems, context volume".format(name), {
 			var glob = ce.stemGlobal, levels, set;
 			ce = loadCe.value;
 			ce.prepare(ScoreStreamPlayer.new, ce.stemLabProject(file));
@@ -69,11 +69,11 @@ writeProject = { |name, body| var file = tmp +/+ (name ++ ".stemlab.json"); File
 			set.(glob[\master], 0.5);
 			set.(glob[\master] + 48, 0.5);
 			(ce.ccAlias[glob[\master] + 48] == glob[\master] and: { ce.ccAlias[glob[\chapter] + 48] == glob[\chapter] })
-				and: { levels.value == [0.5, 0.5] }
-				and: { ce.pressFns[glob[\chapter]].do(_.value); ce.track.labTarget == \stems }
-				and: { set.(glob[\master], 0.5); set.(glob[\master], 0.2); levels.value == [0.1, 0.5] }
+				and: { ce.track.labTarget == \stems and: { levels.value == [0.5, 1] } }
 				and: { ce.pressFns[glob[\chapter]].do(_.value); ce.track.labTarget == \context }
-				and: { set.(glob[\master], 0.4); levels.value == [0.1, 0.2] } });
+				and: { set.(glob[\master], 0.2); levels.value == [0.5, 0.2] }
+				and: { ce.pressFns[glob[\chapter]].do(_.value); ce.track.labTarget == \stems }
+				and: { set.(glob[\master], 0.4); levels.value == [0.4, 0.2] } });
 	};
 	check.("a draft column plays and its stem comes from the project", {
 		var text = File.readAllString(root +/+ "sc/stems" +/+ flute).replace("\"parent\": null", "\"parent\": \"" ++ flute ++ "\""), file, ce, log;
@@ -84,6 +84,19 @@ writeProject = { |name, body| var file = tmp +/+ (name ++ ".stemlab.json"); File
 		(0..127).any { |k| ce.track.columns['1:1'].stepNotes(k).reject { |n| n[\msg].notNil }.notEmpty }
 			and: { ce.track.slots['1:1'] == "draft:airy" }
 			and: { ce.track.uiCols(ce)[\designer][\slots]['1:1'] == "draft" } });
+	check.("an overriding knob on a column-code stem: the code reads 0.5 and the notes carry the parameter", {
+		var brass = "sc/stems/brassSection/brass-section-brightness-space-complexity-pattern-lift.stem";
+		var text = File.readAllString(root +/+ brass).replace("\"parent\": null", "\"parent\": \"" ++ brass.drop(9) ++ "\""), stem, file, ce, log, notes;
+		stem = text.parseJSON;
+		stem["controls"]["k1"] = (label: "Pan", about: "left right", param: "pan", range: [-1, 1], default: 0.5, override: true);
+		file = writeProject.("override-test", "{\"format\":1,\"name\":\"override-test\",\"about\":\"t\","
+			++ "\"context\":{\"track\":\"009-house\"},\"columns\":{\"1:1\":\"draft:pan\"},"
+			++ "\"drafts\":{\"pan\":" ++ loadCe.value.toJSON(stem) ++ "}}");
+		#ce, log = play.(file, 8);
+		ce.setCC(ce.track.columns['1:1'][\ccs][\k1], 1.0, { |m| });
+		notes = (0..127).collect { |k| ce.track.columns['1:1'].stepNotes(k).select { |n| n[\instrument].notNil } }.flatten;
+		(ce.track.columns['1:1'].knob(\k1) == 0.5) and: { notes.size > 0 }
+			and: { notes.every { |n| n[\pan] >= 0 } } and: { notes.any { |n| n[\pan] == 1 } } });
 	check.("fourteen columns load and play", {
 		var slots = File.readAllString(root +/+ "sc/tracks/009-house/009-house.track").parseJSON["slots"], file, ce, log;
 		file = writeProject.("fourteen", "{\"format\":1,\"name\":\"fourteen\",\"about\":\"t\","

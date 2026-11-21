@@ -146,7 +146,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
-- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems, Tracks, Sets) | Visuals;
+- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems & Tracks, Sets) | Visuals;
   the sidebar (key S) shows only the sections of the page: Live = live tracks, Play-Pause/Stop/Record, auto-perform;
   Labs = Sample / Stem Designer; the gear opens Settings (Theme, Visuals, MIDI panel, Recording, keyboard shortcuts);
   **?** opens the help.

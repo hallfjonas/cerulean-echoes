@@ -11,6 +11,14 @@
 //   POST /lab/stems/add       { id, stem }                the stem (sc/stems/ path) on the first free slot → { slot, mode }
 //   POST /lab/stems/replace   { id, slot, stem }          another stem on that slot                       → { slot, mode }
 //   POST /lab/stems/remove    { id, slot, discard? }      the column leaves, its slot is free (a draft only with discard) → { slot, mode }
+//   POST /lab/stems/export-track { id, name? }            the project as a stem track sc/tracks/<name>/ (context
+//                                                         track's frame and backing, the columns on top) → { track, file };
+//                                                         promote: true promotes the drafts first (else they refuse);
+//                                                         without name only a free default name   → { name, drafts }
+// Without a project:
+//   POST /lab/stems/tracks       {}                       the stem tracks and their slots          → { tracks }
+//   POST /lab/stems/default-name { track }                a free project name '<track>-stems'      → { name }
+//   POST /lab/stems/from-track   { track, name, columns, backing }  a new project of the track's stems → { id, file }
 // add, replace and remove change the project file (Save as keeps a copy first). A project that plays follows: a
 // replace from the next bar when the slot's mixer strip fits the stem (mode 'next-bar'), else the project loads again
 // (mode 'reload', a short gap; every load costs the sound server memory, so a load only where a column comes or goes).
@@ -19,7 +27,8 @@
 import path from 'path'
 import { find } from './catalogue.mjs'
 import { buildKnob } from '../stems/knob.mjs'
-import { addColumn, promote, readProject, removeColumn, replaceColumn, repoRoot, saveAs, saveProject, setKnob, stemOf } from '../sound-lab/stem-project.mjs'
+import { addColumn, draftSlots, freeProjectName, freeTrackName, listStemTracks, projectFromTrack, promote, readProject, removeColumn,
+  replaceColumn, repoRoot, saveAs, saveProject, setKnob, stemOf, trackFromProject } from '../sound-lab/stem-project.mjs'
 
 const readBody = request => new Promise((resolve, reject) => {
   let body = ''
@@ -57,8 +66,25 @@ export const createStemLab = ({ getSc, root = repoRoot, log = console.log }) => 
     if (request.method !== 'POST' || !fromOwnPage(request)) return response.writeHead(403).end('forbidden')
     try {
       const body = JSON.parse(await readBody(request) || '{}')
-      const name = projectOf(body.id)
       const route = url.pathname.slice('/lab/stems/'.length)
+      if (route === 'tracks') return json(200, { tracks: listStemTracks(root) })
+      if (route === 'default-name') return json(200, { name: freeProjectName(`${body.track}-stems`, root) })
+      if (route === 'from-track') {
+        const file = projectFromTrack(body.track, body, root)
+        return json(200, { id: 'stems-' + body.name, file: relative(file) })
+      }
+      const name = projectOf(body.id)
+      if (route === 'export-track') {
+        if (!body.name) {
+          const track = readProject(name, root).context?.track
+          return json(200, { name: track ? freeTrackName(track, root) : '', drafts: draftSlots(name, root) })
+        }
+        if (body.promote) {
+          const promoted = draftSlots(name, root).map(slot => promote(name, slot, root).ref)
+          if (promoted.length) await follow(name, {})
+        }
+        return json(200, { track: body.name, file: relative(trackFromProject(name, body.name, root)) })
+      }
       if (route === 'save') return json(200, { file: relative(saveProject(name, valuesOf(name), root)) })
       if (route === 'save-as') {
         const file = saveAs(name, body.name, valuesOf(name), root)

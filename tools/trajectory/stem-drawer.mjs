@@ -1,10 +1,13 @@
 // The player's stem drawer (stem tracks): a column selection (selection.mjs, kind 'column') opens it. It lists the
-// library stems of the column's role (GET /stems) with filters for genre, energy and tag, and marks the stem that plays
+// library stems (GET /stems) with filters for role (preset to the column's role, "any" shows every role), genre,
+// energy and tag, and marks the stem that plays
 // and the one in the track file. A pick swaps it in (POST /swap: from the next bar, or the track loads again with it,
 // a short gap). Revert and Save as act on the whole track (stem-swap.mjs); the track file never changes.
 // A Stem Designer project (selection field lab: true) uses the same drawer: Replace on a column, or Add (field adding: true on a free slot,
 // every role) from the controllers; a pick changes the project file and plays from the next bar or loads it again
 // (stem-lab.mjs). There is no Revert or Save as: the sidebar's Save as copies the project.
+import { askText, toast } from './toast.mjs'
+
 const el = (tag, props = {}, ...children) => {
   const element = Object.assign(document.createElement(tag), props)
   element.append(...children)
@@ -32,7 +35,11 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
   let current = null, message = ''
   const filters = { role: '', genre: '', energy: '', tag: '' }
 
-  const say = text => { message = text }
+  let filteredColumn = null
+  const say = text => {
+    message = text
+    if (text.startsWith('Error: ')) toast(text.slice(7), { kind: 'error' })
+  }
   const reselect = stem => selection.select({ ...current, stem })
 
   const render = (state, versions, all) => {
@@ -59,7 +66,7 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
     panel.replaceChildren(
       el('button', { className: 'close', title: 'Close', onclick: () => selection.clear() }, '×'),
       el('h2', {}, current.adding ? `Add a stem on ${current.slot}` : `Column ${current.slot} · ${slot.role ?? 'draft'}`),
-      el('div', { className: 'row' }, ...(slot.role ? [] : [choice('Role', 'role', [...new Set(all.map(v => v.meta.role))].sort())]),
+      el('div', { className: 'row' }, choice('Role', 'role', [...new Set(all.map(v => v.meta.role))].sort()),
         choice('Genre', 'genre', [...new Set(all.flatMap(v => v.meta.genres))].sort()),
         choice('Energy', 'energy', [1, 2, 3, 4, 5]), choice('Tag', 'tag', [...new Set(all.flatMap(v => v.meta.tags))].sort())),
       list,
@@ -76,11 +83,14 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
       const state = current.lab ? await labState(everything) : await getJson('swap?track=' + encodeURIComponent(current.track))
       const role = state.slots[current.slot]?.role
       if (!role && !current.lab) throw new Error(`slot ${current.slot} holds no stem`)
-      const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...filters, ...role && { role } })
-        .filter(([, v]) => v)))
-      const [found, all] = await Promise.all([getJson('stems?' + query),
-        getJson('stems' + (role ? '?role=' + encodeURIComponent(role) : ''))])
-      render(state, versionsOf(found), versionsOf(all))
+      const columnKey = `${current.track}/${current.slot}`
+      if (filteredColumn !== columnKey) {
+        filteredColumn = columnKey
+        filters.role = role ?? ''
+      }
+      const query = new URLSearchParams(Object.entries(filters).filter(([, v]) => v))
+      const found = await getJson('stems?' + query)
+      render(state, versionsOf(found), everything)
     } catch (error) {
       panel.replaceChildren(el('button', { className: 'close', onclick: () => selection.clear() }, '×'),
         el('output', { textContent: 'Error: ' + error.message }))
@@ -134,7 +144,7 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
   }
 
   async function saveAs () {
-    const name = prompt('Name of the new track (NNN-name). Empty: the next free -v2, -v3 …', '')
+    const name = await askText('Name of the new track (NNN-name). Empty: the next free -v2, -v3 …', '')
     if (name === null) return
     try {
       const result = await post('track/save-as', { track: current.track, name: name.trim() })

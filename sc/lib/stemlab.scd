@@ -4,8 +4,7 @@
 // tempo, frame (chords, chapters, global column) and, as backing, the stems of the slots named in context.backing,
 // which play without a controller. Controls as in a stem track, except column 8:
 //   master fader, button 1  as everywhere, column 8 is the same in both modes. Button 1 cycles what the fader sets:
-//                              the level of everything (Global), of the columns (Stems) or of the backing (Context);
-//                              each keeps its own level, the strips play Global x Stems and Global x Context
+//                              the level of the columns (Stems) or of the backing (Context); each keeps its own level
 //   Add, Remove and Promote are in the player's panel: a free slot shows "+ Add", a column the trash symbol and the
 //   promote symbol (active while the column holds a draft). The panel posts them to the player's server. Replace: a
 //   click on a stem's title opens the player's stem drawer.
@@ -28,13 +27,13 @@
 	track = self.loadStemTrack(contextPath, nil, json);
 	track.project = project;
 	track.labSelected = project[\select].asSymbol;
-	track.labTargets = [\global, \stems, \context];
-	track.labTarget = \global;
-	track.labLevels = (global: 1, stems: 1, context: 1);
+	track.labTargets = [\stems, \context];
+	track.labTarget = \stems;
+	track.labLevels = (stems: 1, context: 1);
 	track.labTags = { |lines|
 		lines.reject { |l| [" g.b1 ", " g.b2 ", " g.fader "].any { |tag| l.contains(tag) } }
 			++ ["// @ctl g.fader Level | the level of the volume shown on button 1.",
-				"// @ctl g.b1 Volume | next: Global (everything), Stems (the columns), Context (the backing)."] };
+				"// @ctl g.b1 Volume | next: Stems (the columns), Context (the backing)."] };
 	track.tagLines = self.stemTrackTags(track);
 	buildBase = track[\build];
 	track[\build] = { |t, ce| buildBase.(t, ce); ce.stemLabBuild(t) };
@@ -51,9 +50,8 @@
 
 ~ce.stemLabBuild = { |self, t|
 	var ce = self, glob = ce.stemGlobal, setLevels = { |send|
-		var g = t.labLevels[\global];
-		ce.setCC(ce.labLevelCc[\stems], g * t.labLevels[\stems], send);
-		ce.setCC(ce.labLevelCc[\context], g * t.labLevels[\context], send) };
+		ce.setCC(ce.labLevelCc[\stems], t.labLevels[\stems], send);
+		ce.setCC(ce.labLevelCc[\context], t.labLevels[\context], send) };
 	ce.stemSlots.do { |slot| t.columns[slot] !? {
 		ce.slotCCs(slot).values.do { |cc| ce.onCC(cc, { t.labSelected = slot; ce.uiPush }) } } };
 	ce.onCC(glob[\master], { |v, send| t.labLevels[t.labTarget] = v; setLevels.(send) });

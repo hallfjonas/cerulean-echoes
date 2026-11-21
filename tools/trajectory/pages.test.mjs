@@ -11,12 +11,13 @@ const catalogue = [
 ]
 
 test('hash: every page round-trips, unknown hashes land on Live, Labs defaults to Samples', () => {
-  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/tracks', '#labs/sets', '#visuals'])
+  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/sets', '#visuals'])
     assert.equal(hashFor(parseHash(hash)), hash)
   assert.deepEqual(parseHash(''), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#nonsense'), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#labs'), { id: 'labs', sub: 'samples' })
   assert.deepEqual(parseHash('#labs/nope'), { id: 'labs', sub: 'samples' })
+  assert.deepEqual(parseHash('#labs/tracks'), { id: 'labs', sub: 'samples' })
 })
 
 test('pickers: Live lists live tracks, Samples and Stems their projects, Strudel boards never', () => {
@@ -24,7 +25,7 @@ test('pickers: Live lists live tracks, Samples and Stems their projects, Strudel
   assert.deepEqual(ids('#live'), ['a', 'b'])
   assert.deepEqual(ids('#labs/samples'), ['sample-kick'])
   assert.deepEqual(ids('#labs/stems'), ['stems-flute'])
-  assert.deepEqual(ids('#labs/tracks'), [])
+  assert.deepEqual(ids('#labs/sets'), [])
   assert.deepEqual(ids('#visuals'), [])
 })
 
@@ -36,9 +37,10 @@ test('sections: a token names a page, all its sub-tabs or one sub-tab', () => {
   assert.ok(shownOn('live labs/samples', samples) && !shownOn('live labs/samples', stems))
 })
 
-test('the waveform analysis belongs to Labs / Samples; Tracks and Sets are placeholders', () => {
+test('the waveform analysis belongs to Labs / Samples; Sets is a placeholder', () => {
   assert.ok(showsShape(parseHash('#labs/samples')))
   for (const hash of ['#live', '#labs/stems', '#visuals']) assert.ok(!showsShape(parseHash(hash)))
-  assert.ok(placeholderFor(parseHash('#labs/tracks')) && placeholderFor(parseHash('#labs/sets')))
+  assert.ok(placeholderFor(parseHash('#labs/sets')))
+  assert.equal(placeholderFor(parseHash('#labs/stems')), null)
   assert.equal(placeholderFor(parseHash('#labs/samples')), null)
 })

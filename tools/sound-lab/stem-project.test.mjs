@@ -9,7 +9,9 @@ import path from 'path'
 import { checkFiles } from '../stems/check-stems.mjs'
 import { buildKnob } from '../stems/knob.mjs'
 import { scan } from '../trajectory/catalogue.mjs'
-import { addColumn, checkAll, listProjects, projectErrors, projectFile, promote, readProject, removeColumn, repoRoot, replaceColumn, saveAs, saveProject, setKnob, trackWith }
+import { addColumn, checkAll, freeProjectName, freeTrackName, listProjects, listStemTracks, projectErrors, projectFile,
+  projectFromTrack, promote, readProject, removeColumn, repoRoot, replaceColumn, saveAs, saveProject, setKnob,
+  draftSlots, trackFromProject, trackWith }
   from './stem-project.mjs'
 
 const sandboxes = []
@@ -176,4 +178,66 @@ test('a knob change makes a draft of a library column, changes a draft in place,
   assert.match(ref, /^flute\/flute-brightness-space-wet-pattern-echo-throw\.stem$/)
   assert.equal(readProject('flute-explore', root).columns['1:1'], ref)
   assert.throws(() => setKnob('flute-explore', '2:1', 'k3', echo, root), /no column 2:1/)
+})
+
+test('a project from a track: lab stems become columns, backing stems play along, the rest stays off', () => {
+  const root = sandbox()
+  const house = listStemTracks(root).find(entry => entry.track === '009-house')
+  assert.equal(house.slots['2:4'], FLUTE)
+  const name = freeProjectName('009-house-stems', root)
+  assert.equal(name, '009-house-stems')
+  const file = projectFromTrack('009-house', { name, columns: ['2:4', '2:3'], backing: ['1:1', '1:3'] }, root)
+  const project = JSON.parse(fs.readFileSync(file, 'utf8'))
+  assert.deepEqual(project.columns, { '2:3': house.slots['2:3'], '2:4': FLUTE })
+  assert.deepEqual(project.context, { track: '009-house', chapter: 0, backing: ['1:1', '1:3'] })
+  assert.equal(project.select, '2:3')
+  assert.deepEqual(projectErrors(project, file, root), [])
+  assert.equal(freeProjectName('009-house-stems', root), '009-house-stems-2')
+  assert.throws(() => projectFromTrack('009-house', { name, columns: ['2:4'] }, root), /exists/)
+  const fresh = { name: '009-house-x', backing: [] }
+  assert.throws(() => projectFromTrack('009-house', { ...fresh, columns: [] }, root), /at least one/)
+  assert.throws(() => projectFromTrack('009-house', { ...fresh, columns: ['2:4'], backing: ['2:4'] }, root), /not both/)
+  assert.throws(() => projectFromTrack('090-nope', { ...fresh, columns: ['1:1'] }, root), /no stem track/)
+})
+
+test('a project as a track: backing and columns on their slots, drafts refused, a context track needed', () => {
+  const root = sandbox()
+  fs.writeFileSync(projectFile('flute-explore', root), JSON.stringify(withDraft(readProject('flute-explore', root))))
+  assert.deepEqual(draftSlots('flute-explore', root), ['1:1'])
+  assert.throws(() => trackFromProject('flute-explore', '009-house-v2', root), /promote the drafts on 1:1 first/)
+  const { ref } = promote('flute-explore', '1:1', root)
+  assert.deepEqual(draftSlots('flute-explore', root), [])
+  assert.equal(freeTrackName('009-house', root), '009-house-2')
+  const file = trackFromProject('flute-explore', '009-house-2', root)
+  const track = JSON.parse(fs.readFileSync(file, 'utf8'))
+  const house = listStemTracks(root).find(entry => entry.track === '009-house')
+  assert.equal(track.slots['1:1'], ref)
+  assert.equal(track.slots['1:2'], FIXTURE.columns['1:2'])
+  assert.equal(track.slots['2:4'], undefined)
+  assert.deepEqual(Object.keys(track.slots).sort(), ['1:1', '1:2', '1:3', '1:4'])
+  assert.equal(track.tempo, 124)
+  assert.ok(house.slots['1:1'] !== ref)
+  assert.deepEqual(checkFiles([file], root)[0].errors, [])
+  assert.equal(freeTrackName('009-house', root), '009-house-3')
+  const lone = { ...readProject('flute-explore', root), name: 'lone' }
+  delete lone.context
+  fs.writeFileSync(projectFile('lone', root), JSON.stringify(lone))
+  assert.throws(() => trackFromProject('lone', '009-house-3', root), /no context track/)
+})
+
+test('a knob change on a column-code stem overrides what the code did with that knob', () => {
+  const root = sandbox()
+  const brass = 'brassSection/brass-section-brightness-space-complexity-pattern-lift.stem'
+  const withBrass = readProject('flute-explore', root)
+  withBrass.columns['1:2'] = brass
+  withBrass.columns['1:3'] = 'bassFM/bass-fm-brightness-space-sound-pattern-octave.stem'
+  fs.writeFileSync(projectFile('flute-explore', root), JSON.stringify(withBrass))
+  const pan = buildKnob('k1', { param: 'pan', range: [-1, 1], default: 0.5, label: 'Pan', about: 'left ↔ right' })
+  setKnob('flute-explore', '1:2', 'k1', pan, root)
+  const draft = Object.values(readProject('flute-explore', root).drafts)[0]
+  assert.equal(draft.controls.k1.override, true)
+  setKnob('flute-explore', '1:3', 'k1', pan, root)
+  const plain = readProject('flute-explore', root).drafts['bass-fm-1-3']
+  assert.equal(plain.controls.k1.override, undefined)
+  assert.deepEqual(projectErrors(readProject('flute-explore', root), projectFile('flute-explore', root), root), [])
 })

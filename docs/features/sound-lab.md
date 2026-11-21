@@ -24,19 +24,19 @@ The old Strudel lab boards stay as they are ([Lab boards](lab-boards.md)); new s
 ### Stem swap
 1. Start the player (`cd tools && node trajectory/server.mjs`, then http://localhost:8766) and play a stem track, for
    example `009-house (stems)` under Live.
-2. Click the name of a column on the Live page. The stem drawer lists the library stems that fit its role; filter by
-   genre, energy or tag.
+2. Click the name of a column on the Live page. The stem drawer lists the library stems of its role; filter by role
+   (set it to any to swap in a stem of another role, e.g. a bass for a lead), genre, energy or tag.
 3. Pick one. It takes over at the next bar. If the new stem needs another mixer strip than the old one, the track is
    loaded again with it (a short gap).
 4. **Revert** puts the file's stems back. **Save as** writes the swaps as a new track (`009-house-v2`); the original
    file never changes.
 
-### Stem Designer
-1. On the **Labs** page, tab **Stems**, pick `Stems: flute-explore` and press **Load**. The columns of the project play on their slots; the
+### Stem Designer (Labs / Stems & Tracks)
+1. On the **Labs** page, tab **Stems & Tracks**, pick `Stems: flute-explore` and press **Load**. The columns of the project play on their slots; the
    backing stems of the context track (`009-house`: kick, sub, bass) play along without a controller.
 2. Turn the knobs of any column. The column you moved last is the selection (the panel header names it). The global
-   fader sets a volume: button 1 of column 8 (the same in both modes) cycles it between **Global** (everything),
-   **Stems** (the columns) and **Context** (the backing). Each keeps its own level; Stems plays at Global x Stems.
+   fader sets a volume: button 1 of column 8 (the same in both modes) cycles it between **Stems** (the columns)
+   and **Context** (the backing). Each keeps its own level.
 3. Every free slot shows **+ Add** where the stem's title would be: click it, pick a stem in the drawer (the one of
    the Live page), it goes on that slot. Above a stem's title are two small symbols: **export** (see Promote) and
    **trash** (the slot is free again and shows + Add). **Replace**: a click on the stem's title opens the
@@ -53,13 +53,21 @@ The old Strudel lab boards stay as they are ([Lab boards](lab-boards.md)); new s
    Echo, Pan), the bounds the knob moves it between, the curve and the knob's default position; a preset
    (`sc/stems/knobs.json`) fills the fields. Apply writes the knob into a draft of the column (a library stem stays
    as it is). Knob 1 and 2 keep the names Brightness and Space while they drive brightness and space, else they get a name of
-   their own. A knob that the stem's code drives gets a parameter mapping on
-   top of it.
-7. To use the winner, make a new track with it: `cd tools && npm run stem-lab -- track-with 009-house 009-house-v2
-   2:4=<sample>/<name>.stem` (a slot of the track, not of the project).
+   their own. A stem with column code (brass, strings …) reads
+   its knobs itself (knob 1 = brightness and level): the editor marks the knob `"override": true`, so the code reads
+   it as its middle position and the new parameter is applied to every note the code makes (pan moves the code's own
+   pan, space, echo and trim stay with the code).
+7. **New from track** (sidebar, folds open): pick a stem track; every stem of it gets **Lab** (a column of the
+   project), **Backing** (plays along, `context.backing`) or **Off**. **All stems in lab** (on by default) sets every
+   stem to Lab, off every stem to Off. **Create** writes `sc/lab/stems/<track>-stems.stemlab.json` (`-2`, … when taken;
+   the name is editable) with the track as context, and plays it.
+8. **Export track** (sidebar) writes the project as a stem track `sc/tracks/<name>/` (default `<context>-2`): the
+   context track's frame, tempo and chapters, its backing stems, the project's columns on their slots. A draft
+   cannot go into a track: a message names the slots and offers to export those stems to the library first. The Live page lists the new track.
 
 From the terminal (in `tools/`): `npm run stem-lab -- check`, `save-as <name> <new>`, `promote <name> <slot>`,
-`track-with <track> <new-track> <slot>=<ref> …`. Library overview: `npm run stems`.
+`track-with <track> <new-track> <slot>=<ref> …`, `from-track <track> <name> <slot>… [--backing <slot>…]`,
+`export-track <name> <new-track>`. Library overview: `npm run stems`.
 
 ## The project file (format 1)
 `sc/lab/stems/<name>.stemlab.json`, schema `sc/lab/stems/stemlab.schema.json`:

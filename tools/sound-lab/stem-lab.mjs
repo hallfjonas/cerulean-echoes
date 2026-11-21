@@ -5,8 +5,11 @@
 //   node sound-lab/stem-lab.mjs promote <name> <slot>            the draft of the column → sc/stems/<sample>/ (new version)
 //   node sound-lab/stem-lab.mjs track-with <track> <new-track> <slot>=<ref> …
 //                                                                new stem track = a copy of <track> with those slots
+//   node sound-lab/stem-lab.mjs from-track <track> <name> <slot>… [--backing <slot>…]
+//                                                                new project: those slots of <track> as columns
+//   node sound-lab/stem-lab.mjs export-track <name> <new-track>  the project as a stem track (context frame + backing)
 import path from 'path'
-import { checkAll, checkProjectFile, promote, saveAs, trackWith } from './stem-project.mjs'
+import { checkAll, checkProjectFile, projectFromTrack, promote, saveAs, trackFromProject, trackWith } from './stem-project.mjs'
 
 const [command, ...args] = process.argv.slice(2)
 
@@ -27,9 +30,17 @@ try {
   } else if (command === 'track-with') {
     const slots = Object.fromEntries(args.slice(2).map(pair => pair.split('=')))
     console.log('wrote ' + trackWith(args[0], args[1], slots))
+  } else if (command === 'from-track') {
+    const split = args.indexOf('--backing')
+    const columns = args.slice(2, split < 0 ? undefined : split)
+    const backing = split < 0 ? [] : args.slice(split + 1)
+    console.log('wrote ' + projectFromTrack(args[0], { name: args[1], columns, backing }))
+  } else if (command === 'export-track') {
+    console.log('wrote ' + trackFromProject(args[0], args[1]))
   } else {
     console.log('usage: node sound-lab/stem-lab.mjs check [files] | save-as <name> <new> | promote <name> <slot> | ' +
-      'track-with <track> <new-track> <slot>=<ref> …')
+      'track-with <track> <new-track> <slot>=<ref> … | from-track <track> <name> <slot>… [--backing <slot>…] | ' +
+      'export-track <name> <new-track>')
     process.exit(2)
   }
 } catch (error) {

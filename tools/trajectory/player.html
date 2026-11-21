@@ -42,6 +42,15 @@
   .seg button { background: none; padding: 5px 0; color: var(--dim) }
   .seg button:hover { background: var(--control-hi) }
   .seg button[aria-pressed=true] { background: var(--accent); color: var(--on-accent) }
+  #stemLab [data-slot] { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; font-size: 12px }
+  #stemLab [data-slot] .seg { margin-bottom: 4px }
+  #stemLab label input:not([type=checkbox]) { grid-column: 1 / 3 }
+  #sidebar #stemLab details > summary { margin: 0 0 10px; padding: 7px 10px; background: var(--accent); color: var(--on-accent);
+    border-radius: var(--radius); font-size: 13px; font-weight: 500; text-align: center; list-style: none }
+  #sidebar #stemLab details > summary::-webkit-details-marker { display: none }
+  #sidebar #stemLab details > summary::before { content: '+ ' }
+  #sidebar #stemLab details[open] > summary::before { content: '– ' }
+  #stemLab [data-part=project] .row { margin-top: 0 }
   .script-info { margin-top: 12px; font-size: 13px }
   .script-title { font-weight: 500 }
   .script-mood { color: var(--dim); margin-top: 2px }
@@ -108,7 +117,7 @@
      Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
      DAW ports; the CC moved last per number); a control not moved yet reads 0.
      Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
-     #labs/stems, #labs/tracks, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
+     #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
      show the track's LC view (drawn into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on
      the canvas). The Settings view (the gear) lays over the current page.
      The sidebar (key S) holds the page links, the settings gear, the track, Play-Pause / Stop / Record and auto-perform.
@@ -162,9 +171,9 @@
     <span id="status">loading Strudel …</span>
   </section>
   <section id="sampleLab" data-pages="labs/samples" hidden></section>
-  <section id="stemLab" data-pages="labs/stems" hidden></section>
+  <section id="stemLab" data-pages="labs/stems"></section>
   <section id="autoPerform" data-pages="live"></section>
-  <section id="placeholderNote" data-pages="labs/tracks labs/sets"></section>
+  <section id="placeholderNote" data-pages="labs/sets"></section>
 </aside>
 <button id="sideOpen" class="icon" title="Show the sidebar (key S)" aria-label="Show the sidebar">☰</button>
 <main id="stage">
@@ -208,6 +217,7 @@ import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountKnobEditor } from './knob-editor.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
+import { toast } from './toast.mjs'
 import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
 const $ = id => document.getElementById(id)
@@ -292,6 +302,17 @@ addEventListener('message', async event => {
   if (event.source !== $('scPanel').contentWindow) return
   const knob = event.data?.labKnob
   if (knob && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') return knobEditor.open({ track: playingId, ...knob })
+  if (event.data?.labNotice) return void toast(event.data.labNotice, { kind: 'error' })
+  const discard = event.data?.labDiscard
+  if (discard && isLab(playingId)) {
+    const answer = await toast('This stem has changes that are not exported yet. Remove it and lose them?',
+      { kind: 'ask', actions: ['Remove and lose changes'] })
+    if (!answer) return
+    const response = await fetch('lab/stems/remove', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: playingId, slot: discard.slot, discard: true }) })
+    if (!response.ok) toast((await response.json().catch(() => ({}))).error ?? 'Remove failed', { kind: 'error' })
+    return
+  }
   const pick = event.data?.labPick
   if (pick && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') {
     return selectLabColumn(pick.slot, pick.action === 'add')

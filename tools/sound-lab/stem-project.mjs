@@ -12,7 +12,7 @@ import { pretty } from './sample-project.mjs'
 export { repoRoot }
 export const stemLabDir = (root = repoRoot) => path.join(root, 'sc', 'lab', 'stems')
 export const projectFile = (name, root = repoRoot) => path.join(stemLabDir(root), `${name}.stemlab.json`)
-export const NAME = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
+export const NAME = /^[a-z0-9]+(-[a-z0-9]+)*$/
 
 const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8'))
 
@@ -141,7 +141,7 @@ export function stemOf(name, slot, root = repoRoot) {
 export function setKnob(name, slot, key, knob, root = repoRoot) {
   const project = readProject(name, root)
   const { ref, draft, stem } = stemOf(name, slot, root)
-  const next = withKnob(stem, key, knob)
+  const next = withKnob(stem, key, stem.code ? { ...knob, override: true } : knob)
   const id = draft ? ref.slice(6) : freeDraftId(project, `${kebab(stem.sample.name)}-${slot.replace(':', '-')}`)
   if (!draft) next.parent = ref
   project.drafts = { ...project.drafts, [id]: next }
@@ -212,23 +212,63 @@ export function promote(name, slot, root = repoRoot) {
 }
 
 const TRACK_NAME = /^[0-9]{3}-[a-z0-9]+(-[a-z0-9]+)*$/
+const trackDir = (name, root) => path.join(root, 'sc', 'tracks', name)
+const trackFile = (name, root) => path.join(trackDir(name, root), `${name}.track`)
+const readTrack = (name, root) => {
+  if (!fs.existsSync(trackFile(name, root))) throw new Error(`no stem track "${name}" in sc/tracks/`)
+  return readJson(trackFile(name, root))
+}
 
-export function trackWith(trackName, newName, slots, root = repoRoot) {
-  if (!TRACK_NAME.test(newName ?? '')) throw new Error(`"${newName}": three digits, a dash, lowercase words (009-house-v2)`)
-  const dir = path.join(root, 'sc', 'tracks', newName)
-  if (fs.existsSync(dir)) throw new Error(`sc/tracks/${newName} exists: pick another name`)
-  const source = path.join(root, 'sc', 'tracks', trackName, `${trackName}.track`)
-  const json = readJson(source)
-  for (const [slot, ref] of Object.entries(slots)) {
-    if (!json.slots[slot]) throw new Error(`slot ${slot} holds no stem in ${trackName}`)
-    if (ref.startsWith('draft:')) throw new Error(`slot ${slot}: promote the draft first`)
-    json.slots[slot] = ref
+export const listStemTracks = (root = repoRoot) => {
+  const dir = path.join(root, 'sc', 'tracks')
+  if (!fs.existsSync(dir)) return []
+  return fs.readdirSync(dir).filter(name => TRACK_NAME.test(name) && fs.existsSync(trackFile(name, root))).sort()
+    .map(name => {
+      const { about, slots } = readTrack(name, root)
+      return { track: name, about, slots }
+    })
+}
+
+const freeNumbered = (base, taken) => {
+  let name = base
+  for (let n = 2; taken(name); n++) name = `${base}-${n}`
+  return name
+}
+
+export const freeProjectName = (base, root = repoRoot) => freeNumbered(base, name => fs.existsSync(projectFile(name, root)))
+
+export const freeTrackName = (base, root = repoRoot) => freeNumbered(base, name => fs.existsSync(trackDir(name, root)))
+
+// a new project from the stems of a stem track: the slots in columns are explored, those in backing play along
+export function projectFromTrack(track, { name, columns = [], backing = [] }, root = repoRoot) {
+  if (!NAME.test(name ?? '')) throw new Error(`"${name}": lowercase words joined by "-" (009-house-stems)`)
+  if (fs.existsSync(projectFile(name, root))) throw new Error(`project "${name}" exists already`)
+  const { slots } = readTrack(track, root)
+  if (!columns.length) throw new Error('pick at least one stem for the lab')
+  for (const slot of [...columns, ...backing]) {
+    if (!slots[slot]) throw new Error(`slot ${slot} holds no stem in ${track}`)
   }
+  const both = columns.filter(slot => backing.includes(slot))
+  if (both.length) throw new Error(`slot ${both.join(', ')}: lab or backing, not both`)
+  const sorted = [...columns].sort()
+  return writeProject({
+    format: 1, name, parent: null, about: `Stems of ${track}.`,
+    context: { track, chapter: 0, backing: [...backing].sort() },
+    select: sorted[0],
+    columns: Object.fromEntries(sorted.map(slot => [slot, slots[slot]])),
+  }, root)
+}
+
+const writeTrack = (trackName, newName, slots, root) => {
+  if (!TRACK_NAME.test(newName ?? '')) throw new Error(`"${newName}": three digits, a dash, lowercase words (009-house-v2)`)
+  const dir = trackDir(newName, root)
+  if (fs.existsSync(dir)) throw new Error(`sc/tracks/${newName} exists: pick another name`)
+  const json = readTrack(trackName, root)
   const frame = `${newName}-frame.scd`
   fs.mkdirSync(dir)
-  fs.copyFileSync(path.join(path.dirname(source), json.frame), path.join(dir, frame))
-  const file = path.join(dir, `${newName}.track`)
-  const sorted = Object.fromEntries(Object.entries(json.slots).sort(([a], [b]) => a.localeCompare(b)))
+  fs.copyFileSync(path.join(trackDir(trackName, root), json.frame), path.join(dir, frame))
+  const file = trackFile(newName, root)
+  const sorted = Object.fromEntries(Object.entries(slots).sort(([a], [b]) => a.localeCompare(b)))
   fs.writeFileSync(file, JSON.stringify({ ...json, name: newName, frame, slots: sorted }, null, 2) + '\n')
   const errors = checkFiles([file], root)[0].errors
   if (errors.length) {
@@ -236,4 +276,29 @@ export function trackWith(trackName, newName, slots, root = repoRoot) {
     throw new Error(`${newName}: ${errors.join('; ')}`)
   }
   return file
+}
+
+export function trackWith(trackName, newName, slots, root = repoRoot) {
+  const json = readTrack(trackName, root)
+  for (const [slot, ref] of Object.entries(slots)) {
+    if (!json.slots[slot]) throw new Error(`slot ${slot} holds no stem in ${trackName}`)
+    if (ref.startsWith('draft:')) throw new Error(`slot ${slot}: promote the draft first`)
+  }
+  return writeTrack(trackName, newName, { ...json.slots, ...slots }, root)
+}
+
+// a project as a stem track: the context track's frame and backing stems, the project's columns on top
+export const draftSlots = (name, root = repoRoot) => Object.entries(readProject(name, root).columns)
+  .filter(([, ref]) => ref.startsWith('draft:')).map(([slot]) => slot).sort()
+
+export function trackFromProject(name, newName, root = repoRoot) {
+  const project = readProject(name, root)
+  const track = project.context?.track
+  if (!track) throw new Error(`"${name}" has no context track: its frame is what a track plays in`)
+  const drafts = draftSlots(name, root)
+  if (drafts.length) throw new Error(`promote the drafts on ${drafts.join(', ')} first`)
+  const { slots } = readTrack(track, root)
+  const backing = Object.fromEntries((project.context.backing ?? []).filter(slot => slots[slot])
+    .map(slot => [slot, slots[slot]]))
+  return writeTrack(track, newName, { ...backing, ...project.columns }, root)
 }

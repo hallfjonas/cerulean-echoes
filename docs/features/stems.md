@@ -126,6 +126,10 @@ A knob maps its value 0..1 in exactly one way:
 - `targets`: a list of `{ param, range, curve }` moved together.
 - `code`: an SC file next to the stem.
 
+`"override": true` on a knob of a stem with column `code`: the code reads that knob as its middle position (0.5) and the
+knob's `param` is applied to every note the code makes (`pan` is added to the note's own pan; `space`, `echo`, `trim`
+stay with the code). The Stem Designer's knob editor sets it.
+
 A parameter is one of the sound's parameters or SynthDef inputs (not `out`, `post`, `freq`), or a stem parameter:
 `space` (room send), `echo` (echo send), `pan`. Knobs act at once, also on sounding notes.
 
