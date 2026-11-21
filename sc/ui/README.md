@@ -16,8 +16,9 @@ Die Launch Controls gehen nie über die Brücke: Stürzen Browser oder Brücke a
 
 - **Anzeige:** beide Seiten nebeneinander wie `▣ LC big` in Strudel, Werte live (auch jede Bewegung an einem LC),
   Chapter, Akkorde, Break, Takt, Akkord des Takts. Die zuletzt benutzte Seite hat einen farbigen Rahmen.
-- **Aussehen:** zwei Themes nach `UI-REDESIGN.md`, „Black“ (Torso-artig, Standard) und „TE“ (Teenage-Engineering-artig);
-  umschalten unten in der Statusleiste (`Black / TE`) oder im Player unter Visual settings („Panel theme“, Taste T).
+- **Aussehen:** zwei Stile nach `UI-REDESIGN.md`, „Minimal“ (Torso-artig, Standard) und „Retro“
+  (Teenage-Engineering-artig), jeweils hell oder dunkel (oder wie das System). Gewählt wird nur im Player (Sidebar,
+  Theme, Taste T), gespeichert in `ce.style` / `ce.tone`; die Ansicht hier folgt und hat keinen eigenen Schalter.
 - **Bedienen mit Maus oder Touch:** Regler hoch/runter ziehen (Shift = fein, Doppelklick = 0, Mausrad),
   Fader anklicken oder ziehen, Tasten drücken. **Shift-Klick** hält eine Taste gedrückt (Drop, Oktave), bis man
   sie wieder anklickt. Ein Klick schickt dieselbe CC wie ein Launch Control: Für den Track ist es egal, woher er
