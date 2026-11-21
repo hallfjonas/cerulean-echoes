@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "name": "brass-section-brightness-space-complexity-pattern-lift",
+  "parent": null,
+  "about": "Disco brass section: pushes, shouts, swells.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 4,
+    "tags": [
+      "disco",
+      "brass",
+      "section"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "brassSection"
+  },
+  "gain": 1.7,
+  "pitch": "chord",
+  "code": "brass-section-figures.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Push"
+    },
+    {
+      "label": "3-3-2 + answer"
+    },
+    {
+      "label": "Shout"
+    },
+    {
+      "label": "Double push"
+    },
+    {
+      "label": "3-3-2 long"
+    },
+    {
+      "label": "Only the one"
+    },
+    {
+      "label": "Rare (4 bars)"
+    },
+    {
+      "label": "Rare swell"
+    },
+    {
+      "label": "Swell + push"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "core → + pickups → + extra hits."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "brass section."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "9 figures, the sparse ones last."
+    },
+    "b2": {
+      "label": "Lift",
+      "about": "section grows while held.",
+      "mode": "hold"
+    }
+  }
+}

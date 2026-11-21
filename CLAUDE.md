@@ -30,6 +30,9 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
   to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
+- `sc/stems/` — the stem library (`<sample>/<name>.stem`, one LC column as JSON; schema, add-ons), `sc/tracks/<id>/<id>.track`
+  = stem versions on the 14 slots; `sc/lab/samples/` (Sample Designer projects), `sc/lab/stems/` (Stem Designer projects);
+  docs: `docs/features/stems.md`, `docs/features/sound-lab.md`
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
@@ -96,6 +99,9 @@ Use them instead of redoing the steps by hand:
 - New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
+- A new sound on the SC machine ("sample designer", "a soft tom", export to `sc/sounds/`): `/sample-designer`.
+- Compare versions of a stem against a track, promote a winner, swap it into a new track ("redesign the piano stem of
+  the house track", "explore a replacement"): `/stem-designer`.
 - Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
   performance"): `/auto-perform`.
 - A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song", "new Guitar Pro
@@ -126,6 +132,8 @@ Tools (run in `tools/`):
   [--out <dir>] [--force]`; `--perform` writes only the script from the map's `performance`; notes per bar:
   `node producer/midi-read.mjs <file.mid> --dump` (`tools/producer/README.md`)
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
+- Stem library (`sc/stems/`, SC stems and stem tracks, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`,
+  `npm run stems` (list, filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
 - The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
   `node trajectory/make-tapped.mjs <track>` puts the tapped code on the clipboard for strudel.cc
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`

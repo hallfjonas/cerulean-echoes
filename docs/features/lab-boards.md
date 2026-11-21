@@ -1,5 +1,7 @@
 # Lab boards
 
+> New sound work on SuperCollider goes to the [sound lab](sound-lab.md); lab boards are the Strudel way.
+
 ## What it is
 A lab board is not a track. It is a test bench for one instrument or one track role, such as bass, keys or kick.
 Either it holds one sound tuned on its own, or it holds several candidates side by side. Each candidate sits in a

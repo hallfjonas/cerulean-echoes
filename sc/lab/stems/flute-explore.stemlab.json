@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "name": "flute-explore",
+  "parent": null,
+  "about": "Flute of 009-house against the library's other leads.",
+  "context": { "track": "009-house", "chapter": 0, "backing": ["1:1", "1:3", "1:4"] },
+  "select": "2:4",
+  "columns": {
+    "2:4": "flute/flute-brightness-space-complexity-pattern-echo-throw.stem",
+    "2:5": "brassSection/brass-section-brightness-space-complexity-pattern-lift.stem",
+    "2:6": "stringSection/string-section-brightness-space-complexity-pattern-lift.stem",
+    "2:7": "strat/strat-brightness-space-complexity-pattern-lift.stem"
+  }
+}

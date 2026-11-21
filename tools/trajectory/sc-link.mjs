@@ -12,6 +12,11 @@
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
 //   POST /sc/load     { id } start the track (SC is started first if needed) → { track }      (own pages only)
 //   POST /sc/stop     stop what plays (SC keeps running)                                      (own pages only)
+// load(id, slots) also takes a stem track's slots in place of its file's ({ '1:4': stem }); swap(slot, stem) puts a stem
+// on a slot of the stem track that plays → { live: true } (from the next bar) or { live: false, reason } (load it
+// instead). onLoaded(id, slots) is called after every load SC answers.
+// SC → here: /ce/save <json> (the Save button of a Sample Designer project) calls onSave(values); /ce/promote <slot>
+// (Promote of a Stem Designer project) calls onPromote(slot).
 import { spawn, execFileSync } from 'child_process'
 import dgram from 'dgram'
 import fs from 'fs'
@@ -46,7 +51,8 @@ const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits
 export const setSample = (args, t = Date.now()) => ({ t, e: round(+args[0], 2), p: round(clamp01(args[1]), 3),
   x: round(clamp01(args[2]), 3), s: args.slice(3, 67).map(v => round(clamp01(v), 3)) })
 
-export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = console.log }) => {
+export const createScLink = ({ repo, resolveTrack, onSave = null, onPromote = null, sclang = findSclang(), log = console.log,
+  onLoaded = () => {} }) => {
   const engineFile = path.join(repo, 'sc', 'engine.scd')
   const viewFile = path.join(repo, 'sc', 'ui', 'index.html')
   const logFile = path.join(os.tmpdir(), `cerulean-sc-engine-${OSC_PORT}.log`)
@@ -98,6 +104,8 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
+      case '/ce/save': onSave?.(json()); break
+      case '/ce/promote': onPromote?.(String(m.args[0])); break
       // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
       case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
       // one set sample every 10 s: kept, and passed on
@@ -133,15 +141,25 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
     return starting
   }
 
-  const load = async id => {
+  const load = async (id, slots) => {
     const file = resolveTrack(id)
     if (!file) throw new Error(`no SuperCollider track '${id}'`)
     await start()
     const loaded = waitFor(m => m.address === '/ce/loaded' || m.address === '/ce/error', LOAD_TIMEOUT, 'answer to the load')
-    toSc('/ce/load', file)
+    toSc('/ce/load', file, ...slots ? [JSON.stringify(slots)] : [])
     const answer = await loaded
     if (answer.address === '/ce/error') throw new Error('SuperCollider: ' + answer.args[0])
+    onLoaded(id, slots)
     return answer.args[0]
+  }
+  const SWAP_ANSWERS = ['/ce/swapped', '/ce/swapReload', '/ce/swapError']
+  const swap = async (slot, stem) => {
+    if (!host.track) throw new Error('nothing plays')
+    const answered = waitFor(m => SWAP_ANSWERS.includes(m.address) && m.args[0] === slot, LOAD_TIMEOUT, 'answer to the swap')
+    toSc('/ce/swap', slot, stem)
+    const answer = await answered
+    if (answer.address === '/ce/swapError') throw new Error('SuperCollider: ' + answer.args[1])
+    return answer.address === '/ce/swapped' ? { live: true } : { live: false, reason: answer.args[1] }
   }
   const stop = () => { if (host.ready) toSc('/ce/stop') }
 
@@ -203,5 +221,5 @@ export const createScLink = ({ repo, resolveTrack, sclang = findSclang(), log = 
   // keep the event streams open through proxies and sleep
   setInterval(() => { for (const res of clients) res.write(': ping\n\n') }, 15000).unref()
 
-  return { handle, load, stop, quit, close, host, state, setHistory, logFile }
+  return { handle, load, swap, stop, quit, close, host, state, setHistory, logFile }
 }

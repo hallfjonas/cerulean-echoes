@@ -118,10 +118,22 @@ body.no-lk .lkbox{visibility:hidden}
 .marks,.chord{margin-left:.5em}
 .theme{font:inherit;background:none;border:0;color:var(--off);cursor:pointer;padding:0}.theme b{color:var(--text);font-weight:500}
 .ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.fader.ctl,.wheel.ctl{cursor:pointer}
+body.pick .name[data-col]{cursor:pointer;text-decoration:underline dotted}
+body.shape-on{height:calc(100% - 230px);--px:min(calc(96vw / var(--W)), calc((94vh - 230px) / var(--H)))}
+#shape{display:none;position:fixed;left:0;right:0;bottom:0;box-sizing:border-box;height:230px;padding:4px 10px 10px;font:11px var(--font);color:var(--text);background:var(--bg)}
+body.shape-on #shape{display:flex;flex-direction:column;gap:4px}
+#shape .numbers{display:flex;flex-wrap:wrap;gap:2px 16px;font-variant-numeric:tabular-nums}
+#shape .numbers b{color:var(--off);font-weight:500;margin-right:4px}
+#shape .numbers .busy{color:var(--off)}
+#shape .plots{flex:1;display:flex;gap:12px;min-height:0}
+#shape figure{margin:0}
+#shape figcaption{color:var(--off);margin-bottom:2px}
+#shape canvas{display:block;background:var(--panel);border:1px solid var(--edge);border-radius:4px}
 </style>
 </head>
 <body>
 <div id=lc><div class=wait>Waiting for the bridge …</div></div>
+<div id=shape><div class=numbers></div><div class=plots></div></div>
 <script>
 // LC view for the SuperCollider version, interactive: drag knobs (up/down; Shift = fine; double-click = 0), click or
 // drag faders, press buttons (Shift-click = keep the button held until the next click). Values come from SuperCollider
@@ -144,6 +156,8 @@ addEventListener('message', e => {
   if (THEMES.includes(e.data?.panelTheme)) applyTheme(e.data.panelTheme)
   // the player's "LC frame" setting (key H): frame the controller moved last, or not
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
+  // a stem track in the player: a click on a column's name selects that column (the player opens the stem drawer)
+  if (typeof e.data?.pickColumns === 'boolean') document.body.classList.toggle('pick', e.data.pickColumns)
 })
 const te = () => document.body.dataset.theme === 'te'
 
@@ -291,10 +305,11 @@ const build = () => {
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
   const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
   const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
-    cols.map(n => '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name>' +
-      esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</span>' +
+    cols.map(n => { const name = (tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')
+      return '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name' +
+      (isGlobal(n) || !name ? '' : ' data-col="' + (page === 'jojo' ? 1 : 2) + ':' + n + '"') + '>' + esc(name) + '</span>' +
       cell(page, n, 'k1') + cell(page, n, 'k2') + cell(page, n, 'k3') + cell(page, n, 'fader') +
-      '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>').join('') + '</div></div></section>').join('')
+      '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>' }).join('') + '</div></div></section>').join('')
   root.className = 'board'
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
@@ -302,6 +317,9 @@ const build = () => {
     '<div class="spec setbox"><canvas id=setv></canvas></div></div></div><div class=head id=head></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
+  for (const el of root.querySelectorAll('[data-col]')) el.addEventListener('click', () => {
+    if (parent !== window && document.body.classList.contains('pick')) parent.postMessage({ select: { kind: 'column', slot: el.dataset.col } }, location.origin)
+  })
   requestAnimationFrame(layoutKeys)
   for (const div of root.querySelectorAll('[data-cell]')) {
     const [page, n0, row] = div.dataset.cell.split(':'), n = +n0
@@ -669,7 +687,7 @@ const connect = () => {
     else if (type === 'cc') {
       for (const [cc, v] of Object.entries(data)) if (!(performance.now() - (mine[cc] ?? -1e9) < 300)) { S.cc[+cc] = v; S.page = pageOfCc(+cc) }
     }
-    else if (type === 'state') S.state = data
+    else if (type === 'state') { S.state = data; dispatchEvent(new CustomEvent('ce-state', { detail: data })) }
     else if (type === 'beat') S.beat = data
     else if (type === 'midi') S.midi = data
     else if (type === 'sc') S.sc = data
@@ -687,6 +705,44 @@ const connect = () => {
 document.addEventListener('click', e => { if (e.target.closest?.('#theme')) setTheme(te() ? 'black' : 'te') })
 applyTheme(readTheme())
 connect()
+</script>
+<script type=module>
+// Sample Designer: the shape of the sound under the LCs (one hit rendered by the player's server, sample-shape.mjs),
+// again after every move of a control. One render at a time; moves during a render ask for one more with the newest
+// values. Only in the player (the standalone bridge has no /lab route).
+import { drawShape } from '/sample-shape-ui.mjs'
+const box = document.getElementById('shape')
+let busy = false, wanted = null, drawn = null, last = null
+const render = async () => {
+  if (busy || wanted === drawn) return
+  busy = true
+  const key = wanted
+  box.querySelector('.numbers .busy')?.remove()
+  box.querySelector('.numbers').insertAdjacentHTML('beforeend', '<span class=busy>rendering …</span>')
+  try {
+    const body = JSON.stringify({ track: S.layout?.name })
+    const response = await fetch('/lab/sample/shape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
+    const shape = await response.json()
+    // the new project's values arrive before the server sees it play: ask again shortly
+    if (response.status === 409) { busy = false; setTimeout(render, 300); return }
+    if (!response.ok) throw new Error(shape.error ?? response.status)
+    last = shape
+    drawShape(box, shape)
+  } catch (error) {
+    box.querySelector('.numbers').textContent = 'Shape: ' + error.message
+  }
+  drawn = key
+  busy = false
+  render()
+}
+addEventListener('ce-state', ({ detail }) => {
+  const on = !!detail?.designer
+  document.body.classList.toggle('shape-on', on)
+  if (!on) { wanted = drawn = last = null; return }
+  wanted = JSON.stringify(detail.designer)
+  render()
+})
+addEventListener('resize', () => { if (last) drawShape(box, last) })
 </script>
 </body>
 </html>

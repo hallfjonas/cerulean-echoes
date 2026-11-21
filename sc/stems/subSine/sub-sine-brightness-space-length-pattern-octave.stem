@@ -1,0 +1,129 @@
+{
+  "format": 2,
+  "name": "sub-sine-brightness-space-length-pattern-octave",
+  "parent": null,
+  "about": "Sine sub on the chord's root, a 16th after the kick.",
+  "meta": {
+    "role": "sub",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "sine",
+      "pump"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "subSine"
+  },
+  "gain": 1.24,
+  "pitch": "root",
+  "frame": {
+    "break": "out",
+    "fog": false,
+    "swing": false
+  },
+  "patterns": [
+    {
+      "label": "Pump",
+      "rhythm": "[~ x@3]!4",
+      "notes": "0",
+      "env": {
+        "a": 0.015,
+        "s": 1,
+        "r": 0.04
+      }
+    },
+    {
+      "label": "Off-beat",
+      "rhythm": "[~ ~ x@2]!4",
+      "notes": "0",
+      "env": {
+        "a": 0.015,
+        "s": 1,
+        "r": 0.04
+      }
+    },
+    {
+      "label": "Half",
+      "rhythm": "[~ x@7]!2",
+      "notes": "0",
+      "env": {
+        "a": 0.015,
+        "s": 1,
+        "r": 0.04
+      }
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "sine ↔ full."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room.",
+      "param": "space",
+      "range": [
+        0,
+        1
+      ]
+    },
+    "k3": {
+      "label": "Length",
+      "about": "long ↔ short.",
+      "param": "length",
+      "range": [
+        1,
+        0.35
+      ]
+    },
+    "fader": {
+      "label": "Level",
+      "about": "sub on the chord's root."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pump → off-beat → half bars."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "up while held.",
+      "addon": "octave",
+      "mode": "hold",
+      "args": {
+        "steps": 12
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "Sine",
+      "params": {
+        "wave": 0,
+        "amp": 0.5
+      }
+    },
+    {
+      "name": "Triangle",
+      "params": {
+        "wave": 1
+      },
+      "amount": {
+        "source": "k1",
+        "points": [
+          [
+            0,
+            0.1
+          ],
+          [
+            1,
+            0.27
+          ]
+        ]
+      }
+    }
+  ]
+}

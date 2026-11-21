@@ -9,13 +9,15 @@
 	self.server = server;
 	self.track = track;
 	self.pressFns = (); self.latches = List[]; self.ccAlias = (); self.uiRows = (); self.ccHooks = ();   // a fresh session (re-running starts clean)
-	self.ccBase = ctl.(128);
+	self.ccBase = ctl.(track[\ccCount] ? 128);
+	(track[\ccStart] ? ()).keysValuesDo { |c, v| self.cc[c] = v; msgs.add([\c_set, self.ccBase + c, v]) };
 	self.toneBus = ctl.(); self.fogBus = ctl.(); self.thinBus = ctl.();
 	self.masterIn = aud.();
 	self.groups = (ctl: node.(), src: node.(), strips: node.(), fx: node.(), master: node.());
 	(track.aliases ? ()).keysValuesDo { |from, to| self.ccAlias[from] = to };
 	// sounds the track uses
 	track.stems.do { |st| st.sounds.do { |snd| if(self.sounds[snd].isNil) { self.loadSound(snd) } } };
+	self.serverSounds = self.sounds.keys.copy;   // their SynthDefs go to the server below (a swap sends the ones it adds)
 	// SynthDefs (also into the SynthDescLib: events then send every control of a sound, not just freq/amp)
 	self.defs.do { |d| d.add; msgs.add([\d_recv, d.asBytes]) };
 	// samples
@@ -32,7 +34,8 @@
 		};
 		self.sampleBuffers[rel]
 	};
-	self.sounds.do { |snd| (snd.samples ? ()).do { |rel| self.loadSample(rel) } };
+	// samples: buffer args of the sound; files: the files a sound's notes pick by name (a wrapper sound, sounds/README.md)
+	self.sounds.do { |snd| ((snd.samples ? ()).values ++ (snd[\files] ? [])).do { |rel| self.loadSample(rel) } };
 	(track.samples ? []).do { |rel| self.loadSample(rel) };
 	// wavetables (sounds with `wavetables: (arg: \shape)`): 4 consecutive buffers per shape
 	self.wavetableBase = ();
@@ -105,18 +108,19 @@
 		msgs.add([\s_new, \ce_delay, dnode, 1, self.groups.fx, \in, dbus, \out, self.masterIn, \time, d[0], \feedback, d[1]]) } };
 	// stems: an audio bus and a strip each; a stem with lanes (layers on other orbits or with another echo) gets
 	// one bus and strip per lane, all on the stem's fader. Notes pick their lane with \lane (default: the first).
-	self.stemBus = (); self.levelSrc = ();
+	self.stemBus = (); self.levelSrc = (); self.stripNode = ();
 	track.stems.do { |st|
 		var snd = self.sounds[st.sounds[0]], lanes = st.lanes ?? { [(name: \main)] };
 		var val = { |x| if(x.isKindOf(Symbol)) { ("c" ++ self.mapBus[x]).asSymbol } { x } };
-		self.stemBus[st.name] = (); self.levelSrc[st.name] = ();
+		self.stemBus[st.name] = (); self.levelSrc[st.name] = (); self.stripNode[st.name] = ();
 		lanes.do { |ln, i|
-			var bus = aud.(), orbit = ln.orbit ? st.orbit, space = ln.space ? st.space;
+			var bus = aud.(), orbit = ln.orbit ? st.orbit, space = ln.space ? st.space, id = node.();
 			self.stemBus[st.name][ln.name] = bus;
+			self.stripNode[st.name][ln.name] = id;
 			// the fader (a CC, a state bus or a number; a lane may have its own): read at each note's start (noteLevel)
 			self.levelSrc[st.name][ln.name] = ln[\level] ? st.level;
 			if(i == 0) { self.stemBus[st.name][\main] = bus; self.levelSrc[st.name][\main] = ln[\level] ? st.level };
-			msgs.add([\s_new, \ce_strip, node.(), 1, self.groups.strips,
+			msgs.add([\s_new, \ce_strip, id, 1, self.groups.strips,
 				\in, bus, \out, self.masterIn, \hpOwn, st.hpOwn ? snd.hpf, \thinOn, (st[\thin] != false).asInteger,
 				// the fader is not here (it acts per note, see noteLevel); fade: a lane's level that acts at once on
 				// sounding notes (a crossfade between layers): a state bus (symbol) or a number
@@ -131,7 +135,7 @@
 				\thinF, ("c" ++ self.thinBus).asSymbol,
 				// space: a CC, or a fixed number when given as (fixed: 0.3)
 				\space, if(space.isKindOf(Event)) { space.fixed } { if(space.isNil) { 0 } { self.ccMap(space) } },
-				\tension, self.ccMap(track.global.tension),
+				\tension, if(st[\tension] == false) { 0 } { self.ccMap(track.global.tension) },
 				\roomOut, self.orbitBus[orbit] ? 0, \roomOn, (self.orbitBus[orbit].notNil).asInteger,
 				\delayOut, self.stemDelayBus[st.name] ? self.orbitDelayBus[orbit] ? 0,
 				\delayOn, (((ln[\echo] ? st[\echo]).notNil or: { (ln[\echoSend] ? st[\echoSend]).notNil })
