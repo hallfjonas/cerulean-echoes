@@ -2,9 +2,12 @@
 // Load plays the project from its file (as Play); Save writes the selected column into it; Save as copies it under a
 // new name. Add, Replace, Remove, Promote and the knob editor are in the controller panel (sc/ui/index.html); the sidebar
 // lists them as a reminder.
+import { ICONS, iconButton } from './sidebar-icons.mjs'
+
 export const mountStemLab = ({ section, selected, play, refresh }) => {
-  section.innerHTML = '<h2>Stem Designer</h2><div class="row"><button data-act="load">Load</button>' +
-    '<button data-act="save">Save</button><button data-act="saveAs">Save as</button></div><output></output>' +
+  section.innerHTML = '<h2>Stem Designer</h2><div class="row">' +
+    iconButton('load', 'Load', ICONS.load) + iconButton('save', 'Save', ICONS.save) +
+    iconButton('saveAs', 'Save as', ICONS.saveAs) + '</div><output></output>' +
     '<ul class="hints"><li>+ Add on a free slot: pick a stem for it.</li><li>Click a stem\'s title: replace it.</li>' +
     '<li>Click a knob\'s name: change what the knob does (parameter, range, default, name).</li>' +
     '<li>Symbols above a stem: export a changed stem to the library, remove it.</li>' +
@@ -29,7 +32,7 @@ export const mountStemLab = ({ section, selected, play, refresh }) => {
     },
   }
   section.addEventListener('click', async event => {
-    const act = event.target.dataset?.act
+    const act = event.target.closest('[data-act]')?.dataset.act
     if (!act) return
     try { out.textContent = await actions[act]() } catch (error) { out.textContent = 'Error: ' + error.message }
   })
