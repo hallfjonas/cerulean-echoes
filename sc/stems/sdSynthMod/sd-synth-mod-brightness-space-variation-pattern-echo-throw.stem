@@ -1,0 +1,83 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-variation-pattern-echo-throw",
+  "parent": null,
+  "about": "Hypnotic stab on the chord root and fifth.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "stab",
+      "saw",
+      "techno"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "gain": 0.62,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "techno-stab.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Stab 1"
+    },
+    {
+      "label": "Stab 2"
+    },
+    {
+      "label": "Stab 3"
+    },
+    {
+      "label": "Stab 4"
+    },
+    {
+      "label": "Stab 5"
+    },
+    {
+      "label": "Stab 6"
+    },
+    {
+      "label": "Stab 7"
+    },
+    {
+      "label": "Stab 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Variation",
+      "about": "as written ↔ quick 16ths, octave jumps."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "hypnotic stab on the chord root."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 stab figures."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the stab while held.",
+      "mode": "hold"
+    }
+  }
+}

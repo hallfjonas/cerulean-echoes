@@ -1,0 +1,63 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-punch-pattern-drop-out-3",
+  "parent": null,
+  "about": "Opus kick tuned to C: soft, round, driven by Wumms.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 5,
+    "tags": [
+      "kick",
+      "sine",
+      "wumms"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSampleMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "opus-kick.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "4/4"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Punch",
+      "about": "soft thump ↔ round kick with a light click."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "kick on every beat, tuned to C."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "double time: 8 kicks per bar while held."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "kick pauses while held.",
+      "mode": "hold"
+    }
+  }
+}

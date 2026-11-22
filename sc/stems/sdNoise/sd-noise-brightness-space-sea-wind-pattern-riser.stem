@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-noise-brightness-space-sea-wind-pattern-riser",
+  "parent": null,
+  "about": "Brown-noise waves and whistling wind gusts.",
+  "meta": {
+    "role": "texture",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 1,
+    "tags": [
+      "sea",
+      "wind",
+      "noise"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdNoise"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "mood-sea-wind.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Waves 1"
+    },
+    {
+      "label": "Waves 2"
+    },
+    {
+      "label": "Waves 3"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Sea ↔ Wind",
+      "about": "waves ↔ both ↔ whistling gusts."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "sea and wind. Keeps playing in the break."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 3 random wave / gust patterns."
+    },
+    "b2": {
+      "label": "Riser",
+      "about": "a noise sweep rises over 2 bars while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.4
+}

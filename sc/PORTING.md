@@ -94,6 +94,8 @@ Bekannte Abweichungen, die an der **Referenz** liegen (Strudel in Node, nicht im
 
 ## Track 008 (Groove Techno): Stand und Entscheidungen
 
+**Seit 2026-11-22 ist 008 ein Stem-Track** (`008-groove-techno.track`; die `.scd` ist gelöscht, [Unterschiede](../docs/reference/scd-translation-differences.md); alte Datei: `git show bdd0a4a:sc/tracks/008-groove-techno/008-groove-techno.scd`).
+
 Stand 18.11.2026: **alle Spuren portiert** (`sc/tracks/008-groove-techno/008-groove-techno.scd`), jede gegen
 `tracks/008-groove-techno/008-groove-techno.strudel` verglichen (Szenarien `tools/sc-port/scenarios/008-*.json`,
 `CE_TRACK=008-groove-techno/008-groove-techno python3 batch.py scenarios/008-kick.json /tmp/cmp-008-kick`).
@@ -307,8 +309,11 @@ Das liegt am gemeinsamen Hall (Impulsantwort `ir/orbit-4.wav` / Faltung), nicht 
 
 ## 001 / 002 Groove (80s groove house) (as of 2026-11-21)
 
-Both tracks ported (`sc/tracks/001-groove/`, `sc/tracks/002-groove/`), scenarios `tools/sc-port/scenarios/001-all.json`,
-`002-all.json` (`CE_TRACK=001-groove/001-groove`, one base and one "moved" scenario per stem: knobs, pattern press, button
+**Since 2026-11-22 both are stem tracks** (`001-groove.track`, `002-groove.track`; the `.scd` files are deleted after the proof,
+[what differs](../docs/reference/scd-translation-differences.md); the old files: `git show 7444173:sc/tracks/001-groove/001-groove.scd`).
+The notes below describe the hand-written version.
+
+Both tracks ported (`sc/tracks/001-groove/`, `sc/tracks/002-groove/`), scenarios for both (removed with the stem-track translation, see git history; `CE_TRACK=001-groove/001-groove`, one base and one "moved" scenario per stem: knobs, pattern press, button
 2 held, Tension, Master, Break). **Not yet checked by ear** (`feedback.md` in each folder lists what to listen for).
 Built like 016 (the Strudel tracks are built on 016's code): Master is Wumms-like (no master volume), Chapter = mood,
 the FX column is 016's; the Launchkey is 016's with the orchestra hit on pad 11.

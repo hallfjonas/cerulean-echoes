@@ -1,0 +1,66 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-drive-pattern-ratchet",
+  "parent": null,
+  "about": "Rave stab: detuned saws, the filter snapping shut.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "house"
+    ],
+    "energy": 5,
+    "tags": [
+      "rave",
+      "stab",
+      "80s"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-rave-stab.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Rave"
+    },
+    {
+      "label": "Call"
+    },
+    {
+      "label": "Off-beat"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Drive",
+      "about": "clean ↔ driven."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "rave stab, follows the chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "rave → call → off-beat."
+    },
+    "b2": {
+      "label": "Ratchet",
+      "about": "the stab repeats in quick 16ths while held.",
+      "mode": "hold"
+    }
+  }
+}

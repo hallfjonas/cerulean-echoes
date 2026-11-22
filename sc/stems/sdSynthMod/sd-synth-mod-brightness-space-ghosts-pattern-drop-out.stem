@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-ghosts-pattern-drop-out",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-punch-pattern-drop-out.stem",
+  "about": "Groove kick with soft ghost kicks between the beats.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "house"
+    ],
+    "energy": 4,
+    "tags": [
+      "909",
+      "four-on-the-floor",
+      "80s"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSampleMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "groove-kick-ghosts.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "4/4"
+    },
+    {
+      "label": "Skip"
+    },
+    {
+      "label": "Half"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Ghosts",
+      "about": "none ↔ soft ghost kicks between the beats.",
+      "default": 0.3
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the kick, on every beat."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "four on the floor → skip into the one → half time."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "kick pauses while held.",
+      "mode": "hold"
+    }
+  }
+}

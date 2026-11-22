@@ -1,0 +1,72 @@
+{
+  "format": 2,
+  "name": "sd-sample-brightness-space-complexity-pattern-fill",
+  "parent": null,
+  "about": "808 cowbell and Simmons-style synth toms.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "808",
+      "toms",
+      "cowbell",
+      "80s"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSample",
+    "extra": [
+      "sdSynthMod",
+      "sdNoise"
+    ]
+  },
+  "gain": 1.95,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "groove-electro.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Cowbell"
+    },
+    {
+      "label": "Toms"
+    },
+    {
+      "label": "Both"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "as written ↔ + rimshot ghosts."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "cowbell and electro toms."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "cowbell → toms → both."
+    },
+    "b2": {
+      "label": "Fill",
+      "about": "a tom run down over the bar while held.",
+      "mode": "hold"
+    }
+  }
+}

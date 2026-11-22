@@ -1,0 +1,81 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-rate-pattern-burst",
+  "parent": null,
+  "about": "Rare short high one-shots at random pitches.",
+  "meta": {
+    "role": "fx",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "accents",
+      "random"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "opus-accents.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Series 1"
+    },
+    {
+      "label": "Series 2"
+    },
+    {
+      "label": "Series 3"
+    },
+    {
+      "label": "Series 4"
+    },
+    {
+      "label": "Series 5"
+    },
+    {
+      "label": "Series 6"
+    },
+    {
+      "label": "Series 7"
+    },
+    {
+      "label": "Series 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Rate",
+      "about": "one hit in about 2 bars ↔ about 2 per bar."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "rare high accents."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 random series."
+    },
+    "b2": {
+      "label": "Burst",
+      "about": "a quick scatter of accents while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1.6
+}

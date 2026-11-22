@@ -1,0 +1,85 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-echo-throw",
+  "parent": null,
+  "about": "Slow lead through an \"o\" vowel, with vibrato.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 2,
+    "tags": [
+      "lead",
+      "vowel",
+      "vibrato"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSynthFx"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-lead.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Melody 1"
+    },
+    {
+      "label": "Melody 2"
+    },
+    {
+      "label": "Melody 3"
+    },
+    {
+      "label": "Melody 4"
+    },
+    {
+      "label": "Melody 5"
+    },
+    {
+      "label": "Melody 6"
+    },
+    {
+      "label": "Melody 7"
+    },
+    {
+      "label": "Melody 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "line → + 3rd voice → + octave echo."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "slow lead on the chord."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 melodies."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the lead while held.",
+      "mode": "hold"
+    }
+  }
+}

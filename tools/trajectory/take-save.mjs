@@ -10,7 +10,7 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { find } from './catalogue.mjs'
-import { PERFORM, checkScript, controlsOf } from './check-perform.mjs'
+import { PERFORM, checkScript, controlsOf, tagSource } from './check-perform.mjs'
 import { toScript } from './take.mjs'
 import { checkReplay, isReplay } from './check-replay.mjs'
 import { summaryLine } from './replay-check.mjs'
@@ -34,7 +34,7 @@ export const saveTake = (id, session) => {
   if (!entry || entry.kind !== 'live') return { status: 404, body: { error: `no live track '${id}'` } }
   if (!isSession(session)) return { status: 400, body: { error: 'not a capture (messages, snapshot, recordedAt)' } }
   const source = fs.readFileSync(entry.path, 'utf8')
-  const controls = controlsOf(source)
+  const controls = controlsOf(tagSource(entry.path))
   const trackHash = session.trackHash ?? crypto.createHash('sha1').update(source).digest('hex')
   const script = toScript({ ...session, track: id, trackHash }, controls)
   const dir = path.join(PERFORM, id, 'takes')

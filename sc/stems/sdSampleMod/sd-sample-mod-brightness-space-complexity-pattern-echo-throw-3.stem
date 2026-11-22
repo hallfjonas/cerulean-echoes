@@ -1,0 +1,77 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-echo-throw-3",
+  "parent": null,
+  "about": "Low tom figures: cycles, canon, Euclid, clapping.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 3,
+    "tags": [
+      "toms",
+      "canon",
+      "clapping"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-toms.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Cycles"
+    },
+    {
+      "label": "Canon"
+    },
+    {
+      "label": "Euclid"
+    },
+    {
+      "label": "Build-up"
+    },
+    {
+      "label": "Crossing"
+    },
+    {
+      "label": "Clapping"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "figure alone ↔ fuller: rests fill, canon voices, drift."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "tom figures."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "cycles → canon → Euclid → build-up → crossing → clapping."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long dotted-8th echo while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1
+}

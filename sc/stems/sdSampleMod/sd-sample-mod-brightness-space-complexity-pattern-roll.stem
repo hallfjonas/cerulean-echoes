@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-roll",
+  "parent": null,
+  "about": "909 clap and rim on 2 and 4, a snare roll.",
+  "meta": {
+    "role": "clap",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "clap",
+      "rim",
+      "909"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "amb-clap.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Clap"
+    },
+    {
+      "label": "Rim"
+    },
+    {
+      "label": "Both"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "plain ↔ a quiet rim before beat 3 ↔ + small double taps."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "clap / rim on 2 and 4. Also the level of Tension's roll."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "clap → rim with a pickup → clap + rim."
+    },
+    "b2": {
+      "label": "Roll",
+      "about": "snare roll, growing over the bar, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.5
+}

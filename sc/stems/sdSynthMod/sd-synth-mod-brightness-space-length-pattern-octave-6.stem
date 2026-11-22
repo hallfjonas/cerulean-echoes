@@ -1,0 +1,66 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-pattern-octave-6",
+  "parent": null,
+  "about": "Pumping sine sub on the low chord root.",
+  "meta": {
+    "role": "sub",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "sub",
+      "pump"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "amb-sub.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Pump"
+    },
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "Long"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "long, pumping notes ↔ short, bouncing ones."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "sub on the chord root, follows the chapter."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pump → off-beat → one long note per bar."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}

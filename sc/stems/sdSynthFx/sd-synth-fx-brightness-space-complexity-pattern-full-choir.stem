@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-synth-fx-brightness-space-complexity-pattern-full-choir",
+  "parent": null,
+  "about": "Choir voices through a vowel filter.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "choir",
+      "vowel",
+      "saw"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthFx"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "mood-choir.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Middle"
+    },
+    {
+      "label": "Low"
+    },
+    {
+      "label": "High"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "one voice ↔ + third ↔ + fifth: three-part harmony."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "choir voices."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "middle → low → high register (new melody each time)."
+    },
+    "b2": {
+      "label": "Full choir",
+      "about": "all three voices while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1
+}

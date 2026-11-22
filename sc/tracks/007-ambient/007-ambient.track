@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "name": "007-ambient",
+  "about": "Dreamy ambient on D in three moods.",
+  "tempo": 70,
+  "swing": 0,
+  "genre": "ambient",
+  "frame": "007-ambient-frame.scd",
+  "chapters": [
+    "Floating",
+    "Melancholic",
+    "Strange"
+  ],
+  "slots": {
+    "1:1": "sdSynthMod/sd-synth-mod-brightness-space-punch-pattern-drop-out-4.stem",
+    "1:2": "sdNoise/sd-noise-brightness-space-sea-wind-pattern-riser.stem",
+    "1:3": "sdSynthMod/sd-synth-mod-brightness-space-beating-pattern-spare.stem",
+    "1:4": "sdSynthMod/sd-synth-mod-brightness-space-groove-pattern-octave.stem",
+    "1:5": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-roll-2.stem",
+    "1:6": "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-echo-throw.stem",
+    "1:7": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-fill-3.stem",
+    "2:1": "sdSynthMod/sd-synth-mod-brightness-space-swell-pattern-freeze-2.stem",
+    "2:2": "sdSampleFx/sd-sample-fx-brightness-space-complexity-pattern-layer.stem",
+    "2:3": "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-echo-throw-2.stem",
+    "2:4": "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-echo-throw-3.stem",
+    "2:5": "sdSynthFx/sd-synth-fx-brightness-space-complexity-pattern-full-choir.stem",
+    "2:6": "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-run-2.stem",
+    "2:7": "sdSampleFx/sd-sample-fx-brightness-space-distortion-pattern-stutter.stem"
+  }
+}

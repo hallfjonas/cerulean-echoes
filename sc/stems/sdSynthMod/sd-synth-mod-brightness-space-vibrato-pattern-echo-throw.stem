@@ -1,0 +1,69 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-vibrato-pattern-echo-throw",
+  "parent": null,
+  "about": "Playful top line on the key, with vibrato and echo.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "hook",
+      "vibrato",
+      "80s"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-hook.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Hook 1"
+    },
+    {
+      "label": "Hook 2"
+    },
+    {
+      "label": "Hook 3"
+    },
+    {
+      "label": "Hook 4"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Vibrato",
+      "about": "none ↔ wide, slow vibrato."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the hook."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 4 hooks."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the hook while held.",
+      "mode": "hold"
+    }
+  }
+}

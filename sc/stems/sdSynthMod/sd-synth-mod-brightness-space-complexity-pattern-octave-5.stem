@@ -1,0 +1,82 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-octave-5",
+  "parent": null,
+  "about": "Pluck arp on the chord tones, with echo.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "arp",
+      "pluck",
+      "echo"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-arp.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Arp 1"
+    },
+    {
+      "label": "Arp 2"
+    },
+    {
+      "label": "Arp 3"
+    },
+    {
+      "label": "Arp 4"
+    },
+    {
+      "label": "Arp 5"
+    },
+    {
+      "label": "Arp 6"
+    },
+    {
+      "label": "Arp 7"
+    },
+    {
+      "label": "Arp 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "some notes left out ↔ every 16th, plus passing notes."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "pluck arp on the chord."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 arp shapes."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}

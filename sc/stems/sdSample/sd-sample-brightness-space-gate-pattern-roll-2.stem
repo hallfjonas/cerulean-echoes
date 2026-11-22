@@ -1,0 +1,71 @@
+{
+  "format": 2,
+  "name": "sd-sample-brightness-space-gate-pattern-roll-2",
+  "parent": "sdSample/sd-sample-brightness-space-gate-pattern-roll.stem",
+  "about": "80s gated snare on 2 and 4; Tension's roll a little quieter.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "house"
+    ],
+    "energy": 4,
+    "tags": [
+      "gated",
+      "snare",
+      "80s"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSample",
+    "extra": [
+      "sdNoise",
+      "sdSynthMod"
+    ]
+  },
+  "gain": 1.5,
+  "pitch": "none",
+  "orbit": 3,
+  "code": "groove-snare-2.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Gated"
+    },
+    {
+      "label": "Snare + clap"
+    },
+    {
+      "label": "Clap"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ gated room."
+    },
+    "k3": {
+      "label": "Gate",
+      "about": "short tail ↔ long gated tail."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "backbeat on 2 and 4. Also the level of Tension's roll."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "gated snare → snare + clap → clap."
+    },
+    "b2": {
+      "label": "Roll",
+      "about": "a snare roll fills in over 2 bars while held.",
+      "mode": "hold"
+    }
+  }
+}

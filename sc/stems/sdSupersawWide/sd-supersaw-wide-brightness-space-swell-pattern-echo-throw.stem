@@ -1,0 +1,72 @@
+{
+  "format": 2,
+  "name": "sd-supersaw-wide-brightness-space-swell-pattern-echo-throw",
+  "parent": null,
+  "about": "JX strings on F minor; Tension brings them in.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 2,
+    "tags": [
+      "strings",
+      "jx-10"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSupersawWide"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "opus-strings.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Fm → D♭"
+    },
+    {
+      "label": "Fm → A♭"
+    },
+    {
+      "label": "Line up"
+    },
+    {
+      "label": "Line down"
+    },
+    {
+      "label": "Chain"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Swell",
+      "about": "quick entry ↔ each note swells in slowly."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "background strings; Tension brings them in."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next move: to D♭, A♭, line up, line down, chain."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the strings while held.",
+      "mode": "hold"
+    }
+  }
+}

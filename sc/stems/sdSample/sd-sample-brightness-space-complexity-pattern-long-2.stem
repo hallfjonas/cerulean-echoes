@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-sample-brightness-space-complexity-pattern-long-2",
+  "parent": null,
+  "about": "Fast swung closed 909 hat and an open hat.",
+  "meta": {
+    "role": "hats",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "hats",
+      "909",
+      "swing"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSample"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "opus-hats.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Groove"
+    },
+    {
+      "label": "Open"
+    },
+    {
+      "label": "Fast"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the pattern as it is ↔ + quiet 32nd skips."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "closed and open hats. Keep playing in the break."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "groove → open → fast."
+    },
+    "b2": {
+      "label": "Long",
+      "about": "open hats ring longer, on every off-beat, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.105
+}

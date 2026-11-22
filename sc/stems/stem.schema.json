@@ -79,6 +79,7 @@
         "fog": {"type": "boolean"},
         "thin": {"type": "boolean"},
         "tension": {"type": "boolean"},
+        "tensionEcho": {"type": "boolean"},
         "swing": {"type": "boolean"},
         "break": {"enum": ["out", "stay"]},
         "tensionFilter": {"type": "boolean"}

@@ -33,7 +33,7 @@ const renderSection = ({ heading, text }) => {
   return section
 }
 
-export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen = readOpen(), parent = null } = {}) => {
+export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen = readOpen(), parent = null, className = '' } = {}) => {
   const panel = document.createElement('aside')
   panel.id = 'help'
   const heading = Object.assign(document.createElement('h2'), { textContent: title })
@@ -41,6 +41,7 @@ export const mountHelp = (sections, { title = 'Help', button = 'Help', startOpen
   panel.append(heading, body)
 
   const toggle = Object.assign(document.createElement('button'), { id: 'helpToggle', textContent: button })
+  toggle.className = className
   toggle.title = title + ' (key ?)'
 
   const setOpen = (open, remember = true) => {
