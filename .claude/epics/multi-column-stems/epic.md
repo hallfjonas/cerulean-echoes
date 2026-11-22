@@ -50,7 +50,7 @@ translation log.
 
 ## Implementation Strategy
 Spec first (001), then loader and engine (002), then shared state (003), then tools and player (004), then 016's
-pair as the pilot with the event-by-event proof (005). One branch and PR per task: `epic/multi-column-stems-<nnn>`
+pair as the pilot with the event-by-event proof (005). One branch and PR per task: `epic/multi-column-stems-001` and so on
 off `origin/main`. 005 needs 002 to 004 merged and the 016 translation (`claude/scd-to-track-016-017`) in.
 
 Risks:
