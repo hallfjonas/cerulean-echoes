@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "about": "The shared button-2 add-ons. A stem names one by its id; the SC add-on library builds each one.",
+  "addons": {
+    "dropOut": { "label": "Drop out", "about": "the stem pauses while held.", "modes": ["hold"] },
+    "echoThrow": {
+      "label": "Echo throw", "about": "long echo while held.", "modes": ["hold"],
+      "args": {
+        "echo": "echo send while held, at least (default 0.6)",
+        "room": "room send while held, at least (default 0.2)",
+        "echoTime": "own echo's time in beats while held (stem with echo)",
+        "echoFeedback": "own echo's feedback while held (stem with echo)"
+      }
+    },
+    "octave": {
+      "label": "Octave", "about": "one octave up while held.", "modes": ["hold", "toggle"],
+      "args": { "steps": "semitones, 12 (default) or -12" }
+    },
+    "riser": {
+      "label": "Riser", "about": "a noise sweep rises while held.", "modes": ["hold"],
+      "args": { "bars": "length of the rise in bars, 2 (default) or 4" }
+    },
+    "roll": { "label": "Roll", "about": "a roll in 16ths, growing over the bar, while held.", "modes": ["hold"] },
+    "fill": {
+      "label": "Fill", "about": "a fill over the bar while held.", "modes": ["hold"],
+      "args": { "rhythm": "mini-notation of the fill (x = hit)", "notes": "mini-notation, optional" }
+    },
+    "open": { "label": "Open", "about": "the sound opens (brighter, longer) while held.", "modes": ["hold"] },
+    "long": { "label": "Long", "about": "notes ring longer while held.", "modes": ["hold"] },
+    "swell": {
+      "label": "Swell", "about": "the stem swells up while held.", "modes": ["hold"],
+      "args": { "bars": "length of the swell in bars, 4 (default)" }
+    },
+    "stutter": { "label": "Stutter", "about": "each beat's start repeats in 16ths while held.", "modes": ["hold"] },
+    "ratchet": { "label": "Ratchet", "about": "each note repeats in quick 16ths while held.", "modes": ["hold"] },
+    "burst": { "label": "Burst", "about": "a quick scatter of accents while held.", "modes": ["hold"] },
+    "lift": { "label": "Lift", "about": "the stem grows, denser and brighter, while held.", "modes": ["hold"] }
+  }
+}

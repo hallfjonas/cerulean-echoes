@@ -1,0 +1,29 @@
+{
+  "format": 1,
+  "name": "009-house-2",
+  "about": "Happy, jazzy, dry house in A minor (stem version).",
+  "tempo": 124,
+  "swing": 0.12,
+  "genre": "house",
+  "frame": "009-house-2-frame.scd",
+  "chapters": [
+    "Vamp",
+    "Progression"
+  ],
+  "slots": {
+    "1:1": "kick909/kick909-brightness-space-punch-pattern-drop-out-2.stem",
+    "1:2": "sdNoise/sd-noise-brightness-space-motion-pattern-riser.stem",
+    "1:3": "subSine/sub-sine-brightness-space-length-pattern-octave.stem",
+    "1:4": "bassFM/bass-fm-brightness-space-sound-pattern-octave.stem",
+    "1:5": "clap909/clap909-brightness-space-complexity-pattern-roll.stem",
+    "1:6": "hats909/hats909-brightness-space-hats-shaker-pattern-open.stem",
+    "1:7": "congas727/congas727-brightness-space-complexity-pattern-fill.stem",
+    "2:1": "sdSupersaw/sd-supersaw-brightness-space-strings-b3-chords-echo-throw.stem",
+    "2:2": "houseKeys/house-keys-brightness-space-length-pattern-sound.stem",
+    "2:3": "brassSection/brass-section-pan-space-complexity-pattern-lift.stem",
+    "2:4": "flute/flute-brightness-space-complexity-pattern-echo-throw.stem",
+    "2:5": "brassSection/brass-section-brightness-space-complexity-pattern-lift.stem",
+    "2:6": "stringSection/string-section-brightness-space-complexity-pattern-lift.stem",
+    "2:7": "strat/strat-brightness-space-complexity-pattern-lift.stem"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "name": "vibraphone-brightness-space-complexity-pattern-echo-throw",
+  "parent": null,
+  "about": "Vibraphone phrases on the chord, growing.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 2,
+    "tags": [
+      "mallets",
+      "jazzy"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "vibraphone"
+  },
+  "gain": 3.13,
+  "pitch": "scale",
+  "code": "vibraphone-phrases.scd",
+  "frame": {
+    "break": "stay"
+  },
+  "patterns": [
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "Tresillo"
+    },
+    {
+      "label": "Call echo"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "core → figure → fills → doubles."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "vibraphone."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "off-beat → tresillo → call echo."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -20,10 +20,19 @@
 };
 // fn(value, send) on every message of a CC (send: as in setCC, for state buses)
 ~ce.ccHooks = ();
-~ce.onCC = { |self, cc, fn| var c = self.ccAlias[cc] ? cc; self.ccHooks[c] = (self.ccHooks[c] ? []).add(fn) };
+~ce.onCC = { |self, cc, fn| var c = self.ccAlias[cc] ? cc; self.ccHooks[c] = (self.ccHooks[c] ? []).add(fn); self.own(\ccHooks, c, fn) };
 // State bus: a control bus the language sets (a lab column's level, room, echo …): synths and strips map it
 ~ce.setState = { |self, name, v, send| self.stateVal[name] = v; send.([\c_set, self.stateBus[name], v]) };
-~ce.onPress = { |self, cc, fn| var c = self.ccAlias[cc] ? cc; self.pressFns[c] = (self.pressFns[c] ? []).add(fn) };
+~ce.onPress = { |self, cc, fn| var c = self.ccAlias[cc] ? cc; self.pressFns[c] = (self.pressFns[c] ? []).add(fn); self.own(\pressFns, c, fn) };
+// Hooks and latches made inside ~ce.owning(owner, fn) belong to owner (a stem column) and leave with ~ce.dropHooks(owner),
+// so a column swapped out of its slot stops reacting to the controls
+~ce.own = { |self, where, key, item| self[\hookOwner] !? { |o| o[\hooks].add([where, key, item]) } };
+~ce.owning = { |self, owner, fn| var was = self[\hookOwner];
+	owner[\hooks] = owner[\hooks] ? List[]; self[\hookOwner] = owner; protect { fn.value } { self[\hookOwner] = was } };
+~ce.dropHooks = { |self, owner|
+	(owner[\hooks] ? []).do { |h| if(h[0] == \latches) { self.latches.remove(h[2]) } {
+		self[h[0]][h[1]] = (self[h[0]][h[1]] ? []).reject { |f| f === h[2] } } };
+	owner[\hooks] = List[] };
 ~ce.held = { |self, cc| self.cc[self.ccAlias[cc] ? cc] > 0.5 };
 ~ce.val = { |self, cc| self.cc[self.ccAlias[cc] ? cc] };
 
@@ -44,6 +53,7 @@
 ~ce.latch = { |self, len = 1, start = 0, onSwitch|
 	var l = (pending: start, now: start, prev: start, bar: -inf, len: len);
 	self.latches.add(l);
+	self.own(\latches, nil, l);
 	l.atBar = { |l, bar|
 		var b = (bar / l.len).floor;
 		if(b > l.bar) {

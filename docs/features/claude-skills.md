@@ -15,6 +15,8 @@ When you work with Claude Code in this repo and the job is one of the ones below
 | `lab-board` | Builds a lab board or the next round of one | "new board", "candidates for bass", "next round" |
 | `lab-to-track` | Moves a finished lab column into a track unchanged | "put the winner into 009" |
 | `add-sample` | Adds an audio file, puts it on a Launchkey pad, levels it and checks that it loads | "put this sample on pad E1" |
+| `sample-designer` | Arranges a free sound as a Sample Designer project, or copies a project and changes it; checks it and loads it in SuperCollider | "a soft tom with a short noise tail" |
+| `stem-designer` | Sets up a Stem Designer project of candidate stems against a track; promotes a winner and puts it into a new track file | "the flute in the house track is boring, explore a replacement" |
 | `auto-perform` | Designs, scripts and reviews an auto-performance | "new performance for 008" |
 | `workflow-review` | Reviews past sessions and proposes ranked repo changes | "workflow review for last week" |
 

@@ -1,5 +1,5 @@
 // Offline render of a track (or some of its stems) for a scenario, with an event log for the comparison.
-// usage: sclang render.scd <track.scd> <scenario.json> <out-prefix> [stem,stem,…]
+// usage: sclang render.scd <track.scd|track.track> <scenario.json> <out-prefix> [stem,stem,…]
 //   scenario (same file as for tools/sc-port/strudel-run.mjs): { "bpm": 124, "cycles": 8, "cc": { "5": 1 },
 //     "events": [ { "t": 2.5, "cc": 37, "v": 1 } ] }   — t in bars (cycles), cc values 0..1
 // Writes <out-prefix>.wav (48 kHz float stereo, the master without trim and limiter) and <out-prefix>.events.json.
@@ -17,7 +17,12 @@ ce = (here.dirname +/+ "lib/ce.scd").load;
 ce.quiet = true; ce.trimDb = 0; ce.limit = 0;
 // comparisons: the FM modulator starts where superdough's offline render has it; "livePhase": true = random as live
 ce.webaudioPhase = (scen["livePhase"] != true) and: { scen["livePhase"] != "true" };
-track = trackFile.load;
+// a Sample Designer project: scenario "sound" plays its exported library sound instead of the machine
+track = case
+{ trackFile.endsWith(".sample.json") } {
+	(here.dirname +/+ "lib/designer.scd").load; ce.sampleProject(trackFile, scen["sound"]) }
+{ trackFile.endsWith(".stemlab.json") } { (here.dirname +/+ "lib/stemlab.scd").load; ce.stemLabProject(trackFile) }
+{ ce.loadTrack(trackFile) };
 if(only.notNil) { var names = only.split($,).collect(_.asSymbol); track.stems = track.stems.select { |s| names.includes(s.name) } };
 server = ScoreStreamPlayer.new;
 bps = num.(scen["bpm"] ? track.bpm) / 60;
@@ -58,6 +63,22 @@ ce.log.do { |l, i|
 	f.write("}}");
 };
 f.write("]\n"); f.close;
+// buffer number → sample file, so two renders of the same notes compare by file (<out-prefix>.buffers.json)
+f = File(prefix ++ ".buffers.json", "w");
+f.write("{" ++ ce.sampleBuffers.keys.asArray.sort.collect { |rel|
+	"\"%\":\"%\"".format(ce.sampleBuffers[rel], rel) }.join(",") ++ "}\n");
+f.close;
+// instrument → the inputs its SynthDef reads (<out-prefix>.controls.json): a comparison ignores every other key
+f = File(prefix ++ ".controls.json", "w");
+f.write("{" ++ ce.log.collect { |l| l[2][\instrument] }.asSet.asArray.reject(_.isNil).collect { |name|
+	var snd = ce.sounds.values.detect { |x| x.def.name.asSymbol == name.asSymbol };
+	var names = snd !? { |x| x.def.allControlNames.collect(_.name) } ?? {
+		SynthDescLib.global[name.asSymbol] !? { |d| d.controlNames } } ? [];
+	"\"%\":[%]".format(name, names.collect { |c| "\"%\"".format(c) }.join(","))
+}.join(",") ++ "}\n");
+f.close;
+// CE_NO_AUDIO=1: the event log only, no audio render
+if("CE_NO_AUDIO".getenv.notNil) { "rendered % (events only)".format(prefix).postln; 0.exit };
 // the command file next to the output (recordNRT's default temp name is the same in every sclang process: two
 // renders at once would overwrite each other's); kept with env CE_OSC=1, for debugging
 score.recordNRT(prefix ++ ".nrt.osc", prefix ++ ".wav", sampleRate: 48000, headerFormat: "WAV", sampleFormat: "float",

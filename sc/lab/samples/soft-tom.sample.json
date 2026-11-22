@@ -1,0 +1,31 @@
+{
+  "format": 1,
+  "name": "soft-tom",
+  "parent": null,
+  "about": "Soft tom: sine with a gentle drop, a short noise tail.",
+  "setup": "drum",
+  "role": "perc",
+  "sources": [
+    { "id": "tone", "kind": "tone", "on": true, "type": "Sine", "k1": 0.4, "k2": 0.2, "k3": 0.4, "level": 0.85 },
+    { "id": "noise", "kind": "noise", "on": true, "type": "White", "k1": 0.45, "k2": 0.5, "k3": 0.5, "level": 0.3 },
+    { "id": "click", "kind": "click", "on": false, "type": "Pulse", "k1": 0.4, "k2": 0.2, "k3": 0, "level": 0.2 }
+  ],
+  "chain": [
+    { "id": "env", "kind": "env", "on": true, "type": "One-shot", "k1": 0.1, "k2": 0.6, "k3": 0, "level": 0.9 },
+    { "id": "filter", "kind": "filter", "on": true, "type": "Low-pass", "k1": 0.55, "k2": 0.1, "k3": 0.2, "level": 1 },
+    { "id": "drive", "kind": "drive", "on": false, "type": "Soft", "k1": 0.2, "k2": 0.5, "k3": 0, "level": 0.3 }
+  ],
+  "audition": {
+    "bpm": 100,
+    "pattern": 0,
+    "accent": 0.5,
+    "space": 0.2,
+    "length": 0.5,
+    "master": 0.8,
+    "patterns": [
+      { "label": "pulse", "rhythm": "x ~ ~ x ~ ~ x ~", "velocity": "1 ~ ~ 0.6 ~ ~ 0.8 ~" },
+      { "label": "roll", "rhythm": "x ~ x ~ x x x ~", "velocity": "1 ~ 0.6 ~ 0.7 0.8 1 ~" },
+      { "label": "single", "rhythm": "x ~ ~ ~ ~ ~ ~ ~" }
+    ]
+  }
+}

@@ -30,6 +30,9 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
   to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
+- `sc/stems/` — the stem library (`<sample>/<name>.stem`, one LC column as JSON; schema, add-ons), `sc/tracks/<id>/<id>.track`
+  = stem versions on the 14 slots; `sc/lab/samples/` (Sample Designer projects), `sc/lab/stems/` (Stem Designer projects);
+  docs: `docs/features/stems.md`, `docs/features/sound-lab.md`
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
@@ -96,6 +99,9 @@ Use them instead of redoing the steps by hand:
 - New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
+- A new sound on the SC machine ("sample designer", "a soft tom", export to `sc/sounds/`): `/sample-designer`.
+- Compare versions of a stem against a track, promote a winner, swap it into a new track ("redesign the piano stem of
+  the house track", "explore a replacement"): `/stem-designer`.
 - Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
   performance"): `/auto-perform`.
 - A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song", "new Guitar Pro
@@ -126,6 +132,8 @@ Tools (run in `tools/`):
   [--out <dir>] [--force]`; `--perform` writes only the script from the map's `performance`; notes per bar:
   `node producer/midi-read.mjs <file.mid> --dump` (`tools/producer/README.md`)
 - Set 011: `npm run set` (build + check); continuum: `npm run continuum`
+- Stem library (`sc/stems/`, SC stems and stem tracks, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`,
+  `npm run stems` (list, filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
 - The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
   `node trajectory/make-tapped.mjs <track>` puts the tapped code on the clipboard for strudel.cc
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
@@ -138,17 +146,18 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
-- Landing page: the MIDI panel (the track's LC view) full size; the sidebar (key S) holds the views (MIDI panel,
-  Visualization), the page links, track, Play/Stop/Record/Save take, auto-perform and the visual settings; **?** opens
-  the help.
+- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems & Tracks, Sets) | Visuals;
+  the sidebar (key S) shows only the sections of the page: Live = live tracks, Play-Pause/Stop/Record, auto-perform;
+  Labs = Sample / Stem Designer; the gear opens Settings (Theme, Visuals, MIDI panel, Recording, keyboard shortcuts);
+  **?** opens the help.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
   (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).
 - Record (key R) writes the master output to `recordings/<track>/` as a WAV (human set, or auto-perform with Record
   audio ticked); `node trajectory/check-recording.mjs` tests the endpoints.
-- Takes: every load captures all MIDI input; Save take writes it as a script v2 to `perform/<track>/takes/` (gitignored,
-  with the play's tapped events). Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
+- Takes: every load captures all MIDI input; the setting Save take on record stop writes it as a script v2 to `perform/<track>/takes/`
+  (gitignored, with the play's tapped events) when a recording ends. Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
   replay fidelity) compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
 - SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's Strudel file is
@@ -187,7 +196,7 @@ loads the same banks as strudel.cc, `banks.mjs`, plus the gm_* soundfonts). `sam
   `samples/mirror/mirror.json`, so the copy plays under the same name once pushed to main.
 
 ## Control texts (`@ctl`)
-The `// @ctl` comments in a track describe every control; the LC view, the player's MIDI panel, the SC UI and
+The `// @ctl` comments in a track describe every control; the LC view, the player's Live page, the SC UI and
 `check-perform` read them (`tools/lcxl-layout/ctl.mjs`). Layout sheets (PDF) and per-track `.syx` modes were retired on
 2026-11-20. Every LC XL 3 gets the same two custom modes once, with Novation Components: `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` in slots 1
 and 2 (same CCs for every track).

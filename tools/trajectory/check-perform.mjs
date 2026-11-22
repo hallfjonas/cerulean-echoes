@@ -3,8 +3,9 @@
 // the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 21-28, keys that parse,
 // velocities 0..1, and the `take` meta field of a take (perform/<track>/takes/<take>.json, checked like a script).
 // A ported track's scripts serve both its SuperCollider version (sc/tracks/<id>/<id>.scd, same @ctl tags) and its
-// frozen Strudel file: by default both are checked.
-// usage (in tools/): node trajectory/check-perform.mjs [<track.strudel | track.scd> …]
+// frozen Strudel file: by default both are checked. A stem track (sc/tracks/<id>/<id>.track) takes its controls from
+// its stems and frame.
+// usage (in tools/): node trajectory/check-perform.mjs [<track.strudel | track.scd | track.track> …]
 //   (default: every track that has scripts)
 // Exit 1 if a script fails.
 import fs from 'fs'
@@ -12,6 +13,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { parse } from '../lcxl-layout/ctl.mjs'
 import { LK_CCS, PADS, isLaunchkeyStep, keyNotes } from './autoperform.mjs'
+import { trackTags } from '../stems/stem-tags.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const repo = path.resolve(here, '..', '..')
@@ -137,7 +139,7 @@ export const checkScript = (script, controls, trackId) => {
   return errors
 }
 
-const trackIdOf = file => path.basename(file).replace(/\.(strudel|scd)$/, '')
+const trackIdOf = file => path.basename(file, path.extname(file))
 const jsonFiles = dir => fs.existsSync(dir)
   ? fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort().map(f => path.join(dir, f))
   : []
@@ -153,16 +155,22 @@ const findFile = (dir, name) => {
   return null
 }
 
-export const trackFileOf = trackId => findFile(path.join(repo, 'tracks'), trackId + '.strudel')
+const stemTrackOf = trackId => {
+  const file = path.join(repo, 'sc', 'tracks', trackId, trackId + '.track')
+  return fs.existsSync(file) ? file : null
+}
+export const trackFileOf = trackId => findFile(path.join(repo, 'tracks'), trackId + '.strudel') ?? stemTrackOf(trackId)
 // The SuperCollider version of a track, or null
 export const scTrackFileOf = trackId => {
   const file = path.join(repo, 'sc', 'tracks', trackId, trackId + '.scd')
   return fs.existsSync(file) ? file : null
 }
+// a stem track's controls come from its stems and frame (stem-tags.mjs), a Strudel or SC track's from its comments
+export const tagSource = file => file.endsWith('.track') ? trackTags(file) : fs.readFileSync(file, 'utf8')
 
 // { file: errors[] } for every script and take of the track
 export const checkTrack = file => {
-  const controls = controlsOf(fs.readFileSync(file, 'utf8'))
+  const controls = controlsOf(tagSource(file))
   return Object.fromEntries([...scriptFiles(trackIdOf(file)), ...takeFiles(trackIdOf(file))].map(script => {
     try { return [script, checkScript(JSON.parse(fs.readFileSync(script, 'utf8')), controls, trackIdOf(file))] }
     catch (error) { return [script, [error.message]] }

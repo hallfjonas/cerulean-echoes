@@ -49,6 +49,12 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 .cl{display:flex;flex-direction:column;align-items:center;min-width:0;gap:calc(14 * var(--px))}
 .cl.global{box-shadow:-1px 0 0 0 var(--track)}
 .name{font-size:var(--fs-name);font-weight:500;color:var(--text);max-width:100%}
+.slotbar{display:flex;gap:calc(10 * var(--px));justify-content:center;height:calc(22 * var(--px));min-height:14px}
+.slotbar button{display:flex;align-items:center;justify-content:center;width:calc(22 * var(--px));min-width:14px;padding:0;border:0;border-radius:4px;background:none;color:var(--text);cursor:pointer}
+.slotbar button svg{width:100%;height:100%;max-width:16px;max-height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.slotbar button:hover:not(:disabled){background:var(--panel)}
+.slotbar button:disabled{opacity:.25;cursor:default}
+.name.add{color:var(--off);cursor:pointer}.name.add:hover{color:var(--text)}
 .name,.kl,.btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .name,.kl,.b2{text-transform:lowercase}
 .kw{display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--px));min-width:0;max-width:100%}
@@ -73,7 +79,10 @@ body:not([data-theme=retro]) .fader .handle{left:50%;transform:translateX(-50%);
 .btns{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--px));min-width:0;max-width:100%}
 .btn{font-size:var(--fs-btn);max-width:100%;color:var(--off)}
 .b1{color:var(--text)}.b1.dim{color:var(--off)}.b2.on{color:var(--accent)}
-.blink{animation:blink 1s steps(1,end) infinite}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
+.blink{animation:blink 1s steps(1,end) infinite}body.designer .blink{animation:none}
+body.designer:not(.stemlab) .duo{display:none}
+body.stemlab .cl:not(.global) .kw .kl{cursor:pointer;text-decoration:underline dotted}
+body.stemlab .cl:not(.global) .kw .kl:hover{color:var(--accent)}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
 .off{visibility:hidden}
 /* Launchkey: mod wheel left of the 8-column grid (knob over 2 pads per column), the keys under the pads */
 .lk{display:grid;grid-template-columns:calc(56 * var(--px)) minmax(0,1fr);grid-template-rows:auto auto auto;
@@ -128,10 +137,22 @@ body.no-lk .lkbox{visibility:hidden}
 .marks i.on{background:var(--text)}
 .marks+.marks,.chord{margin-left:.5em}.marks i:first-child{margin-left:0}
 .ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.fader.ctl,.wheel.ctl{cursor:pointer}
+body.pick .name[data-col]{cursor:pointer;text-decoration:underline dotted}
+body.shape-on{height:calc(100% - 230px);--px:min(calc(96vw / var(--W)), calc((94vh - 230px) / var(--H)))}
+#shape{display:none;position:fixed;left:0;right:0;bottom:0;box-sizing:border-box;height:230px;padding:4px 10px 10px;font:11px var(--font);color:var(--text);background:var(--bg)}
+body.shape-on #shape{display:flex;flex-direction:column;gap:4px}
+#shape .numbers{display:flex;flex-wrap:wrap;gap:2px 16px;font-variant-numeric:tabular-nums}
+#shape .numbers b{color:var(--off);font-weight:500;margin-right:4px}
+#shape .numbers .busy{color:var(--off)}
+#shape .plots{flex:1;display:flex;gap:12px;min-height:0}
+#shape figure{margin:0}
+#shape figcaption{color:var(--off);margin-bottom:2px}
+#shape canvas{display:block;background:var(--panel);border:1px solid var(--edge);border-radius:4px}
 </style>
 </head>
 <body>
 <div id=lc><div class=wait>Waiting for the bridge …</div></div>
+<div id=shape><div class=numbers></div><div class=plots></div></div>
 <script>
 // LC view for the SuperCollider version, interactive: drag knobs (up/down; Shift = fine; double-click = 0), click or
 // drag faders, press buttons (Shift-click = keep the button held until the next click). Values come from SuperCollider
@@ -162,6 +183,10 @@ addEventListener('message', e => {
   if (STYLES.includes(e.data?.theme?.style) && TONES.includes(e.data.theme.tone)) applyTheme(e.data.theme)
   // the player's "LC frame" setting (key H): frame the controller moved last, or not
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
+  // a stem track in the player: a click on a column's name selects that column (the player opens the stem drawer)
+  if (typeof e.data?.pickColumns === 'boolean') document.body.classList.toggle('pick', e.data.pickColumns)
+  // the sound shape under the controllers: the player allows it on its Labs / Samples page only
+  if (typeof e.data?.shapeOn === 'boolean') dispatchEvent(new CustomEvent('ce-shape-allowed', { detail: e.data.shapeOn }))
 })
 const retro = () => document.body.dataset.theme === 'retro', light = () => document.body.dataset.tone === 'light'
 
@@ -309,17 +334,21 @@ const build = () => {
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
   const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
   const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '<span class=head id=head></span>') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
-    cols.map(n => '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name>' +
-      esc((tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')) + '</span>' +
+    cols.map(n => { const name = (tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')
+      return '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name' +
+      (isGlobal(n) || !name ? '' : ' data-col="' + (page === 'jojo' ? 1 : 2) + ':' + n + '"') + '>' + esc(name) + '</span>' +
       cell(page, n, 'k1') + cell(page, n, 'k2') + cell(page, n, 'k3') + cell(page, n, 'fader') +
-      '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>').join('') + '</div></div></section>').join('')
+      '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>' }).join('') + '</div></div></section>').join('')
   root.className = 'board'
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
-    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Visual settings, key C)"></button></p>' +
+    '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Settings, key C)"></button></p>' +
     '<div class="spec setbox"><canvas id=setv></canvas></div></div></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
+  for (const el of root.querySelectorAll('[data-col]')) el.addEventListener('click', () => {
+    if (parent !== window && document.body.classList.contains('pick')) parent.postMessage({ select: { kind: 'column', slot: el.dataset.col } }, location.origin)
+  })
   requestAnimationFrame(layoutKeys)
   for (const div of root.querySelectorAll('[data-cell]')) {
     const [page, n0, row] = div.dataset.cell.split(':'), n = +n0
@@ -336,6 +365,7 @@ const build = () => {
   spectrumResize()
   setDraw()
   update()
+  dispatchEvent(new CustomEvent('ce-built'))
 }
 
 // ---- interaction ----
@@ -784,7 +814,7 @@ const connect = () => {
     else if (type === 'cc') {
       for (const [cc, v] of Object.entries(data)) if (!(performance.now() - (mine[cc] ?? -1e9) < 300)) { S.cc[+cc] = v; S.page = pageOfCc(+cc) }
     }
-    else if (type === 'state') S.state = data
+    else if (type === 'state') { S.state = data; dispatchEvent(new CustomEvent('ce-state', { detail: data })) }
     else if (type === 'beat') S.beat = data
     else if (type === 'midi') S.midi = data
     else if (type === 'sc') S.sc = data
@@ -801,6 +831,143 @@ const connect = () => {
 }
 applyTheme(readTheme())
 connect()
+</script>
+<script type=module>
+// Sample Designer: the shape of the sound under the LCs (one hit rendered by the player's server, sample-shape.mjs),
+// again after every move of a control. One render at a time; moves during a render ask for one more with the newest
+// values. Only in the player (the standalone bridge has no /lab route).
+import { drawShape } from '/sample-shape-ui.mjs'
+const box = document.getElementById('shape')
+let busy = false, wanted = null, drawn = null, last = null, failures = 0
+const render = async () => {
+  if (busy || wanted === drawn) return
+  busy = true
+  const key = wanted
+  try {
+    const body = JSON.stringify({ track: S.layout?.name })
+    const response = await fetch('/lab/sample/shape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
+    const shape = await response.json()
+    // the project loads before the server sees it play: ask again shortly (also after any other failure, so the
+    // figures show from the first load on without a control being moved)
+    if (!response.ok) throw new Error(shape.error ?? response.status)
+    failures = 0
+    last = shape
+    drawShape(box, shape)
+  } catch (error) {
+    busy = false
+    if (++failures > 20) box.querySelector('.numbers').textContent = 'Shape: ' + error.message
+    else setTimeout(render, 300)
+    return
+  }
+  drawn = key
+  busy = false
+  render()
+}
+let shapeAllowed = true, designer = null
+const syncShape = () => {
+  const on = !!designer && !designer.slots && shapeAllowed
+  document.body.classList.toggle('shape-on', on)
+  if (!on) { wanted = drawn = last = null; return }
+  const next = JSON.stringify(designer)
+  if (next !== wanted) failures = 0
+  wanted = next
+  render()
+}
+addEventListener('ce-state', ({ detail }) => {
+  designer = detail?.designer ?? null
+  document.body.classList.toggle('designer', !!designer)
+  syncShape()
+})
+addEventListener('ce-shape-allowed', ({ detail }) => { shapeAllowed = detail; syncShape() })
+addEventListener('resize', () => { if (last) drawShape(box, last) })
+
+// Stem Designer: the header of every stem slot. A free slot reads "+ Add" (the player opens its stem drawer), a column
+// gets a promote symbol (active while the column holds a draft) and a trash symbol above its title; a click on a knob's
+// label opens the player's knob editor. The state's
+// designer.slots says which; the actions go to the player's server (stem-lab.mjs), which loads the project again.
+const ICONS = {
+  promote: '<svg viewBox="0 0 16 16"><path d="M8 11V3M4.5 6.5 8 3l3.5 3.5M3 13h10"/></svg>',
+  del: '<svg viewBox="0 0 16 16"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5M7 7v4M9 7v4"/></svg>',
+}
+const slotOf = (cl, index) => (cl.closest('.pn').dataset.page === 'jojo' ? 1 : 2) + ':' + (index + 1)
+const labAction = async (route, slot, extra = {}) => {
+  try {
+    const response = await fetch('/lab/stems/' + route, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: S.layout?.name, slot, ...extra }) })
+    if (!response.ok) notify((await response.json().catch(() => ({}))).error ?? 'Stem Designer: ' + route + ' failed (' + response.status + ')')
+  } catch (error) {
+    notify('Stem Designer: ' + error.message)
+  }
+}
+const notify = text => parent !== window ? parent.postMessage({ labNotice: text }, location.origin) : alert(text)
+const restoreName = (cl, page, index) => {
+  const name = cl.querySelector('.name')
+  if (!name?.classList.contains('add')) return
+  name.classList.remove('add')
+  delete name.dataset.slot
+  name.textContent = (tags()[PREFIX[page] + ':' + (index + 1)] ?? '').replace(/^\d+\s*/, '')
+  if (name.textContent) name.dataset.col = page === 'jojo' ? '1:' + (index + 1) : '2:' + (index + 1)
+}
+const labHeaders = () => {
+  const slots = S.state?.designer?.slots
+  document.body.classList.toggle('stemlab', !!slots)
+  for (const pn of document.querySelectorAll('.pn')) [...pn.querySelectorAll('.cl')].forEach((cl, index) => {
+    let bar = cl.querySelector('.slotbar')
+    if (!slots) { bar?.remove(); if (!cl.classList.contains('global')) restoreName(cl, pn.dataset.page, index); return }
+    if (!bar) { bar = document.createElement('div'); bar.className = 'slotbar'; cl.prepend(bar) }
+    if (cl.classList.contains('global')) return
+    const page = pn.dataset.page, slot = (page === 'jojo' ? 1 : 2) + ':' + (index + 1), kind = slots[slot]
+    const name = cl.querySelector('.name')
+    if (kind === 'free') {
+      bar.replaceChildren()
+      bar.dataset.kind = 'free'
+      name.classList.add('add')
+      name.dataset.slot = slot
+      delete name.dataset.col
+      name.textContent = '+ Add'
+      return
+    }
+    if (name.classList.contains('add') || !name.textContent) {
+      name.classList.remove('add')
+      name.textContent = (tags()[PREFIX[page] + ':' + (index + 1)] ?? '').replace(/^\d+\s*/, '')
+    }
+    name.dataset.col = (page === 'jojo' ? 1 : 2) + ':' + (index + 1)
+    const wanted = kind === 'draft' ? 'draft' : 'library'
+    if (bar.dataset.kind === wanted && bar.dataset.slot === slot) return
+    bar.dataset.kind = wanted
+    bar.dataset.slot = slot
+    bar.innerHTML = '<button data-act=promote title="' + (wanted === 'draft' ? 'Export this changed stem to the library'
+      : 'In the library already') + '"' + (wanted === 'draft' ? '' : ' disabled') + '>' + ICONS.promote + '</button>' +
+      '<button data-act=remove title="Remove this stem">' + ICONS.del + '</button>'
+  })
+}
+let pressedAt = null
+document.addEventListener('pointerdown', event => { pressedAt = [event.clientX, event.clientY] }, true)
+const moved = event => pressedAt && Math.hypot(event.clientX - pressedAt[0], event.clientY - pressedAt[1]) > 4
+document.addEventListener('click', event => {
+  const add = event.target.closest('.name.add')
+  if (add && parent !== window) return void parent.postMessage({ labPick: { action: 'add', slot: add.dataset.slot } }, location.origin)
+  const label = document.body.classList.contains('stemlab') && !moved(event)
+    && document.elementsFromPoint(event.clientX, event.clientY).find(node => node.classList?.contains('kl'))
+  if (label && !label.closest('.global') && parent !== window) {
+    const [page, n, row] = label.parentElement.dataset.cell.split(':')
+    return void parent.postMessage({ labKnob: { slot: (page === 'jojo' ? 1 : 2) + ':' + n, key: row } }, location.origin)
+  }
+  const button = event.target.closest('.slotbar button')
+  if (!button || button.disabled) return
+  const draft = button.parentElement.dataset.kind === 'draft'
+  if (button.dataset.act === 'remove' && draft) {
+    const slot = button.parentElement.dataset.slot
+    if (parent !== window) parent.postMessage({ labDiscard: { slot } }, location.origin)
+    else if (confirm('This stem has changes that are not exported yet. Remove it and lose them?')) {
+      labAction('remove', slot, { discard: true })
+    }
+  } else labAction(button.dataset.act, button.parentElement.dataset.slot)
+})
+addEventListener('ce-state', labHeaders)
+addEventListener('ce-built', labHeaders)
+// the state may have arrived before this module ran: the sound shape and the headers start from it
+if (S.state) dispatchEvent(new CustomEvent('ce-state', { detail: S.state }))
 </script>
 </body>
 </html>

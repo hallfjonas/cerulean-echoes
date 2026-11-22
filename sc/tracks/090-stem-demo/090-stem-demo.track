@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "name": "090-stem-demo",
+  "about": "The two example stems: 909 kick and warm bass in A minor.",
+  "tempo": 124,
+  "swing": 0.1,
+  "genre": "house",
+  "frame": "090-stem-demo-frame.scd",
+  "chapters": ["Vamp", "Progression"],
+  "slots": {
+    "1:1": "kick909/kick909-brightness-space-punch-pattern-drop-out.stem",
+    "1:4": "bassWarm/bass-warm-brightness-space-length-pattern-octave.stem"
+  }
+}

@@ -5,6 +5,9 @@ description: Move a finished lab column into a track column 1:1 (same controls, 
 
 # Lab column → track column, 1:1
 
+> SuperCollider work (stems, tracks in `sc/`): use `/stem-designer` (compare stem versions against a track) and
+> `/sample-designer` (new sounds); Strudel is deprecated (`DEPRECATION.md`).
+
 The lab column is the spec. The player must find exactly the controls the lab had, in the same places, doing the
 same thing. Do not "adapt" it to the track's row convention (row 3 = character, button 2 = moment) unless the user
 asks: a lab column with Length on row 3 and Shift on button 2 keeps them.

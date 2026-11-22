@@ -3,9 +3,11 @@
 // needed.
 // Talks OSC with the player's server on UDP <port> (default 57131; not 57130, the port of live.scd's LC view bridge,
 // so both can run), with the messages of the LC view (lib/ui.scd), plus:
-//   player → SC: /ce/load <track file path> [cc <n> <v> … lk <n> <v> …]
-//                                             stop what plays, load that track, start it at bar 0; the CCs (0..1) after
-//                                             cc / lk are set before the first note (an auto-perform script's bar 0)
+//   player → SC: /ce/load <track file path> [slots] [cc <n> <v> … lk <n> <v> …]
+//                                             stop what plays, load that track, start it at bar 0; slots (a stem
+//                                             track): JSON { "1:4": stem ref, … } in place of the file's; the CCs (0..1)
+//                                             after cc / lk are set before the first note (an auto-perform script's bar 0)
+//                /ce/swap <slot> <stem ref>   that stem takes over the slot at the next bar (~ce.swapSlot)
 //                /ce/stop                     stop what plays (the server keeps running)
 //                /ce/quit                     stop and end sclang (the server quits with it)
 //                /ce/record start <wav path>  record the master output (bus 0, 2 channels, 16 bit, the server's own sample
@@ -17,11 +19,14 @@
 //                /ce/recording <path> <rate>  the recording runs (answer to /ce/record start)
 //                /ce/recorded <path>          the WAV is closed (stop, a load, /ce/stop, /ce/quit all end a recording)
 //                /ce/recerror <text>          a recording could not start
+//                /ce/swapped <slot> <ref>     the swap waits for the next bar line
+//                /ce/swapReload <slot> <why>  the stem cannot take over while the track plays: load it with the stem
+//                /ce/swapError <slot> <text>  the swap failed (nothing changed)
 // Controllers go straight to SC (MIDI), never through the player. Live play from the IDE stays sc/live.scd.
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;
 var serverPort = (thisProcess.argv[1] ? "57140").asInteger;
-var mute = "CE_SC_MUTE".getenv == "1", toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, setInit, current, recorder, recStart, recStop;
+var mute = "CE_SC_MUTE".getenv == "1", toPlayer = NetAddr("127.0.0.1", port), stopTrack, loadTrack, setInit, current, currentSlots, recorder, recStart, recStop;
 // its own sound server on its own port: never the IDE's default server (localhost:57110), so the engine and a
 // SuperCollider IDE session (live.scd) can run side by side without taking over each other's server
 s = Server(\ceEngine, NetAddr("127.0.0.1", serverPort));
@@ -95,10 +100,11 @@ setInit = { |ce, init|
 		}
 	}
 };
-loadTrack = { |path, init|
+loadTrack = { |path, slots, init|
 	var old = ~ce, ce, track, pattern;
-	current = path;
+	current = path; currentSlots = slots;
 	stopTrack.value;
+	s.sync;
 	// a fresh core per track (latches, buttons, buses start clean); allocators from 0, so every load reuses the same
 	// buffer and bus numbers instead of running out after a few switches
 	s.newAllocators;
@@ -108,7 +114,12 @@ loadTrack = { |path, init|
 	// tests and agents' trial runs (CE_SC_MUTE=1): the master goes to a bus no speaker hears, so nothing plays beside
 	// the user's own set (the groups sit at the tail of the root group, after Server.volume: muting that would not reach them)
 	if(mute) { ce.mainOut = s.options.numAudioBusChannels - 2 };   // the last two buses: the allocators never get there
-	track = path.load;
+	// a Sample Designer project (sc/lab/samples/*.sample.json) plays as a track (lib/designer.scd)
+	// a Stem Designer project (sc/lab/stems/*.stemlab.json) too (lib/stemlab.scd)
+	track = case
+	{ path.endsWith(".sample.json") } { (here +/+ "lib/designer.scd").load; ce.sampleProject(path) }
+	{ path.endsWith(".stemlab.json") } { (here +/+ "lib/stemlab.scd").load; ce.stemLabProject(path) }
+	{ ce.loadTrack(path, slots) };
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
 	old !? { ce.midiPorts = old.midiPorts; ce.lcRaw = old.lcRaw; old.midiWatch !? (_.stop) };
@@ -128,12 +139,22 @@ loadTrack = { |path, init|
 	"▶ % — % BPM".format(track.name, track.bpm).postln;
 };
 
-OSCdef(\ce_host_load, { |msg| var path = msg[1].asString, init = msg.drop(2);
-	fork { { loadTrack.(path, init) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } }
+OSCdef(\ce_host_load, { |msg|
+	// [slots JSON] first if given (it starts with '{'), then the init values (cc … lk …)
+	var path = msg[1].asString, rest = msg.drop(2), slots;
+	if(rest.notEmpty and: { rest[0].asString.beginsWith("{") }) { slots = rest[0].asString; rest = rest.drop(1) };
+	fork { { loadTrack.(path, slots, rest) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } }
 }, '/ce/load').permanent_(true);
 OSCdef(\ce_host_record, { |msg|
 	if(msg[1].asString == "start") { recStart.(msg[2].asString) } { recStop.value }
 }, '/ce/record').permanent_(true);
+OSCdef(\ce_host_swap, { |msg| var slot = msg[1].asSymbol, ref = msg[2].asString;
+	fork { {
+		var ce = ~ce ?? { Error("nothing plays").throw }, why = ce.swapProblem(slot, ref);
+		if(why.notNil) { toPlayer.sendMsg('/ce/swapReload', slot, why) } {
+			ce.swapSlot(slot, ref, { |m, done| ce.sendInit(m); done.value; toPlayer.sendMsg('/ce/swapped', slot, ref) }) }
+	}.try { |e| e.reportError; toPlayer.sendMsg('/ce/swapError', slot, e.errorString) } }
+}, '/ce/swap').permanent_(true);
 OSCdef(\ce_host_stop, { current = nil; stopTrack.value; toPlayer.sendMsg('/ce/stopped') }, '/ce/stop').permanent_(true);
 OSCdef(\ce_host_quit, { fork { stopTrack.value; s.sync; s.quit; 0.exit } }, '/ce/quit').permanent_(true);
 
@@ -148,7 +169,7 @@ OSCdef(\ce_host_quit, { fork { stopTrack.value; s.sync; s.quit; 0.exit } }, '/ce
 		if((now - last) > 4 and: { current.notNil } and: { s.serverRunning }) {
 			"woke up after % s: clearing the server queue, starting % again".format((now - last).round(0.1), current.basename).postln;
 			s.sendMsg('/clearSched');
-			fork { { loadTrack.(current) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } };
+			fork { { loadTrack.(current, currentSlots) }.try { |e| e.reportError; toPlayer.sendMsg('/ce/error', e.errorString) } };
 		};
 		last = now;
 	}

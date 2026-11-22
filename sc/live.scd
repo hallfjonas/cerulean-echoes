@@ -25,8 +25,9 @@ s.options.maxNodes = 4096;          // all stems at once: many short notes overl
 s.options.numBuffers = 2048;        // the track loads ~350 samples
 s.latency = 0.2;                        // only the patterns run ahead; controller moves go to the buses at once
 ~ce = (here +/+ "lib/ce.scd").load;
-~ce.trackFile = here +/+ "tracks" +/+ trackName +/+ trackName ++ ".scd";
-~track = ~ce.trackFile.load;
+~ce.trackFile = [".scd", ".track"].collect { |ext| here +/+ "tracks" +/+ trackName +/+ trackName ++ ext }
+	.detect { |f| File.exists(f) };
+~track = ~ce.loadTrack(~ce.trackFile);
 // the bridge for the web UI (Node.js): started once, keeps running if it already runs
 ~ce.startBridge = { |self|
 	var node = ["/opt/homebrew/bin/node", "/usr/local/bin/node", "/usr/bin/node"].detect { |p| File.exists(p) }

@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "name": "091-soft-tom-demo",
+  "about": "Kick and bass plus the Sample Designer soft tom.",
+  "tempo": 124,
+  "swing": 0.1,
+  "genre": "house",
+  "frame": "091-soft-tom-demo-frame.scd",
+  "chapters": [
+    "Vamp",
+    "Progression"
+  ],
+  "slots": {
+    "1:1": "kick909/kick909-brightness-space-punch-pattern-drop-out.stem",
+    "1:4": "bassWarm/bass-warm-brightness-space-length-pattern-octave.stem",
+    "1:5": "softTom/soft-tom-brightness-space-length-pattern-fill.stem"
+  }
+}

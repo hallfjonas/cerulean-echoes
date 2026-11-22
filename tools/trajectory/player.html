@@ -6,7 +6,7 @@
 <title>Trajectory Player</title>
 <link rel="stylesheet" href="ui.css">
 <style>
-  /* no top bar: the sidebar holds everything; the stage (MIDI panel or visuals) fills the rest */
+  /* no top bar: the sidebar holds everything; the stage (Live, Labs or visuals) fills the rest */
   :root { --side: 300px }
   body { overflow: hidden }
   body.idle { cursor: none }
@@ -16,11 +16,12 @@
   #sidebar button, #sidebar select { text-transform: inherit }
   body.side-closed #sidebar { display: none }
   #sidebar .top { display: flex; align-items: center; gap: 4px; margin: 0 0 14px }
-  #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1 }
+  #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1; min-width: 0 }
   #sidebar nav a { padding: 5px 6px; border-radius: var(--radius); white-space: nowrap }
   #sidebar nav a.here { background: var(--control) }
-  .icon { width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
-  .icon:hover { color: var(--fg) }
+  .icon { flex: none; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
+  .icon:hover, .icon.here { color: var(--fg) }
+  .icon.here { background: var(--control) }
   #sidebar section { border-top: 1px solid var(--line); padding: 14px 0 }
   #sidebar h2, #sidebar details summary { margin: 0 0 10px; font-size: 12px; font-weight: 500; color: var(--dim);
     letter-spacing: 0.04em; cursor: default }
@@ -29,42 +30,84 @@
   #sidebar output { display: block; margin-top: 6px; font-size: 12px; color: var(--dim) }
   #status { display: block; margin-top: 8px; font-size: 12px; color: var(--dim); overflow-wrap: anywhere }
   #track { width: 100% }
-  #sidebar label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
-  #sidebar label input[type=range] { grid-column: 1 / 3; width: 100% }
-  #sidebar label output { grid-row: 1; grid-column: 2; margin: 0 }
-  #sidebar label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
-  #sidebar label select { grid-column: 1 / 3 }
+  #sidebar label, #settingsPage label { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-bottom: 14px }
+  #sidebar label input[type=range], #settingsPage label input[type=range] { grid-column: 1 / 3; width: 100% }
+  #sidebar label output, #settingsPage label output { grid-row: 1; grid-column: 2; margin: 0; font-size: 12px; color: var(--dim) }
+  #sidebar label input[type=checkbox], #settingsPage label input[type=checkbox] { grid-row: 1; grid-column: 2; justify-self: end }
+  #sidebar label select, #settingsPage label select { grid-column: 1 / 3 }
   #sidebar label.inline { display: inline-flex; margin: 0 0 0 10px }
   #autoPerform label output { color: var(--fg) }
-  #settings { margin-top: 12px }
   .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 2px; background: var(--control);
     border-radius: var(--radius); margin-bottom: 8px }
   .seg button { background: none; padding: 5px 0; color: var(--dim) }
   .seg button:hover { background: var(--control-hi) }
   .seg button[aria-pressed=true] { background: var(--accent); color: var(--on-accent) }
+  #stemLab [data-slot] { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; font-size: 12px }
+  #stemLab [data-slot] .seg { margin-bottom: 4px }
+  #stemLab label input:not([type=checkbox]) { grid-column: 1 / 3 }
+  #sidebar #stemLab details > summary { margin: 0 0 10px; padding: 7px 10px; background: var(--accent); color: var(--on-accent);
+    border-radius: var(--radius); font-size: 13px; font-weight: 500; text-align: center; list-style: none }
+  #sidebar #stemLab details > summary::-webkit-details-marker { display: none }
+  #sidebar #stemLab details > summary::before { content: '+ ' }
+  #sidebar #stemLab details[open] > summary::before { content: '– ' }
+  #stemLab [data-part=project] .row { margin-top: 0 }
   .script-info { margin-top: 12px; font-size: 13px }
   .script-title { font-weight: 500 }
   .script-mood { color: var(--dim); margin-top: 2px }
   .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
   .script-sections li.now { color: var(--fg) }
-  /* sidebar closed: one small button top left, always there */
-  #sideOpen { position: fixed; top: 10px; left: 10px; z-index: 2; display: none }
-  body.side-closed #sideOpen { display: grid }
+  #sideHandle { position: fixed; top: 29px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3; width: 17px; height: 38px;
+    padding: 0; display: grid; place-items: center; background: var(--panel); color: var(--dim); border: 1px solid var(--line);
+    border-left: 0; border-radius: 0 6px 6px 0 }
+  #sideHandle:hover { color: var(--fg); background: var(--control) }
+  body.side-closed #sideHandle { left: 0 }
   #stage { position: fixed; top: 0; left: var(--side); right: 0; bottom: 0; background: var(--bg) }
   body.side-closed #stage { left: 0 }
   body.help-open #stage { right: 320px }
+  body.drawer-open #stage { right: 340px }
   body.visuals #stage { display: none }
+  #settingsPage { position: absolute; inset: 0; overflow-y: auto; box-sizing: border-box; padding: 24px 32px 64px;
+    background: var(--bg); text-transform: lowercase; display: grid; grid-template-columns: 180px minmax(0, 560px); gap: 40px;
+    align-content: start; scroll-behavior: smooth }
+  #settingsPage[hidden] { display: none }
+  body.settings-view #lcPanel, body.settings-view #scPanel, body.settings-view #panelEmpty { display: none }
+  #settingsNav { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 2px }
+  #settingsNav a { padding: 6px 10px; border-radius: var(--radius); color: var(--dim) }
+  #settingsNav a:hover { color: var(--fg) }
+  #settingsNav a.here { background: var(--control); color: var(--fg) }
+  #settingsPage section { padding: 0 0 28px; margin: 0 0 28px; border-bottom: 1px solid var(--line) }
+  #settingsPage section:last-child { border-bottom: 0 }
+  #settingsPage h2 { margin: 0 0 4px; font-size: 15px; font-weight: 500 }
+  #settingsPage section > p { margin: 0 0 16px; font-size: 13px; color: var(--dim) }
+  #shortcuts { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 8px 16px }
+  #shortcuts dt { color: var(--dim) }
+  #shortcuts dd { margin: 0; justify-self: end }
+  #shortcuts kbd { display: inline-block; min-width: 20px; padding: 1px 6px; text-align: center; font: inherit; font-size: 12px;
+    background: var(--control); border-radius: var(--radius) }
+  @media (max-width: 760px) {
+    #settingsPage { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px }
+    #settingsNav { position: static; flex-direction: row; flex-wrap: wrap }
+  }
   #lcPanel, #scPanel { width: 100%; height: 100%; border: 0; display: block }
   #lcPanel[hidden], #scPanel[hidden] { display: none }
   #panelEmpty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     color: var(--dim); text-align: center; padding: 24px; background: var(--bg); text-transform: lowercase }
   #panelEmpty[hidden] { display: none }
+  .icon.transport { background: var(--control); color: var(--fg) }
+  .icon.transport:hover:not(:disabled) { background: var(--control-hi) }
   #record.recording { background: var(--rec); color: #F1EFE8 }
   #recInfo { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-variant-numeric: tabular-nums }
   #recInfo[hidden] { display: none }
   #recMeter { width: 60px; height: 6px; background: var(--control); border-radius: 3px; overflow: hidden }
   #recMeter span { display: block; height: 100%; width: 0; background: var(--rec) }
   #recError { color: var(--err); font-size: 12px }
+  .off-page { display: none !important }
+  #sidebar nav#subnav { display: flex; flex-direction: row; gap: 2px; margin: 0 0 14px }
+  #sidebar nav#subnav a { flex: 1; text-align: center }
+  #sidebar nav#subnav a.here { background: var(--control) }
+  #placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim) }
+  #placeholder[hidden] { display: none }
+  body.placeholder #lcPanel, body.placeholder #scPanel, body.placeholder #panelEmpty { display: none }
 </style>
 <script type="importmap">
 { "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
@@ -74,63 +117,87 @@
 <!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here: no strudel.cc needed.
      Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
      DAW ports; the CC moved last per number); a control not moved yet reads 0.
-     Two views share the page, so the sound keeps playing when switching: the MIDI panel (the track's LC view, drawn
-     into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on the canvas).
-     The sidebar (key S) holds the page links, the track, Play / Stop / Record / Save take, auto-perform and the visual
-     settings (generated from settings.mjs, kept in localStorage). Two homotopy controls among them:
+     Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
+     #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
+     show the track's LC view (drawn into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on
+     the canvas). The Settings view (the gear) lays over the current page.
+     The sidebar (key S) holds the page links, the settings gear, the track, Play-Pause / Stop / Record and auto-perform.
+     The gear opens the Settings view: Theme, then the settings generated from settings.mjs (kept in localStorage) in
+     sections, then the keyboard shortcuts. Two homotopy controls among the settings:
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
      Auto-perform (key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start reloads the
      track so the script begins from silence. On a SuperCollider track the steps go to SC instead (sc-auto.mjs), the
      script's bar 0 with the load, and the bar clock is SC's.
-     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); "Save take" posts
+     Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); the setting "Save take on record stop" posts
      it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
      Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs; a SuperCollider track is written by SC itself, recorder-sc.mjs): a human recording runs
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
      tail. Stop, a track change or a new auto-perform run ends a recording.
-     The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window. -->
+     The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window.
+     Stem tracks: a click on a column's name in the Live panel selects the column (selection.mjs) and opens the stem
+     drawer (stem-drawer.mjs): swap the column's stem, Revert, Save as (a new track file; stem-swap.mjs). -->
 <canvas id="view"></canvas>
 <aside id="sidebar">
   <div class="top">
     <nav>
-      <a href="#panel" data-view="panel">MIDI panel</a>
-      <a href="#visuals" data-view="visuals">Visualization</a>
+      <a href="#live" data-page="live">Live</a>
+      <a href="#labs" data-page="labs">Labs</a>
+      <a href="#visuals" data-page="visuals">Visuals</a>
     </nav>
-    <button id="sidebarToggle" class="icon" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
+    <button class="icon" data-view="settings" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
   </div>
+  <nav id="subnav" data-pages="labs"></nav>
   <section>
-    <h2>Track</h2>
-    <select id="track"></select>
+    <h2 id="trackHeading">Track</h2>
+    <select id="track" data-pages="live labs/samples labs/stems"></select>
     <div class="row">
-      <button id="play">Play</button>
-      <button id="stop">Stop</button>
-      <button id="record" title="Key R">Record</button>
+      <button id="play" class="icon transport" title="Play" aria-label="Play" data-pages="live labs/samples labs/stems"></button>
+      <button id="stop" class="icon transport" title="Stop" aria-label="Stop">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
+      </button>
+      <button id="record" class="icon transport" title="Record (key R)" aria-label="Record" data-pages="live">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg>
+      </button>
       <span id="recInfo" hidden><span id="recTime">0:00</span><span id="recMeter"><span></span></span></span>
     </div>
-    <output id="recFile"></output>
-    <span id="recError"></span>
-    <div class="row"><button id="saveTake">Save take</button></div>
-    <output id="takeState"></output>
+    <div data-pages="live">
+      <output id="recFile"></output>
+      <span id="recError"></span>
+      <output id="takeState"></output>
+    </div>
     <span id="status">loading Strudel …</span>
   </section>
-  <section id="autoPerform"></section>
-  <section>
-    <h2>Theme</h2>
-    <div id="theme"></div>
-  </section>
-  <section>
-    <details>
-      <summary>Visual settings</summary>
-      <div id="settings"></div>
-    </details>
-  </section>
+  <section id="sampleLab" data-pages="labs/samples" hidden></section>
+  <section id="stemLab" data-pages="labs/stems"></section>
+  <section id="autoPerform" data-pages="live"></section>
+  <section id="placeholderNote" data-pages="labs/sets"></section>
 </aside>
-<button id="sideOpen" class="icon" title="Show the sidebar (key S)" aria-label="Show the sidebar">☰</button>
+<button id="sideHandle" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
 <main id="stage">
-  <iframe id="lcPanel" title="MIDI panel"></iframe>
-  <iframe id="scPanel" title="MIDI panel (SuperCollider)" hidden></iframe>
+  <iframe id="lcPanel" title="Live"></iframe>
+  <iframe id="scPanel" title="Live (SuperCollider)" hidden></iframe>
   <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
+  <div id="placeholder" hidden></div>
+  <div id="settingsPage" hidden>
+    <nav id="settingsNav" aria-label="Settings sections"></nav>
+    <div id="settingsBody">
+      <section id="settings-theme">
+        <h2>Theme</h2>
+        <p>The look of this page and the MIDI panel: a style, dark, light or as the system (Auto).</p>
+        <div id="theme"></div>
+      </section>
+      <div id="settings"></div>
+      <section id="settings-shortcuts">
+        <h2>Keyboard shortcuts</h2>
+        <p>Work in every view, not while typing in a text field.</p>
+        <dl id="shortcuts"></dl>
+      </section>
+    </div>
+  </div>
 </main>
 <script type="module">
 import { createRenderer } from './render.mjs'
@@ -140,42 +207,25 @@ import { createSmoother } from './smoothing.mjs'
 import * as midi from './midi.mjs'
 import { createEngine } from './engine-strudel.mjs'
 import { createScEngine } from './engine-sc.mjs'
-import { mountSettings } from './settings.mjs'
+import { mountSettings, SETTINGS } from './settings.mjs'
 import { mountHelp } from './help.mjs'
+import { helpFor } from './page-help.mjs'
 import { mountTheme } from './theme.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createScAuto, createScTap } from './sc-auto.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createScRecorder } from './recorder-sc.mjs'
+import { createSelection, columnSelection } from './selection.mjs'
+import { mountStemDrawer } from './stem-drawer.mjs'
+import { mountKnobEditor } from './knob-editor.mjs'
+import { mountSampleLab } from './sample-lab-ui.mjs'
+import { mountStemLab } from './stem-lab-ui.mjs'
+import { toast } from './toast.mjs'
+import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
 const $ = id => document.getElementById(id)
-mountHelp([
-  { heading: 'What it does', text: 'Plays a live track or lab board right here. The MIDI panel shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Visualization draws every stem with its name '
-    + 'and the tempo from Strudel\'s clock. No strudel.cc needed.' },
-  { heading: 'Input', text: 'A track or board from the list (the file is read again on every load, so Play plays your '
-    + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
-  { heading: 'Output', text: 'Sound, the MIDI panel and visuals. Save take writes what the controllers did since the '
-    + 'last load to tools/trajectory/perform/<track>/takes/, uncommitted. Record writes the sound to recordings/<track>/.' },
-  { heading: 'How to use', text: ['Pick a track in the sidebar and press Play.', 'Play the controllers, or start '
-    + 'Auto-perform (P) to try the track without hardware.', 'MIDI panel and Visualization switch the view; the sound '
-    + 'keeps playing.', 'S hides the sidebar, F is fullscreen; Visual '
-    + 'settings hold the visual controls.', 'Theme (T switches Minimal / Retro): the look of this page and the MIDI '
-    + 'panel, dark, light or as the system (Auto).'] },
-  { heading: 'Takes', text: ['Every Play starts a new capture of all controller input (auto-perform included).',
-    'Save take writes it as a script; it shows up in the Auto-perform list as takes/<name>.',
-    'Start plays it back from a fresh load (the clock restarts at bar 0); what you play on top during a replay is '
-    + 'captured too.',
-    'Save take after a replay names its original and shows the replay check; node trajectory/check-replay.mjs '
-    + 'lists every differing bar.',
-    'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
-    'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
-    + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
-  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
-    'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
-    'Stop or another track ends a recording. Recordings stay out of git.'] }
-], { title: 'About this page', button: '?', startOpen: false, parent: document.querySelector('#sidebar .top') })
+const help = mountHelp(helpFor(pageKey(parseHash(location.hash))), { title: 'About this page', button: '?', startOpen: false, parent: document.querySelector('#sidebar .top') })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
@@ -214,32 +264,96 @@ const recorder = createRecorder({ engine, midi: {
 } })
 strudelEngine.ready.then(() => { label = 'ready' })
 let catalogue = []
-const showScripts = () => autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
-fetch('catalogue').then(r => r.json()).then(entries => {
-  catalogue = entries
-  const group = (label, kind) => {
-    const optgroup = document.createElement('optgroup')
-    optgroup.label = label
-    optgroup.append(...entries.filter(entry => entry.kind === kind).map(({ id, label: text, taps, noTapReason }) => {
-      const option = new Option(taps ? text : `${text} (no tap)`, id)
-      option.disabled = !taps
-      option.title = noTapReason ?? ''
-      return option
-    }))
-    return optgroup
-  }
-  $('track').replaceChildren(group('Live', 'live'), group('Lab', 'lab'))
-  $('track').value = ['010-ambient-house', ...entries.map(entry => entry.id)].find(id => entries.some(entry => entry.id === id && entry.taps))
+const showScripts = () => {
+  autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
+  sampleLab.show(entryOf($('track').value))
+  stemLab.show(entryOf($('track').value))
+}
+let page = parseHash(location.hash)
+const picks = {}
+const fillTrack = selectId => {
+  const picked = $('track').value
+  if (picked) picks[pageKey(page)] = picked
+  const entries = entriesFor(page, catalogue)
+  $('track').replaceChildren(...entries.map(({ id, label: text, taps, noTapReason }) => {
+    const option = new Option(taps ? text : `${text} (no tap)`, id)
+    option.disabled = !taps
+    option.title = noTapReason ?? ''
+    return option
+  }))
+  $('track').value = [selectId, picks[pageKey(page)], '010-ambient-house', ...entries.map(entry => entry.id)]
+    .find(id => entries.some(entry => entry.id === id && entry.taps)) ?? ''
   showScripts()
+}
+const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
+  catalogue = entries
+  fillTrack(selectId)
+})
+loadCatalogue()
+const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entryOf($('track').value),
+  play: () => play(), refresh: loadCatalogue })
+const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($('track').value),
+  play: () => play(), refresh: loadCatalogue })
+
+// stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
+const selection = createSelection()
+mountStemDrawer({ selection, onSaved: () => loadCatalogue() })
+const knobEditor = mountKnobEditor({ onOpen: () => selection.clear() })
+selection.on('column', item => { if (item) knobEditor.close() })
+let playingId = null
+const isLab = id => entryOf(id)?.lab === 'stems'
+const sendPick = () => $('scPanel').contentWindow?.postMessage({ pickColumns:
+  (page.id === 'live' && !!entryOf(playingId)?.stems) || (page.id === 'labs' && page.sub === 'stems' && isLab(playingId)) },
+location.origin)
+const sendShape = () => $('scPanel').contentWindow?.postMessage({ shapeOn: showsShape(page) }, location.origin)
+const setPlaying = id => {
+  playingId = id
+  selection.clear()
+  sendPick()
+}
+const selectLabColumn = async (slot, adding) => {
+  const { columns } = await fetch('lab/stems/columns', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: playingId }) }).then(r => r.json())
+  const stem = adding ? 'none' : columns?.[slot]
+  if (stem) selection.select({ kind: 'column', track: playingId, slot, stem, lab: true, ...adding && { adding: true } })
+}
+addEventListener('message', async event => {
+  if (event.source !== $('scPanel').contentWindow) return
+  const knob = event.data?.labKnob
+  if (knob && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') return knobEditor.open({ track: playingId, ...knob })
+  if (event.data?.labNotice) return void toast(event.data.labNotice, { kind: 'error' })
+  const discard = event.data?.labDiscard
+  if (discard && isLab(playingId)) {
+    const answer = await toast('This stem has changes that are not exported yet. Remove it and lose them?',
+      { kind: 'ask', actions: ['Remove and lose changes'] })
+    if (!answer) return
+    const response = await fetch('lab/stems/remove', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: playingId, slot: discard.slot, discard: true }) })
+    if (!response.ok) toast((await response.json().catch(() => ({}))).error ?? 'Remove failed', { kind: 'error' })
+    return
+  }
+  const pick = event.data?.labPick
+  if (pick && isLab(playingId) && page.id === 'labs' && page.sub === 'stems') {
+    return selectLabColumn(pick.slot, pick.action === 'add')
+  }
+  const slot = event.data?.select?.slot
+  if (!slot) return
+  if (isLab(playingId)) return selectLabColumn(slot, false)
+  if (!entryOf(playingId)?.stems) return
+  const state = await fetch('swap?track=' + encodeURIComponent(playingId), { cache: 'no-store' }).then(r => r.json())
+  const stem = state.slots?.[slot]?.stem
+  if (stem) selection.select(columnSelection({ track: playingId, slot, stem }))
 })
 $('track').onchange = () => {
   showScripts()
   stopRecording()
+  if (transport === 'paused') stopTransport()
 }
 
 const TAIL_SECONDS = 4
 let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecording = false, tailTimer = null
 let performing = null
+let transport = 'stopped'
 const queueRecord = task => (recordQueue = recordQueue.then(task))
 const onAudioError = error => {
   recordError = error.message
@@ -274,6 +388,7 @@ const stopRecording = (endedBy = 'stop') => {
     try {
       await audio.stop(endedBy)
       lastFile = file
+      if (settings.get('saveTake')) await saveTake()
     } catch (error) {
       recordError = error.message
     }
@@ -307,6 +422,7 @@ const playSc = async (track, script) => {
   try {
     if (!script) scAuto.clear()
     await scEngine.load(track, scAuto.loadInit())
+    setPlaying(track)
     recorder.start({ track, trackHash: null, cps: engine.cps(), ...script && { script } })
     scAuto.live()
     label = 'playing: ' + track + ' (SuperCollider)'
@@ -316,6 +432,7 @@ const playSc = async (track, script) => {
     attachPanel()
     return false
   }
+  transport = 'playing'
   attachPanel()
   return true
 }
@@ -324,6 +441,7 @@ const play = async script => {
   const track = $('track').value
   if (entryOf(track)?.engine === 'sc') return playSc(track, script)
   scEngine.stop()
+  setPlaying(null)
   current = strudelEngine
   await Promise.all([engine.ready, midi.ready])
   label = 'loading track …'
@@ -334,7 +452,7 @@ const play = async script => {
     const trackHash = response.headers.get('X-Track-Hash')
     recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
     hasLcView = code.includes('globalThis.lcxlView')
-    $('panelEmpty').textContent = 'This track has no MIDI panel: open Visualization.'
+    $('panelEmpty').textContent = 'This track has no Live panel: open Visuals.'
     attachPanel()
     label = 'playing: ' + track
   } catch (error) {
@@ -343,10 +461,30 @@ const play = async script => {
     label = 'Error: ' + error.message
     return false
   }
+  transport = 'playing'
   return true
 }
-$('play').onclick = () => play()
-$('stop').onclick = () => { stopPerformer(); engine.stop(); stopRecording(); label = 'stopped' }
+const stopTransport = () => {
+  stopPerformer()
+  engine.stop()
+  setPlaying(null)
+  stopRecording()
+  transport = 'stopped'
+  label = 'stopped'
+}
+const togglePlay = () => {
+  if (transport === 'playing' && !onSc()) {
+    strudelEngine.pause()
+    transport = 'paused'
+    label = 'paused'
+  } else if (transport === 'paused') {
+    strudelEngine.resume()
+    transport = 'playing'
+    label = 'playing: ' + $('track').value
+  } else if (transport === 'stopped') play()
+}
+$('play').onclick = togglePlay
+$('stop').onclick = stopTransport
 
 const startScript = async id => {
   const track = $('track').value
@@ -397,15 +535,32 @@ const saveTake = async () => {
     + (result.problems.length ? ` · check: ${result.problems.join('; ')}` : '')
     + (result.replay ? ` · replay: ${result.replay}` : '')
 }
-$('saveTake').onclick = saveTake
 
 const clock = seconds => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
 const meterWidth = peak => Math.max(0, Math.min(1, 1 + Math.log10(Math.max(peak, 1e-6)) / 3)) * 100
 const setText = (element, text) => { if (element.textContent !== text) element.textContent = text }
+const ICONS = {
+  play: '<path d="M8 5v14l11-7z"/>',
+  pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+}
+const showTransport = () => {
+  const state = transport === 'playing' ? 'pause' : 'play'
+  const button = $('play')
+  if (button.dataset.transport !== transport) {
+    button.dataset.transport = transport
+    const text = state === 'pause' ? 'Pause' : transport === 'paused' ? 'Resume' : 'Play'
+    button.title = text
+    button.setAttribute('aria-label', text)
+    button.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">${ICONS[state]}</svg>`
+  }
+  button.disabled = state === 'pause' && onSc()
+  $('record').disabled = onSc()
+}
 const showRecording = () => {
   const on = audio.recording
   $('record').classList.toggle('recording', on)
-  setText($('record'), on ? 'Stop rec' : 'Record')
+  $('record').title = on ? 'Stop recording (key R)' : 'Record (key R)'
+  $('record').setAttribute('aria-label', on ? 'Stop recording' : 'Record')
   $('recInfo').hidden = !on
   setText($('recError'), recordError && 'Rec error: ' + recordError)
   if (on) {
@@ -419,7 +574,7 @@ const showRecording = () => {
 
 const panelWindow = $('lcPanel').contentWindow
 panelWindow.addEventListener('keydown', event => dispatchEvent(new KeyboardEvent('keydown', { key: event.key })))
-let hasLcView = false, currentView = 'panel'
+let hasLcView = false, currentView = 'panel'   // 'panel' on Live and Labs, 'visuals' on Visualization
 const detachPanel = () => {
   const view = globalThis.lcxlView
   if (view?.win === panelWindow) view.win = null
@@ -442,21 +597,87 @@ const attachPanel = () => {
   view.win = panelWindow
   view.draw()
 }
-const showView = name => {
-  currentView = name
-  document.body.classList.toggle('visuals', name === 'visuals')
-  renderer.setPaused(name !== 'visuals')
-  for (const link of document.querySelectorAll('[data-view]')) link.classList.toggle('here', link.dataset.view === name)
+let settingsOpen = false
+const showSettings = open => {
+  settingsOpen = open
+  document.body.classList.toggle('visuals', currentView === 'visuals' && !open)
+  document.body.classList.toggle('settings-view', open)
+  $('settingsPage').hidden = !open
+  renderer.setPaused(open || currentView !== 'visuals')
+  document.querySelector('[data-view=settings]').classList.toggle('here', open)
+}
+const showPage = next => {
+  page = next
+  help.setSections(helpFor(pageKey(page)))
+  currentView = page.id === 'visuals' ? 'visuals' : 'panel'
+  showSettings(false)
+  for (const element of document.querySelectorAll('[data-pages]')) element.classList.toggle('off-page', !shownOn(element.dataset.pages, page))
+  for (const link of document.querySelectorAll('[data-page]')) link.classList.toggle('here', link.dataset.page === page.id)
+  for (const link of $('subnav').children) link.classList.toggle('here', link.dataset.sub === page.sub)
+  const placeholder = placeholderFor(page)
+  document.body.classList.toggle('placeholder', !!placeholder)
+  $('placeholder').hidden = !placeholder
+  $('placeholder').textContent = placeholder ?? ''
+  $('placeholderNote').textContent = placeholder ?? ''
+  $('trackHeading').textContent = page.id === 'labs' ? 'Project' : 'Track'
+  if (location.hash !== hashFor(page)) history.replaceState(null, '', hashFor(page))
+  fillTrack()
+  selection.clear()
+  sendPick()
+  sendShape()
   attachPanel()
   wake()
 }
-for (const link of document.querySelectorAll('[data-view]')) link.onclick = event => {
-  event.preventDefault()
-  showView(link.dataset.view)
+document.querySelector('[data-view=settings]').onclick = () => {
+  showSettings(!settingsOpen)
+  attachPanel()
+  wake()
+  attachPanel()
+  wake()
 }
-const toggleSidebar = () => document.body.classList.toggle('side-closed')
-$('sidebarToggle').onclick = toggleSidebar
-$('sideOpen').onclick = toggleSidebar
+$('subnav').replaceChildren(...PAGES.find(entry => entry.id === 'labs').subs.map(sub => {
+  const link = Object.assign(document.createElement('a'), { href: '#labs/' + sub.id, textContent: sub.label })
+  link.dataset.sub = sub.id
+  return link
+}))
+for (const link of [...document.querySelectorAll('[data-page]'), ...$('subnav').children]) link.onclick = event => {
+  event.preventDefault()
+  showPage(parseHash(link.getAttribute('href')))
+}
+addEventListener('hashchange', () => showPage(parseHash(location.hash)))
+const FIXED_SHORTCUTS = [['Hide or show the sidebar', 'S'], ['Fullscreen', 'F'], ['Switch theme style', 'T'],
+  ['Start or stop auto-perform', 'P'], ['Record', 'R'], ['About this page', '?']]
+const shortcuts = [...FIXED_SHORTCUTS, ...SETTINGS.filter(setting => setting.key).map(setting => [setting.label, setting.key.toUpperCase()])]
+$('shortcuts').replaceChildren(...shortcuts.flatMap(([name, key]) => [
+  Object.assign(document.createElement('dt'), { textContent: name }),
+  Object.assign(document.createElement('dd'), { innerHTML: `<kbd>${key}</kbd>` }),
+]))
+const settingsSections = [...$('settingsBody').querySelectorAll('section')]
+$('settingsNav').replaceChildren(...settingsSections.map(section => {
+  const link = Object.assign(document.createElement('a'), { href: '#' + section.id,
+    textContent: section.querySelector('h2').textContent })
+  link.onclick = event => {
+    event.preventDefault()
+    section.scrollIntoView({ block: 'start' })
+  }
+  return link
+}))
+const markSettingsSection = () => {
+  const page = $('settingsPage'), line = page.scrollTop + 40
+  const atEnd = page.scrollTop + page.clientHeight >= page.scrollHeight - 2
+  const here = atEnd ? settingsSections.at(-1) : settingsSections.findLast(section => section.offsetTop <= line) ?? settingsSections[0]
+  for (const link of $('settingsNav').children) link.classList.toggle('here', link.hash === '#' + here.id)
+}
+$('settingsPage').addEventListener('scroll', markSettingsSection)
+new ResizeObserver(markSettingsSection).observe($('settingsPage'))
+const toggleSidebar = () => {
+  const closed = document.body.classList.toggle('side-closed')
+  const handle = $('sideHandle')
+  handle.textContent = closed ? '›' : '‹'
+  handle.title = closed ? 'Show the sidebar (key S)' : 'Hide the sidebar (key S)'
+  handle.setAttribute('aria-label', closed ? 'Show the sidebar' : 'Hide the sidebar')
+}
+$('sideHandle').onclick = toggleSidebar
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement
@@ -476,7 +697,7 @@ const applyLcFrame = () => {
 // the SuperCollider panel follows the LC frame setting too (sent on change and whenever the panel (re)loads)
 let sentLcFrame = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
-$('scPanel').addEventListener('load', sendLcFrame)
+$('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick(); sendShape() })
 // a click on the panel's set view label cycles the view there: keep the setting in step
 addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
@@ -487,6 +708,7 @@ const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
   if (settings.get('lcFrame') !== sentLcFrame) sendLcFrame()
+  showTransport()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
   $('status').textContent = [label, midiText, autoLabel, onSc() ? scVisuals : visuals].filter(Boolean).join(' · ')
@@ -513,7 +735,7 @@ const wake = () => {
   idleTimer = setTimeout(() => document.body.classList.toggle('idle', currentView === 'visuals'), 3000)
 }
 addEventListener('mousemove', wake)
-showView('panel')
+showPage(page)
 </script>
 </body>
 </html>

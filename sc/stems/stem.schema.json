@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stem.schema.json",
+  "title": "Stem (format 1 or 2)",
+  "description": "One fully set-up LC XL 3 column: sample, patterns, three knobs, fader, two buttons. Format 2 adds kits, layers, amounts, envelopes, lengths and held chords. See docs/features/stems.md.",
+  "type": "object",
+  "required": ["format", "name", "parent", "about", "meta", "sample", "pitch", "patterns", "controls"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"enum": [1, 2]},
+    "name": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+    "parent": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9]+/[a-z0-9-]+\\.stem$"},
+    "about": {"type": "string", "minLength": 1, "maxLength": 60},
+    "meta": {
+      "type": "object",
+      "required": ["role", "genres", "energy", "tags", "harmony"],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": ["kick", "perc", "hats", "clap", "sub", "bass", "keys", "chords", "pad", "lead", "texture", "fx"]
+        },
+        "genres": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["ambient", "ambient-house", "house", "techno", "groove-techno", "edm", "classical", "rock"]
+          }
+        },
+        "energy": {"type": "integer", "minimum": 1, "maximum": 5},
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"}
+        },
+        "harmony": {"enum": ["static", "chords", "scale", "none"]}
+      }
+    },
+    "sample": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]*$"},
+        "preset": {"type": "object", "additionalProperties": {"type": "number"}},
+        "extra": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]*$"}
+        },
+        "kit": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"type": "string", "pattern": "^[A-Za-z0-9]+$"},
+          "additionalProperties": {"type": "string", "pattern": "^[A-Za-z0-9_./:-]+\\.(wav|flac|mp3|ogg)$"}
+        }
+      }
+    },
+    "gain": {"type": "number", "exclusiveMinimum": 0, "maximum": 4},
+    "pitch": {"enum": ["none", "midi", "root", "chord", "scale"]},
+    "register": {"type": "integer", "minimum": 0, "maximum": 127},
+    "push": {"type": "boolean"},
+    "orbit": {"type": "integer", "minimum": 1, "maximum": 4},
+    "echo": {
+      "type": "object",
+      "required": ["beats", "feedback"],
+      "additionalProperties": false,
+      "properties": {
+        "beats": {"type": "number", "exclusiveMinimum": 0, "maximum": 4},
+        "feedback": {"type": "number", "minimum": 0, "maximum": 0.95}
+      }
+    },
+    "code": {"$ref": "#/$defs/codeFile"},
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fog": {"type": "boolean"},
+        "thin": {"type": "boolean"},
+        "tension": {"type": "boolean"},
+        "swing": {"type": "boolean"},
+        "break": {"enum": ["out", "stay"]},
+        "tensionFilter": {"type": "boolean"}
+      }
+    },
+    "patterns": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/pattern"}},
+    "layers": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/layer"}},
+    "controls": {
+      "type": "object",
+      "required": ["k1", "k2", "k3", "fader", "b1", "b2"],
+      "additionalProperties": false,
+      "properties": {
+        "k1": {"$ref": "#/$defs/knob"},
+        "k2": {"$ref": "#/$defs/knob"},
+        "k3": {"$ref": "#/$defs/knob"},
+        "fader": {"$ref": "#/$defs/fader"},
+        "b1": {"$ref": "#/$defs/button1"},
+        "b2": {"$ref": "#/$defs/button2"}
+      }
+    }
+  },
+  "$defs": {
+    "codeFile": {"type": "string", "pattern": "^[A-Za-z0-9-]+\\.scd$"},
+    "label": {"type": "string", "minLength": 1, "maxLength": 20},
+    "about": {"type": "string", "minLength": 1, "maxLength": 60},
+    "mini": {"type": "string", "minLength": 1},
+    "range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+    "pattern": {
+      "type": "object",
+      "required": ["label"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"type": "string", "minLength": 1, "maxLength": 20},
+        "rhythm": {"$ref": "#/$defs/mini"},
+        "notes": {"$ref": "#/$defs/mini"},
+        "velocity": {"$ref": "#/$defs/value"},
+        "length": {"$ref": "#/$defs/mini"},
+        "params": {"$ref": "#/$defs/params"},
+        "env": {"$ref": "#/$defs/env"},
+        "voices": {"type": "array", "minItems": 1, "items": {"type": "number"}},
+        "strike": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"bars": {"type": "integer", "minimum": 1, "maximum": 16}}
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["param"],
+      "additionalProperties": false,
+      "properties": {
+        "param": {"type": "string", "pattern": "^[a-z][A-Za-z0-9]*$"},
+        "range": {"$ref": "#/$defs/range"},
+        "curve": {"enum": ["lin", "exp"]},
+        "points": {"$ref": "#/$defs/points"}
+      }
+    },
+    "knob": {
+      "type": "object",
+      "required": ["label", "about"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"$ref": "#/$defs/label"},
+        "about": {"$ref": "#/$defs/about"},
+        "param": {"type": "string", "pattern": "^[a-z][A-Za-z0-9]*$"},
+        "range": {"$ref": "#/$defs/range"},
+        "curve": {"enum": ["lin", "exp"]},
+        "targets": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/target"}},
+        "code": {"$ref": "#/$defs/codeFile"},
+        "points": {"$ref": "#/$defs/points"},
+        "default": {"type": "number", "minimum": 0, "maximum": 1},
+        "override": {"type": "boolean"}
+      }
+    },
+    "fader": {
+      "type": "object",
+      "required": ["label", "about"],
+      "additionalProperties": false,
+      "properties": {"label": {"const": "Level"}, "about": {"$ref": "#/$defs/about"}}
+    },
+    "button1": {
+      "type": "object",
+      "required": ["label", "about"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"enum": ["Pattern", "Chords"]},
+        "about": {"$ref": "#/$defs/about"},
+        "code": {"$ref": "#/$defs/codeFile"}
+      }
+    },
+    "button2": {
+      "type": "object",
+      "required": ["label", "about", "mode"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"$ref": "#/$defs/label"},
+        "about": {"$ref": "#/$defs/about"},
+        "addon": {"type": "string", "pattern": "^[a-z][A-Za-z0-9]*$"},
+        "args": {"type": "object"},
+        "code": {"$ref": "#/$defs/codeFile"},
+        "mode": {"enum": ["hold", "toggle", "step"]}
+      }
+    },
+    "wave": {
+      "type": "object",
+      "required": ["wave", "range"],
+      "additionalProperties": false,
+      "properties": {
+        "wave": {"enum": ["sine", "perlin", "rand"]},
+        "range": {"$ref": "#/$defs/range"},
+        "bars": {"type": "number", "exclusiveMinimum": 0},
+        "at": {"enum": ["hit", "bar"]}
+      }
+    },
+    "value": {
+      "type": ["number", "string", "object"],
+      "minLength": 1,
+      "required": ["wave", "range"],
+      "additionalProperties": false,
+      "properties": {
+        "wave": {"enum": ["sine", "perlin", "rand"]},
+        "range": {"$ref": "#/$defs/range"},
+        "bars": {"type": "number", "exclusiveMinimum": 0},
+        "at": {"enum": ["hit", "bar"]}
+      }
+    },
+    "params": {
+      "type": "object",
+      "propertyNames": {"type": "string", "pattern": "^[a-z][A-Za-z0-9]*$"},
+      "additionalProperties": {"$ref": "#/$defs/value"}
+    },
+    "env": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "a": {"type": "number", "minimum": 0},
+        "d": {"type": "number", "minimum": 0},
+        "s": {"type": "number", "minimum": 0},
+        "r": {"type": "number", "minimum": 0}
+      }
+    },
+    "points": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+    },
+    "amount": {
+      "type": "object",
+      "required": ["source"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {"enum": ["k1", "k2", "k3", "b2", "tension"]},
+        "points": {"$ref": "#/$defs/points"},
+        "curve": {"enum": ["lin", "power"]},
+        "param": {"type": "string", "pattern": "^[a-z][A-Za-z0-9]*$"},
+        "zero": {"enum": ["skip", "play"]}
+      }
+    },
+    "layerPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rhythm": {"$ref": "#/$defs/mini"},
+        "notes": {"$ref": "#/$defs/mini"},
+        "velocity": {"$ref": "#/$defs/value"},
+        "length": {"$ref": "#/$defs/mini"},
+        "params": {"$ref": "#/$defs/params"},
+        "env": {"$ref": "#/$defs/env"},
+        "voices": {"type": "array", "minItems": 1, "items": {"type": "number"}},
+        "strike": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"bars": {"type": "integer", "minimum": 1, "maximum": 16}}
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"$ref": "#/$defs/label"},
+        "sound": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]*$"},
+        "rhythm": {"$ref": "#/$defs/mini"},
+        "notes": {"$ref": "#/$defs/mini"},
+        "velocity": {"$ref": "#/$defs/value"},
+        "length": {"$ref": "#/$defs/mini"},
+        "params": {"$ref": "#/$defs/params"},
+        "env": {"$ref": "#/$defs/env"},
+        "voices": {"type": "array", "minItems": 1, "items": {"type": "number"}},
+        "strike": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"bars": {"type": "integer", "minimum": 1, "maximum": 16}}
+        },
+        "patterns": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/layerPattern"}},
+        "transpose": {"type": "number", "minimum": -48, "maximum": 48},
+        "swing": {"type": "number", "minimum": 0, "maximum": 1},
+        "amount": {"$ref": "#/$defs/amount"},
+        "chance": {
+          "type": ["number", "object"],
+          "minimum": 0,
+          "maximum": 1,
+          "required": ["source"],
+          "additionalProperties": false,
+          "properties": {
+            "source": {"enum": ["k1", "k2", "k3", "b2", "tension"]},
+            "points": {"$ref": "#/$defs/points"},
+            "curve": {"enum": ["lin", "power"]},
+            "param": {"type": "string", "pattern": "^[a-z][A-Za-z0-9]*$"},
+            "zero": {"enum": ["skip", "play"]}
+          }
+        }
+      }
+    }
+  }
+}

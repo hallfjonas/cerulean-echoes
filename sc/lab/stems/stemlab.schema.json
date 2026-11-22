@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stemlab.schema.json",
+  "title": "Stem Designer project (format 1)",
+  "description": "Stem versions side by side on the 14 LC slots, played against a context track. See docs/features/sound-lab.md.",
+  "type": "object",
+  "required": ["format", "name", "about", "columns"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": 1 },
+    "name": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "parent": { "type": ["string", "null"] },
+    "about": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "context": {
+      "type": "object",
+      "required": ["track"],
+      "additionalProperties": false,
+      "properties": {
+        "track": { "type": "string", "pattern": "^[0-9]{3}-[a-z0-9]+(-[a-z0-9]+)*$" },
+        "chapter": { "type": "integer", "minimum": 0 },
+        "backing": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[12]:[1-7]$" }
+        }
+      }
+    },
+    "select": { "type": "string", "pattern": "^[12]:[1-7]$" },
+    "columns": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[12]:[1-7]$" },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^([A-Za-z0-9]+/[a-z0-9-]+\\.stem|draft:[a-z][a-z0-9]*(-[a-z0-9]+)*)$"
+      }
+    },
+    "drafts": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
+      "additionalProperties": { "type": "object" }
+    }
+  }
+}
