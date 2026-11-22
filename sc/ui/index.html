@@ -132,6 +132,10 @@ body.no-lk .lkbox{visibility:hidden}
 /* the set view's canvas fills its box (same size for every view, so nothing moves when the view switches) */
 .setbox canvas{flex:1;height:auto;min-height:0}
 .setlab{font:inherit;background:none;border:0;padding:0;color:inherit;cursor:pointer;white-space:nowrap}
+.setdots{flex:none;display:flex;justify-content:space-between;padding-top:calc(4 * var(--px))}
+.setdot{box-sizing:border-box;width:max(14px, calc(20 * var(--px)));height:max(14px, calc(20 * var(--px)));padding:max(4px, calc(6 * var(--px)));
+  border:0;border-radius:50%;background:var(--track);background-clip:content-box;cursor:pointer}
+.setdot.on{background:var(--hit);background-clip:content-box}
 /* the status in the top line, right of mode 1's label: a warning, or the 8 bar marks, 4 beat dots and the chord */
 .lab .head{margin-left:auto;display:flex;align-items:center;white-space:nowrap;color:var(--text)}
 .warn{color:var(--accent);font-weight:600}
@@ -347,7 +351,7 @@ const build = () => {
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
     '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Settings, key C)"></button></p>' +
-    '<div class="spec setbox"><canvas id=setv></canvas></div></div></div></section></div>'
+    '<div class="spec setbox"><canvas id=setv></canvas><div class=setdots id=setdots></div></div></div></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
   for (const el of root.querySelectorAll('[data-col]')) el.addEventListener('click', () => {
@@ -571,15 +575,36 @@ const SET_LABELS = { ring: 'energy', ring10: 'energy · 10 s', minute: 'last min
 let setView = readSetView()
 S.setHist = []; S.setFast = []
 const applySetView = v => { if (SET_VIEWS.includes(v) && v !== setView) { setView = v; setDraw() } }
-const cycleSetView = () => {
-  const v = SET_VIEWS[(SET_VIEWS.indexOf(setView) + 1) % SET_VIEWS.length]
+const chooseSetView = v => {
   try { localStorage.setItem(SET_KEY, v) } catch (e) {}
   applySetView(v)
   if (parent !== window) parent.postMessage({ setView: v }, location.origin)   // the player keeps its setting in step
 }
+const cycleSetView = () => chooseSetView(SET_VIEWS[(SET_VIEWS.indexOf(setView) + 1) % SET_VIEWS.length])
+const setDots = () => {
+  const box = document.getElementById('setdots')
+  if (!box) return
+  if (box.children.length !== SET_VIEWS.length) {
+    box.replaceChildren(...SET_VIEWS.map(v => {
+      const dot = Object.assign(document.createElement('button'), { className: 'setdot', title: SET_LABELS[v] })
+      dot.dataset.view = v
+      dot.setAttribute('aria-label', 'set view: ' + SET_LABELS[v])
+      return dot
+    }))
+  }
+  for (const dot of box.children) {
+    const on = dot.dataset.view === setView
+    dot.classList.toggle('on', on)
+    dot.setAttribute('aria-pressed', on)
+  }
+}
 addEventListener('message', e => { if (e.origin === location.origin && SET_VIEWS.includes(e.data?.setView)) applySetView(e.data.setView) })
 addEventListener('storage', e => { if (e.key === SET_KEY) applySetView(readSetView()) })
-document.addEventListener('click', e => { if (e.target.closest?.('#setlab')) cycleSetView() })
+document.addEventListener('click', e => {
+  if (e.target.closest?.('#setlab')) return cycleSetView()
+  const dot = e.target.closest?.('.setdot')
+  if (dot) chooseSetView(dot.dataset.view)
+})
 addEventListener('resize', () => setDraw())
 
 // one scale for every view (user, 2026-11-21): bottom / top = the 5 % / 95 % values of the set's loudness so far (1 s
@@ -629,6 +654,7 @@ const setColors = () => retro() && !light()
 const setDraw = () => {
   const cv = document.getElementById('setv'), lab = document.getElementById('setlab')
   if (lab) setText(lab, SET_LABELS[setView])
+  setDots()
   if (!cv || !cv.isConnected) return
   const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect(), w = r.width, h = r.height
   if (!w || !h) return
