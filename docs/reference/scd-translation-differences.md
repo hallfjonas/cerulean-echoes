@@ -28,6 +28,7 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 | 008-groove-techno | every-button (67 bars), warehouse (192 bars), techno-night (bars 0-312, 59,000 events), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the JX lane of the strings (random phases; its analogue lane alone nulls) |
 | 010-ambient-house | every-button (to bar 67), journey (130 bars), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the keys column (noise-level residual, as between two renders of the old track) |
 | 016-grroove-opus | stem-check only (162 bars; 016 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB (the quiet JX strings leave noise-level residual) |
+| 007-ambient | every-button (to bar 66), drift (153 bars, 8,600 events), stem-check (162 bars, 31,800 events) | 100 % | none | 11 stems and the Launchkey −∞ dB; wood, Eno / Shimmer and voice at noise level (random phases, crackle) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
 every stem of all three tracks.
@@ -85,3 +86,16 @@ Compared with `--cc '{"12":1}'` (Master at 1). Column code of the 14 stems (`amb
 | Control texts, names | Shortened to 60 characters (noise Motion, clap Level, arp Complexity, marimba Complexity); `@col` names from the role (Kick, Texture, Pad, Chords, Lead ...) | Stem format |
 | Chapter and Freeze | Unchanged: Chapter picks the next progression at the next 4-bar phrase; the pad's button 2 holds the chord of the moment for every column | The frame owns the root (`rootAt`) |
 | Keys audio | Two renders of the old track already differ at noise level (-43.7 dB against the stem); the new track the same (-41.6 to -45.2 dB); events are equal | FM voice noise |
+
+## 007-ambient
+Compared with `--cc '{"12":1}'` (Master at 1). Column code of the 14 stems (`mood-*.scd`, note helpers `~ce.moodOf`, `~ce.moodFx`, `~ce.figureKit` in `sc/lib/stemkit.scd`); the three moods are the frame's chapters (one bar); the strips' Tension input is the Room knob (frame `global`, no Thin); Tension's tone map and wobble are frame maps.
+
+| What | Difference | Why |
+|---|---|---|
+| Eno and Shimmer | One stem on slot 2:2 (button 2 = Layer: Eno, Shimmer, both); each layer is a lane with its own room, echo and trim (new lane key `trim`). The old track had two strips for one column | A column holds one stem |
+| Unused controls | Drone button 2 is `Spare` and the voice's button 1 has a single pattern; both did nothing before | The stem format wants every button |
+| Pattern labels | `Chord 1` ... `Chord 3` for the drone (the old names followed the mood: `D–A`, `D–A–E` ...), `Waves 1` ..., `Line 1` ..., `Drops 1` ... instead of numbers | A stem's patterns have fixed labels |
+| Master at 0 | A column makes no notes while Master is 0; the old track made the (inaudible) notes anyway. The stem-check keeps Master up | As in 008 and 010 |
+| Layer status | The status line no longer shows `Eno / Shimmer` when button 2 is pressed | The column's step button has no status text |
+| Column names, headings, control texts | `@col` names from the role (Kick, Texture, Pad ...); texts shortened to 60 characters (Sea ↔ Wind, Groove, Complexity ...) | Stem format |
+| Audio | Wood (FM) leaves a residue 41 dB below the signal, Eno / Shimmer 29 dB, the voice (random crackle) 9 dB; every other stem and the Launchkey null; events are equal | Random FM phases and crackle |

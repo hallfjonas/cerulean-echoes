@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-run-2",
+  "parent": null,
+  "about": "Random glockenspiel notes and scale runs.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "glockenspiel",
+      "vcsl",
+      "random"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-glitter.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "High"
+    },
+    {
+      "label": "Very high"
+    },
+    {
+      "label": "Middle"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "a drop now and then ↔ a sparkling rain."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "random glockenspiel notes."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "high → very high → middle register."
+    },
+    "b2": {
+      "label": "Run",
+      "about": "scale runs, denser while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.4
+}

@@ -1,0 +1,71 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-punch-pattern-drop-out-4",
+  "parent": null,
+  "about": "A soft heartbeat kick on D.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "heartbeat",
+      "soft"
+    ],
+    "harmony": "static"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSbd"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "mood-pulse.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false,
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "Heartbeat"
+    },
+    {
+      "label": "Quarters"
+    },
+    {
+      "label": "Halves"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Punch",
+      "about": "three steps: soft thump → synth kick → firm kick."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "a heartbeat thump on D."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "heartbeat → quarters → half notes."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "pulse pauses while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.95
+}

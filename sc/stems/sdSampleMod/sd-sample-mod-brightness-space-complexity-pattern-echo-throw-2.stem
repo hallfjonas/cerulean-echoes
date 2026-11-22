@@ -1,0 +1,74 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-echo-throw-2",
+  "parent": null,
+  "about": "Takada-style marimba figures laid over each other.",
+  "meta": {
+    "role": "keys",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 3,
+    "tags": [
+      "marimba",
+      "xylophone",
+      "canon"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-marimba.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Cycles"
+    },
+    {
+      "label": "Canon"
+    },
+    {
+      "label": "Cells"
+    },
+    {
+      "label": "Euclid"
+    },
+    {
+      "label": "Build-up"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "one figure ↔ all layers."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "marimba figures laid over each other."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "cycles → canon → cells → Euclid → build-up."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long dotted-8th echo while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1
+}

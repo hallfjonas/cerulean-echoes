@@ -1,0 +1,71 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-roll-2",
+  "parent": null,
+  "about": "A soft rim click on 2 and 4.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 1,
+    "tags": [
+      "rim",
+      "click"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdNoise"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-rim.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false,
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "Backbeat"
+    },
+    {
+      "label": "Late ghost"
+    },
+    {
+      "label": "Offset click"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "plain ↔ extra quiet clicks in between."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "soft rim click on 2 and 4."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "backbeat → late ghost → offset click."
+    },
+    "b2": {
+      "label": "Roll",
+      "about": "16th roll, growing over the bar, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 3.5
+}

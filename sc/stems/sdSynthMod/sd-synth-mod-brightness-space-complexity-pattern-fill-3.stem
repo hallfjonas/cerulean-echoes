@@ -1,0 +1,69 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-fill-3",
+  "parent": null,
+  "about": "FM wood clicks and drops on the 16ths.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "wood",
+      "fm",
+      "drops"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-wood.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false,
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "Drops 1"
+    },
+    {
+      "label": "Drops 2"
+    },
+    {
+      "label": "Drops 3"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "a click now and then ↔ a busy pattern."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "wood clicks and drops."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 3 random patterns."
+    },
+    "b2": {
+      "label": "Fill",
+      "about": "almost every 16th plays while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1.7
+}

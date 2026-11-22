@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-swell-pattern-freeze-2",
+  "parent": null,
+  "about": "Slow chords of the mood's scale.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "pad",
+      "saw",
+      "breathing"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-pad.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "I–IV"
+    },
+    {
+      "label": "I–iii–IV–ii"
+    },
+    {
+      "label": "I–vi–IV–vii"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Swell",
+      "about": "still chords ↔ re-struck and breathing."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "long floating chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "3 chord progressions: calm → circling → open."
+    },
+    "b2": {
+      "label": "Freeze",
+      "about": "holds the current chord while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.79
+}

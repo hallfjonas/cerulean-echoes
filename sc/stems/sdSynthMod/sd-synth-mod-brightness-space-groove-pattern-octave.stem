@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-groove-pattern-octave",
+  "parent": null,
+  "about": "Slow bass swells and a 3-3-2 pulse.",
+  "meta": {
+    "role": "bass",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "swell",
+      "pulse"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "mood-bass.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false,
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "Line 1"
+    },
+    {
+      "label": "Line 2"
+    },
+    {
+      "label": "Line 3"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Groove",
+      "about": "swell every bar ↔ 3-3-2 pulse, mixed in the middle."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "slow bass swells."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 3 bass lines (a note every 2 bars)."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.38
+}

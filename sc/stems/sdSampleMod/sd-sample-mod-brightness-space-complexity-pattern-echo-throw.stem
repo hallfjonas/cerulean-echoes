@@ -1,0 +1,69 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-echo-throw",
+  "parent": null,
+  "about": "VCSL small shaker with ghost notes and a cabasa.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "shaker",
+      "vcsl",
+      "cabasa"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-shaker.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false,
+    "break": "out"
+  },
+  "patterns": [
+    {
+      "label": "8ths"
+    },
+    {
+      "label": "16ths"
+    },
+    {
+      "label": "Rocking 3-3-2"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the figure ↔ + quiet 16ths, then a cabasa on beat 4."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "shaker."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "8ths → 16ths → rocking 3-3-2."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long dotted-8th echo while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1
+}
