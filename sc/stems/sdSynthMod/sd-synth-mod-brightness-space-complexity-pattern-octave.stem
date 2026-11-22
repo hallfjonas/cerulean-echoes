@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-octave",
+  "parent": null,
+  "about": "Dark rolling bass, saws through a snapping filter.",
+  "meta": {
+    "role": "bass",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "bass",
+      "rolling",
+      "techno"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "gain": 0.6,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "techno-bass.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "3-3-2"
+    },
+    {
+      "label": "Rolling"
+    },
+    {
+      "label": "Acid"
+    },
+    {
+      "label": "Stomp"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the line as written ↔ quiet ghost 16ths roll in the gaps."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "dark rolling bass, follows Jonas' chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "3-3-2 → rolling → acid → stomp."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}

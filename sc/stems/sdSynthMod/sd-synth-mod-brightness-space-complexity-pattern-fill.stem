@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-fill",
+  "parent": null,
+  "about": "Soft tuned sine bongos and a 909 rimshot.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "bongos",
+      "rimshot",
+      "techno"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSample"
+    ]
+  },
+  "gain": 0.85,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "techno-perc.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Pillow"
+    },
+    {
+      "label": "Gallop"
+    },
+    {
+      "label": "3-3-2"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "steady pattern ↔ + fingertip ghost notes ↔ + little rolls."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "bongos and rimshot. Keep playing in the break."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pillow → gallop → 3-3-2."
+    },
+    "b2": {
+      "label": "Fill",
+      "about": "a bongo run down over the bar while held.",
+      "mode": "hold"
+    }
+  }
+}

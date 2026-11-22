@@ -1,0 +1,77 @@
+{
+  "format": 2,
+  "name": "sd-supersaw-wide-brightness-space-sound-pattern-echo-throw",
+  "parent": null,
+  "about": "Background strings on F minor, one voice moving.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 2,
+    "tags": [
+      "strings",
+      "jx-10",
+      "analogue"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSupersawWide",
+    "extra": [
+      "sdSynthMod"
+    ]
+  },
+  "gain": 0.7,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "techno-strings.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Fm → D♭"
+    },
+    {
+      "label": "Fm → A♭"
+    },
+    {
+      "label": "Line up"
+    },
+    {
+      "label": "Line down"
+    },
+    {
+      "label": "Chain"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Sound",
+      "about": "JX-10 strings ↔ analogue strings (pulse + saw)."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "background strings on F minor."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next move: to D♭, A♭, line up, line down, chain."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the strings while held.",
+      "mode": "hold"
+    }
+  }
+}

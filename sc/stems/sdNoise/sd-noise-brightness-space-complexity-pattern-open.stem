@@ -1,0 +1,73 @@
+{
+  "format": 2,
+  "name": "sd-noise-brightness-space-complexity-pattern-open",
+  "parent": null,
+  "about": "Slow uneven noise breathing, optional chord pulses.",
+  "meta": {
+    "role": "fx",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 2,
+    "tags": [
+      "breath",
+      "noise",
+      "texture"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdNoise",
+    "extra": [
+      "sdSynthMod"
+    ]
+  },
+  "gain": 0.17,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "techno-breath.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "2 bars"
+    },
+    {
+      "label": "4 bars"
+    },
+    {
+      "label": "8 bars"
+    },
+    {
+      "label": "1 bar"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "breath only ↔ chord pulses in 8ths."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "slow, uneven breathing."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "one breath per 2 → 4 → 8 → 1 bar(s)."
+    },
+    "b2": {
+      "label": "Open",
+      "about": "the breath opens fully while held.",
+      "mode": "hold"
+    }
+  }
+}

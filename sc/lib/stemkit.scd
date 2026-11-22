@@ -64,6 +64,12 @@
 		name2midi: { |nm| var m = nm.findRegexp("^([a-g])(b|#)?(-?[0-9])$");
 			(12 * (m[3][1].asInteger + 1)) + (c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11)[m[1][1].asSymbol]
 			+ (m[2][1] == "#").binaryValue - (m[2][1] == "b").binaryValue },
+		// a step line as Strudel writes it ("~ 0 ~ 7 ...") -> [degree or nil per step]
+		line: { |str| str.split($ ).reject(_.isEmpty).collect { |x| if(x == "~") { nil } { x.asFloat } } },
+		// straight lines through three values: soft at 0, round at 0.5, hard at 1
+		punch3: { |p, soft, round, hard| if(p < 0.5) { soft + ((round - soft) * 2 * p) } { round + ((hard - round) * ((2 * p) - 1)) } },
+		// the FM modulator's start phase: offline as superdough's render has it (started at time 0), live random
+		modPhase: { |k, at, freq, bpm| if(ce.webaudioPhase == true) { (2pi * freq * ((k + at) / 4 / (bpm / 60))) % 2pi } { -1 } },
 		// 0 -> 1 over `bars` while the column's button 2 is held (steps per bar); nil while it is not held
 		heldRamp: { |col, bars| var st = ();
 			{ |t| if(col.held(\b2)) { st[\from] = st[\from] ? t.floor; ((t.floor - st[\from]) / bars).clip(0, 1) }
