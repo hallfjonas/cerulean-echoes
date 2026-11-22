@@ -15,7 +15,14 @@ Pitch deck (12 slides, assessment + plan): https://claude.ai/artifact/5gM7MWgHqH
 cd tools && node trajectory/server.mjs [port]
 ```
 
-Then open **http://localhost:8766** in Chrome. The player is the repo's main tool: it plays a track right on localhost
+Then open **http://localhost:8766** in Chrome. Or without a Terminal: double-click **Cerulean Echoes.app** in the
+repo folder (the launcher, `tools/launcher/`): it starts this server, opens the player in the default browser (one tab:
+each player tab holds two open streams, Chrome allows six connections per host, so several tabs hang the page) and
+stops the server and its SuperCollider when it is quit (Dock: Quit; also on a force quit). An already running player
+on the port is only opened. First start: `npm ci` once, with a message. Log: `~/Library/Logs/cerulean-echoes.log`.
+`tools/launcher/launch.sh check|install|start|open|alive|url|stop [--port N] [--no-browser]` does the work (also
+`CE_PORT`, `CE_NO_BROWSER=1`); after changing `launcher.applescript`, rebuild the app with `npm run launcher` and commit it.
+The player is the repo's main tool: it plays a track right on localhost
 (no strudel.cc needed) and shows the Live page full size: both LC pages and the Launchkey row with every control's
 name and value (the track's LC view). The visuals (every stem with its name, tempo from Strudel's clock) are the
 a page of their own (Visuals); Labs holds the Sample and Stem Designer.

@@ -139,6 +139,8 @@ Tools (run in `tools/`):
 ## The player (tools/trajectory)
 The player is the main tool: `cd tools && node trajectory/server.mjs`, then http://localhost:8766 (README:
 `tools/trajectory/README.md`). It plays any live track (Live) or lab board (Lab) from the catalogue with the visuals.
+- Launcher for people without a Terminal: `Cerulean Echoes.app` (repo root, committed; source and `launch.sh` in
+  `tools/launcher/`, rebuild with `npm run launcher`) starts the server, opens one browser tab, quitting stops server + SC.
 - Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
   current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
   strudel.cc.
