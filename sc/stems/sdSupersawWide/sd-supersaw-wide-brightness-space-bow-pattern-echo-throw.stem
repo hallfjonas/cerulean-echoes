@@ -1,0 +1,73 @@
+{
+  "format": 2,
+  "name": "sd-supersaw-wide-brightness-space-bow-pattern-echo-throw",
+  "parent": null,
+  "about": "JX strings in four voices, bowed pulses or swells.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 2,
+    "tags": [
+      "strings",
+      "jx-10",
+      "bowed"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSupersawWide"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-strings.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Lift"
+    },
+    {
+      "label": "Sink"
+    },
+    {
+      "label": "Line up"
+    },
+    {
+      "label": "Line down"
+    },
+    {
+      "label": "Chain"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Bow",
+      "about": "short bowed pulses ↔ long swells."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "strings on the chords; Tension brings them up."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next move: lift · sink · line up · line down · chain."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the strings while held.",
+      "mode": "hold"
+    }
+  }
+}
