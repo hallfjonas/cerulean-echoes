@@ -146,8 +146,8 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   strudel.cc.
 - Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems & Tracks, Sets) | Visuals;
   the sidebar (key S) shows only the sections of the page: Live = live tracks, Play-Pause/Stop/Record, auto-perform;
-  Labs = Sample / Stem Designer; the gear opens Settings (Theme, Visuals, MIDI panel, Recording, keyboard shortcuts);
-  **?** opens the help.
+  Labs = Sample / Stem Designer; the handle on its edge holds the sidebar toggle, the gear (opens Settings: Theme, Visuals, MIDI panel,
+  Recording, keyboard shortcuts) and **?** (opens the help), three equal buttons that stay when the sidebar is hidden.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
   use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
