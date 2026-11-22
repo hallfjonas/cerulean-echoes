@@ -1,0 +1,81 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-answer-3",
+  "parent": null,
+  "about": "Marimba phrase every second bar, up to three voices.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 2,
+    "tags": [
+      "marimba",
+      "phrase"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-marimba.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Phrase 1"
+    },
+    {
+      "label": "Phrase 2"
+    },
+    {
+      "label": "Phrase 3"
+    },
+    {
+      "label": "Phrase 4"
+    },
+    {
+      "label": "Phrase 5"
+    },
+    {
+      "label": "Phrase 6"
+    },
+    {
+      "label": "Phrase 7"
+    },
+    {
+      "label": "Phrase 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "one voice → + a third above → + a fifth: three-part marimba."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "marimba phrase, every second bar."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 phrase rhythms (new notes too)."
+    },
+    "b2": {
+      "label": "Answer",
+      "about": "the phrase plays in every bar while held.",
+      "mode": "hold"
+    }
+  }
+}

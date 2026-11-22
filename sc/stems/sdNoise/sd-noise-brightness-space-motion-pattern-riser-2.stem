@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-noise-brightness-space-motion-pattern-riser-2",
+  "parent": null,
+  "about": "Pink noise glued to the kick, with a riser.",
+  "meta": {
+    "role": "texture",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 2,
+    "tags": [
+      "noise",
+      "pump",
+      "riser"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdNoise"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "amb-noise-pump.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Pump"
+    },
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "Waves"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Motion",
+      "about": "still ↔ filter breathes and noise wanders left and right."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "noise that pumps with the kick."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pump → off-beat breath → slow waves."
+    },
+    "b2": {
+      "label": "Riser",
+      "about": "a noise sweep rises over 2 bars while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.6
+}

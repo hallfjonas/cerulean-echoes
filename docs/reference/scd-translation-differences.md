@@ -26,6 +26,7 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 | 001-groove | sound-tour (176 bars, 26,082 events), stem-check (162 bars, 40,543 events) | 100 % | none | every stem −∞ dB, except the two supersaw columns (see below) |
 | 002-groove | dance-floor (192 bars, 26,771 events), stem-check (162 bars) | 100 % | none | as 001 |
 | 008-groove-techno | every-button (67 bars), warehouse (192 bars), techno-night (bars 0-312, 59,000 events), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the JX lane of the strings (random phases; its analogue lane alone nulls) |
+| 010-ambient-house | every-button (to bar 67), journey (130 bars), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the keys column (noise-level residual, as between two renders of the old track) |
 | 016-grroove-opus | stem-check only (162 bars; 016 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB (the quiet JX strings leave noise-level residual) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
@@ -72,3 +73,15 @@ Compared with `--cc '{"12":1}'` and a stem-check that leaves the controls of Mod
 | Texts | Kick button 1 reads `Pattern`; texts cut to 60 characters (strings Pattern, answer Level, FX Complexity, accents) | Stem format |
 | Names and labels | As for the other tracks; the eight-pattern columns have `Stab 1` … `Series 1` style labels | The same |
 | Strings | The JX supersaw layers start at random phases, so two renders differ at noise level (the track is quiet there) | `sdSupersawWide` |
+
+## 010-ambient-house
+
+Compared with `--cc '{"12":1}'` (Master at 1). Column code of the 14 stems (`amb-*.scd`); the room and echo of every layer (Strudel `roomOf` / `bus`, raised by Tension) are kept as the columns' own state buses, updated on their knobs and on Tension (`~ce.ambientFx` in `sc/lib/stemkit.scd`); Tension's tone map (Fog x (1 + 1.5 t squared)) is the frame's, and the stems turn the strip's own Tension input off (`frame.tension: false`), as the old track did with its global Tension on CC 127.
+
+| What | Difference | Why |
+|---|---|---|
+| Master at 0 | A column makes no notes while Master is 0; the old track made the (inaudible) notes anyway. `every-button` fades Master to 0 at bar 67, so it is compared up to bar 67 | As in 008 |
+| Pattern buttons | The eight-pattern columns have labels `Rhythm 1` ... `Calls 8` instead of numbers | A stem's patterns have labels |
+| Control texts, names | Shortened to 60 characters (noise Motion, clap Level, arp Complexity, marimba Complexity); `@col` names from the role (Kick, Texture, Pad, Chords, Lead ...) | Stem format |
+| Chapter and Freeze | Unchanged: Chapter picks the next progression at the next 4-bar phrase; the pad's button 2 holds the chord of the moment for every column | The frame owns the root (`rootAt`) |
+| Keys audio | Two renders of the old track already differ at noise level (-43.7 dB against the stem); the new track the same (-41.6 to -45.2 dB); events are equal | FM voice noise |

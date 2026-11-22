@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-open",
+  "parent": null,
+  "about": "909 open hat on the off-beat, closed 16ths.",
+  "meta": {
+    "role": "hats",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 2,
+    "tags": [
+      "hats",
+      "909",
+      "off-beat"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "amb-hats.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "16ths"
+    },
+    {
+      "label": "Shuffle"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the pattern as it is ↔ + quiet 16ths ↔ + little 32nd rolls."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "off-beat hat. Keeps playing in the break."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "off-beat → + 16ths → shuffled 16ths."
+    },
+    "b2": {
+      "label": "Open",
+      "about": "long open hats on every 8th while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.6
+}

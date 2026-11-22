@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-octave-4",
+  "parent": null,
+  "about": "Soft rolling bass, a triangle with a quiet saw.",
+  "meta": {
+    "role": "bass",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "bass",
+      "rolling",
+      "pluck"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "amb-bass.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Rolling"
+    },
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "Melodic"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the line as it is ↔ extra 16th notes rolling in between."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "rolling bass, follows the chapter."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "rolling → off-beat → melodic."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}

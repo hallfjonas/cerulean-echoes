@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-softness-pattern-drop-out",
+  "parent": null,
+  "about": "Ambient house kick on D, firm or deep and soft.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "kick",
+      "909",
+      "soft"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSampleMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "amb-kick.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Straight"
+    },
+    {
+      "label": "Pickup"
+    },
+    {
+      "label": "Gap"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Softness",
+      "about": "0 = firm 909 kick ↔ 1 = deep, soft thump without click."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "four-on-the-floor kick, tuned to D."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "straight → pickup before the 1 → gap every 4th bar."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "kick pauses while held.",
+      "mode": "hold"
+    }
+  }
+}

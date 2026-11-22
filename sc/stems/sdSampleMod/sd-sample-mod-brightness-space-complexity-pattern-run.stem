@@ -1,0 +1,83 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-run",
+  "parent": null,
+  "about": "VCSL glockenspiel on random chord tones, runs.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 2,
+    "tags": [
+      "glockenspiel",
+      "vcsl",
+      "random"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-glock.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Glock 1"
+    },
+    {
+      "label": "Glock 2"
+    },
+    {
+      "label": "Glock 3"
+    },
+    {
+      "label": "Glock 4"
+    },
+    {
+      "label": "Glock 5"
+    },
+    {
+      "label": "Glock 6"
+    },
+    {
+      "label": "Glock 7"
+    },
+    {
+      "label": "Glock 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "a few notes per bar ↔ a busy pattern (~60 % of the 16ths)."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "glockenspiel on the chord."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 random patterns."
+    },
+    "b2": {
+      "label": "Run",
+      "about": "chord runs, denser while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 4
+}
