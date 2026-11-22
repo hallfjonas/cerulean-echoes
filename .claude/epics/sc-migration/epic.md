@@ -2,7 +2,7 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-22T03:30:52Z
+updated: 2026-11-22T03:37:26Z
 progress: 64%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
@@ -115,9 +115,10 @@ Estimated total effort: 107 hours
 - Closed: 001, 002, 003, 004, 005, 009, 011.
 - Built, waiting for people: 006 (one first-time user tries the launcher), 007 and 008 (the players approve 001, 002
   and 016 by ear; five Strudel quirks kept 1:1 in 001/002 are listed in `sc/PORTING.md` for a decision).
-- Open: 010 (retire the Strudel parts, SC docs and skills), last; it can start now.
-- Branch: everything is on `epic/sc-migration-next`, merged with `main` (sound lab, player pages) on 2026-11-22;
-  one PR into main, #91 (replaces #77-#81, contains #82, #83, #85). `npm test` 113/113, muted.
+- Open: 010 (retire the Strudel parts, SC docs and skills), last; it can start now, from `main`.
+- Merged into `main` on 2026-11-22 with #91 (the whole branch `epic/sc-migration-next`, merged with Jonas' sound lab
+  and player pages first; it replaced #77-#81 and contained #82, #83, #85). `npm test` 113/113, muted; CI green.
+  New work branches from `main`.
 - Tracks: all 7 live tracks have an SC version (001, 002, 007, 008, 009, 010, 016); their `.strudel` files are frozen
   (D1). Not ported, by plan: set 011 and `tracks/historic/` (removed in 010), the producer songs 012/013 (test fixtures).
 - Controllers (2026-11-22): knob feedback, SC sends every knob change and every load to each LC XL 3, so the devices
