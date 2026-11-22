@@ -313,8 +313,7 @@ Das liegt am gemeinsamen Hall (Impulsantwort `ir/orbit-4.wav` / Faltung), nicht 
 [what differs](../docs/reference/scd-translation-differences.md); the old files: `git show 7444173:sc/tracks/001-groove/001-groove.scd`).
 The notes below describe the hand-written version.
 
-Both tracks ported (`sc/tracks/001-groove/`, `sc/tracks/002-groove/`), scenarios `tools/sc-port/scenarios/001-all.json`,
-`002-all.json` (`CE_TRACK=001-groove/001-groove`, one base and one "moved" scenario per stem: knobs, pattern press, button
+Both tracks ported (`sc/tracks/001-groove/`, `sc/tracks/002-groove/`), scenarios for both (removed with the stem-track translation, see git history; `CE_TRACK=001-groove/001-groove`, one base and one "moved" scenario per stem: knobs, pattern press, button
 2 held, Tension, Master, Break). **Not yet checked by ear** (`feedback.md` in each folder lists what to listen for).
 Built like 016 (the Strudel tracks are built on 016's code): Master is Wumms-like (no master volume), Chapter = mood,
 the FX column is 016's; the Launchkey is 016's with the orchestra hit on pad 11.

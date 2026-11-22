@@ -1,0 +1,74 @@
+{
+  "format": 2,
+  "name": "sd-sample-fx-brightness-space-complexity-pattern-layer",
+  "parent": null,
+  "about": "Bowed vibraphone loops and shimmer swells.",
+  "meta": {
+    "role": "texture",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "vibraphone",
+      "shimmer",
+      "vcsl"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSampleFx",
+    "extra": [
+      "sdSynthMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "mood-eno-shimmer.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Calm"
+    },
+    {
+      "label": "Lydian"
+    },
+    {
+      "label": "Low"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "more loops; the shimmer adds a bell chord."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "bowed loops (low) and shimmer swells (high)."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "note set: calm → lydian → low; shimmer pace too."
+    },
+    "b2": {
+      "label": "Layer",
+      "about": "Eno → Shimmer → both, at the next bar.",
+      "mode": "step",
+      "args": {
+        "states": 3
+      }
+    }
+  },
+  "gain": 1
+}

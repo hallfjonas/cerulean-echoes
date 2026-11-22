@@ -1,0 +1,66 @@
+{
+  "format": 2,
+  "name": "sd-sample-fx-brightness-space-distortion-pattern-stutter",
+  "parent": null,
+  "about": "A spoken voice looping with the clock.",
+  "meta": {
+    "role": "texture",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 2,
+    "tags": [
+      "voice",
+      "radio",
+      "speech"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleFx",
+    "extra": [
+      "sdNoise",
+      "sdCrackle"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "mood-voice.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Voice"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Distortion",
+      "about": "radio → rougher → past half: crushed, broken."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the spoken voice, looping."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "one pattern; nothing to switch."
+    },
+    "b2": {
+      "label": "Stutter",
+      "about": "each beat's start repeats in 16ths while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2
+}

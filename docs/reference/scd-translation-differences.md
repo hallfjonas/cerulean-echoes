@@ -16,6 +16,8 @@ button, every knob row, every button 2 held, global knobs, Chapter, Break, fader
 an audio null test: each stem alone is rendered from the old and the new track (`CE_TRACK=<id>/<id>` and
 `<id>/<id>.track`, `sc-port/sc-render.sh <scenario> <prefix> <stem>`) and the two WAVs are subtracted.
 
+The Strudel-against-`.scd` scenarios of a translated track (`sc-port/scenarios/<id>-<stem>.json`, `001-all.json`, `002-all.json`, run by `batch.py`) are deleted with its `.scd`: they name the old stems and need the Strudel track. The `<id>-stem-check.json` stays: it is the input to re-prove a translation or to render the stem track alone.
+
 The old `.scd` of a translated track is deleted in the commit that adds the proof. It lives in git history:
 `git show 7444173:sc/tracks/<id>/<id>.scd > sc/tracks/<id>/<id>.scd` puts it back next to the `.track` for a new proof.
 
@@ -29,6 +31,7 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 | 010-ambient-house | every-button (to bar 67), journey (130 bars), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the keys column (noise-level residual, as between two renders of the old track) |
 | 016-grroove-opus | stem-check only (162 bars; 016 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB (the quiet JX strings leave noise-level residual) |
 | 017-groove-lsd | stem-check only (162 bars; 017 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB, except the noise-driven `modalPerc` and supersaw sounds (their residual equals hand-vs-hand) |
+| 007-ambient | every-button (to bar 66), drift (153 bars, 8,600 events), stem-check (162 bars, 31,800 events) | 100 % | none | 11 stems and the Launchkey −∞ dB; wood, Eno / Shimmer and voice at noise level (random phases, crackle) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
 every stem of all three tracks.
@@ -97,3 +100,16 @@ Built like 016 and compared the same way (`--cc '{"12":1,"69":0.5}'`, stem-check
 | Answer and the stab | The answer follows the stab's Vanish through the frame (`stabHere`) | As in 016 |
 | Noise-driven sounds | `modalPerc` (percussion, log, bell) and the supersaw strings use random noise or phases, so two renders of either track differ at noise level; the events are equal | The sounds |
 | Texts, names, labels | As for the other tracks | The same |
+
+## 007-ambient
+Compared with `--cc '{"12":1}'` (Master at 1). Column code of the 14 stems (`mood-*.scd`, note helpers `~ce.moodOf`, `~ce.moodFx`, `~ce.figureKit` in `sc/lib/stemkit.scd`); the three moods are the frame's chapters (one bar); the strips' Tension input is the Room knob (frame `global`, no Thin); Tension's tone map and wobble are frame maps.
+
+| What | Difference | Why |
+|---|---|---|
+| Eno and Shimmer | One stem on slot 2:2 (button 2 = Layer: Eno, Shimmer, both); each layer is a lane with its own room, echo and trim (new lane key `trim`). The old track had two strips for one column | A column holds one stem |
+| Unused controls | Drone button 2 is `Spare` and the voice's button 1 has a single pattern; both did nothing before | The stem format wants every button |
+| Pattern labels | `Chord 1` ... `Chord 3` for the drone (the old names followed the mood: `D–A`, `D–A–E` ...), `Waves 1` ..., `Line 1` ..., `Drops 1` ... instead of numbers | A stem's patterns have fixed labels |
+| Master at 0 | A column makes no notes while Master is 0; the old track made the (inaudible) notes anyway. The stem-check keeps Master up | As in 008 and 010 |
+| Layer status | The status line no longer shows `Eno / Shimmer` when button 2 is pressed | The column's step button has no status text |
+| Column names, headings, control texts | `@col` names from the role (Kick, Texture, Pad ...); texts shortened to 60 characters (Sea ↔ Wind, Groove, Complexity ...) | Stem format |
+| Audio | Wood (FM) leaves a residue 41 dB below the signal, Eno / Shimmer 29 dB, the voice (random crackle) 9 dB; every other stem and the Launchkey null; events are equal | Random FM phases and crackle |

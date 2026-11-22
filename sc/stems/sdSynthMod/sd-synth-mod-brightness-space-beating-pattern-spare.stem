@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-beating-pattern-spare",
+  "parent": null,
+  "about": "Slow drone chords of the mood on D.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "ambient"
+    ],
+    "energy": 1,
+    "tags": [
+      "drone",
+      "sine"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSynthFx"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "mood-drone.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Chord 1"
+    },
+    {
+      "label": "Chord 2"
+    },
+    {
+      "label": "Chord 3"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Beating",
+      "about": "pure sines ↔ detuned saw beating."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "slow drone chords on D."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "3 drone chords per chapter: fifth, with a ninth, low root."
+    },
+    "b2": {
+      "label": "Spare",
+      "about": "does nothing in this column.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.46
+}

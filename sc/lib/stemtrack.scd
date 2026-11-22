@@ -10,6 +10,8 @@
 //   orbits, states, samples, maps, stems     merged into the track (stems: e.g. the Launchkey's own stem)
 //   lkNote, lkCtl, lkPadNames                the Launchkey, as in a hand-written track
 //   build: { |frame, track, ce| }            more latches or buttons, after the stem columns
+//   global: (fog: cc, thin: cc, tension: cc, master: cc)   the CCs the strips read instead of column 8's Fog, Thin,
+//                                            Tension and Master (007: its Room knob is the strips' Tension, no Thin)
 //   masterless: true                         no master in the track's global: the strips ignore column 8's fader (stems
 //                                            that want it as a drive read it themselves)
 //   tensionEchoAmt, tensionRoomAmt           how far Tension opens the echo and the room (mixer.scd)
@@ -50,8 +52,8 @@
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
 		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
 		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkPadNames: frame[\lkPadNames],
-		global: if(frame[\masterless] == true) { (fog: glob.fog, thin: glob.thin, tension: glob.tension) } {
-			(fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master) },
+		global: frame[\global] ?? { if(frame[\masterless] == true) { (fog: glob.fog, thin: glob.thin, tension: glob.tension) } {
+			(fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master) } },
 		tensionEchoAmt: frame[\tensionEchoAmt], tensionRoomAmt: frame[\tensionRoomAmt],
 		aliases: [\fog, \thin, \tension, \master, \chapter, \break].collect { |r| (glob[r] + 48) -> glob[r] }.asDict,
 		orbits: frame[\orbits] ?? { (1: (ir: "ir/orbit-0.6.wav", delay: [0.75 * 60 / bpm, 0.2]),
@@ -173,7 +175,7 @@
 		// ownDelay: [time in beats, feedback], so the stem keeps its echo in beats at any tempo
 		strip[\ownDelay] !? { |d| entry[\ownDelay] = [d[0] * 60 / track.bpm, d[1]] };
 		strip[\lanes] !? { |lanes| entry[\lanes] = lanes.collect { |ln|
-			var out = ln.copy; [\level, \fade, \roomR, \echoSend, \space, \echo].do { |key| ln[key] !? { |x| out[key] = ref.(x) } };
+			var out = ln.copy; [\level, \fade, \roomR, \echoSend, \space, \echo, \trim].do { |key| ln[key] !? { |x| out[key] = ref.(x) } };
 			out } };
 	};
 	entry

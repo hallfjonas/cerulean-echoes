@@ -246,7 +246,7 @@ add-on: the code reads them (`col.knob(\k3)`, `col.held(\b2)`).
 | `gate` | `false`: asked at fader 0 too, for state that moves every 16th (lifts, the harmony's look-ahead) |
 | `states` | `(name: start value)`: the column's state buses (`col.setState(\name, v, send)`, `col.stateMapOf(\name)`) |
 | `maps` | `(name: (ccs: [\k1 …], fn: { \|v\| ugen }))`: values the server derives from its controls (`col.mapBusOf`); a map named `trim` is the strip trim, × `gain` |
-| `strip` | `orbit`, `ownDelay` ([time in beats, feedback]), `level`, `roomR`, `echoSend`, `space`, `echo`, `trim`, `lanes`; a Symbol names one of its states, maps or controls (`\k2` = its knob 2) |
+| `strip` | `orbit`, `ownDelay` ([time in beats, feedback]), `level`, `roomR`, `echoSend`, `space`, `echo`, `trim`, `lanes` (a lane has `name`, `orbit`, `level`, `fade`, `roomR`, `echoSend`, `space`, `echo`, `trim`); a Symbol names one of its states, maps or controls (`\k2` = its knob 2) |
 
 Helpers for code files: `col.chordAt(bar)`, `col.chordAtK(k, push)` (the chord at a 16th, `push` = the next bar's chord
 two 16ths early; its `scale` is the scale of `k`'s bar), `col.tensionEcho`, `col.delayNode` (its own echo), and
@@ -392,7 +392,8 @@ A stem track is `sc/tracks/<id>/<id>.track`, JSON, schema `sc/stems/track.schema
   `chordAtK: { |frame, track, k, push| chord }` (the chord at a 16th: chords that change inside a bar, `push` = the next
   bar's chord two 16ths early) and `nextChords: { |frame, track| }` (what Chords on a chords stem does).
   Its `// @` comment lines (`@ctl g.…`, `@col 16:8`, `@lk …`) join the `@ctl` lines made from the stems.
-  Also optional: `masterless: true` (no master in the track: the strips ignore column 8's fader, a stem that wants it as a
+  Also optional: `global: (fog:, thin:, tension:, master:)` (the CCs the strips read instead of column 8's Fog, Thin, Tension
+  and Master: 007 makes its Room knob the strips' Tension and has no Thin), `masterless: true` (no master in the track: the strips ignore column 8's fader, a stem that wants it as a
   drive reads it itself), `tensionEchoAmt` / `tensionRoomAmt` (how far Tension opens echo and room, see mixer.scd) and
   `uiHead` / `uiGlobal: { |frame, track, ce| }` (the Live page's head line and column 8 buttons instead of the default).
   Any other key is the frame's own: column code reads it through `col[\track][\frame]` (001's `degMidi`, `rootAt`, `tonesAt`).
@@ -429,10 +430,11 @@ notes before a riff's chord change inside the bar (format 2 takes the chord of t
 the chord of the next note). Both happen only while the keys play a riff; see task 013.
 
 ## Translated tracks
-The hand-written tracks 001, 002, 008, 010, 016 and 017 are stem tracks now: 14 stems each, all column code (`sc/stems/sdSynthMod/groove-*.scd`,
+The hand-written tracks 001, 002, 007, 008, 010, 016 and 017 are stem tracks now: 14 stems each, all column code (`sc/stems/sdSynthMod/groove-*.scd`,
 `techno-*.scd` and their siblings, sharing the note helpers of `~ce.grooveKit` in `sc/lib/stemkit.scd`), a frame with the moods,
 progressions and Launchkey; 001 and 002 have no master volume (`masterless`). 002 shares chords, pad, arp, hook and strings with 001 and has variants of the
-others (`parent`) and stems of its own (rumble, congas, organ). The old `.scd` files are deleted after the proof; what differs
+others (`parent`) and stems of its own (rumble, congas, organ). 007 has three moods (the chapters, one bar) and its own
+note helpers (`~ce.moodOf`, `~ce.moodFx`, `~ce.figureKit`): Eno and Shimmer share the column 2:2 (button 2 picks the layer, each layer is a lane with its own room, echo and trim). The old `.scd` files are deleted after the proof; what differs
 is listed in [scd-translation-differences](../reference/scd-translation-differences.md).
 
 ## Set (definition only)
