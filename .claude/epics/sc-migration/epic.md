@@ -2,7 +2,7 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-22T03:14:19Z
+updated: 2026-11-22T03:30:52Z
 progress: 64%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
@@ -83,7 +83,7 @@ not the audio thread); the take ↔ WAV alignment once SC records.
 
 - `npm test` green: feature tests for track list, load/play/stop/switch, controllers, pattern/Chapter/Break, MIDI
   panel, auto-perform, takes, recording, producer, SC core.
-- 7 live tracks load on SC from the player; perform scripts in `tools/trajectory/perform/` play on SC to the end.
+- 7 live tracks load on SC from the player; perform scripts in `tools/trajectory/perform/` play on SC to the end. (met)
 - Launcher starts and stops everything with no leftover processes.
 - `tracks/sets/`, `tracks/historic/`, Strudel lab boards and Strudel-only checks/skills removed; `npm run path-lint`
   shows no new missing paths.
@@ -118,7 +118,12 @@ Estimated total effort: 107 hours
 - Open: 010 (retire the Strudel parts, SC docs and skills), last; it can start now.
 - Branch: everything is on `epic/sc-migration-next`, merged with `main` (sound lab, player pages) on 2026-11-22;
   one PR into main, #91 (replaces #77-#81, contains #82, #83, #85). `npm test` 113/113, muted.
-- Known: two LC XL 3s can still make knobs jump (each device keeps its own values); `sc/tools/lc-feedback-test.scd`
-  decides whether SC can keep both devices in step. `sc/samples/voice/david.flac` is not in git (007's sample check
-  fails on a fresh clone). The auto-perform test at 24 bars/s was flaky under load.
+- Tracks: all 7 live tracks have an SC version (001, 002, 007, 008, 009, 010, 016); their `.strudel` files are frozen
+  (D1). Not ported, by plan: set 011 and `tracks/historic/` (removed in 010), the producer songs 012/013 (test fixtures).
+- Controllers (2026-11-22): knob feedback, SC sends every knob change and every load to each LC XL 3, so the devices
+  hold the shared value (user test: custom modes take it); faders and the mod wheel use pickup (no jump, the panel
+  marks an uncaught fader). Tried with one LC; two LCs not tried yet.
+- Launcher: tried by the user (works); open: one first-time user.
+- Known: `sc/samples/voice/david.flac` (44 MB) is not in git (over the 10 MB limit; 007's voice and sample check fail on
+  other checkouts). The auto-perform test at 24 bars/s was flaky under load.
 - Tests and trial runs start SC with `CE_SC_MUTE=1` (master to a silent bus).
