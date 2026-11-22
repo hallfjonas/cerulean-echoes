@@ -16,6 +16,8 @@ button, every knob row, every button 2 held, global knobs, Chapter, Break, fader
 an audio null test: each stem alone is rendered from the old and the new track (`CE_TRACK=<id>/<id>` and
 `<id>/<id>.track`, `sc-port/sc-render.sh <scenario> <prefix> <stem>`) and the two WAVs are subtracted.
 
+The Strudel-against-`.scd` scenarios of a translated track (`sc-port/scenarios/<id>-<stem>.json`, `001-all.json`, `002-all.json`, run by `batch.py`) are deleted with its `.scd`: they name the old stems and need the Strudel track. The `<id>-stem-check.json` stays: it is the input to re-prove a translation or to render the stem track alone.
+
 The old `.scd` of a translated track is deleted in the commit that adds the proof. It lives in git history:
 `git show 7444173:sc/tracks/<id>/<id>.scd > sc/tracks/<id>/<id>.scd` puts it back next to the `.track` for a new proof.
 
