@@ -94,6 +94,8 @@ Bekannte Abweichungen, die an der **Referenz** liegen (Strudel in Node, nicht im
 
 ## Track 008 (Groove Techno): Stand und Entscheidungen
 
+**Seit 2026-11-22 ist 008 ein Stem-Track** (`008-groove-techno.track`; die `.scd` ist gelöscht, [Unterschiede](../docs/reference/scd-translation-differences.md); alte Datei: `git show bdd0a4a:sc/tracks/008-groove-techno/008-groove-techno.scd`).
+
 Stand 18.11.2026: **alle Spuren portiert** (`sc/tracks/008-groove-techno/008-groove-techno.scd`), jede gegen
 `tracks/008-groove-techno/008-groove-techno.strudel` verglichen (Szenarien `tools/sc-port/scenarios/008-*.json`,
 `CE_TRACK=008-groove-techno/008-groove-techno python3 batch.py scenarios/008-kick.json /tmp/cmp-008-kick`).

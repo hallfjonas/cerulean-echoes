@@ -1,0 +1,62 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-pump-chords-colour",
+  "parent": null,
+  "about": "Pad and techno pad; set the progression.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "pad",
+      "chords",
+      "techno"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "gain": 1.2,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "techno-pads.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Chords"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room.",
+      "default": 0.5
+    },
+    "k3": {
+      "label": "Pump",
+      "about": "held chords ↔ the kick pumps the chords on every beat."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the pads (pad + techno pad)."
+    },
+    "b1": {
+      "label": "Chords",
+      "about": "next of 8 chord progressions, for all."
+    },
+    "b2": {
+      "label": "Colour",
+      "about": "7 → 9 → fourths → fifths, at the next bar.",
+      "mode": "hold"
+    }
+  }
+}

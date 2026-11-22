@@ -160,10 +160,10 @@ const stemTrackOf = trackId => {
   return fs.existsSync(file) ? file : null
 }
 export const trackFileOf = trackId => findFile(path.join(repo, 'tracks'), trackId + '.strudel') ?? stemTrackOf(trackId)
-// The SuperCollider version of a track, or null
+// The SuperCollider version of a track (its .scd, else its stem track), or null
 export const scTrackFileOf = trackId => {
   const file = path.join(repo, 'sc', 'tracks', trackId, trackId + '.scd')
-  return fs.existsSync(file) ? file : null
+  return fs.existsSync(file) ? file : stemTrackOf(trackId)
 }
 // a stem track's controls come from its stems and frame (stem-tags.mjs), a Strudel or SC track's from its comments
 export const tagSource = file => file.endsWith('.track') ? trackTags(file) : fs.readFileSync(file, 'utf8')
@@ -181,7 +181,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2).map(f => path.resolve(process.env.INIT_CWD ?? process.cwd(), f))
   const files = args.length ? args : fs.readdirSync(PERFORM, { withFileTypes: true }).filter(e => e.isDirectory())
     .map(e => e.name).sort().flatMap(id => {
-      const found = [scTrackFileOf(id), trackFileOf(id)].filter(Boolean)
+      const found = [...new Set([scTrackFileOf(id), trackFileOf(id)].filter(Boolean))]
       return found.length ? found : [path.join(PERFORM, id)]
     })
   let failed = false

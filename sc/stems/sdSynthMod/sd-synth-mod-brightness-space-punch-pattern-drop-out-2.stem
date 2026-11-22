@@ -1,0 +1,63 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-punch-pattern-drop-out-2",
+  "parent": null,
+  "about": "Techno kick tuned to C: soft, round or hard.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 5,
+    "tags": [
+      "kick",
+      "techno",
+      "sine"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSampleMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "techno-kick.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "4/4"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Punch",
+      "about": "soft thump ↔ round kick ↔ hard and punchy."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "kick on every beat, tuned to C."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "double time: 8 kicks per bar while held."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "kick pauses while held.",
+      "mode": "hold"
+    }
+  }
+}

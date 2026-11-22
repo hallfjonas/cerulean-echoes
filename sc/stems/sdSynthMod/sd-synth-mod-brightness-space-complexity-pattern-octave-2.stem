@@ -1,0 +1,83 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-octave-2",
+  "parent": null,
+  "about": "Hypnotic FM mallet loop on the chord, with echo.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "sequence",
+      "fm",
+      "mallet",
+      "techno"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "gain": 0.8,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "techno-seq.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Loop 1"
+    },
+    {
+      "label": "Loop 2"
+    },
+    {
+      "label": "Loop 3"
+    },
+    {
+      "label": "Loop 4"
+    },
+    {
+      "label": "Loop 5"
+    },
+    {
+      "label": "Loop 6"
+    },
+    {
+      "label": "Loop 7"
+    },
+    {
+      "label": "Loop 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "few notes ↔ loop fills in."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "hypnotic loop on the chord."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 loops (3, 5 or 7 steps)."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}
