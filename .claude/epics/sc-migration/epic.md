@@ -2,8 +2,8 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-21T14:41:10Z
-progress: 55%
+updated: 2026-11-22T03:14:19Z
+progress: 82%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -41,7 +41,8 @@ end; SC becomes a second engine behind its existing engine interface. Supersedes
 - `server.mjs`: OSC socket + WebSocket relay (from `bridge.mjs`); recording endpoints start/stop SC's recorder.
 - `catalogue.mjs`: lists `sc/tracks/*/*.scd` with `engine: 'sc'`.
 - SC (`sc/lib/ui.scd`, `steps.scd`, `setup.scd`): `/ce/load`, `/ce/stop`, `/ce/note` per sounding note, `/ce/record`.
-- Launcher: macOS app/script that starts `sclang` headless with `sc/live.scd`, the server, and the browser.
+- Launcher: `Cerulean Echoes.app` (stay-open AppleScript applet, `tools/launcher/`) starts the server and the browser;
+  the server starts `sclang sc/engine.scd` on the first SC load, quitting the app ends both.
 
 ### Infrastructure
 - `npm test` runs all Node tests and one headless `sclang` test script; GitHub Actions runs the Node part per PR.
@@ -95,13 +96,13 @@ Biggest items: 002 (engine) and the ports (007, 008).
 ## Tasks Created
 - [x] 001.md - Feature-test harness and SC core tests (parallel: false)
 - [x] 002.md - SC engine in the player (parallel: false)
-- [x] 003.md - Visuals from SC, playground (parallel: true) — PR #78
-- [x] 004.md - Auto-perform and takes on SC (parallel: true) — PR #80
-- [x] 005.md - Recording in SC (parallel: true) — PR #79
-- [ ] 006.md - Launcher (parallel: true)
-- [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true)
-- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true) — ported (#64), live check done (#77); waits for the players' ear approval
-- [ ] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
+- [x] 003.md - Visuals from SC, playground (parallel: true)
+- [x] 004.md - Auto-perform and takes on SC (parallel: true)
+- [x] 005.md - Recording in SC (parallel: true)
+- [ ] 006.md - Launcher (parallel: true) — built (#83); open: tried once with one person (under 2 minutes)
+- [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true) — ported (#85); open: the players' ear approval
+- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true) — ported (#64), live check done; open: the players' ear approval
+- [x] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
 - [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
 - [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
 
@@ -110,11 +111,14 @@ Parallel tasks: 8
 Sequential tasks: 3
 Estimated total effort: 107 hours
 
-## Status (2026-11-21)
-- Closed: 001, 002, 011 (merged); 003, 004, 005 (PRs #78, #80, #79, built in parallel on `epic/sc-migration-base`).
-- 008: ported and live-checked; open only for the players' ear approval.
-- Open: 006 launcher, 007 port 001/002, 009 Strudel lab archive (SC lab moved to `sound-lab`), 010 retire Strudel parts.
-- Merge order: #63 (panel, engine fixes; base of the rest) → #78, #79, #80 (#79 and #80 touch the same load / clock /
-  player code: resolve the second one) → this PR. With #80, `npm test` starts several SC servers at once: run the SC
-  tests one after another (machine rule: one heavy job).
-
+## Status (2026-11-22)
+- Closed: 001, 002, 003, 004, 005, 009, 011.
+- Built, waiting for people: 006 (one first-time user tries the launcher), 007 and 008 (the players approve 001, 002
+  and 016 by ear; five Strudel quirks kept 1:1 in 001/002 are listed in `sc/PORTING.md` for a decision).
+- Open: 010 (retire the Strudel parts, SC docs and skills), last; it can start now.
+- Branch: everything is on `epic/sc-migration-next`, merged with `main` (sound lab, player pages) on 2026-11-22;
+  one PR into main, #91 (replaces #77-#81, contains #82, #83, #85). `npm test` 113/113, muted.
+- Known: two LC XL 3s can still make knobs jump (each device keeps its own values); `sc/tools/lc-feedback-test.scd`
+  decides whether SC can keep both devices in step. `sc/samples/voice/david.flac` is not in git (007's sample check
+  fails on a fresh clone). The auto-perform test at 24 bars/s was flaky under load.
+- Tests and trial runs start SC with `CE_SC_MUTE=1` (master to a silent bus).
