@@ -47,9 +47,9 @@ pane), the status line says "No MIDI" and the track plays with the virtual contr
 
 ### Layout
 
-- **No top bar**: the page is the sidebar and the view. With the sidebar hidden a small **☰** top left brings it back.
-- **Sidebar** (left, **‹** or key **S** hides it): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems &
-  Tracks, Sets), the **⚙** gear (Settings), **?** ("About this page", closed on every load) and the sections of the page
+- **No top bar**: the page is the sidebar and the view. The handle on the sidebar edge holds three equal buttons, top to bottom: **‹** (hide / show the sidebar, key **S**), the **⚙** gear (Settings) and **?** ("About this page", closed on every load); with the sidebar hidden the handle stays at the left edge.
+- **Sidebar** (left): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems &
+  Tracks, Sets) and the sections of the page
   you are on: Live = the live track list with Play / Pause, Stop and Record (icon buttons), the status line (what plays,
   MIDI inputs, auto-perform bar) and Auto-perform (with Record audio); Labs = the project list of the sub-tab, Play /
   Pause, Stop and the designer's buttons; Visuals = Stop and the status line. Each element names its pages in

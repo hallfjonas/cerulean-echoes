@@ -18,6 +18,7 @@
   #sidebar .top { display: flex; align-items: center; gap: 4px; margin: 0 0 14px }
   #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1; min-width: 0 }
   #sidebar nav a { padding: 5px 6px; border-radius: var(--radius); white-space: nowrap }
+  #sidebar .top nav a { flex: 1 1 0; text-align: center }
   #sidebar nav a.here { background: var(--control) }
   .icon { flex: none; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
   .icon:hover, .icon.here { color: var(--fg) }
@@ -56,10 +57,12 @@
   .script-mood { color: var(--dim); margin-top: 2px }
   .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
   .script-sections li.now { color: var(--fg) }
-  #sideHandle { position: fixed; top: 29px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3; width: 17px; height: 38px;
-    padding: 0; display: grid; place-items: center; background: var(--panel); color: var(--dim); border: 1px solid var(--line);
-    border-left: 0; border-radius: 0 6px 6px 0 }
-  #sideHandle:hover { color: var(--fg); background: var(--control) }
+  #sideHandle { position: fixed; top: 60px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3;
+    display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-left: 0;
+    border-radius: 0 6px 6px 0; overflow: hidden }
+  .handle-btn { flex: none; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; background: none;
+    color: var(--dim); border-radius: 0; font-size: 16px; line-height: 1 }
+  .handle-btn:hover, .handle-btn.here, .handle-btn.on { color: var(--fg); background: var(--control) }
   body.side-closed #sideHandle { left: 0 }
   #stage { position: fixed; top: 0; left: var(--side); right: 0; bottom: 0; background: var(--bg) }
   body.side-closed #stage { left: 0 }
@@ -121,7 +124,8 @@
      #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
      show the track's LC view (drawn into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on
      the canvas). The Settings view (the gear) lays over the current page.
-     The sidebar (key S) holds the page links, the settings gear, the track, Play-Pause / Stop / Record and auto-perform.
+     The sidebar (key S) holds the page links, the track, Play-Pause / Stop / Record and auto-perform.
+     The handle on the sidebar edge holds the sidebar toggle, the settings gear and the help button.
      The gear opens the Settings view: Theme, then the settings generated from settings.mjs (kept in localStorage) in
      sections, then the keyboard shortcuts. Two homotopy controls among the settings:
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
@@ -146,9 +150,6 @@
       <a href="#labs" data-page="labs">Labs</a>
       <a href="#visuals" data-page="visuals">Visuals</a>
     </nav>
-    <button class="icon" data-view="settings" title="Settings" aria-label="Settings">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
-    </button>
   </div>
   <nav id="subnav" data-pages="labs"></nav>
   <section>
@@ -176,7 +177,12 @@
   <section id="autoPerform" data-pages="live"></section>
   <section id="placeholderNote" data-pages="labs/sets"></section>
 </aside>
-<button id="sideHandle" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
+<div id="sideHandle">
+  <button id="sideToggle" class="handle-btn" title="Hide the sidebar (key S)" aria-label="Hide the sidebar">‹</button>
+  <button class="handle-btn" data-view="settings" title="Settings" aria-label="Settings">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.5a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.5 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.5c0 .2.3.4.5.4h3.8c.3 0 .5-.2.5-.4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+  </button>
+</div>
 <main id="stage">
   <iframe id="lcPanel" title="Live"></iframe>
   <iframe id="scPanel" title="Live (SuperCollider)" hidden></iframe>
@@ -225,7 +231,7 @@ import { toast } from './toast.mjs'
 import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
 const $ = id => document.getElementById(id)
-const help = mountHelp(helpFor(pageKey(parseHash(location.hash))), { title: 'About this page', button: '?', startOpen: false, parent: document.querySelector('#sidebar .top') })
+const help = mountHelp(helpFor(pageKey(parseHash(location.hash))), { title: 'About this page', button: '?', startOpen: false, parent: $('sideHandle'), className: 'handle-btn' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
@@ -672,12 +678,12 @@ $('settingsPage').addEventListener('scroll', markSettingsSection)
 new ResizeObserver(markSettingsSection).observe($('settingsPage'))
 const toggleSidebar = () => {
   const closed = document.body.classList.toggle('side-closed')
-  const handle = $('sideHandle')
+  const handle = $('sideToggle')
   handle.textContent = closed ? '›' : '‹'
   handle.title = closed ? 'Show the sidebar (key S)' : 'Hide the sidebar (key S)'
   handle.setAttribute('aria-label', closed ? 'Show the sidebar' : 'Hide the sidebar')
 }
-$('sideHandle').onclick = toggleSidebar
+$('sideToggle').onclick = toggleSidebar
 
 const hideStatusBoxWhileLcViewOpen = () => {
   const view = globalThis.lcxlView, box = view?.link?.parentElement
