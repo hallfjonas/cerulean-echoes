@@ -3,8 +3,11 @@
 // No sound server needed: tracks are played into a score in the language (like sc/tools/render.scd, without the
 // audio render).
 // usage: sclang tools/sc-test/run.scd        → one line per check (PASS / FAIL), exit code 0 = all passed
+//        sclang tools/sc-test/run.scd <absolute path of a track .scd or .track> …   → only the per-track checks of these
+//        tracks, no building blocks (npm run verify-sc)
 (
 var root = thisProcess.nowExecutingPath.dirname.dirname.dirname, fails = 0, passes = 0, check, loadCe, play, tracks, missing;
+var only = thisProcess.argv.select { |a| a.endsWith(".scd") or: { a.endsWith(".track") } };
 // a hung check must not hang the test run
 SystemClock.sched(240, { "FAIL timeout after 240 s".postln; 1.exit });
 check = { |name, fn|
@@ -42,6 +45,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 	"% % %".format(l[0].round(1e-4), l[1], keys.collect { |k| e[k].round(1e-4) }) } };
 
 {
+	if(only.isEmpty) {
 	// --- building blocks ---
 	check.("mini-notation: alternation, repeats, weights", {
 		var ce = loadCe.value, m = ce.mini("<[0 ~ 2]!3 [~ 4@2]>");
@@ -257,12 +261,22 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 					and: { ce.swapProblem('1:1', "kick909/kick909-brightness-space-punch-pattern-drop-out.stem").isNil } });
 		}.value;
 	}.value;
+	};
 
-	// --- every live track ---
-	tracks = (root +/+ "sc/tracks/*/*.scd").pathMatch.sort.select { |f| f.basename.splitext[0] == f.dirname.basename };
-	check.("SC live tracks found", { tracks.size >= 4 });
+	// --- every live track (or only the tracks named on the command line) ---
+	tracks = if(only.notEmpty) { only } {
+		(root +/+ "sc/tracks/*/*.scd").pathMatch.sort.select { |f| f.basename.splitext[0] == f.dirname.basename } };
+	if(only.isEmpty) { check.("SC live tracks found", { tracks.size >= 4 }) };
 	tracks.do { |file|
 		var name = file.basename.splitext[0], log, pressed;
+		// a stem track (.track): loads, plays and finds its samples; its controls come from its stems (no @ctl lines)
+		if(file.endsWith(".track")) {
+			name = file.basename;
+			check.("% loads and plays notes with the faders up".format(name), {
+				log = play.(file, 4); log.size > 0 });
+			check.("% every sample file it loads exists".format(name), {
+				var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
+		} {
 		check.("% loads and plays notes with the faders up".format(name), {
 			log = play.(file, 4); log.size > 0 });
 		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
@@ -279,6 +293,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 			var pos = line.split($ )[2].split($.)[0].split($:), cc = 36 + pos[1].asInteger + (if(pos[0] == "2") { 48 } { 0 });
 			pressed = play.(file, 4, [[1.5, cc]]);
 			(~sig.(log, 8) != ~sig.(pressed, 8)) and: { ~sig.(log, 0).keep(~sig.(log, 0).count { |s| s.split($ )[0].asFloat < 6 }) == ~sig.(pressed, 0).keep(~sig.(pressed, 0).count { |s| s.split($ )[0].asFloat < 6 }) } });
+		};
 	};
 
 	"% passed, % failed".format(passes, fails).postln;

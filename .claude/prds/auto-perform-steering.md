@@ -169,7 +169,7 @@ without writing any 009 steps by hand.
 - `tools/trajectory/autoperform.mjs` (`compile`, `valueChanges`, `createPerformer`), `check-perform.mjs`, script v2
   format and `perform/design-template.md`.
 - `tools/trajectory/midi.mjs` (virtual port `LCXL3 Auto`, `setAuto`, last-moved-wins via `time`).
-- `tools/strudel-sim/harness.mjs`, `render.mjs`, `measure.mjs` (`--base`), `audibility.mjs` (LUFS reference for
+- `tools/strudel-sim/harness.mjs`, `render.mjs`, measure.mjs (`--base`), audibility.mjs (both removed 2026-11-22, sc-migration 010; LUFS reference for
   calibrating the energy scale).
 - `recording-replay` epic (shared master tap; its WAV takes are valid offline input for `npm run meta`).
 - `/auto-perform` skill: learns the `curve` field and the `curve` / `sweep` commands.

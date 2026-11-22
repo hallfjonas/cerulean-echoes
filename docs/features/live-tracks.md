@@ -2,9 +2,10 @@
 
 ## What it is
 
-A live track is one Strudel file you play like an instrument. Strudel is a language for music code that runs in the
-browser. The tracks are 007 ambient, 008 groove techno, 009 house and 010 ambient house, in `tracks/`. Each part of
-the sound (kick, bass, pad, keys and so on) is a column of controls on the controller.
+A live track is one SuperCollider file you play like an instrument. SuperCollider is a program for sound and music
+code. The tracks are in `sc/tracks/<id>/<id>.scd`: 001 and 002 groove, 007 ambient, 008 groove techno, 009 house,
+010 ambient house, 016 and 017 groove. Each part of the sound (kick, bass, pad, keys and so on) is a column of controls
+on the controller. A knob acts at once, also on notes that already sound.
 
 ## When to use it
 
@@ -49,10 +50,11 @@ to start: raise the master, bring in the kick or the pad, turn Brightness and Sp
 - Pattern changes happen at the next bar, so a press always lands on the beat.
 - Tracks 012 and 013 are different: songs from Guitar Pro. See [producer mode](producer-mode.md).
 - Each live track is one file. Edit that file; do not make copies. A new version goes into a new file.
-- The same file plays on [strudel.cc](strudel-cc.md) as well.
+- Most tracks started in Strudel. Their Strudel files in `tracks/` are frozen; the player still lists them as
+  "(Strudel)" and they play on [strudel.cc](strudel-cc.md).
 
 ## Related
 
 - [Controllers](controllers.md), [player](player.md), [auto-perform](auto-perform.md)
-- [Sets](sets.md)
+- [Stems](stems.md): one column as a file (stem tracks); [sets](sets.md)
 - [Glossary](../reference/glossary.md)

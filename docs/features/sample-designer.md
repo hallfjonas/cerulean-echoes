@@ -56,7 +56,7 @@ Each control's name and what it does show in the panel. Mode 2 is not used.
 The blocks, their knobs and types: `sc/lab/samples/blocks.json`; their sound: `sc/lab/samples/machine.scd`.
 
 ## The project file (format 1)
-Schema: `sc/lab/samples/sample.schema.json`. Check: `npm run sample-lab -- check` (also in `npm run verify` and
+Schema: `sc/lab/samples/sample.schema.json`. Check: `npm run sample-lab -- check` (also in `npm run verify-sc` and
 `npm test`).
 
 | Field | What it is |

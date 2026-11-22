@@ -27,7 +27,7 @@ Stems play on SuperCollider only (`sc/`). The Strudel tracks are not converted.
    `bassFM/…` (three sounds, register), `sdSupersaw/…` (held chords, own echo).
 3. Name the file after the sample and the labels (naming rule below).
 4. Check it: `cd tools && npm run check-stems` (the whole library) or `node stems/check-stems.mjs <file.stem>`.
-   `npm run verify` and `npm test` run the same check.
+   `npm run verify-sc` and `npm test` run the same check.
 
 ## Words
 - **Sample**: a playable sound in `sc/sounds/<name>.scd` (a synth or audio files with named parameters). The repo calls
@@ -333,7 +333,7 @@ Stems from different tracks meet in a swap or a comparison, so each `gain` bring
 by `cd tools && node stems/stem-loudness.mjs <file.track>`: every stem alone in SuperCollider, its fader and the
 master at 1, every knob at 0, its first pattern, Vamp, 8 bars; the level is LUFS-M (the loudest 400 ms).
 
-Target LUFS-M at fader 1 = **−13.7** (the 009 kick, gain 1) + the offset of the role (the strudel-mix targets):
+Target LUFS-M at fader 1 = **−13.7** (the 009 kick, gain 1) + the offset of the role (the targets of the retired Strudel level check):
 
 | Role | Offset (dB) | Target LUFS-M |
 |---|---|---|
@@ -426,8 +426,8 @@ the chord of the next note). Both happen only while the keys play a riff; see ta
 ## Set (definition only)
 A **set** is a unique, ordered list of stem tracks played as one performance: track 1 runs, then the next takes over,
 column by column, with tempo and harmony moving between them, the global column 8 keeping its meaning. A set file
-would name the tracks in order and the length of each change. There is no set file format or tooling yet; set 011
-(`tracks/sets/011-combining-all/`) is the Strudel forerunner ([sets](sets.md)).
+would name the tracks in order and the length of each change. There is no set file format or tooling yet; the
+Strudel forerunner, set 011, was removed with sc-migration 010 ([sets](sets.md)).
 
 ## Good to know
 - `check-stems` checks every `.stem` under `sc/stems/` and every `.track` under `sc/tracks/`: schema, the file name

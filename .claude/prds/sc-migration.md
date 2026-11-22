@@ -64,8 +64,8 @@ Strudel parts that need upkeep are retired. Background and earlier decisions: `S
    Strudel boards in `lab/` move to git history once it exists.
 9. Feature tests (`npm test`) for every feature above plus SC core (`UnitTest`, headless `sclang`); `verify-sc` for one
    changed SC track (loads without errors, tags parse, perform scripts valid).
-10. Retire: set 011 (`tracks/sets/`) and historic 000-006 (`tracks/historic/`); Strudel-only checks and skills
-    (`strudel-sim` checks, `verify`/`compare`/`audibility`/`measure`, `samples/sounds.json` tooling,
+10. Retire: set 011 (tracks/sets/) and historic 000-006 (tracks/historic/); Strudel-only checks and skills
+    (`strudel-sim` checks, `verify`/`compare`/`audibility`/`measure`, samples/sounds.json tooling,
     `/strudel-mix`, `/strudel-optimize`) once nothing that stays depends on them; skills that stay (`/lab-board`,
     `/lab-to-track`, `/add-sample`, `/auto-perform`) get their SC path.
 11. Source of truth (D1): a ported track's `.strudel` file is frozen; edits happen only in its `.scd`.
@@ -85,7 +85,7 @@ Strudel parts that need upkeep are retired. Background and earlier decisions: `S
 - All player features (track list, MIDI panel, auto-perform, takes, recording) pass their feature tests on SC.
 - A first-time user starts a set in under 2 minutes with the launcher and the README (tried with one person).
 - `npm test` green on `main`, run on every PR by CI (Node part).
-- Retired parts gone from the working tree: the Tools page and the Analysis page, `tracks/sets/`, `tracks/historic/`, the Strudel lab boards, the
+- Retired parts gone from the working tree: the Tools page and the Analysis page, tracks/sets/, tracks/historic/, the Strudel lab boards, the
   Strudel-only checks and skills; CLAUDE.md and docs describe the SC workflow.
 
 ## Constraints & Assumptions

@@ -4,6 +4,4 @@
 *.flac binary
 *.mp3 binary
 *.m4a binary
-tracks/**/*-single.strudel linguist-generated
-tracks/sets/011-combining-all/011-set-dual.strudel linguist-generated
 Cerulean?Echoes.app/** binary linguist-generated

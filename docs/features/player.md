@@ -9,7 +9,7 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 
 ## When to use it
 
-- To play a track without opening strudel.cc.
+- To play a live track on SuperCollider, with or without controllers.
 - To rehearse, or to try a track with no controller (auto-perform).
 - To see what the parts of a track do, for example on a projector.
 - To record what you play as a WAV file.
@@ -23,7 +23,7 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
    A SuperCollider track (most live tracks; the old Strudel version is listed as "(Strudel)") starts SuperCollider
    in the background the first time, which takes a few seconds. SuperCollider must be installed. Record,
-   auto-perform and the visuals do not work for SuperCollider tracks yet.
+   auto-perform, takes and the visuals work on SuperCollider tracks.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
 The sidebar shows only what the page needs. **Live**: the live track list, Play / Pause, Stop, Record and
@@ -48,7 +48,8 @@ Keys:
 
 - The player reads the track file again on every load. Edit a track, press Play, and you hear the edit. There is no
   extra step and no copy of the track on disk.
-- A track never needs the player. The same file plays pasted into [strudel.cc](strudel-cc.md).
+- A track never needs the player: an SC track also plays from the SuperCollider IDE (`sc/live.scd`), a frozen
+  Strudel file pasted into [strudel.cc](strudel-cc.md).
 - The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Settings (Visuals) change the visuals, never the
   sound.
 - Recordings go to `recordings/<track>/` in the repo root and are not part of git.

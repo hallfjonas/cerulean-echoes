@@ -111,7 +111,7 @@ Risks and mitigations:
 ## Dependencies
 
 - Internal: `analyse.mjs`, `analyse-file.mjs`, `autoperform.mjs`, `check-perform.mjs`, `midi.mjs`,
-  `engine-strudel.mjs`, `strudel-sim/harness.mjs`, `render.mjs`, `audibility.mjs`, `measure.mjs`.
+  `engine-strudel.mjs`, `strudel-sim/harness.mjs`, `render.mjs`, audibility.mjs, measure.mjs (the last two removed 2026-11-22, sc-migration 010).
 - Epics: `recording-replay` (shared master tap, task 1 there finds the same tap point; coordinate before task 1
   here); `llm-support` (will read the per-bar state later; nothing to wait for).
 - Skill: `/auto-perform` (updated in task 9).

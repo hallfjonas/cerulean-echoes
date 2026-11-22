@@ -45,8 +45,9 @@ node --test producer/*.test.mjs
 Files written: `<id>.strudel`, `<id>-design.md` (stub), `<id>-map.json` (only without `--map`), the `.mid` (copied),
 `perform/<id>/<name>.json` and `<name>.md` (stub).
 
-After generating: `npm run verify -- <track>`, `node strudel-sim/check-sounds.mjs <track>` (new sounds are "not
-checked yet" in `samples/sounds.json` until it runs), `npm run audibility -- <track>`.
+After generating: `node strudel-sim/transpile-check.mjs <track>` (syntax as strudel.cc reads it) and
+`node trajectory/check-perform.mjs <track>`; then listen in the player. The Strudel level and sound checks
+(`verify`, `audibility`, `check-sounds`) were removed with sc-migration 010.
 
 ## The map (`<track>-map.json`)
 Every decision the user made; a re-run keeps them. Bars are song bars (1-based).

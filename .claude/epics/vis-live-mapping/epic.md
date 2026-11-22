@@ -74,7 +74,7 @@ brightness, space and drive. Proven by a Node check that plays a track with scri
 
 ## Dependencies
 
-- `tools/strudel-sim/scenario.mjs` / `harness.mjs` for the Node check.
+- tools/strudel-sim/scenario.mjs (removed 2026-11-22, sc-migration 010) / `harness.mjs` for the Node check.
 - Shared `strip()` in `tools/shared/` (Brightness = `lpf`, Level = `postgain`).
 - `perform/` + `check-perform.mjs` for the sweep scripts.
 

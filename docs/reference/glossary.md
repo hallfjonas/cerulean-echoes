@@ -40,7 +40,7 @@ One English name per concept. Use these terms in notes, comments, labels and fil
 | Jojo / Jonas | Jojo / Jonas (names stay) |
 
 ## Kept as they are
-- Sample, bank and soundfont names (VCSL, `gm_*`, entries in `samples/sounds.json`).
+- Sample, bank and soundfont names (VCSL, `gm_*`, the folders in `sc/samples/`).
 - Own voice recordings and their sample names (`samples/voice/`), the event name `beats-basteln-workshop`.
 - Place and person names (Plänterwald, Midori, Jojo).
 - Quoted external titles.

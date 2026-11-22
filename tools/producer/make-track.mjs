@@ -997,7 +997,7 @@ function designStub(map, song) {
     '## Open questions',
     '',
     '- Columns, voices and patterns above: right for the song?',
-    '- Levels: run `npm run audibility -- <track>` before the performance is written.',
+    '- Levels: set them by ear in the player before the performance is written.',
     '',
   ].join('\n')
 }
