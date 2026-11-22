@@ -16,7 +16,8 @@ cd tools && node trajectory/server.mjs [port]
 ```
 
 Then open **http://localhost:8766** in Chrome. Or without a Terminal: double-click **Cerulean Echoes.app** in the
-repo folder (the launcher, `tools/launcher/`): it starts this server, opens the player in the default browser (one tab:
+repo folder (the launcher, `tools/launcher/`): it starts this server, opens the player in its own window (the app window of Chrome / Brave / Edge, else a tab in the default browser;
+one window:
 each player tab holds two open streams, Chrome allows six connections per host, so several tabs hang the page) and
 stops the server and its SuperCollider when it is quit (Dock: Quit; also on a force quit). An already running player
 on the port is only opened. First start: `npm ci` once, with a message. Log: `~/Library/Logs/cerulean-echoes.log`.

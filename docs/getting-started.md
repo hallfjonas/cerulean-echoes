@@ -13,8 +13,8 @@ play.
 ## Start with one double-click (no Terminal)
 
 1. Install once: [SuperCollider](https://supercollider.github.io/downloads) (drag it into Applications) and
-   [Node.js](https://nodejs.org) (the LTS version). Chrome (or another Chrome-based browser such as Brave) as your
-   default browser is best: Safari has no Web MIDI.
+   [Node.js](https://nodejs.org) (the LTS version), and Chrome or another Chrome-based browser (Brave, Edge): the
+   player then opens in its own window, without tabs or address bar (Safari has no Web MIDI).
 2. Get the repo: `git clone` it (a ZIP download from GitHub is blocked by macOS as an app "from the internet"; then
    right-click the app and pick **Open** once).
 3. Double-click **Cerulean Echoes.app** in the repo folder. The player opens in the browser; SuperCollider starts

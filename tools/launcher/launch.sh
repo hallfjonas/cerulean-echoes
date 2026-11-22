@@ -6,12 +6,14 @@
 #   launch.sh start      start the player server (tools/trajectory/server.mjs) in the background and wait until it
 #                        answers; print "started <pid>", or "running" when a player already answers on the port (then
 #                        nothing is started and stop leaves it alone)
-#   launch.sh open       open the player in the default browser (one tab)
+#   launch.sh open       open the player in its own window: a Chromium browser's app window (Chrome, Brave, Edge,
+#                        Chromium, Vivaldi: no tabs, no address bar; Web MIDI works), else the default browser
 #   launch.sh alive      exit 0 while the server this launcher started runs, 1 when it ended by itself, 3 when this
 #                        launcher started none (or stopped it)
 #   launch.sh url        print the player's address
 #   launch.sh stop       stop the server this launcher started (SIGINT: it ends its SuperCollider), wait for it
-# Options (or environment): --port N (CE_PORT, default 8766), --no-browser (CE_NO_BROWSER=1),
+# Options (or environment): --port N (CE_PORT, default 8766), --no-browser (CE_NO_BROWSER=1), CE_APP_WINDOW=0 (a
+#   normal tab in the default browser instead of the app window),
 #   --watch PID: the started server is stopped when process PID ends (the app: also on a force quit).
 # Environment for tests: CE_LOG (log file), CE_STATE_DIR (pid files), CE_NODE (node binary), SCLANG (as in sc-link.mjs),
 #   CE_SC_PORT / CE_SC_SERVER_PORT (passed on to the server).
@@ -130,6 +132,14 @@ case "$command" in
     ;;
   open)
     if [ "$browser" = 0 ]; then say "open: browser skipped ($url)"; echo skipped; exit 0; fi
+    if [ "${CE_APP_WINDOW:-1}" != 0 ]; then
+      for app in "Google Chrome" "Brave Browser" "Microsoft Edge" "Chromium" "Vivaldi"; do
+        if [ -d "/Applications/$app.app" ] || [ -d "$HOME/Applications/$app.app" ]; then
+          say "open: $url as an app window in $app"
+          if open -na "$app" --args --app="$url"; then echo "opened app window ($app)"; exit 0; fi
+        fi
+      done
+    fi
     say "open: $url"
     open "$url" || fail "Could not open the browser. Open $url yourself."
     echo opened
