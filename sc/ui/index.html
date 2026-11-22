@@ -6,12 +6,12 @@
 <title>LC XL 3</title>
 <style>
 /* Controller mirror after UI-REDESIGN.md and reference/layout-mockup.html: two LC panels (Mode 1, Mode 2), the Launchkey
-   under Mode 1, the spectrum and the set view under Mode 2, the status (bar marks, beats) top right of Mode 1. Everything is laid out on a design board of 1600 x 900
+   under Mode 1, the spectrum and the set view under Mode 2, the status (bar marks, beats, chord) in a line under the spectrum. Everything is laid out on a design board of 1360 x 900
    units and scaled as one piece (--px = one unit in CSS px); only text has a floor and a ceiling. Two styles, "minimal"
    (Torso-like, default) and "retro" (Teenage Engineering-like), each dark or light (data-tone): only tokens and the knob
    component differ.
    Flat: no gradients, shadows, glow or blur. Nothing dims except button text. */
-:root{--W:1600;--H:900}
+:root{--W:1360;--H:900}
 body,body[data-theme=minimal]{--bg:#0b0b0b;--text:#F1EFE8;--off:#5F5E5A;--track:#2C2C2A;--accent:#F1EFE8;--handle:#F1EFE8;
   --edge:#2C2C2A;--frame:#F1EFE8;--hit:#F1EFE8;--keyW:#2C2C2A;--keyB:#0b0b0b;--keyLine:transparent;--keyLab:#8A8A8A;--padF:#2C2C2A;--padLine:transparent;--wheelF:#8A8A8A;
   --font:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
@@ -30,13 +30,19 @@ body{text-transform:lowercase}button,input,select{text-transform:inherit}
 body{display:flex;align-items:center;justify-content:center;color:var(--text);font-family:var(--font);line-height:1.4;
   user-select:none;-webkit-user-select:none;
   --px:min(calc(96vw / var(--W)), calc(94vh / var(--H)));
+  /* the board follows the window (user, 2026-11-22): it always fills the width (extra width goes to the columns), and
+     height beyond the design board (--free) goes first to the bottom row (keys, spectrum, set view; at most 110 units,
+     --low), the rest to the faders. Text and knobs keep their size. */
+  --free:max(0px, calc(94vh - var(--H) * var(--px)));
+  --low:min(calc(var(--free) * .5), calc(110 * var(--px)));
   --fs-name:clamp(13px, calc(20 * var(--px)), 32px);
   --fs-btn:clamp(11px, calc(18 * var(--px)), 28px);
   --fs-lab:clamp(11px, calc(16 * var(--px)), 24px);
   --fs-knob:clamp(11px, calc(14 * var(--px)), 21px)}
 .wait{font-size:var(--fs-lab);color:var(--accent)}
-.board{width:calc(var(--W) * var(--px));display:flex;flex-direction:column;gap:calc(32 * var(--px))}
-.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(40 * var(--px))}
+.board{width:96vw;height:calc(var(--H) * var(--px) + var(--free));display:flex;flex-direction:column;gap:calc(14 * var(--px))}
+.board>.pair+.pair{flex:1;min-height:0}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(20 * var(--px))}
 .pair>section{min-width:0;display:flex;flex-direction:column}
 .lab{display:flex;gap:.6em;font-size:var(--fs-lab);color:var(--off);margin:0 calc(12 * var(--px)) calc(8 * var(--px));
   white-space:nowrap;overflow:hidden;text-transform:lowercase}
@@ -66,7 +72,7 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 .r1 .kb-disc{fill:#378ADD;stroke:#378ADD}.r2 .kb-disc{fill:#1D9E75;stroke:#1D9E75}.r3 .kb-disc{fill:#F1EFE8;stroke:#888780}
 .r1 .kb-ptr,.r2 .kb-ptr{stroke:#F1EFE8}.r3 .kb-ptr{stroke:#2C2C2A}
 /* fader: 28 x 150 units, track max(2px, 4 units), handle 28 x 12 */
-.fader{position:relative;width:calc(28 * var(--px));height:calc(130 * var(--px));margin-top:calc(4 * var(--px));flex:none}
+.fader{position:relative;width:calc(28 * var(--px));height:calc(130 * var(--px) + var(--free) - var(--low));margin-top:calc(4 * var(--px));flex:none}
 .fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
 /* pickup: where the physical fader sits while it has not met the value yet (a short line across the slot) */
 .fader .ghost{position:absolute;left:-20%;width:140%;height:max(2px, calc(2 * var(--px)));background:var(--accent);
@@ -89,7 +95,7 @@ body.stemlab .cl:not(.global) .kw .kl{cursor:pointer;text-decoration:underline d
 body.stemlab .cl:not(.global) .kw .kl:hover{color:var(--accent)}@keyframes blink{0%{opacity:1}50%{opacity:.25}}
 .off{visibility:hidden}
 /* Launchkey: mod wheel left of the 8-column grid (knob over 2 pads per column), the keys under the pads */
-.lk{display:grid;grid-template-columns:calc(56 * var(--px)) minmax(0,1fr);grid-template-rows:auto auto auto;
+.lk{display:grid;grid-template-columns:calc(56 * var(--px)) minmax(0,1fr);grid-template-rows:auto auto 1fr;
   grid-template-areas:"oct knobs" "wheel pads" "wheel keys";column-gap:calc(16 * var(--px));row-gap:calc(6 * var(--px));
   padding:calc(12 * var(--px)) calc(12 * var(--px))}
 .lkknobs{grid-area:knobs}.lk .kb-track,.lk .kb-val{stroke-width:4}body:not([data-theme=retro]) .lk .kl{letter-spacing:-.03em}.lk .knob{width:calc(30 * var(--px))}
@@ -116,7 +122,7 @@ body.stemlab .cl:not(.global) .kw .kl:hover{color:var(--accent)}@keyframes blink
 /* the keys level uses the stems' fader, as tall as pads + keys */
 .wheel .fader{flex:1;height:auto;margin:0}
 /* keys: white keys with real gaps, black keys shorter, between them (slightly off-centre as on a real keyboard) */
-.keys{position:relative;height:calc(130 * var(--px))}
+.keys{position:relative;height:auto;min-height:calc(130 * var(--px))}
 .keys i{position:absolute;top:0;font-style:normal;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
 .keys i.wht{height:100%;width:calc(100% / 15 - 2 * var(--px));background:var(--keyW);box-shadow:inset 0 0 0 1px var(--keyLine);color:var(--keyLab);
   font-size:var(--fs-knob);line-height:1.6;z-index:1;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
@@ -128,7 +134,7 @@ body.no-lk .lkbox{visibility:hidden}
 .duo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) calc(300 * var(--px));gap:calc(28 * var(--px));min-height:0}
 .duo>div{display:flex;flex-direction:column;min-width:0;min-height:0}
 .spec{flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
-.spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
+.spec canvas{display:block;width:100%;height:auto;min-height:calc(190 * var(--px));flex:1}
 /* the set view's canvas fills its box (same size for every view, so nothing moves when the view switches) */
 .setbox canvas{flex:1;height:auto;min-height:0}
 .setlab{font:inherit;background:none;border:0;padding:0;color:inherit;cursor:pointer;white-space:nowrap}
@@ -139,6 +145,20 @@ body.no-lk .lkbox{visibility:hidden}
 /* the status in the top line, right of mode 1's label: a warning, or the 8 bar marks, 4 beat dots and the chord */
 .lab .head{margin-left:auto;display:flex;align-items:center;white-space:nowrap;color:var(--text)}
 .warn{color:var(--accent);font-weight:600}
+/* the player's "Section names" setting (key N) off: the names above the panels go, the lines and what else they hold stay */
+.lab .devwarn{margin-left:auto;white-space:nowrap}
+body.nonames .lab>span:first-child,body.nonames .duo .lab,body.nonames .lkbox .hint{visibility:hidden}
+/* names off: the knob labels that are the same in every stem column (row 1 Brightness, row 2 Space) go too */
+body.nonames .kl.same{visibility:hidden}
+/* the bottom row ends on one line: the Launchkey box stretches with the spectrum and the set view */
+.lkbox .pn.lk{flex:1}
+/* the status line under the spectrum (user, 2026-11-22, variant V1): 8 bar marks stretched to the spectrum's width,
+   4 beat dots, the chord in a fixed slot on the right (chord names differ in length, the marks never move) */
+.lab.beatline{margin:calc(10 * var(--px)) 0 0}
+.lab.beatline .head{margin-left:0;display:flex;align-items:center;width:100%}
+.lab.beatline .bars{flex:1;display:flex;gap:calc(6 * var(--px))}.lab.beatline .bars i{flex:1;margin:0}
+.lab.beatline .chord{flex:none;width:7ch;text-align:right;margin-left:1em;overflow:hidden;text-overflow:ellipsis}
+body.nonames .duo .lab.beatline,body.nonames .lab.beatline>span{visibility:visible}
 .marks i{display:inline-block;background:var(--track);margin-left:max(2px, calc(4 * var(--px)));vertical-align:middle}
 .marks.beats i{width:max(5px, calc(9 * var(--px)));height:max(5px, calc(9 * var(--px)));border-radius:50%}
 .marks.bars i{width:max(7px, calc(14 * var(--px)));height:max(3px, calc(6 * var(--px)));border-radius:1px}
@@ -146,7 +166,8 @@ body.no-lk .lkbox{visibility:hidden}
 .marks+.marks,.chord{margin-left:.5em}.marks i:first-child{margin-left:0}
 .ctl{cursor:ns-resize;touch-action:none}.btn.ctl{cursor:pointer}.fader.ctl,.wheel.ctl{cursor:pointer}
 body.pick .name[data-col]{cursor:pointer;text-decoration:underline dotted}
-body.shape-on{height:calc(100% - 230px);--px:min(calc(96vw / var(--W)), calc((94vh - 230px) / var(--H)))}
+body.shape-on{height:calc(100% - 230px);--px:min(calc(96vw / var(--W)), calc((94vh - 230px) / var(--H)));
+  --free:max(0px, calc(94vh - 230px - var(--H) * var(--px)))}
 #shape{display:none;position:fixed;left:0;right:0;bottom:0;box-sizing:border-box;height:230px;padding:4px 10px 10px;font:11px var(--font);color:var(--text);background:var(--bg)}
 body.shape-on #shape{display:flex;flex-direction:column;gap:4px}
 #shape .numbers{display:flex;flex-wrap:wrap;gap:2px 16px;font-variant-numeric:tabular-nums}
@@ -191,6 +212,8 @@ addEventListener('message', e => {
   if (STYLES.includes(e.data?.theme?.style) && TONES.includes(e.data.theme.tone)) applyTheme(e.data.theme)
   // the player's "LC frame" setting (key H): frame the controller moved last, or not
   if (typeof e.data?.lcFrame === 'boolean') document.body.classList.toggle('noframe', !e.data.lcFrame)
+  // the player's "Section names" setting (key N): the names above the panels (mode 1 · foundation, launchkey, spectrum …)
+  if (typeof e.data?.panelNames === 'boolean') document.body.classList.toggle('nonames', !e.data.panelNames)
   // a stem track in the player: a click on a column's name selects that column (the player opens the stem drawer)
   if (typeof e.data?.pickColumns === 'boolean') document.body.classList.toggle('pick', e.data.pickColumns)
   // the sound shape under the controllers: the player allows it on its Labs / Samples page only
@@ -341,7 +364,7 @@ const build = () => {
   cells.length = 0
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
   const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
-  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '<span class=head id=head></span>') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
+  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=devwarn id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
     cols.map(n => { const name = (tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')
       return '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name' +
       (isGlobal(n) || !name ? '' : ' data-col="' + (page === 'jojo' ? 1 : 2) + ':' + n + '"') + '>' + esc(name) + '</span>' +
@@ -349,7 +372,7 @@ const build = () => {
       '<div class=btns>' + cell(page, n, 'b1') + cell(page, n, 'b2') + '</div></div>' }).join('') + '</div></div></section>').join('')
   root.className = 'board'
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
-    '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
+    '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div><p class="lab beatline"><span class=head id=head></span></p></div>' +
     '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Settings, key C)"></button></p>' +
     '<div class="spec setbox"><canvas id=setv></canvas><div class=setdots id=setdots></div></div></div></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
@@ -369,6 +392,12 @@ const build = () => {
       : kind === 'knob' ? knobSvg() + '<span class=kl>' + esc(name) + '</span>' : esc(name)
     if (c.on) attach(c, kind)
     cells.push(c)
+  }
+  // a knob label that is the same in every stem column of its row on a page (Brightness, Space) goes with the names off
+  for (const page of PAGES) for (const row of ['k1', 'k2']) {
+    const ls = [...root.querySelectorAll('.cl:not(.global) [data-cell^="' + page + ':"][data-cell$=":' + row + '"] .kl')]
+    const same = ls.length > 1 && ls.every(l => l.textContent === ls[0].textContent)
+    ls.forEach(l => l.classList.toggle('same', same))
   }
   spectrumResize()
   setDraw()
@@ -422,6 +451,22 @@ const shownOf = cc => (performance.now() - (mine[cc] ?? -1e9) < 300) ? (S.cc[cc]
 let timer = null
 const update = () => { timer ??= requestAnimationFrame(() => { timer = null; draw() }) }
 const setText = (el, t) => { if (el && el.textContent !== t) el.textContent = t }
+// Devices (user, 2026-11-22): the list is in the player's sidebar (the panel tells it on every change); here only a
+// warning while a device seen since the panel loaded is gone (a loose cable mid-set). Several of a kind: by count.
+const seenPorts = new Map()   // port name → kind, every port SC reported since the panel loaded
+let sentPorts = null
+const showDevices = () => {
+  for (const [name, kind] of S.midi) seenPorts.set(name, kind)
+  const now = new Set(S.midi.map(p => p[0])), gone = { lc: 0, launchkey: 0 }
+  for (const [name, kind] of seenPorts) if (!now.has(name) && kind in gone) gone[kind]++
+  const say = (n, one) => n ? (n > 1 ? n + ' ' + one + 's' : one) + ' missing' : ''
+  const warn = [say(gone.lc, 'launch control'), say(gone.launchkey, 'launchkey')].filter(Boolean).join(' · ')
+  const ports = document.getElementById('ports')
+  if (ports._warn !== warn) { ports._warn = warn; ports.innerHTML = warn ? '<span class=warn>' + esc(warn) + '</span>' : '' }
+  const list = JSON.stringify(S.midi)
+  if (list !== sentPorts && parent !== window) { sentPorts = list; parent.postMessage({ midiPorts: S.midi }, location.origin) }
+}
+
 const draw = () => {
   if (!S.layout) return
   // frame on the page last moved: only with at most one Launch Control (with two, each board has its own page)
@@ -476,14 +521,14 @@ const draw = () => {
     setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
     if (pad) setTimeout(update, 2050)
   }
-  // status (top line, right of mode 1's label): only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
+  // status (its own line under the spectrum): only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
   // marks and 4 beat dots (no 'bar n / 8' text: the marks say it), the chord of the bar. The track's head line
   // (chords / colour) and the global knob values are on the buttons and knobs already.
   const marks = (cls, n, on) => '<span class="marks ' + cls + '">' + [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('') + '</span>'
   const bt = S.beat
   const beat = !bt ? '' : marks('bars', 8, bt.bar % 8) + marks('beats', 4, bt.beat) +
-    (bt.chord ? '<span class=chord>' + esc(bt.chord) + '</span>' : '')
-  setText(document.getElementById('ports'), lcs ? lcs + ' Launch Control' + (lcs > 1 ? 's' : '') : 'no Launch Control: mouse only')
+    '<span class=chord>' + esc(bt.chord ?? '') + '</span>'
+  showDevices()
   const head = document.getElementById('head')
   head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
   const html =
@@ -510,7 +555,7 @@ addEventListener('resize', spectrumResize)
 const layoutKeys = () => {
   const box = document.querySelector('.keys'), board = document.querySelector('.board')
   if (!box || !board) return
-  const W = box.clientWidth, unit = board.getBoundingClientRect().width / 1600, g = Math.max(1, Math.round(2 * unit)), kw = W / 15
+  const W = box.clientWidth, unit = parseFloat(getComputedStyle(board).rowGap) / 14, g = Math.max(1, Math.round(2 * unit)), kw = W / 15
   for (const el of box.querySelectorAll('[data-wi]')) {
     const i = +el.dataset.wi, x0 = Math.round(i * kw), x1 = i === 14 ? W : Math.round((i + 1) * kw) - g
     el.style.left = x0 + 'px'; el.style.width = (x1 - x0) + 'px'
@@ -541,7 +586,8 @@ const drawSpectrum = () => {
     if (!fresh) S.spec[i] *= 0.9   // no data: fall to 0
     peaks[i] = Math.max(S.spec[i], peaks[i] - 0.006)
   }
-  const rows = 12, ncol = dots ? 32 : 24, cw = w / ncol, rh = H / rows
+  // rows follow the height: a taller box gets more rows, the cell keeps its shape at the design size (12 rows)
+  const ncol = dots ? 32 : 24, cw = w / ncol, rows = Math.max(12, Math.floor(H / (cw * (dots ? 1.03 : .78)))), rh = H / rows
   for (let c = 0; c < ncol; c++) {
     const i0 = Math.floor(c * N / ncol), i1 = Math.floor((c + 1) * N / ncol); let v = 0
     for (let i = i0; i < i1; i++) v = Math.max(v, peaks[i])
@@ -660,7 +706,7 @@ const setDraw = () => {
   if (!w || !h) return
   cv.width = Math.max(1, Math.round(w * dpr)); cv.height = Math.max(1, Math.round(h * dpr))
   const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h)
-  const K = setColors(), u = document.querySelector('.board').getBoundingClientRect().width / 1600
+  const K = setColors(), u = parseFloat(getComputedStyle(document.querySelector('.board')).rowGap) / 14
   // a colour between two hex colours (t = 0: a, 1: b)
   const mix = (a, b, t) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), x = p(a), y = p(b)
     return 'rgb(' + x.map((v, i) => Math.round(v + (y[i] - v) * t)).join(',') + ')' }
@@ -723,20 +769,21 @@ const setDraw = () => {
       const idx = k <= cur - lap ? lap + k : lap - 360 + k, s = D[idx]; if (!s) continue
       const a0 = (-90 + k) * Math.PI / 180, a1 = a0 + Math.PI / 180 * 1.02, r = R0 + (R1 - R0) * s.e
       c.beginPath(); c.arc(cx, cy, r, a0, a1); c.arc(cx, cy, R0, a1, a0, true); c.closePath()
-      c.fillStyle = idx === cur ? K.now : mix(K.cur, K.old, Math.min(1, (cur - idx) / 359)); c.fill() }
+      c.fillStyle = mix(K.now, K.old, Math.min(1, (cur - idx) / 359)); c.fill() }
     c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (fs * 1.5) + 'px ' + F; c.fillStyle = K.now
     c.fillText(Math.floor(NOW) + '′', cx, cy)
   } else if (setView === 'ring') {
     // fixed 60′ clock in the spectrum's grid language: 60 spokes (one per minute) x 8 cells, lit = round(√energy · 8);
     // cells grow with the radius; the second hour paints over the first. Brightness follows each minute's AGE, from
-    // the newest (cur) to 60' old (old), so the only edge is at the needle (newest next to oldest), none at 12 o'clock
+    // the newest (now) to 60' old (old), so the only edge is at the needle (newest next to oldest), none at 12 o'clock
     const cx = w / 2, cy = h / 2, R1 = Math.min(w, h) / 2 - 2, R0 = R1 * .4, RINGS = 8, st = (R1 - R0) / RINGS
     const sums = new Map()
     for (const s of D) { const k = Math.floor(s.m - SET_STEP / 2), a = sums.get(k) ?? [0, 0]; a[0] += s.e; a[1]++; sums.set(k, a) }
     const nowMin = D.length ? Math.floor(NOW - SET_STEP / 2) : -1, lap = Math.floor(nowMin / 60) * 60
     for (let k = 0; k < 60; k++) {
       const a = (-90 + (k + .5) * 6) * Math.PI / 180, mAbs = k <= nowMin - lap ? lap + k : lap - 60 + k
-      const lit = mix(K.cur, K.old, Math.min(1, Math.max(0, (nowMin - mAbs) / 59)))
+      // newest in the now colour, fading to old with age (user, 2026-11-22: the newest must stand out, not all grey)
+      const lit = mix(K.now, K.old, Math.min(1, Math.max(0, (nowMin - mAbs) / 59)))
       const sm = sums.get(mAbs), on = sm ? Math.round(sm[0] / sm[1] * RINGS) : 0, isNow = D.length > 0 && mAbs === nowMin
       for (let rr = 0; rr < RINGS; rr++) {
         const rad = R0 + (rr + .5) * st, x = cx + rad * Math.cos(a), y = cy + rad * Math.sin(a), slot = rad * Math.PI / 30
