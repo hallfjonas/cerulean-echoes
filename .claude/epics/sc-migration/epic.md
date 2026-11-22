@@ -2,7 +2,7 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-22T03:37:26Z
+updated: 2026-11-22T03:51:09Z
 progress: 64%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
@@ -85,8 +85,8 @@ not the audio thread); the take ↔ WAV alignment once SC records.
   panel, auto-perform, takes, recording, producer, SC core.
 - 7 live tracks load on SC from the player; perform scripts in `tools/trajectory/perform/` play on SC to the end. (met)
 - Launcher starts and stops everything with no leftover processes.
-- `tracks/sets/`, `tracks/historic/`, Strudel lab boards and Strudel-only checks/skills removed; `npm run path-lint`
-  shows no new missing paths.
+- tracks/sets/, tracks/historic/, Strudel lab boards and Strudel-only checks/skills removed; `npm run path-lint`
+  shows no new missing paths. (met, 010)
 
 ## Estimated Effort
 
@@ -103,7 +103,8 @@ Biggest items: 002 (engine) and the ports (007, 008).
 - [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true) — ported (#85); open: the players' ear approval
 - [ ] 008.md - Port 016-grroove-opus to SC (parallel: true) — ported (#64), live check done; open: the players' ear approval
 - [x] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
-- [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
+- [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false) — built (PR below); open: its last
+  box, the epic's close and removal PR, waits for 006-008
 - [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
 
 Total tasks: 11
@@ -115,12 +116,16 @@ Estimated total effort: 107 hours
 - Closed: 001, 002, 003, 004, 005, 009, 011.
 - Built, waiting for people: 006 (one first-time user tries the launcher), 007 and 008 (the players approve 001, 002
   and 016 by ear; five Strudel quirks kept 1:1 in 001/002 are listed in `sc/PORTING.md` for a decision).
-- Open: 010 (retire the Strudel parts, SC docs and skills), last; it can start now, from `main`.
+- 010 built (2026-11-22): set 011, historic 000-006, the Strudel checks and skills removed; `npm run verify-sc`;
+  CLAUDE.md, CONTRIBUTING.md, docs and skills on the SC workflow. Its last box (epic closed, removal PR) waits.
+- The epic stays in-progress until 006, 007 and 008 close (people, not code). Then: the removal PR
+  `chore/remove-sc-migration-epic` (deletes this folder, the PRD and `sc/PLAN-SC-ENGINE.md`; move what is worth
+  keeping to `docs/` first, CONTRIBUTING.md "Closing").
 - Merged into `main` on 2026-11-22 with #91 (the whole branch `epic/sc-migration-next`, merged with Jonas' sound lab
   and player pages first; it replaced #77-#81 and contained #82, #83, #85). `npm test` 113/113, muted; CI green.
   New work branches from `main`.
 - Tracks: all 7 live tracks have an SC version (001, 002, 007, 008, 009, 010, 016); their `.strudel` files are frozen
-  (D1). Not ported, by plan: set 011 and `tracks/historic/` (removed in 010), the producer songs 012/013 (test fixtures).
+  (D1). Not ported, by plan: set 011 and tracks/historic/ (removed in 010), the producer songs 012/013 (test fixtures).
 - Controllers (2026-11-22): knob feedback, SC sends every knob change and every load to each LC XL 3, so the devices
   hold the shared value (user test: custom modes take it); faders and the mod wheel use pickup (no jump, the panel
   marks an uncaught fader). Tried with one LC; two LCs not tried yet.
