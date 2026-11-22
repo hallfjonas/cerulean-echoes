@@ -18,7 +18,7 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 
 1. Start it: `cd tools && node trajectory/server.mjs`, then open http://localhost:8766 in Chrome. Steps in
    [getting started](../getting-started.md).
-2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the [lab boards](lab-boards.md). Boards
+2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the ear-training tutorials ([lab boards](lab-boards.md) are retired). Boards
    without a master `stack(` are greyed out.
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
    A SuperCollider track (most live tracks; the old Strudel version is listed as "(Strudel)") starts SuperCollider

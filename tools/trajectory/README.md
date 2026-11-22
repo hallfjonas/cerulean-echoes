@@ -21,8 +21,8 @@ name and value (the track's LC view). The visuals (every stem with its name, tem
 a page of their own (Visuals); Labs holds the Sample and Stem Designer.
 The server only answers to its own pages (Origin and Host are checked on the routes that run something).
 
-1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the boards from
-   `lab/`. Boards without a master `stack(` cannot be tapped and are greyed out.
+1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the tutorials from
+   `lab/tutorials/`. Boards without a master `stack(` cannot be tapped and are greyed out.
    SuperCollider tracks (`sc/tracks/`, listed under their plain id; a ported track's frozen Strudel file shows as
    `<id> (Strudel)`) play through SC: the server starts `sclang sc/engine.scd` on the first SC load (a few seconds) and
    ends it with itself; the Live and Labs pages show SC's LC view (`sc/ui/index.html` at `/sc/`); the controllers go straight to

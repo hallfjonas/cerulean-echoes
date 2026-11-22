@@ -21,12 +21,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   its feedback notes; a Guitar Pro song also its `.mid`, `<track>-map.json`
   and `<track>-design.md`. No `old/` folders: superseded variants are deleted once committed, git history keeps them.
 - `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
-- `lab/` — boards, not tracks, one folder per instrument or per track role: `keys/`, `kick/`, `bass/`, `drums/`, `synth/`,
-  `harmony/`, `melody/`, `stab/`, `brass/`, `guitar/`, `strings/`, `samples/`, `tools/`
-  (instrument-independent, e.g. `variation-lab`), `tutorials/` (ear training with live sliders + English handbook PDF).
-  A board is either one sound optimised on its own or a comparison of candidate columns (each built like a track
-  column), worked in rounds: the current round in the folder, older rounds deleted (git history), each round's result in
-  the folder's `feedback.md`. Winners go into the tracks. Rejected board series: `lab/archive/`.
+- `lab/tutorials/` — ear training with live sliders + English handbook PDF (the only part of `lab/` left; the Strudel
+  boards were retired 2026-11-21, lessons in `docs/reference/lab-lessons.md`, boards in git history up to a69f511)
 - `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
   to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
@@ -96,7 +92,7 @@ files.
 Use them instead of redoing the steps by hand:
 - Same sound, less CPU, "drops out", "compare old/new", "event by event": `/strudel-optimize`.
 - Levels, "louder/quieter", "can't hear", clipping, balance of stems, pads, keys and voices: `/strudel-mix`.
-- New board, "candidates", "next round": `/lab-board`; a board winner "into the track": `/lab-to-track`.
+- New sounds: the sound-lab epic's `/stem-designer` and `/sample-designer` (`/lab-board`, `/lab-to-track` are retired pointers).
 - A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
 - Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
 - A new sound on the SC machine ("sample designer", "a soft tom", export to `sc/sounds/`): `/sample-designer`.
