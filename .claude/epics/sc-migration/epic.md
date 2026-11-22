@@ -103,7 +103,7 @@ Biggest items: 002 (engine) and the ports (007, 008).
 - [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true) — ported (#85); open: the players' ear approval
 - [ ] 008.md - Port 016-grroove-opus to SC (parallel: true) — ported (#64), live check done; open: the players' ear approval
 - [x] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
-- [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false) — built (PR below); open: its last
+- [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false) — built (#94); open: its last
   box, the epic's close and removal PR, waits for 006-008
 - [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
 
