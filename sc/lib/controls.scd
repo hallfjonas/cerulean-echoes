@@ -136,10 +136,27 @@
 	if(cg[key] == true) { self.pickFrom = uid; set.value; self.pickFrom = nil; self.uiSend('/ce/phys', key, -1) }
 		{ self.uiSend('/ce/phys', key, v) } };
 ~ce.isKnobCC = { |self, cc| (cc >= 13 and: { cc <= 36 }) or: { cc >= 61 and: { cc <= 84 } } };
+// Mode switch (user 2026-11-22): the physical faders stay where they are, but now send the other mode's CCs; while
+// in the other mode a fader may have moved, so a "caught" state of the new mode's faders is stale. The first CC of a
+// Launch Control from the other mode (CC 5-52 = Mode 1, 53-100 = Mode 2) releases that device's faders of the new
+// mode and forgets their last positions (no "passing" from a stale spot); column 8 (aliased: one fader for both modes)
+// stays caught.
+~ce.lcMode = ();   // uid → 1 or 2, the mode the Launch Control sent its last CC from
+~ce.lcModeSwitch = { |self, uid, num|
+	var m = case { num >= 5 and: { num <= 52 } } { 1 } { num >= 53 and: { num <= 100 } } { 2 } { nil }, was = self.lcMode[uid];
+	if(m.notNil) {
+		self.lcMode[uid] = m;
+		if(was.notNil and: { was != m }) {
+			var cg = self.caught[uid], raw = self.pickRaw[uid];
+			((5..12) + (48 * (m - 1))).do { |f|
+				if(self.ccAlias[f].isNil and: { self.ccAlias.includes(f).not }) {
+					var key = ("c" ++ f).asSymbol;
+					cg !? { cg[key] = false }; raw !? { raw[key] = nil } } } } } };
 ~ce.midiCC = { |self, val, num, uid, chan|
 	switch(self.midiPorts[uid] !? { |p| p.kind },
 		\lc, {
 			chan !? { self.lcChan[num] = chan };
+			self.lcModeSwitch(uid, num);
 			if(self.isKnobCC(num)) {
 				var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e }, last = raw[num];
 				raw[num] = val;
