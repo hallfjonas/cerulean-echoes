@@ -16,6 +16,7 @@
 	self.uiSend('/ce/cc', c, v);
 	// column state (lab columns keep their start values until a control moves; as Strudel, only a change counts)
 	if(force or: { v != was }) { (self.ccHooks[c] ? []).do { |f| f.(v, send) } };
+	if(self.isKnobCC(c)) { self.knobOut(c, v) };
 	if(v > 0.5 and: { was <= 0.5 }) { (self.pressFns[c] ? []).do(_.value); self.uiPush };
 };
 // fn(value, send) on every message of a CC (send: as in setCC, for state buses)
@@ -97,11 +98,29 @@
 // both ends are always reachable and nothing jumps; where device and shared value agree it is 1:1, and a step never
 // moves less than 1:1 (user, 2026-11-21: far apart, the short side felt dead for many steps). A device's first
 // message for a knob only sets its reference (no change). Faders stay absolute (physical position).
-~ce.lcRaw = ();   // uid → (cc → the last raw value 0..127 this Launch Control sent)
+// Knob feedback (user test 2026-11-22, sc/tools/lc-feedback-test.scd: an LC XL 3 in a custom mode takes a CC sent to
+// its MIDI In as the knob's new value): every knob change, from any source (an LC, the web view, a script, a load), is
+// sent to every Launch Control, so each device always holds the shared value and every turn is 1:1; the value scaling
+// above only acts if a device missed a message.
+~ce.lcRaw = ();   // uid → (cc → the last raw value 0..127 this Launch Control sent or was sent)
+~ce.lcOuts = ();  // uid → the Launch Control's MIDI In (a MIDIOut; tests: anything that answers control(chan, cc, value))
+~ce.lcChan = ();  // cc → the MIDI channel (0-based) the Launch Controls send it on (learned; unknown: all 16)
+~ce.knobOut = { |self, c, v|
+	var b = (v * 127).round.asInteger.clip(0, 127), nums = [c] ++ self.ccAlias.keys.asArray.select { |k| self.ccAlias[k] == c };
+	self.lcOuts.keysValuesDo { |uid, out|
+		var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e };
+		nums.do { |num|
+			if(raw[num] != b) {
+				raw[num] = b;
+				{ var ch = self.lcChan[num]; if(ch.notNil) { out.control(ch, num, b) } { 16.do { |k| out.control(k, num, b) } } }
+					.try { |e| "Launch Control feedback: %".format(e.errorString).warn } } } } };
+// every knob to its current value on every Launch Control (after a load: the new track's values)
+~ce.syncKnobs = { |self| ((13..36) ++ (61..84)).do { |c| if(self.ccAlias[c].isNil) { self.knobOut(c, self.cc[c]) } } };
 ~ce.isKnobCC = { |self, cc| (cc >= 13 and: { cc <= 36 }) or: { cc >= 61 and: { cc <= 84 } } };
-~ce.midiCC = { |self, val, num, uid|
+~ce.midiCC = { |self, val, num, uid, chan|
 	switch(self.midiPorts[uid] !? { |p| p.kind },
 		\lc, {
+			chan !? { self.lcChan[num] = chan };
 			if(self.isKnobCC(num)) {
 				var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e }, last = raw[num];
 				raw[num] = val;
@@ -157,19 +176,27 @@
 			var kind = self.midiKindOf(name);
 			MIDIIn.connect(0, e);
 			self.midiPorts[e.uid] = (name: name, kind: kind);
+			if(kind == \lc) { self.lcOuts[e.uid] = self.lcOutFor(e) };
 			found.add(name -> kind);
 		}
 	};
 	found.do { |f| "MIDI connected: %  → %".format(f.key, f.value ? "ignored (unknown controller)").postln };
 	if(found.notEmpty) { self.uiPorts };
 	self.midiPorts.keys.copy.do { |uid| if(now[uid].isNil) {
-		"MIDI gone: %".format(self.midiPorts[uid].name).postln; self.midiPorts.removeAt(uid); self.uiPorts } };
+		"MIDI gone: %".format(self.midiPorts[uid].name).postln; self.midiPorts.removeAt(uid); self.lcOuts.removeAt(uid);
+		self.lcRaw.removeAt(uid); self.uiPorts } };
 	if(found.notEmpty and: { self.midiPorts.values.any { |p| p.kind == \lc }.not }) {
 		"No Launch Control XL 3 yet: plug one in, it is picked up within 2 s".warn };
 };
+// the MIDI In of a Launch Control source (same device; not DAW, not the DIN outs), or nil (also with lcFeedback false:
+// a muted test run never moves the user's knobs)
+~ce.lcOutFor = { |self, src|
+	var d = if(self.lcFeedback == false) { nil } { MIDIClient.destinations.detect { |d| d.device == src.device and: { d.name.containsi("DAW").not }
+		and: { d.name.containsi("DIN").not } } };
+	d !? { { var o = MIDIOut.newByName(d.device, d.name); o.latency = 0; o }.try { nil } } };
 ~ce.connectMidi = { |self|
 	MIDIClient.initialized.not.if { MIDIClient.init(verbose: false) };
-	MIDIdef.cc(\ce_midi, { |val, num, chan, src| self.midiCC(val, num, src) }).permanent_(true);
+	MIDIdef.cc(\ce_midi, { |val, num, chan, src| self.midiCC(val, num, src, chan) }).permanent_(true);
 	MIDIdef.noteOn(\ce_midi_notes, { |vel, note, chan, src| self.midiNote(note, vel, chan, src) }).permanent_(true);
 	self.scanMidi;
 	if(self.midiPorts.values.any { |p| p.kind == \lc }.not) {

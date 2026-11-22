@@ -114,6 +114,7 @@ loadTrack = { |path, slots, init|
 	// tests and agents' trial runs (CE_SC_MUTE=1): the master goes to a bus no speaker hears, so nothing plays beside
 	// the user's own set (the groups sit at the tail of the root group, after Server.volume: muting that would not reach them)
 	if(mute) { ce.mainOut = s.options.numAudioBusChannels - 2 };   // the last two buses: the allocators never get there
+	if(mute) { ce.lcFeedback = false };   // and never sends to the user's Launch Controls
 	// a Sample Designer project (sc/lab/samples/*.sample.json) plays as a track (lib/designer.scd)
 	// a Stem Designer project (sc/lab/stems/*.stemlab.json) too (lib/stemlab.scd)
 	track = case
@@ -122,7 +123,8 @@ loadTrack = { |path, slots, init|
 	{ ce.loadTrack(path, slots) };
 	ce.sendInit(ce.prepare(s, track));
 	// MIDI: keep the ports already connected (connecting twice would double every message)
-	old !? { ce.midiPorts = old.midiPorts; ce.lcRaw = old.lcRaw; old.midiWatch !? (_.stop) };
+	old !? { ce.midiPorts = old.midiPorts; ce.lcRaw = old.lcRaw; ce.lcOuts = old.lcOuts; ce.lcChan = old.lcChan;
+		old.midiWatch !? (_.stop) };
 	{ ce.connectMidi } .try { |e| "MIDI not available (%): the track plays, no controller".format(e.errorString).warn };
 	// a new clock per load: bar 0 = now, as the player expects (scripts and takes count bars from the load)
 	old = ~ceClock;
@@ -132,6 +134,7 @@ loadTrack = { |path, slots, init|
 	// build the track (latches, buttons, control hooks), then set the load's values, then the first note
 	pattern = ce.patterns;
 	setInit.(ce, init ? []);
+	ce.syncKnobs;   // every Launch Control's knobs to this load's values (0, or a script's bar 0)
 	ce.player = pattern.play(~ceClock, quant: 1);
 	ce.startUI;
 	~ce = ce;

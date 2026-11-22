@@ -84,6 +84,18 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		ce.midiCC(119, 15, 1); first = 0.1 - ce.val(15);          // one step down
 		(110..107).do { |v| ce.midiCC(v, 15, 1) };                // 13 steps down in all
 		(first >= (1 / 127 - 1e-6)) and: { ce.val(15) < 1e-6 } });
+	check.("knobs: every change is sent back to every Launch Control, so the next turn is 1:1 on either device", {
+		var ce = loadCe.value.ccBase_(0), sent = List[];
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
+		ce.lcOuts[1] = (control: { |self, ch, num, v| sent.add([1, ch, num, v]) });
+		ce.lcOuts[2] = (control: { |self, ch, num, v| sent.add([2, ch, num, v]) });
+		ce.syncKnobs;                                              // a load: every knob to its value (0) on both
+		ce.midiCC(1, 13, 1, 15); ce.midiCC(60, 13, 1, 15);         // LC 1 (channel 16) turns knob 13 up to 60
+		ce.midiCC(61, 13, 2, 15);                                  // LC 2 got 60 and turns one step on
+		(sent.select { |m| m[0] == 2 and: { m[2] == 13 } }.last[3] == 60)   // LC 2 was told 60, on the learned channel
+			and: { (ce.val(13) - (61 / 127)).abs < 1e-6 }               // 1:1, no jump
+			and: { sent.size >= 96 } });                                // the load sync reached all 48 knobs on both
 	check.("Launch Control ports are found by name, DAW ports are not", {
 		var ce = loadCe.value;
 		(ce.midiKindOf("LCXL3 1 MIDI") == \lc) and: { ce.midiKindOf("LCXL3 1 DAW") != \lc } });
