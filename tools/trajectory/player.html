@@ -18,6 +18,7 @@
   #sidebar .top { display: flex; align-items: center; gap: 4px; margin: 0 0 14px }
   #sidebar .top nav { flex-direction: row; gap: 2px; margin: 0; flex: 1; min-width: 0 }
   #sidebar nav a { padding: 5px 6px; border-radius: var(--radius); white-space: nowrap }
+  #sidebar .top nav a { flex: 1 1 0; text-align: center }
   #sidebar nav a.here { background: var(--control) }
   .icon { flex: none; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; background: none; color: var(--dim) }
   .icon:hover, .icon.here { color: var(--fg) }
@@ -56,7 +57,7 @@
   .script-mood { color: var(--dim); margin-top: 2px }
   .script-sections { margin: 8px 0 0; padding-left: 20px; color: var(--dim) }
   .script-sections li.now { color: var(--fg) }
-  #sideHandle { position: fixed; top: 29px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3;
+  #sideHandle { position: fixed; top: 60px; transform: translateY(-50%); left: calc(var(--side) - 1px); z-index: 3;
     display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-left: 0;
     border-radius: 0 6px 6px 0; overflow: hidden }
   .handle-btn { flex: none; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; background: none;
