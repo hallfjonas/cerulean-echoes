@@ -26,6 +26,7 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 | 001-groove | sound-tour (176 bars, 26,082 events), stem-check (162 bars, 40,543 events) | 100 % | none | every stem −∞ dB, except the two supersaw columns (see below) |
 | 002-groove | dance-floor (192 bars, 26,771 events), stem-check (162 bars) | 100 % | none | as 001 |
 | 008-groove-techno | every-button (67 bars), warehouse (192 bars), techno-night (bars 0-312, 59,000 events), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the JX lane of the strings (random phases; its analogue lane alone nulls) |
+| 016-grroove-opus | stem-check only (162 bars; 016 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB (the quiet JX strings leave noise-level residual) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
 every stem of all three tracks.
@@ -58,3 +59,16 @@ Compared with `--cc '{"12":1,"69":0.5}'` (Master at 1: the scripts never raise i
 | Control texts | Shortened to the 60 characters a stem allows: kick Punch and Level, clap Level, pads Pump, strings Pattern, dark perc Roll | Schema limit |
 | Pad Space | Default 0.5 on the stem (was set only when playing live); passed with `--cc '{"69":0.5}'` | `default` on the knob |
 | Strings | Strings JX lane: audio is not bit-identical between any two renders (random phases); the analogue lane nulls | `sdSupersawWide` starts at random phases |
+
+## 016-grroove-opus
+
+Compared with `--cc '{"12":1}'` and a stem-check that leaves the controls of Mode 2 column 3 alone (the old Stab Shape: CC 55, 63, 71, 79, 87, 95).
+
+| What | Difference | Why |
+|---|---|---|
+| **Stab Shape (2:3) is gone** | The old column had no sound: its knobs (Snap, Length, Resonance), fader (Drive) and buttons (Vanish, Ratchet) shaped the stab on column 4. Slot 2:3 now holds the 008 sequence stem (a hypnotic FM mallet loop; the old track had nothing there, and its fader at 0 keeps it silent). The stab plays with the shape at its zero positions (snap 3 octaves, decay 0.17 s, Q 8, no drive), which is what the old track played with Stab Shape untouched; Ratchet and "stab out by hand" are gone | The stem format has one set of controls per stem and a fixed label set; a stem over two columns is planned in PR #98 (multi-column stems), after which the pair can come back |
+| Answer and the stab | The answer still plays in the bars the stab leaves (Vanish); the frame computes that (`stabHere`) for both | A stem cannot read another stem's state yet (same plan) |
+| Wumms | Column 8's fader stays Wumms (no master volume, `masterless`); kick, rumble, sub and bass read it per note | As in 001 and 002 |
+| Texts | Kick button 1 reads `Pattern`; texts cut to 60 characters (strings Pattern, answer Level, FX Complexity, accents) | Stem format |
+| Names and labels | As for the other tracks; the eight-pattern columns have `Stab 1` … `Series 1` style labels | The same |
+| Strings | The JX supersaw layers start at random phases, so two renders differ at noise level (the track is quiet there) | `sdSupersawWide` |

@@ -1,0 +1,82 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-answer-2",
+  "parent": null,
+  "about": "Counter blips; also plays where the stab leaves.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "blips",
+      "answer",
+      "echo"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "opus-answer.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Answer 1"
+    },
+    {
+      "label": "Answer 2"
+    },
+    {
+      "label": "Answer 3"
+    },
+    {
+      "label": "Answer 4"
+    },
+    {
+      "label": "Answer 5"
+    },
+    {
+      "label": "Answer 6"
+    },
+    {
+      "label": "Answer 7"
+    },
+    {
+      "label": "Answer 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "one voice → + third → + fifth → + 7th, strummed."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "counter blips, every second bar and where the stab leaves."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 phrase rhythms (new notes too)."
+    },
+    "b2": {
+      "label": "Answer",
+      "about": "random extra answers while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.79
+}
