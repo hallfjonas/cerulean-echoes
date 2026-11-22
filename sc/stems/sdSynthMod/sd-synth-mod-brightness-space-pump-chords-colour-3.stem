@@ -1,0 +1,61 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-pump-chords-colour-3",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-pump-chords-colour-2.stem",
+  "about": "One pad, held or pumped; sets the progression.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "pad",
+      "chords",
+      "pump"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "opus-pads.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Chords"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room.",
+      "default": 0.5
+    },
+    "k3": {
+      "label": "Pump",
+      "about": "held chords ↔ the kick pumps the chords on every beat."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the pad; Tension brings it in."
+    },
+    "b1": {
+      "label": "Chords",
+      "about": "next of 8 chord progressions, for all."
+    },
+    "b2": {
+      "label": "Colour",
+      "about": "7 → 9 → fourths → fifths, at the next bar.",
+      "mode": "hold"
+    }
+  }
+}
