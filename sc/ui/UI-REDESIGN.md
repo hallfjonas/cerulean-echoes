@@ -408,7 +408,7 @@ cross data (halo in background colour if it must sit on top).
     moved to the top-right corner of the board (right end of the `mode 2` label line; user request).
   - **Labels (user):** the default view is the ring, labelled `energy`; the others are labelled `energy · area` (the
     energy strip), `map`, `spectrogram`. The label is the click target that cycles the views (ring → map → energy area →
-    spectrogram). A row of small dots under the box, bottom right, has one dot per view; the current view's dot is
+    spectrogram). A row of small dots under the box, evenly spaced across its full width, has one dot per view; the current view's dot is
     highlighted and a click on a dot shows that view.
   - **Data path.** `sc/lib/ui.scd`: the existing spectrum analyser (no new synth) also sends `/ce/lvl` 10×/s: loudness
     power of both channels (roughly K-weighted: +4 dB shelf above 1.5 kHz, high-pass 40 Hz, ~100 ms window), peak and
