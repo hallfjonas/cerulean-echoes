@@ -10,6 +10,10 @@
 //   orbits, states, samples, maps, stems     merged into the track (stems: e.g. the Launchkey's own stem)
 //   lkNote, lkCtl, lkPadNames                the Launchkey, as in a hand-written track
 //   build: { |frame, track, ce| }            more latches or buttons, after the stem columns
+//   masterless: true                         no master in the track's global: the strips ignore column 8's fader (stems
+//                                            that want it as a drive read it themselves)
+//   tensionEchoAmt, tensionRoomAmt           how far Tension opens the echo and the room (mixer.scd)
+//   uiHead, uiGlobal: { |frame, track, ce| } the web UI's head line and column 8 buttons instead of the default
 // and its `// @` comment lines (column 8, Launchkey) are added to the @ctl lines the stems make (stemTrackTags).
 (
 ~ce.noteNumber = { |self, name|
@@ -46,7 +50,9 @@
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
 		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
 		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkPadNames: frame[\lkPadNames],
-		global: (fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master),
+		global: if(frame[\masterless] == true) { (fog: glob.fog, thin: glob.thin, tension: glob.tension) } {
+			(fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master) },
+		tensionEchoAmt: frame[\tensionEchoAmt], tensionRoomAmt: frame[\tensionRoomAmt],
 		aliases: [\fog, \thin, \tension, \master, \chapter, \break].collect { |r| (glob[r] + 48) -> glob[r] }.asDict,
 		orbits: frame[\orbits] ?? { (1: (ir: "ir/orbit-0.6.wav", delay: [0.75 * 60 / bpm, 0.2]),
 			2: (ir: "ir/orbit-1.2.wav", delay: [0.75 * 60 / bpm, 0.3])) },
@@ -59,13 +65,16 @@
 		breakAt: { |self, bar| self.breakL.atBar(bar) == 1 },
 		uiHead: { |self, ce|
 			var pend = { |now, next| if(now == next) { [now] } { [now, next] } }, onOff = ["Beat on", "Beat off"];
-			[["Chapter"] ++ pend.(chapters[self.chapter.now], chapters[self.chapter.pending]),
-				["Chord", self.chordAt(TempoClock.default.bar.max(0)).name],
-				["Break"] ++ pend.(onOff[self.breakL.now], onOff[self.breakL.pending])]
+			if(frame[\uiHead].notNil) { frame[\uiHead].(frame, self, ce) } {
+				[["Chapter"] ++ pend.(chapters[self.chapter.now], chapters[self.chapter.pending]),
+					["Chord", self.chordAt(TempoClock.default.bar.max(0)).name],
+					["Break"] ++ pend.(onOff[self.breakL.now], onOff[self.breakL.pending])] }
 		},
-		uiGlobal: { |self, ce| (b1: [chapters[self.chapter.now], chapters[self.chapter.pending]],
-			b2: [["Beat on", "Beat off"][self.breakL.now], ["Beat on", "Beat off"][self.breakL.pending]],
-			b2on: self.breakL.pending == 1) },
+		uiGlobal: { |self, ce|
+			if(frame[\uiGlobal].notNil) { frame[\uiGlobal].(frame, self, ce) } {
+				(b1: [chapters[self.chapter.now], chapters[self.chapter.pending]],
+					b2: [["Beat on", "Beat off"][self.breakL.now], ["Beat on", "Beat off"][self.breakL.pending]],
+					b2on: self.breakL.pending == 1) } },
 		uiChordAt: { |self, bar| self.chordAt(bar).name },
 		// the step engine asks a slot, not a column: a swap waiting for this slot takes over on the bar line
 		slotStep: { |self, slot, k|
@@ -83,7 +92,7 @@
 			self.columns[slot] = col;
 			self.slots[slot] = col[\stem][\ref];
 			msgs.add((msg: [\n_set, node, \hpOwn, col[\hpOwn], \thinOn, col.thinOnStrip.asInteger,
-				\tEchoOn, col[\tension].asInteger, \roomOut, ce.orbitBus[orbit] ? 0, \roomOn, ce.orbitBus[orbit].notNil.asInteger,
+				\tEchoOn, (col[\tension] and: { col[\tensionEchoOn] }).asInteger, \roomOut, ce.orbitBus[orbit] ? 0, \roomOn, ce.orbitBus[orbit].notNil.asInteger,
 				\delayOut, delayBus ? 0, \delayOn, ((entry[\echo].notNil or: { entry[\echoSend].notNil })
 					and: { delayBus.notNil }).asInteger, \tension, 0]
 				++ if(entry[\trim].isNumber) { [\trim, entry[\trim]] } { [] }));
@@ -151,7 +160,7 @@
 	var slot = col[\slot], strip = col[\colCode] !? { |c| c[\strip] }, ref = { |x| col.stripRef(x) };
 	var entry = (name: col[\stemName], sounds: col[\sounds], level: col[\ccs][\fader], orbit: col[\orbit],
 		hpOwn: col[\hpOwn], master: self.masterCcOf(col), roomR: col.stateName(\room), echoSend: if(col[\echoOn]) { col.stateName(\echo) },
-		thin: col.thinOnStrip, trim: col[\gain], tension: col[\tension], tensionEcho: col[\tension],
+		thin: col.thinOnStrip, trim: col[\gain], tension: col[\tension], tensionEcho: col[\tension] and: { col[\tensionEchoOn] },
 		notes: { |k| track.slotStep(slot, k) });
 	if(col[\boostOn] == true) { entry[\level] = col.stateName(\boost) };
 	if(col[\maps].includesKey(col.mapName(\trim))) { entry[\trim] = col.mapName(\trim) };

@@ -259,7 +259,8 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 	}.value;
 
 	// --- every live track ---
-	tracks = (root +/+ "sc/tracks/*/*.scd").pathMatch.sort.select { |f| f.basename.splitext[0] == f.dirname.basename };
+	tracks = ((root +/+ "sc/tracks/*/*.scd").pathMatch ++ (root +/+ "sc/tracks/*/*.track").pathMatch).sort
+		.select { |f| f.basename.splitext[0] == f.dirname.basename and: { ["090", "091"].indexOfEqual(f.basename.keep(3)).isNil } };
 	check.("SC live tracks found", { tracks.size >= 4 });
 	tracks.do { |file|
 		var name = file.basename.splitext[0], log, pressed;
@@ -275,7 +276,8 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		// the first Pattern / Chords button (button row 1) of the track's @ctl lines, pressed in bar 1:
 		// what plays from bar 2 on changes, what played before does not
 		check.("% Pattern button changes what plays at the next bar".format(name), {
-			var line = File.readAllString(file).split($\n).detect { |l| "^// @ctl (16|2):([1-7])\\.b1 (Pattern|Chords) ".matchRegexp(l) };
+			var lines = if(file.endsWith(".track")) { ~lastCe.track.tagLines.asArray } { File.readAllString(file).split($\n) };
+			var line = lines.detect { |l| "^// @ctl (16|2):([1-7])\\.b1 (Pattern|Chords) ".matchRegexp(l) };
 			var pos = line.split($ )[2].split($.)[0].split($:), cc = 36 + pos[1].asInteger + (if(pos[0] == "2") { 48 } { 0 });
 			pressed = play.(file, 4, [[1.5, cc]]);
 			(~sig.(log, 8) != ~sig.(pressed, 8)) and: { ~sig.(log, 0).keep(~sig.(log, 0).count { |s| s.split($ )[0].asFloat < 6 }) == ~sig.(pressed, 0).keep(~sig.(pressed, 0).count { |s| s.split($ )[0].asFloat < 6 }) } });

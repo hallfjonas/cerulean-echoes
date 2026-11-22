@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-squelch-pattern-open",
+  "parent": null,
+  "about": "303-style acid line in 16ths, accents open the filter.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 4,
+    "tags": [
+      "acid",
+      "303",
+      "80s"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "gain": 1.5,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "groove-acid.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Roll"
+    },
+    {
+      "label": "Sparse"
+    },
+    {
+      "label": "Climb"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "closed filter ↔ open."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Squelch",
+      "about": "round ↔ resonant, squelchy accents."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "acid line, follows the chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "roll → sparse → climb."
+    },
+    "b2": {
+      "label": "Open",
+      "about": "the filter opens wide while held.",
+      "mode": "hold"
+    }
+  }
+}

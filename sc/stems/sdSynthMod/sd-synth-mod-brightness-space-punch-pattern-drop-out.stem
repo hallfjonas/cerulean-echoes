@@ -1,0 +1,69 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-punch-pattern-drop-out",
+  "parent": null,
+  "about": "80s groove kick: 909 click, sine body; Master drives it.",
+  "meta": {
+    "role": "kick",
+    "genres": [
+      "house"
+    ],
+    "energy": 4,
+    "tags": [
+      "909",
+      "four-on-the-floor",
+      "80s"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSampleMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "groove-kick.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "4/4"
+    },
+    {
+      "label": "Skip"
+    },
+    {
+      "label": "Half"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Punch",
+      "about": "soft body ↔ hard 909 click."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the kick, on every beat."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "four on the floor → skip into the one → half time."
+    },
+    "b2": {
+      "label": "Drop out",
+      "about": "kick pauses while held.",
+      "mode": "hold"
+    }
+  }
+}

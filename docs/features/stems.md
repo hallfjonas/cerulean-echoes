@@ -153,6 +153,7 @@ file that uses a format 2 field must say `"format": 2` (`check-stems` refuses it
 | `echo` | its own echo: `{ "beats": 0.5, "feedback": 0.15 }`; knobs and the add-on move it with `echoTime` / `echoFeedback` |
 | `layers` | the sounds of every hit (below); without it the patterns are the one layer |
 | `frame.tensionFilter` | `false`: Tension does not open its filter (Fog still does; room and echo still follow Tension) |
+| `frame.tensionEcho` | `false`: Tension sends no echo from this stem (filter and room still follow Tension) |
 
 ### Pattern fields (also in a layer and a layer's patterns)
 | Field | What it is |
@@ -391,6 +392,10 @@ A stem track is `sc/tracks/<id>/<id>.track`, JSON, schema `sc/stems/track.schema
   `chordAtK: { |frame, track, k, push| chord }` (the chord at a 16th: chords that change inside a bar, `push` = the next
   bar's chord two 16ths early) and `nextChords: { |frame, track| }` (what Chords on a chords stem does).
   Its `// @` comment lines (`@ctl g.…`, `@col 16:8`, `@lk …`) join the `@ctl` lines made from the stems.
+  Also optional: `masterless: true` (no master in the track: the strips ignore column 8's fader, a stem that wants it as a
+  drive reads it itself), `tensionEchoAmt` / `tensionRoomAmt` (how far Tension opens echo and room, see mixer.scd) and
+  `uiHead` / `uiGlobal: { |frame, track, ce| }` (the Live page's head line and column 8 buttons instead of the default).
+  Any other key is the frame's own: column code reads it through `col[\track][\frame]` (001's `degMidi`, `rootAt`, `tonesAt`).
   Example: `sc/tracks/009-house/009-house-frame.scd` (progressions, the scale of each bar on its chords, a stem's own
   chords through `col.riffAt`).
 - Fog, Thin, Tension, Master and Break are the same in every stem track (CC 20, 28, 36, 12, 52; Mode 2 + 48).
@@ -422,6 +427,13 @@ Differences of the format 2 stems to the `.scd` (comparison over the three scrip
 Atmosphere riff (Em/G: its 3rd, 5th and 7th count from the bass G, the `.scd` counts them from E) and on approach
 notes before a riff's chord change inside the bar (format 2 takes the chord of the approach note's 16th, the `.scd`
 the chord of the next note). Both happen only while the keys play a riff; see task 013.
+
+## Translated tracks
+The hand-written tracks 001 and 002 are stem tracks now: 14 stems each, all column code (`sc/stems/sdSynthMod/groove-*.scd` and
+its siblings, sharing the note helpers of `~ce.grooveKit` in `sc/lib/stemkit.scd`), a frame with the moods, progressions and
+Launchkey, no master volume (`masterless`). 002 shares chords, pad, arp, hook and strings with 001 and has variants of the
+others (`parent`) and stems of its own (rumble, congas, organ). The old `.scd` files are deleted after the proof; what differs
+is listed in [scd-translation-differences](../reference/scd-translation-differences.md).
 
 ## Set (definition only)
 A **set** is a unique, ordered list of stem tracks played as one performance: track 1 runs, then the next takes over,

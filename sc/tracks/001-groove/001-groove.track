@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "name": "001-groove",
+  "about": "80s groove house on D: bass, chords, swipes, hook.",
+  "tempo": 124,
+  "swing": 0,
+  "genre": "house",
+  "frame": "001-groove-frame.scd",
+  "chapters": [
+    "Boogie",
+    "Italo",
+    "Rave"
+  ],
+  "slots": {
+    "1:1": "sdSynthMod/sd-synth-mod-brightness-space-punch-pattern-drop-out.stem",
+    "1:2": "sdSample/sd-sample-brightness-space-gate-pattern-roll.stem",
+    "1:3": "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-octave.stem",
+    "1:4": "sdSynthMod/sd-synth-mod-brightness-space-squelch-pattern-open.stem",
+    "1:5": "sdSample/sd-sample-brightness-space-complexity-pattern-fill.stem",
+    "1:6": "sdSample/sd-sample-brightness-space-swing-pattern-open.stem",
+    "1:7": "sdSample/sd-sample-brightness-space-chop-pattern-stutter.stem",
+    "2:1": "sdSynthMod/sd-synth-mod-brightness-space-length-chords-rhythm.stem",
+    "2:2": "sdSupersaw/sd-supersaw-brightness-space-movement-pattern-echo-throw.stem",
+    "2:3": "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-octave-2.stem",
+    "2:4": "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem",
+    "2:5": "sdSupersaw/sd-supersaw-brightness-space-swipe-pattern-swipe.stem",
+    "2:6": "sdSynthMod/sd-synth-mod-brightness-space-drive-pattern-ratchet.stem",
+    "2:7": "sdNoise/sd-noise-brightness-space-complexity-pattern-riser.stem"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-pattern-octave-2",
+  "parent": null,
+  "about": "Italo-disco arpeggio in 16ths over the chord.",
+  "meta": {
+    "role": "lead",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "arp",
+      "italo",
+      "80s"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-arp.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Up"
+    },
+    {
+      "label": "Up-down"
+    },
+    {
+      "label": "Octaves"
+    },
+    {
+      "label": "Italo"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "short plucks ↔ longer notes."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "arpeggio, follows the chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "up → up-down → octaves → Italo."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -34,4 +34,40 @@
 	st[\lastK] = k; st[\lastHeld] = st[\held];
 	if(st[\lift] != was and: { k % 4 == 0 or: { st[\lift] == 0 } or: { st[\lift] == 1 } }) { self.uiPush };
 	st[\lift] };
+
+// The note helpers of the groove tracks' column code (001, 002 and their relatives): a synth, a sample or a noise note as
+// the sd sounds take them, with the log tags (tag, g, midi) the event comparison reads. Made once per column after the
+// server set-up (the buses exist): ~ce.kitOf(col) makes it on the first call and keeps it in the column's state.
+~ce.kitOf = { |self, col| col[\st][\kit] ?? { var kit = self.grooveKit; col[\st][\kit] = kit; kit } };
+~ce.grooveKit = { |self|
+	var ce = self, synthDef = [0.001, 0.05, 0.6, 0.01], waves = (sine: 0, triangle: 1, sawtooth: 2, square: 3);
+	var thin = ("c" ++ ce.thinBus).asSymbol;
+	var adsr = { |a, d, s, r, def| var v = ce.sdADSR(a, d, s, r, def); (a: v[0], d: v[1], s: v[2], r: v[3]) };
+	(
+		tone: ("c" ++ ce.toneBus).asSymbol, fog: ("c" ++ ce.fogBus).asSymbol, thin: thin, adsr: adsr,
+		syn: { |wave, m, g, args| ce.note(\sdSynthMod, (wave: waves[wave], freq: m.midicps, amp: g, thinF: thin,
+			tag: wave.asString, g: g, midi: m) ++ adsr.(nil, nil, nil, nil, synthDef) ++ (args ? ())) },
+		smp: { |rel, tag, g, args, sound = \sdSample| ce.note(sound, (buf: ce.sampleBuffers[rel],
+			stereoIn: (ce.sampleMono[rel] != true).asInteger, amp: g, hold: -1, thinF: thin, tag: tag, g: g)
+			++ adsr.(nil, nil, nil, nil) ++ (args ? ())) },
+		noise: { |color, g, args| ce.note(\sdNoise, (color: color, amp: g, thinF: thin, tag: ["pink", "white"][color], g: g)
+			++ adsr.(nil, nil, nil, nil, synthDef) ++ (args ? ())) },
+		dB: { |x| 10 ** (x / 20) },
+		ramp: { |v, from, to| ((v - from) / (to - from)).clip(0, 1) },
+		// a mini-notation string as a table: 16th of the period -> [[offset in the 16th, length in 16ths, value]]
+		table: { |str| var m = ce.mini(str), t = Dictionary[];
+			m.events.do { |e| var p = e[0] * 16, k = (p + 1e-6).floor.asInteger; t[k] = (t[k] ? []).add([p - k, e[1] * 16, e[2]]) };
+			(period: (m.period * 16).round.asInteger, steps: t) },
+		eventsAt: { |tb, k| tb.steps[k % tb.period] ? [] },
+		// Strudel's swingBy(x, 8) for one onset (pos in 16ths): an event in the second half of its 8th comes x later
+		swingAt: { |pos, x| if(((pos / 2) % 1) >= (0.5 - 1e-6)) { x } { 0 } },
+		name2midi: { |nm| var m = nm.findRegexp("^([a-g])(b|#)?(-?[0-9])$");
+			(12 * (m[3][1].asInteger + 1)) + (c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11)[m[1][1].asSymbol]
+			+ (m[2][1] == "#").binaryValue - (m[2][1] == "b").binaryValue },
+		// 0 -> 1 over `bars` while the column's button 2 is held (steps per bar); nil while it is not held
+		heldRamp: { |col, bars| var st = ();
+			{ |t| if(col.held(\b2)) { st[\from] = st[\from] ? t.floor; ((t.floor - st[\from]) / bars).clip(0, 1) }
+				{ st[\from] = nil; nil } } }
+	)
+};
 )
