@@ -279,14 +279,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 	if(only.isEmpty) { check.("SC live tracks found", { tracks.size >= 4 }) };
 	tracks.do { |file|
 		var name = file.basename.splitext[0], log, pressed;
-		// a stem track (.track): loads, plays and finds its samples; its controls come from its stems (no @ctl lines)
-		if(file.endsWith(".track")) {
-			name = file.basename;
-			check.("% loads and plays notes with the faders up".format(name), {
-				log = play.(file, 4); log.size > 0 });
-			check.("% every sample file it loads exists".format(name), {
-				var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
-		} {
+		// every live track, a stem track (.track) included (its @ctl lines come from its stems: track.tagLines)
 		check.("% loads and plays notes with the faders up".format(name), {
 			log = play.(file, 4); log.size > 0 });
 		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
@@ -296,15 +289,18 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 			var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
 		check.("% several stems play".format(name), {
 			log.notNil and: { log.collect(_[1]).asSet.size >= 3 } });
-		// the first Pattern / Chords button (button row 1) of the track's @ctl lines, pressed in bar 1:
-		// what plays from bar 2 on changes, what played before does not
+		// the first Pattern / Chords button (button row 1) of the track's @ctl lines that switches patterns, pressed in
+		// bar 1: what plays from bar 2 on changes, what played before does not. A stem with one pattern uses button 1
+		// only while held (the groove kicks of 008/016/017: double time) and changes nothing at the next bar: skipped.
 		check.("% Pattern button changes what plays at the next bar".format(name), {
 			var lines = if(file.endsWith(".track")) { ~lastCe.track.tagLines.asArray } { File.readAllString(file).split($\n) };
-			var line = lines.detect { |l| "^// @ctl (16|2):([1-7])\\.b1 (Pattern|Chords) ".matchRegexp(l) };
+			var cols = ~lastCe.track[\columns], switches = { |l|
+				var p = l.split($ )[2].split($.)[0].split($:), slot = ((if(p[0] == "2") { "2" } { "1" }) ++ ":" ++ p[1]).asSymbol;
+				cols.isNil or: { cols[slot].isNil } or: { (cols[slot][\stem][\patterns] ? []).size > 1 } };
+			var line = lines.detect { |l| "^// @ctl (16|2):([1-7])\\.b1 (Pattern|Chords) ".matchRegexp(l) and: { switches.(l) } };
 			var pos = line.split($ )[2].split($.)[0].split($:), cc = 36 + pos[1].asInteger + (if(pos[0] == "2") { 48 } { 0 });
 			pressed = play.(file, 4, [[1.5, cc]]);
 			(~sig.(log, 8) != ~sig.(pressed, 8)) and: { ~sig.(log, 0).keep(~sig.(log, 0).count { |s| s.split($ )[0].asFloat < 6 }) == ~sig.(pressed, 0).keep(~sig.(pressed, 0).count { |s| s.split($ )[0].asFloat < 6 }) } });
-		};
 	};
 
 	"% passed, % failed".format(passes, fails).postln;
