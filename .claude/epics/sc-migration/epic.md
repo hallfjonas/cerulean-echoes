@@ -3,7 +3,7 @@ name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
 updated: 2026-11-22T03:14:19Z
-progress: 82%
+progress: 64%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
