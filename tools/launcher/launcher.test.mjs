@@ -98,9 +98,9 @@ test('--watch: the player stops when the watched process (the app) ends without 
   }
 })
 
-// the app itself: a double-click (open), SuperCollider on the first load, Quit (the Dock's polite quit) ends all
+// the app itself (no window: CE_NO_BROWSER=1): a double-click (open), SuperCollider on the first load, Quit (the Dock's polite quit) ends all
 const appPids = () => execFileSync('ps', ['-axo', 'pid=,args='], { encoding: 'utf8' }).split('\n')
-  .filter(line => line.trimEnd().endsWith(`${app}/Contents/MacOS/applet`)).map(line => +line.trim().split(/\s+/)[0])
+  .filter(line => line.trimEnd().endsWith(`${app}/Contents/MacOS/CeruleanEchoes`)).map(line => +line.trim().split(/\s+/)[0])
 const quitApp = pid => execFileSync('osascript', ['-l', 'JavaScript', '-e',
   `ObjC.import('AppKit'); $.NSRunningApplication.runningApplicationWithProcessIdentifier(${pid}).terminate`])
 const appSkip = process.platform !== 'darwin' ? 'macOS only' : !fs.existsSync(app) ? 'no app' : false
@@ -134,9 +134,10 @@ test('the app: one double-click starts the player, SuperCollider plays on a load
   }
 })
 
-test('the committed app holds the current launcher.applescript (rebuild: npm run launcher)', { skip: appSkip }, () => {
-  const squash = text => text.replace(/\s+/g, '')
-  const compiled = execFileSync('osadecompile', [path.join(app, 'Contents/Resources/Scripts/main.scpt')], { encoding: 'utf8' })
-  assert.equal(squash(compiled), squash(fs.readFileSync(path.join(here, 'launcher.applescript'), 'utf8')))
-  assert.ok(fs.statSync(path.join(app, 'Contents/MacOS/applet')).mode & 0o111, 'the applet is executable')
+test('the committed app holds the current app/main.swift (rebuild: npm run launcher)', { skip: appSkip }, () => {
+  const hash = execFileSync('/usr/libexec/PlistBuddy', ['-c', 'Print :CESourceHash', path.join(app, 'Contents/Info.plist')],
+    { encoding: 'utf8' }).trim()
+  const source = execFileSync('shasum', ['-a', '256', path.join(here, 'app/main.swift')], { encoding: 'utf8' }).split(' ')[0]
+  assert.equal(hash, source)
+  assert.ok(fs.statSync(path.join(app, 'Contents/MacOS/CeruleanEchoes')).mode & 0o111, 'the app is executable')
 })

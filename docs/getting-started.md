@@ -17,14 +17,15 @@ play.
    default browser is best: Safari has no Web MIDI.
 2. Get the repo: `git clone` it (a ZIP download from GitHub is blocked by macOS as an app "from the internet"; then
    right-click the app and pick **Open** once).
-3. Double-click **Cerulean Echoes.app** in the repo folder. The player opens in the browser; SuperCollider starts
+3. Double-click **Cerulean Echoes.app** in the repo folder. The player opens in its own window; SuperCollider starts
    when you press **Play** on a track. The first start installs the player's helpers once (1-2 minutes, a message
    says so).
 
 To stop everything (the player and SuperCollider): quit **Cerulean Echoes** (its Dock icon: Quit, or Cmd-Q).
-Double-click it again while it runs to open the player once more or to stop it.
-Keep only **one** browser tab of the player open: each tab holds two open connections and Chrome allows six per
-address, so several tabs make the page hang. If something does not start, a message says what is missing; details
+Closing the window only hides it (the music goes on); a click on the Dock icon shows it again. In the browser instead
+(Terminal start, or Strudel tracks with controllers: the window has no Web MIDI), keep only **one** tab of the player
+open: each tab holds two open connections and Chrome allows six per address, so several tabs make the page hang.
+If something does not start, a message says what is missing; details
 are in `~/Library/Logs/cerulean-echoes.log`.
 
 ## First play (Terminal)
