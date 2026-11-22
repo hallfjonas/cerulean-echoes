@@ -1,17 +1,18 @@
 {
   "format": 2,
   "name": "sd-synth-mod-brightness-space-complexity-pattern-answer-3",
-  "parent": null,
-  "about": "Marimba phrase every second bar, up to three voices.",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-answer-2.stem",
+  "about": "Rubbery counter blips; also plays where the stab leaves.",
   "meta": {
     "role": "lead",
     "genres": [
-      "ambient-house"
+      "groove-techno"
     ],
-    "energy": 2,
+    "energy": 3,
     "tags": [
-      "marimba",
-      "phrase"
+      "blips",
+      "answer",
+      "echo"
     ],
     "harmony": "chords"
   },
@@ -20,35 +21,34 @@
   },
   "pitch": "none",
   "orbit": 2,
-  "code": "amb-marimba.scd",
+  "code": "lsd-answer.scd",
   "frame": {
-    "thin": false,
-    "tension": false
+    "thin": false
   },
   "patterns": [
     {
-      "label": "Phrase 1"
+      "label": "Answer 1"
     },
     {
-      "label": "Phrase 2"
+      "label": "Answer 2"
     },
     {
-      "label": "Phrase 3"
+      "label": "Answer 3"
     },
     {
-      "label": "Phrase 4"
+      "label": "Answer 4"
     },
     {
-      "label": "Phrase 5"
+      "label": "Answer 5"
     },
     {
-      "label": "Phrase 6"
+      "label": "Answer 6"
     },
     {
-      "label": "Phrase 7"
+      "label": "Answer 7"
     },
     {
-      "label": "Phrase 8"
+      "label": "Answer 8"
     }
   ],
   "controls": {
@@ -62,11 +62,11 @@
     },
     "k3": {
       "label": "Complexity",
-      "about": "one voice → + a third above → + a fifth: three-part marimba."
+      "about": "one voice → + third → + fifth → + 7th, strummed."
     },
     "fader": {
       "label": "Level",
-      "about": "marimba phrase, every second bar."
+      "about": "counter blips, every second bar and where the stab leaves."
     },
     "b1": {
       "label": "Pattern",
@@ -74,8 +74,9 @@
     },
     "b2": {
       "label": "Answer",
-      "about": "the phrase plays in every bar while held.",
+      "about": "random extra answers while held.",
       "mode": "hold"
     }
-  }
+  },
+  "gain": 0.79
 }

@@ -28,6 +28,7 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 | 008-groove-techno | every-button (67 bars), warehouse (192 bars), techno-night (bars 0-312, 59,000 events), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the JX lane of the strings (random phases; its analogue lane alone nulls) |
 | 010-ambient-house | every-button (to bar 67), journey (130 bars), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the keys column (noise-level residual, as between two renders of the old track) |
 | 016-grroove-opus | stem-check only (162 bars; 016 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB (the quiet JX strings leave noise-level residual) |
+| 017-groove-lsd | stem-check only (162 bars; 017 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB, except the noise-driven `modalPerc` and supersaw sounds (their residual equals hand-vs-hand) |
 | 007-ambient | every-button (to bar 66), drift (153 bars, 8,600 events), stem-check (162 bars, 31,800 events) | 100 % | none | 11 stems and the Launchkey −∞ dB; wood, Eno / Shimmer and voice at noise level (random phases, crackle) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
@@ -86,6 +87,17 @@ Compared with `--cc '{"12":1}'` (Master at 1). Column code of the 14 stems (`amb
 | Control texts, names | Shortened to 60 characters (noise Motion, clap Level, arp Complexity, marimba Complexity); `@col` names from the role (Kick, Texture, Pad, Chords, Lead ...) | Stem format |
 | Chapter and Freeze | Unchanged: Chapter picks the next progression at the next 4-bar phrase; the pad's button 2 holds the chord of the moment for every column | The frame owns the root (`rootAt`) |
 | Keys audio | Two renders of the old track already differ at noise level (-43.7 dB against the stem); the new track the same (-41.6 to -45.2 dB); events are equal | FM voice noise |
+
+## 017-groove-lsd
+
+Built like 016 and compared the same way (`--cc '{"12":1,"69":0.5}'`, stem-check without the Mode 2 column 3 controls). Kick, rumble, sub, bass and hats are the 016 stems; the other columns are stems of their own (wood, modal percussion, strings, acid stab, answer, accents, FX), the pad is the 016 pad with its Space default 0.5.
+
+| What | Difference | Why |
+|---|---|---|
+| **Stab Shape (2:3) is gone** | As in 016: slot 2:3 holds the 008 sequence stem (silent at fader 0), the acid stab plays with its shape at the zero positions, and Ratchet and "stab out by hand" are gone | Same reason; see 016 and PR #98 |
+| Answer and the stab | The answer follows the stab's Vanish through the frame (`stabHere`) | As in 016 |
+| Noise-driven sounds | `modalPerc` (percussion, log, bell) and the supersaw strings use random noise or phases, so two renders of either track differ at noise level; the events are equal | The sounds |
+| Texts, names, labels | As for the other tracks | The same |
 
 ## 007-ambient
 Compared with `--cc '{"12":1}'` (Master at 1). Column code of the 14 stems (`mood-*.scd`, note helpers `~ce.moodOf`, `~ce.moodFx`, `~ce.figureKit` in `sc/lib/stemkit.scd`); the three moods are the frame's chapters (one bar); the strips' Tension input is the Room knob (frame `global`, no Thin); Tension's tone map and wobble are frame maps.
