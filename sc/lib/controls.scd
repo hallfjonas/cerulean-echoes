@@ -17,6 +17,7 @@
 	// column state (lab columns keep their start values until a control moves; as Strudel, only a change counts)
 	if(force or: { v != was }) { (self.ccHooks[c] ? []).do { |f| f.(v, send) } };
 	if(self.isKnobCC(c)) { self.knobOut(c, v) };
+	if(self.isFaderCC(c) and: { v != was }) { self.releasePickup(("c" ++ c).asSymbol) };
 	if(v > 0.5 and: { was <= 0.5 }) { (self.pressFns[c] ? []).do(_.value); self.uiPush };
 };
 // fn(value, send) on every message of a CC (send: as in setCC, for state buses)
@@ -116,6 +117,24 @@
 					.try { |e| "Launch Control feedback: %".format(e.errorString).warn } } } } };
 // every knob to its current value on every Launch Control (after a load: the new track's values)
 ~ce.syncKnobs = { |self| ((13..36) ++ (61..84)).do { |c| if(self.ccAlias[c].isNil) { self.knobOut(c, self.cc[c]) } } };
+// Faders and the Launchkey mod wheel have a physical position SC cannot set (no motor). Pickup ("soft takeover", user
+// 2026-11-22): a device's fader changes nothing until it meets the current value (within 2 steps, or passing it between
+// two messages); from then on 1:1. A value set from anywhere else (the other LC, the web view, a script, a load: the
+// values start at 0) releases it again. The web view shows where an uncaught fader sits (/ce/phys key value; -1 = caught).
+~ce.isFaderCC = { |self, cc| (cc >= 5 and: { cc <= 12 }) or: { cc >= 53 and: { cc <= 60 } } };
+~ce.pickRaw = ();   // uid → (key → the device's last position 0..1)   key: \c<cc> (LC fader, after aliasing) or \lk1
+~ce.caught = ();    // uid → (key → true once the device's fader has met the value)
+~ce.releasePickup = { |self, key|
+	self.caught.keysValuesDo { |uid, cg| if(uid != self.pickFrom and: { cg[key] == true }) { cg[key] = false;
+		self.pickRaw[uid] !? { |r| r[key] !? { |p| self.uiSend('/ce/phys', key, p) } } } } };
+~ce.pickup = { |self, uid, key, v, cur, set|
+	var raw = self.pickRaw[uid] ?? { var e = (); self.pickRaw[uid] = e; e }, last = raw[key];
+	var cg = self.caught[uid] ?? { var e = (); self.caught[uid] = e; e };
+	raw[key] = v;
+	if(cg[key] != true and: { ((v - cur).abs <= (2 / 127)) or: { last.notNil and: { (last - cur).sign != (v - cur).sign } } }) {
+		cg[key] = true };
+	if(cg[key] == true) { self.pickFrom = uid; set.value; self.pickFrom = nil; self.uiSend('/ce/phys', key, -1) }
+		{ self.uiSend('/ce/phys', key, v) } };
 ~ce.isKnobCC = { |self, cc| (cc >= 13 and: { cc <= 36 }) or: { cc >= 61 and: { cc <= 84 } } };
 ~ce.midiCC = { |self, val, num, uid, chan|
 	switch(self.midiPorts[uid] !? { |p| p.kind },
@@ -130,13 +149,19 @@
 						cur + ((val - last) * max((1 - cur) / (127 - last), 1 / 127))
 					} { cur - ((last - val) * max(cur / last, 1 / 127)) };
 					self.setCC(num, next.clip(0, 1), { |msg| self.server.sendMsg(*msg) }) }
-			} { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }
+			} {
+				if(self.isFaderCC(num)) {
+					var c = self.ccAlias[num] ? num;
+					self.pickup(uid, ("c" ++ c).asSymbol, val / 127, self.cc[c], { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) })
+				} { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) } }
 		},
-		\launchkey, { self.setLkCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }
+		\launchkey, {
+			if(num == 1) { self.pickup(uid, \lk1, val / 127, self.lkCC[1], { self.setLkCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }) }
+				{ self.setLkCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) } }
 	)
 };
 // A Launchkey control: kept in lkCC; the track may turn it into state buses (lkCtl: level, room, echo)
-~ce.setLkCC = { |self, num, v, send| self.lkCC[num] = v; self.track !? { |t| t[\lkCtl] !? { |f| f.(self, num, v, send) } };
+~ce.setLkCC = { |self, num, v, send| if(num == 1 and: { v != self.lkCC[num] }) { self.releasePickup(\lk1) }; self.lkCC[num] = v; self.track !? { |t| t[\lkCtl] !? { |f| f.(self, num, v, send) } };
 	self.uiSend('/ce/lkcc', num, v) };
 // A Launchkey key or pad (chan 0-based: 9 = MIDI channel 10, the drum pads): the track's notes, played at once —
 // sent without a time stamp, so the server starts them on arrival (a few ms: audio buffer + MIDI), not with the

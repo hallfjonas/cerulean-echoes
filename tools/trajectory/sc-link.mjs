@@ -148,6 +148,8 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
       case '/ce/beat': state.beat = { bar: m.args[0], beat: m.args[1], chord: m.args[2] }; broadcast('beat', state.beat); break
       case '/ce/midi': state.midi = json(); broadcast('midi', state.midi); break
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
+      // where an uncaught fader physically sits (pickup, sc/lib/controls.scd): [key, 0..1], -1 = caught; not kept
+      case '/ce/phys': broadcast('phys', [String(m.args[0]), m.args[1]]); break
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
       case '/ce/level': broadcast('level', Math.round(m.args[0] * 1000) / 1000); break

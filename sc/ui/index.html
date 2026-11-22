@@ -68,6 +68,10 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 /* fader: 28 x 150 units, track max(2px, 4 units), handle 28 x 12 */
 .fader{position:relative;width:calc(28 * var(--px));height:calc(130 * var(--px));margin-top:calc(4 * var(--px));flex:none}
 .fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
+/* pickup: where the physical fader sits while it has not met the value yet (a short line across the slot) */
+.fader .ghost{position:absolute;left:-20%;width:140%;height:max(2px, calc(2 * var(--px)));background:var(--accent);
+  bottom:calc(var(--g, 0) * 100%);transform:translateY(50%);display:none;z-index:3;pointer-events:none}
+.fader.ghosted .ghost{display:block}
 .fader .handle{position:absolute;left:0;width:100%;height:calc(12 * var(--px));border-radius:1px;background:var(--handle);
   bottom:calc(var(--v, 0) * (100% - 12 * var(--px)))}
 /* minimal: the fader is a slim slot that fills from the bottom (a sliver at 0); same box as Retro, so a theme
@@ -209,7 +213,7 @@ const setKnob = (el, v) => {
 const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
 const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 1)
 const PAGES = ['jojo', 'jonas'], PREFIX = { jojo: '16', jonas: '2' }
-const S = { layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
+const S = { phys: {}, layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
   lk: {}, lkBase: 48, lkLit: new Map(), lkLive: -1e9, lkPad: null,   // Launchkey: control values, keyboard window, lit keys/pads
   spec: new Float32Array(48), specAt: -1e9 }                          // the latest spectrum frame and when it came
 const held = new Set()   // CCs kept held by Shift-click
@@ -293,7 +297,7 @@ const lkHtml = () => {
     '<div class="gr lkknobs">' + LK_KNOBS.map(knob).join('') + '</div>' +
     '<div class="gr lkpads">' + [...PADS_TOP, ...PADS_BOTTOM].map(pad).join('') + '</div>' +
     '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '">' +
-    '<span class=btn>mod</span><div class=fader><div class=bar></div><div class=handle></div></div></div>' +
+    '<span class=btn>mod</span><div class=fader><div class=bar></div><div class=handle></div><div class=ghost></div></div></div>' +
     '<div class=keys>' + keys + '</div></div></section>'
 }
 const lkAttach = root => {
@@ -357,7 +361,7 @@ const build = () => {
     div.title = name ? name + (desc ? ': ' + desc : '') : ''
     const kind = row === 'fader' ? 'fader' : row[0] === 'k' ? 'knob' : 'btn'
     div.className = (kind === 'knob' ? 'kw r' + row[1] : kind === 'btn' ? 'btn ' + row : 'fader') + (c.on ? ' ctl' : ' off')
-    div.innerHTML = kind === 'fader' ? '<div class=bar></div><div class=handle></div>'
+    div.innerHTML = kind === 'fader' ? '<div class=bar></div><div class=handle></div><div class=ghost></div>'
       : kind === 'knob' ? knobSvg() + '<span class=kl>' + esc(name) + '</span>' : esc(name)
     if (c.on) attach(c, kind)
     cells.push(c)
@@ -443,7 +447,8 @@ const draw = () => {
       continue
     }
     const sv = shownOf(c.cc)
-    if (c.row === 'fader') c.el.style.setProperty('--v', sv)
+    if (c.row === 'fader') { c.el.style.setProperty('--v', sv); const g = S.phys['c' + c.cc]
+      c.el.classList.toggle('ghosted', g != null); if (g != null) c.el.style.setProperty('--g', g) }
     else { setKnob(c.el, sv); setText(c.el.querySelector('.kl'), name ?? c.name) }
   }
   // Launchkey: values, the keyboard window, lit keys / pads, frame while it is the last thing moved
@@ -451,7 +456,8 @@ const draw = () => {
   if (lk && hasLk()) {
     const now = performance.now(), lit = k => now - (S.lkLit.get(k) ?? -1e9) < 200
     lk.classList.toggle('live', now - S.lkLive < 4000)
-    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.dataset.lk === '1') el.querySelector('.fader').style.setProperty('--v', v); else setKnob(el, v) }
+    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.dataset.lk === '1') { const f = el.querySelector('.fader'), g = S.phys.lk1; f.style.setProperty('--v', v)
+      f.classList.toggle('ghosted', g != null); if (g != null) f.style.setProperty('--g', g) } else setKnob(el, v) }
     for (const el of lk.querySelectorAll('[data-key]')) {
       const m = S.lkBase + +el.dataset.key
       el.className = (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lit('k' + m) ? ' on' : '')
@@ -809,11 +815,12 @@ const connect = () => {
     if (type === 'setsample') { if (data && typeof data.t === 'number') { S.setHist.push(data); setDraw() } return }
     if (type === 'setfasthistory') { if (Array.isArray(data)) { S.setFast = data; setDraw() } return }
     if (type === 'setfast') { if (data && typeof data.t === 'number') { S.setFast.push(data); if (S.setFast.length > 3 * 3600) S.setFast.shift(); setDraw() } return }
-    if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) build() }
+    if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) { S.phys = {}; build() } }
     else if (type === 'ccs') { data.forEach((v, i) => { if (!(performance.now() - (mine[i] ?? -1e9) < 300)) S.cc[i] = v }) }
     else if (type === 'cc') {
       for (const [cc, v] of Object.entries(data)) if (!(performance.now() - (mine[cc] ?? -1e9) < 300)) { S.cc[+cc] = v; S.page = pageOfCc(+cc) }
     }
+    else if (type === 'phys') { const [k, v] = data; if (v < 0) delete S.phys[k]; else S.phys[k] = v }
     else if (type === 'state') { S.state = data; dispatchEvent(new CustomEvent('ce-state', { detail: data })) }
     else if (type === 'beat') S.beat = data
     else if (type === 'midi') S.midi = data

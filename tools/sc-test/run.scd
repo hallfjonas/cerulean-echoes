@@ -57,12 +57,20 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		var ce = loadCe.value.ccBase_(0), l = ce.change(37, 3, "test"), press = { ce.setCC(37, 1, {}); ce.setCC(37, 0, {}) };
 		press.value; l.atBar(1); press.value; l.atBar(2); press.value; l.atBar(3);
 		l.now == 0 });
-	check.("two Launch Controls: a fader follows the one moved last", {
-		var ce = loadCe.value.ccBase_(0);
+	check.("faders: pickup, a fader takes over only once it meets the value (no jump)", {
+		var ce = loadCe.value.ccBase_(0), r = List[];
 		ce.server = (sendMsg: { });
 		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
-		ce.midiCC(127, 5, 1); ce.midiCC(0, 5, 2);
-		ce.val(5) == 0 });
+		ce.midiPorts[3] = (name: "Launchkey MK4 25", kind: \launchkey);
+		ce.midiCC(64, 5, 1); ce.midiCC(60, 5, 1); r.add(ce.val(5) == 0);              // LC 1 sits at half, value 0: nothing
+		ce.midiCC(1, 5, 1); ce.midiCC(64, 5, 1); r.add(ce.val(5) == (64 / 127));       // pulled down to 0: caught, then 1:1
+		ce.midiCC(127, 5, 2); ce.midiCC(100, 5, 2); r.add(ce.val(5) == (64 / 127));    // LC 2 at the top: nothing yet
+		ce.midiCC(50, 5, 2); r.add(ce.val(5) == (50 / 127));                            // passing the value: caught
+		ce.midiCC(70, 5, 1); r.add(ce.val(5) == (50 / 127));                            // LC 1 was released by LC 2's move
+		ce.setCC(5, 0.2, { }); ce.midiCC(51, 5, 2); r.add(ce.val(5) == 0.2);           // a web-view move releases LC 2
+		ce.midiCC(100, 1, 3); r.add(ce.lkCC[1] == 0);                                   // the mod wheel: same
+		ce.midiCC(1, 1, 3); r.add(ce.lkCC[1] == (1 / 127));
+		r.every(_.value) });
 	check.("knobs: turning the other Launch Control moves on from the shared value, no jump", {
 		var ce = loadCe.value.ccBase_(0);
 		ce.server = (sendMsg: { });
@@ -74,8 +82,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		ce.midiCC(127, 14, 1);                                 // LC 1 turned to its end: the shared value reaches the top
 		((ce.val(13) - (72 / 127)).abs < 0.02) and: { ce.val(13) > (72 / 127) }   // LC 2's step continued, no jump to 1/127
 			and: { (ce.val(14) - 1).abs < 1e-6 }
-			and: { ce.midiCC(0, 14, 1); ce.val(14).abs < 1e-6 }                     // and down to the bottom
-			and: { ce.midiCC(5, 5, 2); ce.val(5) == (5 / 127) } });                // faders stay absolute
+			and: { ce.midiCC(0, 14, 1); ce.val(14).abs < 1e-6 } });                 // and down to the bottom
 	check.("knobs: far from the shared value, every step still moves it at least 1:1", {
 		var ce = loadCe.value.ccBase_(0), first;
 		ce.server = (sendMsg: { });
