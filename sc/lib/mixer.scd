@@ -19,17 +19,19 @@
 // trim: the stem's own gain (a number or a mapped bus), on top of level × master.
 // thinOn 0: the stem's voices do Thin themselves (per note, sd voices). Delay send (Strudel bus()): echo × 2 ×
 // space, at most 0.9, or Tension's echo (0 → 0.45 over the first half of the knob) where that is larger; delayOn 0
-// for dry stems (Strudel dryBus: kick, sub, bass).
+// for dry stems (Strudel dryBus: kick, sub, bass). tEchoAmt: Tension's echo at half the knob (0.45 in most tracks; a
+// track sets its own with tensionEchoAmt); tRoomAmt: how far Tension opens the room towards 0.95 (1 = all the way).
 ~ce.defs[\ce_strip] = SynthDef(\ce_strip, { |in, out, level = 0, master = 0, trim = 1, thinF = 1, hpOwn = 0, thinOn = 1,
-	space = 0, tension = 0, roomOut, roomOn = 1, delayOut, delayOn = 0, echo = 0, rDirect = -1, dDirect = -1, tEchoOn = 1|
+	space = 0, tension = 0, roomOut, roomOn = 1, delayOut, delayOn = 0, echo = 0, rDirect = -1, dDirect = -1, tEchoOn = 1,
+	tEchoAmt = 0.45, tRoomAmt = 1|
 	var sig = In.ar(in, 2), f = Lag.kr(thinF, 0.02), base = hpOwn.max(30) * (hpOwn <= 0) + (hpOwn * (hpOwn > 0));
 	var cut = (base * f).min(5000).max(base);
 	var hp = ~ce.hpf(sig, cut, 1 / (10 ** (1/20)));
 	var mix = ((f - 1) / 0.02).clip(0, 1).max(hpOwn > 0);
 	// room: 0.9 × space (lab columns: their own amount from a state bus), Tension opens it up to 0.95
-	var r = Select.kr(rDirect >= 0, [0.9 * space, rDirect]), room = Lag.kr(r + ((0.95 - r) * tension), 0.02) * roomOn;
+	var r = Select.kr(rDirect >= 0, [0.9 * space, rDirect]), room = Lag.kr(r + ((0.95 - r) * tension * tRoomAmt), 0.02) * roomOn;
 	var dbase = Select.kr(dDirect >= 0, [(echo * 2 * space).min(0.9), dDirect]);
-	var dsend = Lag.kr(dbase.max((tension / 0.5).clip(0, 1) * 0.45 * tEchoOn), 0.02) * delayOn;   // tEchoOn 0: no Tension echo
+	var dsend = Lag.kr(dbase.max((tension / 0.5).clip(0, 1) * tEchoAmt * tEchoOn), 0.02) * delayOn;   // tEchoOn 0: no Tension echo
 	sig = Select.ar(thinOn > 0, [sig, XFade2.ar(sig, hp, mix * 2 - 1)]);
 	sig = sig * Lag.kr(level * master * trim, 0.02);
 	Out.ar(out, sig);

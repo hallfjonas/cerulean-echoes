@@ -304,3 +304,43 @@ Das liegt am gemeinsamen Hall (Impulsantwort `ir/orbit-4.wav` / Faltung), nicht 
   Hall-Pegel prüfen? Betrifft auch 008.
 - Accents: so lassen (1:1) oder wie gemeint (verschiedene Schüsse/Tonhöhen, mit FM) — dann in Strudel und SC ändern?
 - Wumms pro Note (wie Strudel) oder live wie früher Master?
+
+## 001 / 002 Groove (80s groove house) (as of 2026-11-21)
+
+Both tracks ported (`sc/tracks/001-groove/`, `sc/tracks/002-groove/`), scenarios `tools/sc-port/scenarios/001-all.json`,
+`002-all.json` (`CE_TRACK=001-groove/001-groove`, one base and one "moved" scenario per stem: knobs, pattern press, button
+2 held, Tension, Master, Break). **Not yet checked by ear** (`feedback.md` in each folder lists what to listen for).
+Built like 016 (the Strudel tracks are built on 016's code): Master is Wumms-like (no master volume), Chapter = mood,
+the FX column is 016's; the Launchkey is 016's with the orchestra hit on pad 11.
+
+| | Events | Loudness Δ (SC − Strudel) |
+|---|---|---|
+| 001 all 14 stems | same (28 scenarios) | dry ≤ 0.1 dB (null −20 … −45 dB); hats +1.0 / +1.5 dB (44.1 kHz samples, as 008 / 016); pad, strings −0.4 … +0.1 dB (supersaw random phases) |
+| 002 all 14 stems | same, except two notes at a button press in the middle of a 16th (see below) | dry ≤ 0.1 dB; rumble −0.1 / −0.4 dB (always reverb); hats as 001; pad, strings −0.2 … −0.5 dB |
+
+Differences seen only where a button is pressed inside a 16th: SC decides a 16th's notes at its start, Strudel at its
+scheduler query (hats: one extra unheld hat, arp: one note without the octave). A press exactly on a bar line also
+switches one bar earlier in SC than in the offline reference (scenarios press at 3.2, not 3).
+
+**Library** (generic, used by these two tracks):
+- `lib/mini.scd`: `*n` (whole numbers), checked against Strudel's parser for all 80 strings of both tracks.
+- Strip: `tensionEchoAmt` (Tension's echo at half the knob; 001: 0.4, 002: 0.2, default 0.45) and `tensionRoomAmt` (how far
+  Tension opens the room; 002: 0.35, Strudel's `roomOf`; the drum pads keep 1, their own formula), per track, stem or lane.
+- New impulse responses `ir/orbit-0.9`, `-1.4`, `-2.2`, `-3.5` (+ `-44100`).
+
+**Decisions**
+- Live as in 016: Space, echo, Fog, Thin, Tension act at once; Tension brings the pad in live (map `padIn` on the trim);
+  Brightness live on pad and strings (long notes), from the next note elsewhere; Level and Master per note.
+- Knob defaults of the Strudel tracks (pad Space 0.5; 002 also kick Ghosts 0.3) only live (`ce.log` nil), set after the
+  columns' hooks (so the pad's room follows; 016 sets its default before them).
+
+**Strudel quirks kept 1:1** (open questions for the players)
+- Chords: the saw copy 0.1 semitone up was meant to be panned right (0.7), but `pan(0.3)` after `superimpose` sets both
+  saws to 0.3.
+- 002 rumble Motion: the "breathing" sine `sin(π t)` is read at the bar start, where it is 0: Motion is a steady
+  0 … 27.5 % darker filter, it does not breathe over 2 bars.
+- 002 kick ghosts: their own low-pass (380 Hz) is overridden by the column's (600 … 9000 Hz), so they are brighter
+  than written.
+- 002 organ stab: the high sine's own short decay (0.05 s, "a quick high click") is overridden by Decay (row 3).
+- 002 percussion: `pan(sine.slow(11))` after the stack overrides the cowbell's (0.65) and shaker's (0.35) own pans.
+- 001 FX: the rising saw's own low-pass is overridden by the column's (as 016).
