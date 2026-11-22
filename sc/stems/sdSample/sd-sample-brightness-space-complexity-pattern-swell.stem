@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-sample-brightness-space-complexity-pattern-swell",
+  "parent": null,
+  "about": "909 clap on 2 and 4, drop clap, snare swell.",
+  "meta": {
+    "role": "clap",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "clap",
+      "909",
+      "techno"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSample"
+  },
+  "gain": 0.4,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "techno-clap.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Simple"
+    },
+    {
+      "label": "Pickup"
+    },
+    {
+      "label": "Drop"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "plain ↔ a quiet clap before beat 3 ↔ + small double taps."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "clap on 2 and 4. Also the level of Tension's roll."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "short clap → with pickup → full drop clap (tail + double)."
+    },
+    "b2": {
+      "label": "Swell",
+      "about": "snare swell over 4 bars while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-roll",
+  "parent": null,
+  "about": "Dark fast percussion: FM claves, shaker, metal.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "claves",
+      "shaker",
+      "metal",
+      "techno"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdNoise"
+    ]
+  },
+  "gain": 0.8,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "techno-dark-perc.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Perc 1"
+    },
+    {
+      "label": "Perc 2"
+    },
+    {
+      "label": "Perc 3"
+    },
+    {
+      "label": "Perc 4"
+    },
+    {
+      "label": "Perc 5"
+    },
+    {
+      "label": "Perc 6"
+    },
+    {
+      "label": "Perc 7"
+    },
+    {
+      "label": "Perc 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "claves → + ticks → + zaps → 32nds."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "dark fast percussion."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 clave figures."
+    },
+    "b2": {
+      "label": "Roll",
+      "about": "a 32nd roll of shaker and metal, louder the longer held.",
+      "mode": "hold"
+    }
+  }
+}

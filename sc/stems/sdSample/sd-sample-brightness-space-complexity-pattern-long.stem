@@ -1,0 +1,68 @@
+{
+  "format": 2,
+  "name": "sd-sample-brightness-space-complexity-pattern-long",
+  "parent": null,
+  "about": "Open 909 hats on the off-beats, closed 16ths.",
+  "meta": {
+    "role": "hats",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "hats",
+      "909",
+      "off-beat",
+      "techno"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSample"
+  },
+  "gain": 0.075,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "techno-hats.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Open"
+    },
+    {
+      "label": "Open + 16ths"
+    },
+    {
+      "label": "Driving"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the pattern as it is ↔ + quiet 16ths ↔ + little 32nd rolls."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "open hats. Keep playing in the break."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "open off-beat → + closed 16ths → driving."
+    },
+    "b2": {
+      "label": "Long",
+      "about": "the open hats ring longer, on every 8th, while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "name": "008-groove-techno",
+  "about": "Groove techno in F: rumble, rolling bass, hypnotic loops.",
+  "tempo": 140,
+  "swing": 0,
+  "genre": "groove-techno",
+  "frame": "008-groove-techno-frame.scd",
+  "chapters": [
+    "Dark",
+    "Tight",
+    "Warm"
+  ],
+  "slots": {
+    "1:1": "sdSynthMod/sd-synth-mod-brightness-space-punch-pattern-drop-out-2.stem",
+    "1:2": "sdSynthMod/sd-synth-mod-brightness-space-motion-pattern-riser.stem",
+    "1:3": "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-octave-4.stem",
+    "1:4": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave.stem",
+    "1:5": "sdSample/sd-sample-brightness-space-complexity-pattern-swell.stem",
+    "1:6": "sdSample/sd-sample-brightness-space-complexity-pattern-long.stem",
+    "1:7": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-fill.stem",
+    "2:1": "sdSynthMod/sd-synth-mod-brightness-space-pump-chords-colour.stem",
+    "2:2": "sdSupersawWide/sd-supersaw-wide-brightness-space-sound-pattern-echo-throw.stem",
+    "2:3": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-2.stem",
+    "2:4": "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem",
+    "2:5": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-answer.stem",
+    "2:6": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-roll.stem",
+    "2:7": "sdNoise/sd-noise-brightness-space-complexity-pattern-open.stem"
+  }
+}

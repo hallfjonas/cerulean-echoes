@@ -173,7 +173,7 @@
 		// ownDelay: [time in beats, feedback], so the stem keeps its echo in beats at any tempo
 		strip[\ownDelay] !? { |d| entry[\ownDelay] = [d[0] * 60 / track.bpm, d[1]] };
 		strip[\lanes] !? { |lanes| entry[\lanes] = lanes.collect { |ln|
-			var out = ln.copy; [\level, \roomR, \echoSend, \space, \echo].do { |key| ln[key] !? { |x| out[key] = ref.(x) } };
+			var out = ln.copy; [\level, \fade, \roomR, \echoSend, \space, \echo].do { |key| ln[key] !? { |x| out[key] = ref.(x) } };
 			out } };
 	};
 	entry

@@ -25,9 +25,10 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 |---|---|---|---|---|
 | 001-groove | sound-tour (176 bars, 26,082 events), stem-check (162 bars, 40,543 events) | 100 % | none | every stem −∞ dB, except the two supersaw columns (see below) |
 | 002-groove | dance-floor (192 bars, 26,771 events), stem-check (162 bars) | 100 % | none | as 001 |
+| 008-groove-techno | every-button (67 bars), warehouse (192 bars), techno-night (bars 0-312, 59,000 events), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the JX lane of the strings (random phases; its analogue lane alone nulls) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
-every stem of both tracks.
+every stem of all three tracks.
 
 ## 001-groove, 002-groove
 
@@ -43,3 +44,17 @@ every stem of both tracks.
 Not changed: loudness (each stem's `gain` is the old `trim`), orbits, Tension's echo and room amounts (001: 0.4; 002: 0.2 and
 0.35), the Launchkey, the Break, the 14 slots of both modes. The rumble, congas and organ of 002 and the variants of the
 001 columns for 002 are stems of their own (`parent` points at the 001 stem they come from).
+
+## 008-groove-techno
+
+Compared with `--cc '{"12":1,"69":0.5}'` (Master at 1: the scripts never raise it, and a stem track plays no note while Master is 0).
+
+| What | Difference | Why |
+|---|---|---|
+| Master at 0 | A column makes no notes while Master is 0; the old track made the (inaudible) notes anyway. The last 24 bars of `techno-night` fade Master to 0 at bar 312, so that script is compared up to bar 312 | The stem engine gates a column on its fader and Master; the old one only multiplied the strip |
+| Column names, headings, pattern labels | As for 001 and 002; the eight-pattern columns (seq, stab, answer, dark perc) have `Loop 1`…`Loop 8` style labels instead of numbers | As above |
+| Button 1 of the kick | `@ctl 16:1.b1` says `Pattern | double time: 8 kicks per bar while held.` instead of `Double time | …` | The label of button 1 is `Pattern` or `Chords` in the stem format |
+| Chords column | `2:1.b1` is `Chords` (was `Pattern`) | The same rule; it steps the progression as before |
+| Control texts | Shortened to the 60 characters a stem allows: kick Punch and Level, clap Level, pads Pump, strings Pattern, dark perc Roll | Schema limit |
+| Pad Space | Default 0.5 on the stem (was set only when playing live); passed with `--cc '{"69":0.5}'` | `default` on the knob |
+| Strings | Strings JX lane: audio is not bit-identical between any two renders (random phases); the analogue lane nulls | `sdSupersawWide` starts at random phases |
