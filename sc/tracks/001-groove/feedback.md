@@ -1,8 +1,8 @@
 # 001 groove (SC): feedback
 
-SuperCollider port of `tracks/house/80s/001-groove/001-groove.strudel` (frozen, decision D1). Same controls and texts.
+SuperCollider port of `tracks/house/80s/001-groove/001-groove.strudel` (removed, in git history; decision D1). Same controls and texts.
 Not yet checked by ear. Play it in the player (`001-groove`, engine SC) or with the `sound-tour` auto-performance, and
-compare with `001-groove-strudel` where something sounds off.
+compare with the Strudel version from git history where something sounds off.
 
 ## What to listen for
 

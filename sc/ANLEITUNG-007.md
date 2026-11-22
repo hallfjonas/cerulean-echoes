@@ -1,7 +1,7 @@
 # Bedienungsanleitung: Track 007 (Ambient) in SuperCollider
 
 Stand 18.11.2026. **Alle Spalten sind portiert**: Jojo 1–7, Jonas 1–7, die globale Spalte 8 und der Launchkey.
-Jede Spur wurde automatisch gegen den Strudel-Track `tracks/ambient/007-ambient-soundscape/007-ambient.strudel`
+Jede Spur wurde automatisch gegen den Strudel-Track `(git history) tracks/ambient/007-ambient-soundscape/007-ambient.strudel`
 verglichen (dieselben Noten, Details in `sc/PORTING.md`, Abschnitt 007). Optimiert wird erst danach.
 
 Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unterschiede:

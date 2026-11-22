@@ -2,7 +2,7 @@
 
 ## What it is
 Auto-perform plays a track for you. A script of control moves and button presses (a "performance") is sent to the
-track (to SuperCollider; a frozen Strudel track gets it through a virtual controller), so the track sounds as if
+track (to SuperCollider), so the track sounds as if
 someone turned the knobs. It does not listen to the sound: it only
 plays what the script says, bar by bar.
 

@@ -21,7 +21,7 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 - **Tempo**: about 60–80 BPM, or no fixed pulse.
 - **Must have**: pads or drones that hold for many bars; slow changes of colour; soft, sparse percussion, if any.
 - **Must not have**: a kick on every beat (four-on-the-floor). That is ambient house.
-- **Tracks here**: [007-ambient-soundscape](../../tracks/ambient/007-ambient-soundscape/) (D, about 70 BPM, three moods).
+- **Tracks here**: 007-ambient ([stem track](../../sc/tracks/007-ambient/)) (D, about 70 BPM, three moods).
 - **Listen**: see the Ambient section of [listening-list.md](listening-list.md).
 
 ## Ambient House
@@ -31,7 +31,7 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 - **Must have**: a four-on-the-floor kick (a kick on every beat); warm pads or keys that carry the melody; organic
   percussion (shakers, hats, rims, not hard claps); room for air, so not dense in every bar.
 - **Must not have**: a groove driven by a bass line and piano chords (that is house); a dark, hypnotic loop (that is techno).
-- **Tracks here**: [010-ambient-house](../../tracks/ambient-house/010-ambient-house/) (D minor, 120 BPM).
+- **Tracks here**: 010-ambient-house ([stem track](../../sc/tracks/010-ambient-house/), D minor, 120 BPM).
 - **Listen**: Harmon, Kiasmos, David August (Ambient House section).
 
 ## House
@@ -42,7 +42,7 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 - **Must have**: four-on-the-floor kick; bass line with groove; house piano chords (also 8-bar progressions); a lighter,
   playful melody on flute-like or bright sounds; a dry sound (little reverb on the drums).
 - **Must not have**: long pads and no bass groove (ambient house); a dark, minimal loop at 130+ BPM (techno).
-- **Tracks here**: [009-house](../../tracks/house/009-house/) (A minor, 124 BPM); [001-groove](../../tracks/house/80s/001-groove/) (80s groove house: disco / boogie and
+- **Tracks here**: 009-house ([stem track](../../sc/tracks/009-house/), A minor, 124 BPM); 001-groove ([stem track](../../sc/tracks/001-groove/), 80s groove house: disco / boogie and
   rave colours, D dorian, 124 BPM).
 - **Listen**: Sarah Wild, Fusion 2025 (the main reference for 009, with its tracklist).
 
@@ -62,7 +62,7 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
   kick, a fast groovy hat and wooden rhythm instruments that bounce, a stab as the theme, and an answer that drifts off.
   Mood: cool, curious, peaceful, raving.
 - **Tempo**: about 130–140 BPM (to agree; 008 is 140).
-- **Scoring**: each stem below is scored 0–100% against its line. Reference: [008-groove-techno](../../tracks/techno/008-groove-techno/),
+- **Scoring**: each stem below is scored 0–100% against its line. Reference: 008-groove-techno ([stem track](../../sc/tracks/008-groove-techno/)),
   scored at 50% overall.
 
 ### Stems
@@ -91,7 +91,7 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 
 - **Must not have**: a bare, minimal loop with no harmonic colour (techno); a playful house piano or flute-like melody over
   a bass groove (house); a dark, heavy kick as the main drive.
-- **Tracks here**: [008-groove-techno](../../tracks/techno/008-groove-techno/) (F, 140 BPM).
+- **Tracks here**: 008-groove-techno ([stem track](../../sc/tracks/008-groove-techno/), F, 140 BPM).
 - **Listen**: add references here when agreed (the Groove Techno section of [listening-list.md](listening-list.md) is
   still empty).
 

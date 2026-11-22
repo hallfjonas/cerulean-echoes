@@ -10,8 +10,8 @@ When you do not have the repo running, you want to play at a friend's place, or 
 
 ## How to use it
 1. Open strudel.cc in Chrome (it needs Web MIDI for the controllers).
-2. Copy the whole track file, for example `tracks/techno/008-groove-techno/008-groove-techno.strudel`, and paste it
-   into the editor.
+2. Copy the whole track file, for example `<track>.strudel`, and paste it into the editor. The repo holds no Strudel track any more; they
+   are in git history.
 3. Connect the Launch Control XL 3 and the Launchkey, allow MIDI access, and press play.
 4. To get the visuals as well, run in `tools/`:
    `node trajectory/make-tapped.mjs <track.strudel>` (copies the code to the clipboard on macOS), paste that into

@@ -1,7 +1,7 @@
 # cerulean-echoes
 
 Live-performed tracks on SuperCollider (SC), played with Novation Launch Control XL 3s and a Launchkey MK4 25
-(devices: `midi-layouts/devices.md`) through the player (`tools/trajectory/`). The older Strudel tracks are frozen.
+(devices: `midi-layouts/devices.md`) through the player (`tools/trajectory/`). The Strudel tracks are removed (git history).
 Talk to the user in English; code comments are English too. Explain audio basics plainly.
 Docs for people: `docs/README.md`; contribution rules: `CONTRIBUTING.md`.
 Deprecated features: `DEPRECATION.md`. Read it before building any feature; never extend a deprecated feature (Strudel is deprecated, new work goes to SuperCollider).
@@ -20,9 +20,8 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   14 slots, frame `<id>-frame.scd`); `sc/lib/` the engine core (`ce.scd`), `sc/engine.scd` what the player starts,
   `sc/live.scd` the IDE start; `sc/sounds/` one sound per file (`sc/sounds/README.md`); `sc/samples/` samples and
   reverb IRs (`CREDITS.md`); porting notes `sc/PORTING.md`
-- `tracks/<genre>/NNN-<name>/` — the frozen Strudel versions (`NNN-<name>.strudel`, decision D1: edits go to the
-  `.scd`), grouped by genre (`ambient`, `ambient-house`, `house`, `techno`), with the tracks' feedback notes; a Guitar
-  Pro song also its `.mid`, `<track>-map.json` and `<track>-design.md`. No `old/` folders: git history keeps them.
+- `tracks/` — removed 2026-11-22: every Strudel track (001/002, 007-010, 016, historic, set 011) is in git history;
+  the tracks live in `sc/tracks/`
 - `midi-layouts/` — device list, the two custom modes (`lcxl3-mode1.syx` / `-mode2.syx`) and the old Strudel layout
   template (`templates/dual-lc.strudel`)
 - `lab/tutorials/` — ear training with live sliders + English handbook PDF (the only part of `lab/` left; the Strudel
@@ -65,8 +64,6 @@ every controller optional. Edit the `.scd`; a new version goes into a new folder
 - A Guitar Pro song: the producer still writes Strudel (`tools/producer/`, `/producer`); the decisions live in
   `<track>-map.json`, change the map and re-run `npm run producer`, never the track. Reference songs 012/013 are test
   fixtures in `tools/producer/fixtures/`. An SC output is decided when the next song comes.
-- Frozen Strudel files stay playable in the player as `<id> (Strudel)` and on strudel.cc; change them only for a fix
-  the user asks for (`DEPRECATION.md`).
 
 ## Controller mapping (LC XL 3)
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.
@@ -119,8 +116,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 `tools/trajectory/README.md`). It plays every live track (Live) and the sound lab projects (Labs) with the visuals.
 - Launcher for people without a Terminal: `Cerulean Echoes.app` (repo root, committed; source and `launch.sh` in
   `tools/launcher/`, rebuild with `npm run launcher`) starts the server, opens one browser tab, quitting stops server + SC.
-- SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's frozen Strudel file is
-  `<id>-strudel`): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
+- SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
   OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it; `CE_SC_PORT`, `CE_SC_SERVER_PORT`);
   `tools/trajectory/sc-link.mjs`, `engine-sc.mjs`. Controllers go straight to SC; the page mirrors SC's state.
   Agents' and tests' runs set `CE_SC_MUTE=1` (master to a silent bus).

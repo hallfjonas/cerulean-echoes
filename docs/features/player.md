@@ -21,7 +21,7 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the ear-training tutorials ([lab boards](lab-boards.md) are retired). Boards
    without a master `stack(` are greyed out.
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
-   A SuperCollider track (most live tracks; the old Strudel version is listed as "(Strudel)") starts SuperCollider
+   A SuperCollider track (every live track) starts SuperCollider
    in the background the first time, which takes a few seconds. SuperCollider must be installed. Record,
    auto-perform, takes and the visuals work on SuperCollider tracks.
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.

@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import test from 'node:test'
 import { compile } from './autoperform.mjs'
-import { PERFORM, checkScript, controlsOf, trackFileOf } from './check-perform.mjs'
+import { PERFORM, checkScript, controlsOf, tagSource, trackFileOf } from './check-perform.mjs'
 import { addMessage, createRecorder, createSession, noteName, thin, toScript } from './take.mjs'
 
 const LC = 'LCXL3 1 MIDI In'
@@ -129,7 +129,7 @@ test('the recorder keeps bars from the load cycle and starts a new session per l
 
 test('a take on a live track passes check-perform (take meta and pad velocity left out until task 5)', () => {
   const track = '010-ambient-house'
-  const real = controlsOf(fs.readFileSync(trackFileOf(track), 'utf8'))
+  const real = controlsOf(tagSource(trackFileOf(track)))
   const button = [...real].find(([, c]) => c.button)[0]
   const knob = [...real].find(([, c]) => !c.button)[0]
   const s = session([
@@ -147,7 +147,7 @@ test('POST /take: a live track gets a take in perform/<track>/takes/ that the ca
   const { saveTake } = await import('./take-save.mjs')
   const { find } = await import('./catalogue.mjs')
   const track = '010-ambient-house'
-  const real = controlsOf(fs.readFileSync(trackFileOf(track), 'utf8'))
+  const real = controlsOf(tagSource(trackFileOf(track)))
   const button = [...real].find(([, c]) => c.button)[0]
   const s = session([[LC, 0xbf, button, 127, 3], [LK, 0x99, 40, 100, 5], [LK, 0x90, 62, 90, 6]])
   s.trackHash = 'a'.repeat(40)

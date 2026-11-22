@@ -2,7 +2,7 @@
 
 Stand 20.11.2026. **Alle Spalten sind portiert**: Mode 1 Spalten 1–7, Mode 2 Spalten 1–7 (Spalte 3 = Stab Shape),
 die globale Spalte 8 und der Launchkey. Jede Spur wurde automatisch gegen den Strudel-Track
-`tracks/techno/groove/016-grroove-opus/016-grroove-opus.strudel` verglichen (dieselben Noten, Details in
+`(git history) tracks/techno/groove/016-grroove-opus/016-grroove-opus.strudel` verglichen (dieselben Noten, Details in
 `sc/PORTING.md`, Abschnitt 016). **Noch nicht mit dem Ohr abgenommen.** Optimiert wird erst danach.
 
 Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unterschiede:

@@ -1,5 +1,5 @@
 // Frame of the 009 stem track (009-house.track): harmony, chapters, the global column 8 texts, the orbits and the
-// Launchkey, the same as sc/tracks/009-house/009-house.scd. Format: sc/lib/stemtrack.scd.
+// Launchkey, the same as the former sc/tracks/009-house/009-house.scd. Format: sc/lib/stemtrack.scd.
 // Vamp = Am9 throughout; Progression = the progression button 1 of the chords column picks (next of 10, at the next
 // 8 bars). A stem that brings its own chords (the keys' riffs, col.riffAt) sets them for the whole track while its
 // fader is up. Every chord carries the scale of its bar: A dorian (F♯) in Vamp and in Am9 D9, A aeolian (F) else.

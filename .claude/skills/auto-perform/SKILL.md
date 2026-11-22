@@ -7,8 +7,7 @@ description: Design, script and review an auto-performance (a script that plays 
 
 An auto-performance is a JSON script (`tools/trajectory/perform/<track>/<name>.json`) that the player sends to
 SuperCollider, in bars (`sc-auto.mjs`: LC CCs as `/ce/cc`, Launchkey CCs, keys and pads as `/ce/lkcc` / `/ce/lknote`;
-bar 0 goes with the load; the bar clock is SC's). A frozen Strudel copy (`<id> (Strudel)`) plays the same scripts
-through the virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto`. It does not listen to the sound. The agent
+bar 0 goes with the load; the bar clock is SC's). It does not listen to the sound. The agent
 cannot hear either: the user listens in the player and the user's words decide. Two loops, each with an explicit gate:
 
 1. **Loop 1, design**: you propose, the user corrects, the user says approved. No script before that.
