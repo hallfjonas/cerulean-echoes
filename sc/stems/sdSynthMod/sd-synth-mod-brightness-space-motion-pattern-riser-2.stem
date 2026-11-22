@@ -1,0 +1,71 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-motion-pattern-riser-2",
+  "parent": null,
+  "about": "Rumble: the kick in a dark reverb; Wumms drives it.",
+  "meta": {
+    "role": "sub",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "rumble",
+      "reverb",
+      "wumms"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdSampleMod",
+      "sdNoise"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 3,
+  "code": "opus-rumble.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "3+4"
+    },
+    {
+      "label": "2+3+4"
+    },
+    {
+      "label": "3"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Motion",
+      "about": "still ↔ the filter breathes and the rumble echoes in 16ths."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "rumble under the kick, same pitch (C)."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "3rd + 4th 16th → 2nd–4th → only the 3rd."
+    },
+    "b2": {
+      "label": "Riser",
+      "about": "a noise sweep rises over 2 bars while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.68
+}

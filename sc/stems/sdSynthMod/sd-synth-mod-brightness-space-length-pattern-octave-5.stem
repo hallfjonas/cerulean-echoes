@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-pattern-octave-5",
+  "parent": null,
+  "about": "Pumping sub on the chord root; Wumms drives it.",
+  "meta": {
+    "role": "sub",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "sub",
+      "pump",
+      "wumms"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "opus-sub.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Pump"
+    },
+    {
+      "label": "Fifth"
+    },
+    {
+      "label": "Syncopated"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "long, pumping notes ↔ short, bouncing ones."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "pumping sub, follows Jonas' chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pump → fifth on beat 4 → syncopated."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.65
+}
