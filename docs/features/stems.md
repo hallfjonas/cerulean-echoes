@@ -429,7 +429,7 @@ notes before a riff's chord change inside the bar (format 2 takes the chord of t
 the chord of the next note). Both happen only while the keys play a riff; see task 013.
 
 ## Translated tracks
-The hand-written tracks 001, 002, 008 and 016 are stem tracks now: 14 stems each, all column code (`sc/stems/sdSynthMod/groove-*.scd`,
+The hand-written tracks 001, 002, 008, 016 and 017 are stem tracks now: 14 stems each, all column code (`sc/stems/sdSynthMod/groove-*.scd`,
 `techno-*.scd` and their siblings, sharing the note helpers of `~ce.grooveKit` in `sc/lib/stemkit.scd`), a frame with the moods,
 progressions and Launchkey; 001 and 002 have no master volume (`masterless`). 002 shares chords, pad, arp, hook and strings with 001 and has variants of the
 others (`parent`) and stems of its own (rumble, congas, organ). The old `.scd` files are deleted after the proof; what differs

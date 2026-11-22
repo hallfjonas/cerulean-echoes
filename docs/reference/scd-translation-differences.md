@@ -27,6 +27,7 @@ The old `.scd` of a translated track is deleted in the commit that adds the proo
 | 002-groove | dance-floor (192 bars, 26,771 events), stem-check (162 bars) | 100 % | none | as 001 |
 | 008-groove-techno | every-button (67 bars), warehouse (192 bars), techno-night (bars 0-312, 59,000 events), stem-check (162 bars) | 100 % | none | every stem −∞ dB, except the JX lane of the strings (random phases; its analogue lane alone nulls) |
 | 016-grroove-opus | stem-check only (162 bars; 016 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB (the quiet JX strings leave noise-level residual) |
+| 017-groove-lsd | stem-check only (162 bars; 017 has no perform scripts), without the Stab Shape controls | 100 % of the 13 sounding stems | none | every stem −∞ dB, except the noise-driven `modalPerc` and supersaw sounds (their residual equals hand-vs-hand) |
 
 The audio null test also ran a global-column scenario (Tension, Fog, Thin and Master sweeps, Chapter, Break; 24 bars) on
 every stem of all three tracks.
@@ -72,3 +73,14 @@ Compared with `--cc '{"12":1}'` and a stem-check that leaves the controls of Mod
 | Texts | Kick button 1 reads `Pattern`; texts cut to 60 characters (strings Pattern, answer Level, FX Complexity, accents) | Stem format |
 | Names and labels | As for the other tracks; the eight-pattern columns have `Stab 1` … `Series 1` style labels | The same |
 | Strings | The JX supersaw layers start at random phases, so two renders differ at noise level (the track is quiet there) | `sdSupersawWide` |
+
+## 017-groove-lsd
+
+Built like 016 and compared the same way (`--cc '{"12":1,"69":0.5}'`, stem-check without the Mode 2 column 3 controls). Kick, rumble, sub, bass and hats are the 016 stems; the other columns are stems of their own (wood, modal percussion, strings, acid stab, answer, accents, FX), the pad is the 016 pad with its Space default 0.5.
+
+| What | Difference | Why |
+|---|---|---|
+| **Stab Shape (2:3) is gone** | As in 016: slot 2:3 holds the 008 sequence stem (silent at fader 0), the acid stab plays with its shape at the zero positions, and Ratchet and "stab out by hand" are gone | Same reason; see 016 and PR #98 |
+| Answer and the stab | The answer follows the stab's Vanish through the frame (`stabHere`) | As in 016 |
+| Noise-driven sounds | `modalPerc` (percussion, log, bell) and the supersaw strings use random noise or phases, so two renders of either track differ at noise level; the events are equal | The sounds |
+| Texts, names, labels | As for the other tracks | The same |

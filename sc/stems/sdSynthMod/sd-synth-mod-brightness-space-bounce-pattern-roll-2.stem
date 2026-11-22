@@ -1,0 +1,71 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-bounce-pattern-roll-2",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-bounce-pattern-roll.stem",
+  "about": "FM wood blocks, a wooden log and a mallet, swung.",
+  "meta": {
+    "role": "perc",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "wood",
+      "log",
+      "mallet",
+      "swing"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "modalPerc"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "lsd-wood.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Rave"
+    },
+    {
+      "label": "Spin"
+    },
+    {
+      "label": "Tumble"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "bright ↔ brighter."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Bounce",
+      "about": "light swing ↔ heavy swing."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "wooden rhythm. Also the level of Tension's wood roll."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "rave → spin (3 against 4) → tumble."
+    },
+    "b2": {
+      "label": "Roll",
+      "about": "a wood roll fills in over 2 bars while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.9
+}
