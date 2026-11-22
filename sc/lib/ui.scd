@@ -5,6 +5,7 @@
 //                  /ce/spectrum 48 floats (the master output, 20 Hz-20 kHz log, 0..1 = -60..0 dB, ~20 times a second)
 //                  /ce/setsample energy punch tension b1..b64 (every 10 s, for the set view: energy in dB, punch and
 //                  tension 0..1, 64 bands 20 Hz-20 kHz log, 0..1 = -60..0 dB; see uiSetFrame)
+//                  /ce/level peak (the master's peak 0..1 of the last 100 ms, 10 times a second: the recording meter)
 // bridge → SC: /ce/hello (send everything again) · /ce/cc cc value (a click in the UI: the same as a MIDI message)
 //              /ce/lkcc num value · /ce/lknote note velocity chan (the Launchkey row: as the device would send)
 (
@@ -82,7 +83,7 @@
 		self.uiSend('/ce/spectrum', *msg.drop(3));
 		self.uiSetFrame(\spec, msg.drop(3));
 	} }, '/ce/spec').permanent_(true);
-	OSCdef(\ce_ui_lvl, { |msg| if(msg[1] == self.uiSpec) { self.uiSetFrame(\lvl, msg.drop(3)) } }, '/ce/lvl').permanent_(true);
+	OSCdef(\ce_ui_lvl, { |msg| if(msg[1] == self.uiSpec) { self.uiSetFrame(\lvl, msg.drop(3)); self.uiSend('/ce/level', msg[4]) } }, '/ce/lvl').permanent_(true);
 	def.send(srv, ['/s_new', \ceSpectrum, self.uiSpec, 1, 0]);   // add to the tail of the root group (node 0)
 };
 ~ce.uiSpecStop = { |self|

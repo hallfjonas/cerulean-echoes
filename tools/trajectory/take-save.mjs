@@ -3,8 +3,10 @@
 // checks it like check-perform and writes perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<source>.json (uncommitted,
 // gitignored), and the tapped events of the play next to it as <name>.events.jsonl (one batch per line, named by the
 // take's `events` field). The track id must be a live track of the catalogue; the file name is made here, never by the
-// page. Answers { id: 'takes/<name>', steps, problems: check-perform's errors (the take is written anyway), replay?:
+// page. A SuperCollider track's capture has no trackHash (the page gets no track text): the sha1 of the .scd file is
+// filled in here; its events are SC's state echoes per bar (sc-auto.mjs createScTap), checked by check-replay alike. Answers { id: 'takes/<name>', steps, problems: check-perform's errors (the take is written anyway), replay?:
 // the verdict of check-replay when the play was the replay of a take with events }.
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { find } from './catalogue.mjs'
@@ -31,8 +33,10 @@ export const saveTake = (id, session) => {
   const entry = find(id)
   if (!entry || entry.kind !== 'live') return { status: 404, body: { error: `no live track '${id}'` } }
   if (!isSession(session)) return { status: 400, body: { error: 'not a capture (messages, snapshot, recordedAt)' } }
-  const controls = controlsOf(fs.readFileSync(entry.path, 'utf8'))
-  const script = toScript({ ...session, track: id }, controls)
+  const source = fs.readFileSync(entry.path, 'utf8')
+  const controls = controlsOf(source)
+  const trackHash = session.trackHash ?? crypto.createHash('sha1').update(source).digest('hex')
+  const script = toScript({ ...session, track: id, trackHash }, controls)
   const dir = path.join(PERFORM, id, 'takes')
   fs.mkdirSync(dir, { recursive: true })
   const name = nameOf(dir, script.take.source)

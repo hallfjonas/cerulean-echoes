@@ -6,7 +6,7 @@
 <title>LC XL 3</title>
 <style>
 /* Controller mirror after UI-REDESIGN.md and reference/layout-mockup.html: two LC panels (Mode 1, Mode 2), the Launchkey
-   under Mode 1, the spectrum and the status strip under Mode 2. Everything is laid out on a design board of 1600 x 900
+   under Mode 1, the spectrum and the set view under Mode 2, the status (bar marks, beats) top right of Mode 1. Everything is laid out on a design board of 1600 x 900
    units and scaled as one piece (--px = one unit in CSS px); only text has a floor and a ceiling. Two styles, "minimal"
    (Torso-like, default) and "retro" (Teenage Engineering-like), each dark or light (data-tone): only tokens and the knob
    component differ.
@@ -68,6 +68,10 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 /* fader: 28 x 150 units, track max(2px, 4 units), handle 28 x 12 */
 .fader{position:relative;width:calc(28 * var(--px));height:calc(130 * var(--px));margin-top:calc(4 * var(--px));flex:none}
 .fader .bar{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:max(2px, calc(4 * var(--px)));background:var(--track)}
+/* pickup: where the physical fader sits while it has not met the value yet (a short line across the slot) */
+.fader .ghost{position:absolute;left:-20%;width:140%;height:max(2px, calc(2 * var(--px)));background:var(--accent);
+  bottom:calc(var(--g, 0) * 100%);transform:translateY(50%);display:none;z-index:3;pointer-events:none}
+.fader.ghosted .ghost{display:block}
 .fader .handle{position:absolute;left:0;width:100%;height:calc(12 * var(--px));border-radius:1px;background:var(--handle);
   bottom:calc(var(--v, 0) * (100% - 12 * var(--px)))}
 /* minimal: the fader is a slim slot that fills from the bottom (a sliver at 0); same box as Retro, so a theme
@@ -119,20 +123,17 @@ body.stemlab .cl:not(.global) .kw .kl:hover{color:var(--accent)}@keyframes blink
 .keys i.blk{height:60%;width:calc(100% / 15 * .58);background:var(--keyB);z-index:2;border-radius:0 0 calc(3 * var(--px)) calc(3 * var(--px))}
 .keys i.on{background:var(--hit);box-shadow:none}.keys i.wht.on{color:var(--bg)}
 body.no-lk .lkbox{visibility:hidden}
-/* under Mode 2: the spectrum and, right of it, the set view (300 units wide), the status strip on one line under both
+/* under Mode 2: the spectrum and, right of it, the set view (300 units wide)
    (it ends level with the Launchkey box); both boxes the same height, nothing moves when the set view switches */
 .duo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) calc(300 * var(--px));gap:calc(28 * var(--px));min-height:0}
 .duo>div{display:flex;flex-direction:column;min-width:0;min-height:0}
 .spec{flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(14 * var(--px)) calc(12 * var(--px));border:1px solid var(--edge);border-radius:calc(10 * var(--px));min-height:0}
 .spec canvas{display:block;width:100%;height:calc(190 * var(--px));flex:none}
+/* the set view's canvas fills its box (same size for every view, so nothing moves when the view switches) */
+.setbox canvas{flex:1;height:auto;min-height:0}
 .setlab{font:inherit;background:none;border:0;padding:0;color:inherit;cursor:pointer;white-space:nowrap}
-.head{padding:calc(8 * var(--px)) calc(12 * var(--px)) 0;display:flex;flex-direction:column;gap:calc(2 * var(--px));
-  font-size:var(--fs-lab);line-height:1.4;min-width:0}
-/* two lines: chapter / chords / break / global knobs, then bar marks, beats, chord and the theme switch */
-.head .row{display:flex;gap:calc(18 * var(--px));align-items:baseline;white-space:nowrap;overflow:hidden;min-width:0}
-.head .row>div{min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
-.head .row>div.keep{flex-shrink:0}
-.head .k{color:var(--off);margin-right:.5em;text-transform:lowercase}.head .next{color:var(--off)}
+/* the status in the top line, right of mode 1's label: a warning, or the 8 bar marks, 4 beat dots and the chord */
+.lab .head{margin-left:auto;display:flex;align-items:center;white-space:nowrap;color:var(--text)}
 .warn{color:var(--accent);font-weight:600}
 .marks i{display:inline-block;background:var(--track);margin-left:max(2px, calc(4 * var(--px)));vertical-align:middle}
 .marks.beats i{width:max(5px, calc(9 * var(--px)));height:max(5px, calc(9 * var(--px)));border-radius:50%}
@@ -212,7 +213,7 @@ const setKnob = (el, v) => {
 const ROWS = ['k1', 'k2', 'k3', 'fader', 'b1', 'b2']
 const CC_ROW = { k1: 12, k2: 20, k3: 28, fader: 4, b1: 36, b2: 44 }   // CC = row base + column (Mode 1)
 const PAGES = ['jojo', 'jonas'], PREFIX = { jojo: '16', jonas: '2' }
-const S = { layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
+const S = { phys: {}, layout: null, cc: Array(128).fill(0), state: null, beat: null, midi: [], sc: false, page: 'jojo', bridge: false,
   lk: {}, lkBase: 48, lkLit: new Map(), lkLive: -1e9, lkPad: null,   // Launchkey: control values, keyboard window, lit keys/pads
   spec: new Float32Array(48), specAt: -1e9 }                          // the latest spectrum frame and when it came
 const held = new Set()   // CCs kept held by Shift-click
@@ -296,7 +297,7 @@ const lkHtml = () => {
     '<div class="gr lkknobs">' + LK_KNOBS.map(knob).join('') + '</div>' +
     '<div class="gr lkpads">' + [...PADS_TOP, ...PADS_BOTTOM].map(pad).join('') + '</div>' +
     '<div class="wheel ctl" data-lk="1" title="' + esc(wheelName + (wheelDesc ? ': ' + wheelDesc : '')) + '">' +
-    '<span class=btn>mod</span><div class=fader><div class=bar></div><div class=handle></div></div></div>' +
+    '<span class=btn>mod</span><div class=fader><div class=bar></div><div class=handle></div><div class=ghost></div></div></div>' +
     '<div class=keys>' + keys + '</div></div></section>'
 }
 const lkAttach = root => {
@@ -336,7 +337,7 @@ const build = () => {
   cells.length = 0
   const cols = [1, 2, 3, 4, 5, 6, 7, 8]
   const cell = (page, n, row) => '<div data-cell="' + page + ':' + n + ':' + row + '"></div>'
-  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
+  const panels = PAGES.map(page => '<section><p class=lab><span>' + esc(modeLabel(page)) + '</span>' + (page === 'jonas' ? '<span class=hint id=ports></span>' : '<span class=head id=head></span>') + '</p><div class="pn page" data-page=' + page + '><div class=gr>' +
     cols.map(n => { const name = (tags()[PREFIX[page] + ':' + n] ?? (isGlobal(n) ? 'Global' : '')).replace(/^\d+\s*/, '')
       return '<div class="cl' + (isGlobal(n) ? ' global' : '') + '"><span class=name' +
       (isGlobal(n) || !name ? '' : ' data-col="' + (page === 'jojo' ? 1 : 2) + ':' + n + '"') + '>' + esc(name) + '</span>' +
@@ -346,7 +347,7 @@ const build = () => {
   root.innerHTML = '<div class=pair>' + panels + '</div><div class=pair>' + lkHtml() +
     '<section><div class=duo><div><p class=lab>spectrum</p><div class=spec><canvas id=spec></canvas></div></div>' +
     '<div><p class=lab><button class=setlab id=setlab title="set view, how the set went so far: a click shows the next view (also in the player: Settings, key C)"></button></p>' +
-    '<div class="spec setbox"><canvas id=setv></canvas></div></div></div><div class=head id=head></div></section></div>'
+    '<div class="spec setbox"><canvas id=setv></canvas></div></div></div></section></div>'
   document.body.classList.toggle('no-lk', !hasLk())
   lkAttach(root)
   for (const el of root.querySelectorAll('[data-col]')) el.addEventListener('click', () => {
@@ -360,7 +361,7 @@ const build = () => {
     div.title = name ? name + (desc ? ': ' + desc : '') : ''
     const kind = row === 'fader' ? 'fader' : row[0] === 'k' ? 'knob' : 'btn'
     div.className = (kind === 'knob' ? 'kw r' + row[1] : kind === 'btn' ? 'btn ' + row : 'fader') + (c.on ? ' ctl' : ' off')
-    div.innerHTML = kind === 'fader' ? '<div class=bar></div><div class=handle></div>'
+    div.innerHTML = kind === 'fader' ? '<div class=bar></div><div class=handle></div><div class=ghost></div>'
       : kind === 'knob' ? knobSvg() + '<span class=kl>' + esc(name) + '</span>' : esc(name)
     if (c.on) attach(c, kind)
     cells.push(c)
@@ -446,7 +447,8 @@ const draw = () => {
       continue
     }
     const sv = shownOf(c.cc)
-    if (c.row === 'fader') c.el.style.setProperty('--v', sv)
+    if (c.row === 'fader') { c.el.style.setProperty('--v', sv); const g = S.phys['c' + c.cc]
+      c.el.classList.toggle('ghosted', g != null); if (g != null) c.el.style.setProperty('--g', g) }
     else { setKnob(c.el, sv); setText(c.el.querySelector('.kl'), name ?? c.name) }
   }
   // Launchkey: values, the keyboard window, lit keys / pads, frame while it is the last thing moved
@@ -454,7 +456,8 @@ const draw = () => {
   if (lk && hasLk()) {
     const now = performance.now(), lit = k => now - (S.lkLit.get(k) ?? -1e9) < 200
     lk.classList.toggle('live', now - S.lkLive < 4000)
-    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.dataset.lk === '1') el.querySelector('.fader').style.setProperty('--v', v); else setKnob(el, v) }
+    for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.dataset.lk === '1') { const f = el.querySelector('.fader'), g = S.phys.lk1; f.style.setProperty('--v', v)
+      f.classList.toggle('ghosted', g != null); if (g != null) f.style.setProperty('--g', g) } else setKnob(el, v) }
     for (const el of lk.querySelectorAll('[data-key]')) {
       const m = S.lkBase + +el.dataset.key
       el.className = (BLACK.includes(m % 12) ? 'blk' : 'wht') + (lit('k' + m) ? ' on' : '')
@@ -469,7 +472,7 @@ const draw = () => {
     setText(document.getElementById('lkPad'), pad ? '· ' + padName(pad) : '')
     if (pad) setTimeout(update, 2050)
   }
-  // status strip: only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
+  // status (top line, right of mode 1's label): only what shows nowhere else (user, 2026-11-21): a warning when SC or the bridge is missing, the 8 bar
   // marks and 4 beat dots (no 'bar n / 8' text: the marks say it), the chord of the bar. The track's head line
   // (chords / colour) and the global knob values are on the buttons and knobs already.
   const marks = (cls, n, on) => '<span class="marks ' + cls + '">' + [...Array(n).keys()].map(k => '<i' + (k === on ? ' class=on' : '') + '></i>').join('') + '</span>'
@@ -480,8 +483,7 @@ const draw = () => {
   const head = document.getElementById('head')
   head.title = 'drag knobs · click faders · Shift-click holds a button' + (hasLk() ? ' · computer keys A–K, octave Z / X' : '')
   const html =
-    (!S.bridge ? '<div class="warn keep">Bridge not reachable</div>' : !S.sc ? '<div class="warn keep">SuperCollider not running</div>' : '') +
-    '<div class=row><div class=keep>' + beat + '</div></div>'
+    !S.bridge ? '<span class=warn>bridge not reachable</span>' : !S.sc ? '<span class=warn>supercollider not running</span>' : beat
   if (head._html !== html) { head._html = html; head.innerHTML = html }   // unchanged: keep the elements (a click in progress)
 }
 
@@ -722,28 +724,44 @@ const setDraw = () => {
     c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (fs * 1.5) + 'px ' + F; c.fillStyle = K.now
     c.fillText(Math.floor(NOW) + '′', cx, cy)
   } else if (setView === 'map') {
-    // mood map, x = energy, y = tension; no window: the trail fades with age (alpha = e^(−age/12′), gone below 0.05)
-    // labels outside the square (user, 2026-11-21): above it tense / full, under it calm / driving
-    const lh = fs * 1.35, side = Math.min(w, h - 2 * lh), x0 = (w - side) / 2, y0 = (h - side) / 2, X = e => x0 + e * side, Y = t => y0 + side - t * side
-    c.strokeStyle = K.grid; c.lineWidth = 1; c.strokeRect(x0 + .5, y0 + .5, side - 1, side - 1)
-    c.fillStyle = K.grid; c.fillRect(x0 + side / 2, y0, 1, side); c.fillRect(x0, y0 + side / 2, side, 1)
+    // mood map, x = energy, y = tension, over the whole box (user, 2026-11-21: larger, nicer). A faint dot field in the
+    // spectrum's language, the centre cross, the corner words inside the corners (the one the set is in now lit). The
+    // trail is a smooth curve that fades with age (e^(−age/12′), gone below 0.05) and thins out; the last 90 s and the
+    // now dot (with a ring) in the now colour.
+    const pad = 6 * u, x0 = pad, y0 = pad, W = w - 2 * pad, H = h - 2 * pad, X = e => x0 + e * W, Y = t => y0 + H - t * H
+    const gc = retro() ? 18 : 24, gr = Math.max(4, Math.round(gc * H / W)), dr = 1 * u + .4
+    c.fillStyle = K.off
+    for (let i = 0; i <= gc; i++) for (let j = 0; j <= gr; j++) {
+      const gx = x0 + i * W / gc, gy = y0 + j * H / gr; c.beginPath()
+      if (retro()) c.rect(gx - dr, gy - dr, 2 * dr, 2 * dr); else c.arc(gx, gy, dr, 0, Math.PI * 2)
+      c.fill() }
+    c.fillStyle = K.grid; c.fillRect(Math.round(X(.5)), y0, 1, H); c.fillRect(x0, Math.round(Y(.5)), W, 1)
+    let qx = -1, qy = -1
     if (D.length) {
-      const Ex = smooth(D.map(s => s.e), 12), Tx = smooth(D.map(s => s.t), 12), n = D.length - 1, TAU = 12, B = 3
-      for (let b = 0; ; b++) {   // age buckets of 3′, each drawn as a few continuous paths
-        const a0 = b * B, alpha = Math.exp(-(a0 + B / 2) / TAU); if (alpha < .05) break
-        c.globalAlpha = alpha; c.strokeStyle = K.data; c.lineWidth = (1 + 2 * alpha) * u; c.beginPath()
-        for (const run of runs(D)) { let open = false
-          for (const i of run) { const age = NOW - D[i].m; if (age < a0 || age > a0 + B + SET_STEP) { open = false; continue }
-            open ? c.lineTo(X(Ex[i]), Y(Tx[i])) : c.moveTo(X(Ex[i]), Y(Tx[i])); open = true } }
-        c.stroke()
-      }
-      c.globalAlpha = 1; c.strokeStyle = K.now; c.lineWidth = 3 * u; c.lineCap = 'round'; c.beginPath()
-      for (let i = Math.max(0, n - 9); i <= n; i++) i === Math.max(0, n - 9) ? c.moveTo(X(Ex[i]), Y(Tx[i])) : c.lineTo(X(Ex[i]), Y(Tx[i]))
-      c.stroke(); c.lineCap = 'butt'
-      c.fillStyle = K.now; c.beginPath(); c.arc(X(Ex[n]), Y(Tx[n]), 6 * u, 0, Math.PI * 2); c.fill()
+      // tension on the set's own range (5-95 % so far, at least 0.2 wide), like energy: raw tension sits low in most
+      // tracks and the trail stuck at the bottom (user, 2026-11-21); ±2′ smoothing so the trail does not jump
+      const tv = D.map(s => s.t).filter(Number.isFinite).sort((p, q) => p - q), thi = tv.length ? tv[Math.floor((tv.length - 1) * .95)] : 1
+      const tlo = tv.length ? Math.min(tv[Math.floor((tv.length - 1) * .05)], thi - .2) : 0, tn = t => Math.min(1, Math.max(0, (t - tlo) / (thi - tlo)))
+      const Ex = smooth(D.map(s => s.e), 12), Tx = smooth(D.map(s => tn(s.t ?? 0)), 12), n = D.length - 1, TAU = 12
+      const P = i => [X(Ex[i]), Y(Tx[i])], mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]
+      c.lineCap = 'round'; c.lineJoin = 'round'
+      for (const run of runs(D)) for (let k = 0; k < run.length; k++) {
+        // one piece per sample: from the midpoint before it to the midpoint after it, bent through the sample itself
+        const i = run[k], age = NOW - D[i].m, alpha = Math.exp(-age / TAU); if (alpha < .05) continue
+        const p = P(i), a = k ? mid(P(run[k - 1]), p) : p, b = k < run.length - 1 ? mid(p, P(run[k + 1])) : p
+        const fresh = age < 1.5
+        c.strokeStyle = fresh ? K.now : mix(K.bg, K.data, Math.min(1, .25 + alpha * .85))
+        c.lineWidth = (fresh ? 3 : .8 + 2.2 * alpha) * u + .3
+        c.beginPath(); c.moveTo(a[0], a[1]); c.quadraticCurveTo(p[0], p[1], b[0], b[1]); c.stroke() }
+      c.lineCap = 'butt'
+      const [nx, ny] = P(n)
+      c.strokeStyle = K.now; c.globalAlpha = .35; c.lineWidth = 1.5 * u; c.beginPath(); c.arc(nx, ny, 11 * u, 0, Math.PI * 2); c.stroke()
+      c.globalAlpha = 1; c.fillStyle = K.now; c.beginPath(); c.arc(nx, ny, 5.5 * u, 0, Math.PI * 2); c.fill()
+      qx = Ex[n] >= .5 ? 1 : 0; qy = Tx[n] >= .5 ? 1 : 0
     }
-    c.fillStyle = K.lab; c.textBaseline = 'bottom'; c.textAlign = 'left'; c.fillText('tense', x0, y0 - 2 * u); c.textAlign = 'right'; c.fillText('full', x0 + side, y0 - 2 * u)
-    c.textBaseline = 'top'; c.fillText('driving', x0 + side, y0 + side + 2 * u); c.textAlign = 'left'; c.fillText('calm', x0, y0 + side + 2 * u)
+    const corner = (text, right, top) => { c.textAlign = right ? 'right' : 'left'; c.textBaseline = top ? 'top' : 'bottom'
+      label(text, right ? x0 + W - 4 * u : x0 + 4 * u, top ? y0 + 3 * u : y0 + H - 3 * u, qx === +right && qy === +top ? K.now : K.lab) }
+    corner('tense', false, true); corner('full', true, true); corner('calm', false, false); corner('driving', true, false)
   } else {
     // strips: the last 60′, now at the right edge
     const L = setView === 'spectrogram' ? fs * 2.2 : 0, top = 4 * u, H = h - fs * 1.6 - 6 * u, t0 = NOW - 60, X = m => L + (m - t0) / 60 * (w - L)
@@ -797,11 +815,12 @@ const connect = () => {
     if (type === 'setsample') { if (data && typeof data.t === 'number') { S.setHist.push(data); setDraw() } return }
     if (type === 'setfasthistory') { if (Array.isArray(data)) { S.setFast = data; setDraw() } return }
     if (type === 'setfast') { if (data && typeof data.t === 'number') { S.setFast.push(data); if (S.setFast.length > 3 * 3600) S.setFast.shift(); setDraw() } return }
-    if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) build() }
+    if (type === 'layout') { const first = !S.layout || JSON.stringify(S.layout) !== JSON.stringify(data); S.layout = data; document.title = data.name + ' · LC XL 3'; if (first) { S.phys = {}; build() } }
     else if (type === 'ccs') { data.forEach((v, i) => { if (!(performance.now() - (mine[i] ?? -1e9) < 300)) S.cc[i] = v }) }
     else if (type === 'cc') {
       for (const [cc, v] of Object.entries(data)) if (!(performance.now() - (mine[cc] ?? -1e9) < 300)) { S.cc[+cc] = v; S.page = pageOfCc(+cc) }
     }
+    else if (type === 'phys') { const [k, v] = data; if (v < 0) delete S.phys[k]; else S.phys[k] = v }
     else if (type === 'state') { S.state = data; dispatchEvent(new CustomEvent('ce-state', { detail: data })) }
     else if (type === 'beat') S.beat = data
     else if (type === 'midi') S.midi = data

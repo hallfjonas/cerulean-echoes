@@ -2,7 +2,10 @@
 // fields (sections in order, inside `bars`, every step in a section), the shape of every step, every CC a control of
 // the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 21-28, keys that parse,
 // velocities 0..1, and the `take` meta field of a take (perform/<track>/takes/<take>.json, checked like a script).
-// usage (in tools/): node trajectory/check-perform.mjs [<track.strudel|track.track> …]
+// A ported track's scripts serve both its SuperCollider version (sc/tracks/<id>/<id>.scd, same @ctl tags) and its
+// frozen Strudel file: by default both are checked. A stem track (sc/tracks/<id>/<id>.track) takes its controls from
+// its stems and frame.
+// usage (in tools/): node trajectory/check-perform.mjs [<track.strudel | track.scd | track.track> …]
 //   (default: every track that has scripts)
 // Exit 1 if a script fails.
 import fs from 'fs'
@@ -157,7 +160,12 @@ const stemTrackOf = trackId => {
   return fs.existsSync(file) ? file : null
 }
 export const trackFileOf = trackId => findFile(path.join(repo, 'tracks'), trackId + '.strudel') ?? stemTrackOf(trackId)
-// a stem track's controls come from its stems and frame (stem-tags.mjs), a Strudel track's from its comments
+// The SuperCollider version of a track, or null
+export const scTrackFileOf = trackId => {
+  const file = path.join(repo, 'sc', 'tracks', trackId, trackId + '.scd')
+  return fs.existsSync(file) ? file : null
+}
+// a stem track's controls come from its stems and frame (stem-tags.mjs), a Strudel or SC track's from its comments
 export const tagSource = file => file.endsWith('.track') ? trackTags(file) : fs.readFileSync(file, 'utf8')
 
 // { file: errors[] } for every script and take of the track
@@ -172,7 +180,10 @@ export const checkTrack = file => {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2).map(f => path.resolve(process.env.INIT_CWD ?? process.cwd(), f))
   const files = args.length ? args : fs.readdirSync(PERFORM, { withFileTypes: true }).filter(e => e.isDirectory())
-    .map(e => e.name).sort().map(id => trackFileOf(id) ?? path.join(PERFORM, id))
+    .map(e => e.name).sort().flatMap(id => {
+      const found = [scTrackFileOf(id), trackFileOf(id)].filter(Boolean)
+      return found.length ? found : [path.join(PERFORM, id)]
+    })
   let failed = false
   for (const file of files) {
     if (!fs.existsSync(file)) {
@@ -181,7 +192,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       continue
     }
     for (const [script, errors] of Object.entries(checkTrack(file))) {
-      const name = path.relative(PERFORM, script)
+      const name = path.relative(PERFORM, script) + (file.endsWith('.scd') ? ' (SuperCollider)' : '')
       console.log(errors.length ? `${name}: FAIL\n  ${errors.join('\n  ')}` : `${name}: ok`)
       failed ||= errors.length > 0
     }

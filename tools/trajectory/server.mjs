@@ -28,7 +28,7 @@ import { fileURLToPath } from 'url'
 import { tapSource } from './make-tapped.mjs'
 import { find, scan, toPublic } from './catalogue.mjs'
 import { handleTake } from './take-save.mjs'
-import { handleRecording } from './recording.mjs'
+import { handleRecording, useScLink } from './recording.mjs'
 import { createScLink } from './sc-link.mjs'
 import { createSampleLab } from './sample-lab.mjs'
 import { createStemLab } from './stem-lab.mjs'
@@ -55,6 +55,7 @@ const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
   resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null },
   onLoaded: (id, slots) => swaps.loaded(id, slots) })
 const swaps = createStemSwap({ repo, find, sc })
+useScLink(sc)
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`)

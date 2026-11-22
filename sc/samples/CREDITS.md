@@ -46,3 +46,5 @@
 - `tr727/perc-00.wav`, `tr727/perc-01.wav` — TR-727 agogo high / low (tidal-drum-machines, `RolandTR727_perc` n 0 / 1):
   track 010's congas.
 - `ir/orbit-5.wav` (+ `-44100`) — the orbit reverb measurement for room size 5 (track 010, orbit 2).
+- `ir/orbit-0.9.wav`, `ir/orbit-1.4.wav`, `ir/orbit-2.2.wav`, `ir/orbit-3.5.wav` (+ `-44100`) — the orbit reverb measurement
+  for room sizes 0.9, 1.4, 2.2 and 3.5 (tracks 001 and 002: snare room, drums, rumble room, colour hall).

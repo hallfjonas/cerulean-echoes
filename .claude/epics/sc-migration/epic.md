@@ -2,8 +2,8 @@
 name: sc-migration
 status: in-progress
 created: 2026-11-20T12:13:35Z
-updated: 2026-11-20T18:11:25Z
-progress: 27%
+updated: 2026-11-22T03:30:52Z
+progress: 64%
 prd: .claude/prds/sc-migration.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -41,7 +41,8 @@ end; SC becomes a second engine behind its existing engine interface. Supersedes
 - `server.mjs`: OSC socket + WebSocket relay (from `bridge.mjs`); recording endpoints start/stop SC's recorder.
 - `catalogue.mjs`: lists `sc/tracks/*/*.scd` with `engine: 'sc'`.
 - SC (`sc/lib/ui.scd`, `steps.scd`, `setup.scd`): `/ce/load`, `/ce/stop`, `/ce/note` per sounding note, `/ce/record`.
-- Launcher: macOS app/script that starts `sclang` headless with `sc/live.scd`, the server, and the browser.
+- Launcher: `Cerulean Echoes.app` (stay-open AppleScript applet, `tools/launcher/`) starts the server and the browser;
+  the server starts `sclang sc/engine.scd` on the first SC load, quitting the app ends both.
 
 ### Infrastructure
 - `npm test` runs all Node tests and one headless `sclang` test script; GitHub Actions runs the Node part per PR.
@@ -82,7 +83,7 @@ not the audio thread); the take ↔ WAV alignment once SC records.
 
 - `npm test` green: feature tests for track list, load/play/stop/switch, controllers, pattern/Chapter/Break, MIDI
   panel, auto-perform, takes, recording, producer, SC core.
-- 7 live tracks load on SC from the player; perform scripts in `tools/trajectory/perform/` play on SC to the end.
+- 7 live tracks load on SC from the player; perform scripts in `tools/trajectory/perform/` play on SC to the end. (met)
 - Launcher starts and stops everything with no leftover processes.
 - `tracks/sets/`, `tracks/historic/`, Strudel lab boards and Strudel-only checks/skills removed; `npm run path-lint`
   shows no new missing paths.
@@ -95,13 +96,13 @@ Biggest items: 002 (engine) and the ports (007, 008).
 ## Tasks Created
 - [x] 001.md - Feature-test harness and SC core tests (parallel: false)
 - [x] 002.md - SC engine in the player (parallel: false)
-- [ ] 003.md - Visuals from SC, playground (parallel: true)
-- [ ] 004.md - Auto-perform and takes on SC (parallel: true)
-- [ ] 005.md - Recording in SC (parallel: true)
-- [ ] 006.md - Launcher (parallel: true)
-- [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true)
-- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true)
-- [ ] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
+- [x] 003.md - Visuals from SC, playground (parallel: true)
+- [x] 004.md - Auto-perform and takes on SC (parallel: true)
+- [x] 005.md - Recording in SC (parallel: true)
+- [ ] 006.md - Launcher (parallel: true) — built (#83); open: tried once with one person (under 2 minutes)
+- [ ] 007.md - Port 001-groove and 002-groove to SC (parallel: true) — ported (#85); open: the players' ear approval
+- [ ] 008.md - Port 016-grroove-opus to SC (parallel: true) — ported (#64), live check done; open: the players' ear approval
+- [x] 009.md - Archive of the Strudel lab; SC lab moved to `sound-lab` (parallel: true)
 - [ ] 010.md - Tools, skills, docs for SC; retire Strudel parts (parallel: false)
 - [x] 011.md - Retire the Tools page and the Analysis page (parallel: true)
 
@@ -109,3 +110,20 @@ Total tasks: 11
 Parallel tasks: 8
 Sequential tasks: 3
 Estimated total effort: 107 hours
+
+## Status (2026-11-22)
+- Closed: 001, 002, 003, 004, 005, 009, 011.
+- Built, waiting for people: 006 (one first-time user tries the launcher), 007 and 008 (the players approve 001, 002
+  and 016 by ear; five Strudel quirks kept 1:1 in 001/002 are listed in `sc/PORTING.md` for a decision).
+- Open: 010 (retire the Strudel parts, SC docs and skills), last; it can start now.
+- Branch: everything is on `epic/sc-migration-next`, merged with `main` (sound lab, player pages) on 2026-11-22;
+  one PR into main, #91 (replaces #77-#81, contains #82, #83, #85). `npm test` 113/113, muted.
+- Tracks: all 7 live tracks have an SC version (001, 002, 007, 008, 009, 010, 016); their `.strudel` files are frozen
+  (D1). Not ported, by plan: set 011 and `tracks/historic/` (removed in 010), the producer songs 012/013 (test fixtures).
+- Controllers (2026-11-22): knob feedback, SC sends every knob change and every load to each LC XL 3, so the devices
+  hold the shared value (user test: custom modes take it); faders and the mod wheel use pickup (no jump, the panel
+  marks an uncaught fader). Tried with one LC; two LCs not tried yet.
+- Launcher: tried by the user (works); open: one first-time user.
+- Known: `sc/samples/voice/david.flac` (44 MB) is not in git (over the 10 MB limit; 007's voice and sample check fail on
+  other checkouts). The auto-perform test at 24 bars/s was flaky under load.
+- Tests and trial runs start SC with `CE_SC_MUTE=1` (master to a silent bus).

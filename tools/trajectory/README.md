@@ -15,18 +15,25 @@ Pitch deck (12 slides, assessment + plan): https://claude.ai/artifact/5gM7MWgHqH
 cd tools && node trajectory/server.mjs [port]
 ```
 
-Then open **http://localhost:8766** in Chrome. The player is the repo's main tool: it plays a track right on localhost
+Then open **http://localhost:8766** in Chrome. Or without a Terminal: double-click **Cerulean Echoes.app** in the
+repo folder (the launcher, `tools/launcher/`): it starts this server, opens the player in the default browser (one tab:
+each player tab holds two open streams, Chrome allows six connections per host, so several tabs hang the page) and
+stops the server and its SuperCollider when it is quit (Dock: Quit; also on a force quit). An already running player
+on the port is only opened. First start: `npm ci` once, with a message. Log: `~/Library/Logs/cerulean-echoes.log`.
+`tools/launcher/launch.sh check|install|start|open|alive|url|stop [--port N] [--no-browser]` does the work (also
+`CE_PORT`, `CE_NO_BROWSER=1`); after changing `launcher.applescript`, rebuild the app with `npm run launcher` and commit it.
+The player is the repo's main tool: it plays a track right on localhost
 (no strudel.cc needed) and shows the Live page full size: both LC pages and the Launchkey row with every control's
 name and value (the track's LC view). The visuals (every stem with its name, tempo from Strudel's clock) are the
 a page of their own (Visuals); Labs holds the Sample and Stem Designer.
 The server only answers to its own pages (Origin and Host are checked on the routes that run something).
 
-1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the boards from
-   `lab/`. Boards without a master `stack(` cannot be tapped and are greyed out.
+1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the tutorials from
+   `lab/tutorials/`. Boards without a master `stack(` cannot be tapped and are greyed out.
    SuperCollider tracks (`sc/tracks/`, listed under their plain id; a ported track's frozen Strudel file shows as
    `<id> (Strudel)`) play through SC: the server starts `sclang sc/engine.scd` on the first SC load (a few seconds) and
    ends it with itself; the Live and Labs pages show SC's LC view (`sc/ui/index.html` at `/sc/`); the controllers go straight to
-   SC. Not yet for SC tracks: Record, auto-perform, visuals (sc-migration tasks 003-005).
+   SC. Record, auto-perform, takes and the visuals work on SC tracks (below).
 2. **Play**. The player taps the track file in memory each time it loads it, so editing a track and pressing Play
    plays the edit; there is no tapped copy on disk and no extra step. Picking another track while one plays stops it
    and loads the new one.
@@ -153,6 +160,13 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   **P**) ends it and releases held keys (the controls keep their values). The next Start sets every control of both
   virtual inputs back to 0 before the track loads, then sets the script's bar-0 values.
 - Takes you saved (below) are listed with the scripts as `takes/<name>` and play the same way.
+- **On a SuperCollider track** the same scripts play (from `perform/<id>/`, shared with the `<id> (Strudel)` copy),
+  but the steps go to SC instead of the virtual inputs (`sc-auto.mjs`): an LC CC as `/sc/cc` (→ `/ce/cc`), a
+  Launchkey CC as `/sc/lk` (→ `/ce/lkcc`), keys and pads as `/sc/lk` notes (→ `/ce/lknote`; SC has no note-off), one
+  request after the other in step order. The script's bar 0 goes with the load (`/sc/load { id, cc, lk }`), so SC
+  sets it before the first note. The bar clock is SC's: `engine-sc.mjs` `cycle()` follows the `/ce/beat` messages
+  (sent when the beat sounds) and runs on at the track's tempo in between, never backwards; beat to beat it is a few
+  ms off, far less than the half bar scripts place presses early.
 - While a script plays, the sidebar shows its title, mood and sections (the current one in bold, `intent` on hover),
   and the status line the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
@@ -214,6 +228,13 @@ fidelity) compares the events of every replay take with those of its original, b
 bar with a reason: `value` (a control read another value, one MIDI step off is expected on thinned ramps), `timing`
 (a key, press or move landed one query off) or `only` (an event of one play with no partner: button state, level or
 randomness). Takes with no events, no replay or no original are listed as such. Exit code 1 when a replay differs.
+
+**Takes on SuperCollider tracks:** the capture still hears the controllers in the page (Web MIDI; SC gets the same
+MIDI straight) and the script (the SC output posts each step as the virtual port's message); the bar comes from SC's
+clock. SC starts every load from 0, so the bar-0 snapshot is only what the load set, never a hardware position. The
+take's events are SC's state echoes, one batch per bar (`sc-auto.mjs` `createScTap`): controls (in steps of 4 MIDI
+steps), Launchkey controls, pattern choices and head line, and the keys and pads of each bar; the server fills in the
+sha1 of the `.scd` file as `trackHash`. `check-replay` compares them like Strudel's events.
 
 ### Help panel
 
@@ -281,7 +302,9 @@ it was retired on 2026-11-20):
 | `check-recording.mjs` | end-to-end test of the recording endpoints |
 | `settings.mjs` | every general setting as data, in groups; builds the Settings sections and the keys |
 | `catalogue.mjs` | scans live tracks (Strudel and SuperCollider, field `engine`) and lab boards, their auto-perform scripts |
+| `sc-source.mjs` | SuperCollider notes (SSE `notes`, sent by `sc/lib/steps.scd` when each note sounds) → lines |
 | `engine-sc.mjs` | the SuperCollider engine in the page: load / stop over `/sc/…`, `cycle()` from SC's beats, no audio output in the page |
+| `sc-auto.mjs` | auto-perform and takes on SC: the performer's output to SC (`/sc/cc`, `/sc/lk`, bar 0 with the load) and the per-bar state tap for takes |
 | `sc-link.mjs`, `osc.mjs` | the server's link to SC: starts `sc/engine.scd`, OSC on UDP 57131 (SC's own server on 57140, not the IDE's 57110), `/sc/` routes and live state for the pages |
 | `help.mjs`, `ui.css`, `theme.mjs` | the Help panel; the look (colour tokens per style and tone); the Theme switch |
 | `banks.mjs` | sample banks and soundfonts the player loads, as strudel.cc does |

@@ -8,9 +8,15 @@
 //   GET  /sc/events   live state: layout, ccs, cc, state, beat, midi, lk, lkcc, lknote, spectrum (48 bands 0..1), plus host
 //                     ({ running, ready, track, error }); for the set view: sethistory (every set sample of this server
 //                     session, sent once on connect) and setsample (each new one, every 10 s; see setSample below)
+//                     and notes: [[stem, instrument, Hz, pan, level, seconds, room], …] per 25 ms (the sounding notes, for the visuals)
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
-//   POST /sc/load     { id } start the track (SC is started first if needed) → { track }      (own pages only)
+//   POST /sc/load     { id, cc?, lk? } start the track (SC is started first if needed) → { track }  (own pages only)
+//                     cc / lk: [[number, value]] set before the first note (an auto-perform script's bar 0)
+//   (recording: recording.mjs asks `record.start(path)` / `record.stop()` of this link: OSC /ce/record start|stop, the
+//   answers /ce/recording, /ce/recorded, /ce/recerror; `record.onEnd(fn)` is told when SC closed the WAV, also when a
+//   load or SC ending did it; the master's peak comes as SSE `level`, 0..1, 10 times a second)
+//   POST /sc/hello    SC sends its full state again (own pages only)
 //   POST /sc/stop     stop what plays (SC keeps running)                                      (own pages only)
 // load(id, slots) also takes a stem track's slots in place of its file's ({ '1:4': stem }); swap(slot, stem) puts a stem
 // on a slot of the stem track that plays → { live: true } (from the next bar) or { live: false, reason } (load it
@@ -94,6 +100,8 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
     waiters.add(waiter)
   })
 
+  let recordEndHandler = () => {}
+  const recordEnded = () => recordEndHandler()
   let ccBatch = {}, ccTimer = null
   const queueCc = (cc, v) => {
     ccBatch[cc] = v
@@ -101,8 +109,27 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
     ccTimer ??= setTimeout(() => { broadcast('cc', ccBatch); ccBatch = {}; ccTimer = null }, 25)
   }
 
+  // /ce/note (sc/lib/steps.scd): one per sounding note, passed on in batches of 25 ms as the SSE event 'notes':
+  // [[stem, instrument, Hz (0 = a sample), pan 0..1, level, seconds, room 0..1], …]
+  let noteBatch = [], noteTimer = null
+  const queueNote = args => {
+    noteBatch.push([args[0], args[1], round(+args[2], 1), round(+args[3], 3), round(+args[4], 3), round(+args[5], 3), round(+args[6], 3)])
+    noteTimer ??= setTimeout(() => { broadcast('notes', noteBatch); noteBatch = []; noteTimer = null }, 25)
+  }
+
   const udp = dgram.createSocket('udp4')
   const toSc = (address, ...args) => udp.send(encode(address, args), sc.port, sc.address)
+  // OSC goes over UDP, which can drop a packet when SC is busy (a fast ramp): 150 ms after the last change of a
+  // control, its latest value is sent once more. Repeating a value changes nothing in SC (a press counts only on the
+  // rising edge); a lost last value gets corrected. Pending repeats are dropped on a load (no value of the previous
+  // track carries over).
+  const settling = new Map()
+  const settle = (address, n, v) => {
+    const key = address + n
+    clearTimeout(settling.get(key))
+    settling.set(key, setTimeout(() => { settling.delete(key); toSc(address, { i: n }, { f: v }) }, 150))
+  }
+  const dropSettle = () => { for (const timer of settling.values()) clearTimeout(timer); settling.clear() }
   udp.on('message', (buf, rinfo) => {
     let m
     try { m = decode(buf) } catch { return }
@@ -117,11 +144,16 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
       case '/ce/ccs': state.ccs = json(); broadcast('ccs', state.ccs); break
       case '/ce/cc': queueCc(m.args[0], m.args[1]); break
       case '/ce/state': state.state = json(); broadcast('state', state.state); break
+      case '/ce/note': queueNote(m.args); break
       case '/ce/beat': state.beat = { bar: m.args[0], beat: m.args[1], chord: m.args[2] }; broadcast('beat', state.beat); break
       case '/ce/midi': state.midi = json(); broadcast('midi', state.midi); break
       case '/ce/lkccs': state.lk = json(); broadcast('lk', state.lk); break
+      // where an uncaught fader physically sits (pickup, sc/lib/controls.scd): [key, 0..1], -1 = caught; not kept
+      case '/ce/phys': broadcast('phys', [String(m.args[0]), m.args[1]]); break
       case '/ce/lkcc': (state.lk ??= {})[m.args[0]] = m.args[1]; broadcast('lkcc', [m.args[0], m.args[1]]); break
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
+      case '/ce/level': broadcast('level', Math.round(m.args[0] * 1000) / 1000); break
+      case '/ce/recorded': recordEnded(); break
       case '/ce/save': onSave?.(json()); break
       // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
       case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break
@@ -165,17 +197,21 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
     child.on('exit', code => {
       child = null
       starting = null
+      recordEnded()
       setHost({ running: false, ready: false, track: null, error: code ? `sclang ended (code ${code}), log: ${logFile}` : null })
     })
     return waitFor(m => m.address === '/ce/ready', BOOT_TIMEOUT, 'boot')
   }
 
-  const load = async (id, slots) => {
+  // slots (a stem track): { "1:4": stem ref, … }; init: { cc, lk } as [[number, value]] (an auto-perform script's bar 0).
+  // Sent as /ce/load <file> [slots JSON] cc <n> <v> … lk <n> <v> …
+  const load = async (id, slots, init = {}) => {
     const file = resolveTrack(id)
     if (!file) throw new Error(`no SuperCollider track '${id}'`)
     await start()
     const loaded = waitFor(m => m.address === '/ce/loaded' || m.address === '/ce/error', LOAD_TIMEOUT, 'answer to the load')
-    toSc('/ce/load', file, ...slots ? [JSON.stringify(slots)] : [])
+    const values = kind => (init[kind] ?? []).flatMap(([n, v]) => [{ i: n | 0 }, { f: clamp01(v) }])
+    toSc('/ce/load', file, ...slots ? [JSON.stringify(slots)] : [], 'cc', ...values('cc'), 'lk', ...values('lk'))
     const answer = await loaded
     if (answer.address === '/ce/error') throw new Error('SuperCollider: ' + answer.args[0])
     onLoaded(id, slots)
@@ -191,6 +227,27 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
     return answer.address === '/ce/swapped' ? { live: true } : { live: false, reason: answer.args[1] }
   }
   const stop = () => { if (host.ready) toSc('/ce/stop') }
+
+  // the WAV is written by SC itself (DiskOut), at the path given
+  const record = {
+    // resolves with the sample rate SC records at; rejects when SC is not running or cannot start
+    start: async file => {
+      if (!host.ready) throw Object.assign(new Error('SuperCollider is not running: start a track first'), { status: 409 })
+      const answer = waitFor(m => m.address === '/ce/recording' || m.address === '/ce/recerror', 10e3, 'answer to the recording start')
+      toSc('/ce/record', 'start', file)
+      const m = await answer
+      if (m.address === '/ce/recerror') throw Object.assign(new Error('SuperCollider: ' + m.args[0]), { status: 409 })
+      return Number(m.args[1])
+    },
+    // resolves when SC has closed the file (at once when SC is not running); a stop is also an end that SC reports by itself
+    stop: () => {
+      if (!host.ready) return Promise.resolve()
+      const closed = waitFor(m => m.address === '/ce/recorded', 5e3, 'recording end').catch(() => {})
+      toSc('/ce/record', 'stop')
+      return closed
+    },
+    onEnd: fn => { recordEndHandler = fn },
+  }
 
   // end sclang (and with it the sound server); waits up to 3 s, then kills
   const quit = () => new Promise(resolve => {
@@ -231,16 +288,18 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
     try {
       const body = await readBody(request)
       if (route === '/cc') {
-        for (const [cc, v] of JSON.parse(body)) toSc('/ce/cc', { i: cc | 0 }, { f: clamp01(v) })
+        for (const [cc, v] of JSON.parse(body)) { toSc('/ce/cc', { i: cc | 0 }, { f: clamp01(v) }); settle('/ce/cc', cc | 0, clamp01(v)) }
         return response.writeHead(204).end()
       }
+      // ask SC for its full state again (layout, all CCs, Launchkey, rows): a page or test that may have missed echoes
+      if (route === '/hello') { if (host.ready) toSc('/ce/hello'); return response.writeHead(204).end() }
       if (route === '/lk') {
         const b = JSON.parse(body)
-        for (const [n, v] of b.cc ?? []) toSc('/ce/lkcc', { i: n | 0 }, { f: clamp01(v) })
+        for (const [n, v] of b.cc ?? []) { toSc('/ce/lkcc', { i: n | 0 }, { f: clamp01(v) }); settle('/ce/lkcc', n | 0, clamp01(v)) }
         if (b.note) toSc('/ce/lknote', { i: b.note[0] | 0 }, { i: b.note[1] | 0 }, { i: b.note[2] | 0 })
         return response.writeHead(204).end()
       }
-      if (route === '/load') return json(200, { track: await load(JSON.parse(body).id) })
+      if (route === '/load') { const b = JSON.parse(body); dropSettle(); return json(200, { track: await load(b.id, b.slots, b) }) }
       if (route === '/stop') { stop(); return json(200, { stopped: true }) }
       return response.writeHead(404).end('not found')
     } catch (error) {
@@ -251,6 +310,6 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
   // keep the event streams open through proxies and sleep
   setInterval(() => { for (const res of clients) res.write(': ping\n\n') }, 15000).unref()
 
-  return { handle, load, swap, stop, quit, close, host, state, setHistory, get logFile() { return logFile },
+  return { handle, load, swap, stop, quit, close, record, host, state, setHistory, get logFile() { return logFile },
     get ports() { return { osc: oscPort, server: serverPort } } }
 }

@@ -128,10 +128,11 @@
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
      Auto-perform (key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start reloads the
-     track so the script begins from silence.
+     track so the script begins from silence. On a SuperCollider track the steps go to SC instead (sc-auto.mjs), the
+     script's bar 0 with the load, and the bar clock is SC's.
      Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); the setting "Save take on record stop" posts
      it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
-     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs): a human recording runs
+     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs; a SuperCollider track is written by SC itself, recorder-sc.mjs): a human recording runs
      from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
      tail. Stop, a track change or a new auto-perform run ends a recording.
      The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window.
@@ -201,6 +202,7 @@
 <script type="module">
 import { createRenderer } from './render.mjs'
 import { createStrudelSource } from './strudel-source.mjs'
+import { createScSource } from './sc-source.mjs'
 import { createSmoother } from './smoothing.mjs'
 import * as midi from './midi.mjs'
 import { createEngine } from './engine-strudel.mjs'
@@ -211,7 +213,9 @@ import { helpFor } from './page-help.mjs'
 import { mountTheme } from './theme.mjs'
 import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
+import { createScAuto, createScTap } from './sc-auto.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
+import { createScRecorder } from './recorder-sc.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountKnobEditor } from './knob-editor.mjs'
@@ -227,11 +231,15 @@ const smoother = createSmoother(renderer.push)
 let label = 'loading Strudel …', visuals = '', autoLabel = ''
 createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text },
   onBatch: batch => recorder.addEvents(batch) })
+let scVisuals = ''
+createScSource({ onLine: smoother.push, onStatus: text => { scVisuals = text } })
 
 // Two engines: Strudel in this page, SuperCollider through the server (catalogue entry engine 'sc'). `engine` forwards
 // to the one that plays, so takes, auto-perform and the recorder read one clock.
 const strudelEngine = createEngine(midi)
-const scEngine = createScEngine()
+// a take of an SC play keeps SC's state echoes per bar as its events (check-replay)
+const scTap = createScTap({ onBatch: batch => recorder.addEvents(batch) })
+const scEngine = createScEngine({ onEvent: (type, data) => scTap.push(type, data) })
 let current = strudelEngine
 const engine = {
   ready: strudelEngine.ready,
@@ -242,7 +250,18 @@ const engine = {
 }
 const onSc = () => current === scEngine
 const entryOf = id => catalogue.find(entry => entry.id === id)
-const recorder = createRecorder({ midi, engine })
+// Auto-perform output: midi.mjs's virtual ports for a Strudel track, SC (over the server) for an SC track
+const scAuto = createScAuto({ post: (route, body) => fetch('sc/' + route, { method: 'POST',
+  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) })
+let autoOut = midi
+const autoOutput = Object.fromEntries(['setAuto', 'setAutoLk', 'noteAuto', 'noteOffAuto', 'releaseAutoKeys', 'resetAuto']
+  .map(name => [name, (...args) => autoOut[name](...args)]))
+// takes hear the controllers (Web MIDI) and the script (midi.mjs's virtual ports, or the SC output); on SC the bar-0
+// snapshot is what the load set (SC starts every load from 0)
+const recorder = createRecorder({ engine, midi: {
+  onMessage: callback => { midi.onMessage(callback); scAuto.onMessage(callback) },
+  heldCcs: () => onSc() ? scAuto.heldCcs() : midi.heldCcs(),
+} })
 strudelEngine.ready.then(() => { label = 'ready' })
 let catalogue = []
 const showScripts = () => {
@@ -336,14 +355,21 @@ let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecord
 let performing = null
 let transport = 'stopped'
 const queueRecord = task => (recordQueue = recordQueue.then(task))
-const audio = createAudioRecorder({ engine, onError: error => {
+const onAudioError = error => {
   recordError = error.message
   stopRecording()
+}
+// Strudel records in this page (recorder.mjs); SuperCollider writes its own WAV (recorder-sc.mjs): `audio` is the one in use
+const audioWeb = createAudioRecorder({ engine, onError: onAudioError })
+const audioSc = createScRecorder({ engine, onError: onAudioError })
+const audio = new Proxy({}, { get: (_, key) => {
+  const used = audioSc.recording ? audioSc : audioWeb.recording ? audioWeb : onSc() ? audioSc : audioWeb
+  const value = used[key]
+  return typeof value === 'function' ? value.bind(used) : value
 } })
 const startRecording = (source, script = null) => queueRecord(async () => {
   if (audio.recording) return
   recordError = ''
-  if (onSc()) return void (recordError = 'recording SuperCollider tracks is not built yet')
   try {
     await engine.ready
     await audio.start({ track: $('track').value, source, script })
@@ -372,7 +398,7 @@ const toggleRecord = () => audio.recording ? stopRecording() : startRecording(pe
 $('record').onclick = toggleRecord
 
 let running = false, stoppedByPage = false
-const performer = createPerformer({ midi, engine, onChange: progress => {
+const performer = createPerformer({ midi: autoOutput, engine, onChange: progress => {
   if (!progress && running && autoRecording) {
     if (stoppedByPage) stopRecording()
     else tailTimer = setTimeout(() => stopRecording('script-end'), TAIL_SECONDS * 1000)
@@ -394,11 +420,14 @@ const playSc = async (track, script) => {
   current = scEngine
   label = scEngine.host().ready ? 'loading track …' : 'starting SuperCollider …'
   try {
-    await scEngine.load(track)
+    if (!script) scAuto.clear()
+    await scEngine.load(track, scAuto.loadInit())
     setPlaying(track)
     recorder.start({ track, trackHash: null, cps: engine.cps(), ...script && { script } })
+    scAuto.live()
     label = 'playing: ' + track + ' (SuperCollider)'
   } catch (error) {
+    scAuto.live()
     label = 'Error: ' + error.message
     attachPanel()
     return false
@@ -463,9 +492,12 @@ const startScript = async id => {
   if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
   const script = await response.json()
   const entry = entryOf(track)
-  if (entry?.engine === 'sc') return void (label = 'Auto-perform for SuperCollider tracks is not built yet')
   if (script.track !== (entry?.base ?? track)) return void (label = `Error: script ${id} is for ${script.track}`)
-  midi.addAuto({ launchkey: usesLaunchkey(script) })
+  stopPerformer()
+  // SC: the steps go to SC; bar 0 is held and sent with the load
+  autoOut = entry?.engine === 'sc' ? scAuto : midi
+  if (autoOut === scAuto) scAuto.hold()
+  else midi.addAuto({ launchkey: usesLaunchkey(script) })
   performer.prime(script)
   const recordAudio = $('recordAuto').checked
   if (recordAudio) await stopRecording()
@@ -679,7 +711,7 @@ const showStatus = () => {
   showTransport()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
-  $('status').textContent = [label, midiText, autoLabel, onSc() ? '' : visuals].filter(Boolean).join(' · ')
+  $('status').textContent = [label, midiText, autoLabel, onSc() ? scVisuals : visuals].filter(Boolean).join(' · ')
   requestAnimationFrame(showStatus)
 }
 showStatus()

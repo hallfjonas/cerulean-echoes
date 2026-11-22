@@ -57,12 +57,52 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		var ce = loadCe.value.ccBase_(0), l = ce.change(37, 3, "test"), press = { ce.setCC(37, 1, {}); ce.setCC(37, 0, {}) };
 		press.value; l.atBar(1); press.value; l.atBar(2); press.value; l.atBar(3);
 		l.now == 0 });
-	check.("two Launch Controls: the one moved last wins", {
+	check.("faders: pickup, a fader takes over only once it meets the value (no jump)", {
+		var ce = loadCe.value.ccBase_(0), r = List[];
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
+		ce.midiPorts[3] = (name: "Launchkey MK4 25", kind: \launchkey);
+		ce.midiCC(64, 5, 1); ce.midiCC(60, 5, 1); r.add(ce.val(5) == 0);              // LC 1 sits at half, value 0: nothing
+		ce.midiCC(1, 5, 1); ce.midiCC(64, 5, 1); r.add(ce.val(5) == (64 / 127));       // pulled down to 0: caught, then 1:1
+		ce.midiCC(127, 5, 2); ce.midiCC(100, 5, 2); r.add(ce.val(5) == (64 / 127));    // LC 2 at the top: nothing yet
+		ce.midiCC(50, 5, 2); r.add(ce.val(5) == (50 / 127));                            // passing the value: caught
+		ce.midiCC(70, 5, 1); r.add(ce.val(5) == (50 / 127));                            // LC 1 was released by LC 2's move
+		ce.setCC(5, 0.2, { }); ce.midiCC(51, 5, 2); r.add(ce.val(5) == 0.2);           // a web-view move releases LC 2
+		ce.midiCC(100, 1, 3); r.add(ce.lkCC[1] == 0);                                   // the mod wheel: same
+		ce.midiCC(1, 1, 3); r.add(ce.lkCC[1] == (1 / 127));
+		r.every(_.value) });
+	check.("knobs: turning the other Launch Control moves on from the shared value, no jump", {
 		var ce = loadCe.value.ccBase_(0);
 		ce.server = (sendMsg: { });
 		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
-		ce.midiCC(127, 13, 1); ce.midiCC(0, 13, 2);
-		ce.val(13) == 0 });
+		ce.midiCC(0, 13, 1); ce.midiCC(72, 13, 1);            // LC 1: 0 → 72
+		ce.midiCC(0, 13, 2); ce.midiCC(1, 13, 2);             // LC 2 sits at 0, turned one step up
+		ce.midiCC(100, 14, 1); ce.midiCC(101, 14, 1);          // LC 1 knob 14 sits high, …
+		ce.midiCC(0, 14, 2); ce.midiCC(30, 14, 2);            // … LC 2 sets it low (30 steps up from 0)
+		ce.midiCC(127, 14, 1);                                 // LC 1 turned to its end: the shared value reaches the top
+		((ce.val(13) - (72 / 127)).abs < 0.02) and: { ce.val(13) > (72 / 127) }   // LC 2's step continued, no jump to 1/127
+			and: { (ce.val(14) - 1).abs < 1e-6 }
+			and: { ce.midiCC(0, 14, 1); ce.val(14).abs < 1e-6 } });                 // and down to the bottom
+	check.("knobs: far from the shared value, every step still moves it at least 1:1", {
+		var ce = loadCe.value.ccBase_(0), first;
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc);
+		ce.setCC(15, 0.1, { }); ce.midiCC(120, 15, 1);           // the device sits at 120, the shared value at 0.1
+		ce.midiCC(119, 15, 1); first = 0.1 - ce.val(15);          // one step down
+		(110..107).do { |v| ce.midiCC(v, 15, 1) };                // 13 steps down in all
+		(first >= (1 / 127 - 1e-6)) and: { ce.val(15) < 1e-6 } });
+	check.("knobs: every change is sent back to every Launch Control, so the next turn is 1:1 on either device", {
+		var ce = loadCe.value.ccBase_(0), sent = List[];
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc); ce.midiPorts[2] = (name: "LCXL3 2", kind: \lc);
+		ce.lcOuts[1] = (control: { |self, ch, num, v| sent.add([1, ch, num, v]) });
+		ce.lcOuts[2] = (control: { |self, ch, num, v| sent.add([2, ch, num, v]) });
+		ce.syncKnobs;                                              // a load: every knob to its value (0) on both
+		ce.midiCC(1, 13, 1, 15); ce.midiCC(60, 13, 1, 15);         // LC 1 (channel 16) turns knob 13 up to 60
+		ce.midiCC(61, 13, 2, 15);                                  // LC 2 got 60 and turns one step on
+		(sent.select { |m| m[0] == 2 and: { m[2] == 13 } }.last[3] == 60)   // LC 2 was told 60, on the learned channel
+			and: { (ce.val(13) - (61 / 127)).abs < 1e-6 }               // 1:1, no jump
+			and: { sent.size >= 96 } });                                // the load sync reached all 48 knobs on both
 	check.("Launch Control ports are found by name, DAW ports are not", {
 		var ce = loadCe.value;
 		(ce.midiKindOf("LCXL3 1 MIDI") == \lc) and: { ce.midiKindOf("LCXL3 1 DAW") != \lc } });
