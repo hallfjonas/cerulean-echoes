@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-swell-pattern-freeze",
+  "parent": null,
+  "about": "Warm pad on the chapter's chords; Freeze holds them.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 2,
+    "tags": [
+      "pad",
+      "warm",
+      "freeze"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-pad.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Warm"
+    },
+    {
+      "label": "Open"
+    },
+    {
+      "label": "Wide"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Swell",
+      "about": "still ↔ slowly breathing in and out (every 2 bars)."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "warm pad on the chapter's chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "voicing: warm → open (9th) → wide."
+    },
+    "b2": {
+      "label": "Freeze",
+      "about": "holds the current chord while held, for everybody.",
+      "mode": "hold"
+    }
+  }
+}

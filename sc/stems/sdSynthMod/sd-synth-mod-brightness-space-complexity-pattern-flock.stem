@@ -1,0 +1,82 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-flock",
+  "parent": null,
+  "about": "Bird chirps on chord tones, up to a dawn chorus.",
+  "meta": {
+    "role": "fx",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 1,
+    "tags": [
+      "birds",
+      "chirps",
+      "dawn"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-birds.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Calls 1"
+    },
+    {
+      "label": "Calls 2"
+    },
+    {
+      "label": "Calls 3"
+    },
+    {
+      "label": "Calls 4"
+    },
+    {
+      "label": "Calls 5"
+    },
+    {
+      "label": "Calls 6"
+    },
+    {
+      "label": "Calls 7"
+    },
+    {
+      "label": "Calls 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "a few calls ↔ a busy dawn chorus, an octave higher too."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "bird chirps on the chord."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 call rhythms (new notes too)."
+    },
+    "b2": {
+      "label": "Flock",
+      "about": "a whole flock calls while held.",
+      "mode": "hold"
+    }
+  }
+}

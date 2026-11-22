@@ -1,0 +1,82 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-pattern-stab",
+  "parent": null,
+  "about": "Rootless deep-house chord stabs, FM e-piano.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "ambient-house"
+    ],
+    "energy": 3,
+    "tags": [
+      "stabs",
+      "e-piano",
+      "deep-house"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "amb-keys.scd",
+  "frame": {
+    "thin": false,
+    "tension": false
+  },
+  "patterns": [
+    {
+      "label": "Rhythm 1"
+    },
+    {
+      "label": "Rhythm 2"
+    },
+    {
+      "label": "Rhythm 3"
+    },
+    {
+      "label": "Rhythm 4"
+    },
+    {
+      "label": "Rhythm 5"
+    },
+    {
+      "label": "Rhythm 6"
+    },
+    {
+      "label": "Rhythm 7"
+    },
+    {
+      "label": "Rhythm 8"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "long ringing chords ↔ short, choppy stabs."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "chord stabs on the chapter's chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 deep-house rhythms."
+    },
+    "b2": {
+      "label": "Stab",
+      "about": "a chord on every off-beat while held.",
+      "mode": "hold"
+    }
+  }
+}
