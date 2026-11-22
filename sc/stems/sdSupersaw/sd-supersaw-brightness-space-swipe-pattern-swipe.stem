@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-supersaw-brightness-space-swipe-pattern-swipe",
+  "parent": null,
+  "about": "Disco strings: held chord, stabs or octave line, swipes.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "strings",
+      "swipe",
+      "80s"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSupersaw",
+    "extra": [
+      "sdSynthMod"
+    ]
+  },
+  "gain": 0.9,
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-strings.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Held"
+    },
+    {
+      "label": "Stabs"
+    },
+    {
+      "label": "Octave"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ hall."
+    },
+    "k3": {
+      "label": "Swipe",
+      "about": "none ↔ a swipe every 4 bars ↔ every 2 bars."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the strings."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "held → stabs → octave line."
+    },
+    "b2": {
+      "label": "Swipe",
+      "about": "a swipe at the end of every bar while held.",
+      "mode": "hold"
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-chords-rhythm",
+  "parent": null,
+  "about": "Juno-like 7th chords on the off-beat; sets the harmony.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "juno",
+      "stabs",
+      "80s"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-chords.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Chords"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "short stabs ↔ long chords."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the chords."
+    },
+    "b1": {
+      "label": "Chords",
+      "about": "next of 6 progressions, for everybody."
+    },
+    "b2": {
+      "label": "Rhythm",
+      "about": "off-beat → boogie → held, at the next bar.",
+      "mode": "hold"
+    }
+  }
+}

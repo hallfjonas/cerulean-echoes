@@ -1,0 +1,66 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-decay-pattern-echo-throw",
+  "parent": null,
+  "about": "Organ stab on the chord, with an echo throw.",
+  "meta": {
+    "role": "chords",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "organ",
+      "stab",
+      "80s"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-organ.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Stab"
+    },
+    {
+      "label": "Call"
+    },
+    {
+      "label": "Off-beat"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Decay",
+      "about": "short stab ↔ ringing organ."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "organ stab, follows the chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "stab → call → off-beat."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the stab while held.",
+      "mode": "hold"
+    }
+  }
+}

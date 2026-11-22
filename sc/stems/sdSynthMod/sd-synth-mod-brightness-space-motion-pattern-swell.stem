@@ -1,0 +1,66 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-motion-pattern-swell",
+  "parent": null,
+  "about": "Rumble: the kick's echo in a dark room, rolling under it.",
+  "meta": {
+    "role": "sub",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "rumble",
+      "sub",
+      "room"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 4,
+  "code": "groove-rumble.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Pulse"
+    },
+    {
+      "label": "Roll"
+    },
+    {
+      "label": "Bounce"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dark ↔ a little brighter."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "tight ↔ long room."
+    },
+    "k3": {
+      "label": "Motion",
+      "about": "still ↔ the filter breathes over 2 bars."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "rolling low end under the kick."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "pulse → roll → bounce."
+    },
+    "b2": {
+      "label": "Swell",
+      "about": "the rumble grows longer and louder while held.",
+      "mode": "hold"
+    }
+  }
+}

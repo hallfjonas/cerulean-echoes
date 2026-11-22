@@ -1,0 +1,71 @@
+{
+  "format": 2,
+  "name": "sd-supersaw-brightness-space-movement-pattern-echo-throw",
+  "parent": null,
+  "about": "80s chorus pad; Tension brings it in.",
+  "meta": {
+    "role": "pad",
+    "genres": [
+      "house"
+    ],
+    "energy": 2,
+    "tags": [
+      "chorus",
+      "supersaw",
+      "80s"
+    ],
+    "harmony": "chords"
+  },
+  "sample": {
+    "name": "sdSupersaw"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "groove-pad.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "7"
+    },
+    {
+      "label": "9"
+    },
+    {
+      "label": "Sus"
+    },
+    {
+      "label": "Fifths"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ hall.",
+      "default": 0.5
+    },
+    "k3": {
+      "label": "Movement",
+      "about": "still ↔ the filter sweeps slowly."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the pad; Tension brings it in."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "7 → 9 → sus → fifths, at the next bar."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the pad while held.",
+      "mode": "hold"
+    }
+  }
+}

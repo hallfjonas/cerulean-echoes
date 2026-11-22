@@ -107,7 +107,7 @@
 		orbit: stem[\orbit] !? { |o| self.numOf(o).asInteger } ?? {
 			if(self.lowRoles.includes(stem[\meta][\role].asSymbol)) { 1 } { 2 } },
 		fog: opt.(\fog), thin: opt.(\thin), tension: opt.(\tension), swing: opt.(\swing), breakOut: frame[\break] == "out",
-		tensionFilter: opt.(\tensionFilter),
+		tensionFilter: opt.(\tensionFilter), tensionEchoOn: opt.(\tensionEcho),
 		targets: targets, knobCode: knobCode,
 		overridden: if(colCode.isNil) { [] } { [\k1, \k2, \k3].select { |kk| controls[kk][\override].asString == "true" } },
 		holdKnob: targets.values.flatten(1).any { |t| t[\param] == \hold },
@@ -254,7 +254,8 @@
 		// on; notes at level 0 are not played)
 		gated: { |col, bar|
 			var ce = col[\ce], always = col[\colCode] !? { |c| c[\gate] == false } ? col[\ungated];
-			(always.not and: { (ce.val(col[\ccs][\fader]) <= 0) or: { ce.val(ce.masterCcOf(col) ? col[\track].global.master) <= 0 } })
+			var master = ce.masterCcOf(col) ? col[\track].global[\master];
+			(always.not and: { (ce.val(col[\ccs][\fader]) <= 0) or: { master.notNil and: { ce.val(master) <= 0 } } })
 				or: { col[\breakOut] and: { col[\track].breakAt(bar) } }
 		},
 		miniOf: { |col, str| var key = str.asSymbol, cache = col[\miniCache];

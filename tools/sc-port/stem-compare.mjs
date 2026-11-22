@@ -5,7 +5,8 @@
 // usage (in tools/): node sc-port/stem-compare.mjs <script.json> <workdir> [--track 009-house] [--bars 0-192]
 //   [--cc '{"61":0.6}'] [--audio]
 // --track: sc/tracks/<id>/<id>.scd and <id>.track; --cc: controls at bar 0 on both sides (start values);
-// --audio: render audio too (WAVs in <workdir>). Prints one line per stem; exit 1 on a difference.
+// --audio: render audio too (WAVs in <workdir>). Prints one line per stem with its match (equal events / the larger
+// side) and the overall match; exit 1 on a difference.
 import fs from 'fs'
 import path from 'path'
 import { execFileSync } from 'child_process'
@@ -88,7 +89,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const inRange = e => e.b >= from - 1e-9 && e.b < bars - 1e-9
   const A = norm(pa, nameMap).filter(inRange), B = norm(pb, {}).filter(inRange)
   const stems = [...new Set([...A, ...B].map(e => e.stem))].sort()
-  let diff = 0
+  let diff = 0, matched = 0, total = 0
   const report = {}
   for (const st of stems) {
     const count = list => { const m = new Map(); for (const e of list) m.set(sig(e), (m.get(sig(e)) ?? 0) + 1); return m }
@@ -96,12 +97,19 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const only = (x, y) => [...x].flatMap(([k, n]) => Array(Math.max(0, n - (y.get(k) ?? 0))).fill(k))
     const oa = only(ca, cb), ob = only(cb, ca)
     const na = [...ca.values()].reduce((s, n) => s + n, 0), nb = [...cb.values()].reduce((s, n) => s + n, 0)
-    report[st] = { scd: na, track: nb, onlyScd: oa.slice(0, 5), onlyTrack: ob.slice(0, 5) }
+    const same = na - oa.length, size = Math.max(na, nb)
+    const match = size ? 100 * same / size : 100
+    matched += same
+    total += size
+    report[st] = { scd: na, track: nb, match: Number(match.toFixed(2)), onlyScd: oa.slice(0, 5), onlyTrack: ob.slice(0, 5) }
     if (oa.length || ob.length) diff++
     console.log(`${st.padEnd(6)} scd ${String(na).padStart(6)}  track ${String(nb).padStart(6)}  ` +
-      (oa.length || ob.length ? `DIFF (${oa.length} only scd, ${ob.length} only track)` : 'equal'))
+      (oa.length || ob.length ? `DIFF ${match.toFixed(1)}% (${oa.length} only scd, ${ob.length} only track)` : 'equal'))
   }
+  const overall = total ? 100 * matched / total : 100
+  report.overall = Number(overall.toFixed(2))
   fs.writeFileSync(path.join(work, 'report.json'), JSON.stringify(report, null, 1))
-  console.log(diff ? `${diff} stems differ (details: ${path.join(work, 'report.json')})` : 'all stems equal, event by event')
+  console.log(diff ? `${diff} stems differ, ${overall.toFixed(2)}% of events equal (details: ${path.join(work, 'report.json')})`
+    : 'all stems equal, event by event')
   process.exit(diff ? 1 : 0)
 }

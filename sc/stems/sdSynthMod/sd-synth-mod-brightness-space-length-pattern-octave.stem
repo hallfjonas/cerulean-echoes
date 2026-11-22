@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-pattern-octave",
+  "parent": null,
+  "about": "Disco octave bass on the chord root; Master drives it.",
+  "meta": {
+    "role": "bass",
+    "genres": [
+      "house"
+    ],
+    "energy": 4,
+    "tags": [
+      "disco",
+      "octave",
+      "80s"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "gain": 0.67,
+  "pitch": "none",
+  "orbit": 1,
+  "code": "groove-bass.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Octaves"
+    },
+    {
+      "label": "Boogie"
+    },
+    {
+      "label": "Gallop"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "short plucks ↔ long, legato notes."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "octave bass, follows the chords."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "octaves → boogie → gallop."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}

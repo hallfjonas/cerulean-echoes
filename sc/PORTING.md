@@ -307,6 +307,10 @@ Das liegt am gemeinsamen Hall (Impulsantwort `ir/orbit-4.wav` / Faltung), nicht 
 
 ## 001 / 002 Groove (80s groove house) (as of 2026-11-21)
 
+**Since 2026-11-22 both are stem tracks** (`001-groove.track`, `002-groove.track`; the `.scd` files are deleted after the proof,
+[what differs](../docs/reference/scd-translation-differences.md); the old files: `git show 7444173:sc/tracks/001-groove/001-groove.scd`).
+The notes below describe the hand-written version.
+
 Both tracks ported (`sc/tracks/001-groove/`, `sc/tracks/002-groove/`), scenarios `tools/sc-port/scenarios/001-all.json`,
 `002-all.json` (`CE_TRACK=001-groove/001-groove`, one base and one "moved" scenario per stem: knobs, pattern press, button
 2 held, Tension, Master, Break). **Not yet checked by ear** (`feedback.md` in each folder lists what to listen for).
