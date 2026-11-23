@@ -1,12 +1,12 @@
 #!/bin/bash
-# The launcher's work, called by "Cerulean Echoes.app" (tools/launcher/launcher.applescript) and by its test:
+# The launcher's work, called by "Cerulean Echoes.app" (tools/launcher/app/main.swift) and by its test:
 #   launch.sh check      exit 0 and print "ok", or "install" when tools/node_modules is missing;
 #                        exit 1 with a plain message (stderr) when Node.js or SuperCollider is missing
 #   launch.sh install    npm ci in tools/ (once, on the first start)
 #   launch.sh start      start the player server (tools/trajectory/server.mjs) in the background and wait until it
 #                        answers; print "started <pid>", or "running" when a player already answers on the port (then
 #                        nothing is started and stop leaves it alone)
-#   launch.sh open       open the player in the default browser (one tab)
+#   launch.sh open       open the player in the default browser (one tab; the app shows it in its own window instead)
 #   launch.sh alive      exit 0 while the server this launcher started runs, 1 when it ended by itself, 3 when this
 #                        launcher started none (or stopped it)
 #   launch.sh url        print the player's address

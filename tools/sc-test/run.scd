@@ -71,6 +71,15 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		ce.midiCC(100, 1, 3); r.add(ce.lkCC[1] == 0);                                   // the mod wheel: same
 		ce.midiCC(1, 1, 3); r.add(ce.lkCC[1] == (1 / 127));
 		r.every(_.value) });
+	check.("faders: switching modes releases the new mode's faders (no jump from a fader moved in the other mode)", {
+		var ce = loadCe.value.ccBase_(0), r = List[];
+		ce.server = (sendMsg: { });
+		ce.midiPorts[1] = (name: "LCXL3 1", kind: \lc);
+		ce.midiCC(0, 53, 1); ce.midiCC(38, 53, 1); r.add(ce.val(53) == (38 / 127));    // Mode 2 fader 1: caught at 38
+		ce.midiCC(38, 5, 1); ce.midiCC(100, 5, 1);                                       // Mode 1: the same fader moved to 100
+		ce.midiCC(101, 53, 1); r.add(ce.val(53) == (38 / 127));                          // back in Mode 2: no jump
+		ce.midiCC(39, 53, 1); r.add(ce.val(53) == (39 / 127));                           // met the value again: 1:1
+		r.every(_.value) });
 	check.("knobs: turning the other Launch Control moves on from the shared value, no jump", {
 		var ce = loadCe.value.ccBase_(0);
 		ce.server = (sendMsg: { });

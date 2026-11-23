@@ -16,8 +16,8 @@ cd tools && node trajectory/server.mjs [port]
 ```
 
 Then open **http://localhost:8766** in Chrome. Or without a Terminal: double-click **Cerulean Echoes.app** in the
-repo folder (the launcher, `tools/launcher/`): it starts this server, opens the player in the default browser (one tab:
-each player tab holds two open streams, Chrome allows six connections per host, so several tabs hang the page) and
+repo folder (the launcher, `tools/launcher/`): it starts this server, shows the player in its own window (WKWebView; no Web MIDI, so Strudel tracks get no
+controllers there, SC tracks are unaffected) and
 stops the server and its SuperCollider when it is quit (Dock: Quit; also on a force quit). An already running player
 on the port is only opened. First start: `npm ci` once, with a message. Log: `~/Library/Logs/cerulean-echoes.log`.
 `tools/launcher/launch.sh check|install|start|open|alive|url|stop [--port N] [--no-browser]` does the work (also
