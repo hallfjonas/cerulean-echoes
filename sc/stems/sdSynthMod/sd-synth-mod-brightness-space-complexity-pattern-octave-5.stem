@@ -5,6 +5,7 @@
   "about": "Pluck arp on the chord tones, with echo.",
   "meta": {
     "role": "lead",
+    "label": "Arp",
     "genres": [
       "ambient-house"
     ],

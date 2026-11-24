@@ -5,6 +5,7 @@
   "about": "Marimba phrase every second bar, up to three voices.",
   "meta": {
     "role": "lead",
+    "label": "Marimba",
     "genres": [
       "ambient-house"
     ],
