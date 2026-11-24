@@ -16,8 +16,9 @@ export function trackTags(file, root = repoRoot) {
   for (const slot of SLOTS.filter(s => track.slots[s])) {
     const stem = JSON.parse(fs.readFileSync(path.join(root, 'sc', 'stems', track.slots[slot]), 'utf8'))
     const [mode, n] = [slot[0] === '1' ? '16' : '2', slot[2]]
-    const role = stem.meta.role
-    lines.push(`// @col ${mode}:${n} ${n} ${role[0].toUpperCase()}${role.slice(1)}`)
+    // the column's name: the stem's own label (Birds), else its role (Fx)
+    const name = stem.meta.label ?? stem.meta.role
+    lines.push(`// @col ${mode}:${n} ${n} ${name[0].toUpperCase()}${name.slice(1)}`)
     for (const row of ROWS) {
       lines.push(`// @ctl ${mode}:${n}.${row} ${stem.controls[row].label} | ${stem.controls[row].about}`)
     }

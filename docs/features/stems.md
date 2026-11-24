@@ -73,7 +73,7 @@ Schema: `sc/stems/stem.schema.json` (formats 1 and 2; format 2 adds fields, see 
 | `name` | yes | the file name without `.stem` |
 | `parent` | yes | path of the parent version under `sc/stems/`, or `null` |
 | `about` | yes | one line (at most 60 characters): what the stem is |
-| `meta` | yes | `role`, `genres`, `energy`, `tags`, `harmony` (see Metadata) |
+| `meta` | yes | `role`, `genres`, `energy`, `tags`, `harmony`, optional `label` (see Metadata) |
 | `sample` | yes | `name` of the sound in `sc/sounds/`, optional `preset` (parameter → number, only the sound's parameters), optional `extra` (further sounds a code stem plays, e.g. `["bassM1", "bassWarm"]`) |
 | `gain` | no | loudness trim (linear, default 1) that brings the stem to the common target level |
 | `pitch` | yes | how `notes` are read: `none`, `midi`, `root`, `chord`, `scale` (see Patterns) |
@@ -353,6 +353,7 @@ balance is by ear.
 | Field | What it is |
 |---|---|
 | `role` | required, one of: kick, perc, hats, clap, sub, bass, keys, chords, pad, lead, texture, fx. Decides which slots it fits and what the swap list shows |
+| `label` | optional, at most 12 characters: the column's name in the live view (Birds, Marimba); without it the role names the column |
 | `genres` | at least one of the genres in [genres.md](../reference/genres.md): ambient, ambient-house, house, techno, groove-techno, edm, classical, rock |
 | `energy` | 1 (calm) to 5 (peak), for sorting candidates for build-ups and sets |
 | `tags` | free lowercase kebab-case words; moods go here (airy, warm, 909, acid …) |

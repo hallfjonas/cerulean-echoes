@@ -188,7 +188,8 @@
 		"// @mode 2 Mode 2 — Colour"];
 	self.stemSlots.do { |slot| track[\columns][slot] !? { |col|
 		var s = slot.asString, mode = if(s[0] == $1) { "16" } { "2" }, n = s[2], stem = col[\stem];
-		var role = stem[\meta][\role].asString;
+		// the column's name: the stem's own label (Birds), else its role (Fx)
+		var role = (stem[\meta][\label] ? stem[\meta][\role]).asString;
 		lines.add("// @col %:% % %".format(mode, n, n, role[0].toUpper.asString ++ role.drop(1)));
 		[\k1, \k2, \k3, \fader, \b1, \b2].do { |kk| var c = stem[\controls][kk];
 			lines.add("// @ctl %:%.% % | %".format(mode, n, kk, c[\label], c[\about])) }

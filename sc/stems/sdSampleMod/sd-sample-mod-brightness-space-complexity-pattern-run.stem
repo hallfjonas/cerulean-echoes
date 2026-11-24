@@ -5,6 +5,7 @@
   "about": "VCSL glockenspiel on random chord tones, runs.",
   "meta": {
     "role": "lead",
+    "label": "Glock",
     "genres": [
       "ambient-house"
     ],

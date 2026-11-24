@@ -5,6 +5,7 @@
   "about": "Warm pad on the chapter's chords; Freeze holds them.",
   "meta": {
     "role": "pad",
+    "label": "Pad",
     "genres": [
       "ambient-house"
     ],
