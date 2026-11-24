@@ -25,6 +25,10 @@ export const SETTINGS = [
     apply: (value, { renderer }) => renderer.setRings(value) },
   { id: 'lcFrame', group: 'midi-panel', label: 'LC frame', kind: 'toggle', default: true, key: 'h',
     tip: 'Key H: frame around the controller used last in the LC view / MIDI panel', apply: () => {} },
+  // shown in the sidebar (Live), not on the Settings page: player.html moves the field there
+  { id: 'panelNames', group: 'midi-panel', label: 'Section names', kind: 'toggle', default: true, key: 'n',
+    tip: 'Key N: the names above the panels (mode 1 · foundation, mode 2 · colour, launchkey, spectrum, energy)',
+    apply: value => document.getElementById('scPanel')?.contentWindow?.postMessage({ panelNames: value }, location.origin) },
   { id: 'saveTake', group: 'recording', label: 'Save take on record stop', kind: 'toggle', default: false, key: null,
     tip: 'Saves what the controllers did since the last load as a take when a recording ends', apply: () => {} },
   { id: 'look', group: 'visualization', label: 'Look', kind: 'choice', options: ['deck', 'ocean', 'clean'], default: 'deck', key: 'v',

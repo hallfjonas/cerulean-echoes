@@ -175,6 +175,11 @@
   <section id="sampleLab" data-pages="labs/samples" hidden></section>
   <section id="stemLab" data-pages="labs/stems"></section>
   <section id="autoPerform" data-pages="live"></section>
+  <section id="panelSide" data-pages="live">
+    <h2>MIDI panel</h2>
+    <div id="panelSettings"></div>
+    <output id="devices"></output>
+  </section>
   <section id="placeholderNote" data-pages="labs/sets"></section>
 </aside>
 <div id="sideHandle">
@@ -701,12 +706,25 @@ const applyLcFrame = () => {
 }
 
 // the SuperCollider panel follows the LC frame setting too (sent on change and whenever the panel (re)loads)
-let sentLcFrame = null
+let sentLcFrame = null, shownOnSc = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
-$('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick(); sendShape() })
+$('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick(); sendShape(); sendPanelNames() })
+// the panel's section names (setting "Section names", key N): its field sits in the sidebar, sent on every (re)load
+const sendPanelNames = () => $('scPanel').contentWindow?.postMessage({ panelNames: settings.get('panelNames') }, location.origin)
+$('panelSettings').append(document.querySelector('#settings [data-setting=panelNames]'))
+// the MIDI devices SuperCollider sees (the panel sends the list on every change; the panel itself only warns when one
+// goes missing): one line per device, in the sidebar
+const KIND_NAMES = { lc: 'Launch Control', launchkey: 'Launchkey' }
+let scPorts = []
+const showDevices = () => {
+  const lines = !onSc() ? [] : scPorts.length ? scPorts.map(([name, kind]) => (KIND_NAMES[kind] ?? kind) + ' · ' + name)
+    : ['no controller found: mouse only']
+  $('devices').replaceChildren(...lines.map(line => Object.assign(document.createElement('div'), { textContent: line })))
+}
 // a click on the panel's set view label cycles the view there: keep the setting in step
 addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== $('scPanel').contentWindow) return
+  if (Array.isArray(event.data?.midiPorts)) { scPorts = event.data.midiPorts; showDevices() }
   const view = event.data?.setView
   if (typeof view === 'string' && view !== settings.get('setView')) settings.set('setView', view)
 })
@@ -714,6 +732,7 @@ const showStatus = () => {
   hideStatusBoxWhileLcViewOpen()
   applyLcFrame()
   if (settings.get('lcFrame') !== sentLcFrame) sendLcFrame()
+  if (onSc() !== shownOnSc) { shownOnSc = onSc(); showDevices() }
   showTransport()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'

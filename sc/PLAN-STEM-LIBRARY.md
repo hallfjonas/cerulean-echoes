@@ -1,7 +1,69 @@
-# Sound-Lab-Ideen (Maschinen, Algo-Sequencer, Würfel-Modus)
+# Sound-Lab-Ideen (Sound Machine und Modi, Maschinen, Algo-Sequencer, Würfel-Modus)
 
 > Stem, Library, Tracks und Lab sind umgesetzt: siehe `docs/features/stems.md` und `docs/features/sound-lab.md`.
 > Hier bleiben nur Ideen, die noch nicht gebaut sind. Siehe auch: `SC-MIGRATION.md`, `sc/PLAN-UI.md`.
+
+### Grundsätze: eine Sound Machine, mehrere Modi (Stand 24.11.2026)
+
+Das Sound Lab ist **ein** Instrument, die Sound Machine, mit mehreren Modi. Jeder Modus ist eine eigene Maschine mit
+eigener Klangerzeugung, eigenen Parametern und eigenen Generatoren. Gemeinsam ist die Technik, nicht das Instrument.
+Der Stem Designer (Stems vergleichen, kombinieren, ausdünnen) bleibt ein eigener Arbeitsschritt danach.
+
+| Modus | Was er macht | Maschinen aus der Tabelle unten |
+|---|---|---|
+| Kick | Bassdrum (mit Rumble) | Kick, Rumble |
+| Bass | Sub, Bass, Acid (303-Klang mit seinem Sequencer) | Mono-Bass, 303-Sequencer |
+| Percussion | alle anderen Drums: Snare, Clap, Rim, Toms, Congas, Hats, Becken | Drum Voice, Metal, Grids |
+| Harmonie | mehrere Töne gleichzeitig: Akkorde, Pads, Stabs (z. B. Stab in 008, `techno-stab.scd`) | Poly, Chord Memory |
+| Melodie | eine Linie: Leads, Antworten, Sequenzen, Arps, Glocken (z. B. Answer und Glocken-Sequenz in 008, `techno-answer.scd`, `techno-seq.scd`) | FM, Wavetable, Arpeggiator, Turing Machine, Antwort |
+| Drone / Soundscape | Flächen, Drones, Texturen | Texture, Balsam |
+
+Kick-Prinzip: immer nur ein Sample gleichzeitig; alle Regler formen dieses Sample, ein Knopf schaltet durch die
+Grundsounds. (Das Drum-Setup im Sample Designer baut die Kick dagegen aus Tone, Noise und Click.)
+Die Harmonie-Zentrale (Tonart, Skala, Progression) ist kein Modus, sondern geteilte Technik, die jeder Modus liest.
+
+**Gemeinsame Technik** (geteilt, wo es passt; kein Universal-Framework): Clock und Sync, Event-Scheduling, Zufall
+(reproduzierbare Folgen, Würfel), Wahrscheinlichkeit, Modulation (LFOs, Hüllkurven), Pattern-Speicher,
+Harmonie-Zentrale (global, pro Maschine höchstens Override), Groove (Swing), Stem-Vertrag und Promote in die Library,
+die Regel „alle Regler auf 0 klingen schon gut“. Schon da: die Bausteine des Sample Designers
+(`sc/lab/samples/blocks.json`, `sc/lab/samples/machine.scd`); offen, ob sie ein Modus unter mehreren werden oder
+geteilte Teile.
+
+**Eigen pro Maschine:** Klangerzeugung, Art des Sequencers, welche Generatoren sie kombiniert, eigene Zufallsregeln,
+eigene Spezialfunktionen. Keine Maschine muss alles können, keine wird der Einheitlichkeit wegen beschnitten.
+
+**Musikalische Generierung und Klang-Modulation** sind getrennte Systeme, die zusammenwirken dürfen.
+Generierung = Ereignisse (Sequencer, Noten, Rhythmus, Arp, Wahrscheinlichkeit, Variation).
+Modulation = Klangparameter über die Zeit (LFOs, Hüllkurven, Random-Modulation, Filter-, Sample-Position-,
+FX-Modulation). Noten-Generatoren sind geteilte Bausteine und hängen an einem Klang: eine Lab-Spalte = Klang +
+Generator(en), allein spielbar, keine eigene Spalte für den Generator. Beispiele: Melodie kombiniert Step-Sequencer,
+Arp, Akkord-Generator und Zufallsnoten; Percussion kombiniert Sample-Sequencing, rhythmische Variation,
+Wahrscheinlichkeit und Sample-Auswahl.
+
+**Zufall in drei Arten**, in jedem Modus, pro Maschine angepasst:
+- Pattern (was passiert: Noten, Trigger, Samples, Steps) und Performance (wie: Velocity, Timing, Akzente, Länge):
+  Zufall pro Parameter nach dem T-1 (siehe unten).
+- Klang (wie es klingt: Pitch, Filter, Decay, Sample-Position, FX): Würfel-Modus (siehe unten).
+- Steuerung: Menge, Wahrscheinlichkeit, Bereich, Lock, neu würfeln, reproduzierbar (wiederholende Folge, Seed);
+  Ebenen: Pattern, Spur, Parameter, einzelner Step.
+
+**LC-Belegung: noch festzulegen.** Tendenz: Reihen statt Spalten. Jede Reihe hat in allen Maschinen dieselbe Rolle,
+die Maschine bestimmt die Parameter darin; die Spalten sind dann die Layer oder Stimmen einer Maschine.
+
+| Reihe | Rolle |
+|---|---|
+| Knöpfe 1 | Klangerzeugung |
+| Knöpfe 2 | Hüllkurven, Filter, Formung |
+| Knöpfe 3 | Charakter, Modulation, Effekte |
+| Fader | Pegel, Layer-Balance, Makros |
+
+Bisher sind Sample Designer und T-1-Entwurf spaltenweise (Spalte = Baustein, Reihen = Haupt / Form und Zeit / Fein).
+Die Live-Stems behalten ihr eigenes Reihenschema (Brightness, Space, benannt).
+
+**Seiten:** Sequencing, Zufall und Generatoren bekommen eigene Seiten auf denselben Reglern, statt in die drei
+Klangreihen gequetscht zu werden. Dafür der LC im DAW-Modus (`.claude/prds/lcxl3-daw-mode.md`: Track = Maschine,
+Page = Seite/Preset, Shift); die Belegung kommt mit der Folge-PRD. Arbeitsweise nicht-linear: frei wechseln zwischen
+Klang, Pattern, Variation, Vorhören und Resampling.
 
 ### Würfel-Modus (RND-Idee)
 
@@ -19,6 +81,7 @@ Zweck: schnell viele Kandidaten erzeugen und aussortieren, passt zum Ausdünnen 
 ### Maschinen (Kandidaten)
 
 Geräte, von denen wir Ideen nehmen (was sie können, was wir übernehmen): `docs/reference/gear-inspiration.md`.
+Zuordnung zu den Modi: siehe Grundsätze oben.
 
 | Bereich | Maschine | Vorbild für die Funktionalität |
 |---|---|---|
@@ -37,6 +100,7 @@ Geräte, von denen wir Ideen nehmen (was sie können, was wir übernehmen): `doc
 | Noten | Chord Memory | Korg Polysix (eine Taste = ganzer Akkord) |
 | Rhythmus | Grids | Mutable Instruments Grids (X/Y-Karte, Dichte pro Drum) |
 | Noten | Turing Machine | Music Thing Modular (Zufallsschleife zwischen fest und mutierend) |
+| Noten | Antwort (Call and Response) | kein Gerät, aus 008 (`techno-answer.scd`): kurze Phrase am Ende jedes zweiten Takts, Akkordtöne zufällig, Stimmen dazu |
 | Werkzeug | Würfel (RND) | Cyma Forma RND |
 | Rhythmus | Euklidische Rhythmen | Bjorklund, Torso T-1 |
 | Harmonie | Harmonie-Zentrale (Tonart, Skala, Progression) | siehe „Kapitel“ unten und `sc/PLAN-UI.md` |
@@ -104,7 +168,7 @@ Statt Noten einzeln zu programmieren, gibt man Regeln vor und dreht an ihnen.
 Für uns: genau das Prinzip „Zufall in engen, getesteten Grenzen“ aus dem Sound Lab. Die wiederholende Folge passt
 besser zu House/Techno als echter Zufall, weil Muster wiedererkennbar bleiben.
 
-#### Belegung auf der LC (Entwurf, nach unserem LC-Schema)
+#### Belegung auf der LC (Entwurf, nach unserem LC-Schema; spaltenweise, siehe „LC-Belegung: noch festzulegen“ oben)
 
 Spalten = Bausteine von links nach rechts; Encoder oben/Mitte/unten = Hauptparameter / Form und Zeit / Feinheit;
 **Fader = Zufallsmenge des Bausteins** (0 = fest); Button oben = Baustein an/aus, Button unten = Modus.
@@ -146,4 +210,6 @@ Offen: ob „Ramp“ (Repeats) und „Ramp“ (Style) eine zweite Ebene brauchen
 
 - Welche Referenz-Progressionen und Referenz-Spektren nehmen wir aus echten Platten?
 - Maschinen-Lab: Wie viele Parameter pro Maschine, ab wann eine zweite Ebene?
-- Sind Noten-Generatoren (Arp, Grids, Turing Machine) eigene Spalten, oder hängen sie an einem Klang-Stem?
+- LC-Belegung: Reihen (Tendenz) oder Spalten pro Baustein? Noch festzulegen, siehe Grundsätze.
+- Sample-Designer-Bausteine: ein Modus unter mehreren oder geteilte Teile?
+- Beantwortet (24.11.2026): Noten-Generatoren hängen an einem Klang, keine eigenen Spalten.
