@@ -41,7 +41,9 @@ body{display:flex;align-items:center;justify-content:center;color:var(--text);fo
   --fs-knob:clamp(11px, calc(14 * var(--px)), 21px)}
 .wait{font-size:var(--fs-lab);color:var(--accent)}
 .board{width:96vw;height:calc(var(--H) * var(--px) + var(--free));display:flex;flex-direction:column;gap:calc(14 * var(--px))}
-.board>.pair+.pair{flex:1;min-height:0}
+/* the bottom row's height is the board's leftover, never its content's: the canvases' buffers (sized to their box) would
+   otherwise hold the row tall and push the Launchkey past the window */
+.board>.pair+.pair{flex:1;min-height:0;grid-template-rows:minmax(0,1fr)}
 .pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:calc(20 * var(--px))}
 .pair>section{min-width:0;display:flex;flex-direction:column}
 .lab{display:flex;gap:.6em;font-size:var(--fs-lab);color:var(--off);margin:0 calc(12 * var(--px)) calc(8 * var(--px));
