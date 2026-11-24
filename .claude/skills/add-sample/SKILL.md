@@ -8,7 +8,7 @@ description: Add an audio file (own recording, voice line, freesound one-shot) t
 An SC track (`sc/tracks/<id>/<id>.scd`) reads its samples from disk: a path relative to `sc/samples/`
 (`"voice/brace.wav"`) or `"repo:<path>"` for the repo's own `samples/` folder. A file that is not listed in the
 track's `samples:` or not on disk is silent without an error; that is the usual cause of "the sample is silent".
-No push is needed: SC plays the checkout. The frozen Strudel tracks are not changed (`DEPRECATION.md`).
+No push is needed: SC plays the checkout.
 
 ## 1. The file
 - Folder by kind: `sc/samples/voice/` (own spoken lines), a drum machine or instrument folder for one-shots

@@ -2,8 +2,7 @@
 // fields (sections in order, inside `bars`, every step in a section), the shape of every step, every CC a control of
 // the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 21-28, keys that parse,
 // velocities 0..1, and the `take` meta field of a take (perform/<track>/takes/<take>.json, checked like a script).
-// A ported track's scripts serve both its SuperCollider version (sc/tracks/<id>/<id>.scd, same @ctl tags) and its
-// frozen Strudel file: by default both are checked. A stem track (sc/tracks/<id>/<id>.track) takes its controls from
+// A track's scripts are checked against its SuperCollider version (sc/tracks/<id>/<id>.scd). A stem track (sc/tracks/<id>/<id>.track) takes its controls from
 // its stems and frame.
 // usage (in tools/): node trajectory/check-perform.mjs [<track.strudel | track.scd | track.track> …]
 //   (default: every track that has scripts)
@@ -147,6 +146,7 @@ export const scriptFiles = trackId => jsonFiles(path.join(PERFORM, trackId))
 const takeFiles = trackId => jsonFiles(path.join(PERFORM, trackId, 'takes'))
 
 const findFile = (dir, name) => {
+  if (!fs.existsSync(dir)) return null
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name)
     const found = entry.isDirectory() ? findFile(full, name) : entry.name === name ? full : null

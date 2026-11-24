@@ -30,8 +30,7 @@ The server only answers to its own pages (Origin and Host are checked on the rou
 
 1. Pick a track in the sidebar: **Live** holds the live tracks, **Lab** the tutorials from
    `lab/tutorials/`. Boards without a master `stack(` cannot be tapped and are greyed out.
-   SuperCollider tracks (`sc/tracks/`, listed under their plain id; a ported track's frozen Strudel file shows as
-   `<id> (Strudel)`) play through SC: the server starts `sclang sc/engine.scd` on the first SC load (a few seconds) and
+   SuperCollider tracks (`sc/tracks/`, listed under their plain id) play through SC: the server starts `sclang sc/engine.scd` on the first SC load (a few seconds) and
    ends it with itself; the Live and Labs pages show SC's LC view (`sc/ui/index.html` at `/sc/`); the controllers go straight to
    SC. Record, auto-perform, takes and the visuals work on SC tracks (below).
 2. **Play**. The player taps the track file in memory each time it loads it, so editing a track and pressing Play
@@ -160,7 +159,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   **P**) ends it and releases held keys (the controls keep their values). The next Start sets every control of both
   virtual inputs back to 0 before the track loads, then sets the script's bar-0 values.
 - Takes you saved (below) are listed with the scripts as `takes/<name>` and play the same way.
-- **On a SuperCollider track** the same scripts play (from `perform/<id>/`, shared with the `<id> (Strudel)` copy),
+- **On a SuperCollider track** the same scripts play (from `perform/<id>/`, one set per track id),
   but the steps go to SC instead of the virtual inputs (`sc-auto.mjs`): an LC CC as `/sc/cc` (→ `/ce/cc`), a
   Launchkey CC as `/sc/lk` (→ `/ce/lkcc`), keys and pads as `/sc/lk` notes (→ `/ce/lknote`; SC has no note-off), one
   request after the other in step order. The script's bar 0 goes with the load (`/sc/load { id, cc, lk }`), so SC
@@ -240,14 +239,14 @@ and output, how to use it. Closing it is remembered. A new page calls
 
 ### Strudel.cc
 
-Every frozen Strudel track file plays on strudel.cc as it is; the player adds nothing to it. To see the visuals of a track that
+A Strudel track file plays on strudel.cc as it is; the player adds nothing to it. The repo holds none any more (git history). To see the visuals of a track that
 plays on strudel.cc, put the tapped code on the clipboard (macOS) and paste it into strudel.cc next to the player:
 
 ```bash
-cd tools && node trajectory/make-tapped.mjs ../tracks/techno/008-groove-techno/008-groove-techno.strudel
+cd tools && node trajectory/make-tapped.mjs <track.strudel>
 ```
 
-Strudel is deprecated: these files are frozen (set 011 and the dual versions were removed with sc-migration 010).
+Strudel is deprecated; every Strudel track was removed from the repo.
 
 ## Progress
 

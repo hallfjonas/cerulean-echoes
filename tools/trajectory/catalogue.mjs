@@ -38,6 +38,7 @@ const trackFolders = dir => fs.readdirSync(dir, { withFileTypes: true })
 
 const liveFiles = () => {
   const tracks = path.join(repo, 'tracks')
+  if (!fs.existsSync(tracks)) return []
   const folders = fs.readdirSync(tracks, { withFileTypes: true })
     .filter(genre => genre.isDirectory() && !NOT_LIVE_GENRES.includes(genre.name))
     .flatMap(genre => trackFolders(path.join(tracks, genre.name)))

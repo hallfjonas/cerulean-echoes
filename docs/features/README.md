@@ -16,4 +16,4 @@ related. New here? Start with [getting started](../getting-started.md).
 - [Visuals](visuals.md) - the looks and settings of the picture
 - [Producer mode](producer-mode.md) - Guitar Pro songs as live tracks
 - [Claude skills](claude-skills.md) - what to say to Claude Code for each job
-- [strudel.cc](strudel-cc.md) - playing a frozen Strudel track in the Strudel web editor
+- [strudel.cc](strudel-cc.md) - playing a Strudel track (none in the repo) in the Strudel web editor

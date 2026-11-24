@@ -2,7 +2,7 @@
 
 Stand 18.11.2026. Aus der Portierung von 009 (alle Spalten, Launchkey, global) gelernt. Vorher lesen:
 `SC-MIGRATION.md` (Ziele, Entscheidungen), `CLAUDE.md` (Regeln, Beschriftung), `sc/README.md` (Aufbau),
-`sc/PORTING.md` (Entscheidungen bei 009), `sc/tracks/009-house/009-house.scd` (das Vorbild, ausführlich kommentiert).
+`sc/PORTING.md` (Entscheidungen bei 009), `sc/tracks/009-house/009-house.scd` (das Vorbild, ausführlich kommentiert; entfernt, nur noch in der Git-Historie).
 
 ## Ziel und Reihenfolge
 

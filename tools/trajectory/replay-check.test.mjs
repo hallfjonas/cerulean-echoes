@@ -5,7 +5,7 @@ import fs from 'fs'
 import path from 'path'
 import test from 'node:test'
 import { createPerformer } from './autoperform.mjs'
-import { PERFORM, controlsOf, trackFileOf } from './check-perform.mjs'
+import { PERFORM, controlsOf, tagSource, trackFileOf } from './check-perform.mjs'
 import { checkReplay, reportLines } from './check-replay.mjs'
 import { barLine, compareEvents, parseEvents, summaryLine } from './replay-check.mjs'
 import { createRecorder, createSession } from './take.mjs'
@@ -83,7 +83,7 @@ test('a primed performer sets bar 0 before the load and resets nothing after it'
 test('POST /take keeps the events; saving a replay answers its verdict, check-replay reports the bars', async () => {
   const { saveTake } = await import('./take-save.mjs')
   const track = '010-ambient-house'
-  const button = [...controlsOf(fs.readFileSync(trackFileOf(track), 'utf8'))].find(([, c]) => c.button)[0]
+  const button = [...controlsOf(tagSource(trackFileOf(track)))].find(([, c]) => c.button)[0]
   const capture = (events, script) => {
     const s = createSession({ track, trackHash: 'a'.repeat(40), cps: 0.5, recordedAt: '2026-11-17T20:00:00Z',
       ...script && { script } })

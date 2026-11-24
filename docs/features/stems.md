@@ -276,7 +276,7 @@ taken from their `@ctl … .b2` lines:
 
 | Label | Job | Tracks | In the library |
 |---|---|---|---|
-| Drop out | the stem pauses while held (009-house.scd calls it "Drop") | 007, 008, 009, 010, 016 | `dropOut` |
+| Drop out | the stem pauses while held (009-house calls it "Drop") | 007, 008, 009, 010, 016 | `dropOut` |
 | Echo throw | long echo while held | 007, 008, 009, 010, 016 | `echoThrow` |
 | Octave | one octave up while held | 007, 008, 009, 010, 016 | `octave` |
 | Riser | a noise sweep rises over 2 (016: 4) bars | 007, 008, 009, 010, 016 | `riser` |
@@ -406,8 +406,8 @@ A stem track is `sc/tracks/<id>/<id>.track`, JSON, schema `sc/stems/track.schema
 The 009 pilot added `chordAtK` and `nextChords` to the frame.
 
 ## The 009 pilot
-`sc/tracks/009-house/009-house.track` (catalogue `009-house-stems`, beside `009-house.scd`) is 009 rebuilt from 14
-stems. Proof, event by event against the `.scd` (every note with all its parameters):
+`sc/tracks/009-house/009-house.track` (catalogue `009-house`) is 009 rebuilt from 14 stems. The monolithic `009-house.scd` it was proven against
+is removed (git history). The proof was event by event against the `.scd` (every note with all its parameters):
 `cd tools && node sc-port/stem-compare.mjs <script.json> <workdir> --cc '<start values>'` over
 `trajectory/perform/009-house/dance-floor.json` (192 bars), `every-button.json` and `sc-port/scenarios/009-stem-check.json`
 (every row-3 sweep, every button 2 held, riffs, Sound mode, Break, Launchkey). `--audio` renders both for a null test.
@@ -497,5 +497,4 @@ Strudel forerunner, set 011, was removed with sc-migration 010 ([sets](sets.md))
 - [Samples and sounds](samples-and-sounds.md)
 - [Controllers](controllers.md)
 - [Lab boards](lab-boards.md)
-- [Sets](sets.md)
 - [Checks](checks.md)

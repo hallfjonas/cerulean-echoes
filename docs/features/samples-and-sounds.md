@@ -27,7 +27,6 @@ Add a sample with the Claude skill `add-sample` ([Claude skills](claude-skills.m
 - Use only sounds you may use: own recordings, or CC0 and CC BY files with the credit in `sc/samples/CREDITS.md`.
 - No file over 10 MB goes into git. Keep samples small (trim silence, mono for voices). The 007 voice
   (`sc/samples/voice/david.flac`, 44 MB) is the one exception and lives outside git.
-- The frozen Strudel tracks load their own samples from the `main` branch on GitHub ([strudel.cc](strudel-cc.md)).
 
 ## Related
 - [Controllers](controllers.md)
