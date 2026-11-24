@@ -87,5 +87,9 @@ Device `LCXL3 Jojo`, five runs of a test script (`midi-trace.scd` plus messages 
 | Screen | `F0 00 20 29 02 15 04 35 62 F7` (stationary display, three lines), `… 06 35 <field> <ascii> F7` per line, `… 04 35 7F F7` shows it: works |
 | Disable (`9F 0C 00`) | the LC reports CC 30 = 6 and is back in Custom Mode 1 |
 
+Repeat the test (another LC, new firmware): `sc/tools/lcxl3-daw-test.scd` switches every connected LC into DAW mode,
+runs four phases (custom mode, DAW page with every LED, knob feedback, fader pickup) and shows on the LC's screen what
+to press; the log lists every message with its port (run command in the file's header).
+
 Not measured yet: knob feedback on a DAW page (host position to `DAW In` ch 16), the "DAW Fader Pickup" default
 (ch 7 CC 70), a second LC.
