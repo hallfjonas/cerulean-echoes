@@ -118,7 +118,7 @@ Tools (run in `tools/`):
 The player is the main tool: `cd tools && node trajectory/server.mjs`, then http://localhost:8766 (README:
 `tools/trajectory/README.md`). It plays every live track (Live) and the sound lab projects (Labs) with the visuals.
 - Launcher for people without a Terminal: `Cerulean Echoes.app` (repo root, committed; source and `launch.sh` in
-  `tools/launcher/`, rebuild with `npm run launcher`) starts the server, opens one browser tab, quitting stops server + SC.
+  `tools/launcher/`, rebuild with `npm run launcher`) starts the server, shows the player in its own window (Swift/WKWebView, no Web MIDI: SC tracks only for controllers), quitting stops server + SC.
 - SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's frozen Strudel file is
   `<id>-strudel`): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
   OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it; `CE_SC_PORT`, `CE_SC_SERVER_PORT`);

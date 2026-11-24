@@ -9,11 +9,12 @@ page numbers below refer to it.
 - Today every track uses the LC XL 3 in **standalone (MIDI) mode** with two custom modes. In this mode the **Track ◄ ►,
   Page ▲ ▼, Record, Play, Solo/Arm and Mute/Select buttons send nothing**. Measured on 2026-11-21, and confirmed by the
   guide (p. 7). Novation Components cannot assign them in a custom mode.
-- In **DAW mode** those buttons report as CCs on the `DAW Out` port. The custom modes keep working on `MIDI Out`
-  (p. 9, not yet measured). The host also gets control of the screen and LEDs.
-- Switching is possible without touching the custom modes or the tracks. Open risks are a stray press of Mode
-  (into DAW Mixer / DAW Control) and the device staying in DAW mode after a crash. Both have fixes (below).
-- Not done yet: two short device tests (see "Open tests"). Until they pass, the live tracks stay in standalone mode.
+- In **DAW mode** the LC adds two DAW pages (Mixer, Control). On a DAW page **every control** reports on `DAW Out`
+  (Page, Track, Solo/Arm, Mute/Select, Record, Play, Shift, the 16 bottom buttons, knobs, faders), **every LED** takes
+  a colour from the host, and the host can write on the **screen**. Measured on 2026-11-23 (below).
+- DAW mode **with a custom mode active** is not enough: Page, Track, Solo/Arm and Mute/Select still send nothing and
+  the custom-mode buttons keep their stored colours. Only Record, Play, Shift and the small button (CC 104) report.
+- The switch of the SC engine to DAW mode is planned in `.claude/prds/lcxl3-daw-mode.md`.
 
 ## Measured in standalone mode (2026-11-21)
 Monitor: `sc/tools/midi-trace.scd` (every message from every MIDI input, with its port).
@@ -48,8 +49,9 @@ Novation Components: Track and Page cannot be selected in the custom mode editor
 | Screen | configurable displays, text fields, a 128 × 64 bitmap | 13-15 |
 | DIN out | no MIDI from the DIN outputs in DAW mode (we use USB only) | 8 |
 
-The table with the exact CC numbers of each button in DAW mode is an image in the PDF and could not be read as text.
-A web search snippet says Track 103 / 102 and Page 106 / 107; that needs the device test.
+Button numbers (the device picture on p. 9, confirmed by the tests): Page ▲ / ▼ 106 / 107, Track ◀ / ▶ 103 / 102,
+Record 118, Play 116, Solo/Arm 65, Mute/Select 66, the small button next to Solo/Arm 104, Shift ch 7 CC 63 (Mode has no
+CC); bottom buttons 37-44 / 45-52, knobs 13-36, faders 5-12 (the same numbers as our Mode 1).
 
 ## What switching would mean for us
 | Part | Effect |
@@ -64,15 +66,30 @@ A web search snippet says Track 103 / 102 and Page 106 / 107; that needs the dev
 ## Risks and fixes
 | Risk | Live impact | Fix |
 |---|---|---|
-| A press of Mode lands in DAW Mixer / DAW Control: faders and knobs report on the DAW port, the track no longer hears them | high, on stage | the engine reads CC 30 and sets the custom mode back (or maps the DAW controls too) |
+| A press of Mode moves the LC to another page (custom mode or DAW page) | high, on stage | the engine reads CC 30 (measured) and reads both ports, or sets its page back; see the PRD |
 | Player or engine crashes without disabling: the device stays in DAW mode | low: custom modes keep working; the next power-up is standalone | disable on every exit; power cycle as manual reset |
 | Fader pickup in DAW mode changes how faders report after a jump | unknown | measure; switch pickup off (CC 70) if it delays faders |
-| Custom-mode controls do not keep sending on `MIDI Out` in DAW mode (guide implies they do) | would break every track | open test 1 decides; if it fails, DAW mode is dropped |
+| Custom-mode controls do not keep sending on `MIDI Out` in DAW mode | none: measured, they keep sending once a custom mode is selected (CC 30 = 6) | — |
 
-## Open tests (with the device and `midi-trace.scd`)
-1. Enable DAW mode (`9F 0C 7F` to the DAW port). Move knobs and faders in Mode 1 and Mode 2: still the same CCs on
-   `MIDI Out`, values without jumps?
-2. In DAW mode, press Track ◄ ►, Page ▲ ▼, Record, Play, Solo/Arm, Mute/Select: which CC on `DAW Out`, values on press
-   and release?
-3. Press Mode: is CC 30 reported, and does sending CC 30 = 6 put the device back into Custom Mode 1?
-4. Disable (`9F 0C 00`): back to the standalone behaviour measured above?
+## Measured in DAW mode (2026-11-23)
+Device `LCXL3 Jojo`, five runs of a test script (`midi-trace.scd` plus messages to `DAW In`); one LC.
+
+| Situation | Seen |
+|---|---|
+| Enable (`9F 0C 7F` to `DAW In`) | the LC jumps to a DAW page by itself; knobs and faders report on `DAW Out` ch 16, the track hears nothing |
+| ch 7 CC 30 = 6 sent right after enabling | back in Custom Mode 1: knobs on `MIDI Out` as before (with DAW mode still on) |
+| Mode + bottom button on the device | reported on `DAW Out` ch 7 CC 30 (Custom 1 = 6, Custom 2 = 7), plus CC 31 with the same value (meaning unknown) |
+| Custom mode + DAW mode: Record, Play, Shift, CC 104 | report on `DAW Out` (buttons ch 1, press 127 / release 0; Shift ch 7 CC 63) |
+| Custom mode + DAW mode: Page, Track, Solo/Arm, Mute/Select | **nothing**, pressed twice, slowly |
+| Custom mode + DAW mode: LEDs | Record / Play colourable; custom-mode buttons keep their stored colours (palette CC and RGB sysex) |
+| DAW page (CC 30 = 1 Mixer, = 2 Control; both the same) | every button reports (bottom 37-52, Page, Track, Solo/Arm, Mute/Select), press and release; knobs ch 16 13-36, faders ch 16 5-12 |
+| DAW page: LEDs | every button and knob LED takes the palette colour sent (ch 1 CC <index> <colour>) |
+| Screen | `F0 00 20 29 02 15 04 35 62 F7` (stationary display, three lines), `… 06 35 <field> <ascii> F7` per line, `… 04 35 7F F7` shows it: works |
+| Disable (`9F 0C 00`) | the LC reports CC 30 = 6 and is back in Custom Mode 1 |
+
+Repeat the test (another LC, new firmware): `sc/tools/lcxl3-daw-test.scd` switches every connected LC into DAW mode,
+runs four phases (custom mode, DAW page with every LED, knob feedback, fader pickup) and shows on the LC's screen what
+to press; the log lists every message with its port (run command in the file's header).
+
+Not measured yet: knob feedback on a DAW page (host position to `DAW In` ch 16), the "DAW Fader Pickup" default
+(ch 7 CC 70), a second LC.
