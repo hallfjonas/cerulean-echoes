@@ -52,6 +52,14 @@ Bisher hat Claude Sounds aus dem Lab-Ordner in Tracks hineinkopiert – mit wech
 - Controller gehen **per MIDI direkt an SC**, nicht über den Browser. Die UI zeigt an und steuert Unkritisches.
 - Pegelanzeigen (Spuren + Summe) und optional Spektrum in die UI.
 - Für Installationen: UI auch vom Handy/Tablet erreichbar, SC headless.
+- **Neues Design (entschieden 20.11.2026), Details für Agents in `sc/ui/UI-REDESIGN.md`, Referenz-Mockup `sc/ui/reference/layout-mockup.html`:**
+  - Die UI spiegelt die Hardware: zwei LC-Panels nebeneinander (Mode 1 Foundation, Mode 2 Colour), darunter links die Launchkey-Leiste (optional, im gleichen Spaltenraster), rechts ein Live-Spektrum der Summe.
+  - Zwei Themes: **Black** (Torso-artig, Standard; Bogen-Drehknöpfe, Spektrum als LED-Punkte) und **TE** (Teenage-Engineering-artig; farbige Scheiben blau/grün/weiß, orange Fader; Spektrum als farbige Segmente).
+  - Tasten nur als Text: Taste 1 zeigt den Namen des aktiven Patterns (max. 6 Zeichen), Taste 2 ihre Funktion. Nichts wird ausgegraut außer Tastentext; Warten auf die Phrasengrenze = Blinken.
+  - Skalierung: Die ganze Fläche wird als Ganzes skaliert und passt immer in Breite und Höhe; nur die Schrift hat Unter- und Obergrenze. Panels bewusst breiter als die Hardware (ca. 1,6 : 1), damit alles auf 16:9 passt.
+  - Jeder Drehknopf hat ein kleines Label darunter (z. B. `bright`, `space`, `length`), auch die Launchkey-Knöpfe.
+  - Labels einzeilig, ein bis zwei Wörter, nie umbrechen.
+  - Neben dem Spektrum eine **Set-Ansicht** (Energie des Sets über die Zeit) mit vier umschaltbaren Varianten zum Ausprobieren: Ring (feste 60′-Uhr, die zweite Stunde übermalt die erste), Stimmungskarte (Spur verblasst mit der Zeit), Energie und Punch sowie Spektrogramm (beide die letzten 60′). Keine Kapitelnamen in diesen Ansichten.
 
 ### Master-Kette / Gain-Staging
 - Spuren peaken bei ca. −12 bis −18 dBFS, Summe vor dem Limiter bei ca. −6 dBFS.
