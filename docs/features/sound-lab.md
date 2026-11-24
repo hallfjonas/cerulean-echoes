@@ -11,7 +11,7 @@ every result can be saved, copied and put into a track:
 - **Stem swap**: another library stem on one column of a track that plays, from the next bar.
 
 A stem is one finished LC column as a file (sample, patterns, three knobs, fader, two buttons); see [Stems](stems.md).
-The old Strudel lab boards stay as they are ([Lab boards](lab-boards.md)); new sound work goes here.
+The old Strudel lab boards were retired ([Lab boards](lab-boards.md)); new sound work goes here.
 
 ## When to use it
 - A column is boring or too repetitive and you want to hear replacements (Stem Designer).

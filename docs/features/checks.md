@@ -1,39 +1,40 @@
 # Checks
 
 ## What it is
-A set of command line tools in `tools/` that test a track without a browser, a speaker or a controller. Each answers
-one question. Run all commands from the `tools/` folder (run `npm install` there once).
+Command line tools in `tools/` that test the project without a speaker or a controller. Each answers one question.
+Run all commands from the `tools/` folder (run `npm install` there once). The SuperCollider parts need SuperCollider
+installed (`sclang`); without it they are skipped.
 
 ## When to use it
-Before you open a pull request, after you edit a track, and whenever something sounds wrong: too quiet, clipping,
-dropouts, a sound that does not load.
+Before you open a pull request, after you edit a track or an auto-perform script, and when something does not load.
 
 ## How to use it
 | Question | Command |
 |---|---|
-| Does every feature still work (player, takes, producer, SuperCollider tracks)? | `npm test` |
-| Is the edited track still fine overall? | `npm run verify -- <track>` |
-| Is every stem loud enough, and does anything clip? | `npm run audibility -- <track>` |
-| Did my edit change the sound? | `npm run compare -- <old.strudel> <new.strudel>` |
-| What happens when I move a knob or press a pad? | `npm run scenario -- <track> --cc 13=0.5@1` |
-| Do all sounds load? | `node strudel-sim/check-sounds.mjs <track>` |
+| Does every feature still work (player, takes, recording, launcher, producer, stems, sound lab, SuperCollider tracks)? | `npm test` |
+| Is my edited SuperCollider track still fine? | `npm run verify-sc -- <track.scd>` |
+| Are the auto-perform scripts still valid? | `node trajectory/check-perform.mjs` |
+| Is the stem library valid? | `npm run check-stems` |
+| Where is what in a long track? | `npm run track-map -- <track.scd>` |
+| Do the paths named in the docs exist? | `npm run path-lint` |
 
-- `verify` checks the syntax, compares with the last commit, checks the sounds, checks the `@ctl` tags, and checks the
-  auto-perform scripts. With no arguments it checks every changed track. Add `--online` to
-  check the sounds over the network.
-- `audibility` renders the mix, every stem, the Launchkey keys and the pads at the default state and flags
-  `SILENT`, `LOW` or `CLIPS`. Clipping is a level so high that the sound distorts.
-- `compare` lists the differences event by event. A difference is "changed", not a failure: your edit may be meant to
-  change the sound.
-- `scenario` simulates controller moves and prints what plays. `--view` shows the LC view as text.
-- `check-sounds` plays the track in a simulator, fetches each sound file and updates `samples/sounds.json`.
+- `npm test` runs the feature tests. It plays every SuperCollider track headless (no sound) and checks that it plays
+  notes with the faders up, that Launchkey knob 1 arrives, that every sample file exists and that the Pattern button
+  changes what plays. GitHub runs the Node part on every pull request.
+- `verify-sc` checks one track (or, with no argument, every changed one): the `@ctl` tags parse, its auto-perform
+  scripts are valid, and it loads and plays headless in SuperCollider. A stem file or a Sample Designer project in the
+  change also gets its check.
+- `check-perform` checks every script against the controls of its track: a step that moves a control the track does
+  not have, a bad bar or a bad value is reported.
 
 ## Good to know
-- These checks work on event data and a simulated renderer, not on a speaker: they find silence, clipping and drift,
-  not taste.
-- A bad sound is reported as broken or unchecked; sounds from your own samples load only after a push to `main`.
-- Run one heavy check at a time; the laptop is shared.
-- Skills that drive these tools: `strudel-optimize` (same sound, less CPU), `strudel-mix` (levels).
+- The checks are feature tests: something plays, a value arrives, a file is written. They do not measure the sound
+  and do not judge taste: listen in the [player](player.md).
+- Run one heavy check at a time (`npm test` starts SuperCollider); the laptop is shared.
+- `sc/samples/voice/david.flac` (the 007 voice) is too big for git. Without it, 007's "every sample file it loads
+  exists" check fails.
+- The Strudel checks (`verify`, `audibility`, `compare`, `scenario`, `check-sounds`) were removed with the move to
+  SuperCollider; the Strudel files are frozen.
 
 ## Related
 - [Claude skills](claude-skills.md)

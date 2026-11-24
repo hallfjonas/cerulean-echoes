@@ -124,10 +124,8 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
 
 ## Not genres
 
-- `sets/`: combined sets that play several tracks in one piece (011 plays 007 → 010 → 009 → 008). A set takes the genre
-  of its tracks; it has no genre of its own.
-- `historic/`: older tracks 000–006 and `johannes-tracks`. They are not assigned to a genre here. Add a definition when the
-  genre is agreed.
+- Sets (several tracks played in one piece) take the genre of their tracks; they have no genre of their own. The old
+  Strudel set 011 and the historic tracks 000–006 were removed with sc-migration 010 (git history).
 
 ## Choosing between neighbours
 

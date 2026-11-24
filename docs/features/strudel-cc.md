@@ -1,8 +1,9 @@
 # strudel.cc
 
 ## What it is
-[strudel.cc](https://strudel.cc) is the web editor for Strudel, the live coding language the tracks are written in.
-Every live track file plays there exactly as it is. The [player](player.md) adds the visuals on top of the same file.
+[strudel.cc](https://strudel.cc) is the web editor for Strudel, the live coding language the tracks were first
+written in. Strudel is deprecated ([DEPRECATION.md](../../DEPRECATION.md)): the live tracks play on SuperCollider now,
+and their Strudel files in `tracks/` are frozen. Each frozen file still plays on strudel.cc exactly as it is.
 
 ## When to use it
 When you do not have the repo running, you want to play at a friend's place, or you want the plain Strudel experience.
@@ -21,7 +22,6 @@ When you do not have the repo running, you want to play at a friend's place, or 
 - Your own samples load from `main` on GitHub. A new sample plays on strudel.cc only after it is pushed to `main`.
 - The player loads the same sound banks as strudel.cc, so a sound that works in one works in the other.
 - Without a controller you can still play; unmoved controls read 0.
-- Set 011 is a generated file and is not in the player's list.
 
 ## Related
 - [Player](player.md)

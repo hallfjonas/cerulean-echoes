@@ -1,7 +1,7 @@
 # cerulean-echoes
 
-Live-performed Strudel tracks (strudel.cc), played with Novation Launch Control XL 3s via `midin()` and a
-Launchkey MK4 25 via `midikeys()` (devices: `midi-layouts/devices.md`).
+Live-performed tracks on SuperCollider (SC), played with Novation Launch Control XL 3s and a Launchkey MK4 25
+(devices: `midi-layouts/devices.md`) through the player (`tools/trajectory/`). The older Strudel tracks are frozen.
 Talk to the user in English; code comments are English too. Explain audio basics plainly.
 Docs for people: `docs/README.md`; contribution rules: `CONTRIBUTING.md`.
 Deprecated features: `DEPRECATION.md`. Read it before building any feature; never extend a deprecated feature (Strudel is deprecated, new work goes to SuperCollider).
@@ -16,24 +16,26 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 "keys" = the Launchkey keys, "drum C1 / E1" = Launchkey pad by Novation note name (C1 = note 36, E1 = 40).
 
 ## Layout
-- `tracks/<genre>/NNN-<name>/` — one folder per track, grouped by genre (`ambient`, `ambient-house`, `house`,
-  `techno`; `sets/` for 011, `historic/` for 000-006): the track (`NNN-<name>.strudel`),
-  its feedback notes; a Guitar Pro song also its `.mid`, `<track>-map.json`
-  and `<track>-design.md`. No `old/` folders: superseded variants are deleted once committed, git history keeps them.
-- `midi-layouts/` — device list and the two-controller template (`templates/dual-lc.strudel`)
+- `sc/tracks/<id>/<id>.scd` — the live tracks (source of truth), `<id>.track` = a stem track (stem versions on the
+  14 slots, frame `<id>-frame.scd`); `sc/lib/` the engine core (`ce.scd`), `sc/engine.scd` what the player starts,
+  `sc/live.scd` the IDE start; `sc/sounds/` one sound per file (`sc/sounds/README.md`); `sc/samples/` samples and
+  reverb IRs (`CREDITS.md`); porting notes `sc/PORTING.md`
+- `tracks/<genre>/NNN-<name>/` — the frozen Strudel versions (`NNN-<name>.strudel`, decision D1: edits go to the
+  `.scd`), grouped by genre (`ambient`, `ambient-house`, `house`, `techno`), with the tracks' feedback notes; a Guitar
+  Pro song also its `.mid`, `<track>-map.json` and `<track>-design.md`. No `old/` folders: git history keeps them.
+- `midi-layouts/` — device list, the two custom modes (`lcxl3-mode1.syx` / `-mode2.syx`) and the old Strudel layout
+  template (`templates/dual-lc.strudel`)
 - `lab/tutorials/` — ear training with live sliders + English handbook PDF (the only part of `lab/` left; the Strudel
   boards were retired 2026-11-21, lessons in `docs/reference/lab-lessons.md`, boards in git history up to a69f511)
 - `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
   to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
-- `sc/stems/` — the stem library (`<sample>/<name>.stem`, one LC column as JSON; schema, add-ons), `sc/tracks/<id>/<id>.track`
-  = stem versions on the 14 slots; `sc/lab/samples/` (Sample Designer projects), `sc/lab/stems/` (Stem Designer projects);
+- `sc/stems/` — the stem library (`<sample>/<name>.stem`, one LC column as JSON; schema, add-ons); `sc/lab/samples/` (Sample Designer projects), `sc/lab/stems/` (Stem Designer projects);
   docs: `docs/features/stems.md`, `docs/features/sound-lab.md`
 - `samples/` — audio recordings
-- `recordings/<track>/` — WAV recordings with a `.json` sidecar of the player's output, written by the player, not in git
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
 - `snippets/` — small helpers and tests (`midi-test.strudel`)
-- `tools/` — Node tools (run `npm install` in `tools/` once): equivalence/CPU check, per-stem loudness,
+- `tools/` — Node tools (run `npm install` in `tools/` once): the player, `npm test`, checks, sound lab, launcher,
   Guitar Pro MIDI → live track (`producer/`)
 
 ## Rules
@@ -46,155 +48,113 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - Never push to main or force-push it; branch from a fresh `origin/main`, one PR per feature.
 - Before a multi-file edit: `git status`, and look for sibling branches/PRs and other sessions working on the same
   track (`gh pr list`), so nothing is built twice or overwritten.
-- Generated files (`-single`, `011-set-dual.strudel`) are never merged by hand: on a conflict take either side and
-  regenerate (hook, `npm run set`).
+- Generated files (a producer song track, `dual-lc-test.strudel`) are never merged by hand: on a conflict take either
+  side and regenerate (`npm run producer`, the hook).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
-## Live tracks (007-010 and newer): one file each
-The single layout is the source of truth: one file `NNN-<name>.strudel` (`007-ambient`, `008-groove-techno`,
-`009-house`, `010-ambient-house`, …), every controller optional. Edit these
-files.
-- A Guitar Pro song: every part plays its notes as written (song bar 1 = cycle 0), re-voiced; the decisions live in
-  `<track>-map.json` beside the `.mid`. It is generated: change the map (or `tools/producer/`) and re-run
-  `npm run producer`, not the track. The reference songs 012 (hand-built pilot) and 013 live on as test fixtures in
-  `tools/producer/fixtures/`. See `/producer`.
-- Rows and columns after `midi-layouts/templates/dual-lc.strudel`: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour
-  on columns 1-7, column 8 global. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0
-  must already sound good.
-- Every connected LC XL 3 (port name contains `LCXL3`, not `DAW`) gets the full single layout: Mode 1 = foundation
-  (same CCs as Mode 16), Mode 2 = colour (CC + 48), column 8 global on both. Several LCs: per CC the one moved last
-  wins (`lcCc`, built on `lastMoved`, made once per CC). No LC found: a warning, silence. Without Web MIDI (the Node
-  tools) one plain `midin()` stands in, so `/strudel-optimize` and `tools/strudel-sim` still work.
-- Launchkey MK4 25 (optional, its own stem `stemLK`): keys = a pad, drum pads (channel 10) = 16 one-shots, mod wheel
-  CC 1 = keys level × master, knobs CC 21-28 = sound (same meaning in every track; the sounds fit each track).
-- The LC view (`▣ LC big`) shows Mode 1 and Mode 2 side by side, the page moved last framed, and the Launchkey row. `midikeys` has no note-off (fixed note length) and its queue is
-  emptied by the scheduler's first query: read it through `shareQuery` when more than one layer uses it.
-- The old dual/multi and generated single versions are in git history. `-dual`/`-single` files and
-  `tools/lcxl-layout/make-single.mjs` (run by the hook after every edit of a dual file or the template; never edit a
-  single file by hand) remain only for 011 and the template.
-
-## The set (011)
-- `tracks/sets/011-combining-all/011-set-dual.strudel` plays 007 → 010 → 009 → 008 as one set (Fog knob in set mode =
-  position, Jonas' column 8 button 2 toggles it). It is GENERATED by `tools/set/make-set.mjs` from the frozen dual
-  versions in `tracks/sets/011-combining-all/sources/`
-  (`007-ambient-dual`, `010-ambient-house-dual`, `009-house-dual`, `008-groove-techno-multi`) and
-  `tools/set/set-frame.strudel`: never edit it by hand. Changes to the one-file tracks do not reach the set; run
-  `npm run set` in `tools/` after changing a frozen source or the frame (builds, then `check-set.mjs` proves each
-  plateau plays its track event by event).
+## Live tracks (SuperCollider)
+All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3),
+every controller optional. Edit the `.scd`; a new version goes into a new folder (e.g. `009-house-2`).
+- Rows and columns: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour (CC + 48) on columns 1-7, column 8 global on
+  both. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0 must already sound good.
+- Knobs act at once, also on sounding notes (control buses); faders from the next note, with pickup (a device's fader
+  changes nothing until it meets the value); pattern buttons switch at the next bar, Chapter at the next bar or phrase.
+- Every connected LC XL 3 (port name contains `LCXL3`, not `DAW`) gets the full layout; several LCs share every value
+  (SC sends each knob change back to every LC). Launchkey MK4 25 (optional): keys = a pad, drum pads (channel 10) = 16
+  one-shots (`lkNote`, names in `lkPadNames`), mod wheel CC 1 = keys level × master, knobs CC 21-28 = sound.
+- A Guitar Pro song: the producer still writes Strudel (`tools/producer/`, `/producer`); the decisions live in
+  `<track>-map.json`, change the map and re-run `npm run producer`, never the track. Reference songs 012/013 are test
+  fixtures in `tools/producer/fixtures/`. An SC output is decided when the next song comes.
+- Frozen Strudel files stay playable in the player as `<id> (Strudel)` and on strudel.cc; change them only for a fix
+  the user asks for (`DEPRECATION.md`).
 
 ## Controller mapping (LC XL 3)
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.
-- Mode 2 = same layout, every CC + 48 (melodies). Column 8 is global in both modes:
-  fader and knobs read from both modes' CCs via `lastMoved` (last moved wins).
-- In code: `col(n)` / `col2(n)` → `{ hpf, lpf, char, level, btn }` (see `tracks/historic/006/006-arp.strudel`).
+- Mode 2 = same layout, every CC + 48 (melodies). Column 8 is global in both modes: its Mode 2 CCs are aliases of
+  Mode 1's (an SC track's `aliases`), so the last move wins.
+- In an SC track: `col.(n, plus)` → `(bright, space, char, level, btn, btn2)` CCs, `jojo.(n)` / `jonas.(n)` (+ 48),
+  `glob` = column 8 (see any `sc/tracks/<id>/<id>.scd`).
 
 ## Skills and tools
 Use them instead of redoing the steps by hand:
-- Same sound, less CPU, "drops out", "compare old/new", "event by event": `/strudel-optimize`.
-- Levels, "louder/quieter", "can't hear", clipping, balance of stems, pads, keys and voices: `/strudel-mix`.
-- New sounds: the sound-lab epic's `/stem-designer` and `/sample-designer` (`/lab-board`, `/lab-to-track` are retired pointers).
-- A new sample (file, sample map, Launchkey pad, level, push): `/add-sample`.
-- Review past sessions for a date or range, pain points, "workflow review", "retro": `/workflow-review`.
 - A new sound on the SC machine ("sample designer", "a soft tom", export to `sc/sounds/`): `/sample-designer`.
 - Compare versions of a stem against a track, promote a winner, swap it into a new track ("redesign the piano stem of
-  the house track", "explore a replacement"): `/stem-designer`.
+  the house track", "explore a replacement"): `/stem-designer`. (`/lab-board`, `/lab-to-track` are retired pointers.)
+- A new sample (file into `sc/samples/`, a Launchkey pad, level): `/add-sample`.
 - Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
   performance"): `/auto-perform`.
-- A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song", "new Guitar Pro
-  song"): `/producer`.
+- A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song"): `/producer`.
+- Start the player on a port or branch: `/player`. Review past sessions ("workflow review", "retro"): `/workflow-review`.
 
 Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their
-`@`-tags checked and their single version regenerated (`tools/lcxl-layout/hook.mjs`, `bash-hook.mjs`). A commit
-with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
+`@`-tags checked (and the template its one-controller copy `dual-lc-test.strudel`; `tools/lcxl-layout/hook.mjs`,
+`bash-hook.mjs`). A commit with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at
+session start.
 
 Tools (run in `tools/`):
-- Does every feature still work? `npm test` (player, takes, producer, and SuperCollider: building blocks + every
-  `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`). Runs in CI on every PR;
-  the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output identical".
-- After editing a track: `npm run verify -- <track…>` (transpile, compare vs HEAD, sounds, layout/syx, tap, auto-perform scripts;
-  no args = all changed tracks; `--online` checks sounds online)
-- Old vs new, event by event: `npm run compare -- <old.strudel> <new.strudel> [--stem <name>]`
-- Levels are measured, not guessed: `npm run audibility -- <track>` (mix, every stem, Launchkey keys and pads at the
-  default state, from cycle `--from <n>` on for a song whose parts rest at its start; flags SILENT / LOW / CLIPS);
-  per-stem fader ranges: `npm run measure -- <track> stem=faderCC[,charCC] …`
-  (for 007-010 pass `--base '{"12":1,"60":1}'`)
-- Sounds load? `node strudel-sim/check-sounds.mjs [--offline] <track…>`; broken bank sound:
-  `node strudel-sim/mirror-sound.mjs <sound>`
-- Controller scenario without a throwaway script: `npm run scenario -- <track> --cc 13=0.5@1 --press 37@2 --pad 36@1
-  --lk 21=0.7 --keys '<c3 e3>' --lc 2 --cc2 … [--before 0-4 --after 4-8] [--stems|--events|--view]` (`--view` = LC view
-  as text)
-- Syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
+- Does every feature still work? `npm test` (player, takes, recording, launcher, producer, stems, sound lab, and SC:
+  building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`).
+  Runs in CI on every PR; the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output
+  identical", no sound measuring. `sc/samples/voice/david.flac` (44 MB) is not in git: 007's sample check fails without it.
+- After editing an SC track or its perform scripts: `npm run verify-sc -- [<track.scd | .track> …]` (tags parse,
+  perform scripts valid, the track loads and plays headless in `sclang`; stems and Sample Designer projects too; no
+  args = every changed SC track). Scripts alone: `node trajectory/check-perform.mjs [<track file>]`.
+- Outline a long track before reading it: `npm run track-map -- <track.scd | track.strudel>`, then `sed -n` ranges
+- Stem library (`sc/stems/`, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`, `npm run stems` (list,
+  filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
+- Offline render: `sclang sc/tools/render.scd <track.scd|.track> <scenario.json> <out-prefix>`; porting and
+  Strudel ↔ SC comparison: `tools/sc-port/`
 - Guitar Pro MIDI → track, design stub, perform script: `npm run producer -- <file.mid> [--map <map.json>]
-  [--out <dir>] [--force]`; `--perform` writes only the script from the map's `performance`; notes per bar:
-  `node producer/midi-read.mjs <file.mid> --dump` (`tools/producer/README.md`)
-- Set 011: `npm run set` (build + check); continuum: `npm run continuum`
-- Stem library (`sc/stems/`, SC stems and stem tracks, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`,
-  `npm run stems` (list, filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
-- The player (`node trajectory/server.mjs [port]`, then localhost:8766): see "The player" below;
-  `node trajectory/make-tapped.mjs <track>` puts the tapped code on the clipboard for strudel.cc
+  [--out <dir>] [--force]`; `--perform` writes only the script; notes per bar: `node producer/midi-read.mjs <file.mid>
+  --dump` (`tools/producer/README.md`); Strudel syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
-- Outline a long track before reading it: `npm run track-map -- <track>`, then `sed -n` ranges
 - Paths cited in docs, skills and epics exist? `npm run path-lint` (planned files in epics show up too)
+- Removed with sc-migration 010 (git history): set 011 and its tools, historic 000-006, the Strudel checks
+  (`verify`, `compare`, `audibility`, `measure`, `scenario`, `check-sounds` and the sound list), `/strudel-mix`,
+  `/strudel-optimize`. `tools/strudel-sim/` keeps only the harness the producer test, `sc-port` and the player's
+  catalogue check use.
 
 ## The player (tools/trajectory)
 The player is the main tool: `cd tools && node trajectory/server.mjs`, then http://localhost:8766 (README:
-`tools/trajectory/README.md`). It plays any live track (Live) or lab board (Lab) from the catalogue with the visuals.
+`tools/trajectory/README.md`). It plays every live track (Live) and the sound lab projects (Labs) with the visuals.
 - Launcher for people without a Terminal: `Cerulean Echoes.app` (repo root, committed; source and `launch.sh` in
   `tools/launcher/`, rebuild with `npm run launcher`) starts the server, shows the player in its own window (Swift/WKWebView, no Web MIDI: SC tracks only for controllers), quitting stops server + SC.
-- Single source: the track file. The player taps it in memory on every load (`/track/<id>`), so Play plays the
-  current edit; there are no tapped copies on disk. A track never depends on the player and still plays pasted into
-  strudel.cc.
+- SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's frozen Strudel file is
+  `<id>-strudel`): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
+  OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it; `CE_SC_PORT`, `CE_SC_SERVER_PORT`);
+  `tools/trajectory/sc-link.mjs`, `engine-sc.mjs`. Controllers go straight to SC; the page mirrors SC's state.
+  Agents' and tests' runs set `CE_SC_MUTE=1` (master to a silent bus).
+- Single source: the track file, read again on every load, so Play plays the current edit.
 - Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems & Tracks, Sets) | Visuals;
   the sidebar (key S) shows only the sections of the page: Live = live tracks, Play-Pause/Stop/Record, auto-perform;
   Labs = Sample / Stem Designer; the handle on its edge holds the sidebar toggle, the gear (opens Settings: Theme, Visuals, MIDI panel,
   Recording, keyboard shortcuts) and **?** (opens the help), three equal buttons that stay when the sidebar is hidden.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
-  controls, buttons, keys, pads, Launchkey CCs) into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`:
-  use it to try a track or the player without controllers. A new control or a changed `@ctl` needs the script checked
-  (`node trajectory/check-perform.mjs`, part of `npm run verify`). Every load restarts the clock (bar 0 = cycle 0).
-- Record (key R) writes the master output to `recordings/<track>/` as a WAV (human set, or auto-perform with Record
-  audio ticked); `node trajectory/check-recording.mjs` tests the endpoints.
+  controls, buttons, keys, pads, Launchkey CCs); on an SC track the steps go to SC over OSC (`sc-auto.mjs`), on a
+  Strudel one into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`. A new control or a changed `@ctl`
+  needs the script checked (`node trajectory/check-perform.mjs`, part of `npm run verify-sc`). Every load restarts the
+  clock (bar 0 = cycle 0).
+- Record (key R) writes the master output to `recordings/<track>/` as a WAV (SC records itself); human set, or
+  auto-perform with Record audio ticked; `node trajectory/check-recording.mjs` tests the endpoints.
 - Takes: every load captures all MIDI input; the setting Save take on record stop writes it as a script v2 to `perform/<track>/takes/`
-  (gitignored, with the play's tapped events) when a recording ends. Start on a take replays it; `node trajectory/check-replay.mjs <track>` (Tools: Check
-  replay fidelity) compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
+  (gitignored, with the play's tapped events) when a recording ends. Start on a take replays it; `node trajectory/check-replay.mjs <track>`
+  compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
-- SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id; a ported track's Strudel file is
-  `<id>-strudel`): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
-  OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it); `tools/trajectory/sc-link.mjs`,
-  `engine-sc.mjs`. Record, auto-perform and visuals for SC tracks: sc-migration tasks 003-005.
 
-## Writing efficient Strudel (CPU)
-Strudel computes every event of every layer even when it is silent; dense tracks then drop out.
-- Gate silent parts so they are not queried at all: `gate(cond, pat) = cond.fmap(on => on ? pat : silence).innerJoin()`.
-  Gate stems on fader/global level > 0 (`strip()`), crossfade layers where `fadeMain`/`fadeExtra` reach 0,
-  overtone layers on mode and density. Only gate where the gain is exactly 0, so the sound stays identical.
-- Stateful closures (`cycleButton`, `lastMoved`): create each once per control, never inside a gated
-  pattern only; query them every tick via a `stateTaps` stack in the master (`.filterValues(() => false)`),
-  otherwise button presses are lost while the stem is gated.
-- Keep the safety net at the end of the master: `.filterValues(v => (v.gain ?? 1) * (v.postgain ?? 1) > 0)`.
-- Prove a restructuring is inaudible with `/strudel-optimize` (compares old and new event by event).
+## Shared code in the Strudel tracks
+Blocks the Strudel tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
+`tools/shared/<name>.strudel-part` (the producer copies it into the tracks it writes). `npm run shared -- --check`
+shows drift; `npm run shared -- --from <track> <name>` syncs a changed block. SC tracks share code through `sc/lib/`.
 
-## Shared code in the live tracks
-Blocks the live tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
-`tools/shared/<name>.strudel-part` (the producer copies it into the tracks it writes). Edit the block in one track,
-then `npm run shared -- --from <track> <name>` (in `tools/`); never hand-patch the copies. `npm run shared -- --check`
-shows drift.
-
-## Sounds that load (samples/sounds.json)
-Every sound a track plays must load in a browser, on strudel.cc and in the player (`tools/trajectory/player.html`
-loads the same banks as strudel.cc, `banks.mjs`, plus the gm_* soundfonts). `samples/sounds.json` is the list:
-`ok` (whitelist, where it loads from) and `broken` (blacklist, why).
-- Own samples load from raw.githubusercontent `main`: check-sounds warns "plays only after push to main" until the
-  file is on `origin/main`.
-- After adding or changing a sound: `cd tools && node strudel-sim/check-sounds.mjs <track>` (plays the track in the
-  simulator with every control and pad, fetches each sound's file, updates the list). The hook compares every edited
-  track with the list offline and reports broken or unchecked sounds.
-- A broken bank sound (e.g. a VCSL file whose path has a comma: raw.githubusercontent then sends a header Chrome
-  refuses) is copied into `samples/mirror/` with `node strudel-sim/mirror-sound.mjs <sound>`; every track loads
-  `samples/mirror/mirror.json`, so the copy plays under the same name once pushed to main.
+## Samples and sounds (SC)
+An SC track loads its files from disk: `sc/samples/<folder>/<file>` or `repo:<path>` (the repo's own `samples/`),
+listed in the track's `samples:`; credits in `sc/samples/CREDITS.md`. Sounds (SynthDefs) are `sc/sounds/<name>.scd`,
+checked when loaded. A missing file is silent without an error: `npm run verify-sc` and `npm test` list missing files.
+SC cannot read m4a; use wav or flac.
 
 ## Control texts (`@ctl`)
-The `// @ctl` comments in a track describe every control; the LC view, the player's Live page, the SC UI and
+The `// @ctl` comments in a track (`.scd` or `.strudel`; a stem track's come from its stems and frame,
+`tools/stems/stem-tags.mjs`) describe every control; the player's Live page, the SC UI (`sc/ui/index.html`) and
 `check-perform` read them (`tools/lcxl-layout/ctl.mjs`). Layout sheets (PDF) and per-track `.syx` modes were retired on
 2026-11-20. Every LC XL 3 gets the same two custom modes once, with Novation Components: `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` in slots 1
 and 2 (same CCs for every track).

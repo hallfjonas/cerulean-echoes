@@ -3,7 +3,7 @@
 Our MIDI controllers. Out of the box both Launch Control XL 3 have the same name (`LCXL3 1 MIDI Out`).
 That is why they are renamed in macOS (Audio MIDI Setup → Window → Show MIDI Studio → double-click the device).
 
-| Name      | Device                       | Role (set 011 and old two-controller versions) | Custom modes            |
+| Name      | Device                       | Role (old two-controller versions)       | Custom modes            |
 |-----------|------------------------------|---------------------------------|-------------------------|
 | Jonas     | Novation Launch Control XL 3 | Colour (columns 1–7) + global (column 8) | Mode 16, Mode 2, Mode 1 |
 | Jojo      | Novation Launch Control XL 3 | Foundation (beat + bass, all 8 columns) | Mode 16 |
@@ -15,7 +15,7 @@ That is why they are renamed in macOS (Audio MIDI Setup → Window → Show MIDI
   Plugged into a different USB port, the names can move with them: check briefly in MIDI Studio.
 - After renaming, restart Chrome fully, otherwise Strudel still sees the old names.
 - `setup0.syx`: custom mode file from Novation Components (called "New Custom Mode" on the device).
-- One controller alone (one-file track, `*-single.strudel`, or Jojo's device missing): Mode 1 = Jojo, Mode 2 = Jonas.
+- One controller alone (every live track today, or Jojo's device missing): Mode 1 = Jojo, Mode 2 = Jonas.
   Mode 1 must get the same CCs as Mode 16 in Components (faders 5–12, knobs 13–36, buttons 37–52).
 
 ## One-file tracks (007, 008, 009, 010)

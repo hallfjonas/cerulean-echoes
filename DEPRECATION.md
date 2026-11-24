@@ -20,6 +20,10 @@ separate decision, made with the user.
 - **New features go to SuperCollider** (`sc/`). Plans and decisions for the move are in [SC-MIGRATION.md](SC-MIGRATION.md).
 - **Still in use:** existing `.strudel` tracks and the Strudel tools keep running. Change them only for a fix the user
   asks for, and never overwrite a track.
+- **Removed on 2026-11-22** (decided with the user, sc-migration 010): set 011, the historic tracks 000-006, the
+  Strudel checks (`verify`, `compare`, `audibility`, `measure`, `scenario`, `check-sounds`, the sound list) and the
+  skills `/strudel-mix` and `/strudel-optimize`. Still there: the frozen `.strudel` files of the ported tracks, the
+  player's Strudel engine (while it needs no work), the producer (writes Strudel) and the harness its test uses.
 
 ## How to add an entry
 

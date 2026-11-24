@@ -3,7 +3,7 @@
 ## What it is
 The player draws the music while it plays. Every voice of a track (a stem) is shown with its name. Where it sits tells
 you something about the sound: left to right is the stereo position (pan), low to high is the pitch, and the
-brightness follows the loudness. A ring pulses with the kick drum and the tempo comes from Strudel's own clock.
+brightness follows the loudness. A ring pulses with the kick drum and the tempo comes from the engine's own clock (SuperCollider's beats).
 
 ## When to use it
 For rehearsal, for a projector behind you, or to see which voice is doing what.

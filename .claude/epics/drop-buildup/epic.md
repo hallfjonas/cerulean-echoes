@@ -60,7 +60,7 @@ drop lands after it. The live view must show this countdown.
 - **Tension knob stays.** The manual Tension knob keeps working on top; the automatic build-up adds to it, it does not
   replace it.
 - **Sounds per track.** The engine is shared; the crash and swell sounds are chosen per track (909 crash in 008,
-  softer cymbal/noise swell in 007/010) and must pass `check-sounds.mjs`.
+  softer cymbal/noise swell in 007/010) and must pass check-sounds.mjs.
 - **Labels.** The button keeps the name `Break`; its `@ctl` text is one short line describing the new behaviour. The
   status box and the LC view show the recipe / build-up level and the bars left to the drop.
 
@@ -93,7 +93,7 @@ drop lands after it. The live view must show this countdown.
 1. Build the engine and both variants on a lab board, not in a track. Play them in rounds, record the verdict in the
    board's `feedback.md`.
 2. Port the winner (or a hybrid) into one track first (008, the clearest drop), verify with `/strudel-optimize`
-   that nothing else changes when the button is not pressed, and with `check-sounds.mjs`.
+   that nothing else changes when the button is not pressed, and with check-sounds.mjs.
 3. Roll out to 009, 010, 007 with per-track sounds; these are independent of each other and can run in parallel.
 4. The set (011) is generated from frozen dual versions and is out of scope here.
 
@@ -110,15 +110,15 @@ judge.
 4. **Variant 2 front-end**: toggle with elapsed-time → build-up mapping. (depends on 1; parallel with 3)
 5. **Status box and LC view**: break row with bars left, build-up level, next recipe. (depends on 3, 4)
 6. **Lab round and decision**: play both, write `feedback.md`, pick the winner or a hybrid. (depends on 2-5)
-7. **Port to 008**: engine + winning front-end + `@ctl` text; `/strudel-optimize` and `check-sounds.mjs`. (depends on 6)
+7. **Port to 008**: engine + winning front-end + `@ctl` text; `/strudel-optimize` and check-sounds.mjs. (depends on 6)
 8. **Port to 009, 010, 007**: per-track crash/swell sounds, guides updated. (depends on 7; the three in parallel)
 
 ## Dependencies
 
 - `barLatch`, `cycleButton`, `gate`, `stateTaps` helpers already in each one-file track.
 - Tension knob's snare roll (`tensionRoll`) in 008/009/010 as the base for the roll layer; 007 has none.
-- Crash / noise samples that load on strudel.cc (`samples/sounds.json`), e.g. `rolandtr909_cr` already used in 008.
-- `tools/strudel-sim` (`/strudel-optimize`, `check-sounds.mjs`) for verification.
+- Crash / noise samples that load on strudel.cc (samples/sounds.json, removed 2026-11-22 with sc-migration 010), e.g. `rolandtr909_cr` already used in 008.
+- `tools/strudel-sim` (/strudel-optimize, check-sounds.mjs: both removed 2026-11-22 with sc-migration 010) for verification.
 - Layout hook (`lcxl-layout`) to regenerate PDFs and `.syx` after `@ctl` changes.
 
 ## Success Criteria (Technical)
@@ -128,7 +128,7 @@ judge.
 - Drops are audibly different from press to press / from short to long breaks; at least 3 distinct recipes.
 - With Break never pressed, `/strudel-optimize` shows the track event-identical to its current version.
 - No dropouts: build-up layers are gated, CPU check in `tools/strudel-sim` no worse than today.
-- Every new sound passes `check-sounds.mjs`.
+- Every new sound passes check-sounds.mjs.
 - Status box and LC view show what the button will do next and how many bars remain to the drop.
 - Tension knob still works and stacks on the automatic build-up.
 

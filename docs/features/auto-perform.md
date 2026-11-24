@@ -1,8 +1,9 @@
 # Auto-perform
 
 ## What it is
-Auto-perform plays a track for you. A script of control moves and button presses (a "performance") is sent into a
-virtual controller, so the track sounds as if someone turned the knobs. It does not listen to the sound: it only
+Auto-perform plays a track for you. A script of control moves and button presses (a "performance") is sent to the
+track (to SuperCollider; a frozen Strudel track gets it through a virtual controller), so the track sounds as if
+someone turned the knobs. It does not listen to the sound: it only
 plays what the script says, bar by bar.
 
 ## When to use it
@@ -25,12 +26,12 @@ tries each control once. Some tracks have longer performances with a short descr
 to 1. The full format is in `tools/trajectory/perform/script-format-v2.md`.
 
 ## Good to know
-- The virtual controllers are called `LCXL3 Auto` and `Launchkey MK4 25 Auto`. A track treats them like the real
-  devices ([controllers](controllers.md)).
+- A SuperCollider track takes the script's moves like moves of the real devices ([controllers](controllers.md)).
+  For a Strudel track the virtual controllers are called `LCXL3 Auto` and `Launchkey MK4 25 Auto`.
 - A real Launchkey plays along with the script. Its keys only sound while the mod wheel is up.
 - The player also keeps a take of everything you play, and can save it as a new script (setting **Save take on record stop**). Details are in
   the Auto-perform and Takes sections of `tools/trajectory/README.md`.
-- Check scripts with `cd tools && node trajectory/check-perform.mjs`; `npm run verify` runs it too. A new control or a
+- Check scripts with `cd tools && node trajectory/check-perform.mjs`; `npm run verify-sc` runs it too. A new control or a
   changed `@ctl` text means the scripts need a check.
 - Design and write a new performance with the Claude skill `auto-perform` ([Claude skills](claude-skills.md)). Claude
   cannot hear, so you listen and say what to change.

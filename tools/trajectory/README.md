@@ -171,11 +171,7 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   and the status line the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
   step, every CC in the track's `@ctl` tags, every press a button, pads 36-51, LK CCs 1 / 21-28, keys that parse,
-  and the `take` meta field of a take. `npm run verify` runs it.
-- Levels without a browser: `npm run scenario -- <track> --script <file> [--stems]` plays the whole script (LC and
-  Launchkey steps) and prints, per section, the audible events and the loudest event gain per stem in dB, with
-  `SILENT` for a section without sound. These are event gains, not rendered audio: peaks and clipping need
-  `npm run audibility`.
+  and the `take` meta field of a take. `npm run verify-sc` runs it (with the track's headless load in SC).
 
 ### Recording audio
 
@@ -244,15 +240,14 @@ and output, how to use it. Closing it is remembered. A new page calls
 
 ### Strudel.cc
 
-Every live track file plays on strudel.cc as it is; the player adds nothing to it. To see the visuals of a track that
+Every frozen Strudel track file plays on strudel.cc as it is; the player adds nothing to it. To see the visuals of a track that
 plays on strudel.cc, put the tapped code on the clipboard (macOS) and paste it into strudel.cc next to the player:
 
 ```bash
 cd tools && node trajectory/make-tapped.mjs ../tracks/techno/008-groove-techno/008-groove-techno.strudel
 ```
 
-Old dual versions are tapped through their single version (e.g.
-`tracks/sets/011-combining-all/011-set-single.strudel`); set 011 is not in the player's list.
+Strudel is deprecated: these files are frozen (set 011 and the dual versions were removed with sc-migration 010).
 
 ## Progress
 
@@ -328,7 +323,7 @@ The player is meant for visuals and rehearsals, not as a full replacement for st
 
 **Sounds in the player:** Strudel's built-in synths, dirt samples, drum machines, VCSL, piano, the `gm_*` soundfonts
 and all samples a track loads itself; `banks.mjs` loads the same banks as strudel.cc. A sound that does not load is
-listed in `samples/sounds.json` (check: `node strudel-sim/check-sounds.mjs <track>`).
+silent there (the Strudel sound check was removed with sc-migration 010; SC tracks load their samples from disk).
 Controllers: every Launch Control XL 3, the Launchkey (keys, drum pads, mod wheel, knobs) and the virtual
 `LCXL3 Auto` port.
 
