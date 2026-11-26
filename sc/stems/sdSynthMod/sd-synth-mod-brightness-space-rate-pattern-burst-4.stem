@@ -1,0 +1,80 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-rate-pattern-burst-4",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-rate-pattern-burst-3.stem",
+  "about": "Rare high one-shots in six families.",
+  "meta": {
+    "role": "fx",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "accents",
+      "random",
+      "echo"
+    ],
+    "harmony": "none",
+    "label": "Accents"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-accents-groups.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Random"
+    },
+    {
+      "label": "Chirp"
+    },
+    {
+      "label": "Pluck"
+    },
+    {
+      "label": "Spark"
+    },
+    {
+      "label": "Laser"
+    },
+    {
+      "label": "Bleep"
+    },
+    {
+      "label": "Acid"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Rate",
+      "about": "one hit in about 2 bars ↔ about 2 per bar."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "rare high accents with their own echo."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "a random family each phrase, then the six in turn."
+    },
+    "b2": {
+      "label": "Burst",
+      "about": "a quick scatter of accents while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1.6
+}

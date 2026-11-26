@@ -1,0 +1,88 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-static-pattern-tune-2",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-static-pattern-tune.stem",
+  "about": "Broken signals from deep space in the middle, in bar 6.",
+  "meta": {
+    "role": "fx",
+    "label": "Radio",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "radio",
+      "space",
+      "broken",
+      "siren",
+      "static"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdNoise"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 3,
+  "code": "lsd-radio-2.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Random"
+    },
+    {
+      "label": "Mayday"
+    },
+    {
+      "label": "Sat"
+    },
+    {
+      "label": "Pulsar"
+    },
+    {
+      "label": "Chime"
+    },
+    {
+      "label": "Glitch"
+    },
+    {
+      "label": "Siren"
+    },
+    {
+      "label": "Doom"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Static",
+      "about": "clean ↔ crackle, hiss and drop-outs."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "a broken signal in bar 6 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "a random signal each phrase, then the seven in turn."
+    },
+    "b2": {
+      "label": "Tune",
+      "about": "a whistle gliding like a shortwave dial, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.45
+}

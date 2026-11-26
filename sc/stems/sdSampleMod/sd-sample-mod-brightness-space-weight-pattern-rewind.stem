@@ -1,0 +1,85 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-weight-pattern-rewind",
+  "parent": "sdSampleMod/sd-sample-mod-brightness-space-weight-pattern-reverse.stem",
+  "about": "Metal hits on the right, far away, in bar 5.",
+  "meta": {
+    "role": "fx",
+    "label": "Metal",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "metal",
+      "clank",
+      "gong",
+      "right"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleMod",
+    "extra": [
+      "sdSynthMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-metal-2.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Random"
+    },
+    {
+      "label": "Clank"
+    },
+    {
+      "label": "Ting"
+    },
+    {
+      "label": "Gong"
+    },
+    {
+      "label": "Scrape"
+    },
+    {
+      "label": "Chain"
+    },
+    {
+      "label": "Anvil"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Weight",
+      "about": "light ting ↔ heavy clang over a low gong.",
+      "default": 0.6
+    },
+    "fader": {
+      "label": "Level",
+      "about": "metal hits, right and far, in bar 5 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "a random figure each phrase, then the six in turn."
+    },
+    "b2": {
+      "label": "Rewind",
+      "about": "the figure every bar, backwards, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1.0
+}
