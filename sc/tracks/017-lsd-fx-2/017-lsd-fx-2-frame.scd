@@ -1,7 +1,8 @@
 // Frame of the 017 LSD FX 2 stem track (017-lsd-fx-2.track): 017-groove-lsd's frame without the chords column. Mode 1 is
-// 017's foundation with congas (1:5) and claps (1:7); Mode 2 the strings, the stab and the leads of 017, then four sparse fx
-// columns. The root stays on F (no progressions, no chord colours). The three moods (Chapter), the orbits, the global
-// column 8 texts and the Launchkey are 017's. Format: sc/lib/stemtrack.scd.
+// 017's foundation with congas (1:5) and claps (1:7); Mode 2 the strings, the stab and the leads of 017, then four sparse
+// fx columns, the metal (2:4) one of them: the Launchkey keys play its sound. The root stays on F (no progressions, no
+// chord colours). The three moods (Chapter), the orbits, the global column 8 texts and the Launchkey are 017's.
+// Format: sc/lib/stemtrack.scd.
 // Column 8's fader is Wumms (more low end, punch and drive), not a volume: kick, rumble, sub and bass read it per note, so
 // the frame is masterless. Chapter = the mood, all on F: Dark (minor), Tight (phrygian), Warm (dorian); it switches at the next bar. Every column
 // plays degrees of the root (F) in the mood's scale: frame.degMidi, rootAt.
@@ -13,17 +14,10 @@
 // @ctl g.fader Wumms | more low end, punch and drive.
 // @ctl g.b1 Chapter | mood: dark → tense → warm, at the next bar.
 // @ctl g.b2 Break | 1st: low end out. 2nd: all back on the one.
-// @lk level Keys Level | mod wheel: volume of the keys.
-// @lk k1 Brightness | dull ↔ bright; harder keys brighter.
-// @lk k2 Piano → Rhodes | off → piano → Rhodes → off.
-// @lk k3 B3 → M1 | off → organ B3 → M1 → off.
-// @lk k4 Vibes → Marimba | off → vibraphone → marimba → off.
-// @lk k5 Length | short notes ↔ long.
-// @lk k6 Space | a little air ↔ room.
-// @lk k7 Echo | dry ↔ long echo.
+// @lk level Keys Level | mod wheel: volume of the keys, apart from the metal column's fader.
+// @lk k1 Key Tone | keys: darker ↔ brighter, on top of the metal's Brightness.
 // @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 (
-var lkKeysLib = (~ce.root +/+ "lib/lkkeys.scd").load;
 var bpm = 134, beat = 60 / bpm, fogCC = 20, tensionCC = 36;
 var moods = [(name: "Dark", steps: [0, 2, 3, 5, 7, 8, 10]), (name: "Tight", steps: [0, 1, 3, 5, 7, 8, 10]),
 	(name: "Warm", steps: [0, 2, 3, 5, 7, 9, 10])];
@@ -51,39 +45,43 @@ uiGlobal: { |frame, track, ce| (b1: ["F " ++ moods[track.chapter.now].name, "F "
 orbits: (1: (ir: "ir/orbit-1.6.wav", delay: [0.75 * beat, 0.3]), 2: (ir: "ir/orbit-4.wav", delay: [0.75 * beat, 0.58]),
 	3: (ir: "ir/orbit-2.6.wav", delay: [0.25 * beat, 0.45])),
 // state buses: room and echo amounts the language derives from knobs (columns whose Space is scaled, echo throws)
-states: (lkLevel: 0, lkBright: 0, lkRoom: 0.9 * 0.1, lkEcho: 0),
+states: (lkLevel: 0, lkBright: 0.5,
+	// the room and echo of the metal column (2:4), which the keys' lane follows (the column's own values replace these)
+	s2_4_room: 0.9 * 0.4, s2_4_echo: 0.15),
 samples: ["tr909/bd-01.wav", "tr909/oh-00.wav", "tr909/hh-00.wav",
 	// the metal fx column (2:4)
 	"dirt/metal-00.wav",
 	// the Launchkey's drum pads (as 008): drum-machine one-shots, Dirt-Samples (strudel.cc's default samples), the spoken samples
 	"voice/brace.wav", "voice/piece_of_paper.flac", "voice/plaenterwald_wine_and_cheese.flac", "voice/plaenterwald.flac",
 	"voice/lw.wav", "voice/the_creatures_have_begun_illumination.flac", "voice/the_evening_does_not_end.flac", "voice/in_the_vast.flac",
-	"tr909/lt-00.wav", "tr909/rim-00.wav", "tr909/cr-00.wav", "tr808/sh-00.wav", "dirt/space-00.wav", "dirt/wind-00.wav"] ++ ~ce.lkKeysFiles,
+	"tr909/lt-00.wav", "tr909/rim-00.wav", "tr909/cr-00.wav", "tr808/sh-00.wav", "dirt/space-00.wav", "dirt/wind-00.wav"],
 
 stems: [
-	(name: \lk, sounds: ~ce.lkKeysSounds ++ [\sdSampleMod, \sdSynthMod], level: \lkLevel, tensionEcho: false, thin: false,
-		lanes: [(name: \keys, orbit: 2, roomR: \lkRoom, echoSend: \lkEcho),
+	(name: \lk, sounds: [\sdSampleMod, \sdSynthMod], level: \lkLevel, tensionEcho: false, thin: false,
+		lanes: [(name: \metal, orbit: 2, roomR: \s2_4_room, echoSend: \s2_4_echo),
 			(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \lt, orbit: 1, level: 1.0, roomR: 0.5),
 			(name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.4), (name: \braaam, orbit: 1, level: 1.0, roomR: 0.9),
 			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
-// the Launchkey's start values: keys at a third, dark, a little piano and organ, short notes, some room, full echo
-lkStart: (1: 0.34, 21: 0.15, 22: 0.32, 23: 0.18, 25: 0.29, 26: 0.42, 27: 1),
-// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these), the same as 008's. Mod wheel (CC 1) = keys level,
-// knobs CC 21-28: 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 one-shot darkness.
+// the Launchkey's start values: the mod wheel at a third, the key tone neutral
+lkStart: (1: 0.34, 21: 0.5),
+// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play the metal sound (2:4): a second player
+// on the keys, the first one shaping the metal on the Launch Control. Its Brightness, Weight, Space, Rewind and Pattern reach
+// the keys (Random: a figure per press), its fader does not (it keeps playing its own hits). The mod wheel (CC 1) is the keys'
+// level, knob 1 (CC 21) their tone (the filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the one-shot darkness of
+// the drum pads.
 lkCtl: { |ce, num, v, send|
 	switch(num,
 		1, { ce.setState(\lkLevel, v, send) },
-		21, { ce.setState(\lkBright, v, send) },
-		26, { ce.setState(\lkRoom, 0.9 * (0.1 + (0.7 * v)), send) },   // roomOf(0.1 … 0.8)
-		27, { ce.setState(\lkEcho, 0.6 * v, send) })
+		21, { ce.setState(\lkBright, v, send) })
 },
 lkNote: { |ce, note, vel, chan|
-	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(5));   // note length in bars
-	var tone = ("c" ++ ce.toneBus).asSymbol, thin = ("c" ++ ce.thinBus).asSymbol;
+	var k = { |n| ce.lkCC[20 + n] };
+	var thin = ("c" ++ ce.thinBus).asSymbol;
 	if(chan != 9) {
-		ce.lkKeysNotes(note, vel, [k.(2), k.(3), k.(4)],
-			(hold: nl * 16, lane: \keys, tone: tone, bright: ce.stateMap(\lkBright), thinF: thin))
+		var col = ce.track.columns['2:4'], tone = 2 ** (4 * (ce.stateVal[\lkBright] - 0.5));
+		(col !? { |c| c[\colCode] !? { |code| code[\keys] !? { |f| f.(c, note, vel) } } } ? []).collect { |n|
+			n.put(\lo, n[\lo] * tone).put(\hi, n[\hi] * tone) }
 	} {
 		// drum pads 36-51 (Drum mode): the spoken samples (left half), drum one-shots, a synth drop hit, Dirt-Samples
 		var shots = [
