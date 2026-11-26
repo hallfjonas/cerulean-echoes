@@ -10,6 +10,7 @@ related. New here? Start with [getting started](../getting-started.md).
 - [Lab boards](lab-boards.md) - retired: the old Strudel test benches
 - [Sets](sets.md) - several tracks as one performance (planned for SuperCollider)
 - [Sound lab](sound-lab.md) - Sample Designer, Stem Designer and stem swap in the player
+- [Space analyzer](space-analyzer.md) - where a stem track's frequency and time space is free or crowded
 - [Stems](stems.md) - one LC column as a file: format, naming, add-ons, stem tracks (SuperCollider)
 - [Samples and sounds](samples-and-sounds.md) - adding audio and checking that sounds load
 - [Checks](checks.md) - `npm test`, `verify-sc` and the other tools that test without a speaker

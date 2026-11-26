@@ -11,7 +11,7 @@ const catalogue = [
 ]
 
 test('hash: every page round-trips, unknown hashes land on Live, Labs defaults to Samples', () => {
-  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/sets', '#visuals'])
+  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/space', '#labs/sets', '#visuals'])
     assert.equal(hashFor(parseHash(hash)), hash)
   assert.deepEqual(parseHash(''), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#nonsense'), { id: 'live', sub: null })
@@ -25,6 +25,7 @@ test('pickers: Live lists live tracks, Samples and Stems their projects, Strudel
   assert.deepEqual(ids('#live'), ['a', 'b'])
   assert.deepEqual(ids('#labs/samples'), ['sample-kick'])
   assert.deepEqual(ids('#labs/stems'), ['stems-flute'])
+  assert.deepEqual(ids('#labs/space'), [])
   assert.deepEqual(ids('#labs/sets'), [])
   assert.deepEqual(ids('#visuals'), [])
 })

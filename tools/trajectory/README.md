@@ -291,7 +291,10 @@ it was retired on 2026-11-20):
 | `make-tapped.mjs` | `tapSource(src, name)`: every stem gets its readable name from the track (`@col` column name, Jojo's column 8: the name of its Pattern button, `stemLK` = Launchkey) as `.tag()`, the master sends via `.onTrigger` (sound unchanged); also a CLI that copies the tapped code to the clipboard |
 | `server.mjs` | `/` player, static pages, `/catalogue`, `/track/<id>` (tapped on request), `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, relay POST `/events` → SSE `/stream`; CORS and private-network headers on the relay for strudel.cc |
 | `player.html` | the player page: loads a track through the engine, the sidebar, the Live / Labs panel (the track's LC view in an iframe), the visuals (`render.mjs`) and the Settings view |
-| `pages.mjs` | the pages (Live, Labs with Samples / Stems & Tracks / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
+| `pages.mjs` | the pages (Live, Labs with Samples / Stems & Tracks / Space / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
+| `space-analysis.mjs` | Space Analyzer maths (DOM-free): bytes ↔ dB, coarser time cells, which stems are active where; test `space-analysis.test.mjs` |
+| `space-render.mjs` | Space Analyzer render side: one stem rendered alone (`sc-port/sc-render.sh`), measured per band and 1/32-bar cell, cached in `recordings/space/`; test `space-render.test.mjs` |
+| `space-lab.mjs`, `space-lab-ui.mjs` | the `/lab/space/…` routes (stem tracks, one stem per request, one at a time) and the Labs / Space page (sidebar rows, map) |
 | `engine-strudel.mjs` | everything Strudel: `initStrudel`, sample banks and `gm_*` soundfonts, evaluate, stop, `cycle()` (the cycle the scheduler queries next), the `midin` / `midikeys` shims |
 | `midi.mjs` | Web MIDI: ports map, last value per CC, key queue, virtual `LCXL3 Auto` and `Launchkey MK4 25 Auto` ports |
 | `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the sidebar section |
