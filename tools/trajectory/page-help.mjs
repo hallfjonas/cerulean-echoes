@@ -1,5 +1,5 @@
 // The "About this page" text of every player page, by page key (pages.mjs pageKey): Live, Labs / Samples,
-// Labs / Stems & Tracks, Labs / Space, the planned Labs page and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
+// Labs / Stems, Labs / Space, the planned Labs page and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
 const LIVE = [
   { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
     + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample Designer, Stems & '
@@ -50,7 +50,7 @@ const SAMPLES = [
 ]
 
 const STEMS = [
-  { heading: 'What it does', text: 'Stems & Tracks: stems side by side on the controller columns, played against a '
+  { heading: 'What it does', text: 'Stems: stems side by side on the controller columns, played against a '
     + 'context track, to find the stem that fits; a project made from a track, and a project written back as a track.' },
   { heading: 'Input', text: 'A project from the list (sc/lab/stems/<name>.stemlab.json): its columns on '
     + 'their slots, and the context track that plays the rest. New from track starts from a stem track instead.' },

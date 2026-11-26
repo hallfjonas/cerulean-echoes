@@ -12,6 +12,9 @@ const SHOWN_CHOICES = [1, 2, 4, 8, 16, 32]
 const VIEWS = [['stems', 'Stems'], ['crowd', 'Crowding'], ['free', 'Free space']]
 const TICKS = [50, 100, 200, 500, 1000, 2000, 5000, 10000]
 const MARGIN = { left: 40, right: 36, top: 4, bottom: 38 }
+const PALETTE = ['#AFA9EC', '#5DCAA5', '#F0997B', '#ED93B1', '#B4B2A9', '#85B7EB', '#97C459', '#EF9F27', '#F09595',
+  '#7F77DD', '#1D9E75', '#D85A30', '#D4537E', '#888780', '#378ADD', '#639922', '#BA7517', '#E24B4A',
+  '#534AB7', '#0F6E56', '#993C1D', '#993556', '#5F5E5A', '#185FA5', '#3B6D11', '#854F0B', '#A32D2D']
 
 const hzText = hz => hz >= 1000 ? `${(hz / 1000).toFixed(hz >= 10000 ? 0 : 1)}k` : String(Math.round(hz))
 const bandOfHz = hz => (BANDS - 1) * Math.log(hz / bandHz(0)) / Math.log(bandHz(BANDS - 1) / bandHz(0))
@@ -78,6 +81,48 @@ export function mountSpaceLab({ section, stage }) {
     stem.dot.title = state === 'error' ? stem.error : { ready: 'Rendered', stale: 'Needs a render', rendering: 'Rendering …' }[state]
   }
 
+  const palette = document.createElement('div')
+  palette.className = 'space-colors'
+  palette.hidden = true
+  palette.innerHTML = PALETTE.map(color => `<button type="button" data-color="${color}" style="background:${color}" aria-label="${color}"></button>`).join('') +
+    '<input data-field="hex" maxlength="7" placeholder="#rrggbb" aria-label="Hex colour">'
+  section.append(palette)
+  let picking = null
+
+  const closeColors = () => { palette.hidden = true; picking = null }
+
+  const openColors = (stem, anchor) => {
+    if (picking?.stem === stem) return closeColors()
+    picking = { stem, anchor }
+    field(palette, 'hex').value = stem.color
+    palette.hidden = false
+    const rect = anchor.getBoundingClientRect()
+    const { offsetWidth, offsetHeight } = palette
+    palette.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - offsetWidth - 8))}px`
+    palette.style.top = `${rect.bottom + 4 + offsetHeight > innerHeight ? Math.max(8, rect.top - offsetHeight - 4) : rect.bottom + 4}px`
+  }
+
+  const setColor = color => {
+    if (!picking) return
+    picking.stem.color = color
+    picking.anchor.style.background = color
+    saveColors(info.track, stems)
+    draw()
+  }
+
+  palette.onclick = event => {
+    const color = event.target.dataset?.color
+    if (color) { setColor(color); closeColors() }
+  }
+  field(palette, 'hex').onchange = event => {
+    if (/^#[0-9a-f]{6}$/i.test(event.target.value)) setColor(event.target.value.toLowerCase())
+  }
+  document.addEventListener('pointerdown', event => {
+    if (!palette.hidden && !palette.contains(event.target) && event.target !== picking?.anchor) closeColors()
+  })
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeColors() })
+  document.addEventListener('scroll', closeColors, true)
+
   const buildRows = () => {
     const container = side('stems')
     container.replaceChildren()
@@ -91,7 +136,7 @@ export function mountSpaceLab({ section, stage }) {
       const knob = key => `<label>${escapeHtml(stem.controls[key])} <output></output>` +
         `<input type="range" min="0" max="1" step="0.01" value="${stem.setting[key]}" data-setting="${key}"></label>`
       row.innerHTML = `<input type="checkbox" checked aria-label="Include ${escapeHtml(stem.name)}">` +
-        `<input type="color" value="${stem.color}" aria-label="Colour of ${escapeHtml(stem.name)}">` +
+        `<button type="button" class="space-swatch" style="background:${stem.color}" aria-label="Colour of ${escapeHtml(stem.name)}"></button>` +
         `<span class="space-name"><i class="space-dot"></i>${escapeHtml(stem.name)} <small>${stem.slot}</small></span>` +
         `<select aria-label="Pattern of ${escapeHtml(stem.name)}">${stem.patterns.map((label, i) => option(i, escapeHtml(label))).join('')}</select>` +
         `<details><summary>Settings</summary>${['k1', 'k2', 'k3'].map(knob).join('')}` +
@@ -99,7 +144,7 @@ export function mountSpaceLab({ section, stage }) {
       stem.dot = row.querySelector('.space-dot')
       const [include, color, , pattern] = row.children
       include.onchange = () => { stem.on = include.checked; draw() }
-      color.oninput = () => { stem.color = color.value; saveColors(info.track, stems); draw() }
+      color.onclick = () => openColors(stem, color)
       pattern.onchange = () => { stem.setting.pattern = Number(pattern.value); change(stem) }
       for (const input of row.querySelectorAll('[data-setting]')) {
         const text = input.parentElement.querySelector('output')

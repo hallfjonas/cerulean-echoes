@@ -1,4 +1,4 @@
-// The player's Stems & Tracks section (sidebar, Labs / Stems & Tracks). With a Stem Designer project picked: Load plays
+// The player's Stems section (sidebar, Labs / Stems). With a Stem Designer project picked: Load plays
 // it from its file (as Play); Save writes the selected column into it; Save as copies it under a new name; Export track
 // writes it as a stem track (sc/tracks/, the Live page lists it). New from track makes a project of a stem track's
 // stems, each one in the lab (a column), in the backing (plays along) or off, and opens it. Add, Replace, Remove,
@@ -9,7 +9,7 @@ import { askText, toast } from './toast.mjs'
 const CHOICES = [['lab', 'Lab'], ['backing', 'Backing'], ['off', 'Off']]
 
 export const mountStemLab = ({ section, selected, play, refresh }) => {
-  section.innerHTML = '<h2>Stems &amp; Tracks</h2>' +
+  section.innerHTML = '<h2>Stems</h2>' +
     '<div data-part="project"><div class="row">' +
     iconButton('load', 'Load', ICONS.load) + iconButton('save', 'Save', ICONS.save) +
     iconButton('saveAs', 'Save as', ICONS.saveAs) + iconButton('exportTrack', 'Export track', ICONS.export) +

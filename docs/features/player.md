@@ -26,7 +26,7 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 4. Play with the [controllers](controllers.md). A control you have not moved reads 0.
 
 The sidebar shows only what the page needs. **Live**: the live track list, Play / Pause, Stop, Record and
-Auto-perform. **Labs** (Samples, Stems & Tracks): the project list, Play / Pause, Stop and the designer buttons; the waveform
+Auto-perform. **Labs** (Samples, Stems): the project list, Play / Pause, Stop and the designer buttons; the waveform
 analysis shows under the controllers on Samples only. **Labs / Space** has its own sidebar and map (see the
 [space analyzer](space-analyzer.md)). **Visuals**: Stop. Switching pages keeps the sound playing; a page
 has its own address (`#live`, `#labs/samples`, `#labs/stems`, `#labs/space`, `#labs/sets`, `#visuals`). The gear next to

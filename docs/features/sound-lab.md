@@ -31,8 +31,8 @@ The old Strudel lab boards were retired ([Lab boards](lab-boards.md)); new sound
 4. **Revert** puts the file's stems back. **Save as** writes the swaps as a new track (`009-house-v2`); the original
    file never changes.
 
-### Stem Designer (Labs / Stems & Tracks)
-1. On the **Labs** page, tab **Stems & Tracks**, pick `Stems: flute-explore` and press **Load**. The columns of the project play on their slots; the
+### Stem Designer (Labs / Stems)
+1. On the **Labs** page, tab **Stems**, pick `Stems: flute-explore` and press **Load**. The columns of the project play on their slots; the
    backing stems of the context track (`009-house`: kick, sub, bass) play along without a controller.
 2. Turn the knobs of any column. The column you moved last is the selection (the panel header names it). The global
    fader sets a volume: button 1 of column 8 (the same in both modes) cycles it between **Stems** (the columns)

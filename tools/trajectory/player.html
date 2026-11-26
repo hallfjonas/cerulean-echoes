@@ -52,11 +52,17 @@
   #sidebar #stemLab details > summary::before { content: '+ ' }
   #sidebar #stemLab details[open] > summary::before { content: '– ' }
   #stemLab [data-part=project] .row { margin-top: 0 }
-  #spaceLab .space-stem { display: grid; grid-template-columns: 18px 24px minmax(0, 1fr) 96px; gap: 6px; align-items: center;
+  body.space { --side: 248px }
+  #spaceLab .space-stem { display: grid; grid-template-columns: 18px 24px minmax(0, 1fr); gap: 6px; align-items: center;
     padding: 6px 0; border-top: 1px solid var(--line); font-size: 12px }
-  #spaceLab .space-stem input[type=color] { width: 24px; height: 22px; padding: 0; border: 0; background: none }
-  #spaceLab .space-stem select { min-width: 0; width: 100% }
-  #spaceLab .space-stem details { grid-column: 1 / 5; margin-top: 2px }
+  #spaceLab .space-swatch { width: 24px; height: 22px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius) }
+  .space-colors { position: fixed; z-index: 20; display: grid; grid-template-columns: repeat(9, 22px); gap: 4px; padding: 8px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); text-transform: none }
+  .space-colors[hidden] { display: none }
+  .space-colors button { width: 22px; height: 22px; padding: 0; border: 1px solid var(--line); border-radius: 4px }
+  .space-colors input { grid-column: 1 / -1; width: 100%; box-sizing: border-box }
+  #spaceLab .space-stem select { grid-column: 3; min-width: 0; width: 100% }
+  #spaceLab .space-stem details { grid-column: 1 / -1; margin-top: 2px }
   #spaceLab .space-stem summary { margin: 0; font-size: 11px; color: var(--dim); cursor: pointer }
   #spaceLab .space-stem details label { margin: 6px 0 0 }
   #spaceLab .space-name small { color: var(--dim) }
@@ -133,8 +139,8 @@
   #recMeter span { display: block; height: 100%; width: 0; background: var(--rec) }
   #recError { color: var(--err); font-size: 12px }
   .off-page { display: none !important }
-  #sidebar nav#subnav { display: flex; flex-direction: row; gap: 2px; margin: 0 0 14px }
-  #sidebar nav#subnav a { flex: 1; text-align: center }
+  #sidebar nav#subnav { display: grid; grid-template-columns: repeat(2, minmax(max-content, 1fr)); gap: 2px; margin: 0 0 14px }
+  #sidebar nav#subnav a { text-align: center }
   #sidebar nav#subnav a.here { background: var(--control) }
   #placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim) }
   #placeholder[hidden] { display: none }

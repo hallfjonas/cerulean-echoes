@@ -1,10 +1,10 @@
-// The pages of the player: Live, Labs (Samples, Stems & Tracks, Space, Sets) and Visuals. DOM-free: which catalogue
+// The pages of the player: Live, Labs (Samples, Stems, Space, Sets) and Visuals. DOM-free: which catalogue
 // entries a page offers, which sidebar sections it shows and how a page is written in the URL hash.
 export const PAGES = [
   { id: 'live', label: 'Live', subs: [] },
   { id: 'labs', label: 'Labs', subs: [
     { id: 'samples', label: 'Samples' },
-    { id: 'stems', label: 'Stems & Tracks' },
+    { id: 'stems', label: 'Stems' },
     { id: 'space', label: 'Space' },
     { id: 'sets', label: 'Sets', placeholder: 'Set Designer: planned (.claude/epics/set-designer).' }] },
   { id: 'visuals', label: 'Visuals', subs: [] },
