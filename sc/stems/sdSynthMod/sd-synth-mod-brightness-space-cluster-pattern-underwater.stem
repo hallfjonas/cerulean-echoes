@@ -1,0 +1,84 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-cluster-pattern-underwater",
+  "parent": null,
+  "about": "Water drops scattered wide and close, bars 3 and 7.",
+  "meta": {
+    "role": "fx",
+    "label": "Drops",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "drops",
+      "water",
+      "bubbles",
+      "wide"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "lsd-drops.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Drip"
+    },
+    {
+      "label": "Trickle"
+    },
+    {
+      "label": "Splash"
+    },
+    {
+      "label": "Pair"
+    },
+    {
+      "label": "Off-beats"
+    },
+    {
+      "label": "Falling"
+    },
+    {
+      "label": "Rising"
+    },
+    {
+      "label": "Random"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Cluster",
+      "about": "single drops ↔ up to six more around the figure."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "water drops in bars 3 and 7 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 drop figures; the last is new each phrase."
+    },
+    "b2": {
+      "label": "Underwater",
+      "about": "drops every bar, two octaves down, muffled, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.85
+}

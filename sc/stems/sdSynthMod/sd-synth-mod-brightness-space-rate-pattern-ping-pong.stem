@@ -1,0 +1,84 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-rate-pattern-ping-pong",
+  "parent": null,
+  "about": "Laser zaps on the left, once per 8-bar phrase.",
+  "meta": {
+    "role": "fx",
+    "label": "Zaps",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "laser",
+      "zap",
+      "sci-fi",
+      "left"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 3,
+  "code": "lsd-zap.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Pew"
+    },
+    {
+      "label": "Zip"
+    },
+    {
+      "label": "Pew pew"
+    },
+    {
+      "label": "Triplet"
+    },
+    {
+      "label": "Bounce"
+    },
+    {
+      "label": "Dive"
+    },
+    {
+      "label": "Chirp"
+    },
+    {
+      "label": "Random"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Rate",
+      "about": "one figure per phrase ↔ four, in bars 2, 6, 4, 8."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "laser zaps, left, in bar 2 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 zap figures; the last is new each phrase."
+    },
+    "b2": {
+      "label": "Ping-pong",
+      "about": "zaps every bar, echoing right ↔ left, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.95
+}

@@ -47,7 +47,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
 ## Live tracks (SuperCollider)
-All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3),
+All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3, 017-lsd-fx),
 every controller optional. Edit the `.scd`; a new version goes into a new folder (e.g. `009-house-2`).
 - Rows and columns: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour (CC + 48) on columns 1-7, column 8 global on
   both. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0 must already sound good.

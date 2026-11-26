@@ -1,0 +1,87 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-weight-pattern-reverse",
+  "parent": null,
+  "about": "Metal hits on the right, far away, in bar 5.",
+  "meta": {
+    "role": "fx",
+    "label": "Metal",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "metal",
+      "clank",
+      "gong",
+      "right"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleMod",
+    "extra": [
+      "sdSynthMod"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-metal.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Clank"
+    },
+    {
+      "label": "Ting"
+    },
+    {
+      "label": "Gong"
+    },
+    {
+      "label": "Scrape"
+    },
+    {
+      "label": "Chain"
+    },
+    {
+      "label": "Crash swell"
+    },
+    {
+      "label": "Anvil"
+    },
+    {
+      "label": "Random"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Weight",
+      "about": "light ting ↔ heavy clang over a low gong."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "metal hits, right and far, in bar 5 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 metal figures; the last is new each phrase."
+    },
+    "b2": {
+      "label": "Reverse",
+      "about": "the figure every bar, backwards, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1.0
+}
