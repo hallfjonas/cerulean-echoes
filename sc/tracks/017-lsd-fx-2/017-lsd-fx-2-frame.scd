@@ -67,10 +67,11 @@ stems: [
 			(name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.4), (name: \braaam, orbit: 1, level: 1.0, roomR: 0.9),
 			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
+// the Launchkey's start values: keys at a third, dark, a little piano and organ, short notes, some room, full echo
+lkStart: (1: 0.34, 21: 0.15, 22: 0.32, 23: 0.18, 25: 0.29, 26: 0.42, 27: 1),
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these), the same as 008's. Mod wheel (CC 1) = keys level,
 // knobs CC 21-28: 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 one-shot darkness.
 lkCtl: { |ce, num, v, send|
-	if(num == 22) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
 	switch(num,
 		1, { ce.setState(\lkLevel, v, send) },
 		21, { ce.setState(\lkBright, v, send) },
@@ -81,7 +82,7 @@ lkNote: { |ce, note, vel, chan|
 	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(5));   // note length in bars
 	var tone = ("c" ++ ce.toneBus).asSymbol, thin = ("c" ++ ce.thinBus).asSymbol;
 	if(chan != 9) {
-		ce.lkKeysNotes(note, vel, [if(ce.lkTurned2 == true) { k.(2) } { 0.5 }, k.(3), k.(4)],
+		ce.lkKeysNotes(note, vel, [k.(2), k.(3), k.(4)],
 			(hold: nl * 16, lane: \keys, tone: tone, bright: ce.stateMap(\lkBright), thinF: thin))
 	} {
 		// drum pads 36-51 (Drum mode): the spoken samples (left half), drum one-shots, a synth drop hit, Dirt-Samples
