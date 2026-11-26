@@ -1,9 +1,9 @@
 // The "About this page" text of every player page, by page key (pages.mjs pageKey): Live, Labs / Samples,
-// Labs / Stems & Tracks, the planned Labs page and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
+// Labs / Stems, Labs / Space, the planned Labs page and Visuals. DOM-free: a section is { heading, text } as help.mjs shows it.
 const LIVE = [
   { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
-    + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample Designer and Stems & '
-    + 'Tracks (Sets is planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
+    + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample Designer, Stems & '
+    + 'Tracks and Space (Sets is planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
     + 'only what the page needs. No strudel.cc needed.' },
   { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
@@ -50,7 +50,7 @@ const SAMPLES = [
 ]
 
 const STEMS = [
-  { heading: 'What it does', text: 'Stems & Tracks: stems side by side on the controller columns, played against a '
+  { heading: 'What it does', text: 'Stems: stems side by side on the controller columns, played against a '
     + 'context track, to find the stem that fits; a project made from a track, and a project written back as a track.' },
   { heading: 'Input', text: 'A project from the list (sc/lab/stems/<name>.stemlab.json): its columns on '
     + 'their slots, and the context track that plays the rest. New from track starts from a stem track instead.' },
@@ -85,6 +85,26 @@ const STEMS = [
     + 'the library already has nothing to export: the symbol is grayed out.' }
 ]
 
+const SPACE = [
+  { heading: 'What it does', text: 'Shows where a stem track\'s sound space is free and where it is crowded: time '
+    + 'runs left to right, frequency bottom to top, and every cell shows which stems are there.' },
+  { heading: 'Input', text: 'A stem track and a setting for each of its stems (pattern, three knobs, level). Every '
+    + 'stem is rendered alone in SuperCollider for the chosen number of bars.' },
+  { heading: 'Output', text: 'The map and its numbers. Renders are kept in recordings/space/ (outside git): a stem '
+    + 'whose setting did not change is not rendered again.' },
+  { heading: 'How to use', text: ['Pick a track and a render length, then press Analyse. The first run renders every stem '
+    + '(a few seconds each); later runs only the stems you changed.',
+    'The tick box includes a stem in the map, the colour swatch sets its colour; neither renders anything.',
+    'Settings (pattern, knobs, level) change the stem\'s sound: its dot turns to "needs a render", Analyse renders it again.',
+    'Stems colours each cell by its loudest stem; Crowding counts the stems per cell; Free space shows only the gaps.',
+    'Cell size runs from 1/32 of a bar to a whole bar; Bars shown and From bar pick the window.',
+    '"Active within" decides how far below the loudest sound a stem still counts as there.',
+    'The strip on the right shows how much of the time each frequency band is used, the strip below how much of the '
+    + 'spectrum each cell uses. Hover the map for the stems in a cell.'] },
+  { heading: 'Good to know', text: 'Low notes below about 100 Hz are smeared over roughly 85 ms, longer than a 1/32 '
+    + 'cell: use 1/16 or coarser to judge the bass. Each cell is the loudest part of a band, not an average.' }
+]
+
 const PLANNED = [
   { heading: 'What it does', text: 'Planned: this designer is not built yet. The Labs menu keeps its place.' }
 ]
@@ -96,6 +116,6 @@ const VISUALS = [
     'S hides the sidebar, F is fullscreen.'] }
 ]
 
-const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/sets': PLANNED, visuals: VISUALS }
+const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/space': SPACE, 'labs/sets': PLANNED, visuals: VISUALS }
 
 export const helpFor = key => BY_PAGE[key] ?? LIVE

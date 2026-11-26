@@ -27,6 +27,17 @@ export function hitProject(project) {
 }
 
 export function readWav(buffer) {
+  const { channels, sampleRate } = readWavChannels(buffer)
+  const samples = new Float32Array(channels[0].length)
+  for (let i = 0; i < samples.length; i++) {
+    let sum = 0
+    for (const channel of channels) sum += channel[i]
+    samples[i] = sum / channels.length
+  }
+  return { samples, sampleRate }
+}
+
+export function readWavChannels(buffer) {
   if (buffer.toString('ascii', 0, 4) !== 'RIFF' || buffer.toString('ascii', 8, 12) !== 'WAVE') {
     throw new Error('not a WAV file')
   }
@@ -50,13 +61,11 @@ export function readWav(buffer) {
           : bits === 24 ? (o => buffer.readIntLE(o, 3) / 8388608)
             : bits === 32 ? (o => buffer.readInt32LE(o) / 2147483648) : null
       if (!read) throw new Error(`WAV: ${bits}-bit format ${code} not supported`)
-      const samples = new Float32Array(frames)
+      const data = Array.from({ length: channels }, () => new Float32Array(frames))
       for (let i = 0; i < frames; i++) {
-        let sum = 0
-        for (let c = 0; c < channels; c++) sum += read(body + (i * channels + c) * width)
-        samples[i] = sum / channels
+        for (let c = 0; c < channels; c++) data[c][i] = read(body + (i * channels + c) * width)
       }
-      return { samples, sampleRate }
+      return { channels: data, sampleRate }
     }
     at = body + size + (size % 2)
   }
@@ -88,7 +97,7 @@ export async function renderHit(name, { values = null, sclang, root = repoRoot }
   }
 }
 
-function fft(re, im) {
+export function fft(re, im) {
   const n = re.length
   for (let i = 1, j = 0; i < n; i++) {
     let bit = n >> 1
@@ -110,7 +119,7 @@ function fft(re, im) {
   }
 }
 
-function magnitudes(samples, from, size) {
+export function magnitudes(samples, from, size) {
   const re = new Float64Array(size), im = new Float64Array(size)
   for (let i = 0; i < size; i++) {
     const x = samples[from + i] ?? 0
@@ -122,11 +131,11 @@ function magnitudes(samples, from, size) {
   return out
 }
 
-const logPoints = (count, lo = 20, hi = 20000) =>
+export const logPoints = (count, lo = 20, hi = 20000) =>
   Array.from({ length: count }, (_, i) => lo * (hi / lo) ** (i / (count - 1)))
 
 // highest magnitude between neighbouring log points: thin peaks stay visible on a log axis
-const onLogAxis = (mags, binHz, points) => points.map((hz, i) => {
+export const onLogAxis = (mags, binHz, points) => points.map((hz, i) => {
   const lo = Math.max(1, Math.floor((i ? Math.sqrt(points[i - 1] * hz) : hz) / binHz))
   const hi = Math.min(mags.length - 1, Math.max(lo, Math.ceil((i < points.length - 1 ? Math.sqrt(points[i + 1] * hz) : hz) / binHz)))
   let max = 0

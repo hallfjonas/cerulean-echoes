@@ -18,6 +18,7 @@
 //                    started on the first SC load and ended with this server
 //   /lab/sample/…    Sample Designer projects: save, save as, export (see sample-lab.mjs)
 //   /lab/stems/…     Stem Designer projects: save, save as, add, replace, remove, promote, knob (see stem-lab.mjs)
+//   /lab/space/…     Space Analyzer: stem tracks, one stem rendered alone and measured per band and time cell (see space-lab.mjs)
 //   GET /sound-params?sample=<name>, GET /knobs   the parameters a knob can drive on that sound, the knob presets
 // strudel.cc is a public https page; Chrome lets it reach localhost only with the CORS and private-network headers.
 import crypto from 'crypto'
@@ -32,6 +33,7 @@ import { handleRecording, useScLink } from './recording.mjs'
 import { createScLink } from './sc-link.mjs'
 import { createSampleLab } from './sample-lab.mjs'
 import { createStemLab } from './stem-lab.mjs'
+import { createSpaceLab } from './space-lab.mjs'
 import { repo } from './catalogue.mjs'
 import { stemIndex } from '../stems/stem-index.mjs'
 import { knobPresets, soundParams } from '../stems/knob.mjs'
@@ -51,6 +53,7 @@ const clients = new Set()
 let received = 0
 const sampleLab = createSampleLab({ getSc: () => sc })
 const stemLab = createStemLab({ getSc: () => sc })
+const spaceLab = createSpaceLab()
 const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
   resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null },
   onLoaded: (id, slots) => swaps.loaded(id, slots) })
@@ -79,6 +82,7 @@ const server = http.createServer((request, response) => {
   if (['/swap', '/swap/revert', '/track/save-as'].includes(url.pathname)) return swaps.handle(request, response, url, fromOwnPage)
   if (url.pathname.startsWith('/lab/sample/')) return sampleLab.handle(request, response, url, fromOwnPage)
   if (url.pathname.startsWith('/lab/stems/')) return stemLab.handle(request, response, url, fromOwnPage)
+  if (url.pathname.startsWith('/lab/space/')) return spaceLab.handle(request, response, url, fromOwnPage)
   if (request.method === 'OPTIONS') return response.writeHead(204, CORS).end()
   if (request.method === 'POST' && url.pathname === '/events') {
     let body = ''
