@@ -1,0 +1,92 @@
+{
+  "format": 2,
+  "name": "sd-noise-brightness-space-complexity-pattern-riser-6",
+  "parent": "sdNoise/sd-noise-brightness-space-complexity-pattern-riser-5.stem",
+  "about": "Swirling risers and tails; 8 phrase and tail choices.",
+  "meta": {
+    "role": "fx",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "riser",
+      "tail",
+      "siren",
+      "bell",
+      "dive"
+    ],
+    "harmony": "none",
+    "label": "Risers"
+  },
+  "sample": {
+    "name": "sdNoise",
+    "extra": [
+      "sdSynthMod",
+      "modalPerc"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-fx-random.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Random"
+    },
+    {
+      "label": "8 bar"
+    },
+    {
+      "label": "16 bar"
+    },
+    {
+      "label": "4 bar"
+    },
+    {
+      "label": "Boom"
+    },
+    {
+      "label": "Laser"
+    },
+    {
+      "label": "Bell"
+    },
+    {
+      "label": "Dive"
+    },
+    {
+      "label": "Turn"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "riser + tail ↔ + saw ↔ + mid sweep ↔ + dub siren."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "risers and tails at the phrase changes."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "a random phrase every 16 bars, then the eight in turn."
+    },
+    "b2": {
+      "label": "Riser",
+      "about": "a riser by hand, over 4 bars while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.4
+}

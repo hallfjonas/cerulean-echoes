@@ -62,6 +62,9 @@
 	(track.states ? ()).keysValuesDo { |name, v0|
 		var bus = ctl.(); self.stateBus[name] = bus; self.stateVal[name] = v0; msgs.add([\c_set, bus, v0]) };
 	self.stateMap = { |self, name| ("c" ++ self.stateBus[name]).asSymbol };
+	// the Launchkey's start values (track.lkStart: (cc: value), mod wheel 1, knobs 21-28): set as if moved, so the track's
+	// lkCtl derives its state buses; a load's own values (an auto-perform script's bar 0) come after
+	(track[\lkStart] ? ()).keysValuesDo { |n, v| self.setLkCC(n, v, { |m| msgs.add(m) }) };
 	self.mapBus = ();
 	(track.maps ? ()).keysValuesDo { |name, m|
 		var bus = ctl.(), def = SynthDef(("ce_map_" ++ name).asSymbol, { |out|

@@ -51,7 +51,8 @@
 	var track = (
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
 		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
-		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkPadNames: frame[\lkPadNames],
+		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkStart: frame[\lkStart],
+		lkPadNames: frame[\lkPadNames],
 		global: frame[\global] ?? { if(frame[\masterless] == true) { (fog: glob.fog, thin: glob.thin, tension: glob.tension) } {
 			(fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master) } },
 		tensionEchoAmt: frame[\tensionEchoAmt], tensionRoomAmt: frame[\tensionRoomAmt],

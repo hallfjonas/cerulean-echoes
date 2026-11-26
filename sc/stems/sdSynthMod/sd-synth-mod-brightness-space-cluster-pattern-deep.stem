@@ -1,0 +1,88 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-cluster-pattern-deep",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-cluster-pattern-underwater.stem",
+  "about": "Distant drops, glass and bells off the grid, bars 3 and 7.",
+  "meta": {
+    "role": "fx",
+    "label": "Drops",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "drops",
+      "glass",
+      "bell",
+      "mysterious",
+      "wide"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "modalPerc"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "lsd-drops-2.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Random"
+    },
+    {
+      "label": "Cave"
+    },
+    {
+      "label": "Glass"
+    },
+    {
+      "label": "Bell"
+    },
+    {
+      "label": "Swell"
+    },
+    {
+      "label": "Spark"
+    },
+    {
+      "label": "Drift"
+    },
+    {
+      "label": "Well"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Cluster",
+      "about": "single drops ↔ up to six more around the figure."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "distant drops in bars 3 and 7 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "a random figure each phrase, then the seven in turn."
+    },
+    "b2": {
+      "label": "Deep",
+      "about": "drops every bar, two octaves down, muffled, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.85
+}

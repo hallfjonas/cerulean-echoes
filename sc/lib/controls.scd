@@ -192,7 +192,7 @@
 	self.uiSend('/ce/lknote', note, chan);
 	self.playNow(notes, self.stemBus[\lk], self.groups.src, \lk)
 };
-// Notes as the tracks make them (ce.note …, \lane, \hold in 16ths, \msg entries), started immediately
+// Notes as the tracks make them (ce.note …, \lane, \hold and \at in 16ths, \msg entries), started at once (\at: later)
 ~ce.playNow = { |self, notes, lanes, group, stem|
 	var bps = TempoClock.default.tempo, srv = self.server;
 	// returns the node ids of the started synths; the fader at this moment (noteLevel), a note at level 0 is not played
@@ -202,7 +202,8 @@
 			var desc = SynthDescLib.global[n[\instrument]], args = List[], id = srv.nextNodeID;
 			var e = n.copy.putAll((out: lanes[n[\lane] ? \main], hold: (n[\hold] ? 1) / 4 / bps, post: (n[\post] ? 1) * lv));
 			desc !? { desc.controlNames.do { |k| e[k] !? { |v| args.add(k).add(v) } } };
-			srv.sendMsg(\s_new, n[\instrument], id, 0, group.asNodeID, *args);
+			if((n[\at] ? 0) > 0) { srv.sendBundle(n[\at] / 4 / bps, [\s_new, n[\instrument], id, 0, group.asNodeID] ++ args.asArray) }
+				{ srv.sendMsg(\s_new, n[\instrument], id, 0, group.asNodeID, *args) };
 			id
 		} }
 	}.reject(_.isNil)
