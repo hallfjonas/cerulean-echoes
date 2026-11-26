@@ -173,15 +173,21 @@ can be tried without hardware. It is open loop: the script does not listen to wh
 
 ### Recording audio
 
-**Record** (button in the sidebar, key **R**) writes what you hear, the master output, as a WAV file.
+**Record** (button in the sidebar, key **R**) is a switch, always clickable (`record-arm.mjs`): while it is on, whatever
+plays is written as a WAV file of the master output. White = off; steady red = on, nothing plays; pulsing red and white
+= a file is being written.
 
-- Human recording: from Record to a second press of Record (or Stop, or another track). Auto-perform with **Record audio** ticked
-  records from Start to the end of the script plus 4 s; Stop, another track or a new Start ends it earlier.
+- Human recording: from Play to Stop (or another track, or switching Record off). Stop leaves the switch on, so the next
+  Play records again. Auto-perform with **Record audio** ticked, or with the switch on, records from Start to the end of
+  the script plus 4 s (then a human recording continues if the track still plays); Stop, another track or a new Start
+  ends it earlier. A failed start (SuperCollider down, disk full) switches Record off and shows the error.
 - Files: `recordings/<track>/<YYYY-MM-DD>-<HHMMSS>-<human|auto>.wav` (16-bit PCM, stereo, the audio context's sample
   rate, 48 kHz in Chrome) and a `.json` sidecar of the same name (track, track hash, script, take, start cycle, cps,
   sample rate, length, how it ended). `recordings/` is outside git. The server makes every name; the page sends only
   the track id and the source. Recording is refused below 2 GB of free disk.
-- How: the engine wraps `AudioNode.prototype.connect` so that everything that connects to the context's destination
+- How, SuperCollider tracks: SC writes the WAV itself (DiskOut, `sc/engine.scd`), started and stopped over OSC; the page
+  only starts and finishes it (`recorder-sc.mjs`) and takes the level meter from SC.
+- How, Strudel tracks: the engine wraps `AudioNode.prototype.connect` so that everything that connects to the context's destination
   goes through one master bus that also feeds the recorder worklet (`recorder-worklet.js`, `recorder.mjs`). The
   worklet streams 1 s chunks to `PUT /recording/<track>/<name>` (`recording.mjs`); the file and the sidecar are
   rewritten after every chunk, so a crash leaves a valid file. Closing the tab ends the recording with `endedBy:
@@ -291,6 +297,7 @@ it was retired on 2026-11-20):
 | `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the sidebar section |
 | `take.mjs`, `take-save.mjs` | the capture of a play's MIDI input and its conversion to a take script; `POST /take/<track>` writes the take and its events |
 | `recorder.mjs`, `recorder-worklet.js`, `recording.mjs` | the audio recorder in the page (master bus tap, PCM worklet) and the server side that writes the WAV and sidecar |
+| `record-arm.mjs` | the rules of the Record switch: when to start or stop recording, how the button looks |
 | `replay-check.mjs`, `check-replay.mjs` | replay fidelity: the pure event comparison and its CLI |
 | `check-recording.mjs` | end-to-end test of the recording endpoints |
 | `settings.mjs` | every general setting as data, in groups; builds the Settings sections and the keys |

@@ -98,7 +98,10 @@
   #panelEmpty[hidden] { display: none }
   .icon.transport { background: var(--control); color: var(--fg) }
   .icon.transport:hover:not(:disabled) { background: var(--control-hi) }
-  #record.recording { background: var(--rec); color: #F1EFE8 }
+  #record.armed, #record.recording { background: var(--rec); color: var(--accent) }
+  #record.recording { animation: record-pulse 1.2s ease-in-out infinite }
+  @keyframes record-pulse { 50% { background: var(--accent); color: var(--rec) } }
+  @media (prefers-reduced-motion: reduce) { #record.recording { animation: none } }
   #recInfo { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-variant-numeric: tabular-nums }
   #recInfo[hidden] { display: none }
   #recMeter { width: 60px; height: 6px; background: var(--control); border-radius: 3px; overflow: hidden }
@@ -136,9 +139,10 @@
      script's bar 0 with the load, and the bar clock is SC's.
      Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); the setting "Save take on record stop" posts
      it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
-     Record (key R) writes the master output to recordings/<track>/ as a WAV (recorder.mjs; a SuperCollider track is written by SC itself, recorder-sc.mjs): a human recording runs
-     from Record to Stop; with "Record audio" ticked, auto-perform records from Start to the script's end plus a 4 s
-     tail. Stop, a track change or a new auto-perform run ends a recording.
+     Record (key R) is a switch (record-arm.mjs): on, it writes the master output to recordings/<track>/ as a WAV
+     (recorder.mjs; a SuperCollider track is written by SC itself, recorder-sc.mjs) whenever a track plays: a human
+     recording runs from Play to Stop; with "Record audio" ticked or the switch on, auto-perform records from Start to
+     the script's end plus a 4 s tail. Stop, a track change or switching off ends a recording; the switch stays on.
      The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window.
      Stem tracks: a click on a column's name in the Live panel selects the column (selection.mjs) and opens the stem
      drawer (stem-drawer.mjs): swap the column's stem, Revert, Save as (a new track file; stem-swap.mjs). -->
@@ -227,6 +231,7 @@ import { createRecorder } from './take.mjs'
 import { createScAuto, createScTap } from './sc-auto.mjs'
 import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createScRecorder } from './recorder-sc.mjs'
+import { recordAction, recordButtonState } from './record-arm.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
 import { mountStemDrawer } from './stem-drawer.mjs'
 import { mountKnobEditor } from './knob-editor.mjs'
@@ -363,11 +368,13 @@ $('track').onchange = () => {
 
 const TAIL_SECONDS = 4
 let recordQueue = Promise.resolve(), recordError = '', lastFile = '', autoRecording = false, tailTimer = null
+let recordArmed = false
 let performing = null
 let transport = 'stopped'
 const queueRecord = task => (recordQueue = recordQueue.then(task))
 const onAudioError = error => {
   recordError = error.message
+  recordArmed = false
   stopRecording()
 }
 // Strudel records in this page (recorder.mjs); SuperCollider writes its own WAV (recorder-sc.mjs): `audio` is the one in use
@@ -387,6 +394,7 @@ const startRecording = (source, script = null) => queueRecord(async () => {
     autoRecording = source === 'auto'
   } catch (error) {
     recordError = error.message
+    recordArmed = false
   }
 })
 const stopRecording = (endedBy = 'stop') => {
@@ -405,14 +413,22 @@ const stopRecording = (endedBy = 'stop') => {
     }
   })
 }
-const toggleRecord = () => audio.recording ? stopRecording() : startRecording(performing ? 'auto' : 'human', performing)
+const reconcileRecording = () => {
+  const action = recordAction({ armed: recordArmed, transport, recording: audio.recording })
+  if (action === 'start') startRecording(performing ? 'auto' : 'human', performing)
+  else if (action === 'stop') stopRecording()
+}
+const toggleRecord = () => {
+  recordArmed = !recordArmed
+  reconcileRecording()
+}
 $('record').onclick = toggleRecord
 
 let running = false, stoppedByPage = false
 const performer = createPerformer({ midi: autoOutput, engine, onChange: progress => {
   if (!progress && running && autoRecording) {
     if (stoppedByPage) stopRecording()
-    else tailTimer = setTimeout(() => stopRecording('script-end'), TAIL_SECONDS * 1000)
+    else tailTimer = setTimeout(() => stopRecording('script-end').then(reconcileRecording), TAIL_SECONDS * 1000)
   }
   running = !!progress
   performing = progress ? performing : null
@@ -488,11 +504,13 @@ const togglePlay = () => {
     strudelEngine.pause()
     transport = 'paused'
     label = 'paused'
+    reconcileRecording()
   } else if (transport === 'paused') {
     strudelEngine.resume()
     transport = 'playing'
     label = 'playing: ' + $('track').value
-  } else if (transport === 'stopped') play()
+    reconcileRecording()
+  } else if (transport === 'stopped') play().then(reconcileRecording)
 }
 $('play').onclick = togglePlay
 $('stop').onclick = stopTransport
@@ -510,7 +528,7 @@ const startScript = async id => {
   if (autoOut === scAuto) scAuto.hold()
   else midi.addAuto({ launchkey: usesLaunchkey(script) })
   performer.prime(script)
-  const recordAudio = $('recordAuto').checked
+  const recordAudio = $('recordAuto').checked || recordArmed
   if (recordAudio) await stopRecording()
   if (!await play(id)) return
   if (recordAudio) await startRecording('auto', id)
@@ -565,13 +583,20 @@ const showTransport = () => {
     button.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">${ICONS[state]}</svg>`
   }
   button.disabled = state === 'pause' && onSc()
-  $('record').disabled = onSc()
+}
+const RECORD_TITLES = {
+  off: 'Record: off. Switch on to record whenever a track plays (key R)',
+  armed: 'Record: on, waiting for Play. Switch off (key R)',
+  recording: 'Recording. Switch off to stop (key R)',
 }
 const showRecording = () => {
   const on = audio.recording
+  const state = recordButtonState({ armed: recordArmed, recording: on })
+  $('record').classList.toggle('armed', state === 'armed')
   $('record').classList.toggle('recording', on)
-  $('record').title = on ? 'Stop recording (key R)' : 'Record (key R)'
-  $('record').setAttribute('aria-label', on ? 'Stop recording' : 'Record')
+  $('record').title = RECORD_TITLES[state]
+  $('record').setAttribute('aria-label', 'Record')
+  $('record').setAttribute('aria-pressed', String(state !== 'off'))
   $('recInfo').hidden = !on
   setText($('recError'), recordError && 'Rec error: ' + recordError)
   if (on) {
