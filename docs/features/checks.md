@@ -31,8 +31,6 @@ Before you open a pull request, after you edit a track or an auto-perform script
 - The checks are feature tests: something plays, a value arrives, a file is written. They do not measure the sound
   and do not judge taste: listen in the [player](player.md).
 - Run one heavy check at a time (`npm test` starts SuperCollider); the laptop is shared.
-- `sc/samples/voice/david.flac` (the 007 voice) is too big for git. Without it, 007's "every sample file it loads
-  exists" check fails.
 
 ## Related
 - [Claude skills](claude-skills.md)

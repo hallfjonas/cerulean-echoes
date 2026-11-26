@@ -25,8 +25,7 @@ Add a sample with the Claude skill `add-sample` ([Claude skills](claude-skills.m
 - SuperCollider reads the files from your checkout: a new sample plays at once, no push needed.
 - New synth sounds and whole drum sounds come from the [sound lab](sound-lab.md) (Sample Designer).
 - Use only sounds you may use: own recordings, or CC0 and CC BY files with the credit in `sc/samples/CREDITS.md`.
-- No file over 10 MB goes into git. Keep samples small (trim silence, mono for voices). The 007 voice
-  (`sc/samples/voice/david.flac`, 44 MB) is the one exception and lives outside git.
+- No file over 10 MB goes into git. Keep samples small (trim silence, mono for voices).
 
 ## Related
 - [Controllers](controllers.md)

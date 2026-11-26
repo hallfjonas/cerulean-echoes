@@ -1,0 +1,87 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-static-pattern-tune",
+  "parent": null,
+  "about": "Morse code bleeps in the middle, in bar 6.",
+  "meta": {
+    "role": "fx",
+    "label": "Radio",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "radio",
+      "morse",
+      "bleeps",
+      "static"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod",
+    "extra": [
+      "sdNoise"
+    ]
+  },
+  "pitch": "none",
+  "orbit": 3,
+  "code": "lsd-radio.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "SOS"
+    },
+    {
+      "label": "CQ"
+    },
+    {
+      "label": "LSD"
+    },
+    {
+      "label": "QRZ"
+    },
+    {
+      "label": "ACID"
+    },
+    {
+      "label": "DUB"
+    },
+    {
+      "label": "FM"
+    },
+    {
+      "label": "Random"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Static",
+      "about": "clean bleeps ↔ crackle and hiss around them."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "a Morse word in bar 6 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 Morse words; the last is new each phrase."
+    },
+    "b2": {
+      "label": "Tune",
+      "about": "a whistle gliding like a shortwave dial, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.45
+}

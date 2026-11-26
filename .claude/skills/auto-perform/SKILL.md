@@ -78,7 +78,7 @@ Both approval lines in `feedback.md`, a Lessons section at the end, the task's b
 
 ## Lessons from 007-010
 - The length in minutes goes into the design; one stopwatch check against the top bar settles any doubt.
-- Ambient with a recording (007, David's voice, `sc/samples/voice/david.flac`, not in git): the recording is clock-locked (time in
+- Ambient with a recording (a spoken voice, not in any live track now): the recording is clock-locked (time in
   it = bar x seconds per bar), the Voice fader only reveals it. Size the piece to the recording, bring the music in
   already under the voice, keep a bed under it at the end. There is no transcript or speech-to-text: to cue a sound to a
   word, ask the user for the recording time.

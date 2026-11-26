@@ -47,7 +47,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
 ## Live tracks (SuperCollider)
-All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3),
+All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3, 017-lsd-fx),
 every controller optional. Edit the `.scd`; a new version goes into a new folder (e.g. `009-house-2`).
 - Rows and columns: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour (CC + 48) on columns 1-7, column 8 global on
   both. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0 must already sound good.
@@ -84,7 +84,7 @@ Tools (run in `tools/`):
 - Does every feature still work? `npm test` (player, takes, recording, launcher, producer, stems, sound lab, and SC:
   building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`).
   Runs in CI on every PR; the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output
-  identical", no sound measuring. `sc/samples/voice/david.flac` (44 MB) is not in git: 007's sample check fails without it.
+  identical", no sound measuring.
 - After editing an SC track or its perform scripts: `npm run verify-sc -- [<track.scd | .track> …]` (tags parse,
   perform scripts valid, the track loads and plays headless in `sclang`; stems and Sample Designer projects too; no
   args = every changed SC track). Scripts alone: `node trajectory/check-perform.mjs [<track file>]`.
