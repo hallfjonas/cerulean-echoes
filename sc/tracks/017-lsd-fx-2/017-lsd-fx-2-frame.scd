@@ -76,7 +76,7 @@ lkCtl: { |ce, num, v, send|
 		21, { ce.setState(\lkBright, v, send) })
 },
 lkNote: { |ce, note, vel, chan|
-	var k = { |n| ce.lkCC[20 + n] };
+	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(5));   // the Braaam's length in bars (knob 5)
 	var thin = ("c" ++ ce.thinBus).asSymbol;
 	if(chan != 9) {
 		var col = ce.track.columns['2:4'], tone = 2 ** (4 * (ce.stateVal[\lkBright] - 0.5));
