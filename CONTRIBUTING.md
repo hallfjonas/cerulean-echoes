@@ -24,13 +24,12 @@ tracks safe. For what the project does, start at [docs/README.md](docs/README.md
 
 - **Do not overwrite a track.** A new version goes into a new file. Replace an old one only when asked to.
 - **One file per live track.** Each live track lives in `sc/tracks/<id>/<id>.scd` (SuperCollider). Every controller
-  is optional. Edit that file, not a copy. The Strudel versions in `tracks/` are frozen: Strudel is deprecated
-  ([DEPRECATION.md](DEPRECATION.md)).
+  is optional. Edit that file, not a copy. Strudel is deprecated ([DEPRECATION.md](DEPRECATION.md)).
 - **Songs from Guitar Pro are generated** from their map file `<track>-map.json`. Change the map and run
   `npm run producer`, never the track. See [producer mode](docs/features/producer-mode.md).
 - **Ask before changing the sound.** Effects, reverb, delay, orbits, naming and the controller layout change how a
   track plays and feels. Discuss these first.
-- **Strudel strings** (producer songs, frozen files): use single quotes for plain text. Double quotes are read as
+- **Strudel strings** (producer songs): use single quotes for plain text. Double quotes are read as
   mini-notation.
 - **Boards and stems need rhythm**, not only held notes.
 
@@ -41,10 +40,8 @@ These files are generated. On a merge conflict take either side, then regenerate
 | Generated file | Regenerate with (in `tools/`) |
 |---|---|
 | a Guitar Pro song track and its perform script | `npm run producer` (edit the map, not the track) |
-| `midi-layouts/templates/dual-lc-test.strudel` | the editor hook, from `dual-lc.strudel` |
 
-An editor hook checks the `@`-tags of a changed `.strudel` file when you work with Claude Code. The text of a control
-is the `// @ctl` comment in the track.
+The text of a control is the `// @ctl` comment in the track.
 
 Code blocks that several tracks share are marked `@shared <name> begin` and `end`. Edit the block in one track, then
 run `npm run shared -- --from <track> <name>`. `npm run shared -- --check` shows drift.

@@ -13,7 +13,7 @@ That is why they are renamed in macOS (Audio MIDI Setup → Window → Show MIDI
 - Both controllers have the same CC layout (see `CLAUDE.md`, section "Controller mapping").
 - The names live only in macOS, not on the controller. On another computer the devices are called `LCXL3 1` again.
   Plugged into a different USB port, the names can move with them: check briefly in MIDI Studio.
-- After renaming, restart Chrome fully, otherwise Strudel still sees the old names.
+- After renaming, restart Chrome fully, otherwise it still sees the old names.
 - `setup0.syx`: custom mode file from Novation Components (called "New Custom Mode" on the device).
 - One controller alone (every live track today, or Jojo's device missing): Mode 1 = Jojo, Mode 2 = Jonas.
   Mode 1 must get the same CCs as Mode 16 in Components (faders 5–12, knobs 13–36, buttons 37–52).

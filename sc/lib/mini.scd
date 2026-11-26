@@ -2,7 +2,7 @@
 // numbers), sub-sequences ([a b]), alternation (<a b c>, one item per cycle). ~ce.mini(str) → (period: cycles, events: [[begin, dur, value]])
 // with begin / dur in cycles from the start of the period. Values: numbers as numbers, everything else (note names)
 // as strings. Example: ~ce.mini("<[0 ~ 2]!3 [~ 4@2]>") → period 4, the first bar three times, then the second.
-// Checked against Strudel's own parser by tools/sc-port/mini-check.mjs.
+// Follows Strudel's mini-notation.
 (
 ~ce.miniParse = { |self, str|
 	var toks = List[], i = 0, cur = "", pos = 0, item, seq;
