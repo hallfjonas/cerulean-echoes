@@ -1,6 +1,7 @@
 // Frame of the 017 LSD FX 2 stem track (017-lsd-fx-2.track): 017-groove-lsd's frame without the chords column. Mode 1 is
-// 017's foundation, Mode 2 seven sparse fx columns, so the root stays on F (no progressions, no chord colours). The
-// three moods (Chapter), the orbits, the global column 8 texts and the Launchkey are 017's. Format: sc/lib/stemtrack.scd.
+// 017's foundation with congas (1:5) and claps (1:7); Mode 2 the strings, the stab and the leads of 017, then four sparse fx
+// columns. The root stays on F (no progressions, no chord colours). The three moods (Chapter), the orbits, the global
+// column 8 texts and the Launchkey are 017's. Format: sc/lib/stemtrack.scd.
 // Column 8's fader is Wumms (more low end, punch and drive), not a volume: kick, rumble, sub and bass read it per note, so
 // the frame is masterless. Chapter = the mood, all on F: Dark (minor), Tight (phrygian), Warm (dorian); it switches at the next bar. Every column
 // plays degrees of the root (F) in the mood's scale: frame.degMidi, rootAt.
@@ -8,7 +9,7 @@
 // @col 2:8 8 Global
 // @ctl g.k1 Fog | clear ↔ muffled (all low-passes down).
 // @ctl g.k2 Thin | full ↔ thin (all high-passes up).
-// @ctl g.k3 Tension | density: echo, reverb; the end adds a wood roll.
+// @ctl g.k3 Tension | density: strings up, echo, reverb, a snare roll.
 // @ctl g.fader Wumms | more low end, punch and drive.
 // @ctl g.b1 Chapter | mood: dark → tense → warm, at the next bar.
 // @ctl g.b2 Break | 1st: low end out. 2nd: all back on the one.
@@ -34,6 +35,10 @@ masterless: true,
 // the degree in the mood's scale from F<oct>; octaves wrap, also below
 degMidi: { |frame, deg, oct, mood| var st = deg.ceil.asInteger;
 	(12 * (oct + 1)) + 5 + moods[mood].steps[st % 7] + (12 * (st / 7).floor) },
+// the stab (2:2) plays in a bar unless Vanish (its row 3, CC 78) left it out: rand at the bar start, up to 85 % of the bars;
+// the leads' blips play in the bars it leaves while its fader (CC 54) is up
+stabHere: { |frame, track, b| track.ce.rand(b) >= (0.85 * track.ce.val(78)) },
+stabGap: { |frame, track, b| frame.stabHere(track, b).not and: { track.ce.val(54) > 0 } },
 rootAt: { |frame, track, b| 0 },
 chordAt: { |frame, track, bar| anyChord },
 uiHead: { |frame, track, ce|

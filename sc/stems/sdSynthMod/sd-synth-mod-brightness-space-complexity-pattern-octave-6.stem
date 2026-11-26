@@ -1,0 +1,81 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-octave-6",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-2.stem",
+  "about": "The loop and the answer blips of 017, alone or together.",
+  "meta": {
+    "role": "lead",
+    "label": "Leads",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "sequence",
+      "fm",
+      "mallet",
+      "blips",
+      "answer"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-leads.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Loop"
+    },
+    {
+      "label": "Blips"
+    },
+    {
+      "label": "Duo 1"
+    },
+    {
+      "label": "Duo 2"
+    },
+    {
+      "label": "Duo 3"
+    },
+    {
+      "label": "Duo 4"
+    },
+    {
+      "label": "Trade"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ echo + room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "loop fills in; blips add third, fifth, 7th."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "mallet loop and counter blips."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "loop → blips → four duos → trade."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "the loop one octave up while held.",
+      "mode": "hold"
+    }
+  }
+}
