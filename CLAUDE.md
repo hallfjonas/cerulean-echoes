@@ -84,7 +84,7 @@ Tools (run in `tools/`):
 - Does every feature still work? `npm test` (player, takes, recording, launcher, producer, stems, sound lab, and SC:
   building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`).
   Runs in CI on every PR; the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output
-  identical", no sound measuring. `sc/samples/voice/david.flac` (44 MB) is not in git: 007's sample check fails without it.
+  identical", no sound measuring.
 - After editing an SC track or its perform scripts: `npm run verify-sc -- [<track.scd | .track> …]` (tags parse,
   perform scripts valid, the track loads and plays headless in `sclang`; stems and Sample Designer projects too; no
   args = every changed SC track). Scripts alone: `node trajectory/check-perform.mjs [<track file>]`.
