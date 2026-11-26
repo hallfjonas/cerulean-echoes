@@ -24,8 +24,9 @@ const LIVE = [
     'Keep the player tab visible while capturing or replaying: a background tab slows the timers.',
     'A take worth keeping: move it up from perform/<track>/takes/ to perform/<track>/, give it a name and a title, '
     + 'run check-perform and commit it. Takes left in takes/ stay out of git.'] },
-  { heading: 'Recording', text: ['Record (R) writes what you hear to recordings/<track>/ as a WAV; Stop rec ends it.',
-    'Auto-perform with Record audio ticked records from Start to the end of the script plus 4 s.',
+  { heading: 'Recording', text: ['Record (R) is a switch: while it is on, whatever plays is written to recordings/<track>/ as a WAV.',
+    'White = off, steady red = on and waiting for Play, pulsing = recording. Stop leaves it on; click it again to switch off.',
+    'Auto-perform with Record audio ticked (or Record on) records from Start to the end of the script plus 4 s.',
     'Stop or another track ends a recording. Recordings stay out of git.'] },
   { heading: 'Stem swap', text: ['Stem tracks only: click a column\'s name in the Live panel.',
     'The drawer lists the library stems of that column\'s role; filter by role (any shows every role), genre, energy and tag.',

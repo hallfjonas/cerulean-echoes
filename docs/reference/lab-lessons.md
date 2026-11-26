@@ -1,7 +1,7 @@
 # Lab lessons (Strudel boards, retired 2026-11-21)
 
-The Strudel lab boards (`lab/<instrument>/`, `lab/archive/`) were removed from the working tree; only `lab/tutorials/`
-stays. Git history keeps every board and its `feedback.md`: restore with
+The Strudel lab boards (`lab/<instrument>/`, `lab/archive/`) and the ear-training tutorials (`lab/tutorials/`) were removed
+from the working tree. Git history keeps every board and its `feedback.md`: restore with
 `git checkout a69f511 -- lab/<folder>` (a69f511 = last commit that still has them; the boards' sources and research
 links are in those `feedback.md` files). New sound work goes to the sound-lab epic (Stem Designer / Sample Designer).
 The grades below are the user's, 2026-11-05 to 2026-11-12.

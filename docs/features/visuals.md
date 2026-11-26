@@ -33,4 +33,3 @@ For rehearsal, for a projector behind you, or to see which voice is doing what.
 - [Player](player.md)
 - [Controllers](controllers.md)
 - [Auto-perform](auto-perform.md)
-- [strudel.cc](strudel-cc.md)

@@ -27,7 +27,6 @@ to 1. The full format is in `tools/trajectory/perform/script-format-v2.md`.
 
 ## Good to know
 - A SuperCollider track takes the script's moves like moves of the real devices ([controllers](controllers.md)).
-  For a Strudel track the virtual controllers are called `LCXL3 Auto` and `Launchkey MK4 25 Auto`.
 - A real Launchkey plays along with the script. Its keys only sound while the mod wheel is up.
 - The player also keeps a take of everything you play, and can save it as a new script (setting **Save take on record stop**). Details are in
   the Auto-perform and Takes sections of `tools/trajectory/README.md`.

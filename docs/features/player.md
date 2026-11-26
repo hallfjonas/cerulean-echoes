@@ -18,8 +18,7 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 
 1. Start it: double-click `Cerulean Echoes.app` in the repo folder, or `cd tools && node trajectory/server.mjs`, then
    open http://localhost:8766 in Chrome. Steps in [getting started](../getting-started.md).
-2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Lab** = the ear-training tutorials ([lab boards](lab-boards.md) are retired). Boards
-   without a master `stack(` are greyed out.
+2. Pick a track in the sidebar on the left. **Live** = the live tracks, **Labs** = the Sample and Stem Designer projects.
 3. Press **Play**. Press **Stop** to end. Picking another track stops the current one.
    A SuperCollider track (every live track) starts SuperCollider
    in the background the first time, which takes a few seconds. SuperCollider must be installed. Record,
@@ -48,8 +47,7 @@ Keys:
 
 - The player reads the track file again on every load. Edit a track, press Play, and you hear the edit. There is no
   extra step and no copy of the track on disk.
-- A track never needs the player: an SC track also plays from the SuperCollider IDE (`sc/live.scd`), a frozen
-  Strudel file pasted into [strudel.cc](strudel-cc.md).
+- A track never needs the player: an SC track also plays from the SuperCollider IDE (`sc/live.scd`).
 - The picture is for looking only. The Hard / Soft and Raw / Smooth sliders in Settings (Visuals) change the visuals, never the
   sound.
 - Recordings go to `recordings/<track>/` in the repo root and are not part of git.

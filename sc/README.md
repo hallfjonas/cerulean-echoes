@@ -35,26 +35,11 @@ sc/
   sounds/                  ein Klang = eine Datei im festen Format (sounds/README.md)
   tracks/009-house/ und 008-groove-techno/   die Tracks: Spalten, Muster, Harmonie — verweist auf Klänge per Name
   samples/                 Samples und Hall-Impulsantworten (CREDITS.md)
-  tools/render.scd         Offline-Render eines Szenarios (für die Vergleiche)
+  tools/render.scd         Offline-Render eines Szenarios
 ```
 
-## Vergleich mit Strudel (`tools/sc-port/`)
+## Werkzeuge (`tools/sc-port/`)
 
-Ein **Szenario** (JSON: Reglerstellungen + Tastendrücke über die Zeit) wird auf beiden Seiten offline gerendert:
-Strudel mit superdough in Node, SuperCollider im Non-Realtime-Modus. Verglichen werden die Noten (Einsatz,
-Tonhöhe, Länge, Anschlag) und der Klang (Lautheit, Terzband-Spektrum, Hüllkurve, Null-Test).
-
-```
-cd tools && npm install            # einmal
-pip install numpy scipy soundfile pyloudnorm
-cd sc-port
-python3 batch.py scenarios/kick.json /tmp/cmp-kick     # eine Spur: scenarios/<spur>.json
-for f in scenarios/*.json; do python3 batch.py $f /tmp/cmp-$(basename $f .json); done   # alle (dauert ~1 h)
-```
-
-Weitere Werkzeuge: `mini-check.mjs` (Mini-Notation gegen Strudels Parser), `soundfont-extract.py` (gm-Soundfonts
-für SC), `reverb-ir.mjs` (Hall-Impulsantworten), `noise-buffers.py`.
-
-Null-Test: Rest nach Abziehen in dB unter dem Signal; um −30 dB und darunter = praktisch identisch. Szenarien mit
-Hall (Space, Tension) können nicht nullen (superdough würfelt sein Hall-Rauschen); dort zählen Lautheit und
-Spektrum.
+`stem-compare.mjs` (Stem-Track gegen den handgeschriebenen Track), `soundfont-extract.py` (gm-Soundfonts für SC),
+`reverb-ir.mjs` (Hall-Impulsantworten), `noise-buffers.py`. Ein **Szenario** (JSON: Reglerstellungen + Tastendrücke
+über die Zeit) in `scenarios/` wird mit `sc/tools/render.scd` offline gerendert.

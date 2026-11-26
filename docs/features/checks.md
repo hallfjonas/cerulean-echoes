@@ -33,8 +33,6 @@ Before you open a pull request, after you edit a track or an auto-perform script
 - Run one heavy check at a time (`npm test` starts SuperCollider); the laptop is shared.
 - `sc/samples/voice/david.flac` (the 007 voice) is too big for git. Without it, 007's "every sample file it loads
   exists" check fails.
-- The Strudel checks (`verify`, `audibility`, `compare`, `scenario`, `check-sounds`) were removed with the move to
-  SuperCollider; the Strudel files are frozen.
 
 ## Related
 - [Claude skills](claude-skills.md)

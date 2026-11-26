@@ -23,7 +23,7 @@ play.
 
 To stop everything (the player and SuperCollider): quit **Cerulean Echoes** (its Dock icon: Quit, or Cmd-Q).
 Closing the window only hides it (the music goes on); a click on the Dock icon shows it again. In the browser instead
-(Terminal start, or Strudel tracks with controllers: the window has no Web MIDI), keep only **one** tab of the player
+(Terminal start), keep only **one** tab of the player
 open: each tab holds two open connections and Chrome allows six per address, so several tabs make the page hang.
 If something does not start, a message says what is missing; details
 are in `~/Library/Logs/cerulean-echoes.log`.

@@ -21,8 +21,8 @@ When you work with Claude Code in this repo and the job is one of the ones below
 ## Good to know
 - A skill only guides Claude. The real work is done by the tools in `tools/` (see [checks](checks.md)).
 - Claude asks before it changes sound, effects or the controller layout, unless that is the task.
-- Hooks run on their own after every edit: they check the `@ctl` tags of a changed Strudel file.
-- The Strudel skills `strudel-mix` and `strudel-optimize` were removed with the move to SuperCollider.
+- Hooks run on their own: one refuses a commit with a staged file over 10 MB, one installs the packages in a fresh
+  worktree at session start.
 - Project rules Claude always reads: `CLAUDE.md`.
 
 ## Related

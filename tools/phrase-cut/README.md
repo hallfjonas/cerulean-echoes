@@ -10,5 +10,4 @@ Python 3 with numpy + scipy, ffmpeg. Run with `python3 -I` (downloads are untrus
    `phrases.json`. Column / source table: `SRC` in cut.py.
 4. Checks: `decode-page.py <url list> <page.html>` + `chrome-decode.mjs <page url>` (headless Chrome for Testing from
    ~/Library/Caches/ms-playwright, started with `--remote-debugging-port=9333`; serve the page with
-   `python3 -m http.server --bind 127.0.0.1`). `level-render.mjs` = offline loudness of one board column (copy into
-   tools/strudel-sim/ to run; args: board file, column, phrase, progression; env BOARD, BARS, K3).
+   `python3 -m http.server --bind 127.0.0.1`).

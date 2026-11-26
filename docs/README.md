@@ -14,7 +14,6 @@ Start here. For how to contribute, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 - [reference/glossary.md](reference/glossary.md) - words used in this project and in music production
 - [../midi-layouts/devices.md](../midi-layouts/devices.md) - the MIDI devices and their ports
-- [reference/casio-gp310-midi.md](reference/casio-gp310-midi.md) - using the Casio GP-310 piano with Strudel over MIDI
 - [reference/lcxl3-daw-mode.md](reference/lcxl3-daw-mode.md) - LC XL 3 standalone vs DAW mode: measured buttons, switching
 - [reference/scd-translation-differences.md](reference/scd-translation-differences.md) - what differs when a hand-written SC track becomes a stem track
 - [reference/genres.md](reference/genres.md) - what each genre is: definition, tempo, must-have and must-not-have features

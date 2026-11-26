@@ -22,10 +22,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   reverb IRs (`CREDITS.md`); porting notes `sc/PORTING.md`
 - `tracks/` — removed 2026-11-22: every Strudel track (001/002, 007-010, 016, historic, set 011) is in git history;
   the tracks live in `sc/tracks/`
-- `midi-layouts/` — device list, the two custom modes (`lcxl3-mode1.syx` / `-mode2.syx`) and the old Strudel layout
-  template (`templates/dual-lc.strudel`)
-- `lab/tutorials/` — ear training with live sliders + English handbook PDF (the only part of `lab/` left; the Strudel
-  boards were retired 2026-11-21, lessons in `docs/reference/lab-lessons.md`, boards in git history up to a69f511)
+- `midi-layouts/` — device list and the two custom modes (`lcxl3-mode1.syx` / `-mode2.syx`)
 - `docs/reference/genres.md` — what each genre is (tempo, must-have / must-not-have, groove techno stem by stem); use it
   to pick a track's genre and to judge a stem
 - `docs/reference/listening-list.md` — links to tracks and sets to listen to, by genre, optional note on what to listen for
@@ -33,22 +30,20 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   docs: `docs/features/stems.md`, `docs/features/sound-lab.md`
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
-- `snippets/` — small helpers and tests (`midi-test.strudel`)
 - `tools/` — Node tools (run `npm install` in `tools/` once): the player, `npm test`, checks, sound lab, launcher,
   Guitar Pro MIDI → live track (`producer/`)
 
 ## Rules
 - **Non-destructive:** a new version of a track goes into a new file; never overwrite an existing track unless asked.
 - Ask before changing sound, effects, orbits, reverb/delay, naming or the controller layout, unless that is the task.
-- Single quotes for plain text in Strudel (double quotes are parsed as mini-notation).
 - Boards and stems need rhythm, not just held notes.
 
 ## Git
 - Never push to main or force-push it; branch from a fresh `origin/main`, one PR per feature.
 - Before a multi-file edit: `git status`, and look for sibling branches/PRs and other sessions working on the same
   track (`gh pr list`), so nothing is built twice or overwritten.
-- Generated files (a producer song track, `dual-lc-test.strudel`) are never merged by hand: on a conflict take either
-  side and regenerate (`npm run producer`, the hook).
+- Generated files (a producer song track) are never merged by hand: on a conflict take either side and regenerate
+  (`npm run producer`).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
 ## Live tracks (SuperCollider)
@@ -76,17 +71,14 @@ every controller optional. Edit the `.scd`; a new version goes into a new folder
 Use them instead of redoing the steps by hand:
 - A new sound on the SC machine ("sample designer", "a soft tom", export to `sc/sounds/`): `/sample-designer`.
 - Compare versions of a stem against a track, promote a winner, swap it into a new track ("redesign the piano stem of
-  the house track", "explore a replacement"): `/stem-designer`. (`/lab-board`, `/lab-to-track` are retired pointers.)
+  the house track", "explore a replacement"): `/stem-designer`.
 - A new sample (file into `sc/samples/`, a Launchkey pad, level): `/add-sample`.
 - Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
   performance"): `/auto-perform`.
 - A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song"): `/producer`.
 - Start the player on a port or branch: `/player`. Review past sessions ("workflow review", "retro"): `/workflow-review`.
 
-Hooks: after every Edit/Write and every Bash call, the `.strudel` files changed since the last run get their
-`@`-tags checked (and the template its one-controller copy `dual-lc-test.strudel`; `tools/lcxl-layout/hook.mjs`,
-`bash-hook.mjs`). A commit with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at
-session start.
+Hooks: a commit with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
 
 Tools (run in `tools/`):
 - Does every feature still work? `npm test` (player, takes, recording, launcher, producer, stems, sound lab, and SC:
@@ -99,17 +91,15 @@ Tools (run in `tools/`):
 - Outline a long track before reading it: `npm run track-map -- <track.scd | track.strudel>`, then `sed -n` ranges
 - Stem library (`sc/stems/`, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`, `npm run stems` (list,
   filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
-- Offline render: `sclang sc/tools/render.scd <track.scd|.track> <scenario.json> <out-prefix>`; porting and
-  Strudel ↔ SC comparison: `tools/sc-port/`
+- Offline render: `sclang sc/tools/render.scd <track.scd|.track> <scenario.json> <out-prefix>`; scenarios,
+  stem comparison and asset generators: `tools/sc-port/`
 - Guitar Pro MIDI → track, design stub, perform script: `npm run producer -- <file.mid> [--map <map.json>]
   [--out <dir>] [--force]`; `--perform` writes only the script; notes per bar: `node producer/midi-read.mjs <file.mid>
   --dump` (`tools/producer/README.md`); Strudel syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
 - Paths cited in docs, skills and epics exist? `npm run path-lint` (planned files in epics show up too)
-- Removed with sc-migration 010 (git history): set 011 and its tools, historic 000-006, the Strudel checks
-  (`verify`, `compare`, `audibility`, `measure`, `scenario`, `check-sounds` and the sound list), `/strudel-mix`,
-  `/strudel-optimize`. `tools/strudel-sim/` keeps only the harness the producer test, `sc-port` and the player's
-  catalogue check use.
+- Removed Strudel tools and skills are in git history (list: `DEPRECATION.md`). `tools/strudel-sim/` keeps only the
+  harness the producer test uses and the producer's syntax check.
 
 ## The player (tools/trajectory)
 The player is the main tool: `cd tools && node trajectory/server.mjs`, then http://localhost:8766 (README:
