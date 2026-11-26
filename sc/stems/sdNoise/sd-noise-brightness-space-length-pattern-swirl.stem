@@ -1,0 +1,84 @@
+{
+  "format": 2,
+  "name": "sd-noise-brightness-space-length-pattern-swirl",
+  "parent": null,
+  "about": "Noise whoosh travelling through the stereo field.",
+  "meta": {
+    "role": "fx",
+    "label": "Whoosh",
+    "genres": [
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "whoosh",
+      "noise",
+      "sweep",
+      "pan"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdNoise"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "lsd-whoosh.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Left → right"
+    },
+    {
+      "label": "Right → left"
+    },
+    {
+      "label": "Up"
+    },
+    {
+      "label": "Down"
+    },
+    {
+      "label": "Circle"
+    },
+    {
+      "label": "Pass-by"
+    },
+    {
+      "label": "There and back"
+    },
+    {
+      "label": "Random"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "some echo ↔ room and long echo."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "half a bar ↔ two bars, ending on bar 5."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "a whoosh into bar 5 of each phrase."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "next of 8 paths; the last is new each phrase."
+    },
+    "b2": {
+      "label": "Swirl",
+      "about": "noise circling the room once a beat, while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.5
+}

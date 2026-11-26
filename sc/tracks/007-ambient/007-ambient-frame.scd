@@ -57,7 +57,7 @@ samples: ~ce.vcslFiles ++ (0..11).collect { |i| "vcsl/shaker_small/" ++ ["Mid_Sh
 		"Mid_ShakerHighFaster_Down", "Mid_ShakerHighFaster_Up", "Mid_ShakerLowFaster_Down", "Mid_ShakerLowFaster_Up"][i div: 2]
 		++ "_rr" ++ ((i % 2) + 1) ++ ".flac" }
 	++ ["vcsl/cabasa/Cabasa1_Hit_rr1_Mid.flac", "vcsl/cabasa/Cabasa1_Hit_rr2_Mid.flac", "vcsl/tom2_mallet/TomL_HitM_v2_rr1_Mid.flac",
-		"vcsl/agogo/Agogo_High_v2_rr1_Mid.flac", "voice/david.flac",
+		"vcsl/agogo/Agogo_High_v2_rr1_Mid.flac",
 		// the Launchkey's pads
 		"voice/brace.wav", "voice/piece_of_paper.flac", "voice/plaenterwald_wine_and_cheese.flac", "voice/the_evening_progresses.flac",
 		"voice/lw.wav", "voice/the_creatures_have_begun_illumination.flac", "voice/the_evening_does_not_end.flac",

@@ -8,8 +8,6 @@ Einrichten, Starten, Stoppen und Probleme wie bei 009 (`sc/ANLEITUNG.md`). Unter
 
 - **Track wählen:** in `sc/live.scd` die Zeile `var trackName = …;` auf `"007-ambient"` ändern.
 - **Custom Modes:** die gemeinsamen (`midi-layouts/lcxl3-mode1.syx` / `-mode2.syx`, Slots 1 und 2). Die Belegung ändert sich nicht.
-- **Samples:** `sc/samples/voice/david.flac` (Jonas 7, die gesprochene Aufnahme, 9:13 min) ist 46 MB groß und wird
-  beim Start geladen (ein, zwei Sekunden).
 
 ## Was sofort wirkt
 
