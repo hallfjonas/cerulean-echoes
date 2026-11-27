@@ -32,7 +32,7 @@ options and the map format are in [tools/producer/README.md](../../tools/produce
 - A generated track is changed through its map file, not by editing the track. The next run would overwrite the edit.
 - Nothing is overwritten without `--force`, so a filled-in design survives a re-run.
 - Not supported yet: tempo changes, time signatures other than 4/4, pickup bars, triplets, lyrics and bends. The tool
-  warns or stops. See `.claude/prds/producer-slow-rock.md`.
+  warns or stops.
 - The Strudel level and sound checks were removed with the move to SuperCollider: set levels by ear in the player.
 
 ## Related

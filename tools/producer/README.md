@@ -17,7 +17,7 @@ fixtures.
 3. What the reader handles: format 0/1, running status, any number of tracks, Guitar Pro's two channels per track
    (merged), program changes inside a track (a voice change at that bar), markers (become sections), GM drums on
    channel 10, grids down to 1/1024 of a bar.
-4. What it does not handle yet (see `.claude/prds/producer-slow-rock.md`): tempo changes (the first tempo is used, with
+4. What it does not handle yet: tempo changes (the first tempo is used, with
    a warning), time signatures other than 4/4 and pickup bars (counted as 4/4, with a warning: everything after
    shifts), triplets and other non-power-of-two grids (the producer stops with "no power-of-two grid up to 1/1024
    fits"), lyrics, bends (plain notes).

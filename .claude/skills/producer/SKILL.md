@@ -19,8 +19,8 @@ and `tools/producer/fixtures/013-hope-for-niklas/` (generated), each with its ma
    genre (pick it by the definitions in `docs/reference/genres.md`); put the file at `tracks/<genre>/NNN-<name>/gp-<name>.mid`. `git status`, `gh pr list` first (CLAUDE.md Git).
 2. `cd tools && node producer/midi-read.mjs <file.mid>`: tempo, bars, markers, per part channels, programs (with the
    bar of each change), notes, grid, range, warnings. Stop and tell the user on a tempo change, a pickup or non-4/4
-   bar, or "grid finer than 1/1024 (triplets?)": the producer does not handle them yet
-   (`.claude/prds/producer-slow-rock.md`). `--dump --track n --bars a-b` shows a part as mini-notation.
+   bar, or "grid finer than 1/1024 (triplets?)": the producer does not handle them yet.
+   `--dump --track n --bars a-b` shows a part as mini-notation.
 
 ## 2. Generate (dry run first)
 1. `npm run producer -- <file.mid> --name NNN-<name> --genre <genre> --out <scratchpad dir>`: writes the track, the map
