@@ -30,8 +30,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   docs: `docs/features/stems.md`, `docs/features/sound-lab.md`
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
-- `tools/` — Node tools (run `npm install` in `tools/` once): the player, `npm test`, checks, sound lab, launcher,
-  Guitar Pro MIDI → live track (`producer/`)
+- `tools/` — Node tools (run `npm install` in `tools/` once): the player, `npm test`, checks, sound lab, launcher
 
 ## Rules
 - **Non-destructive:** a new version of a track goes into a new file; never overwrite an existing track unless asked.
@@ -42,12 +41,10 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
 - Never push to main or force-push it; branch from a fresh `origin/main`, one PR per feature.
 - Before a multi-file edit: `git status`, and look for sibling branches/PRs and other sessions working on the same
   track (`gh pr list`), so nothing is built twice or overwritten.
-- Generated files (a producer song track) are never merged by hand: on a conflict take either side and regenerate
-  (`npm run producer`).
 - No file over 10 MB in git (a PreToolUse hook refuses the commit); recordings stay small or outside the repo.
 
 ## Live tracks (SuperCollider)
-All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3, 017-lsd-fx(-2/-3)),
+All live tracks play on SC (`sc/tracks/<id>/<id>.scd`: 001, 002, 007, 008, 009, 010, 016, 017; stem tracks 009-house-2/3, 017-lsd-fx(-2)),
 every controller optional. Edit the `.scd`; a new version goes into a new folder (e.g. `009-house-2`).
 - Rows and columns: Mode 1 = Jojo's foundation, Mode 2 = Jonas' colour (CC + 48) on columns 1-7, column 8 global on
   both. Same row meaning everywhere; Jojo's button 1 has at most 3 patterns; all knobs at 0 must already sound good.
@@ -56,9 +53,6 @@ every controller optional. Edit the `.scd`; a new version goes into a new folder
 - Every connected LC XL 3 (port name contains `LCXL3`, not `DAW`) gets the full layout; several LCs share every value
   (SC sends each knob change back to every LC). Launchkey MK4 25 (optional): keys = a pad, drum pads (channel 10) = 16
   one-shots (`lkNote`, names in `lkPadNames`), mod wheel CC 1 = keys level × master, knobs CC 21-28 = sound.
-- A Guitar Pro song: the producer still writes Strudel (`tools/producer/`, `/producer`); the decisions live in
-  `<track>-map.json`, change the map and re-run `npm run producer`, never the track. Reference songs 012/013 are test
-  fixtures in `tools/producer/fixtures/`. An SC output is decided when the next song comes.
 
 ## Controller mapping (LC XL 3)
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.
@@ -75,14 +69,14 @@ Use them instead of redoing the steps by hand:
 - A new sample (file into `sc/samples/`, a Launchkey pad, level): `/add-sample`.
 - Design, script and review an auto-performance for a live track ("auto-performance", "perform script", "new
   performance"): `/auto-perform`.
-- A Guitar Pro song (MIDI export) into a live track with a performance ("producer", "next song"): `/producer`.
 - Start the player on a port or branch: `/player`. Review past sessions ("workflow review", "retro"): `/workflow-review`.
 
 Hooks: a commit with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
 
 Tools (run in `tools/`):
-- Does every feature still work? `npm test` (player, takes, recording, launcher, producer, stems, sound lab, and SC:
-  building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`).
+- Does every feature still work? `npm test` (player, takes, recording, launcher, stems, sound lab, and SC:
+  building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`;
+  every library stem in every stem track's frame against `tools/sc-test/stem-frames-known.json`).
   Runs in CI on every PR; the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output
   identical", no sound measuring.
 - After editing an SC track or its perform scripts: `npm run verify-sc -- [<track.scd | .track> …]` (tags parse,
@@ -93,19 +87,18 @@ Tools (run in `tools/`):
   filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
 - Offline render: `sclang sc/tools/render.scd <track.scd|.track> <scenario.json> <out-prefix>`; scenarios,
   stem comparison and asset generators: `tools/sc-port/`
-- Guitar Pro MIDI → track, design stub, perform script: `npm run producer -- <file.mid> [--map <map.json>]
-  [--out <dir>] [--force]`; `--perform` writes only the script; notes per bar: `node producer/midi-read.mjs <file.mid>
-  --dump` (`tools/producer/README.md`); Strudel syntax as strudel.cc sees it: `node strudel-sim/transpile-check.mjs <file…>`
 - Session digests: `node session-digest/digest.mjs [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--only <id>]`
 - Paths cited in docs, skills and epics exist? `npm run path-lint` (planned files in epics show up too)
-- Removed Strudel tools and skills are in git history (list: `DEPRECATION.md`). `tools/strudel-sim/` keeps only the
-  harness the producer test uses and the producer's syntax check.
+- Removed Strudel tools and skills are in git history (list: `DEPRECATION.md`).
 
 ## The player (tools/trajectory)
 The player is the main tool: `cd tools && node trajectory/server.mjs`, then http://localhost:8766 (README:
 `tools/trajectory/README.md`). It plays every live track (Live) and the sound lab projects (Labs) with the visuals.
 - Launcher for people without a Terminal: `Cerulean Echoes.app` (repo root, committed; source and `launch.sh` in
   `tools/launcher/`, rebuild with `npm run launcher`) starts the server, shows the player in its own window (Swift/WKWebView, no Web MIDI: SC tracks only for controllers), quitting stops server + SC.
+- Whenever the user should listen to something, or asks to start the player, offer the command that opens
+  `Cerulean Echoes.app` with its absolute path, quoted because of the space. The app plays the code of the folder
+  it sits in; if a player already answers on port 8766 (another app), it shows that one: quit it first.
 - SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
   OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it; `CE_SC_PORT`, `CE_SC_SERVER_PORT`);
   `tools/trajectory/sc-link.mjs`, `engine-sc.mjs`. Controllers go straight to SC; the page mirrors SC's state.
@@ -129,7 +122,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 
 ## Shared code in the Strudel tracks
 Blocks the Strudel tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
-`tools/shared/<name>.strudel-part` (the producer copies it into the tracks it writes). `npm run shared -- --check`
+`tools/shared/<name>.strudel-part`. `npm run shared -- --check`
 shows drift; `npm run shared -- --from <track> <name>` syncs a changed block. SC tracks share code through `sc/lib/`.
 
 ## Samples and sounds (SC)

@@ -1,7 +1,7 @@
 # Metal Space
 
 ## Meta
-- Track: 017-lsd-fx-3 (017-lsd-fx-2's stems and frame, unchanged)
+- Track: 017-lsd-fx-2 (stems and frame unchanged; a second performance of the same track)
 - Length: 224 bars = 6 min 41 s at 134 BPM (1 bar = 1.79 s; Metal Mix's 232 minus the 8 bars cut from the chords)
 - Mood: driving, dark, groovy; the metal is the main character, then your keys take it over
 - Story: Metal Mix's arc with fewer layers at once. The chords get a short 8-bar turn and come back later with another
