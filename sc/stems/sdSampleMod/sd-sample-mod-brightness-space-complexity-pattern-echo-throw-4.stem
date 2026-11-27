@@ -1,0 +1,67 @@
+{
+  "format": 2,
+  "name": "sd-sample-mod-brightness-space-complexity-pattern-echo-throw-4",
+  "parent": null,
+  "about": "Swung 16th shakers, a low shaker answering left.",
+  "meta": {
+    "role": "hats",
+    "label": "Shakers",
+    "genres": [
+      "house",
+      "groove-techno"
+    ],
+    "energy": 3,
+    "tags": [
+      "shaker",
+      "swung",
+      "vcsl",
+      "cabasa"
+    ],
+    "harmony": "none"
+  },
+  "sample": {
+    "name": "sdSampleMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "acid-shakers.scd",
+  "patterns": [
+    {
+      "label": "16ths"
+    },
+    {
+      "label": "Rock"
+    },
+    {
+      "label": "Off-beat"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "soft ↔ crisp."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "as written ↔ + ghost strokes and a cabasa."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "16th shakers, slightly right."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "16ths → rock → off-beat."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "dotted-8th echo on the shakers while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 2.5
+}
