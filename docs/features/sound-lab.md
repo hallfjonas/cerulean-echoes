@@ -85,6 +85,9 @@ version (a draft, then Promote).
 
 ## Good to know
 - Claude cannot hear. It builds the project and proves that it loads; you decide by ear.
+- Not every stem fits every track yet: a stem's code may need something of its own track's frame. Such a stem goes
+  quiet on its slot, the rest plays on, and the player shows which slot failed and why. The known misfits are listed in
+  `tools/sc-test/stem-frames-known.json` (track → stem → error), checked by `npm test`.
 - Stems from different tracks are brought to a common level by each stem's `gain`; a new version may still need a trim.
 - Fourteen columns plus backing load and play in the offline test; the live load on the laptop has not been measured
   yet. If it drops out, rest columns (fader 0) cost nothing, and fewer candidates per round help.

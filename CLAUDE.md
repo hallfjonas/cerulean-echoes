@@ -75,7 +75,8 @@ Hooks: a commit with a staged file over 10 MB is refused; a fresh worktree gets 
 
 Tools (run in `tools/`):
 - Does every feature still work? `npm test` (player, takes, recording, launcher, stems, sound lab, and SC:
-  building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`).
+  building blocks + every `sc/tracks` track loads, plays and reacts to its Pattern button; `tools/sc-test/run.scd`;
+  every library stem in every stem track's frame against `tools/sc-test/stem-frames-known.json`).
   Runs in CI on every PR; the SC part skips without `sclang`. Feature tests only: loose checks, never "is the output
   identical", no sound measuring.
 - After editing an SC track or its perform scripts: `npm run verify-sc -- [<track.scd | .track> …]` (tags parse,
