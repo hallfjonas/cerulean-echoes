@@ -106,16 +106,23 @@ const SPACE = [
 ]
 
 const TRACKS = [
-  { heading: 'What it does', text: 'Edits an auto-performance of a live track at five levels: Story, Sections, '
-    + 'Moves, Lanes and Steps.' },
+  { heading: 'What it does', text: 'Edits an auto-performance of a live track at five levels (Story, Sections, '
+    + 'Moves, Lanes and Steps), checks it, saves it as a new script and plays it from any bar.' },
   { heading: 'How to use', text: ['Pick a track, then one of its performances (scripts and takes), or press New '
     + 'performance.',
     'Keys 1-5 pick the level; the selection stays when the level changes. Click the ruler to set the cursor: the '
     + 'sidebar adds sections, moves or steps there.',
     'Drag moves, section edges, energy dots and lane dots. Cmd-Z undoes, Escape clears the selection, Backspace '
     + 'deletes the selected move or step.',
+    'Play (sidebar) plays this version, saved or not, from "From bar" (a 4-bar line). While it plays, click a '
+    + 'section or the ruler to go there.',
+    'Save as writes a new script; Save writes over one the lab saved before. Errors from check-perform show in the '
+    + 'footer and block saving.',
+    'Press and Break moves sit on the bar where the button takes over: the press goes half a bar before.',
     'Bars count from 0, as in the script. The tempo on top is a what-if: it changes the minutes shown, not the '
-    + 'track.'] }
+    + 'track.'] },
+  { heading: 'Output', text: 'perform/<track>/<name>.json (the script) and <name>.lab.json (sections and moves). An '
+    + 'existing script is never overwritten.' }
 ]
 
 const PLANNED = [

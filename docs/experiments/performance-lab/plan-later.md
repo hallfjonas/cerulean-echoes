@@ -1,7 +1,7 @@
 # Plan: later
 
-What the Tracks lab will do after [plan-now.md](plan-now.md). Described by function, not by task; each item becomes its
-own plan when it is picked up. Order is a suggestion.
+What the Tracks lab will do after its first phase ([tracks-lab.md](../../features/tracks-lab.md)). Described by
+function, not by task; each item becomes its own plan when it is picked up. Order is a suggestion.
 
 ## Launchkey support
 

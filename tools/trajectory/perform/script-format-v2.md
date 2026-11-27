@@ -94,6 +94,7 @@ take: {
 
 | File | Content |
 |---|---|
+| `tools/trajectory/perform/<track>/<name>.lab.json` | the Tracks lab's sidecar of a script it saved: `{ format, scriptHash, lab }` (sections and moves; `check-perform` skips it) |
 | `tools/trajectory/perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<source>.json` | the take (a script with `take`) |
 | `tools/trajectory/perform/<track>/takes/<same name>.events.jsonl` | tapped events of the play, one batch per line as posted to `/events`, `cycle` counted from the load's bar line (task 7) |
 | `recordings/<track>/<YYYY-MM-DD>-<HHMMSS>-<human\|auto>.wav` | audio, 16-bit PCM, context sample rate, stereo |

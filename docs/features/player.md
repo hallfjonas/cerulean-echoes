@@ -4,7 +4,8 @@
 
 A web page on your own computer that plays any live track or lab project. It has three pages. **Live** (the start page) shows both Launch
 Control pages and the Launchkey row with every control's name and value, and lets you pick a live track and
-auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks and Sets are placeholders).
+auto-perform it. **Labs** holds the Sample Designer, Stem Designer, Space analyzer and Tracks lab (Sets is a
+placeholder).
 **Visuals** draws the music: every part of the track is a moving shape with its name. It also holds a recorder.
 
 ## When to use it
@@ -28,8 +29,9 @@ auto-perform it. **Labs** holds the Sample Designer and Stem Designer (Tracks an
 The sidebar shows only what the page needs. **Live**: the live track list, Play / Pause, Stop, Record and
 Auto-perform. **Labs** (Samples, Stems): the project list, Play / Pause, Stop and the designer buttons; the waveform
 analysis shows under the controllers on Samples only. **Labs / Space** has its own sidebar and map (see the
-[space analyzer](space-analyzer.md)). **Visuals**: Stop. Switching pages keeps the sound playing; a page
-has its own address (`#live`, `#labs/samples`, `#labs/stems`, `#labs/space`, `#labs/sets`, `#visuals`). The gear next to
+[space analyzer](space-analyzer.md)), **Labs / Tracks** its own sidebar and timeline (see the
+[Tracks lab](tracks-lab.md)). **Visuals**: Stop. Switching pages keeps the sound playing; a page has its own address
+(`#live`, `#labs/samples`, `#labs/stems`, `#labs/space`, `#labs/tracks`, `#labs/sets`, `#visuals`). The gear next to
 the pages opens **Settings** on top of the current page: Theme, Visuals, MIDI panel, Recording and a list of the keyboard
 shortcuts, with a list of sections on the left to jump between them.
 

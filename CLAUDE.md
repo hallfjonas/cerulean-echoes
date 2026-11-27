@@ -104,9 +104,11 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   `tools/trajectory/sc-link.mjs`, `engine-sc.mjs`. Controllers go straight to SC; the page mirrors SC's state.
   Agents' and tests' runs set `CE_SC_MUTE=1` (master to a silent bus).
 - Single source: the track file, read again on every load, so Play plays the current edit.
-- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems, Space, Sets) | Visuals;
+- Landing page: Live (the track's LC view) full size; pages Live | Labs (Samples, Stems, Space, Tracks, Sets) | Visuals;
   the sidebar (key S) shows only the sections of the page: Live = live tracks, Play-Pause/Stop/Record, auto-perform;
-  Labs = Sample / Stem Designer, Space (frequency × time map of a stem track, `docs/features/space-analyzer.md`); the handle on its edge holds the sidebar toggle, the gear (opens Settings: Theme, Visuals, MIDI panel,
+  Labs = Sample / Stem Designer, Space (frequency × time map of a stem track, `docs/features/space-analyzer.md`),
+  Tracks (edit, check, save and play auto-performances from a bar, `docs/features/tracks-lab.md`); the handle on its
+  edge holds the sidebar toggle, the gear (opens Settings: Theme, Visuals, MIDI panel,
   Recording, keyboard shortcuts) and **?** (opens the help), three equal buttons that stay when the sidebar is hidden.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
   controls, buttons, keys, pads, Launchkey CCs); the steps go to SC over OSC (`sc-auto.mjs`). A new control or a changed `@ctl`
