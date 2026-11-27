@@ -1,5 +1,4 @@
-// The player's SuperCollider engine: the same interface as engine-strudel.mjs ({ ready, load, stop, cycle, cps,
-// output }), with the sound made by SC (sc/engine.scd, started by the server through sc-link.mjs). The controllers
+// The player's SuperCollider engine ({ ready, load, stop, cycle, cps, output }), with the sound made by SC (sc/engine.scd, started by the server through sc-link.mjs). The controllers
 // go straight to SC; this page only follows SC's state over /sc/events (the clock from its beats, the MIDI panel
 // from sc/ui/index.html in its own frame).
 // load(id, init?) takes a catalogue id, not code; init = { cc: [[cc, value]], lk: [[number, value]] } is set before

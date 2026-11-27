@@ -22,14 +22,14 @@ const isVirtual = port => VIRTUAL_PORTS.includes(port)
 export const noteName = note => `${NOTE_NAMES[note % 12]}${Math.floor(note / 12) - 1}`
 
 // A play's buffer: meta { track, trackHash, cps, recordedAt, script?, snapshot: midi.heldCcs() at the load }, the
-// messages { port, status, data, time, bar } in arrival order and the tapped Strudel events as batches (addEvents)
+// messages { port, status, data, time, bar } in arrival order and the tapped events as batches (addEvents)
 export const createSession = meta => ({ ...meta, snapshot: meta.snapshot ?? [], messages: [], events: [] })
 export const addMessage = (session, message, bar) => session.messages.push({ ...message, bar: roundBar(bar) })
 
 // Captures every play: start() at each track load opens a new session (the previous one is dropped). Bar 0 is the
 // bar line the performer starts a script on (startBarOf): the clock has already run a query or two after the load, and
 // counting from that raw cycle put every replayed step a tenth of a bar early.
-// addEvents(batch): a batch of tapped events as the server relays it (strudel-source.mjs onBatch), kept with `cycle`
+// addEvents(batch): a batch of tapped events as the SC tap hands it in (sc-auto.mjs createScTap), kept with `cycle`
 // counted from the same bar line. An event the clock has not reached yet is a late batch of the play before the load
 // (its clock ran further) and is dropped, as is anything before the bar line.
 export const createRecorder = ({ midi, engine }) => {

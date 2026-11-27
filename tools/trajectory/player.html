@@ -81,7 +81,7 @@
   #spaceStage .space-map { position: relative; flex: 1; min-height: 120px }
   #spaceStage canvas { position: absolute; inset: 0 }
   #spaceStage .space-info { min-height: 32px; font-size: 12px; color: var(--dim) }
-  body.space #lcPanel, body.space #scPanel, body.space #panelEmpty { display: none }
+  body.space #scPanel, body.space #panelEmpty { display: none }
   .script-info { margin-top: 12px; font-size: 13px }
   .script-title { font-weight: 500 }
   .script-mood { color: var(--dim); margin-top: 2px }
@@ -103,7 +103,7 @@
     background: var(--bg); text-transform: lowercase; display: grid; grid-template-columns: 180px minmax(0, 560px); gap: 40px;
     align-content: start; scroll-behavior: smooth }
   #settingsPage[hidden] { display: none }
-  body.settings-view #lcPanel, body.settings-view #scPanel, body.settings-view #panelEmpty { display: none }
+  body.settings-view #scPanel, body.settings-view #panelEmpty { display: none }
   #settingsNav { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 2px }
   #settingsNav a { padding: 6px 10px; border-radius: var(--radius); color: var(--dim) }
   #settingsNav a:hover { color: var(--fg) }
@@ -121,8 +121,8 @@
     #settingsPage { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px }
     #settingsNav { position: static; flex-direction: row; flex-wrap: wrap }
   }
-  #lcPanel, #scPanel { width: 100%; height: 100%; border: 0; display: block }
-  #lcPanel[hidden], #scPanel[hidden] { display: none }
+  #scPanel { width: 100%; height: 100%; border: 0; display: block }
+  #scPanel[hidden] { display: none }
   #panelEmpty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     color: var(--dim); text-align: center; padding: 24px; background: var(--bg); text-transform: lowercase }
   #panelEmpty[hidden] { display: none }
@@ -143,19 +143,15 @@
   #sidebar nav#subnav a.here { background: var(--control) }
   #placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim) }
   #placeholder[hidden] { display: none }
-  body.placeholder #lcPanel, body.placeholder #scPanel, body.placeholder #panelEmpty { display: none }
+  body.placeholder #scPanel, body.placeholder #panelEmpty { display: none }
 </style>
-<script type="importmap">
-{ "imports": { "@strudel/core": "./strudel-globals.mjs", "@strudel/webaudio": "./strudel-globals.mjs" } }
-</script>
 </head>
 <body>
-<!-- Plays a track (tapped by server.mjs on load, make-tapped.mjs) right here: no strudel.cc needed.
-     Every control the track reads through midin() comes from the connected controllers (Web MIDI, every input except
-     DAW ports; the CC moved last per number); a control not moved yet reads 0.
+<!-- Plays a track through SuperCollider (the server starts it on the first load, sc-link.mjs). The controllers go
+     straight to SC; this page mirrors its state.
      Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
      #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
-     show the track's LC view (drawn into the iframe #lcPanel instead of its own window) and the visuals (render.mjs on
+     show the track's LC view (sc/ui/index.html in the iframe #scPanel) and the visuals (render.mjs on
      the canvas). The Settings view (the gear) lays over the current page.
      The sidebar (key S) holds the page links, the track, Play-Pause / Stop / Record and auto-perform.
      The handle on the sidebar edge holds the sidebar toggle, the settings gear and the help button.
@@ -164,16 +160,14 @@
      "Hard ↔ Soft" sets the character of the visuals (render.mjs setCharacter).
      "Raw ↔ Smooth" averages the signals the visuals see over a window growing exponentially up to 2^53 lines
      (smoothing.mjs); the sound is not affected.
-     Auto-perform (key P) plays a script into the virtual input 'LCXL3 Auto' (autoperform.mjs); Start reloads the
-     track so the script begins from silence. On a SuperCollider track the steps go to SC instead (sc-auto.mjs), the
-     script's bar 0 with the load, and the bar clock is SC's.
+     Auto-perform (key P) plays a script (autoperform.mjs): the steps go to SC (sc-auto.mjs), the script's bar 0 with
+     the load (Start reloads the track so the script begins from silence), and the bar clock is SC's.
      Every load (Play, Start) begins a capture of all MIDI input, the auto inputs too (take.mjs); the setting "Save take on record stop" posts
      it to the server, which writes perform/<track>/takes/<name>.json, listed with the scripts.
      Record (key R) is a switch (record-arm.mjs): on, it writes the master output to recordings/<track>/ as a WAV
-     (recorder.mjs; a SuperCollider track is written by SC itself, recorder-sc.mjs) whenever a track plays: a human
+     (SC writes it itself, recorder-sc.mjs) whenever a track plays: a human
      recording runs from Play to Stop; with "Record audio" ticked or the switch on, auto-perform records from Start to
      the script's end plus a 4 s tail. Stop, a track change or switching off ends a recording; the switch stays on.
-     The track's status box (bottom right) shows only in the visuals, while the LC view is not in its own window.
      Stem tracks: a click on a column's name in the Live panel selects the column (selection.mjs) and opens the stem
      drawer (stem-drawer.mjs): swap the column's stem, Revert, Save as (a new track file; stem-swap.mjs). -->
 <canvas id="view"></canvas>
@@ -204,7 +198,7 @@
       <span id="recError"></span>
       <output id="takeState"></output>
     </div>
-    <span id="status">loading Strudel …</span>
+    <span id="status"></span>
   </section>
   <section id="sampleLab" data-pages="labs/samples" hidden></section>
   <section id="stemLab" data-pages="labs/stems"></section>
@@ -224,7 +218,6 @@
   </button>
 </div>
 <main id="stage">
-  <iframe id="lcPanel" aria-label="Live"></iframe>
   <iframe id="scPanel" aria-label="Live (SuperCollider)" hidden></iframe>
   <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
   <div id="placeholder" hidden></div>
@@ -248,20 +241,17 @@
 </main>
 <script type="module">
 import { createRenderer } from './render.mjs'
-import { createStrudelSource } from './strudel-source.mjs'
 import { createScSource } from './sc-source.mjs'
 import { createSmoother } from './smoothing.mjs'
 import * as midi from './midi.mjs'
-import { createEngine } from './engine-strudel.mjs'
 import { createScEngine } from './engine-sc.mjs'
 import { mountSettings, SETTINGS } from './settings.mjs'
 import { mountHelp } from './help.mjs'
 import { helpFor } from './page-help.mjs'
 import { mountTheme } from './theme.mjs'
-import { createPerformer, mountAutoPerform, sectionLabel, usesLaunchkey } from './autoperform.mjs'
+import { createPerformer, mountAutoPerform, sectionLabel } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createScAuto, createScTap } from './sc-auto.mjs'
-import { createRecorder as createAudioRecorder } from './recorder.mjs'
 import { createScRecorder } from './recorder-sc.mjs'
 import { recordAction, recordButtonState } from './record-arm.mjs'
 import { createSelection, columnSelection } from './selection.mjs'
@@ -277,44 +267,29 @@ const $ = id => document.getElementById(id)
 const help = mountHelp(helpFor(pageKey(parseHash(location.hash))), { title: 'About this page', button: '?', startOpen: false, parent: $('sideHandle'), className: 'handle-btn' })
 const renderer = createRenderer($('view'))
 const smoother = createSmoother(renderer.push)
-let label = 'loading Strudel …', visuals = '', autoLabel = ''
-createStrudelSource({ onLine: smoother.push, onStatus: text => { visuals = text },
-  onBatch: batch => recorder.addEvents(batch) })
+let label = 'ready', autoLabel = ''
 let scVisuals = ''
 createScSource({ onLine: smoother.push, onStatus: text => { scVisuals = text } })
 
-// Two engines: Strudel in this page, SuperCollider through the server (catalogue entry engine 'sc'). `engine` forwards
-// to the one that plays, so takes, auto-perform and the recorder read one clock.
-const strudelEngine = createEngine(midi)
-// a take of an SC play keeps SC's state echoes per bar as its events (check-replay)
+// SuperCollider makes the sound, through the server (catalogue entry engine 'sc'); takes, auto-perform and the recorder
+// read its one clock. A take of an SC play keeps SC's state echoes per bar as its events (check-replay).
 const scTap = createScTap({ onBatch: batch => recorder.addEvents(batch) })
-const scEngine = createScEngine({ onEvent: (type, data) => {
+const engine = createScEngine({ onEvent: (type, data) => {
   if (type === 'stemerror') toast(`Slot ${data[0]} (${data[1]}) is silent: ${data[2]}`, { kind: 'error' })
   else scTap.push(type, data)
 } })
-let current = strudelEngine
-const engine = {
-  ready: strudelEngine.ready,
-  stop: () => { strudelEngine.stop(); scEngine.stop() },
-  cycle: () => current.cycle(),
-  cps: () => current.cps(),
-  output: () => current.output(),
-}
-const onSc = () => current === scEngine
+let scStarted = false
+const onSc = () => scStarted
 const entryOf = id => catalogue.find(entry => entry.id === id)
-// Auto-perform output: midi.mjs's virtual ports for a Strudel track, SC (over the server) for an SC track
+// Auto-perform output: SC, over the server
 const scAuto = createScAuto({ post: (route, body) => fetch('sc/' + route, { method: 'POST',
   headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) })
-let autoOut = midi
-const autoOutput = Object.fromEntries(['setAuto', 'setAutoLk', 'noteAuto', 'noteOffAuto', 'releaseAutoKeys', 'resetAuto']
-  .map(name => [name, (...args) => autoOut[name](...args)]))
-// takes hear the controllers (Web MIDI) and the script (midi.mjs's virtual ports, or the SC output); on SC the bar-0
-// snapshot is what the load set (SC starts every load from 0)
+// takes hear the controllers (Web MIDI) and the script (the SC output); the bar-0 snapshot is what the load set (SC
+// starts every load from 0)
 const recorder = createRecorder({ engine, midi: {
   onMessage: callback => { midi.onMessage(callback); scAuto.onMessage(callback) },
-  heldCcs: () => onSc() ? scAuto.heldCcs() : midi.heldCcs(),
+  heldCcs: () => scAuto.heldCcs(),
 } })
-strudelEngine.ready.then(() => { label = 'ready' })
 let catalogue = []
 const showScripts = () => {
   autoPerform.setScripts(catalogue.find(entry => entry.id === $('track').value)?.scripts ?? [])
@@ -327,14 +302,9 @@ const fillTrack = selectId => {
   const picked = $('track').value
   if (picked) picks[pageKey(page)] = picked
   const entries = entriesFor(page, catalogue)
-  $('track').replaceChildren(...entries.map(({ id, label: text, taps, noTapReason }) => {
-    const option = new Option(taps ? text : `${text} (no tap)`, id)
-    option.disabled = !taps
-    option.title = noTapReason ?? ''
-    return option
-  }))
+  $('track').replaceChildren(...entries.map(({ id, label: text }) => new Option(text, id)))
   $('track').value = [selectId, picks[pageKey(page)], '010-ambient-house', ...entries.map(entry => entry.id)]
-    .find(id => entries.some(entry => entry.id === id && entry.taps)) ?? ''
+    .find(id => entries.some(entry => entry.id === id)) ?? ''
   showScripts()
 }
 const loadCatalogue = selectId => fetch('catalogue').then(r => r.json()).then(entries => {
@@ -400,7 +370,6 @@ addEventListener('message', async event => {
 $('track').onchange = () => {
   showScripts()
   stopRecording()
-  if (transport === 'paused') stopTransport()
 }
 
 const TAIL_SECONDS = 4
@@ -414,14 +383,8 @@ const onAudioError = error => {
   recordArmed = false
   stopRecording()
 }
-// Strudel records in this page (recorder.mjs); SuperCollider writes its own WAV (recorder-sc.mjs): `audio` is the one in use
-const audioWeb = createAudioRecorder({ engine, onError: onAudioError })
-const audioSc = createScRecorder({ engine, onError: onAudioError })
-const audio = new Proxy({}, { get: (_, key) => {
-  const used = audioSc.recording ? audioSc : audioWeb.recording ? audioWeb : onSc() ? audioSc : audioWeb
-  const value = used[key]
-  return typeof value === 'function' ? value.bind(used) : value
-} })
+// SuperCollider writes its own WAV (recorder-sc.mjs)
+const audio = createScRecorder({ engine, onError: onAudioError })
 const startRecording = (source, script = null) => queueRecord(async () => {
   if (audio.recording) return
   recordError = ''
@@ -462,7 +425,7 @@ const toggleRecord = () => {
 $('record').onclick = toggleRecord
 
 let running = false, stoppedByPage = false
-const performer = createPerformer({ midi: autoOutput, engine, onChange: progress => {
+const performer = createPerformer({ midi: scAuto, engine, onChange: progress => {
   if (!progress && running && autoRecording) {
     if (stoppedByPage) stopRecording()
     else tailTimer = setTimeout(() => stopRecording('script-end').then(reconcileRecording), TAIL_SECONDS * 1000)
@@ -479,13 +442,14 @@ const stopPerformer = () => {
   stoppedByPage = false
 }
 
-const playSc = async (track, script) => {
-  strudelEngine.stop()
-  current = scEngine
-  label = scEngine.host().ready ? 'loading track …' : 'starting SuperCollider …'
+const play = async script => {
+  stopPerformer()
+  const track = $('track').value
+  scStarted = true
+  label = engine.host().ready ? 'loading track …' : 'starting SuperCollider …'
   try {
     if (!script) scAuto.clear()
-    await scEngine.load(track, scAuto.loadInit())
+    await engine.load(track, scAuto.loadInit())
     setPlaying(track)
     recorder.start({ track, trackHash: null, cps: engine.cps(), ...script && { script } })
     scAuto.live()
@@ -500,34 +464,6 @@ const playSc = async (track, script) => {
   attachPanel()
   return true
 }
-const play = async script => {
-  stopPerformer()
-  const track = $('track').value
-  if (entryOf(track)?.engine === 'sc') return playSc(track, script)
-  scEngine.stop()
-  setPlaying(null)
-  current = strudelEngine
-  await Promise.all([engine.ready, midi.ready])
-  label = 'loading track …'
-  const response = await fetch('track/' + encodeURIComponent(track), { cache: 'no-store' })
-  const code = await response.text()
-  try {
-    await strudelEngine.load(code)
-    const trackHash = response.headers.get('X-Track-Hash')
-    recorder.start({ track, trackHash, cps: engine.cps(), ...script && { script } })
-    hasLcView = code.includes('globalThis.lcxlView')
-    $('panelEmpty').textContent = 'This track has no Live panel: open Visuals.'
-    attachPanel()
-    label = 'playing: ' + track
-  } catch (error) {
-    hasLcView = false
-    attachPanel()
-    label = 'Error: ' + error.message
-    return false
-  }
-  transport = 'playing'
-  return true
-}
 const stopTransport = () => {
   stopPerformer()
   engine.stop()
@@ -537,17 +473,7 @@ const stopTransport = () => {
   label = 'stopped'
 }
 const togglePlay = () => {
-  if (transport === 'playing' && !onSc()) {
-    strudelEngine.pause()
-    transport = 'paused'
-    label = 'paused'
-    reconcileRecording()
-  } else if (transport === 'paused') {
-    strudelEngine.resume()
-    transport = 'playing'
-    label = 'playing: ' + $('track').value
-    reconcileRecording()
-  } else if (transport === 'stopped') play().then(reconcileRecording)
+  if (transport === 'stopped') play().then(reconcileRecording)
 }
 $('play').onclick = togglePlay
 $('stop').onclick = stopTransport
@@ -557,13 +483,10 @@ const startScript = async id => {
   const response = await fetch(`perform/${encodeURIComponent(track)}/${encodeURIComponent(id)}`, { cache: 'no-store' })
   if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
   const script = await response.json()
-  const entry = entryOf(track)
-  if (script.track !== (entry?.base ?? track)) return void (label = `Error: script ${id} is for ${script.track}`)
+  if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
   stopPerformer()
-  // SC: the steps go to SC; bar 0 is held and sent with the load
-  autoOut = entry?.engine === 'sc' ? scAuto : midi
-  if (autoOut === scAuto) scAuto.hold()
-  else midi.addAuto({ launchkey: usesLaunchkey(script) })
+  // the steps go to SC; bar 0 is held and sent with the load
+  scAuto.hold()
   performer.prime(script)
   const recordAudio = $('recordAuto').checked || recordArmed
   if (recordAudio) await stopRecording()
@@ -614,12 +537,12 @@ const showTransport = () => {
   const button = $('play')
   if (button.dataset.transport !== transport) {
     button.dataset.transport = transport
-    const text = state === 'pause' ? 'Pause' : transport === 'paused' ? 'Resume' : 'Play'
+    const text = state === 'pause' ? 'Pause' : 'Play'
     button.title = text
     button.setAttribute('aria-label', text)
     button.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">${ICONS[state]}</svg>`
   }
-  button.disabled = state === 'pause' && onSc()
+  button.disabled = state === 'pause'
 }
 const RECORD_TITLES = {
   off: 'Record: off. Switch on to record whenever a track plays (key R)',
@@ -640,35 +563,18 @@ const showRecording = () => {
     const seconds = audio.elapsed()
     setText($('recTime'), clock(seconds))
     $('recMeter').firstChild.style.width = meterWidth(audio.level()) + '%'
-    const megabytes = (seconds * (engine.output()?.context.sampleRate ?? 48000) * 4 / 1e6).toFixed(1)
+    const megabytes = (seconds * 48000 * 4 / 1e6).toFixed(1)
     setText($('recFile'), `${audio.name}.wav · ${megabytes} MB` + (tailTimer ? ' · tail' : ''))
   } else setText($('recFile'), lastFile ? 'Last: ' + lastFile : '')
 }
 
-const panelWindow = $('lcPanel').contentWindow
-panelWindow.addEventListener('keydown', event => dispatchEvent(new KeyboardEvent('keydown', { key: event.key })))
-let hasLcView = false, currentView = 'panel'   // 'panel' on Live and Labs, 'visuals' on Visualization
-const detachPanel = () => {
-  const view = globalThis.lcxlView
-  if (view?.win === panelWindow) view.win = null
-}
+let currentView = 'panel'   // 'panel' on Live and Labs, 'visuals' on Visualization
 const attachPanel = () => {
-  // SuperCollider: the LC view of sc/ui/index.html (state from SC), loaded once
+  // the LC view of sc/ui/index.html (state from SC), loaded once, shown once a track has played
   $('scPanel').hidden = !onSc()
-  $('lcPanel').hidden = onSc()
-  if (onSc()) {
-    if (!$('scPanel').getAttribute('src')) $('scPanel').src = 'sc/'
-    $('panelEmpty').hidden = true
-    return detachPanel()
-  }
-  const view = globalThis.lcxlView
-  $('panelEmpty').hidden = hasLcView && !!view
-  if (!hasLcView || !view || currentView !== 'panel') return detachPanel()
-  const doc = panelWindow.document
-  doc.head.innerHTML = '<style>' + view.css + '</style>'
-  if (!doc.getElementById('lc')) doc.body.innerHTML = '<div id=lc></div>'
-  view.win = panelWindow
-  view.draw()
+  if (!onSc()) return
+  if (!$('scPanel').getAttribute('src')) $('scPanel').src = 'sc/'
+  $('panelEmpty').hidden = true
 }
 let settingsOpen = false
 const showSettings = open => {
@@ -755,22 +661,7 @@ const toggleSidebar = () => {
 }
 $('sideToggle').onclick = toggleSidebar
 
-const hideStatusBoxWhileLcViewOpen = () => {
-  const view = globalThis.lcxlView, box = view?.link?.parentElement
-  const ownWindowOpen = !!view?.win && view.win !== panelWindow && !view.win.closed
-  if (box && box !== document.body) box.hidden = currentView === 'panel' || ownWindowOpen
-}
-
-const NO_FRAME_CSS = '.page.live{border-color:#222 !important}'
-const applyLcFrame = () => {
-  const view = globalThis.lcxlView, doc = view?.win && !view.win.closed ? view.win.document : null
-  if (!doc) return
-  const style = doc.getElementById('noFrame')
-  if (settings.get('lcFrame')) style?.remove()
-  else if (!style) doc.head.append(Object.assign(doc.createElement('style'), { id: 'noFrame', textContent: NO_FRAME_CSS }))
-}
-
-// the SuperCollider panel follows the LC frame setting too (sent on change and whenever the panel (re)loads)
+// the SuperCollider panel follows the LC frame setting (sent on change and whenever the panel (re)loads)
 let sentLcFrame = null, shownOnSc = null
 const sendLcFrame = () => { sentLcFrame = settings.get('lcFrame'); $('scPanel').contentWindow?.postMessage({ lcFrame: sentLcFrame }, location.origin) }
 $('scPanel').addEventListener('load', () => { sendLcFrame(); sendPick(); sendShape(); sendPanelNames() })
@@ -794,14 +685,12 @@ addEventListener('message', event => {
   if (typeof view === 'string' && view !== settings.get('setView')) settings.set('setView', view)
 })
 const showStatus = () => {
-  hideStatusBoxWhileLcViewOpen()
-  applyLcFrame()
   if (settings.get('lcFrame') !== sentLcFrame) sendLcFrame()
   if (onSc() !== shownOnSc) { shownOnSc = onSc(); showDevices() }
   showTransport()
   showRecording()
   const midiText = midi.available() ? 'MIDI: ' + midi.count() + ' inputs' : 'No MIDI'
-  $('status').textContent = [label, midiText, autoLabel, onSc() ? scVisuals : visuals].filter(Boolean).join(' · ')
+  $('status').textContent = [label, midiText, autoLabel, scVisuals].filter(Boolean).join(' · ')
   requestAnimationFrame(showStatus)
 }
 showStatus()

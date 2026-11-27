@@ -1,19 +1,17 @@
 // Auto-perform and takes on SuperCollider tracks. Pure: runs in the page and in Node (the caller hands in `post`).
 //
-// createScAuto: the performer's output for an SC track. autoperform.mjs plays a script into an object with midi.mjs's
-// auto interface (setAuto, setAutoLk, noteAuto, noteOffAuto, releaseAutoKeys, resetAuto); on a Strudel track that is
-// midi.mjs's virtual ports, on an SC track it is this: every step goes to SC through the player's server, like a click
-// in the LC view: an LC CC → POST /sc/cc (→ /ce/cc), a Launchkey CC → POST /sc/lk { cc } (→ /ce/lkcc), keys and pads
+// createScAuto: the performer's output. autoperform.mjs plays a script into an object with the auto interface (setAuto,
+// setAutoLk, noteAuto, noteOffAuto, releaseAutoKeys, resetAuto); this is it: every step goes to SC through the player's
+// server, like a click in the LC view: an LC CC → POST /sc/cc (→ /ce/cc), a Launchkey CC → POST /sc/lk { cc } (→ /ce/lkcc), keys and pads
 // → POST /sc/lk { note: [note, velocity 1-127, channel 0-based: 9 = pads] } (→ /ce/lknote). SC plays a key at once
 // and has no note-off: noteOffAuto only reaches the capture. The requests go out one after the other in step order
 // (consecutive CCs of a tick share one), so a ramp never ends on an older value. The scripts stay as they are.
 // hold() (before prime): nothing is sent, the values are kept and go with the load (loadInit() → POST /sc/load
-// { id, cc, lk }), so SC sets a script's bar 0 before its first note, like a primed script on Strudel; live() after the
-// load. Every step also reaches onMessage listeners as the MIDI message midi.mjs's virtual port would send (ports
-// 'LCXL3 Auto' / 'Launchkey MK4 25 Auto'), so a take of an SC play hears the script as on Strudel; heldCcs() is the
-// take's bar-0 snapshot: SC starts every load from 0, so it is what the load set, never a hardware position.
+// { id, cc, lk }), so SC sets a script's bar 0 before its first note; live() after the load. Every step also
+// reaches onMessage listeners as the MIDI message a virtual port would send (ports 'LCXL3 Auto' / 'Launchkey MK4 25
+// Auto'), so a take of an SC play hears the script; heldCcs() is the take's bar-0 snapshot: SC starts every load from 0, so it is what the load set, never a hardware position.
 //
-// createScTap: the SC counterpart of the tapped Strudel events of a play (a take's events file, check-replay): SC's
+// createScTap: the tapped events of a play (a take's events file, check-replay): SC's
 // state echoes on /sc/events (push(type, data) for each) as one batch per bar. At each bar line (beat message with
 // beat 0, bar b):
 //   'sc keys'  cycle b-1, the keys and pads SC played in the bar before (notes: 'note/channel …' in arrival order)
@@ -21,9 +19,9 @@
 //              read a tick earlier or later still matches)
 //   'sc lk'    cycle b, the Launchkey CCs, likewise
 //   'sc state' cycle b, the pattern choices (rows.<column>: 'now>next') and the track's other state lines (JSON)
-// Events have duration 1 (a bar) and are compared by replay-check.mjs like Strudel's.
-export const AUTO_PORT = 'LCXL3 Auto'              // = midi.mjs AUTO_PORT
-export const LK_AUTO_PORT = 'Launchkey MK4 25 Auto' // = midi.mjs LK_AUTO_PORT
+// Events have duration 1 (a bar) and are compared by replay-check.mjs.
+export const AUTO_PORT = 'LCXL3 Auto'
+export const LK_AUTO_PORT = 'Launchkey MK4 25 Auto'
 export const CC_STEP = 4
 
 const byte = value => Math.round(value * 127)

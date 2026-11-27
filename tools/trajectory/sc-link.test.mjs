@@ -19,16 +19,13 @@ test('OSC: what the link sends reads back the same', () => {
   assert.deepEqual(m.args, [13, 0.5, 'x'])
 })
 
-test('track list: every SC track is a live track on engine sc; a ported track keeps its Strudel copy', async () => {
+test('track list: every SC track is a live track on engine sc', async () => {
   const { scan } = await import('./catalogue.mjs')
   const live = scan().filter(entry => entry.kind === 'live')
   const sc = live.filter(entry => entry.engine === 'sc')
   assert.ok(sc.length >= 4, 'at least the four ported tracks')
   for (const entry of sc) {
     assert.match(entry.path, entry.stems ? /\.track$/ : /\.scd$/)
-    assert.ok(entry.taps, `${entry.id} playable`)
-    const copy = live.find(other => other.base === entry.id)
-    if (copy) assert.equal(copy.engine, 'strudel')
   }
   assert.equal(new Set(live.map(entry => entry.id)).size, live.length, 'ids are unique')
   assert.ok(sc.some(entry => entry.stems && entry.id === '090-stem-demo'), 'the stem demo track is listed')

@@ -20,7 +20,7 @@ const SCANNED = [
   /^CLAUDE\.md$/, /^\.claude\/skills\/.+\/SKILL\.md$/, /^\.claude\/epics\/.+\.md$/, /^\.claude\/prds\/[^/]+\.md$/,
   /^docs\/[^/]+\.md$/, /^midi-layouts\/[^/]+\.md$/, /^tools\/[^/]+\/README\.md$/
 ]
-const EXTENSIONS = 'mjs|js|json|md|strudel|pdf|syx|typ|html|yml|yaml|sh|sfz|wav|mp3|txt'
+const EXTENSIONS = 'mjs|js|json|md|pdf|syx|typ|html|yml|yaml|sh|sfz|wav|mp3|txt'
 const hasExtension = new RegExp(`\\.(${EXTENSIONS})$`)
 const placeholder = /<[A-Za-z-]+>|\bNNN\b|\*|\{[^}]*,[^}]*\}/
 

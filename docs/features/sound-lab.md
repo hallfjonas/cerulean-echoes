@@ -97,3 +97,45 @@ version (a draft, then Promote).
   yet. If it drops out, rest columns (fader 0) cost nothing, and fewer candidates per round help.
 - Column 8 in the Stem Designer has no Chapter or Break button (button 1 picks the volume the fader sets); the project's
   `context.chapter` sets the chapter.
+
+## Ideas: plugin blocks (not built)
+
+How the free plugin packs of `sc/PLAN-SOUND-QUALITY.md` (sc3-plugins, mi-UGens, section 4 there) would appear on the
+controller. Moved from that plan; nothing here is built.
+
+### As Sample Designer blocks (`sc/lab/samples/blocks.json`)
+New block kinds, same schema as now (row 1 main, row 2 shape/time, row 3 fine/mod, fader level or mix, button 1
+on/off, button 2 type):
+
+| Block | part | Row 1 | Row 2 | Row 3 | Fader | Button 2 (type) |
+|---|---|---|---|---|---|---|
+| Plaits | source | Timbre | Morph | Harmonics | Level | engine (16 models; cycles) |
+| Rings | fx (resonator) | Brightness | Damping | Structure | Mix | Modal / String / FM bell |
+| Clouds | fx | Position | Size | Density | Mix | Granular / Stretch / Loop / Spectral |
+| Ladder filter (DFM1 / MiRipples) | fx | Cutoff | Resonance | Env amount | Mix | LP / BP / HP |
+| Tape | fx | Drive | Wow/flutter | Tone | Mix | Tape / Tube |
+| Reverb | fx | Size | Damping | Pre-delay | Mix | Room / Hall / Plate |
+
+New setups to try, e.g. **Texture** (Plaits → Rings → Clouds → Envelope → LFO → Tape) and **Drum voice (Plaits)**
+(Plaits drum models → Envelope → Ladder filter → Drive). Mode 2 is unused in the Sample Designer: it could hold the
+second page of a block that needs more than three knobs (Plaits' LPG decay/colour, Clouds' feedback/texture/spread).
+
+### In a stem (the live column)
+The stem keeps the fixed row meanings, so the player never has to relearn a column:
+
+| Control | Plaits stem | Rings stem | Clouds stem |
+|---|---|---|---|
+| Row 1 Brightness | Timbre (+ LPG colour) | Brightness | texture/filter |
+| Row 2 Space | Space | Space | Space (+ Clouds' own reverb) |
+| Row 3 (named) | Morph | Structure | Density |
+| Fader Level | Level | Level | Level |
+| Button 1 Pattern | Pattern | Pattern | Pattern / Freeze |
+| Button 2 (named) | Engine (next model, at the next bar) | Model | Freeze |
+
+All knobs at 0 must already sound good (track rule): set every mapping's bounds so the 0 end is a usable sound,
+not silence or a raw extreme.
+
+### Randomizing (Würfel mode)
+Plaits and Rings are well suited: their parameters are 0..1, and the musical range is wide. Still store a tested
+range per parameter in the block definition (as planned for the Würfel mode), plus a list of allowed engines per role
+(e.g. a bass stem: VA, waveshaping, FM, bass drum model only).
