@@ -95,6 +95,9 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
 `tools/trajectory/README.md`). It plays every live track (Live) and the sound lab projects (Labs) with the visuals.
 - Launcher for people without a Terminal: `Cerulean Echoes.app` (repo root, committed; source and `launch.sh` in
   `tools/launcher/`, rebuild with `npm run launcher`) starts the server, shows the player in its own window (Swift/WKWebView, no Web MIDI: SC tracks only for controllers), quitting stops server + SC.
+- Whenever the user should listen to something, or asks to start the player, offer the command that opens
+  `Cerulean Echoes.app` with its absolute path, quoted because of the space. The app plays the code of the folder
+  it sits in; if a player already answers on port 8766 (another app), it shows that one: quit it first.
 - SuperCollider tracks (`sc/tracks/`, catalogue `engine: 'sc'`, plain id): the server starts `sclang sc/engine.scd` on the first SC load and ends it with itself (own ports:
   OSC 57131, server 57140, so an IDE session with `live.scd` can run beside it; `CE_SC_PORT`, `CE_SC_SERVER_PORT`);
   `tools/trajectory/sc-link.mjs`, `engine-sc.mjs`. Controllers go straight to SC; the page mirrors SC's state.
