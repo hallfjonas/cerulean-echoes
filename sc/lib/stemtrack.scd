@@ -79,10 +79,20 @@
 					b2: [["Beat on", "Beat off"][self.breakL.now], ["Beat on", "Beat off"][self.breakL.pending]],
 					b2on: self.breakL.pending == 1) } },
 		uiChordAt: { |self, bar| self.chordAt(bar).name },
-		// the step engine asks a slot, not a column: a swap waiting for this slot takes over on the bar line
+		// the step engine asks a slot, not a column: a swap waiting for this slot takes over on the bar line. A column
+		// whose code throws (a stem that needs what this frame lacks) goes quiet and is reported once; the others play on
 		slotStep: { |self, slot, k|
 			var msgs = if(k % 16 == 0 and: { self.pending[slot].notNil }) { self.switchSlot(slot) } { [] };
-			msgs ++ (self.columns[slot] ?? { self.backing[slot] }).stepNotes(k)
+			var col = self.columns[slot] ?? { self.backing[slot] }, notes = [];
+			// the try is its own statement: a primitive that fails inside it corrupts an expression the try is part of
+			if(col[\failed].isNil) { notes = { col.stepNotes(k) }.try { |e| self.columnFailed(slot, col, e); [] } };
+			msgs ++ notes
+		},
+		columnFailed: { |self, slot, col, error|
+			var name = col[\stem][\name].asString;
+			col[\failed] = error.errorString;
+			"Slot % (%) is silent: %".format(slot, name, col[\failed]).warn;
+			self.ce.uiSend('/ce/stemerror', slot.asString, name, col[\failed])
 		},
 		// the outgoing column's own hooks and latches leave with it; the strip takes the new stem's settings (its shape
 		// is the same, ~ce.swapProblem)

@@ -62,3 +62,25 @@ test('Stem Designer: projects load and play, A/B swaps, Promote reaches the play
     const summary = lines.find(line => /passed, \d+ failed$/.test(line)) ?? 'no summary (sclang crashed?)'
     assert.equal(run.status, 0, `${summary}\n${lines.filter(line => /^FAIL/.test(line)).join('\n')}`)
   })
+
+// Every library stem in every stem track's frame (stem-frames.scd): a stem whose code fails in a frame goes quiet
+// there. stem-frames-known.json lists the known failures ({ track: { stem ref: error } }); the test fails on a new one
+// and on a listed one that works now. STEM_FRAMES_WRITE=1 writes the file from this run instead.
+test('Stems in every frame: only the known failures', { skip: sclang ? false : 'sclang not installed' }, () => {
+  const run = spawnSync(sclang, [path.join(here, 'stem-frames.scd')], { encoding: 'utf8', timeout: 1300e3 })
+  const lines = `${run.stdout}\n${run.stderr}`.split('\n')
+  assert.equal(run.status, 0, lines.filter(line => /^FAIL|^ERROR:/.test(line)).join('\n') || 'sclang failed')
+  const found = {}
+  for (const line of lines) {
+    const m = line.match(/^ERROR (\S+) (\S+) \| (.*)$/)
+    if (m) (found[m[1]] ??= {})[m[2]] = m[3]
+  }
+  const knownFile = path.join(here, 'stem-frames-known.json')
+  if (process.env.STEM_FRAMES_WRITE === '1') fs.writeFileSync(knownFile, JSON.stringify(found, null, 2) + '\n')
+  const known = JSON.parse(fs.readFileSync(knownFile, 'utf8'))
+  const pairs = map => Object.entries(map).flatMap(([track, stems]) => Object.keys(stems).map(ref => `${track} ${ref}`))
+  const fresh = pairs(found).filter(pair => !pairs(known).includes(pair))
+  const fixed = pairs(known).filter(pair => !pairs(found).includes(pair))
+  assert.deepEqual({ fresh, fixed }, { fresh: [], fixed: [] },
+    'fresh: stems that fail in a frame (fix the stem or frame, or list it); fixed: listed failures that work now')
+})
