@@ -52,7 +52,8 @@ every controller optional. Edit the `.scd`; a new version goes into a new folder
   changes nothing until it meets the value); pattern buttons switch at the next bar, Chapter at the next bar or phrase.
 - Every connected LC XL 3 (port name contains `LCXL3`, not `DAW`) gets the full layout; several LCs share every value
   (SC sends each knob change back to every LC). Launchkey MK4 25 (optional): keys = a pad, drum pads (channel 10) = 16
-  one-shots (`lkNote`, names in `lkPadNames`), mod wheel CC 1 = keys level × master, knobs CC 21-28 = sound.
+  one-shots (`lkNote`, names in `lkPadNames`), mod wheel CC 1 = keys level × master, knobs CC 21-28 = sound. A stem
+  track's frame may let the keys play one of its columns (`lkKeys`, a knob picks it; 017-lsd-fx-2: knob 1).
 
 ## Controller mapping (LC XL 3)
 - Custom Mode 16 (channel 16): columns 1-7 = stems. Fader CC 5-11, knob rows CC 13-19 / 21-27 / 29-35, buttons CC 37-43 / 45-51.

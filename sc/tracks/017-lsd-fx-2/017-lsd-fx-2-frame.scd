@@ -1,7 +1,8 @@
 // Frame of the 017 LSD FX 2 stem track (017-lsd-fx-2.track): 017-groove-lsd's frame without the chords column. Mode 1 is
 // 017's foundation with congas (1:5) and claps (1:7); Mode 2 the strings, the stab and the leads of 017, then four sparse
-// fx columns, the metal (2:4) one of them: the Launchkey keys play its sound. The root stays on F (no progressions, no
-// chord colours). The three moods (Chapter), the orbits, the global column 8 texts and the Launchkey are 017's.
+// fx columns, the metal (2:4) one of them. The Launchkey keys play one Mode 2 column (knob 1 picks it, the metal at
+// the start). The root stays on F (no progressions, no chord colours). The three moods (Chapter), the orbits, the
+// global column 8 texts and the Launchkey are 017's.
 // Format: sc/lib/stemtrack.scd.
 // Column 8's fader is Wumms (more low end, punch and drive), not a volume: kick, rumble, sub and bass read it per note, so
 // the frame is masterless. Chapter = the mood, all on F: Dark (minor), Tight (phrygian), Warm (dorian); it switches at the next bar. Every column
@@ -14,8 +15,9 @@
 // @ctl g.fader Wumms | more low end, punch and drive.
 // @ctl g.b1 Chapter | mood: dark → tense → warm, at the next bar.
 // @ctl g.b2 Break | 1st: low end out. 2nd: all back on the one.
-// @lk level Keys Level | mod wheel: volume of the keys, apart from the metal column's fader.
-// @lk k1 Key Tone | keys: darker ↔ brighter, on top of the metal's Brightness.
+// @lk level Keys Level | mod wheel: volume of the keys, apart from the column's fader.
+// @lk k1 Keys Stem | keys: which Mode 2 column they play.
+// @lk k2 Key Tone | keys: darker ↔ brighter, on top of the column's Brightness.
 // @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 (
 var bpm = 134, beat = 60 / bpm, fogCC = 20, tensionCC = 36;
@@ -38,16 +40,14 @@ chordAt: { |frame, track, bar| anyChord },
 uiHead: { |frame, track, ce|
 	var pend = { |now, next| if(now == next) { [now] } { [now, next] } };
 	[["Chapter"] ++ pend.("F " ++ moods[track.chapter.now].name, "F " ++ moods[track.chapter.pending].name),
-	 ["Break"] ++ pend.(beatNames[track.breakL.now], beatNames[track.breakL.pending])]
+	 ["Break"] ++ pend.(beatNames[track.breakL.now], beatNames[track.breakL.pending]), ["Keys", ce.lkColumnLabel]]
 },
 uiGlobal: { |frame, track, ce| (b1: ["F " ++ moods[track.chapter.now].name, "F " ++ moods[track.chapter.pending].name],
 	b2: [beatNames[track.breakL.now], beatNames[track.breakL.pending]], b2on: track.breakL.pending == 1) },
 orbits: (1: (ir: "ir/orbit-1.6.wav", delay: [0.75 * beat, 0.3]), 2: (ir: "ir/orbit-4.wav", delay: [0.75 * beat, 0.58]),
 	3: (ir: "ir/orbit-2.6.wav", delay: [0.25 * beat, 0.45])),
 // state buses: room and echo amounts the language derives from knobs (columns whose Space is scaled, echo throws)
-states: (lkLevel: 0, lkBright: 0.5,
-	// the room and echo of the metal column (2:4), which the keys' lane follows (the column's own values replace these)
-	s2_4_room: 0.9 * 0.4, s2_4_echo: 0.15),
+states: (lkLevel: 0, lkBright: 0.5),
 samples: ["tr909/bd-01.wav", "tr909/oh-00.wav", "tr909/hh-00.wav",
 	// the metal fx column (2:4)
 	"dirt/metal-00.wav",
@@ -58,31 +58,29 @@ samples: ["tr909/bd-01.wav", "tr909/oh-00.wav", "tr909/hh-00.wav",
 
 stems: [
 	(name: \lk, sounds: [\sdSampleMod, \sdSynthMod], level: \lkLevel, tensionEcho: false, thin: false,
-		lanes: [(name: \metal, orbit: 2, roomR: \s2_4_room, echoSend: \s2_4_echo),
-			(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \lt, orbit: 1, level: 1.0, roomR: 0.5),
+		lanes: [(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \lt, orbit: 1, level: 1.0, roomR: 0.5),
 			(name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.4), (name: \braaam, orbit: 1, level: 1.0, roomR: 0.9),
 			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
 // the Launchkey's start values: the mod wheel at a third, the key tone neutral
-lkStart: (1: 0.34, 21: 0.5),
-// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play the metal sound (2:4): a second player
-// on the keys, the first one shaping the metal on the Launch Control. Its Brightness, Weight, Space, Rewind and Pattern reach
-// the keys (Random: a figure per press), its fader does not (it keeps playing its own hits). The mod wheel (CC 1) is the keys'
-// level, knob 1 (CC 21) their tone (the filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the one-shot darkness of
-// the drum pads.
+lkStart: (1: 0.34, 22: 0.5),
+// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play one Mode 2 column that can play
+// keys (lkKeys, sc/lib/stemtrack.scd; today the metal, 2:4): a second player on the keys, the first one shaping the
+// column on the Launch Control. Its knobs and buttons reach the keys, its fader does not (it keeps playing its own
+// hits). Knob 1 (CC 21) picks the column, the mod wheel (CC 1) is the keys' level, knob 2 (CC 22) their tone (the
+// filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the one-shot darkness of the drum pads.
+lkKeys: (slots: ['2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7'], start: '2:4', cc: 21,
+	level: \lkLevel, tone: \lkBright),
 lkCtl: { |ce, num, v, send|
 	switch(num,
 		1, { ce.setState(\lkLevel, v, send) },
-		21, { ce.setState(\lkBright, v, send) })
+		22, { ce.setState(\lkBright, v, send) })
 },
+// the drum pads only: the keys play the column lkKeys picks
 lkNote: { |ce, note, vel, chan|
 	var k = { |n| ce.lkCC[20 + n] }, nl = 0.25 + (1.75 * k.(5));   // the Braaam's length in bars (knob 5)
 	var thin = ("c" ++ ce.thinBus).asSymbol;
-	if(chan != 9) {
-		var col = ce.track.columns['2:4'], tone = 2 ** (4 * (ce.stateVal[\lkBright] - 0.5));
-		(col !? { |c| c[\colCode] !? { |code| code[\keys] !? { |f| f.(c, note, vel) } } } ? []).collect { |n|
-			n.put(\lo, n[\lo] * tone).put(\hi, n[\hi] * tone) }
-	} {
+	if(chan != 9) { [] } {
 		// drum pads 36-51 (Drum mode): the spoken samples (left half), drum one-shots, a synth drop hit, Dirt-Samples
 		var shots = [
 			(file: "voice/brace.wav", tag: "brace"),

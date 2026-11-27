@@ -268,6 +268,18 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 				ce.prepare(ScoreStreamPlayer.new, track);
 				(track.slots['1:4'] == bassRef) and: { ce.swapProblem('1:4', ce.loadTrack(house).slots['1:4']).notNil }
 					and: { ce.swapProblem('1:1', "kick909/kick909-brightness-space-punch-pattern-drop-out.stem").isNil } });
+			check.("stem track lkKeys: keys play a pitched JSON column at the key's note, a knob picks the column", {
+				var ce, track, slots, notes;
+				play.(house, 1);
+				ce = ~lastCe; track = ce.track;
+				slots = ce.stemSlots.select { |s| var c = track.columns[s];
+					c.notNil and: { c[\colCode].isNil } and: { c[\pitch] != \none } and: { c[\kit].isNil } };
+				track.lkKeys = (slots: slots.keep(2), start: slots[0], cc: 21);
+				track.lkKeysSlot = slots[0];
+				notes = ce.lkColumnNotes(64, 0.8);
+				ce.setLkCC(21, 1, {});
+				(slots.size >= 2) and: { notes.notEmpty } and: { notes.every { |n| n[\midi] == 64 } }
+					and: { track.lkKeysSlot == slots[1] } });
 		}.value;
 	}.value;
 	};
@@ -283,8 +295,21 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		check.("% loads and plays notes with the faders up".format(name), {
 			log = play.(file, 4); log.size > 0 });
 		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
+		// (on a stem track whose keys play a column, lkKeys, the knob picks that column)
 		check.("% Launchkey knob 1 (CC 21) reaches the track".format(name), {
-			var ce = ~lastCe; ce.setLkCC(21, 0.7, {}); ce.stateVal[\lkBright] == 0.7 });
+			var ce = ~lastCe, keys = ce.track[\lkKeys];
+			ce.setLkCC(21, 0.7, {});
+			if(keys.notNil and: { keys[\cc] == 21 }) { ce.lkColumnChoices.includes(ce.track[\lkKeysSlot]) } {
+				ce.stateVal[\lkBright] == 0.7 } });
+		if((~lastCe !? { |c| c.track !? { |t| t[\lkKeys] } }).notNil) {
+			check.("% Launchkey keys play the chosen column into its strip, silent at level 0".format(name), {
+				var ce = ~lastCe, t = ce.track, lv = t[\lkKeys][\level], r;
+				ce.setState(lv, 0.8, {});
+				r = ce.lkRoute(60, 0.8, 0);
+				ce.setState(lv, 0, {});
+				r[\notes].notEmpty and: { r[\lanes] === ce.stemBus[t[\columns][t[\lkKeysSlot]][\stemName]] }
+					and: { ce.lkRoute(60, 0.8, 0)[\notes].isEmpty } });
+		};
 		check.("% every sample file it loads exists".format(name), {
 			var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
 		check.("% several stems play".format(name), {
