@@ -23,12 +23,17 @@ Two knob improvements for the SuperCollider live tracks (`sc/tracks/`: 007, 008,
 
 - **The device switches the bank, the software does not.** No Keys/Pads toggle in code. Which Launchkey button
   does this and which CCs it sends is measured first (task 001); the plan assumes bank A = CC 21-28, bank B = CC 31-38.
-  This replaces the software toggle (FR1-FR5) of the epic `launchkey-knob-target` for the SC tracks.
+  This replaces the software Keys/Pads toggle of the removed epic `launchkey-knob-target` for the SC tracks.
 - **One pad-to-knob map.** Pads are notes 36-51 on channel 10. In the factory layout (confirmed in task 001)
   columns 1-4 = notes 36-39 (bottom) and 40-43 (top), columns 5-8 = 44-47 (bottom) and 48-51 (top).
   `ce.lkPadColumn(note)` in `sc/lib` is the only place that knows it.
-- **A knob's job applies to both its pads**, each pad using it in its own way where the parameter differs
-  (a filter on a drum hit, a filter on a voice sample).
+- **A bank B knob's job applies to all 16 pads** (decided 2026-11-27, not per column): the same eight jobs on every
+  track, each neutral at 0. `ce.lkPadMods(i)` and `ce.lkPad(n)` in `sc/lib/controls.scd` are the only place that
+  knows them. Done so far: 1 pitch down, 2 brightness (the former Pad Fog), 3 thin, 4 drive, 5 pad spread (pad 1
+  left … pad 16 right), 6 boost. Knobs 7 and 8 are free (room and echo are lane sends, they need state buses).
+- **Key pan on knob 8 (CC 28).** Spreads the keys across the stereo field: 0 = all in the middle, 1 = the lowest key
+  of the keyboard window hard left, the highest hard right (`ce.lkKeyPan`; the window follows the octave buttons the
+  way the player's keyboard does). Pad Fog moved from CC 28 to CC 32.
 - **Pad modulation reads the knob at the hit** (as the Pad Fog knob does today in `lkNote`) unless the parameter can
   act on a sounding shot; then it goes through a state bus.
 - **Relative is applied only on the hardware path** (`ce.midiCC`). The web UI, auto-perform and takes send
@@ -55,7 +60,7 @@ Two knob improvements for the SuperCollider live tracks (`sc/tracks/`: 007, 008,
   the bank last moved framed.
 
 ### Tools
-- `tools/lcxl-layout/ctl.mjs`: parse `@lk pad.kN` tags (the format fixed in the epic `launchkey-knob-target`).
+- `tools/lcxl-layout/ctl.mjs`: parse `@lk pad.kN` tags (`// @lk pad.k1 Name | text`, as the frames write them).
 - `tools/sc-test/run.scd` and Node tests: feature tests for both parts.
 
 ## Implementation Strategy
@@ -81,7 +86,7 @@ touches `setLkCC` / `lkCtl`, so merge one after the other. One branch and PR per
 
 ## Success Criteria (Technical)
 
-- Bank B knob *n* changes both pads of column *n*, not the other columns; bank A behaves as before (feature test).
+- Bank B knob *n* does its job on every pad (feature test: `sc/tools` `run.scd`); bank A behaves as before, except knob 8.
 - Knobs at 0 in bank B: pads sound as today.
 - Relative on: moving a knob never jumps the value; first message after the switch only records the raw value;
   UI, auto-perform and takes still set absolute values.
@@ -95,7 +100,7 @@ and docs 3 h.
 ## Open Questions
 
 - Which Launchkey button changes the knob CCs, and does bank B really send CC 31-38? (task 001)
-- The 8 pad jobs: proposal in task 003 (pitch, brightness, space, echo, length, drive, pan, level); decided by ear.
+- Pad jobs 7 and 8 (candidates: room, echo throw); jobs 1-6 are in and still to be tuned by ear.
 - Relative mode: software relative is planned. If the player means endless hardware encoders, that needs
   Novation Components modes and a measurement first; it would become its own task.
 - Step size: a full sweep of the knob = full range of the value, or finer? Start with 1:1.
