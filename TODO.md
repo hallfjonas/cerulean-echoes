@@ -25,7 +25,7 @@ Long text of each idea: `git show 1bd1438:docs/player-future.md`.
 - Meta-steering: `meta.mjs`, curve view, control-map sweep, open and closed loop are in epic `auto-perform-steering`.
   Not planned: an LLM agent per phrase that reads the curve and the measured state and replans when a human grabs a
   control.
-- Producer inputs beyond Guitar Pro (see `tools/producer/`): song form plus genre, note sheet (MusicXML, MIDI,
+- Producer inputs beyond Guitar Pro (the producer was removed on 2026-11-27, git history keeps it): song form plus genre, note sheet (MusicXML, MIDI,
   ABC; scans need music recognition), song name recalled by an LLM. Needs a written song model, a generator from
   that model to a one-file track, and a timeline that moves Chapter and Tension per section.
 - Trajectory score: a per-bar separation number (stems apart in pan and pitch) from the Strudel path, a "good
