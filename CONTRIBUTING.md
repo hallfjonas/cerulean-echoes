@@ -7,7 +7,7 @@ tracks safe. For what the project does, start at [docs/README.md](docs/README.md
 
 1. Install [SuperCollider](https://supercollider.github.io/downloads) (3.13 or newer) and Node.js. The live tracks
    play on SuperCollider.
-2. Clone the repo and run `npm install` once in `tools/`. The checks and the player need it.
+2. Clone the repo. The tools in `tools/` need nothing installed beyond Node.js.
 3. Start the player: double-click `Cerulean Echoes.app`, or `cd tools && node trajectory/server.mjs` and open
    http://localhost:8766. It plays any track without controllers (auto-perform). See
    [getting started](docs/getting-started.md).

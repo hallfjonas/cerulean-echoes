@@ -30,18 +30,14 @@ are in `~/Library/Logs/cerulean-echoes.log`.
 
 ## First play (Terminal)
 
-1. Install the tools once:
-   ```bash
-   cd tools && npm install
-   ```
-2. Start the player:
+1. Start the player:
    ```bash
    cd tools && node trajectory/server.mjs
    ```
-3. Open http://localhost:8766 in Chrome.
-4. Pick a track in the list at the top. **Live** holds the live tracks (007 to 010).
-5. Press **Play**.
-6. Raise the master fader. Nothing sounds until it is up: the live tracks start with everything quiet on purpose.
+2. Open http://localhost:8766 in Chrome.
+3. Pick a track in the list at the top. **Live** holds the live tracks (007 to 010).
+4. Press **Play**.
+5. Raise the master fader. Nothing sounds until it is up: the live tracks start with everything quiet on purpose.
    - With a controller: move the fader in the last column (column 8, the global column).
    - Without a controller: pick a script in the Auto-perform section of the sidebar and press **Start**
      (key **P**). The script moves the controls for you. See [auto-perform](features/auto-perform.md).

@@ -2,7 +2,7 @@
 
 ## What it is
 Command line tools in `tools/` that test the project without a speaker or a controller. Each answers one question.
-Run all commands from the `tools/` folder (run `npm install` there once). The SuperCollider parts need SuperCollider
+Run all commands from the `tools/` folder. The SuperCollider parts need SuperCollider
 installed (`sclang`); without it they are skipped.
 
 ## When to use it

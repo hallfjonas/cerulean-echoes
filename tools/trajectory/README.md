@@ -19,7 +19,7 @@ Then open **http://localhost:8766** in Chrome. Or without a Terminal: double-cli
 repo folder (the launcher, `tools/launcher/`): it starts this server, shows the player in its own window (WKWebView; no Web MIDI, which SC tracks do not need: the
 controllers go straight to SC) and
 stops the server and its SuperCollider when it is quit (Dock: Quit; also on a force quit). An already running player
-on the port is only opened. First start: `npm ci` once, with a message. Log: `~/Library/Logs/cerulean-echoes.log`.
+on the port is only opened. Log: `~/Library/Logs/cerulean-echoes.log`.
 `tools/launcher/launch.sh check|install|start|open|alive|url|stop [--port N] [--no-browser]` does the work (also
 `CE_PORT`, `CE_NO_BROWSER=1`); after changing `launcher.applescript`, rebuild the app with `npm run launcher` and commit it.
 The player is the repo's main tool: it plays a track through SuperCollider on localhost and shows the Live page full

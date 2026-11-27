@@ -18,9 +18,9 @@ separate decision, made with the user.
 - **Not supported for new features:** new Strudel tracks, boards or stems; new controls, layouts, auto-performances or
   visuals written in Strudel; new Strudel-only helpers or checks.
 - **New features go to SuperCollider** (`sc/`). Plans and decisions for the move are in [SC-MIGRATION.md](SC-MIGRATION.md).
-- **Still there:** `tools/sc-port/reverb-ir.mjs`, which measures Strudel's reverb with `superdough` (and
-  `node-web-audio-api`, the two npm packages left) to make an impulse response for SC. Nothing else in the player or
-  the tools runs Strudel.
+- **Still there:** the files Strudel made, kept as assets: the measured reverb impulse responses (`sc/samples/ir/`), the
+  noise buffers and the gm soundfont zones (`sc/samples/`), and the generators `soundfont-extract.py` and
+  `noise-buffers.py` in `tools/sc-port/`. Nothing in the player or the tools runs Strudel.
 - **Removed on 2026-11-22** (decided with the user, sc-migration 010): set 011, the historic tracks 000-006, the
   Strudel checks (`verify`, `compare`, `audibility`, `measure`, `scenario`, `check-sounds`, the sound list) and the
   skills `/strudel-mix` and `/strudel-optimize`.
@@ -30,8 +30,10 @@ separate decision, made with the user.
 - **Removed on 2026-11-27** (decided with the user): the producer (Guitar Pro MIDI → Strudel track: `tools/producer/`,
   `npm run producer`, the skill `/producer`, the producer mode docs, the 012 and 013 fixtures), the player's Strudel
   engine (`engine-strudel.mjs`, `strudel-source.mjs`, `strudel-globals.mjs`, `banks.mjs`, `make-tapped.mjs` and the
-  routes and page code that served them), `tools/strudel-sim/`, `tools/shared/` (`npm run shared`) and the `@strudel/*`
-  npm packages. Git history keeps them.
+  routes and page code that served them), `tools/strudel-sim/`, `tools/shared/` (`npm run shared`), the reverb
+  measuring script `tools/sc-port/reverb-ir.mjs` and every npm package of `tools/` (`tools/` has none left, so the
+  session-start install hook, the `npm ci` step in CI and the launcher's first-start install went too). Git history
+  keeps them.
 
 ## How to add an entry
 

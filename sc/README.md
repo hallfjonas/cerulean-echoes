@@ -41,5 +41,5 @@ sc/
 ## Werkzeuge (`tools/sc-port/`)
 
 `stem-compare.mjs` (Stem-Track gegen den handgeschriebenen Track), `soundfont-extract.py` (gm-Soundfonts für SC),
-`reverb-ir.mjs` (Hall-Impulsantworten), `noise-buffers.py`. Ein **Szenario** (JSON: Reglerstellungen + Tastendrücke
+`noise-buffers.py`. Ein **Szenario** (JSON: Reglerstellungen + Tastendrücke
 über die Zeit) in `scenarios/` wird mit `sc/tools/render.scd` offline gerendert.

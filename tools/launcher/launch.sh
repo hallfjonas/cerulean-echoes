@@ -1,8 +1,7 @@
 #!/bin/bash
 # The launcher's work, called by "Cerulean Echoes.app" (tools/launcher/app/main.swift) and by its test:
-#   launch.sh check      exit 0 and print "ok", or "install" when tools/node_modules is missing;
+#   launch.sh check      exit 0 and print "ok";
 #                        exit 1 with a plain message (stderr) when Node.js or SuperCollider is missing
-#   launch.sh install    npm ci in tools/ (once, on the first start)
 #   launch.sh start      start the player server (tools/trajectory/server.mjs) in the background and wait until it
 #                        answers; print "started <pid>", or "running" when a player already answers on the port (then
 #                        nothing is started and stop leaves it alone)
@@ -90,15 +89,7 @@ case "$command" in
     has_sclang || fail "SuperCollider is missing. Install it once from https://supercollider.github.io/downloads (drag it into Applications), then start Cerulean Echoes again."
     [ -f "$tools/trajectory/server.mjs" ] || fail "The player is not next to the app ($tools/trajectory/server.mjs is missing). Keep Cerulean Echoes.app in the repo folder."
     say "check: node $node ($("$node" --version)), repo $repo"
-    if [ -d "$tools/node_modules" ]; then echo ok; else echo install; fi
-    ;;
-  install)
-    [ -n "$node" ] || fail "Node.js is missing. Install it once from https://nodejs.org, then start Cerulean Echoes again."
-    npm="$(dirname "$node")/npm"; [ -x "$npm" ] || npm="$(command -v npm)"
-    say "install: npm ci in $tools"
-    (cd "$tools" && "$npm" ci >> "$log" 2>&1) || fail "Installing the player's helpers failed (no internet connection?). Details: $log"
-    say "install: done"
-    echo installed
+    echo ok
     ;;
   start)
     if our_pid >/dev/null; then echo "started $(our_pid)"; exit 0; fi

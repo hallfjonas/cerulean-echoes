@@ -15,7 +15,6 @@ Arguments: `$ARGUMENTS`, in any order. A token of only digits is the port (defau
 - No worktree has it: `git fetch origin <branch>` if it is not local, then
   `git worktree add .claude/worktrees/<branch with / replaced by ->  <branch>`. Never switch the branch of the main
   checkout and never touch uncommitted work. If the branch does not exist locally or on origin, stop and say so.
-- A fresh worktree has no `tools/node_modules`: run `npm ci` in its `tools/` first.
 
 ## 2. Check the port
 `lsof -nP -iTCP:<port> -sTCP:LISTEN`. If something listens, show its command and the port and ask whether to use

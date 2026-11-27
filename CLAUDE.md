@@ -30,7 +30,7 @@ User vocabulary: "Density" = Tension, "build-up button" = Chapter, "global Wumms
   docs: `docs/features/stems.md`, `docs/features/sound-lab.md`
 - `samples/` — audio recordings
 - `recordings/<track>/` — WAV recordings (+ `.json` sidecar) of the player's output, written by the player, outside git
-- `tools/` — Node tools (run `npm install` in `tools/` once): the player, `npm test`, checks, sound lab, launcher
+- `tools/` — Node tools (no packages to install): the player, `npm test`, checks, sound lab, launcher
 
 ## Rules
 - **Non-destructive:** a new version of a track goes into a new file; never overwrite an existing track unless asked.
@@ -71,7 +71,7 @@ Use them instead of redoing the steps by hand:
   performance"): `/auto-perform`.
 - Start the player on a port or branch: `/player`. Review past sessions ("workflow review", "retro"): `/workflow-review`.
 
-Hooks: a commit with a staged file over 10 MB is refused; a fresh worktree gets `npm ci` in `tools/` at session start.
+Hooks: a commit with a staged file over 10 MB is refused.
 
 Tools (run in `tools/`):
 - Does every feature still work? `npm test` (player, takes, recording, launcher, stems, sound lab, and SC:
