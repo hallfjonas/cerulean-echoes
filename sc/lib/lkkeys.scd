@@ -5,6 +5,8 @@
 // to an octave), release 0.5 s, gain × 2 (LK_KEYS_GAIN). Loaded by the tracks that use it (not by ce.scd).
 // ~ce.lkKeysNotes(note, vel, mix, args): mix = the three pair knobs (0..1); args: hold (16ths), lane, tone (bus symbol),
 // bright (bus symbol or number: knob 1), thinF … — merged into every note. Brightness is a bus: it acts on sounding keys.
+// Knob 8 (CC 28) spreads the keys across the stereo field: 0 = every key in the middle, 1 = the lowest key of the keyboard
+// window hard left and the highest hard right (the window follows the octave buttons the way the player's keyboard does).
 (
 // a pair knob → [level A, level B]
 ~ce.lkPair = { |self, v, dip = 0|
@@ -21,9 +23,16 @@
 ~ce.lkKeysFiles = ~ce.lkKeysMaps.values.collect { |m| m.collect(_[1]) }.flatten
 	++ ~ce.fontFiles("0110_JCLive_sf2_file") ++ ~ce.fontFiles("0120_JCLive_sf2_file");
 ~ce.lkKeysSounds = [\sdSampleMod, \sdSynthMod, \sdFont];
+~ce.lkBase = 48;
+~ce.lkKeyPan = { |self, note|
+	var spread = self.lkCC[28];
+	if(note < self.lkBase or: { note > (self.lkBase + 24) }) { self.lkBase = 12 * (note / 12).floor };
+	0.5 + (0.5 * spread * ((2 * ((note - self.lkBase) / 24)) - 1))
+};
 ~ce.lkKeysNotes = { |self, note, vel, mix, args|
 	var lv = self.lkPair(mix[0], -1.3) ++ self.lkPair(mix[1], 1.3) ++ self.lkPair(mix[2]);
 	var touch = 2 ** (2 * (vel - 0.5)), out = List[];
+	var keyPan = self.lkKeyPan(note), spreading = self.lkCC[28] > 0;
 	var adsr = { |a, d, s, r| var v = self.sdADSR(a, d, s, r ? 0.5, [0.001, 0.05, 0.6, 0.01]); (a: v[0], d: v[1], s: v[2], r: v[3]) };
 	var lp = { |lo, hi| (lpOn: 1, lo: lo * touch, hi: hi * touch) };
 	var smp = { |map, g, lo, hi| var m = note, k = self.lkKeysMaps[map].inject(nil, { |b, x| if(b.isNil or: { (x[0] - m).abs < (b[0] - m).abs }) { x } { b } });
@@ -34,12 +43,13 @@
 	var font = { |preset, tag, m, g, lo, hi| var z = self.fontNote(preset, m);
 		z !? { self.note(\sdFont, z ++ (amp: g * vel, tag: tag, g: g * vel, midi: m, a: 0.001, d: 0.001, s: 1, r: 0.5) ++ args ++ lp.(lo, hi)) } };
 	var gk = 2;   // LK_KEYS_GAIN
+	if(spreading) { args = args ++ (pan: keyPan) };
 	if(lv[0] > 0) { out.add(smp.(\stein, 0.6 * 0.49 / 0.955 * 0.99 * lv[0] * gk, 250, 8100)) };
 	if(lv[1] > 0) { out.add(smp.(\jrh, 0.6 * 0.292 / 0.955 * 0.902 * lv[1] * gk, 250, 2000)) };
 	// organ B3: sines on the root, a 12th and an octave above, each a little sharp and flat (left / right), vibrato
 	if(lv[2] > 0) { [0, 19, 12].do { |d, j| [-0.04, 0.04].do { |dt, side|
 		out.add(syn.(\sine, note + d + dt, [0.12, 0.07, 0.1][j] * 1.82 * 0.85 * lv[2] * gk, adsr.(0.004), 250, 2000,
-			(vib: 0.8, vibmod: 0.08, pan: if(side == 1) { 0.7 } { 0.3 }))) } } };
+			(vib: 0.8, vibmod: 0.08, pan: if(spreading) { (keyPan + if(side == 1) { 0.2 } { -0.2 }).clip(0, 1) } { if(side == 1) { 0.7 } { 0.3 } }))) } } };
 	// M1 organ: a square an octave up, sines two octaves up and a 19th up (a short click)
 	if(lv[3] > 0) {
 		out.add(syn.(\square, note + 12, 0.22 * 0.42 * 1.85 * lv[3] * gk, adsr.(0.002, 0.25, 0.7), 250, 5000));

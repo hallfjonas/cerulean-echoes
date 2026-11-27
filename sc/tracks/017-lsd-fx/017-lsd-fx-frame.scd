@@ -20,7 +20,13 @@
 // @lk k5 Length | short notes ↔ long.
 // @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right.
+// @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
+// @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
+// @lk pad.k4 Pad Drive | drum pads: clean ↔ driven.
+// @lk pad.k5 Pad Spread | drum pads: all in the middle ↔ pad 1 left, pad 16 right.
+// @lk pad.k6 Pad Boost | drum pads: as played ↔ louder.
 (
 var lkKeysLib = (~ce.root +/+ "lib/lkkeys.scd").load;
 var bpm = 134, beat = 60 / bpm, fogCC = 20, tensionCC = 36;
@@ -63,7 +69,7 @@ stems: [
 			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these), the same as 008's. Mod wheel (CC 1) = keys level,
-// knobs CC 21-28: 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 one-shot darkness.
+// knobs CC 21-28: 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 key pan spread; bank B (CC 31-38) = the drum pads: 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost.
 lkCtl: { |ce, num, v, send|
 	if(num == 22) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
 	switch(num,
@@ -99,11 +105,12 @@ lkNote: { |ce, note, vel, chan|
 			(file: "dirt/wind-00.wav", tag: "wind", rate: 0.5, lane: \wind, gain: 1.36),
 		];
 		// gain: the shot's own, else superdough's default 0.8 (the log keeps Strudel's notation: gain × velocity)
-		var i = (note - 36) % 16, sh = shots[i], g = (sh[\gain] ? 0.8) * vel, gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
-		// the low-pass: knob 8 (18 kHz → 800 Hz) × Fog / Tension at the hit, the shot's own at most
+		var i = (note - 36) % 16, sh = shots[i], pm = ce.lkPadMods(i),
+			g = (sh[\gain] ? 0.8) * vel * pm[\gain], gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
+		// the low-pass: pad knob 2 (CC 32, 18 kHz → 800 Hz) × Fog / Tension at the hit, the shot's own at most
 		var tv = (0.06 ** ce.val(fogCC)) * (1 + (1.5 * ce.val(tensionCC)));
-		var cut = ((18000 * ((800 / 18000) ** k.(8))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
-		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]);
+		var cut = ((18000 * ((800 / 18000) ** ce.lkPad(2))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
+		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]) ++ pm[\base];
 		// a shot with `once` ignores new hits until it has played out
 		ce.lkOnce = ce.lkOnce ? ();
 		if(sh[\once].notNil and: { (ce.lkOnce[i] ? -1) > now }) { [] } {
@@ -121,7 +128,7 @@ lkNote: { |ce, note, vel, chan|
 			} {
 				// no clip or release: the whole sample
 				[ce.note(\sdSampleMod, base ++ (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
-					rate: sh[\rate] ? 1, hold: -1, amp: g, g: gl, hp: sh[\hp] ? 0, a: 0.001, d: 0.001, s: 1, r: 0.01))]
+					rate: (sh[\rate] ? 1) * pm[\rate], hold: -1, amp: g, g: gl, hp: max(sh[\hp] ? 0, pm[\hp]), a: 0.001, d: 0.001, s: 1, r: 0.01))]
 			}
 		}
 	}

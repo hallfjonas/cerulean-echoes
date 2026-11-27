@@ -18,7 +18,13 @@
 // @lk k5 Detune | one clean voice ↔ wide and wobbly (two detuned voices around it).
 // @lk k6 Space | much reverb ↔ far away (it is ambient: never dry).
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog (lpf 18 kHz → 800 Hz).
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right.
+// @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
+// @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
+// @lk pad.k4 Pad Drive | drum pads: clean ↔ driven.
+// @lk pad.k5 Pad Spread | drum pads: all in the middle ↔ pad 1 left, pad 16 right.
+// @lk pad.k6 Pad Boost | drum pads: as played ↔ louder.
 (
 var bpm = 70, beat = 60 / bpm;
 var moods = [
@@ -70,7 +76,7 @@ stems: [
 			(name: \r08, orbit: 1, level: 1.0, roomR: 0.8), (name: \r09, orbit: 1, level: 1.0, roomR: 0.9)]),
 ],
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). Mod wheel (CC 1) = keys level (× master, up to
-// × 2, from the next key), knobs CC 21-28: 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 one-shot darkness. Every key
+// × 2, from the next key), knobs CC 21-28: 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 key pan spread; bank B (CC 31-38) = the drum pads: 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost. Every key
 // plays a note of fixed length (Strudel's midikeys has no note-off: the length is knob 4). Brightness, Resonance and
 // Detune act at once on sounding keys (state buses), the rest from the next key.
 lkCtl: { |ce, num, v, send|
@@ -88,7 +94,7 @@ lkNote: { |ce, note, vel, chan|
 	if(chan != 9) {
 		// keys: a soft glass pad, a triangle with two quiet saws detuned up and down (sdSynthFx: the detune is live)
 		var a = 0.01 * (400 ** k.(3)), base = (hold: nl * 16, lpOn: 1, bright: ce.stateMap(\lkBright), lo: 400, hi: 6000, tone: tone,
-			lpq: ce.stateMap(\lkRes), a: a, d: 0.6, s: 0.8, r: 3, lane: \keys);
+			lpq: ce.stateMap(\lkRes), a: a, d: 0.6, s: 0.8, r: 3, lane: \keys) ++ ce.lkKeyPanArgs(note);
 		[[1, 0.45, 0], [2, 0.12, 1], [2, 0.12, -1]].collect { |x|
 			ce.note(\sdSynthFx, base ++ (wave: x[0], freq: note.midicps, amp: x[1] * vel,
 				cents: if(x[2] == 0) { 0 } { if(x[2] > 0) { ce.stateMap(\lkDet) } { ce.stateMap(\lkDetN) } },
@@ -114,11 +120,12 @@ lkNote: { |ce, note, vel, chan|
 			(file: "tr909/cr-00.wav", tag: "rolandtr909_cr", rate: -0.5, lane: \r07, gain: 0.54),
 		];
 		// gain: the shot's own, else superdough's default 0.8 (the log keeps Strudel's notation: gain × velocity, missing = 1)
-		var i = (note - 36) % 16, sh = shots[i], gl = (sh[\gain] ? 1) * vel, g = (sh[\gain] ? 0.8) * vel, now = thisThread.seconds;
-		// the low-pass: knob 8 (18 kHz → 800 Hz) × Fog / Tension (read here: one-shots keep it), the shot's own at most
+		var i = (note - 36) % 16, sh = shots[i], pm = ce.lkPadMods(i), gl = (sh[\gain] ? 1) * vel,
+			g = (sh[\gain] ? 0.8) * vel * pm[\gain], now = thisThread.seconds;
+		// the low-pass: pad knob 2 (CC 32, 18 kHz → 800 Hz) × Fog / Tension (read here: one-shots keep it), the shot's own at most
 		var tv = (0.06 ** ce.val(20)) * (1 + (1.5 * ce.val(36)));
-		var cut = ((18000 * ((800 / 18000) ** k.(8))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
-		var lp = (lpOn: 1, lo: cut, hi: cut, tone: 1, lane: sh[\lane] ? \r03, tag: sh[\tag], g: gl);
+		var cut = ((18000 * ((800 / 18000) ** ce.lkPad(2))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
+		var lp = (lpOn: 1, lo: cut, hi: cut, tone: 1, lane: sh[\lane] ? \r03, tag: sh[\tag], g: gl) ++ pm[\base];
 		// a shot with `once` ignores new hits until it has played out
 		ce.lkOnce = ce.lkOnce ? ();
 		if(sh[\once].notNil and: { (ce.lkOnce[i] ? -1) > now }) { [] } {
@@ -132,7 +139,7 @@ lkNote: { |ce, note, vel, chan|
 			{ sh[\noise].notNil } {
 				[ce.note(\sdNoise, (color: 0, amp: g, hold: nl * 16, a: sh[\a], d: sh[\d], s: sh[\s], r: sh[\r]) ++ lp)] }
 			{ [ce.note(\sdSampleMod, (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
-				rate: sh[\rate] ? 1, amp: g, hold: -1, a: 0.001, d: 0.001, s: 1, r: 0.01) ++ lp)] }
+				rate: (sh[\rate] ? 1) * pm[\rate], amp: g, hold: -1, a: 0.001, d: 0.001, s: 1, r: 0.01) ++ lp)] }
 		}
 	}
 },

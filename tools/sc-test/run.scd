@@ -75,6 +75,22 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		ce.midiCC(100, 1, 3); r.add(ce.lkCC[1] == 0);                                   // the mod wheel: same
 		ce.midiCC(1, 1, 3); r.add(ce.lkCC[1] == (1 / 127));
 		r.every(_.value) });
+	check.("Launchkey key pan: spread 0 keeps every key in the middle, 1 pans the keyboard window left to right", {
+		var ce = loadCe.value, r = List[];
+		r.add(ce.lkKeyPan(48) == 0.5); r.add(ce.lkKeyPanArgs(48).isEmpty);
+		ce.lkCC[28] = 1;
+		r.add(ce.lkKeyPan(48) == 0); r.add(ce.lkKeyPan(60) == 0.5); r.add(ce.lkKeyPan(72) == 1);
+		r.add(ce.lkKeyPanArgs(72)[\pan] == 1);
+		r.add(ce.lkKeyPan(24) == 0); r.add(ce.lkKeyPan(48) == 1);   // an octave down: the window moved to 24..48
+		ce.lkCC[28] = 0.5; r.add(ce.lkKeyPan(48) == 0.75);
+		r.every(_.value) });
+	check.("Launchkey pad bank (CC 31-38): neutral at 0, the knobs reach the pad hit", {
+		var ce = loadCe.value, r = List[], m = ce.lkPadMods(0);
+		r.add((m[\rate] == 1) and: { m[\hp] == 0 } and: { m[\gain] == 1 } and: { m[\base][\shape] == 0 } and: { m[\base][\pan].isNil });
+		ce.setLkCC(31, 1, { }); ce.setLkCC(35, 1, { }); ce.setLkCC(36, 1, { });
+		r.add(ce.lkPad(1) == 1); r.add(ce.lkPadMods(0)[\rate] == 0.5); r.add(ce.lkPadMods(0)[\base][\pan] == 0);
+		r.add(ce.lkPadMods(15)[\base][\pan] == 1); r.add(ce.lkPadMods(0)[\gain] == 1.5);
+		r.every(_.value) });
 	check.("faders: switching modes releases the new mode's faders (no jump from a fader moved in the other mode)", {
 		var ce = loadCe.value.ccBase_(0), r = List[];
 		ce.server = (sendMsg: { });
@@ -285,6 +301,14 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
 		check.("% Launchkey knob 1 (CC 21) reaches the track".format(name), {
 			var ce = ~lastCe; ce.setLkCC(21, 0.7, {}); ce.stateVal[\lkBright] == 0.7 });
+		// the pad bank and the key pan at full: the pads still play, every key is panned
+		check.("% pad bank knobs (CC 31-38) and key pan (CC 28) turned up still play pads and keys".format(name), {
+			var ce = ~lastCe, f = ce.track[\lkNote], pads, keys;
+			f.isNil or: {
+				(31..38).do { |n| ce.setLkCC(n, 1, { }) }; ce.setLkCC(28, 1, { });
+				pads = f.(ce, 36, 1, 9); keys = f.(ce, 60, 1, 0);
+				(31..38).do { |n| ce.setLkCC(n, 0, { }) }; ce.setLkCC(28, 0, { });
+				pads.notEmpty and: { keys.every { |n| n[\pan].notNil and: { n[\pan] >= 0 } } } } });
 		check.("% every sample file it loads exists".format(name), {
 			var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
 		check.("% several stems play".format(name), {
