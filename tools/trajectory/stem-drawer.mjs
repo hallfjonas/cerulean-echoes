@@ -7,7 +7,8 @@
 // every role) from the controllers; a pick changes the project file and plays from the next bar or loads it again
 // (stem-lab.mjs). There is no Revert or Save as: the sidebar's Save as copies the project.
 // Stems whose code does not fit the track's frame (GET /stems/fit, stem-fit.mjs) are greyed out with the reason and
-// cannot be picked; the check runs when the drawer opens (a few seconds the first time for a track).
+// cannot be picked; the check runs when the drawer opens (a few seconds the first time for a track), and the list
+// shows only once it is done.
 import { askText, toast } from './toast.mjs'
 
 const el = (tag, props = {}, ...children) => {
@@ -56,6 +57,7 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
       return select
     }
     const list = el('ul')
+    const checking = el('p', { className: 'loading', textContent: 'Checking which stems fit this track …' })
     for (const version of versions) {
       const marks = [version.file === slot.stem && 'plays', version.file === slot.file && 'in the file'].filter(Boolean)
       const misfit = fit?.misfits?.[version.file]
@@ -74,16 +76,16 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
       el('div', { className: 'row' }, choice('Role', 'role', [...new Set(all.map(v => v.meta.role))].sort()),
         choice('Genre', 'genre', [...new Set(all.flatMap(v => v.meta.genres))].sort()),
         choice('Energy', 'energy', [1, 2, 3, 4, 5]), choice('Tag', 'tag', [...new Set(all.flatMap(v => v.meta.tags))].sort())),
-      list,
+      fit && !fit.misfits ? checking : list,
       ...(lab ? [] : [el('div', { className: 'row' },
         el('button', { disabled: !state.playing, onclick: revert, title: 'Put the file\'s stems back' }, 'Revert'),
         el('button', { onclick: saveAs, title: 'Write a new track file with the stems that play' }, 'Save as …'))]),
-      el('output', { textContent: message || fitNote() || (lab ? 'Pick a stem: the project file changes.' : state.playing
+      el('output', { textContent: message || fitNote() || (fit && !fit.misfits ? '' : lab
+        ? 'Pick a stem: the project file changes.' : state.playing
         ? 'Pick a stem: it plays from the next bar.' : 'Press Play to swap; the list shows the file.') }))
   }
 
-  const fitNote = () => !fit ? '' : !fit.misfits ? 'Checking which stems fit this track …'
-    : fit.error ? `Not checked which stems fit: ${fit.error}` : ''
+  const fitNote = () => fit?.error ? `Not checked which stems fit: ${fit.error}` : ''
   const loadFit = track => {
     fit = { track }
     const done = result => { if (fit?.track === track) { fit = { track, ...result }; if (current) show() } }
