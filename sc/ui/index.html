@@ -288,7 +288,7 @@ const flush = async () => {
 let lkOut = {}, lkFlushing = false
 const lkMine = {}
 const lkSend = (n, v) => {
-  S.lk[n] = v; lkMine[n] = performance.now(); lkOut[n] = v; S.lkLive = performance.now(); update()
+  S.lk[n] = v; S.lkBank = n > 30 ? 'b' : n > 20 ? 'a' : S.lkBank; lkMine[n] = performance.now(); lkOut[n] = v; S.lkLive = performance.now(); update()
   if (!lkFlushing) { lkFlushing = true; requestAnimationFrame(async () => {
     const cc = Object.entries(lkOut).map(([k, x]) => [+k, x]); lkOut = {}
     try { await fetch('lk', { method: 'POST', body: JSON.stringify({ cc }), keepalive: true }) } catch (e) {}
@@ -311,7 +311,7 @@ const lkLight = key => { S.lkLit.set(key, performance.now()); update(); setTimeo
 const lkHtml = () => {
   const tag = key => (tags()['lk.' + key] ?? key).split(' | ')
   const knob = ([key, n]) => { const [name, desc] = tag(key)
-    return '<div class="kw r3 ctl" data-lk="' + n + '" title="' + esc(name + (desc ? ': ' + desc : '')) + '">' + knobSvg() + '<span class=kl>' + esc(name) + '</span></div>' }
+    return '<div class="kw r3 ctl" data-lk="' + n + '" data-kn="' + (n - 20) + '" title="' + esc(name + (desc ? ': ' + desc : '')) + '">' + knobSvg() + '<span class=kl>' + esc(name) + '</span></div>' }
   const pad = n => '<div class=pad data-pad="' + n + '" title="' + esc(padName(n)) + ' (note ' + n + ')"></div>'
   // a two-octave keyboard from C (the window always starts on a C): 15 white keys, the black keys shorter, between them
   const WHITE = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24], w = 100 / 15
@@ -319,7 +319,7 @@ const lkHtml = () => {
     WHITE.slice(0, -1).flatMap((k, i) => { const b = (k + 1) % 12, shift = { 1: -0.06, 6: -0.06, 3: 0.06, 10: 0.06 }[b] ?? 0
       return BLACK.includes(b) ? ['<i class=blk data-bi="' + (i + 1) + '" data-sh="' + shift + '" data-key="' + (k + 1) + '" style="left:' + ((i + 1) * w - w * 0.29 + w * shift) + '%"></i>'] : [] }).join('')
   const [wheelName, wheelDesc] = tag('level')
-  return '<section class=lkbox><p class=lab><span>launchkey</span><span class=pad-name id=lkPad></span>' +
+  return '<section class=lkbox><p class=lab><span>launchkey</span><span class=pad-name id=lkPad></span><span class=pad-name id=lkBank></span>' +
     '<span class=hint>computer keys A–K · octave Z / X</span></p><div class="pn lk" id=lk>' +
     // as on the Launchkey 25: knobs over a tight 2 x 8 pad block, the keys at the bottom with the mod wheel left of them
     '<div class=oct><span class=ol>oct <b id=octv>0</b></span><div class=row><button id=octDown data-oct="-24" title="two octaves down (Z)" aria-label="two octaves down"><svg viewBox="0 0 7 12"><polyline points="6,1 1,6 6,11"/></svg></button><button id=octUp data-oct="24" title="two octaves up (X)" aria-label="two octaves up"><svg viewBox="0 0 7 12"><polyline points="1,1 6,6 1,11"/></svg></button></div></div>' +
@@ -340,14 +340,16 @@ const lkAttach = root => {
       el.addEventListener('pointermove', e => { if (el.hasPointerCapture(e.pointerId)) lkSend(n, at(e)) })
     } else {
       let y0 = 0, v0 = 0
-      el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = S.lk[n] ?? 0 })
+      const cc = () => +el.dataset.lk   // the knob row shows bank A (CC 21-28) or bank B (CC 31-38)
+      el.addEventListener('pointerdown', e => { e.preventDefault(); el.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = S.lk[cc()] ?? 0 })
       el.addEventListener('pointermove', e => {
         if (!el.hasPointerCapture(e.pointerId)) return
-        lkSend(n, Math.min(1, Math.max(0, v0 + (y0 - e.clientY) / (e.shiftKey ? 800 : 200))))
+        lkSend(cc(), Math.min(1, Math.max(0, v0 + (y0 - e.clientY) / (e.shiftKey ? 800 : 200))))
       })
-      el.addEventListener('dblclick', () => lkSend(n, 0))
+      el.addEventListener('dblclick', () => lkSend(cc(), 0))
     }
-    el.addEventListener('wheel', e => { e.preventDefault(); lkSend(n, Math.min(1, Math.max(0, (S.lk[n] ?? 0) - Math.sign(e.deltaY) * (e.shiftKey ? 0.005 : 0.02)))) }, { passive: false })
+    el.addEventListener('wheel', e => { e.preventDefault(); const k = +el.dataset.lk
+      lkSend(k, Math.min(1, Math.max(0, (S.lk[k] ?? 0) - Math.sign(e.deltaY) * (e.shiftKey ? 0.005 : 0.02)))) }, { passive: false })
   }
   for (const el of root.querySelectorAll('[data-key]')) el.addEventListener('pointerdown', e => { e.preventDefault(); lkNote(S.lkBase + +el.dataset.key, 0) })
   for (const el of root.querySelectorAll('[data-pad]')) el.addEventListener('pointerdown', e => { e.preventDefault(); lkNote(+el.dataset.pad, 9) })
@@ -507,6 +509,14 @@ const draw = () => {
   if (lk && hasLk()) {
     const now = performance.now(), lit = k => now - (S.lkLit.get(k) ?? -1e9) < 200
     lk.classList.toggle('live', now - S.lkLive < 4000)
+    const bankB = S.lkBank === 'b', tagOf = key => (tags()['lk.' + key] ?? '').split(' | ')
+    for (const el of lk.querySelectorAll('[data-kn]')) {
+      const kn = el.dataset.kn, [name, desc] = tagOf((bankB ? 'pad.k' : 'k') + kn)
+      el.dataset.lk = (bankB ? 30 : 20) + +kn
+      setText(el.querySelector('.kl'), name || '–'); el.title = (name || '–') + (desc ? ': ' + desc : '')
+      el.style.opacity = name ? '' : '.35'
+    }
+    setText(document.getElementById('lkBank'), bankB ? 'knobs: pads (bank B)' : 'knobs: keys (bank A)')
     for (const el of lk.querySelectorAll('[data-lk]')) { const v = S.lk[el.dataset.lk] ?? 0; if (el.dataset.lk === '1') { const f = el.querySelector('.fader'), g = S.phys.lk1; f.style.setProperty('--v', v)
       f.classList.toggle('ghosted', g != null); if (g != null) f.style.setProperty('--g', g) } else setKnob(el, v) }
     for (const el of lk.querySelectorAll('[data-key]')) {
@@ -901,7 +911,8 @@ const connect = () => {
     else if (type === 'midi') S.midi = data
     else if (type === 'sc') S.sc = data
     else if (type === 'lk') { for (const [k, v] of Object.entries(data)) if (!(performance.now() - (lkMine[k] ?? -1e9) < 300)) S.lk[k] = v }
-    else if (type === 'lkcc') { const [k, v] = data; if (!(performance.now() - (lkMine[k] ?? -1e9) < 300)) { S.lk[k] = v; S.lkLive = performance.now() } }
+    else if (type === 'lkcc') { const [k, v] = data; if (!(performance.now() - (lkMine[k] ?? -1e9) < 300)) { S.lk[k] = v; S.lkLive = performance.now()
+      S.lkBank = k > 30 ? 'b' : k > 20 ? 'a' : S.lkBank } }
     else if (type === 'lknote') {   // a key or pad played (device or UI): light it; a key outside the window moves it
       const [note, chan] = data
       if (chan === 9) { lkLight('p' + note); S.lkPad = [note, performance.now()] }

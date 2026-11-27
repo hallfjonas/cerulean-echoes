@@ -171,7 +171,7 @@ The `sound-lab` epic makes stems JSON files and adds Sample Designer, Stem Desig
 - Internal: player hub (merged), auto-perform script format and the `/auto-perform` skill (PR 26),
   `check-perform.mjs`, `npm run verify`, `tools.mjs` guard pattern, `catalogue.mjs`, the Settings drawer.
 - External: the `claude` CLI on the machine that runs the player.
-- Other epics: `vis-live-mapping`, `drop-buildup` and `launchkey-knob-target` also change the player or the LC view;
+- Other epics: `vis-live-mapping`, `drop-buildup` and `lk-pad-knobs` also change the player or the LC view;
   merge one at a time. The producer mode (merged) is the first Compose input and can use the bridge once it exists.
 
 ## Risks

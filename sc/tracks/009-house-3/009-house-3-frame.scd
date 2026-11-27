@@ -19,7 +19,13 @@
 // @lk k5 Length | short notes ↔ long.
 // @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right Starts at 100 %.
+// @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
+// @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
+// @lk pad.k4 Pad Drive | drum pads: clean ↔ driven.
+// @lk pad.k5 Pad Spread | drum pads: all in the middle ↔ pad 1 left, pad 16 right.
+// @lk pad.k6 Pad Boost | drum pads: as played ↔ louder.
 (
 var lkKeysLib = (~ce.root +/+ "lib/lkkeys.scd").load;
 var bpm = 124, fogCC = 20, tensionCC = 36;
@@ -87,6 +93,8 @@ stems: [(name: \lk, sounds: ~ce.lkKeysSounds ++ [\sdSampleMod, \sdFont], level: 
 	lanes: [(name: \keys, orbit: 2, roomR: \lkRoom, echoSend: \lkEcho),
 		(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.3),
 		(name: \oohs, orbit: 1, level: 1.0, roomR: 0.6), (name: \vib, orbit: 1, level: 1.0, roomR: 0.5)])],
+// key pan starts at 100 %: the low keys left, the high keys right
+lkStart: (28: 1),
 lkCtl: { |ce, num, v, send|
 	if(num == 22) { ce.lkTurned2 = true };
 	switch(num,
@@ -120,10 +128,11 @@ lkNote: { |ce, note, vel, chan|
 			(font: "0110_JCLive_sf2_file", tag: "gm_vibraphone", note: 76, lane: \vib),
 			(file: "tr909/sd-00.wav", tag: "rolandtr909_sd", rate: 0.8, gain: 1.28),
 		];
-		var i = (note - 36) % 16, sh = shots[i], g = (sh[\gain] ? 0.8) * vel, gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
+		var i = (note - 36) % 16, sh = shots[i], pm = ce.lkPadMods(i),
+			g = (sh[\gain] ? 0.8) * vel * pm[\gain], gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
 		var tv = (0.06 ** ce.val(fogCC)) * (1 + (1.5 * ce.val(tensionCC)));
-		var cut = ((18000 * ((800 / 18000) ** k.(8))) * tv).clip(80, 18000);
-		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]);
+		var cut = ((18000 * ((800 / 18000) ** ce.lkPad(2))) * tv).clip(80, 18000);
+		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]) ++ pm[\base];
 		ce.lkOnce = ce.lkOnce ? ();
 		if(sh[\once].notNil and: { (ce.lkOnce[i] ? -1) > now }) { [] } {
 			sh[\once] !? { ce.lkOnce[i] = now + sh[\once] };
@@ -133,7 +142,7 @@ lkNote: { |ce, note, vel, chan|
 					r: adsr[3], midi: sh[\note]))] } ? []
 			} {
 				[ce.note(\sdSampleMod, base ++ (buf: ce.sampleBuffers[sh[\file]],
-					stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger, rate: sh[\rate] ? 1, hold: -1, amp: g, g: gl,
+					stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger, rate: (sh[\rate] ? 1) * pm[\rate], hold: -1, amp: g, g: gl,
 					a: 0.001, d: 0.001, s: 1, r: 0.01))]
 			}
 		}

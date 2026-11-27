@@ -6,7 +6,7 @@
 //        sclang tools/sc-test/run.scd <absolute path of a track .scd or .track> …   → only the per-track checks of these
 //        tracks, no building blocks (npm run verify-sc)
 (
-var root = thisProcess.nowExecutingPath.dirname.dirname.dirname, fails = 0, passes = 0, check, loadCe, play, tracks, missing;
+var root = thisProcess.nowExecutingPath.dirname.dirname.dirname, fails = 0, passes = 0, check, loadCe, faders, play, tracks, missing;
 var only = thisProcess.argv.select { |a| a.endsWith(".scd") or: { a.endsWith(".track") } };
 // a hung check must not hang the test run
 SystemClock.sched(240, { "FAIL timeout after 240 s".postln; 1.exit });
@@ -16,14 +16,18 @@ check = { |name, fn|
 	if(ok == true) { passes = passes + 1; "PASS %".format(name).postln } { fails = fails + 1; "FAIL %%".format(name, msg).postln };
 };
 loadCe = { var ce = (root +/+ "sc/lib/ce.scd").load; ce.quiet = true; ce.uiOn = false; ce };
+// faders up as a controller moves them (through the column hooks: column code keeps its own level state); after
+// ce.patterns, which builds the columns
+faders = { |ce, ccs, send| (ccs ? ((5..12) ++ (53..59))).do { |c| ce.setCC(c, 1, send, true) } };
 // Play a track for `bars` bars into a score with every fader and the master up; `presses` = [[bar, cc], …] (a press
 // of a 16th), [[bar, cc, beats], …] (held that long) or [[bar, function], …] (called at that time).
 // Returns the note log: [[beat, stem, event], …]
 play = { |file, bars, presses|
-	var ce = loadCe.value, track = ce.loadTrack(file), msgs, ctl, stream;
+	var ce = loadCe.value, track = ce.loadTrack(file), msgs, ctl, pats, stream;
 	msgs = ce.prepare(ScoreStreamPlayer.new, track);
+	pats = ce.patterns;
 	// faders of columns 1-7 on both pages and the master (column 8): up
-	((5..12) ++ (53..59)).do { |c| ce.cc[ce.ccAlias[c] ? c] = 1; msgs = msgs.add([\c_set, ce.ccIndex(c), 1]) };
+	faders.(ce, nil, { |m| msgs = msgs.add(m) });
 	ctl = Prout({ var t = 0;
 		(presses ? []).sort { |a, b| a[0] <= b[0] }.do { |p| var at = p[0] * 4;
 			if(at > t) { (type: \rest, dur: at - t).yield; t = at };
@@ -32,7 +36,7 @@ play = { |file, bars, presses|
 				t = t + (p[2] ? 0.25) } } });
 	ce.log = List[];
 	~lastCe = ce;
-	stream = Ppar([ctl, ce.patterns]).asStream;
+	stream = Ppar([ctl, pats]).asStream;
 	ce.makeScore(stream, bars * 4, track.bpm / 60, msgs);
 	ce.log.asArray
 };
@@ -74,6 +78,22 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		ce.setCC(5, 0.2, { }); ce.midiCC(51, 5, 2); r.add(ce.val(5) == 0.2);           // a web-view move releases LC 2
 		ce.midiCC(100, 1, 3); r.add(ce.lkCC[1] == 0);                                   // the mod wheel: same
 		ce.midiCC(1, 1, 3); r.add(ce.lkCC[1] == (1 / 127));
+		r.every(_.value) });
+	check.("Launchkey key pan: spread 0 keeps every key in the middle, 1 pans the keyboard window left to right", {
+		var ce = loadCe.value, r = List[];
+		r.add(ce.lkKeyPan(48) == 0.5); r.add(ce.lkKeyPanArgs(48).isEmpty);
+		ce.lkCC[28] = 1;
+		r.add(ce.lkKeyPan(48) == 0); r.add(ce.lkKeyPan(60) == 0.5); r.add(ce.lkKeyPan(72) == 1);
+		r.add(ce.lkKeyPanArgs(72)[\pan] == 1);
+		r.add(ce.lkKeyPan(24) == 0); r.add(ce.lkKeyPan(48) == 1);   // an octave down: the window moved to 24..48
+		ce.lkCC[28] = 0.5; r.add(ce.lkKeyPan(48) == 0.75);
+		r.every(_.value) });
+	check.("Launchkey pad bank (CC 31-38): neutral at 0, the knobs reach the pad hit", {
+		var ce = loadCe.value, r = List[], m = ce.lkPadMods(0);
+		r.add((m[\rate] == 1) and: { m[\hp] == 0 } and: { m[\gain] == 1 } and: { m[\base][\shape] == 0 } and: { m[\base][\pan].isNil });
+		ce.setLkCC(31, 1, { }); ce.setLkCC(35, 1, { }); ce.setLkCC(36, 1, { });
+		r.add(ce.lkPad(1) == 1); r.add(ce.lkPadMods(0)[\rate] == 0.5); r.add(ce.lkPadMods(0)[\base][\pan] == 0);
+		r.add(ce.lkPadMods(15)[\base][\pan] == 1); r.add(ce.lkPadMods(0)[\gain] == 1.5);
 		r.every(_.value) });
 	check.("faders: switching modes releases the new mode's faders (no jump from a fader moved in the other mode)", {
 		var ce = loadCe.value.ccBase_(0), r = List[];
@@ -129,7 +149,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		var beatsOf = { |log, stem, from, to| of.(log, stem, from, to).collect { |l| l[0].round(1e-3) } };
 		// a stem track prepared in a score, its columns started, faders of columns 1 and 4 and the master up
 		var ready = { var ce = loadCe.value, track = ce.loadTrack(demo);
-			ce.prepare(ScoreStreamPlayer.new, track); ce.patterns; [5, 8, 12].do { |c| ce.cc[c] = 1 }; [ce, track] };
+			ce.prepare(ScoreStreamPlayer.new, track); ce.patterns; faders.(ce, [5, 8, 12]); [ce, track] };
 		check.("stem: a .stem loads as a column with its sample, patterns and add-on", {
 			var ce = loadCe.value, track = ce.loadTrack(demo), col = track.columns['1:1'];
 			(col[\sample] == \kick909) and: { col[\pats].size == 3 } and: { col[\addon] === ce.addons[\dropOut] }
@@ -210,7 +230,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 			check.("009 stem track: 14 stems load, every column makes notes", {
 				var ce = loadCe.value, track = ce.loadTrack(house);
 				ce.prepare(ScoreStreamPlayer.new, track); ce.patterns;
-				((5..12) ++ (53..59)).do { |c| ce.cc[c] = 1 };
+				faders.(ce);
 				(track.columns.size == 14) and: {
 					track.columns.every { |col| (0..127).any { |k| col.stepNotes(k).reject { |n| n[\msg].notNil }.notEmpty } } } });
 			// stem format 2: the 009 drums, sub, bass and harmony are JSON (kits, layers, amounts, lengths, held chords)
@@ -218,7 +238,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 				var ce = loadCe.value, track = ce.loadTrack(house), at = { |slot, k| track.columns[slot].stepNotes(k) };
 				var bufs = { |notes| notes.collect { |n| ce.sampleBuffers.findKeyForValue(n[\buf]) } };
 				ce.prepare(ScoreStreamPlayer.new, track); ce.patterns;
-				((5..12) ++ (53..59)).do { |c| ce.cc[c] = 1 };
+				faders.(ce);
 				check.("stem format 2: a kit's notes pick its files, played to their end", {
 					var n = at.('1:5', 4);
 					(bufs.(n) == ["tr909/cp-00.wav"]) and: { n[0][\hold] == -1 } });
@@ -303,13 +323,23 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 				ce.stateVal[\lkBright] == 0.7 } });
 		if((~lastCe !? { |c| c.track !? { |t| t[\lkKeys] } }).notNil) {
 			check.("% Launchkey keys play the chosen column into its strip, silent at level 0".format(name), {
-				var ce = ~lastCe, t = ce.track, lv = t[\lkKeys][\level], r;
+				var ce = ~lastCe, t = ce.track, lv = t[\lkKeys][\level], was = ce.stateVal[lv], r, silent;
 				ce.setState(lv, 0.8, {});
 				r = ce.lkRoute(60, 0.8, 0);
 				ce.setState(lv, 0, {});
-				r[\notes].notEmpty and: { r[\lanes] === ce.stemBus[t[\columns][t[\lkKeysSlot]][\stemName]] }
-					and: { ce.lkRoute(60, 0.8, 0)[\notes].isEmpty } });
+				silent = ce.lkRoute(60, 0.8, 0)[\notes].isEmpty;
+				ce.setState(lv, was, {});
+				r[\notes].notEmpty and: { r[\lanes] === ce.stemBus[t[\columns][t[\lkKeysSlot]][\stemName]] } and: { silent } });
 		};
+		check.("% key pan (CC 28) starts at its maximum".format(name), { ~lastCe.lkCC[28] == 1 });
+		// the pad bank and the key pan at full: the pads still play, every key is panned
+		check.("% pad bank knobs (CC 31-38) and key pan (CC 28) turned up still play pads and keys".format(name), {
+			var ce = ~lastCe, f = ce.track[\lkNote], pads, keys;
+			f.isNil or: {
+				(31..38).do { |n| ce.setLkCC(n, 1, { }) }; ce.setLkCC(28, 1, { });
+				pads = f.(ce, 36, 1, 9); keys = ce.lkRoute(60, 1, 0)[\notes];
+				(31..38).do { |n| ce.setLkCC(n, 0, { }) }; ce.setLkCC(28, 0, { });
+				pads.notEmpty and: { keys.every { |n| n[\pan].notNil and: { n[\pan] >= 0 } } } } });
 		check.("% every sample file it loads exists".format(name), {
 			var m = missing.(~lastCe); if(m.notEmpty) { ("  missing: " ++ m.join(", ")).postln }; m.isEmpty });
 		check.("% several stems play".format(name), {

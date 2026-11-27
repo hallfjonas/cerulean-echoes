@@ -51,7 +51,10 @@
 ~ce.loadStemTrack = { |self, path, slots, project|
 	var json = project ?? { self.readJSON(path) }, dir = json[\dir] ? path.dirname, frameFile = dir +/+ json[\frame], frame = frameFile.load;
 	var bpm = self.numOf(json[\tempo]), glob = self.stemGlobal, chapters = json[\chapters];
-	var track = (
+	var track;
+	// a function the frame does not have fails with its name (an Event would answer nil, and the column stay silent)
+	frame[\forward] = { |fr, selector| Error("the frame has no %".format(selector)).throw };
+	track = (
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
 		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
 		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkStart: frame[\lkStart],
@@ -82,10 +85,20 @@
 					b2: [["Beat on", "Beat off"][self.breakL.now], ["Beat on", "Beat off"][self.breakL.pending]],
 					b2on: self.breakL.pending == 1) } },
 		uiChordAt: { |self, bar| self.chordAt(bar).name },
-		// the step engine asks a slot, not a column: a swap waiting for this slot takes over on the bar line
+		// the step engine asks a slot, not a column: a swap waiting for this slot takes over on the bar line. A column
+		// whose code throws (a stem that needs what this frame lacks) goes quiet and is reported once; the others play on
 		slotStep: { |self, slot, k|
 			var msgs = if(k % 16 == 0 and: { self.pending[slot].notNil }) { self.switchSlot(slot) } { [] };
-			msgs ++ (self.columns[slot] ?? { self.backing[slot] }).stepNotes(k)
+			var col = self.columns[slot] ?? { self.backing[slot] }, notes = [];
+			// the try is its own statement: a primitive that fails inside it corrupts an expression the try is part of
+			if(col[\failed].isNil) { notes = { col.stepNotes(k) }.try { |e| self.columnFailed(slot, col, e); [] } };
+			msgs ++ notes
+		},
+		columnFailed: { |self, slot, col, error|
+			var name = col[\stem][\name].asString;
+			col[\failed] = error.errorString.replace("ERROR: ", "");
+			"Slot % (%) is silent: %".format(slot, name, col[\failed]).warn;
+			self.ce.uiSend('/ce/stemerror', slot.asString, name, col[\failed])
 		},
 		// the outgoing column's own hooks and latches leave with it; the strip takes the new stem's settings (its shape
 		// is the same, ~ce.swapProblem)
@@ -210,13 +223,14 @@
 		self.status("Keys", self.lkColumnLabel);
 		self.uiPush }
 };
-// the notes of a key: the column's, with the tone (× the low-pass range, neutral at half) and the level on top
+// the notes of a key: the column's, with the tone (× the low-pass range, neutral at half), the key pan (knob 8) and the
+// level on top
 ~ce.lkColumnNotes = { |self, note, vel|
 	var t = self.track, cfg = t[\lkKeys], col = t[\columns][t[\lkKeysSlot]];
 	var level = cfg[\level] !? { |x| self.stateVal[x] } ? 1;
 	var tone = cfg[\tone] !? { |x| 2 ** (4 * ((self.stateVal[x] ? 0.5) - 0.5)) } ? 1;
 	if((level <= 0) or: { self.lkColumnPlayable(col).not }) { [] } {
-		var lanes = self.stemBus[col[\stemName]], notes;
+		var lanes = self.stemBus[col[\stemName]], pan = self.lkKeyPanArgs(note), notes;
 		notes = if(col[\colCode].notNil) { col[\colCode][\keys].(col, note, vel) } {
 			var k = (TempoClock.default.beats * 4).floor.asInteger.max(0), hit = (at: 0, dur: 4, note: 0, vel: vel);
 			[col.noteOf(hit, k, (k / 16).floor, col.knobValues(false), false, col[\layers][0])]
@@ -225,6 +239,7 @@
 			if(lanes[n[\lane]].isNil) { n.removeAt(\lane) };
 			n[\lo] !? { |x| n[\lo] = x * tone };
 			n[\hi] !? { |x| n[\hi] = x * tone };
+			n.putAll(pan);
 			n[\post] = (n[\post] ? 1) * level } };
 		notes ? []
 	}

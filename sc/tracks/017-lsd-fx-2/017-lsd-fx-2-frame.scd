@@ -18,7 +18,13 @@
 // @lk level Keys Level | mod wheel: volume of the keys, apart from the column's fader.
 // @lk k1 Keys Stem | keys: which Mode 2 column they play.
 // @lk k2 Key Tone | keys: darker ↔ brighter, on top of the column's Brightness.
-// @lk k8 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right Starts at 100 %.
+// @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
+// @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
+// @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
+// @lk pad.k4 Pad Drive | drum pads: clean ↔ driven.
+// @lk pad.k5 Pad Spread | drum pads: all in the middle ↔ pad 1 left, pad 16 right.
+// @lk pad.k6 Pad Boost | drum pads: as played ↔ louder.
 (
 var bpm = 134, beat = 60 / bpm, fogCC = 20, tensionCC = 36;
 var moods = [(name: "Dark", steps: [0, 2, 3, 5, 7, 8, 10]), (name: "Tight", steps: [0, 1, 3, 5, 7, 8, 10]),
@@ -63,12 +69,13 @@ stems: [
 			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
 // the Launchkey's start values: the mod wheel at a third, the key tone neutral
-lkStart: (1: 0.34, 22: 0.5),
+lkStart: (1: 0.34, 22: 0.5, 28: 1),
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play one Mode 2 column that can play
 // keys (lkKeys, sc/lib/stemtrack.scd; today the metal, 2:4): a second player on the keys, the first one shaping the
 // column on the Launch Control. Its knobs and buttons reach the keys, its fader does not (it keeps playing its own
 // hits). Knob 1 (CC 21) picks the column, the mod wheel (CC 1) is the keys' level, knob 2 (CC 22) their tone (the
-// filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the one-shot darkness of the drum pads.
+// filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the key pan spread; bank B (CC 31-38) = the drum pads:
+// 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost.
 lkKeys: (slots: ['2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7'], start: '2:4', cc: 21,
 	level: \lkLevel, tone: \lkBright),
 lkCtl: { |ce, num, v, send|
@@ -101,11 +108,12 @@ lkNote: { |ce, note, vel, chan|
 			(file: "dirt/wind-00.wav", tag: "wind", rate: 0.5, lane: \wind, gain: 1.36),
 		];
 		// gain: the shot's own, else superdough's default 0.8 (the log keeps Strudel's notation: gain × velocity)
-		var i = (note - 36) % 16, sh = shots[i], g = (sh[\gain] ? 0.8) * vel, gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
-		// the low-pass: knob 8 (18 kHz → 800 Hz) × Fog / Tension at the hit, the shot's own at most
+		var i = (note - 36) % 16, sh = shots[i], pm = ce.lkPadMods(i),
+			g = (sh[\gain] ? 0.8) * vel * pm[\gain], gl = (sh[\gain] ? 1) * vel, now = thisThread.seconds;
+		// the low-pass: pad knob 2 (CC 32, 18 kHz → 800 Hz) × Fog / Tension at the hit, the shot's own at most
 		var tv = (0.06 ** ce.val(fogCC)) * (1 + (1.5 * ce.val(tensionCC)));
-		var cut = ((18000 * ((800 / 18000) ** k.(8))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
-		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]);
+		var cut = ((18000 * ((800 / 18000) ** ce.lkPad(2))) * tv).clip(80, 18000).min(sh[\cutoff] ? 18000);
+		var base = (lpOn: 1, lo: cut, hi: cut, tone: 1, thinF: thin, lane: sh[\lane] ? \shots, tag: sh[\tag]) ++ pm[\base];
 		// a shot with `once` ignores new hits until it has played out
 		ce.lkOnce = ce.lkOnce ? ();
 		if(sh[\once].notNil and: { (ce.lkOnce[i] ? -1) > now }) { [] } {
@@ -123,7 +131,7 @@ lkNote: { |ce, note, vel, chan|
 			} {
 				// no clip or release: the whole sample
 				[ce.note(\sdSampleMod, base ++ (buf: ce.sampleBuffers[sh[\file]], stereoIn: (ce.sampleMono[sh[\file]] != true).asInteger,
-					rate: sh[\rate] ? 1, hold: -1, amp: g, g: gl, hp: sh[\hp] ? 0, a: 0.001, d: 0.001, s: 1, r: 0.01))]
+					rate: (sh[\rate] ? 1) * pm[\rate], hold: -1, amp: g, g: gl, hp: max(sh[\hp] ? 0, pm[\hp]), a: 0.001, d: 0.001, s: 1, r: 0.01))]
 			}
 		}
 	}
