@@ -72,7 +72,7 @@ test('perform lab routes: POST from own pages only', async () => {
 
 const track = '009-house'
 const original = JSON.parse(fs.readFileSync(path.join(PERFORM, track, 'dance-floor.json'), 'utf8'))
-const lab = importScript(original)
+const lab = importScript(original, controlsOf(tagSource(scTrackFileOf(track))))
 const script = toScript(lab)
 const temporary = () => fs.mkdtempSync(path.join(os.tmpdir(), 'perform-lab-'))
 

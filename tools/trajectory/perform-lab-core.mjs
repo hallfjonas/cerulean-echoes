@@ -156,21 +156,117 @@ export const fitSections = (sections, bars) => {
   return kept.map((section, i) => i === kept.length - 1 ? { ...section, to: bars } : section)
 }
 
-// A script as a lab: its sections (or one over the whole length), its steps as Hand-made moves, one per section and
-// control. compileMoves gives back the script's steps.
-export const importScript = script => {
+const isLevel = control => !!control && !control.button && / Level$/.test(control.name) &&
+  !control.name.startsWith('Global')
+const isGlobal = (control, name) => control?.name === `Global ${name}`
+const sameText = step => JSON.stringify(Object.keys(step).sort().map(key => [key, step[key]]))
+const compilesTo = (move, steps) => {
+  const made = MOVES[move.kind].steps(move)
+  return made.length === steps.length && made.every((step, i) => sameText(step) === sameText(steps[i]))
+}
+const moveOf = (kind, steps, p) => ({ id: newId('m'), kind, bar: steps[0].bar, p, edits: {} })
+
+// one Launch Control step as a move: Enter or Leave on a Level fader, Press on a button, Move control on the rest
+const singleMove = (step, control) => {
+  if (step.press !== undefined) return moveOf('press', [step], { cc: step.press })
+  if (isLevel(control) && step.value === 0) return moveOf('leave', [step], { cc: step.cc, over: step.ramp ?? 0 })
+  if (isLevel(control)) return moveOf('enter', [step], { cc: step.cc, to: step.value, over: step.ramp ?? 0 })
+  return moveOf('control', [step], { cc: step.cc, to: step.value, over: step.ramp ?? 0 })
+}
+
+// a pair of steps on one control as one move: a Break (two presses on Break), a Fog dip (up, then back to 0 on Fog),
+// a Build (a ramp up, then a jump to 0 where the ramp ends); null when the pair is none of them
+const pairMove = (first, second, control) => {
+  if (!second) return null
+  if (first.press !== undefined) {
+    return isGlobal(control, 'Break') ? moveOf('break', [first, second], { cc: first.press,
+      length: round(second.bar - first.bar) }) : null
+  }
+  if (!(first.value > 0) || second.value !== 0) return null
+  const over = first.ramp ?? 0
+  if (isGlobal(control, 'Fog')) {
+    const hold = round(second.bar - first.bar - over)
+    return hold >= 0 ? moveOf('fogDip', [first, second], { cc: first.cc, to: first.value, over, hold,
+      back: second.ramp ?? 0 }) : null
+  }
+  if (!isLevel(control) && over > 0 && second.ramp === undefined && round(first.bar + over) === second.bar) {
+    return moveOf('build', [first, second], { cc: first.cc, to: first.value, over, release: true })
+  }
+  return null
+}
+
+const LAYERS_MIN = 3
+
+// runs of Enter (or Leave) moves on different faders, the same level and ramp, at a steady distance: Layers
+const withLayers = moves => {
+  const result = []
+  const fits = (run, move) => {
+    const last = run.at(-1)
+    const every = round(run.length > 1 ? run[1].bar - run[0].bar : move.bar - last.bar)
+    return move.kind === last.kind && move.p.over === last.p.over && move.p.to === last.p.to && every > 0 &&
+      round(move.bar - last.bar) === every && !run.some(other => other.p.cc === move.p.cc)
+  }
+  let run = []
+  const close = () => {
+    if (run.length >= LAYERS_MIN) {
+      const layers = moveOf('layers', [run[0]], { dir: run[0].kind === 'enter' ? 'in' : 'out',
+        ccs: run.map(move => move.p.cc), every: round(run[1].bar - run[0].bar), over: run[0].p.over,
+        to: run[0].p.to ?? 0.6 })
+      const steps = run.map(move => move.steps[0])
+      result.push(compilesTo(layers, steps) ? { ...layers, steps } : run)
+    } else result.push(run)
+    run = []
+  }
+  for (const move of moves) {
+    if (!['enter', 'leave'].includes(move.kind)) result.push(move)
+    else if (run.length && fits(run, move)) run.push(move)
+    else {
+      close()
+      run = [move]
+    }
+  }
+  close()
+  return result.flat()
+}
+
+// A script as a lab: its meta and sections (or one section over the whole length), its Launch Control steps
+// recognised as moves (Enter, Leave, Layers, Build, Fog dip, Break, Press, Move control) by the track's controls
+// (cc → { name, button }), every other step (Launchkey keys, pads, knobs) in Hand-made moves, one per section and
+// control. A guess that would not compile back to its steps is not made: compileMoves gives back the script's steps.
+export const importScript = (script, controls = new Map()) => {
   const steps = [...script.steps].sort((a, b) => a.bar - b.bar)
   const bars = script.bars ?? Math.max(1, Math.ceil(Math.max(0, ...steps.map(stepEnd))))
   const sections = (script.sections?.length ? script.sections : [{ name: 'All', from: 0, to: bars }])
     .map(({ name, from, to, intent }) => newSection({ name, from, to, ...intent && { intent } }))
-  const groups = new Map()
+  const order = new Map(steps.map((step, i) => [step, i]))
+  const byControl = new Map(), handMade = new Map()
   for (const step of steps) {
-    const section = sections.findIndex(({ from, to }) => from <= step.bar && step.bar < to)
-    const key = `${section}|${controlKey(step)}`
-    groups.set(key, [...groups.get(key) ?? [], step])
+    const key = controlKey(step)
+    if (typeof key === 'number') byControl.set(key, [...byControl.get(key) ?? [], step])
+    else {
+      const section = sections.findIndex(({ from, to }) => from <= step.bar && step.bar < to)
+      handMade.set(`${section}|${key}`, [...handMade.get(`${section}|${key}`) ?? [], step])
+    }
   }
-  const moves = [...groups.values()].map(list => ({ id: newId('m'), kind: 'handMade', bar: list[0].bar,
-    p: { steps: list.map(({ bar, ...step }) => ({ at: round(bar - list[0].bar), ...step })) }, edits: {} }))
+  const recognised = []
+  for (const [cc, list] of byControl) {
+    for (let i = 0; i < list.length; i++) {
+      const pair = pairMove(list[i], list[i + 1], controls.get(cc))
+      if (pair && compilesTo(pair, [list[i], list[i + 1]])) {
+        recognised.push({ ...pair, steps: [list[i], list[++i]] })
+        continue
+      }
+      const single = singleMove(list[i], controls.get(cc))
+      const { bar: _bar, ...rest } = list[i]
+      recognised.push({ ...compilesTo(single, [list[i]]) ? single
+        : moveOf('handMade', [list[i]], { steps: [{ at: 0, ...rest }] }), steps: [list[i]] })
+    }
+  }
+  const lcMoves = withLayers(recognised.sort((a, b) => order.get(a.steps[0]) - order.get(b.steps[0])))
+  const handMoves = [...handMade.values()].map(list => ({ ...moveOf('handMade', list,
+    { steps: list.map(({ bar, ...step }) => ({ at: round(bar - list[0].bar), ...step })) }), steps: list }))
+  const moves = [...lcMoves, ...handMoves].sort((a, b) => order.get(a.steps[0]) - order.get(b.steps[0]))
+    .map(({ steps: _steps, ...move }) => move)
   return { track: script.track, ...script.title && { title: script.title }, bars,
     ...script.mood && { mood: script.mood }, sections, moves }
 }

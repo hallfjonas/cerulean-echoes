@@ -639,7 +639,7 @@ export function mountTracksLab({ section, stage }) {
       setStatus('loading …')
       const opened = await post('open', { track, name: performance.name })
       if (run !== state.run) return
-      open(opened.lab ?? importScript(opened.script), performance.name, opened.owned)
+      open(opened.lab ?? importScript(opened.script, state.controls), performance.name, opened.owned)
       setStatus(opened.note ?? '')
     } catch (error) {
       if (run === state.run) setStatus(error.message)

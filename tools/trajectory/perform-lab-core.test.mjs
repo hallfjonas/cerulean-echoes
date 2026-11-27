@@ -1,11 +1,15 @@
 // The Tracks lab's core (perform-lab-core.mjs): every move compiles to steps check-perform accepts on a real track,
 // a step edit survives a parameter change and follows its move, a deleted step stays deleted, bars are 0-based and
-// ranges half-open, the lab's own warnings.
+// ranges half-open, the lab's own warnings, the section helpers, and the importer: it recognises the moves, and every
+// script and take in perform/ (takes only where check-perform accepts them) compiles back to its steps, compared per
+// control in bar order.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { checkScript, controlsOf, scTrackFileOf, tagSource } from './check-perform.mjs'
-import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, fitSections, importScript, insertSection,
-  moveEdge, moveText, movesIn, newMove, newSection, removeSection, sectionOf, spanOf, toScript }
+import fs from 'fs'
+import path from 'path'
+import { PERFORM, checkScript, controlsOf, scTrackFileOf, tagSource } from './check-perform.mjs'
+import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, controlKey, fitSections, importScript,
+  insertSection, moveEdge, moveText, movesIn, newMove, newSection, removeSection, sectionOf, spanOf, toScript }
   from './perform-lab-core.mjs'
 
 const trackId = '009-house'
@@ -112,18 +116,64 @@ test('perform lab: sections are cut around an inserted one, a removed one leaves
   assert.deepEqual(fitSections(base, 48).map(({ from, to }) => [from, to]), [[0, 16], [16, 48]])
 })
 
-test('perform lab: an imported script compiles back to its steps', () => {
-  const script = { track: trackId, title: 'T', bars: 32, sections: [{ name: 'A', from: 0, to: 16, intent: 'in' },
-    { name: 'B', from: 16, to: 32 }], steps: [{ bar: 20, press: 52 }, { bar: 0, cc: 5, value: 0.7, ramp: 2 },
-    { bar: 2.5, keys: 'c4 e4', velocity: 0.6 }, { bar: 16, cc: 5, value: 0, ramp: 4 },
-    { bar: 17.3333, lk: 1, value: 1 }] }
-  const lab = importScript(script)
-  const byBar = steps => [...steps].sort((a, b) => a.bar - b.bar)
-  assert.deepEqual(compileMoves(lab.moves), byBar(script.steps))
+const perControl = steps => {
+  const lists = new Map()
+  for (const step of [...steps].sort((a, b) => a.bar - b.bar)) {
+    const key = String(controlKey(step))
+    lists.set(key, [...lists.get(key) ?? [], JSON.stringify(Object.keys(step).sort().map(k => [k, step[k]]))])
+  }
+  return Object.fromEntries([...lists].sort())
+}
+
+test('perform lab: an imported script keeps its meta and sections, one section when it has none', () => {
+  const script = { track: trackId, title: 'T', bars: 32, mood: 'calm', sections: [
+    { name: 'A', from: 0, to: 16, intent: 'in' }, { name: 'B', from: 16, to: 32 }], steps: [{ bar: 2, press: 44 }] }
+  const lab = importScript(script, controls)
+  assert.deepEqual([lab.title, lab.bars, lab.mood], ['T', 32, 'calm'])
   assert.deepEqual(lab.sections.map(({ name, from, to, intent }) => [name, from, to, intent]),
     [['A', 0, 16, 'in'], ['B', 16, 32, undefined]])
-  assert.equal(lab.moves.length, 5, 'one Hand-made move per section and control')
-  const plain = importScript({ track: trackId, steps: [{ bar: 3, cc: 5, value: 1, ramp: 2 }] })
+  const plain = importScript({ track: trackId, steps: [{ bar: 3, cc: 5, value: 1, ramp: 2 }] }, controls)
   assert.deepEqual([plain.bars, plain.sections.map(({ from, to }) => [from, to])], [5, [[0, 5]]],
     'no sections: one over the whole length, which ends with the last step')
+})
+
+test('perform lab: the importer recognises the moves, Launchkey steps stay Hand-made', () => {
+  const steps = [
+    { bar: 0, cc: 5, value: 0.7, ramp: 2 }, { bar: 16, cc: 5, value: 0, ramp: 4 },
+    { bar: 4, cc: 6, value: 0.6, ramp: 2 }, { bar: 8, cc: 7, value: 0.6, ramp: 2 },
+    { bar: 12, cc: 8, value: 0.6, ramp: 2 },
+    { bar: 20, cc: 36, value: 0.9, ramp: 8 }, { bar: 28, cc: 36, value: 0 },
+    { bar: 24, cc: 20, value: 0.6, ramp: 4 }, { bar: 32, cc: 20, value: 0, ramp: 4 },
+    { bar: 40, press: 52 }, { bar: 48, press: 52 }, { bar: 36, press: 44 },
+    { bar: 10, cc: 13, value: 0.5 }, { bar: 50, cc: 28, value: 0.8, ramp: 4 }, { bar: 60, cc: 28, value: 0 },
+    { bar: 2.5, keys: 'c4 e4', velocity: 0.6 }, { bar: 17.3333, lk: 1, value: 1 }]
+  const lab = importScript({ track: trackId, bars: 64, steps }, controls)
+  assert.deepEqual(lab.moves.map(move => move.kind), ['enter', 'handMade', 'layers', 'control', 'leave',
+    'handMade', 'build', 'fogDip', 'press', 'break', 'control', 'control'])
+  assert.deepEqual(lab.moves.find(move => move.kind === 'layers').p, { dir: 'in', ccs: [6, 7, 8], every: 4, over: 2,
+    to: 0.6 })
+  assert.deepEqual(lab.moves.find(move => move.kind === 'fogDip').p, { cc: 20, to: 0.6, over: 4, hold: 4, back: 4 })
+  assert.deepEqual(lab.moves.find(move => move.kind === 'break').p, { cc: 52, length: 8 })
+  assert.deepEqual(perControl(compileMoves(lab.moves)), perControl(steps))
+  assert.equal(lab.moves.filter(move => move.kind === 'build').length, 1,
+    'a ramp whose jump to 0 comes later than its end is not a Build')
+})
+
+test('perform lab: every script and take in perform/ compiles back to its steps', () => {
+  const tracks = fs.readdirSync(PERFORM, { withFileTypes: true }).filter(entry => entry.isDirectory())
+  let count = 0
+  for (const { name: track } of tracks) {
+    const trackControls = controlsOf(tagSource(scTrackFileOf(track)))
+    for (const dir of [path.join(PERFORM, track), path.join(PERFORM, track, 'takes')]) {
+      if (!fs.existsSync(dir)) continue
+      for (const file of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.lab.json'))) {
+        const script = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'))
+        if (dir.endsWith('takes') && checkScript(script, trackControls, track).length) continue
+        const lab = importScript(script, trackControls)
+        assert.deepEqual(perControl(compileMoves(lab.moves)), perControl(script.steps), `${track}/${file}`)
+        count++
+      }
+    }
+  }
+  assert.ok(count >= 15, `${count} scripts`)
 })
