@@ -1,4 +1,4 @@
-// One check for edited SuperCollider tracks (successor of the Strudel `verify`, retired in sc-migration 010):
+// One check for edited SuperCollider tracks:
 //   tags     the @-tags parse (lcxl-layout/ctl.mjs; a stem track's come from its stems and frame, stems/stem-tags.mjs)
 //   perform  its auto-perform scripts and takes are valid (trajectory/check-perform.mjs)
 //   load     the track loads headless in sclang and plays (sc-test/run.scd with only this track: notes with the
@@ -44,8 +44,6 @@ const line = (name, step, status, detail, secs = '') =>
 let failed = false
 
 const named = args.filter(a => /\.(scd|stem|track)$/.test(a))
-for (const strudel of args.filter(a => a.endsWith('.strudel')))
-  line(path.basename(strudel), 'file', 'skip', 'a Strudel file: frozen, its checks were retired (sc-migration 010)')
 const inStems = a => path.resolve(cwd, a).startsWith(path.join(root, 'sc', 'stems') + path.sep)
 const stemsChanged = named.length ? named.some(a => /\.(stem|track)$/.test(a) || inStems(a))
   : changed().some(f => /^sc\/(stems|sounds)\/|\.track$/.test(f))

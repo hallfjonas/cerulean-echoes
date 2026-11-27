@@ -1,24 +1,21 @@
-// Outline of a long track: banners, @-tag runs, helper definitions, stems (and the master of a Strudel track), with line
+// Outline of a long track: banners, @-tag runs, helper definitions, stems, with line
 // numbers, so only the needed ranges are read (sed -n).
 // A SuperCollider track (.scd): `// ----` banners, `var` helpers, the track event's top-level keys (`key stems`) and
 // every stem `(name: \x, …)` in it (`stem x`).
-// usage (in tools/): node track-map.mjs <track.strudel | track.scd>
+// usage (in tools/): node track-map.mjs <track.scd>
 import { readFileSync } from 'node:fs'
 
 const [trackPath] = process.argv.slice(2)
 if (!trackPath) {
-  console.error('usage: node track-map.mjs <track.strudel | track.scd>')
+  console.error('usage: node track-map.mjs <track.scd>')
   process.exit(2)
 }
 
 const lines = readFileSync(trackPath, 'utf8').split('\n')
-const sc = trackPath.endsWith('.scd')
-const RULE = sc ? /^\/\/\s*(?:={4,}|-{4,})\s*$/ : /^\/\/\s*={4,}\s*$/
+const RULE = /^\/\/\s*(?:={4,}|-{4,})\s*$/
 const DASH_BANNER = /^\/\/\s*-{2,}\s*(.+?)\s*-{2,}\s*$/
 const TAG = /^\/\/\s*@(ctl|mode|lk|col|layout|globalcc|row|note)\b\s*(.*)$/
-const DECLARATION = sc ? /^var\s+([A-Za-z_]\w*)/
-  : /^(?:export\s+)?(?:const|let|var|function|async function)\s+([A-Za-z_$][\w$]*)/
-const MASTER = /^(?:\$:\s*)?stack\($/
+const DECLARATION = /^var\s+([A-Za-z_]\w*)/
 const SC_KEY = /^([A-Za-z]\w*):\s/
 const SC_STEM = /^\t\(name:\s*\\(\w+)/
 const WIDTH = 120
@@ -101,22 +98,16 @@ for (let i = 0; i < lines.length; i++) {
     continue
   }
 
-  const key = sc && SC_KEY.exec(line)
+  const key = SC_KEY.exec(line)
   if (key) {
     flush()
     output.push(`  ${number}  key ${key[1]}`)
     continue
   }
-  const stem = sc && SC_STEM.exec(line)
+  const stem = SC_STEM.exec(line)
   if (stem) {
     flush()
     output.push(`  ${number}  stem ${stem[1]}`)
-    continue
-  }
-
-  if (!sc && MASTER.test(line)) {
-    flush()
-    output.push(`${number}  MASTER stack(`)
   }
 }
 flush()

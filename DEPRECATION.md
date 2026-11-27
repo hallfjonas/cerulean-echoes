@@ -18,16 +18,20 @@ separate decision, made with the user.
 - **Not supported for new features:** new Strudel tracks, boards or stems; new controls, layouts, auto-performances or
   visuals written in Strudel; new Strudel-only helpers or checks.
 - **New features go to SuperCollider** (`sc/`). Plans and decisions for the move are in [SC-MIGRATION.md](SC-MIGRATION.md).
-- **Still in use:** existing `.strudel` tracks and the Strudel tools keep running. Change them only for a fix the user
-  asks for, and never overwrite a track.
+- **Still there:** `tools/sc-port/reverb-ir.mjs`, which measures Strudel's reverb with `superdough` (and
+  `node-web-audio-api`, the two npm packages left) to make an impulse response for SC. Nothing else in the player or
+  the tools runs Strudel.
 - **Removed on 2026-11-22** (decided with the user, sc-migration 010): set 011, the historic tracks 000-006, the
   Strudel checks (`verify`, `compare`, `audibility`, `measure`, `scenario`, `check-sounds`, the sound list) and the
-  skills `/strudel-mix` and `/strudel-optimize`. Still there: the player's Strudel engine (while it needs no work).
+  skills `/strudel-mix` and `/strudel-optimize`.
 - **Removed on 2026-11-26** (decided with the user): the lab tutorials (`lab/tutorials/`), `snippets/`,
   `superdirt-setup/`, the `dual-lc` template and the layout hooks that checked `.strudel` files, the Strudel-only
   comparison tools in `tools/sc-port/`, and the skills `/lab-board` and `/lab-to-track`.
 - **Removed on 2026-11-27** (decided with the user): the producer (Guitar Pro MIDI → Strudel track: `tools/producer/`,
-  `npm run producer`, the skill `/producer`, the producer mode docs, the 012 and 013 fixtures). Git history keeps it.
+  `npm run producer`, the skill `/producer`, the producer mode docs, the 012 and 013 fixtures), the player's Strudel
+  engine (`engine-strudel.mjs`, `strudel-source.mjs`, `strudel-globals.mjs`, `banks.mjs`, `make-tapped.mjs` and the
+  routes and page code that served them), `tools/strudel-sim/`, `tools/shared/` (`npm run shared`) and the `@strudel/*`
+  npm packages. Git history keeps them.
 
 ## How to add an entry
 

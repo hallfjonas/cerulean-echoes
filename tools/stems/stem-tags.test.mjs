@@ -1,5 +1,5 @@
 // Feature tests for the @ctl lines of a stem track: made from its stems and frame, read by check-perform like the
-// comments of a Strudel track. (SC makes the same lines: compared in sc-test/sc.test.mjs.)
+// comments of an SC track. (SC makes the same lines: compared in sc-test/sc.test.mjs.)
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import path from 'path'
