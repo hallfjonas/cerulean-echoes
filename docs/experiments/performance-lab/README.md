@@ -35,7 +35,7 @@ A step the lab cannot explain becomes a "Hand-made" move.
 
 ```
 lab file  <name>.lab.json   { story, refs, status, sections[{id,name,type,from,to,intent,energy}],
-                              moves[{id,kind,bar,p:{...},edits:{i:{bar?,value?,ramp?,del?}}}], rounds[] }
+                              moves[{id,kind,bar,p:{...},edits:{i:{at?,value?,ramp?,del?}}}], rounds[] }
 script    <name>.json        plain script v2, compiled from the lab file; check-perform stays the judge
 ```
 
