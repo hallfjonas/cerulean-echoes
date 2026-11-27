@@ -71,29 +71,9 @@ need no change. The sidecar is what makes the high levels editable; a script wit
 
 ## Plan
 
-One PR per phase, each branched from a fresh `origin/main`. Every phase ends with `npm test` and `npm run verify-sc`
-green and a listen or look in the player where it touches sound or UI.
+Two phases, no phase-per-PR split:
 
-1. **This PR: prototype and notes.** Static HTML, demo data, no server. Review the UI and the model, answer what is left.
-2. **Core module (seam 4).** Move the move catalogue, `compile()` and the edit overrides out of the prototype into
-   `tools/trajectory/perform-lab/` as pure functions with feature tests: every move compiles to valid steps, an
-   override survives a move edit, `check-perform` accepts the result.
-3. **Tracks page shell (seams 1, 2, 10).** Labs sub-tab "Tracks" in `pages.mjs` and the player, server routes that list
-   a track's performances and its controls (`controlsOf`, `@lk`, pad names). Read-only: open a performance, see the
-   controls and the existing steps at the Steps level.
-4. **Save (seams 5, 6).** Write `<name>.json` and the `<name>.lab.json` sidecar, run `check-perform` on save, show its
-   errors in the footer. A new performance goes into a new file; an existing script is never overwritten without a
-   "save as".
-5. **Import (seam 3).** Recognise the 14 existing scripts as sections and moves. Acceptance: importing and compiling
-   gives back the original steps for every script (what is not recognised stays a Hand-made move), so no script can
-   change by being opened. Takes use the same importer.
-6. **Play (seam 7).** Start at a bar or section through the existing auto-perform path, play / pause, click a section
-   to jump (the TODO.md item "auto-perform playback control"). Needs a listen on the real player.
-7. **Feedback and draft (seams 8, 9).** Adjust operations from words, feedback rounds written to `feedback.md`,
-   design `.md` export (1-based bars), draft moves from the story through the `/auto-perform` skill. Energy stays
-   descriptive unless the user decides otherwise.
-8. **Later, separate plan.** Tempo written to the track (seam 11) and stem editing, which turns Tracks into the main
-   tracks lab. Out of scope until phases 2 to 7 are in use.
-
-Risks: the importer is the hard part (recognition ambiguity), so phase 5 keeps the round-trip rule as its test; the
-player page is large, so the lab gets its own module files rather than growing `player.html`.
+- [plan-now.md](plan-now.md): one PR (this one), seven steps after the prototype: core, shell and routes, levels UI, save,
+  import, play, then docs. Launch Control only; no Launchkey support, no LLM help, no tempo write, no stem editing.
+- [plan-later.md](plan-later.md): what comes after, by function: Launchkey moves, drafting, LLM support, workflow
+  records, tempo write, stem editing.
