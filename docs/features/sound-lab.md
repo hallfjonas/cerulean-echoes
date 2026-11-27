@@ -27,7 +27,8 @@ The old Strudel lab boards were retired ([Lab boards](lab-boards.md)); new sound
 2. Click the name of a column on the Live page. The stem drawer lists the library stems of its role; filter by role
    (set it to any to swap in a stem of another role, e.g. a bass for a lead), genre, energy or tag. Stems that do not
    fit the track are greyed out with the reason (for example "the frame has no tonesAt": the stem needs something
-   only its own track has); the check runs when the drawer opens, a few seconds the first time for a track.
+   only its own track has). The check starts when the track loads and takes a few seconds the first time; until
+   it is done the drawer shows "Checking which stems fit this track …".
 3. Pick one. It takes over at the next bar. If the new stem needs another mixer strip than the old one, the track is
    loaded again with it (a short gap).
 4. **Revert** puts the file's stems back. **Save as** writes the swaps as a new track (`009-house-v2`); the original

@@ -57,7 +57,7 @@ const stemLab = createStemLab({ getSc: () => sc })
 const spaceLab = createSpaceLab()
 const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
   resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null },
-  onLoaded: (id, slots) => swaps.loaded(id, slots) })
+  onLoaded: (id, slots) => { swaps.loaded(id, slots); fits.fitOf(id).catch(() => {}) } })
 const swaps = createStemSwap({ repo, find, sc })
 const fits = createStemFit({ repo, find, sclang: findSclang() })
 useScLink(sc)

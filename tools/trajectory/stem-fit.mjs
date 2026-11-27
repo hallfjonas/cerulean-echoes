@@ -1,7 +1,7 @@
 // Which library stems fit a stem track: sc/tools/stem-fit.scd plays every library stem on the track's slots offline
 // (its own sclang, no sound) and names the ones whose code fails in the track's frame. The answer is kept while the
-// server runs, per frame file and library state (any change under sc/stems or sc/lib checks again); the stem drawer
-// greys the misfits out (stem-drawer.mjs).
+// server runs, per frame file and library state (any change under sc/stems or sc/lib checks again). The server starts
+// the check as soon as a track or project has loaded, so the stem drawer (stem-drawer.mjs) usually finds it done.
 //   GET /stems/fit?track=<id>   (a stem track, or a Stem Designer project: its context track) → { misfits: { ref:
 //                               reason } }, after the check (a few seconds the first time); { misfits: {}, error }
 //                               when it could not run

@@ -7,8 +7,8 @@
 // every role) from the controllers; a pick changes the project file and plays from the next bar or loads it again
 // (stem-lab.mjs). There is no Revert or Save as: the sidebar's Save as copies the project.
 // Stems whose code does not fit the track's frame (GET /stems/fit, stem-fit.mjs) are greyed out with the reason and
-// cannot be picked; the check runs when the drawer opens (a few seconds the first time for a track), and the list
-// shows only once it is done.
+// cannot be picked. The check starts when the track loads (a few seconds the first time for a track); a drawer opened
+// before it is done shows the list only once it is.
 import { askText, toast } from './toast.mjs'
 
 const el = (tag, props = {}, ...children) => {
