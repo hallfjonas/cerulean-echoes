@@ -18,7 +18,7 @@
 // @lk k5 Detune | one clean voice ↔ wide and wobbly (two detuned voices around it).
 // @lk k6 Space | much reverb ↔ far away (it is ambient: never dry).
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right Starts at 100 %.
 // @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
 // @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 // @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
@@ -79,6 +79,8 @@ stems: [
 // × 2, from the next key), knobs CC 21-28: 1 cutoff, 2 resonance, 3 attack, 4 note length, 5 detune, 6 reverb, 7 echo, 8 key pan spread; bank B (CC 31-38) = the drum pads: 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost. Every key
 // plays a note of fixed length (Strudel's midikeys has no note-off: the length is knob 4). Brightness, Resonance and
 // Detune act at once on sounding keys (state buses), the rest from the next key.
+// key pan starts at 100 %: the low keys left, the high keys right
+lkStart: (28: 1),
 lkCtl: { |ce, num, v, send|
 	switch(num,
 		1, { ce.setState(\lkLevel, 2 * v, send) },

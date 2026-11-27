@@ -19,7 +19,7 @@
 // @lk k5 Length | short notes ↔ long.
 // @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right Starts at 100 %.
 // @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
 // @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 // @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
@@ -93,6 +93,8 @@ stems: [(name: \lk, sounds: ~ce.lkKeysSounds ++ [\sdSampleMod, \sdFont], level: 
 	lanes: [(name: \keys, orbit: 2, roomR: \lkRoom, echoSend: \lkEcho),
 		(name: \shots, orbit: 1, level: 1.0, roomR: 0.3), (name: \rim, orbit: 1, level: 1.0, roomR: 0.3, echoSend: 0.3),
 		(name: \oohs, orbit: 1, level: 1.0, roomR: 0.6), (name: \vib, orbit: 1, level: 1.0, roomR: 0.5)])],
+// key pan starts at 100 %: the low keys left, the high keys right
+lkStart: (28: 1),
 lkCtl: { |ce, num, v, send|
 	if(num == 22) { ce.lkTurned2 = true };
 	switch(num,

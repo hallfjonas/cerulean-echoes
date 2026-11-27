@@ -301,6 +301,7 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
 		check.("% Launchkey knob 1 (CC 21) reaches the track".format(name), {
 			var ce = ~lastCe; ce.setLkCC(21, 0.7, {}); ce.stateVal[\lkBright] == 0.7 });
+		check.("% key pan (CC 28) starts at its maximum".format(name), { ~lastCe.lkCC[28] == 1 });
 		// the pad bank and the key pan at full: the pads still play, every key is panned
 		check.("% pad bank knobs (CC 31-38) and key pan (CC 28) turned up still play pads and keys".format(name), {
 			var ce = ~lastCe, f = ce.track[\lkNote], pads, keys;

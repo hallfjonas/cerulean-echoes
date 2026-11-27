@@ -33,7 +33,7 @@ Two knob improvements for the SuperCollider live tracks (`sc/tracks/`: 007, 008,
   left … pad 16 right), 6 boost. Knobs 7 and 8 are free (room and echo are lane sends, they need state buses).
 - **Key pan on knob 8 (CC 28).** Spreads the keys across the stereo field: 0 = all in the middle, 1 = the lowest key
   of the keyboard window hard left, the highest hard right (`ce.lkKeyPan`; the window follows the octave buttons the
-  way the player's keyboard does). Pad Fog moved from CC 28 to CC 32.
+  way the player's keyboard does). It starts at 100 % (`lkStart: (28: 1)` in every frame). Pad Fog moved from CC 28 to CC 32.
 - **Pad modulation reads the knob at the hit** (as the Pad Fog knob does today in `lkNote`) unless the parameter can
   act on a sounding shot; then it goes through a state bus.
 - **Relative is applied only on the hardware path** (`ce.midiCC`). The web UI, auto-perform and takes send

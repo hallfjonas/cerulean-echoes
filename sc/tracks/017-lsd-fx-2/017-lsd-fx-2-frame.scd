@@ -16,7 +16,7 @@
 // @ctl g.b2 Break | 1st: low end out. 2nd: all back on the one.
 // @lk level Keys Level | mod wheel: volume of the keys, apart from the metal column's fader.
 // @lk k1 Key Tone | keys: darker ↔ brighter, on top of the metal's Brightness.
-// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right Starts at 100 %.
 // @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
 // @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 // @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
@@ -70,7 +70,7 @@ stems: [
 			(name: \space, orbit: 1, level: 1.0, roomR: 0.9), (name: \wind, orbit: 1, level: 1.0, roomR: 0.8)]),
 ],
 // the Launchkey's start values: the mod wheel at a third, the key tone neutral
-lkStart: (1: 0.34, 21: 0.5),
+lkStart: (1: 0.34, 21: 0.5, 28: 1),
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play the metal sound (2:4): a second player
 // on the keys, the first one shaping the metal on the Launch Control. Its Brightness, Weight, Space, Rewind and Pattern reach
 // the keys (Random: a figure per press), its fader does not (it keeps playing its own hits). The mod wheel (CC 1) is the keys'

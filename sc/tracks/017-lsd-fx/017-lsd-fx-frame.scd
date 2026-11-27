@@ -20,7 +20,7 @@
 // @lk k5 Length | short notes ↔ long.
 // @lk k6 Space | a little air ↔ room.
 // @lk k7 Echo | dry ↔ long echo.
-// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right.
+// @lk k8 Key Pan | keys: all in the middle ↔ low keys left, high keys right Starts at 100 %.
 // @lk pad.k1 Pitch | drum pads (bank B): natural ↔ an octave down.
 // @lk pad.k2 Pad Fog | drum pads: clear ↔ muffled, like the global Fog.
 // @lk pad.k3 Pad Thin | drum pads: full ↔ thin.
@@ -70,6 +70,8 @@ stems: [
 ],
 // LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these), the same as 008's. Mod wheel (CC 1) = keys level,
 // knobs CC 21-28: 1 brightness, 2-4 the keys' sound pairs, 5 length, 6 space, 7 echo, 8 key pan spread; bank B (CC 31-38) = the drum pads: 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost.
+// key pan starts at 100 %: the low keys left, the high keys right
+lkStart: (28: 1),
 lkCtl: { |ce, num, v, send|
 	if(num == 22) { ce.lkTurned2 = true };   // knob 2 keeps its start value 0.5 (piano + Rhodes) until it is turned
 	switch(num,
