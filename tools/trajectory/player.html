@@ -150,8 +150,8 @@
 <!-- Plays a track through SuperCollider (the server starts it on the first load, sc-link.mjs). The controllers go
      straight to SC; this page mirrors its state.
      Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
-     #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
-     show the track's LC view (sc/ui/index.html in the iframe #scPanel) and the visuals (render.mjs on
+     #labs/stems, #labs/tracks, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and
+     Labs show the track's LC view (sc/ui/index.html in the iframe #scPanel) and the visuals (render.mjs on
      the canvas). The Settings view (the gear) lays over the current page.
      The sidebar (key S) holds the page links, the track, Play-Pause / Stop / Record and auto-perform.
      The handle on the sidebar edge holds the sidebar toggle, the settings gear and the help button.
@@ -203,6 +203,7 @@
   <section id="sampleLab" data-pages="labs/samples" hidden></section>
   <section id="stemLab" data-pages="labs/stems"></section>
   <section id="spaceLab" data-pages="labs/space"></section>
+  <section id="tracksLab" data-pages="labs/tracks"></section>
   <section id="autoPerform" data-pages="live"></section>
   <section id="panelSide" data-pages="live">
     <h2>MIDI panel</h2>
@@ -222,6 +223,7 @@
   <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
   <div id="placeholder" hidden></div>
   <div id="spaceStage" data-pages="labs/space"></div>
+  <div id="tracksStage" data-pages="labs/tracks"></div>
   <div id="settingsPage" hidden>
     <nav id="settingsNav" aria-label="Settings sections"></nav>
     <div id="settingsBody">
@@ -260,6 +262,7 @@ import { mountKnobEditor } from './knob-editor.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
 import { mountSpaceLab } from './space-lab-ui.mjs'
+import { mountTracksLab } from './perform-lab-ui.mjs'
 import { toast } from './toast.mjs'
 import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
@@ -317,6 +320,7 @@ const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entr
 const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($('track').value),
   play: () => play(), refresh: loadCatalogue })
 const spaceLab = mountSpaceLab({ section: $('spaceLab'), stage: $('spaceStage') })
+const tracksLab = mountTracksLab({ section: $('tracksLab'), stage: $('tracksStage') })
 
 // stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
 const selection = createSelection()
@@ -598,6 +602,9 @@ const showPage = next => {
   const onSpace = page.id === 'labs' && page.sub === 'space'
   document.body.classList.toggle('space', onSpace)
   if (onSpace) spaceLab.show()
+  const onTracks = page.id === 'labs' && page.sub === 'tracks'
+  document.body.classList.toggle('tracks', onTracks)
+  if (onTracks) tracksLab.show()
   $('placeholder').hidden = !placeholder
   $('placeholder').textContent = placeholder ?? ''
   $('placeholderNote').textContent = placeholder ?? ''

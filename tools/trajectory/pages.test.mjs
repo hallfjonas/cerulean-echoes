@@ -9,13 +9,13 @@ const catalogue = [
 ]
 
 test('hash: every page round-trips, unknown hashes land on Live, Labs defaults to Samples', () => {
-  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/space', '#labs/sets', '#visuals'])
+  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/space', '#labs/tracks', '#labs/sets', '#visuals'])
     assert.equal(hashFor(parseHash(hash)), hash)
   assert.deepEqual(parseHash(''), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#nonsense'), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#labs'), { id: 'labs', sub: 'samples' })
   assert.deepEqual(parseHash('#labs/nope'), { id: 'labs', sub: 'samples' })
-  assert.deepEqual(parseHash('#labs/tracks'), { id: 'labs', sub: 'samples' })
+  assert.deepEqual(parseHash('#labs/tracks'), { id: 'labs', sub: 'tracks' })
 })
 
 test('pickers: Live lists live tracks, Samples and Stems their projects', () => {
@@ -24,6 +24,7 @@ test('pickers: Live lists live tracks, Samples and Stems their projects', () => 
   assert.deepEqual(ids('#labs/samples'), ['sample-kick'])
   assert.deepEqual(ids('#labs/stems'), ['stems-flute'])
   assert.deepEqual(ids('#labs/space'), [])
+  assert.deepEqual(ids('#labs/tracks'), [])
   assert.deepEqual(ids('#labs/sets'), [])
   assert.deepEqual(ids('#visuals'), [])
 })

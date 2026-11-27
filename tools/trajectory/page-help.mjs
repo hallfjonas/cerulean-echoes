@@ -105,6 +105,13 @@ const SPACE = [
     + 'cell: use 1/16 or coarser to judge the bass. Each cell is the loudest part of a band, not an average.' }
 ]
 
+const TRACKS = [
+  { heading: 'What it does', text: 'Shows the auto-performances of a live track: for now the steps of a script, in '
+    + 'bar order.' },
+  { heading: 'How to use', text: ['Pick a track, then one of its performances (scripts and takes).',
+    'Bars count from 0, as in the script; the length is shown in bars and in minutes at the track\'s tempo.'] }
+]
+
 const PLANNED = [
   { heading: 'What it does', text: 'Planned: this designer is not built yet. The Labs menu keeps its place.' }
 ]
@@ -116,6 +123,7 @@ const VISUALS = [
     'S hides the sidebar, F is fullscreen.'] }
 ]
 
-const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/space': SPACE, 'labs/sets': PLANNED, visuals: VISUALS }
+const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/space': SPACE, 'labs/tracks': TRACKS,
+  'labs/sets': PLANNED, visuals: VISUALS }
 
 export const helpFor = key => BY_PAGE[key] ?? LIVE
