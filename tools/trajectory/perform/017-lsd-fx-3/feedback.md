@@ -30,3 +30,19 @@
   (levels, Complexity, 2-bar rests) from 17 to 188. Claps 0.2-0.3 (were 0.5). No Metal Rewind in Groove; the end is
   the radio alone. 232 -> 224 bars (6 min 41 s).
 - Decision: again (the design is not approved yet)
+
+## Loop 1 / Round 2 - metal-space.md (2026-11-27)
+- User: "Approved"
+- Changed: nothing; the open questions resolve to the design's defaults (Final drop: the four fx at Level 1, as written;
+  hats in the 2-bar break out, as written; leads once; the end is the radio alone, no metal hit at 213).
+- Decision: approved
+- Approval: Design approved by the user on 2026-11-27 ("Approved").
+
+## Loop 2 / Round 1 - metal-space.json (2026-11-27)
+- Script written from the approved design: 329 steps, 224 bars. Checks: check-perform ok, verify-sc ok (load, 5 checks).
+- Not checked by any tool: levels, clipping, CPU, and how the drift sounds. Only the listen decides.
+- Launchkey: no steps (keys by hand). Mod wheel is the user's: up in Down (about bar 97), down at the Final drop (bar 157).
+- Assumptions to confirm by ear: pattern presses assume the default is the first pattern (Pads Lift, Leads Loop, Chords
+  Stab 1); "held" button steps are a press on each bar of the hold; Hats at 0.5 in the Final drop (the design said
+  "Groove" without a level); Metal space and brightness reset to 0.6 / 0.5 at 157 after the keys' 0.9.
+- Decision: pending (listen in the player)
