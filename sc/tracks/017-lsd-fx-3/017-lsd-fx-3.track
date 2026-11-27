@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "name": "017-lsd-fx-3",
+  "about": "017 LSD with congas and claps; strings, stab, leads, fx.",
+  "tempo": 134,
+  "swing": 0,
+  "genre": "groove-techno",
+  "frame": "017-lsd-fx-3-frame.scd",
+  "chapters": [
+    "Dark",
+    "Tight",
+    "Warm"
+  ],
+  "slots": {
+    "1:1": "sdSynthMod/sd-synth-mod-brightness-space-punch-pattern-drop-out-3.stem",
+    "1:2": "sdSynthMod/sd-synth-mod-brightness-space-motion-pattern-riser-2.stem",
+    "1:3": "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-octave-5.stem",
+    "1:4": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-3.stem",
+    "1:5": "congas727/congas727-brightness-space-complexity-pattern-fill-2.stem",
+    "1:6": "sdSample/sd-sample-brightness-space-complexity-pattern-long-2.stem",
+    "1:7": "clap909/clap909-brightness-space-complexity-pattern-roll-2.stem",
+    "2:1": "sdSupersawWide/sd-supersaw-wide-brightness-space-bow-pattern-echo-throw.stem",
+    "2:2": "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem",
+    "2:3": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-6.stem",
+    "2:4": "sdSampleMod/sd-sample-mod-brightness-space-weight-pattern-rewind.stem",
+    "2:5": "sdSynthMod/sd-synth-mod-brightness-space-static-pattern-tune-2.stem",
+    "2:6": "sdSynthMod/sd-synth-mod-brightness-space-rate-pattern-burst-4.stem",
+    "2:7": "sdNoise/sd-noise-brightness-space-complexity-pattern-riser-6.stem"
+  }
+}
