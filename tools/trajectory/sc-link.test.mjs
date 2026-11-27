@@ -9,7 +9,7 @@ import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { encode, decode } from './osc.mjs'
-import { findSclang } from './sc-link.mjs'
+import { findSclang, loadArgs } from './sc-link.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 
@@ -17,6 +17,13 @@ test('OSC: what the link sends reads back the same', () => {
   const m = decode(encode('/ce/cc', [{ i: 13 }, { f: 0.5 }, 'x']))
   assert.equal(m.address, '/ce/cc')
   assert.deepEqual(m.args, [13, 0.5, 'x'])
+})
+
+test('load message: slots, bar-0 values, and button presses only when a script starts later', () => {
+  assert.deepEqual(loadArgs('/t.track', null, { cc: [[13, 0.5]], lk: [[1, 2]] }),
+    ['/t.track', 'cc', { i: 13 }, { f: 0.5 }, 'lk', { i: 1 }, { f: 1 }])
+  assert.deepEqual(loadArgs('/t.track', { '1:4': 'x.stem' }, { press: [[44, 2], [37, 0]] }),
+    ['/t.track', '{"1:4":"x.stem"}', 'cc', 'lk', 'press', { i: 44 }, { i: 2 }])
 })
 
 test('track list: every SC track is a live track on engine sc', async () => {

@@ -7,8 +7,12 @@
 // Keys on this page: 1-5 the level, ⌘Z / Ctrl-Z undo, Escape clears the selection, Backspace / Delete removes the
 // selected move or step. The tempo is a what-if: it changes the minutes shown, never the track.
 // Bars count from 0 and ranges end before their last number, as in the script.
-//   mountTracksLab({ section, stage }) → { show() }   show() loads the tracks on first use
-import { MOVES, compileTagged, controlKey, fitSections, importScript, insertSection, labWarnings, moveEdge,
+// Play (sidebar) plays the lab's script as it is now, saved or not, from a bar on a 4-bar line (Chapter switches on
+// 4-bar phrases counted from the load); while it plays, a click on a section or the ruler starts it again there.
+//   mountTracksLab({ section, stage, perform }) → { show(), progress(p) }   show() loads the tracks on first use;
+//   perform: { play(script, id, from) → Promise<played>, stop() } (the player's auto-perform); progress(p) is the
+//   performer's onChange ({ bar, script } or null)
+import { MOVES, PRESS_LEAD, compileTagged, controlKey, fitSections, importScript, insertSection, labWarnings, moveEdge,
   moveText, movesIn, newId, newMove, newSection, removeSection, sectionOf, spanOf, stepEnd, toScript }
   from './perform-lab-core.mjs'
 import { askText, toast } from './toast.mjs'
@@ -130,12 +134,16 @@ const performanceMeta = performance => [performance.bars && `${performance.bars}
   performance.sections && `${performance.sections} sections`, `${performance.steps} steps`,
   performance.design && 'design', performance.take && 'take'].filter(Boolean).join(' · ')
 
-export function mountTracksLab({ section, stage }) {
+const phraseOf = bar => Math.max(0, Math.floor(bar / 4) * 4)
+const BUTTON_MOVES = ['press', 'break']
+const IDLE_PLAY_HINT = 'Plays this version, saved or not. While it plays, click a section or the ruler to go there.'
+
+export function mountTracksLab({ section, stage, perform }) {
   section.innerHTML = '<h2>Tracks</h2>' +
     '<label>Track <select data-pick="track"></select></label>' +
     '<label>Performance <select data-pick="performance"></select></label>' +
     '<p class="hint" data-part="meta"></p><button data-act="newPerformance">New performance</button>' +
-    '<output data-part="status"></output><div data-part="palette"></div>'
+    '<output data-part="status"></output><div data-part="play"></div><div data-part="palette"></div>'
   stage.innerHTML = '<div class="tl-bar" data-part="bar"></div><div class="tl-main"><div class="tl-scroll" ' +
     'data-part="scroll"><div class="tl-hint" data-part="hint"></div><div data-part="timeline"></div></div>' +
     '<aside class="tl-inspector" data-part="inspector"></aside></div><div class="tl-foot" data-part="foot"></div>'
@@ -144,7 +152,8 @@ export function mountTracksLab({ section, stage }) {
   const pick = name => section.querySelector(`[data-pick="${name}"]`)
   const state = { tracks: null, info: null, controls: new Map(), lab: null, name: null, owned: false, level: 'moves',
     sel: null, cursor: 0, zoom: 12, ppb: 12, bpm: null, history: [], dirty: false, stepView: 'table',
-    stepScope: 'selection', tagged: [], spans: new Map(), errors: [], run: 0, checkRun: 0 }
+    stepScope: 'selection', tagged: [], spans: new Map(), errors: [], run: 0, checkRun: 0, from: 0, playing: null,
+    playBar: null }
 
   const post = async (route, body) => {
     const response = await fetch('lab/tracks/' + route,
@@ -471,8 +480,11 @@ export function mountTracksLab({ section, stage }) {
     const move = sel.move
     const own = state.tagged.filter(item => item.move === move.id)
     const edits = Object.keys(move.edits ?? {}).length
+    const button = BUTTON_MOVES.includes(move.kind)
     return `${crumbs(sel)}<h3>${MOVES[move.kind].name} move</h3><div class="tl-field"><span>Bar</span><input ` +
-      `type="number" step="0.25" min="0" data-f="moveBar" data-id="${move.id}" value="${move.bar}"></div>` +
+      `type="number" step="${button ? 1 : 0.25}" min="0" data-f="moveBar" data-id="${move.id}" ` +
+      `value="${move.bar}"></div>${button ? `<p class="hint">The bar where the button takes over (Chapter: the next ` +
+        `4-bar line); it is pressed ${PRESS_LEAD} bar before.</p>` : ''}` +
       `${MOVES[move.kind].fields.map(field => fieldHtml(move, field)).join('')}<p class="chips"><button ` +
       `data-act="nudge" data-id="${move.id}" data-v="-1">Earlier</button><button data-act="nudge" ` +
       `data-id="${move.id}" ` +
@@ -579,6 +591,38 @@ export function mountTracksLab({ section, stage }) {
       steps: stepsView })[state.level]()
     scroll.style.setProperty('--ppb', state.ppb)
     scroll.scrollTo(left, top)
+    placePlayhead()
+  }
+  const placePlayhead = () => {
+    const timeline = part('timeline').querySelector('.tl')
+    if (!timeline) return
+    let head = timeline.querySelector('.tl-playhead')
+    if (state.playBar === null) return head?.remove()
+    if (!head) timeline.append(head = Object.assign(document.createElement('div'), { className: 'tl-playhead' }))
+    head.style.left = `${LABEL_WIDTH + bx(state.playBar)}px`
+  }
+  const renderPlay = () => {
+    if (!state.lab || !perform) return void (part('play').innerHTML = '')
+    const at = state.playBar === null ? '' : `bar ${Math.floor(state.playBar)} (from 0) of ${state.lab.bars}` +
+      `${sectionOf(state.lab, state.playBar) ? ` · ${sectionOf(state.lab, state.playBar).name}` : ''}`
+    part('play').innerHTML = '<h2>Play</h2><label>From bar <input type="number" step="4" min="0" data-play="from" ' +
+      `value="${state.from}"></label><div class="row"><button data-act="play">${state.playing ? 'Again' : 'Play'}` +
+      `</button><button data-act="stop"${state.playing ? '' : ' disabled'}>Stop</button></div>` +
+      `<p class="hint" data-part="playing">${state.playing ? at || 'loading …' : IDLE_PLAY_HINT}</p>`
+  }
+  const startPlay = from => {
+    if (!perform || !state.lab) return
+    state.from = phraseOf(Math.min(from, state.lab.bars - 1))
+    const script = toScript(state.lab)
+    const played = perform.play(script, `lab:${state.name ?? 'new'}`, state.from)
+    state.playing = script
+    state.playBar = null
+    renderPlay()
+    played.then(ok => {
+      if (ok || state.playing !== script) return
+      state.playing = null
+      renderPlay()
+    })
   }
   const renderInspector = () => {
     const sel = selection()
@@ -598,6 +642,7 @@ export function mountTracksLab({ section, stage }) {
     renderTimeline()
     renderInspector()
     renderFoot()
+    renderPlay()
     scheduleCheck()
   }
   const renderLive = () => {
@@ -752,9 +797,13 @@ export function mountTracksLab({ section, stage }) {
     save: () => state.owned && state.name ? save(state.name) : saveAs(),
     saveAs,
     level: el => { state.level = el.dataset.v; render() },
-    select: el => select(el.dataset.type === 'step'
-      ? { type: 'step', move: el.dataset.move, index: Number(el.dataset.index) }
-      : { type: el.dataset.type, id: el.dataset.id }),
+    select: el => {
+      select(el.dataset.type === 'step' ? { type: 'step', move: el.dataset.move, index: Number(el.dataset.index) }
+        : { type: el.dataset.type, id: el.dataset.id })
+      if (el.dataset.type === 'section' && state.playing) startPlay(findSection(el.dataset.id).from)
+    },
+    play: () => startPlay(state.from),
+    stop: () => perform?.stop(),
     undo,
     resetBpm: () => { state.bpm = state.info.tempo; render() },
     stepView: el => { state.stepView = el.dataset.v; render() },
@@ -882,7 +931,9 @@ export function mountTracksLab({ section, stage }) {
       } else if (kind === 'param') {
         findMove(el.dataset.id).p[key] = parseParam(el.dataset.t, el)
       } else if (kind === 'moveBar') {
-        findMove(el.dataset.id).bar = Math.max(0, Number(el.value))
+        const move = findMove(el.dataset.id)
+        const bar = Math.max(0, Number(el.value))
+        move.bar = BUTTON_MOVES.includes(move.kind) ? Math.round(bar) : bar
       } else if (kind === 'step') {
         const value = ['keys'].includes(key) ? el.value : Number(el.value)
         editStep(findMove(el.dataset.move), Number(el.dataset.index), { [key]: value })
@@ -908,7 +959,11 @@ export function mountTracksLab({ section, stage }) {
     const start = once()
     if (kind === 'cursor') {
       const place = ev => { state.cursor = clamp(snap(barAt(ev), 1), 0, state.lab.bars); render() }
-      drag = { move: place }
+      drag = { move: place, end: () => {
+        if (state.playing) return startPlay(state.cursor)
+        state.from = phraseOf(state.cursor)
+        renderPlay()
+      } }
       return place(event)
     }
     if (kind === 'move') {
@@ -992,5 +1047,24 @@ export function mountTracksLab({ section, stage }) {
   })
   addEventListener('resize', () => { if (state.lab && !stage.closest('.off-page')) renderTimeline() })
 
-  return { show: () => { if (!state.tracks) load(); else if (state.lab) render() } }
+  section.addEventListener('change', event => {
+    if (event.target.dataset?.play !== 'from' || !state.lab) return
+    state.from = phraseOf(Math.min(Number(event.target.value) || 0, state.lab.bars - 1))
+    renderPlay()
+  })
+
+  return {
+    show: () => { if (!state.tracks) load(); else if (state.lab) render() },
+    progress: p => {
+      if (!p) {
+        if (state.playing) Object.assign(state, { playing: null, playBar: null })
+      } else if (p.script === state.playing) state.playBar = p.bar
+      else return
+      placePlayhead()
+      const line = part('playing')
+      if (p && line) line.textContent = `bar ${Math.floor(p.bar)} (from 0) of ${state.lab?.bars ?? '?'}` +
+        `${p.section ? ` · ${p.section.name}` : ''}`
+      else renderPlay()
+    },
+  }
 }

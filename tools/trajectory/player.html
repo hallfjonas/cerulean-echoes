@@ -251,7 +251,7 @@ import { mountSettings, SETTINGS } from './settings.mjs'
 import { mountHelp } from './help.mjs'
 import { helpFor } from './page-help.mjs'
 import { mountTheme } from './theme.mjs'
-import { createPerformer, mountAutoPerform, sectionLabel } from './autoperform.mjs'
+import { createPerformer, mountAutoPerform, pressCounts, sectionLabel } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createScAuto, createScTap } from './sc-auto.mjs'
 import { createScRecorder } from './recorder-sc.mjs'
@@ -320,7 +320,10 @@ const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entr
 const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($('track').value),
   play: () => play(), refresh: loadCatalogue })
 const spaceLab = mountSpaceLab({ section: $('spaceLab'), stage: $('spaceStage') })
-const tracksLab = mountTracksLab({ section: $('tracksLab'), stage: $('tracksStage') })
+const tracksLab = mountTracksLab({ section: $('tracksLab'), stage: $('tracksStage'), perform: {
+  play: (script, id, from) => playScript(script, id, { track: script.track, from, record: false }),
+  stop: () => stopTransport(),
+} })
 
 // stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
 const selection = createSelection()
@@ -439,6 +442,7 @@ const performer = createPerformer({ midi: scAuto, engine, onChange: progress => 
   const barText = progress ? `auto bar ${Math.floor(progress.bar) + 1} / ${Math.ceil(progress.end)}` : ''
   autoLabel = [barText, progress && sectionLabel(progress.section, progress.bar)].filter(Boolean).join(' · ')
   autoPerform.show(!!progress, barText, progress)
+  tracksLab.progress(progress)
 } })
 const stopPerformer = () => {
   stoppedByPage = true
@@ -446,14 +450,15 @@ const stopPerformer = () => {
   stoppedByPage = false
 }
 
-const play = async script => {
+// script: the id of the auto-perform script that plays (none for a plain Play); press: [[cc, count]] for a script
+// started at a later bar (autoperform.mjs pressCounts)
+const play = async (script, { track = $('track').value, press = [] } = {}) => {
   stopPerformer()
-  const track = $('track').value
   scStarted = true
   label = engine.host().ready ? 'loading track …' : 'starting SuperCollider …'
   try {
     if (!script) scAuto.clear()
-    await engine.load(track, scAuto.loadInit())
+    await engine.load(track, { ...scAuto.loadInit(), ...press.length && { press } })
     setPlaying(track)
     recorder.start({ track, trackHash: null, cps: engine.cps(), ...script && { script } })
     scAuto.live()
@@ -482,22 +487,27 @@ const togglePlay = () => {
 $('play').onclick = togglePlay
 $('stop').onclick = stopTransport
 
+// A script plays from bar `from` (0: from the start): the steps go to SC, the values at `from` and the presses before
+// it are held and sent with the load. The Tracks lab plays its own script this way (record: false, its own track).
+const playScript = async (script, id, { track = $('track').value, from = 0, record = true } = {}) => {
+  stopPerformer()
+  scAuto.hold()
+  performer.prime(script, from)
+  const recordAudio = record && ($('recordAuto').checked || recordArmed)
+  if (recordAudio) await stopRecording()
+  if (!await play(id, { track, press: pressCounts(script, from) })) return false
+  if (recordAudio) await startRecording('auto', id)
+  performing = id
+  performer.start(script, from)
+  return true
+}
 const startScript = async id => {
   const track = $('track').value
   const response = await fetch(`perform/${encodeURIComponent(track)}/${encodeURIComponent(id)}`, { cache: 'no-store' })
   if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
   const script = await response.json()
   if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
-  stopPerformer()
-  // the steps go to SC; bar 0 is held and sent with the load
-  scAuto.hold()
-  performer.prime(script)
-  const recordAudio = $('recordAuto').checked || recordArmed
-  if (recordAudio) await stopRecording()
-  if (!await play(id)) return
-  if (recordAudio) await startRecording('auto', id)
-  performing = id
-  performer.start(script)
+  await playScript(script, id)
 }
 
 const settings = mountSettings($('settings'), { renderer, smoother })

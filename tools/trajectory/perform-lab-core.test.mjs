@@ -38,7 +38,8 @@ test('perform lab: defaults name the track’s controls', () => {
   assert.equal(name(newMove('press', 0, controls).p.cc), 'Global Chapter')
   assert.match(name(newMove('enter', 0, controls).p.cc), / Level$/)
   assert.deepEqual(compileMoves([newMove('break', 8, controls, { length: 4 })]),
-    [{ bar: 8, press: 52 }, { bar: 12, press: 52 }])
+    [{ bar: 7.5, press: 52 }, { bar: 11.5, press: 52 }], 'pressed half a bar early, so Break takes over on bar 8')
+  assert.deepEqual(compileMoves([newMove('press', 0, controls)]), [{ bar: 0, press: 44 }], 'never before bar 0')
   assert.deepEqual(compileMoves([newMove('control', 3, controls, { cc: 13, to: 0.5, over: 0 })]),
     [{ bar: 3, cc: 13, value: 0.5 }], 'no ramp field for a jump')
 })
@@ -78,14 +79,14 @@ test('perform lab: bars are 0-based, ranges half-open', () => {
   assert.deepEqual(movesIn(lab, sections[1]).map(move => move.kind), ['press'])
   assert.deepEqual(spanOf(newMove('enter', 0, controls, { over: 2 })), [0, 2])
   assert.equal(compileMoves(lab.moves)[0].bar, 0)
-  const outside = labOf([newMove('press', 64, controls)])
+  const outside = labOf([newMove('control', 64, controls)])
   assert.ok(check(outside).errors.some(error => /in no section|ends after bar 64/.test(error)),
     'a step at the end bar is outside the script')
 })
 
 test('perform lab: steps come out in bar order, the script has only script v2 fields', () => {
   const lab = labOf([newMove('press', 30, controls), newMove('enter', 2, controls), newMove('leave', 20, controls)])
-  assert.deepEqual(toScript(lab).steps.map(step => step.bar), [2, 20, 30])
+  assert.deepEqual(toScript(lab).steps.map(step => step.bar), [2, 20, 29.5])
   assert.deepEqual(Object.keys(toScript(lab)), ['track', 'title', 'bars', 'sections', 'steps'])
   assert.deepEqual(toScript(lab).sections[0], { name: 'Intro', from: 0, to: 16 })
 })
@@ -154,6 +155,9 @@ test('perform lab: the importer recognises the moves, Launchkey steps stay Hand-
     to: 0.6 })
   assert.deepEqual(lab.moves.find(move => move.kind === 'fogDip').p, { cc: 20, to: 0.6, over: 4, hold: 4, back: 4 })
   assert.deepEqual(lab.moves.find(move => move.kind === 'break').p, { cc: 52, length: 8 })
+  assert.equal(lab.moves.find(move => move.kind === 'break').bar, 40.5, 'a press on bar 40 takes over on 41')
+  assert.equal(importScript({ track: trackId, bars: 8, steps: [{ bar: 3.5, press: 44 }] }, controls).moves[0].bar, 4,
+    'pressed half a bar early: the move sits on the bar where the button takes over')
   assert.deepEqual(perControl(compileMoves(lab.moves)), perControl(steps))
   assert.equal(lab.moves.filter(move => move.kind === 'build').length, 1,
     'a ramp whose jump to 0 comes later than its end is not a Build')

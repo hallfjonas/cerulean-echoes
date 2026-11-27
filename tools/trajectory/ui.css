@@ -96,7 +96,9 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #tracksStage p { margin: 6px 0 }
 #tracksStage .tl-hint { position: sticky; left: 0; display: flex; justify-content: space-between; gap: 12px;
   padding: 8px 0 4px; color: var(--dim); font-size: 12px }
-#tracksStage .tl { min-width: max-content; padding-bottom: 24px; user-select: none }
+#tracksStage .tl { position: relative; min-width: max-content; padding-bottom: 24px; user-select: none }
+#tracksStage .tl-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); z-index: 4;
+  pointer-events: none }
 #tracksStage .tl-row { display: flex; border-bottom: 1px solid var(--line) }
 #tracksStage .tl-label { position: sticky; left: 0; z-index: 2; width: var(--label-w); flex: none;
   box-sizing: border-box; padding: 4px 8px; background: var(--bg); border-right: 1px solid var(--line);

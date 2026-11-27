@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import fs from 'fs'
 import path from 'path'
 import test from 'node:test'
-import { compile, createPerformer } from './autoperform.mjs'
+import { compile, createPerformer, pressCounts } from './autoperform.mjs'
 import { PERFORM, checkTrack, scTrackFileOf } from './check-perform.mjs'
 import { createRecorder } from './take.mjs'
 import { AUTO_PORT, LK_AUTO_PORT, createScAuto, createScTap } from './sc-auto.mjs'
@@ -98,6 +98,38 @@ test('the performer plays a script into SC to its end: bar 0 with the load, then
   assert.ok(!ccs.some(([cc, v]) => cc === 13 && v === 64 / 127), 'bar 0 went with the load, not again')
   assert.equal(compile(script).notes.length, 2)
 })
+
+test('the performer starts at a later bar: its values with the load, earlier presses counted, earlier notes skipped',
+  async () => {
+    const { sent, post } = recordingPost()
+    const auto = createScAuto({ post })
+    let cycle = 0, done
+    const finished = new Promise(resolve => { done = resolve })
+    const bars = []
+    const performer = createPerformer({ midi: auto, engine: { cycle: () => cycle },
+      onChange: p => p ? bars.push(p.bar) : done() })
+    const script = { track: 'x', steps: [{ bar: 0, cc: 13, value: 0.2 }, { bar: 2, cc: 13, value: 1, ramp: 4 },
+      { bar: 1, press: 44 }, { bar: 3, press: 44 }, { bar: 3, press: 37 }, { bar: 5, press: 44 }, { bar: 2, pad: 36 },
+      { bar: 6, keys: 'c3' }] }
+    assert.deepEqual(pressCounts(script, 4), [[44, 2], [37, 1]])
+    assert.deepEqual(pressCounts(script, 0), [])
+    auto.hold()
+    performer.prime(script, 4)
+    assert.deepEqual(auto.loadInit().cc, [[13, 76 / 127]], 'the value half-way up the ramp at bar 4')
+    auto.live()
+    performer.start(script, 4)
+    assert.equal(bars[0], 4, 'the clock counts on from bar 4')
+    const clock = setInterval(() => { cycle += 0.25 }, 20)
+    await finished
+    clearInterval(clock)
+    await auto.idle()
+    const ccs = sent.filter(([route]) => route === 'cc').flatMap(([, pairs]) => pairs)
+    const notes = sent.filter(([route, body]) => route === 'lk' && body.note).map(([, body]) => body.note)
+    assert.deepEqual(ccs.filter(([cc]) => cc === 44).map(([, v]) => v), [1, 0], 'only the press after bar 4')
+    assert.equal(ccs.filter(([cc]) => cc === 37).length, 0)
+    assert.deepEqual(notes, [[48, 102, 0]], 'the pad before bar 4 is skipped')
+    assert.equal(ccs.filter(([cc]) => cc === 13).at(-1)[1], 1)
+  })
 
 test('SC tap: one batch per bar with controls, pattern state and the keys of the bar before', () => {
   const batches = []

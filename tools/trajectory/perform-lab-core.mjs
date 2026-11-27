@@ -7,15 +7,18 @@
 // A move's parameters `p` make its steps; an edit overrides one of them by its index, so a later parameter change
 // keeps the edit: `at` = bars after the move's bar (the step moves with the move), `ramp: 0` removes the ramp,
 // `del: true` drops the step.
+// A button takes over at the next bar line after its press (Chapter at the next 4-bar line), so a Press or Break move
+// sits on the bar where the button takes over and presses PRESS_LEAD bars before it (never before bar 0).
 import { sectionAt } from './autoperform.mjs'
 
 export const MAX_AT_ONCE = 6
+export const PRESS_LEAD = 0.5
 
 const round = n => Math.round(n * 1e4) / 1e4
 const ccStep = (bar, cc, value, ramp = 0) => ramp > 0
   ? { bar: round(bar), cc, value, ramp: round(ramp) }
   : { bar: round(bar), cc, value }
-const pressStep = (bar, cc) => ({ bar: round(bar), press: cc })
+const pressStep = (bar, cc) => ({ bar: round(Math.max(0, bar - PRESS_LEAD)), press: cc })
 
 const ccsWhere = (controls, test) => [...controls].filter(([, control]) => test(control)).map(([cc]) => cc)
 const levelsOf = controls =>
@@ -164,11 +167,12 @@ const compilesTo = (move, steps) => {
   const made = MOVES[move.kind].steps(move)
   return made.length === steps.length && made.every((step, i) => sameText(step) === sameText(steps[i]))
 }
-const moveOf = (kind, steps, p) => ({ id: newId('m'), kind, bar: steps[0].bar, p, edits: {} })
+const moveOf = (kind, steps, p, bar = steps[0].bar) => ({ id: newId('m'), kind, bar, p, edits: {} })
+const buttonMoveOf = (kind, steps, p) => moveOf(kind, steps, p, round(steps[0].bar + PRESS_LEAD))
 
 // one Launch Control step as a move: Enter or Leave on a Level fader, Press on a button, Move control on the rest
 const singleMove = (step, control) => {
-  if (step.press !== undefined) return moveOf('press', [step], { cc: step.press })
+  if (step.press !== undefined) return buttonMoveOf('press', [step], { cc: step.press })
   if (isLevel(control) && step.value === 0) return moveOf('leave', [step], { cc: step.cc, over: step.ramp ?? 0 })
   if (isLevel(control)) return moveOf('enter', [step], { cc: step.cc, to: step.value, over: step.ramp ?? 0 })
   return moveOf('control', [step], { cc: step.cc, to: step.value, over: step.ramp ?? 0 })
@@ -179,7 +183,7 @@ const singleMove = (step, control) => {
 const pairMove = (first, second, control) => {
   if (!second) return null
   if (first.press !== undefined) {
-    return isGlobal(control, 'Break') ? moveOf('break', [first, second], { cc: first.press,
+    return isGlobal(control, 'Break') ? buttonMoveOf('break', [first, second], { cc: first.press,
       length: round(second.bar - first.bar) }) : null
   }
   if (!(first.value > 0) || second.value !== 0) return null
