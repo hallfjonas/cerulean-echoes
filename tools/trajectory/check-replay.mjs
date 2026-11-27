@@ -1,11 +1,11 @@
-// Replay fidelity: does a replayed take play what the original play played? A take keeps the tapped Strudel events of
+// Replay fidelity: does a replayed take play what the original play played? A take keeps the tapped events of
 // its play (take `events`, <name>.events.jsonl, take-save.mjs). Replaying a take in the player (Start on takes/<name>)
 // and saving that play as a take gives a replay take: its `take.script` names the original, and it has events too.
 // This compares the two event lists bar by bar (replay-check.mjs) and lists every differing bar with the reason.
 // A take that cannot be checked (no events, no replay yet, original gone) is listed as such, never left out.
 // A SuperCollider track's takes keep SC's state echoes per bar instead (sc-auto.mjs createScTap: pattern choices,
 // controls, keys per bar), compared the same way.
-// usage (in tools/): node trajectory/check-replay.mjs <track.strudel | track.scd | track id> [takes/<replay take>]
+// usage (in tools/): node trajectory/check-replay.mjs <track.scd | track id> [takes/<replay take>]
 // Without a take: every replay take of the track. Exit 1 if a replay differs or cannot be read.
 import fs from 'fs'
 import path from 'path'
@@ -64,10 +64,10 @@ const failed = check => !!check.error || !check.result.bars || check.result.diff
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [target, only] = process.argv.slice(2)
   if (!target) {
-    console.error('usage (in tools/): node trajectory/check-replay.mjs <track.strudel | track.scd | track id> [takes/<take>]')
+    console.error('usage (in tools/): node trajectory/check-replay.mjs <track.scd | track id> [takes/<take>]')
     process.exit(2)
   }
-  const trackId = path.basename(target).replace(/\.(strudel|scd)$/, '')
+  const trackId = path.basename(target).replace(/\.scd$/, '')
   const takes = takesOf(trackId)
   const replays = only ? [only] : takes.filter(t => isReplay(t.script)).map(t => t.id)
   const checks = replays.map(id => checkReplay(trackId, id))

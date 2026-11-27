@@ -1,6 +1,6 @@
-// Replay fidelity, the pure part: compares the tapped Strudel events of an original play with those of its replay and
+// Replay fidelity, the pure part: compares the tapped events of an original play with those of its replay and
 // reports, per bar, what differs and the likely reason. Runs in Node (check-replay.mjs, take-save.mjs) and in tests.
-// An event is { stem, cycle, value, duration, … } as the tap posts it (make-tapped.mjs), `cycle` counted from the
+// An event is { stem, cycle, value, duration, … } as the tap posts it (sc-auto.mjs createScTap), `cycle` counted from the
 // load's bar line (take.mjs); `delay` and `cps` are when it was sent, not what was played, and are left out.
 // Two events are the same when stem, cycle (6 decimals), duration (4 decimals) and every tapped value match.
 // A difference is paired up where it can be, which names the reason:

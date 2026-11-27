@@ -29,12 +29,9 @@ tracks safe. For what the project does, start at [docs/README.md](docs/README.md
   track plays and feels. Discuss these first.
 - **Boards and stems need rhythm**, not only held notes.
 
-## Control texts and shared code
+## Control texts
 
 The text of a control is the `// @ctl` comment in the track.
-
-Code blocks that several tracks share are marked `@shared <name> begin` and `end`. Edit the block in one track, then
-run `npm run shared -- --from <track> <name>`. `npm run shared -- --check` shows drift.
 
 ## Checks before you open a PR
 

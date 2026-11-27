@@ -1,6 +1,5 @@
 // Turns SuperCollider's notes (SSE event 'notes' of sc-link.mjs, sent by sc/lib/steps.scd when each note sounds) into
-// trajectory lines (README, "How it is built"): the same line format as strudel-source.mjs, so render.mjs draws SC tracks
-// too. A note: [stem, instrument, Hz (0 = a sample), pan 0..1, level, seconds, room 0..1]. The pulse comes from SC's
+// trajectory lines (README, "How it is built"), so render.mjs draws SC tracks. A note: [stem, instrument, Hz (0 = a sample), pan 0..1, level, seconds, room 0..1]. The pulse comes from SC's
 // beat messages and the layout's bpm.
 
 const DRUM_HZ = [[/(kick|bd)/i, 60], [/(snare|clap|rim|sd|cp)/i, 1800], [/(hat|hh|ride|cym|shaker)/i, 8000]]

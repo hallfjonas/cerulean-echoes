@@ -29,7 +29,7 @@ const valueAt = (curve, bar) => {
   return value
 }
 
-test('note names in Strudel spelling', () => {
+test('note names with sharps as #', () => {
   assert.equal(noteName(60), 'c4')
   assert.equal(noteName(61), 'c#4')
   assert.equal(noteName(36), 'c2')
