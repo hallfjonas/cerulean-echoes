@@ -15,5 +15,4 @@ related. New here? Start with [getting started](../getting-started.md).
 - [Samples and sounds](samples-and-sounds.md) - adding audio and checking that sounds load
 - [Checks](checks.md) - `npm test`, `verify-sc` and the other tools that test without a speaker
 - [Visuals](visuals.md) - the looks and settings of the picture
-- [Producer mode](producer-mode.md) - Guitar Pro songs as live tracks
 - [Claude skills](claude-skills.md) - what to say to Claude Code for each job

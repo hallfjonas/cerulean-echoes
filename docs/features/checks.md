@@ -11,7 +11,7 @@ Before you open a pull request, after you edit a track or an auto-perform script
 ## How to use it
 | Question | Command |
 |---|---|
-| Does every feature still work (player, takes, recording, launcher, producer, stems, sound lab, SuperCollider tracks)? | `npm test` |
+| Does every feature still work (player, takes, recording, launcher, stems, sound lab, SuperCollider tracks)? | `npm test` |
 | Is my edited SuperCollider track still fine? | `npm run verify-sc -- <track.scd>` |
 | Are the auto-perform scripts still valid? | `node trajectory/check-perform.mjs` |
 | Is the stem library valid? | `npm run check-stems` |

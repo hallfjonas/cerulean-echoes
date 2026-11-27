@@ -48,7 +48,6 @@ to start: raise the master, bring in the kick or the pad, turn Brightness and Sp
 
 - All knobs at 0 must already sound good. Start there.
 - Pattern changes happen at the next bar, so a press always lands on the beat.
-- Tracks 012 and 013 are different: songs from Guitar Pro. See [producer mode](producer-mode.md).
 - Each live track is one file. Edit that file; do not make copies. A new version goes into a new file.
 - Most tracks started in Strudel. Those files are removed from the repo; git history keeps them.
 
