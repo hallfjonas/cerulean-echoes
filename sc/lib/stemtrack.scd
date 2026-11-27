@@ -93,7 +93,7 @@
 		},
 		columnFailed: { |self, slot, col, error|
 			var name = col[\stem][\name].asString;
-			col[\failed] = error.errorString;
+			col[\failed] = error.errorString.replace("ERROR: ", "");
 			"Slot % (%) is silent: %".format(slot, name, col[\failed]).warn;
 			self.ce.uiSend('/ce/stemerror', slot.asString, name, col[\failed])
 		},

@@ -1,15 +1,15 @@
-// Which library stems fail in which frame? Every stem of sc/stems goes onto a slot of every stem track (14 stems per
-// load, one per slot), plays 16 bars into a score (faders up through the column hooks, Tension 0.6), and each column
-// whose code failed (it went quiet, sc/lib/stemtrack.scd) prints one line:
-//   ERROR <track id> <stem ref> | <first line of the error>
-// A batch that throws outside the columns (a stem's hook on load) is tried again one stem per load.
-// usage: sclang tools/sc-test/stem-frames.scd [<track id> …]   (no ids: every stem track)
+// Which library stems fit a stem track's frame? Every stem of sc/stems goes onto a slot of the track (14 stems per
+// load, one per slot), plays 16 bars into a score (no sound; faders up through the column hooks, Tension 0.6), and
+// each column whose code failed (it went quiet, sc/lib/stemtrack.scd) prints one line:
+//   MISFIT <track id> <stem ref> | <first line of the error>
+// A batch that throws outside the columns (a stem's hook on load) is tried again one stem per load. The player's stem
+// drawer greys the misfits out (tools/trajectory/stem-fit.mjs); npm test checks them against a list.
+// usage: sclang sc/tools/stem-fit.scd <absolute path of a .track> …
 (
-var root = thisProcess.nowExecutingPath.dirname.dirname.dirname, only = thisProcess.argv;
+var root = thisProcess.nowExecutingPath.dirname.dirname.dirname;
 var slots = [1, 2].collect { |m| (1..7).collect { |c| "%:%".format(m, c) } }.flatten;
 var refs = (root +/+ "sc/stems/*/*.stem").pathMatch.collect { |p| p.drop((root +/+ "sc/stems/").size) };
-var tracks = (root +/+ "sc/tracks/*/*.track").pathMatch.select { |p|
-	only.isEmpty or: { only.includesEqual(p.basename.splitext[0]) } };
+var tracks = thisProcess.argv.select { |a| a.endsWith(".track") };
 var firstLine = { |text| text.split($\n).reject(_.isEmpty).first ? "" }, run;
 SystemClock.sched(1200, { "FAIL timeout after 1200 s".postln; 1.exit });
 // plays these refs on the first slots of the track; [ref, error or nil] per ref
@@ -30,7 +30,7 @@ run = { |file, batch|
 		refs.clump(slots.size).do { |batch|
 			var res = { run.(file, batch) }.try { |e|
 				batch.collect { |ref| [ref, { run.(file, [ref])[0][1] }.try { |e1| e1.errorString }] } };
-			res.do { |r| r[1] !? { |err| "ERROR % % | %".format(id, r[0], firstLine.(err).replace("ERROR: ", "")).postln } } };
+			res.do { |r| r[1] !? { |err| "MISFIT % % | %".format(id, r[0], firstLine.(err).replace("ERROR: ", "")).postln } } };
 		"DONE %".format(id).postln };
 	0.exit
 }.forkIfNeeded;
