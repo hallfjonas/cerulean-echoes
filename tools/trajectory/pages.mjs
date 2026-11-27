@@ -31,8 +31,7 @@ export const placeholderFor = ({ id, sub }) =>
 export const shownOn = (tokens, page) => String(tokens).split(/\s+/).filter(Boolean)
   .some(token => token === page.id || token === pageKey(page))
 
-// the picker of a page: Live lists live tracks, Samples and Stems their designer projects; the Strudel lab boards
-// (kind 'lab' without a designer) are not offered
+// the picker of a page: Live lists live tracks, Samples and Stems their designer projects
 export const entriesFor = (page, catalogue) => {
   if (page.id === 'live') return catalogue.filter(entry => entry.kind === 'live')
   if (page.id === 'labs' && page.sub === 'samples') return catalogue.filter(entry => entry.lab === 'sample')

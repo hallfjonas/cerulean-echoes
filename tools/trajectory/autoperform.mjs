@@ -1,5 +1,5 @@
 // Auto-perform: plays a script of control moves and button presses into the virtual input 'LCXL3 Auto' and keys, drum
-// pads and knobs into the virtual Launchkey 'Launchkey MK4 25 Auto' (midi.mjs), so a track can be tried without a
+// pads and knobs into the virtual Launchkey 'Launchkey MK4 25 Auto' (sc-auto.mjs), so a track can be tried without a
 // controller. Open loop: the script does not listen to what it hears.
 // Script: { track, title?, bars?, mood?, sections?: [{ name, from, to, intent? }], steps } with steps
 //   { bar, cc, value, ramp? }            a Launch Control CC (value 0..1, sent as MIDI 0..127)
@@ -32,7 +32,7 @@ const midiValue = value => Math.round(value * 127) / 127
 
 const CHROMA = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }
 const ACCIDENTAL = { '#': 1, s: 1, b: -1, f: -1 }
-// A note name as Strudel reads it (c4 = 60, octave 3 if left out, # / s sharp, b / f flat) or a MIDI number
+// A note name (c4 = 60, octave 3 if left out, # / s sharp, b / f flat) or a MIDI number
 export const noteNumber = name => {
   if (/^\d+$/.test(name)) return Number(name) <= 127 ? Number(name) : null
   const match = name.match(/^([a-g])([#sbf]*)(-?\d)?$/i)
