@@ -48,7 +48,10 @@
 ~ce.loadStemTrack = { |self, path, slots, project|
 	var json = project ?? { self.readJSON(path) }, dir = json[\dir] ? path.dirname, frameFile = dir +/+ json[\frame], frame = frameFile.load;
 	var bpm = self.numOf(json[\tempo]), glob = self.stemGlobal, chapters = json[\chapters];
-	var track = (
+	var track;
+	// a function the frame does not have fails with its name (an Event would answer nil, and the column stay silent)
+	frame[\forward] = { |fr, selector| Error("the frame has no %".format(selector)).throw };
+	track = (
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
 		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
 		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkStart: frame[\lkStart],
