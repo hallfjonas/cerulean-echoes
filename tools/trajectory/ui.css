@@ -78,6 +78,7 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #tracksStage .dim, #tracksStage .hint { color: var(--dim) }
 #tracksStage .hint { font-size: 12px }
 #tracksStage .bad { color: var(--err) }
+#tracksStage .ok { color: var(--c-enter) }
 #tracksStage .metric { padding: 3px 8px; background: var(--control); border-radius: var(--radius) }
 #tracksStage input, #tracksStage textarea, #tracksStage select { background: var(--control); color: var(--fg);
   border: 0; border-radius: var(--radius); padding: 4px 7px; font: inherit; min-width: 0 }

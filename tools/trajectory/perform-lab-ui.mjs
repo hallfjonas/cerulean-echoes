@@ -11,8 +11,11 @@
 import { MOVES, compileTagged, controlKey, fitSections, importScript, insertSection, labWarnings, moveEdge,
   moveText, movesIn, newId, newMove, newSection, removeSection, sectionOf, spanOf, stepEnd, toScript }
   from './perform-lab-core.mjs'
+import { askText, toast } from './toast.mjs'
 
 const TAKE_PREFIX = 'takes/'
+const NAME = /^[a-z0-9][a-z0-9-]*$/
+const CHECK_DELAY_MS = 300
 const HISTORY = 100
 const LABEL_WIDTH = 116
 const LEVELS = [['story', 'Story', 'why'], ['sections', 'Sections', 'where'], ['moves', 'Moves', 'what'],
@@ -139,15 +142,17 @@ export function mountTracksLab({ section, stage }) {
 
   const part = name => section.querySelector(`[data-part="${name}"]`) ?? stage.querySelector(`[data-part="${name}"]`)
   const pick = name => section.querySelector(`[data-pick="${name}"]`)
-  const state = { tracks: null, info: null, controls: new Map(), lab: null, name: null, level: 'moves', sel: null,
-    cursor: 0, zoom: 12, ppb: 12, bpm: null, history: [], dirty: false, stepView: 'table', stepScope: 'selection',
-    tagged: [], spans: new Map(), run: 0 }
+  const state = { tracks: null, info: null, controls: new Map(), lab: null, name: null, owned: false, level: 'moves',
+    sel: null, cursor: 0, zoom: 12, ppb: 12, bpm: null, history: [], dirty: false, stepView: 'table',
+    stepScope: 'selection', tagged: [], spans: new Map(), errors: [], run: 0, checkRun: 0 }
 
   const post = async (route, body) => {
     const response = await fetch('lab/tracks/' + route,
       { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const result = await response.json().catch(() => ({}))
-    if (!response.ok) throw new Error(result.error ?? `${route}: ${response.status}`)
+    if (!response.ok) {
+      throw Object.assign(new Error(result.error ?? result.refused ?? `${route}: ${response.status}`), { result })
+    }
     return result
   }
   const setStatus = text => { part('status').textContent = text }
@@ -431,10 +436,12 @@ export function mountTracksLab({ section, stage }) {
   }
   const inspectOverview = () => {
     const warnings = labWarnings(state.lab)
+    const list = (items, cls) => items.length ? items.map(text => `<p class="${cls}">${escapeHtml(text)}</p>`).join('')
+      : '<p>None.</p>'
     return `<h3>This performance</h3><p>${escapeHtml(state.lab.title ?? 'Untitled')}: ${state.lab.sections.length} ` +
       `sections, ${state.lab.moves.length} moves, ${state.tagged.length} steps.</p><p class="hint">Click a ` +
-      'section, a move or a step. The selection stays when you change the level.</p><h3>Warnings</h3>' +
-      (warnings.length ? warnings.map(text => `<p class="dim">${escapeHtml(text)}</p>`).join('') : '<p>None.</p>')
+      'section, a move or a step. The selection stays when you change the level.</p>' +
+      `<h3>Check (check-perform)</h3>${list(state.errors, 'bad')}<h3>Warnings</h3>${list(warnings, 'dim')}`
   }
   const inspectSection = sel => {
     const item = sel.section
@@ -534,11 +541,35 @@ export function mountTracksLab({ section, stage }) {
   }
   const renderFoot = () => {
     const warnings = labWarnings(state.lab)
+    const errors = state.errors.length
+    const canSave = state.owned && state.dirty && !errors
     part('foot').innerHTML = `<span>${state.tagged.length} steps from ${state.lab.moves.length} moves</span>` +
+      `<span class="${errors ? 'bad' : 'ok'}" title="${escapeHtml(state.errors.join('\n'))}">${errors
+        ? `${errors} error${errors === 1 ? '' : 's'}` : '✓ check-perform'}</span>` +
       `<span class="dim">${warnings.length ? `${warnings.length} warnings` : 'no warnings'}</span>` +
       `<span class="${state.dirty ? 'bad' : 'dim'}">${state.dirty ? 'unsaved changes' : state.name ? 'as on disk' :
         'new'}</span><span class="grow"></span>` +
-      '<span class="dim">keys 1–5 level · ⌘Z undo · ⌫ delete · Esc clear</span>'
+      '<span class="dim">keys 1–5 level · ⌘Z undo · ⌫ delete · Esc clear</span>' +
+      `<button data-act="save"${canSave ? '' : ' disabled'} title="${state.owned ? 'Save over this performance'
+        : 'Only performances the lab wrote are saved over: use Save as'}">Save</button>` +
+      `<button data-act="saveAs"${errors ? ' disabled' : ''} title="Save as a new performance">Save as</button>`
+  }
+  let checkTimer = null
+  const scheduleCheck = () => {
+    clearTimeout(checkTimer)
+    const run = ++state.checkRun
+    checkTimer = setTimeout(async () => {
+      if (!state.lab) return
+      try {
+        const { errors } = await post('check', { track: state.lab.track, script: toScript(state.lab) })
+        if (run === state.checkRun) state.errors = errors
+      } catch (error) {
+        if (run === state.checkRun) state.errors = [error.message]
+      }
+      if (run !== state.checkRun || !state.lab) return
+      renderFoot()
+      if (!selection()) renderInspector()
+    }, CHECK_DELAY_MS)
   }
   const renderTimeline = () => {
     const scroll = part('scroll')
@@ -567,17 +598,22 @@ export function mountTracksLab({ section, stage }) {
     renderTimeline()
     renderInspector()
     renderFoot()
+    scheduleCheck()
   }
   const renderLive = () => {
     derive()
     renderTimeline()
     renderFoot()
+    scheduleCheck()
   }
 
-  const discardOk = () => !state.dirty || confirm('Discard the unsaved changes of this performance?')
-  const open = (lab, name) => {
+  const discardOk = async () => !state.dirty || await toast('Discard the unsaved changes of this performance?',
+    { kind: 'ask', actions: ['Discard'] }) === 'Discard'
+  const open = (lab, name, owned = false) => {
     state.lab = lab && { story: '', refs: '', ...lab }
     state.name = name
+    state.owned = owned
+    state.errors = []
     state.sel = null
     state.cursor = 0
     state.history = []
@@ -601,25 +637,29 @@ export function mountTracksLab({ section, stage }) {
         'press New performance.')))
       if (performance.error) return void (run === state.run && (open(null, null), setStatus(performance.error)))
       setStatus('loading …')
-      const response = await fetch(`perform/${encodeURIComponent(track)}/${encodeURIComponent(performance.name)}`,
-        { cache: 'no-store' })
-      if (!response.ok) throw new Error(`${performance.name}: ${response.status}`)
-      const script = await response.json()
+      const opened = await post('open', { track, name: performance.name })
       if (run !== state.run) return
-      open(importScript(script), performance.name)
-      setStatus('')
+      open(opened.lab ?? importScript(opened.script), performance.name, opened.owned)
+      setStatus(opened.note ?? '')
     } catch (error) {
       if (run === state.run) setStatus(error.message)
     }
   }
-  const fillPerformances = () => {
+  const fillTrackOptions = () => {
+    pick('track').innerHTML = state.tracks.map(track => option(track.track, track.performances.length
+      ? `${track.label} (${track.performances.length})` : track.label)).join('')
+  }
+  const fillPerformanceOptions = () => {
     const performances = trackOf(pick('track').value)?.performances ?? []
     pick('performance').innerHTML = performances.map(entry => option(entry.name, performanceLabel(entry))).join('')
     pick('performance').disabled = !performances.length
+  }
+  const fillPerformances = () => {
+    fillPerformanceOptions()
     return openPerformance()
   }
   const newPerformance = async () => {
-    if (!discardOk()) return
+    if (!await discardOk()) return
     await loadTrack(pick('track').value)
     const bars = 64
     open({ track: pick('track').value, title: 'New performance', bars, sections: [newSection({ name: 'Intro',
@@ -631,24 +671,28 @@ export function mountTracksLab({ section, stage }) {
     setStatus('')
   }
   let shownTrack = '', shownPerformance = ''
-  pick('track').onchange = () => {
-    if (!discardOk()) return void (pick('track').value = shownTrack)
+  pick('track').onchange = async () => {
+    const wanted = pick('track').value
+    pick('track').value = shownTrack
+    if (!await discardOk()) return
+    pick('track').value = shownTrack = wanted
     state.dirty = false
-    shownTrack = pick('track').value
-    fillPerformances().then(() => { shownPerformance = pick('performance').value })
-  }
-  pick('performance').onchange = () => {
-    if (!discardOk()) return void (pick('performance').value = shownPerformance)
-    state.dirty = false
+    await fillPerformances()
     shownPerformance = pick('performance').value
+  }
+  pick('performance').onchange = async () => {
+    const wanted = pick('performance').value
+    pick('performance').value = shownPerformance
+    if (!await discardOk()) return
+    pick('performance').value = shownPerformance = wanted
+    state.dirty = false
     openPerformance()
   }
   const load = async () => {
     setStatus('loading …')
     try {
       state.tracks = (await post('tracks', {})).tracks
-      pick('track').innerHTML = state.tracks.map(track => option(track.track, track.performances.length
-        ? `${track.label} (${track.performances.length})` : track.label)).join('')
+      fillTrackOptions()
       pick('track').value = state.tracks.find(track => track.performances.length)?.track ?? state.tracks[0]?.track ?? ''
       shownTrack = pick('track').value
       await fillPerformances()
@@ -659,6 +703,44 @@ export function mountTracksLab({ section, stage }) {
     }
   }
 
+  const slug = text => String(text ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  const saveAs = async () => {
+    const track = state.lab.track
+    const taken = trackOf(track)?.performances.map(entry => entry.name) ?? []
+    let suggestion = slug(state.lab.title) || 'performance'
+    for (let n = 2; taken.includes(suggestion); n++) suggestion = `${slug(state.lab.title) || 'performance'}-${n}`
+    const name = (await askText('Save as (lowercase letters, digits and dashes)', suggestion))?.trim()
+    if (!name) return
+    if (!NAME.test(name)) return void toast('A name is lowercase letters, digits and dashes.', { kind: 'error' })
+    if (taken.includes(name) && name !== state.name && await toast(`Replace ${name}?`,
+      { kind: 'ask', actions: ['Replace'] }) !== 'Replace') return
+    await save(name)
+  }
+  const save = async name => {
+    const track = state.lab.track
+    try {
+      await post('save', { track, name, script: toScript(state.lab), lab: state.lab })
+    } catch (error) {
+      if (error.result?.errors) {
+        state.errors = error.result.errors
+        renderFoot()
+        renderInspector()
+      }
+      return void toast(error.result?.errors ? `Not saved: ${error.result.errors.length} errors (check-perform)`
+        : `Not saved: ${error.message}`, { kind: 'error' })
+    }
+    Object.assign(state, { name, owned: true, dirty: false })
+    state.tracks = (await post('tracks', {})).tracks
+    fillTrackOptions()
+    pick('track').value = shownTrack = track
+    fillPerformanceOptions()
+    pick('performance').value = shownPerformance = name
+    const performance = trackOf(track)?.performances.find(entry => entry.name === name)
+    part('meta').textContent = performance ? performanceMeta(performance) : ''
+    render()
+    toast(`Saved perform/${track}/${name}.json`)
+  }
+
   const change = mutate => {
     commit()
     mutate()
@@ -667,6 +749,8 @@ export function mountTracksLab({ section, stage }) {
   const select = sel => { state.sel = sel; render() }
   const ACTIONS = {
     newPerformance,
+    save: () => state.owned && state.name ? save(state.name) : saveAs(),
+    saveAs,
     level: el => { state.level = el.dataset.v; render() },
     select: el => select(el.dataset.type === 'step'
       ? { type: 'step', move: el.dataset.move, index: Number(el.dataset.index) }

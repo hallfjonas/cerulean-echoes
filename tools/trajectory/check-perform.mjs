@@ -140,7 +140,7 @@ export const checkScript = (script, controls, trackId) => {
 
 const trackIdOf = file => path.basename(file, path.extname(file))
 const jsonFiles = dir => fs.existsSync(dir)
-  ? fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort().map(f => path.join(dir, f))
+  ? fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.lab.json')).sort().map(f => path.join(dir, f))
   : []
 export const scriptFiles = trackId => jsonFiles(path.join(PERFORM, trackId))
 const takeFiles = trackId => jsonFiles(path.join(PERFORM, trackId, 'takes'))
