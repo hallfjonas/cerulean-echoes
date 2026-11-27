@@ -145,12 +145,9 @@ Estimated total effort: 107 hours
   3. #109 (live panel layout, native app window and icon, fader pickup across a mode switch): one conflict with 1, the
      player/launcher paragraph of `CLAUDE.md`; resolve after 1 is in.
 - **Still on Strudel after that, to be ported to SC** (user, 2026-11-22: a SC counterpart is best; Jonas decides how):
-  - Producer (`tools/producer/`, ~2000 lines): the MIDI reader, the map and the perform scripts stay; the output must
-    become stems + a `.track` instead of a `.strudel` file (stems already take mini-notation, one item per bar `< >`);
-    Guitar Pro instruments map to SC library sounds; fixtures 012/013 re-checked bar by bar. Estimate: 1-2 sessions
-    plus one listening session.
+  - Producer: removed on 2026-11-27 instead of ported (decided with the user; git history keeps it).
   - Sets: 011 was retired in 010, SC has no set mode yet (Labs / Sets is a placeholder; see the `set-designer` epic).
-  - Ear-training tutorials (`lab/tutorials/`, `.strudel` + PDF handbooks).
+  - Ear-training tutorials: removed on 2026-11-26.
 - **Then the cleanup PR:** the Strudel engine in the player, the rest of `tools/strudel-sim/`, `check-sounds` and
   `samples/sounds.json`, the Strudel hooks, the tests that load `@strudel/core`, the Strudel sections of `CLAUDE.md`;
   `DEPRECATION.md` marks Strudel as removed.

@@ -22,11 +22,12 @@ separate decision, made with the user.
   asks for, and never overwrite a track.
 - **Removed on 2026-11-22** (decided with the user, sc-migration 010): set 011, the historic tracks 000-006, the
   Strudel checks (`verify`, `compare`, `audibility`, `measure`, `scenario`, `check-sounds`, the sound list) and the
-  skills `/strudel-mix` and `/strudel-optimize`. Still there: the player's Strudel engine (while it needs no work), the
-  producer (writes Strudel) and the harness its test uses.
+  skills `/strudel-mix` and `/strudel-optimize`. Still there: the player's Strudel engine (while it needs no work).
 - **Removed on 2026-11-26** (decided with the user): the lab tutorials (`lab/tutorials/`), `snippets/`,
   `superdirt-setup/`, the `dual-lc` template and the layout hooks that checked `.strudel` files, the Strudel-only
   comparison tools in `tools/sc-port/`, and the skills `/lab-board` and `/lab-to-track`.
+- **Removed on 2026-11-27** (decided with the user): the producer (Guitar Pro MIDI → Strudel track: `tools/producer/`,
+  `npm run producer`, the skill `/producer`, the producer mode docs, the 012 and 013 fixtures). Git history keeps it.
 
 ## How to add an entry
 

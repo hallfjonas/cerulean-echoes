@@ -288,7 +288,10 @@ createScSource({ onLine: smoother.push, onStatus: text => { scVisuals = text } }
 const strudelEngine = createEngine(midi)
 // a take of an SC play keeps SC's state echoes per bar as its events (check-replay)
 const scTap = createScTap({ onBatch: batch => recorder.addEvents(batch) })
-const scEngine = createScEngine({ onEvent: (type, data) => scTap.push(type, data) })
+const scEngine = createScEngine({ onEvent: (type, data) => {
+  if (type === 'stemerror') toast(`Slot ${data[0]} (${data[1]}) is silent: ${data[2]}`, { kind: 'error' })
+  else scTap.push(type, data)
+} })
 let current = strudelEngine
 const engine = {
   ready: strudelEngine.ready,

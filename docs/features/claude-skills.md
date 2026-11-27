@@ -14,7 +14,6 @@ When you work with Claude Code in this repo and the job is one of the ones below
 | `sample-designer` | Arranges a free sound as a Sample Designer project, or copies a project and changes it; checks it and loads it in SuperCollider | "a soft tom with a short noise tail" |
 | `stem-designer` | Sets up a Stem Designer project of candidate stems against a track; promotes a winner and puts it into a new track file | "the flute in the house track is boring, explore a replacement" |
 | `auto-perform` | Designs, scripts and reviews an auto-performance | "new performance for 008" |
-| `producer` | Turns a Guitar Pro song (MIDI export) into a live track with a performance | "next Guitar Pro song" |
 | `player` | Starts the player on a port or a branch and opens it | "start the player on port 8800" |
 | `workflow-review` | Reviews past sessions and proposes ranked repo changes | "workflow review for last week" |
 

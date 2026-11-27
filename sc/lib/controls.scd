@@ -192,6 +192,26 @@
 	self.uiSend('/ce/lknote', note, chan);
 	self.playNow(notes, self.stemBus[\lk], self.groups.src, \lk)
 };
+// Knob 8 (CC 28) spreads the keys across the stereo field (0 = all in the middle, 1 = the lowest key of the keyboard window
+// hard left, the highest hard right); the window follows the octave buttons: it moves to the octave of a key outside it
+// (the player's keyboard does the same). A pan as Strudel has it, 0..1.
+~ce.lkBase = 48;
+~ce.lkKeyPan = { |self, note|
+	if(note < self.lkBase or: { note > (self.lkBase + 24) }) { self.lkBase = 12 * (note / 12).floor };
+	0.5 + (0.5 * self.lkCC[28] * ((2 * ((note - self.lkBase) / 24)) - 1))
+};
+// the pan for a key as a note arg: nothing at spread 0 (the voice keeps its own sound), else (pan: …)
+~ce.lkKeyPanArgs = { |self, note| var p = self.lkKeyPan(note); if(self.lkCC[28] > 0) { (pan: p) } { () } };
+// The drum pad bank of the Launchkey (knobs 1-8 send CC 31-38 there): what a pad hit takes from the knobs, all neutral at 0.
+// Knob 1 pitch down (up to an octave), 2 brightness (the low-pass, read by the track), 3 thin (high-pass up), 4 drive,
+// 5 pad spread (pad 1 left … pad 16 right), 6 boost (gain up to × 1.5). Returns (rate: factor, hp: Hz, gain: factor, base: the
+// note's own args: shape, hp and pan).
+~ce.lkPad = { |self, n| self.lkCC[30 + n] };
+~ce.lkPadMods = { |self, i|
+	var drive = 0.9 * self.lkPad(4), spread = self.lkPad(5);
+	(rate: 2 ** self.lkPad(1).neg, hp: if(self.lkPad(3) > 0) { 40 * (50 ** self.lkPad(3)) } { 0 }, gain: 1 + (0.5 * self.lkPad(6)),
+		base: (shape: drive, hp: if(self.lkPad(3) > 0) { 40 * (50 ** self.lkPad(3)) } { 0 }) ++ if(spread > 0) { (pan: 0.5 + (0.5 * spread * ((2 * (i / 15)) - 1))) } { () })
+};
 // Notes as the tracks make them (ce.note …, \lane, \hold and \at in 16ths, \msg entries), started at once (\at: later)
 ~ce.playNow = { |self, notes, lanes, group, stem|
 	var bps = TempoClock.default.tempo, srv = self.server;
