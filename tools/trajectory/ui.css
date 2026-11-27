@@ -47,6 +47,7 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #stemDrawer li, #knobEditor li { padding: 8px 0; border-top: 1px solid var(--line) }
 #stemDrawer li button, #knobEditor li button { width: 100%; text-align: left; overflow-wrap: anywhere }
 #stemDrawer .meta, #stemDrawer .about, #knobEditor .hint { margin-top: 4px; color: var(--dim); font-size: 12px }
+#stemDrawer li.misfit { opacity: 0.5 }
 #stemDrawer output, #knobEditor output { display: block; margin-top: 8px; color: var(--dim); font-size: 13px }
 #knobEditor label { display: grid; grid-template-columns: 1fr 1.4fr; gap: 4px 8px; align-items: center; margin: 10px 0 }
 #knobEditor label.wide { grid-template-columns: 1fr }

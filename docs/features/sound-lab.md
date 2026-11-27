@@ -25,7 +25,9 @@ The old Strudel lab boards were retired ([Lab boards](lab-boards.md)); new sound
 1. Start the player (`cd tools && node trajectory/server.mjs`, then http://localhost:8766) and play a stem track, for
    example `009-house (stems)` under Live.
 2. Click the name of a column on the Live page. The stem drawer lists the library stems of its role; filter by role
-   (set it to any to swap in a stem of another role, e.g. a bass for a lead), genre, energy or tag.
+   (set it to any to swap in a stem of another role, e.g. a bass for a lead), genre, energy or tag. Stems that do not
+   fit the track are greyed out with the reason (for example "the frame has no tonesAt": the stem needs something
+   only its own track has); the check runs when the drawer opens, a few seconds the first time for a track.
 3. Pick one. It takes over at the next bar. If the new stem needs another mixer strip than the old one, the track is
    loaded again with it (a short gap).
 4. **Revert** puts the file's stems back. **Save as** writes the swaps as a new track (`009-house-v2`); the original
@@ -85,8 +87,9 @@ version (a draft, then Promote).
 
 ## Good to know
 - Claude cannot hear. It builds the project and proves that it loads; you decide by ear.
-- Not every stem fits every track yet: a stem's code may need something of its own track's frame. Such a stem goes
-  quiet on its slot, the rest plays on, and the player shows which slot failed and why. The known misfits are listed in
+- Not every stem fits every track yet: a stem's code may need something of its own track's frame. The drawer greys
+  such stems out; one that gets on a slot anyway (a project file, a track file) goes quiet there, the rest plays on,
+  and the player shows which slot failed and why. The known misfits are listed in
   `tools/sc-test/stem-frames-known.json` (track → stem → error), checked by `npm test`.
 - Stems from different tracks are brought to a common level by each stem's `gain`; a new version may still need a trim.
 - Fourteen columns plus backing load and play in the offline test; the live load on the laptop has not been measured
