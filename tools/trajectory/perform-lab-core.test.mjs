@@ -4,8 +4,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { checkScript, controlsOf, scTrackFileOf, tagSource } from './check-perform.mjs'
-import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, moveText, movesIn, newMove, sectionOf, spanOf,
-  toScript } from './perform-lab-core.mjs'
+import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, fitSections, importScript, insertSection,
+  moveEdge, moveText, movesIn, newMove, newSection, removeSection, sectionOf, spanOf, toScript }
+  from './perform-lab-core.mjs'
 
 const trackId = '009-house'
 const controls = controlsOf(tagSource(scTrackFileOf(trackId)))
@@ -92,4 +93,37 @@ test('perform lab: warnings for a section without moves and for too many moves a
   const lab = labOf([newMove('enter', 2, controls), ...crowd])
   assert.deepEqual(check(lab).warnings, [`Groove (bars 16→64): ${MAX_AT_ONCE + 1} moves at once at bar 20`])
   assert.deepEqual(check(lab).errors, [])
+})
+
+test('perform lab: sections are cut around an inserted one, a removed one leaves no gap, edges keep a bar', () => {
+  const base = [{ id: 'a', name: 'A', from: 0, to: 16 }, { id: 'b', name: 'B', from: 16, to: 32 }]
+  const inserted = insertSection(base, newSection({ name: 'N', from: 4, to: 12 }))
+  assert.deepEqual(inserted.map(({ name, from, to }) => [name, from, to]),
+    [['A', 0, 4], ['N', 4, 12], ['A', 12, 16], ['B', 16, 32]])
+  assert.equal(inserted[0].id, 'a')
+  assert.notEqual(inserted[2].id, 'a', 'the cut-off part is a section of its own')
+  assert.deepEqual(insertSection(base, newSection({ name: 'N', from: 0, to: 16 })).map(s => s.name), ['N', 'B'])
+  assert.deepEqual(removeSection(base, 'b').map(({ id, from, to }) => [id, from, to]), [['a', 0, 32]])
+  assert.deepEqual(removeSection(base, 'a').map(({ id, from, to }) => [id, from, to]), [['b', 0, 32]])
+  assert.deepEqual(moveEdge(base, 0, 20).map(({ from, to }) => [from, to]), [[0, 20], [20, 32]])
+  assert.deepEqual(moveEdge(base, 0, 40).map(({ from, to }) => [from, to]), [[0, 31], [31, 32]])
+  assert.deepEqual(fitSections(base, 24).map(({ from, to }) => [from, to]), [[0, 16], [16, 24]])
+  assert.deepEqual(fitSections(base, 12).map(({ from, to }) => [from, to]), [[0, 12]])
+  assert.deepEqual(fitSections(base, 48).map(({ from, to }) => [from, to]), [[0, 16], [16, 48]])
+})
+
+test('perform lab: an imported script compiles back to its steps', () => {
+  const script = { track: trackId, title: 'T', bars: 32, sections: [{ name: 'A', from: 0, to: 16, intent: 'in' },
+    { name: 'B', from: 16, to: 32 }], steps: [{ bar: 20, press: 52 }, { bar: 0, cc: 5, value: 0.7, ramp: 2 },
+    { bar: 2.5, keys: 'c4 e4', velocity: 0.6 }, { bar: 16, cc: 5, value: 0, ramp: 4 },
+    { bar: 17.3333, lk: 1, value: 1 }] }
+  const lab = importScript(script)
+  const byBar = steps => [...steps].sort((a, b) => a.bar - b.bar)
+  assert.deepEqual(compileMoves(lab.moves), byBar(script.steps))
+  assert.deepEqual(lab.sections.map(({ name, from, to, intent }) => [name, from, to, intent]),
+    [['A', 0, 16, 'in'], ['B', 16, 32, undefined]])
+  assert.equal(lab.moves.length, 5, 'one Hand-made move per section and control')
+  const plain = importScript({ track: trackId, steps: [{ bar: 3, cc: 5, value: 1, ramp: 2 }] })
+  assert.deepEqual([plain.bars, plain.sections.map(({ from, to }) => [from, to])], [5, [[0, 5]]],
+    'no sections: one over the whole length, which ends with the last step')
 })

@@ -106,10 +106,16 @@ const SPACE = [
 ]
 
 const TRACKS = [
-  { heading: 'What it does', text: 'Shows the auto-performances of a live track: for now the steps of a script, in '
-    + 'bar order.' },
-  { heading: 'How to use', text: ['Pick a track, then one of its performances (scripts and takes).',
-    'Bars count from 0, as in the script; the length is shown in bars and in minutes at the track\'s tempo.'] }
+  { heading: 'What it does', text: 'Edits an auto-performance of a live track at five levels: Story, Sections, '
+    + 'Moves, Lanes and Steps.' },
+  { heading: 'How to use', text: ['Pick a track, then one of its performances (scripts and takes), or press New '
+    + 'performance.',
+    'Keys 1-5 pick the level; the selection stays when the level changes. Click the ruler to set the cursor: the '
+    + 'sidebar adds sections, moves or steps there.',
+    'Drag moves, section edges, energy dots and lane dots. Cmd-Z undoes, Escape clears the selection, Backspace '
+    + 'deletes the selected move or step.',
+    'Bars count from 0, as in the script. The tempo on top is a what-if: it changes the minutes shown, not the '
+    + 'track.'] }
 ]
 
 const PLANNED = [

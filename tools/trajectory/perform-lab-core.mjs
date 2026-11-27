@@ -80,11 +80,11 @@ export const MOVES = {
     text: p => `Steps ×${p.steps.length}` },
 }
 
-const newId = () => 'm' + Math.random().toString(36).slice(2, 10)
+export const newId = prefix => prefix + Math.random().toString(36).slice(2, 10)
 
 // A move of `kind` at `bar` with the track's default controls, `p` overriding them
 export const newMove = (kind, bar, controls, p = {}) =>
-  ({ id: newId(), kind, bar, p: { ...MOVES[kind].defaults(controls), ...p }, edits: {} })
+  ({ id: newId('m'), kind, bar, p: { ...MOVES[kind].defaults(controls), ...p }, edits: {} })
 
 export const moveText = (move, controls) => MOVES[move.kind].text(move.p, controls)
 
@@ -106,7 +106,11 @@ export const compileTagged = moves => moves.flatMap(move => MOVES[move.kind].ste
 
 export const compileMoves = moves => compileTagged(moves).map(({ step }) => step)
 
-const stepEnd = step => step.bar + (step.ramp ?? 0) + (step.length ?? 0)
+export const stepEnd = step => step.bar + (step.ramp ?? 0) + (step.length ?? 0)
+
+// what a step acts on: a Launch Control CC (number, a control or a button), 'lk:<cc>', 'keys' or 'pad'
+export const controlKey = step => step.keys !== undefined ? 'keys' : step.pad !== undefined ? 'pad'
+  : step.lk !== undefined ? `lk:${step.lk}` : step.press ?? step.cc
 
 // [from, to] bars the move's steps cover (a ramp to its end); a move without steps covers only its bar
 export const spanOf = move => {
@@ -117,6 +121,59 @@ export const spanOf = move => {
 
 export const sectionOf = (lab, bar) => sectionAt(lab, bar)
 export const movesIn = (lab, section) => lab.moves.filter(move => section.from <= move.bar && move.bar < section.to)
+
+export const newSection = fields => ({ id: newId('s'), energy: 0.5, ...fields })
+
+// The sections with `added` in its place: sections it overlaps are cut around it (a cut one keeps its id before it)
+export const insertSection = (sections, added) => [...sections.flatMap(section => {
+  if (section.to <= added.from || section.from >= added.to) return [section]
+  return [{ ...section, to: added.from }, { ...section, id: newId('s'), from: added.to }]
+    .filter(part => part.to > part.from)
+}), added].sort((a, b) => a.from - b.from)
+
+// The sections without `id`; the one before takes over its bars (the one after, if it was the first)
+export const removeSection = (sections, id) => {
+  const index = sections.findIndex(section => section.id === id)
+  if (index < 0) return sections
+  const removed = sections[index]
+  const rest = sections.filter(section => section.id !== id)
+  if (index > 0) rest[index - 1] = { ...rest[index - 1], to: removed.to }
+  else if (rest.length) rest[0] = { ...rest[0], from: removed.from }
+  return rest
+}
+
+// The edge between section `index` and the next one moved to `bar`, each keeping at least one bar
+export const moveEdge = (sections, index, bar) => {
+  const [left, right] = [sections[index], sections[index + 1]]
+  const edge = Math.min(right.to - 1, Math.max(left.from + 1, bar))
+  return sections.map((section, i) => i === index ? { ...section, to: edge } : i === index + 1
+    ? { ...section, from: edge } : section)
+}
+
+// The sections cut to `bars`: the last one ends there, sections that start after it are dropped
+export const fitSections = (sections, bars) => {
+  const kept = sections.filter(section => section.from < bars)
+  return kept.map((section, i) => i === kept.length - 1 ? { ...section, to: bars } : section)
+}
+
+// A script as a lab: its sections (or one over the whole length), its steps as Hand-made moves, one per section and
+// control. compileMoves gives back the script's steps.
+export const importScript = script => {
+  const steps = [...script.steps].sort((a, b) => a.bar - b.bar)
+  const bars = script.bars ?? Math.max(1, Math.ceil(Math.max(0, ...steps.map(stepEnd))))
+  const sections = (script.sections?.length ? script.sections : [{ name: 'All', from: 0, to: bars }])
+    .map(({ name, from, to, intent }) => newSection({ name, from, to, ...intent && { intent } }))
+  const groups = new Map()
+  for (const step of steps) {
+    const section = sections.findIndex(({ from, to }) => from <= step.bar && step.bar < to)
+    const key = `${section}|${controlKey(step)}`
+    groups.set(key, [...groups.get(key) ?? [], step])
+  }
+  const moves = [...groups.values()].map(list => ({ id: newId('m'), kind: 'handMade', bar: list[0].bar,
+    p: { steps: list.map(({ bar, ...step }) => ({ at: round(bar - list[0].bar), ...step })) }, edits: {} }))
+  return { track: script.track, ...script.title && { title: script.title }, bars,
+    ...script.mood && { mood: script.mood }, sections, moves }
+}
 
 const scriptSection = ({ name, from, to, intent }) => intent ? { name, from, to, intent } : { name, from, to }
 
@@ -144,15 +201,15 @@ const busiestBar = (moves, section) => {
   return best
 }
 
+// The lab's own warnings: a section without moves, too many moves at once
+export const labWarnings = lab => (lab.sections ?? []).flatMap(section => {
+  const label = `${section.name} (bars ${section.from}→${section.to})`
+  const { bar, count } = busiestBar(lab.moves, section)
+  return [...movesIn(lab, section).length ? [] : [`${label} has no moves`],
+    ...count > MAX_AT_ONCE ? [`${label}: ${count} moves at once at bar ${bar}`] : []]
+})
+
 // { errors, warnings }: errors are check-perform's on the compiled script (checkScript from check-perform.mjs, handed
-// in so this module stays free of fs); warnings are the lab's own: a section without moves, too many moves at once
-export const checkLab = (lab, { controls, trackId, checkScript }) => {
-  const warnings = []
-  for (const section of lab.sections ?? []) {
-    const label = `${section.name} (bars ${section.from}→${section.to})`
-    if (!movesIn(lab, section).length) warnings.push(`${label} has no moves`)
-    const { bar, count } = busiestBar(lab.moves, section)
-    if (count > MAX_AT_ONCE) warnings.push(`${label}: ${count} moves at once at bar ${bar}`)
-  }
-  return { errors: checkScript(toScript(lab), controls, trackId), warnings }
-}
+// in so this module stays free of fs), warnings the lab's own
+export const checkLab = (lab, { controls, trackId, checkScript }) =>
+  ({ errors: checkScript(toScript(lab), controls, trackId), warnings: labWarnings(lab) })
