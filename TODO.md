@@ -3,11 +3,7 @@
 
 # Backend
 + Switch to Supercollider to minimize latency
-- Mono low end (SC, not started): kick/sub/bass are already mono, but their Space knob sends into the stereo
-  convolution reverb with no high-pass, so stereo energy reaches the sub range. Plan: a high-pass (~150 Hz) before the
-  reverb returns (`sc/lib/mixer.scd`). Later, as the library grows: `~ce.checkSound` measures a sound's side energy
-  below ~120 Hz and warns (the `mono:` key is only declared today, not enforced). A mono-bass master stage
-  (M/S, Linkwitz-Riley crossover) only if that is not enough.
+- Mono low end and club safety: moved to `sc/PLAN-SOUND-QUALITY.md`, 2.7 (Club output).
 
 # Player
 
