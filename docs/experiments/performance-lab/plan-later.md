@@ -35,8 +35,8 @@ own plan when it is picked up. Order is a suggestion.
 
 ## Tracks lab
 
-- Tempo written to the track (the `bpm` in its frame) instead of a what-if, with the length and every bar-based label
-  updated and a warning for performances written at another tempo.
+- Tempo written to the track (the `tempo` of its `.track` file, which the engine reads) instead of a what-if, with
+  the length and every bar-based label updated and a warning for performances written at another tempo.
 - Stem editing: the lab grows from performances into the main place for a track, with its stems (list, swap, levels,
   knob names) next to its performances. This is its own plan; the existing Stem Designer and `docs/features/stems.md`
   are the starting point.

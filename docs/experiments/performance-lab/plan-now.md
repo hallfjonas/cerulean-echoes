@@ -13,7 +13,7 @@ decisions are in the [design notes](README.md).
 - A Labs sub-tab **Tracks** with track and performance dropdowns, expected length (bars and minutes), tempo as a
   what-if, and the five levels Story, Sections, Moves, Lanes, Steps.
 - Moves for the Launch Control XL 3 only: Enter, Layers, Leave, Build, Fog dip, Move control, Break, Press, Hand-made.
-- Compile moves and hand edits to script v2, check, save as a new file, import the 14 existing scripts, play from a bar.
+- Compile moves and hand edits to script v2, check, save as a new file, import the 15 existing scripts, play from a bar.
 
 **Out** (see later): integrated LLM support (words to adjust operations, drafting from the story text), writing the
 tempo to the track, stem editing, Launchkey support (keys, pads, knobs and mod wheel as moves, lanes and pickers),
@@ -36,8 +36,9 @@ Files follow the stem lab: a server module with a `handle` function, a UI module
 2. **Shell and routes** (`perform-lab.mjs`, `pages.mjs`, `server.mjs`, `player.html`). Add `{ id: 'tracks', label:
    'Tracks' }` to the Labs subs and its sidebar sections (`data-pages="labs/tracks"`). Read-only routes under
    `/lab/tracks/`: tracks with performances (from `perform/<track>/*.json`, with meta), the track's controls
-   (`controlsOf` / `tagSource`) and its bpm (read from the track frame). Opens the existing steps at the Steps level.
-   Test: the routes list every performance of every track and a control table for a stem track and an `.scd` track.
+   (`controlsOf` / `tagSource`) and its bpm (the `tempo` of the `.track` file, which the engine reads). Opens the
+   existing steps at the Steps level. Test: the routes list every performance of every track and a control table for
+   two stem tracks (every track is a `.track`; there is no `.scd` track left).
 3. **Levels UI** (`perform-lab-ui.mjs`, styles in `ui.css`). Port the five levels from the prototype with the same
    interactions: selection that survives a level change, drag for moves, section edges and lane dots, undo, zoom, keys
    1-5. Tempo changes the displayed length only. Unit-test the pure parts (ruler marks, snap, lane paths); the rest is
@@ -50,16 +51,30 @@ Files follow the stem lab: a server module with a `handle` function, a UI module
 5. **Import** (core, `importScript`). Group the Launch Control steps of a script into moves: a ramp on a Level
    control is Enter or Leave, a staggered run of them is Layers, a ramp up and a jump to 0 is Build, up and down on
    Fog is Fog dip, two presses on Break are a Break, one press is Press, other cc steps are Move control; everything
-   else, Launchkey steps included, is Hand-made. Sections, title, mood and bars come from the script's meta. **Rule
-   that decides done:** for every script and take in `perform/`, `compileMoves(importScript(script))` gives back
-   exactly the original steps. Test (`perform-lab-core.test.mjs`) runs it over all of them, so opening a script
-   cannot change it.
-6. **Play** (`perform-lab-ui.mjs`, `autoperform.mjs`, `sc-auto.mjs`). Play and Stop in the lab sidebar use the existing
-   auto-perform path. First read how the performer takes a script (a catalogue file or a posted script) and use the
-   lighter route; the lab plays its in-memory script, so unsaved edits can be heard. New: start at bar N or at a
-   section (steps before the bar are applied as the last value per control, then the clock starts at N), and click a
-   section or the ruler to jump while playing. Test: `autoperform` tests for the start offset. **A listen in the player
-   on 009 and 010 decides this step**; the agent cannot hear.
+   else, Launchkey steps included, is Hand-made. Sections, title, mood and bars come from the script's meta; a script
+   without sections (the `every-button` scripts, `spike-run`) gets one section over its whole length, and a missing
+   `bars` is the end of its last step. A take saved as a copy drops its `take` meta and becomes a hand-written script.
+   **Rule that decides done:** for every script in `perform/`, `compileMoves(importScript(script))` gives back the
+   original steps, compared after a stable sort by bar (two scripts are not in bar order; steps on one control at one
+   bar keep their order, the last one wins). Test (`perform-lab-core.test.mjs`) runs it over all committed scripts,
+   so opening a script cannot change it; takes are gitignored, so they are included only where present locally and
+   only those `check-perform` accepts.
+6. **Play** (`perform-lab-ui.mjs`, `autoperform.mjs`, `sc-auto.mjs`, `sc-link.mjs`, `sc/engine.scd`). Play and Stop
+   in the lab sidebar use the existing auto-perform path. The page fetches a script and plays it itself
+   (`createPerformer`), so the player's start splits into fetch and play and the lab hands over its in-memory script:
+   unsaved edits can be heard, no new server route. New: start at bar N or at a section, and click a section or the
+   ruler to jump while playing.
+   - Start at N: controls get their value at N (the last value per control, a ramp read at N). Buttons step through
+     states one press at a time, so their state at N is the number of presses before N: `/ce/load` gains
+     `press <cc> <count>`, applied before the first note, beside the `cc` and `lk` values it carries today. Keys and
+     pads before N are skipped. Then the clock starts at N.
+   - N snaps: a ruler click goes down to the 4-bar line (Chapter switches on 4-bar phrases counted from the load), a
+     section click starts at the section's first bar.
+   - A jump while playing is a reload at N, forward and back (a short gap; every load costs the sound server memory).
+   - A recording or take of an unsaved lab script names it `lab:<name>` as its `script`.
+
+   Test: `autoperform` and `sc-auto` tests for the start offset and the press counts; `sc-link` test for the load
+   message. **A listen in the player on 009 and 010 decides this step**; the agent cannot hear.
 7. **Docs and clean-up.** `docs/features/tracks-lab.md`, the help text, `docs/features/auto-perform.md` (play from a
    bar), `tools/trajectory/README.md`, CLAUDE.md layout line. Delete the prototype. Move anything still useful
    from this folder into `docs/features/tracks-lab.md`; keep `plan-later.md` as the roadmap.
@@ -76,7 +91,8 @@ Files follow the stem lab: a server module with a `handle` function, a UI module
 - **Importer ambiguity.** Several readings of a ramp are plausible; the round-trip rule makes a wrong guess harmless
   (it only changes how a step is grouped, not what plays). Keep the recogniser small and let Hand-made catch the rest.
 - **Play from a bar** touches the performer that works today (the user approved it by listening). Add the offset as a
-  new path and leave the start-at-0 path as it is; compare 009 start-at-0 before and after with `check-replay`.
+  new path and leave the start-at-0 path as it is (a load without presses sends what it sends today); compare 009
+  start-at-0 before and after with `check-replay`.
 - **Size of `player.html`.** The lab gets its own modules and only a section and a script tag in the page.
 - **Sidecar drift.** If a script is edited outside the lab, its sidecar no longer matches: store a hash of the `.json`
   in the sidecar and re-import (with a note) when it differs.
