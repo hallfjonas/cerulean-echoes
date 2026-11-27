@@ -156,7 +156,7 @@
 ~ce.uiHello = { |self|
 	self.uiLayout;
 	self.uiSend('/ce/ccs', self.toJSON(self.cc));
-	self.uiSend('/ce/lkccs', self.toJSON(([1] ++ (21..28)).collect { |n| n -> self.lkCC[n] }.asDict));
+	self.uiSend('/ce/lkccs', self.toJSON(([1] ++ (21..28) ++ (31..38)).collect { |n| n -> self.lkCC[n] }.asDict));
 	self.uiPush;
 	self.uiPorts;
 };

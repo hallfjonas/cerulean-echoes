@@ -1,6 +1,6 @@
 // Checks the auto-perform scripts (perform/<track>/<script>.json, see autoperform.mjs) against their track: the meta
 // fields (sections in order, inside `bars`, every step in a section), the shape of every step, every CC a control of
-// the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 21-28, keys that parse,
+// the track's @ctl tags, every press one of its buttons, Launchkey pads 36-51, LK CCs 1 / 21-28 / 31-38, keys that parse,
 // velocities 0..1, and the `take` meta field of a take (perform/<track>/takes/<take>.json, checked like a script).
 // A track's scripts are checked against its SuperCollider version (sc/tracks/<id>/<id>.scd). A stem track (sc/tracks/<id>/<id>.track) takes its controls from
 // its stems and frame.
@@ -102,7 +102,7 @@ const checkLaunchkeyStep = (step, at) => {
     if (step.velocity !== undefined && !(step.velocity > 0 && step.velocity <= 1)) errors.push(`${at}: velocity 0..1`)
   } else {
     if (!hasOnly(step, ['bar', 'lk', 'value'], ['ramp'])) errors.push(`${at}: needs bar, lk, value (ramp)`)
-    if (!LK_CCS.includes(step.lk)) errors.push(`${at}: lk ${step.lk} is not the mod wheel (1) or a knob (21-28)`)
+    if (!LK_CCS.includes(step.lk)) errors.push(`${at}: lk ${step.lk} is not the mod wheel (1) or a knob (21-28, 31-38)`)
     if (!(step.value >= 0 && step.value <= 1)) errors.push(`${at}: value must be 0..1`)
     if (step.ramp !== undefined && !(step.ramp > 0)) errors.push(`${at}: ramp must be > 0 bars`)
   }

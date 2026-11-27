@@ -17,16 +17,18 @@ loadCe = { var ce = (root +/+ "sc/lib/ce.scd").load;
 	(root +/+ "sc/lib/stemlab.scd").load; ce.quiet = true; ce.uiOn = false; ce.swapLoad = { |m, done| done.value }; ce };
 // plays a project for `bars` bars with every fader up; presses = [[bar, cc], …]; returns [ce, [[beat, stem, event], …]]
 play = { |file, bars, presses|
-	var ce = loadCe.value, track = ce.stemLabProject(file), msgs, ctl;
+	var ce = loadCe.value, track = ce.stemLabProject(file), msgs, ctl, pats;
 	msgs = ce.prepare(ScoreStreamPlayer.new, track);
-	((5..12) ++ (53..59)).do { |c| ce.cc[c] = 1; msgs = msgs.add([\c_set, ce.ccIndex(c), 1]) };
+	pats = ce.patterns;
+	// through the column hooks, as a controller moves them
+	((5..12) ++ (53..59)).do { |c| ce.setCC(c, 1, { |m| msgs = msgs.add(m) }, true) };
 	ctl = Prout({ var t = 0;
 		(presses ? []).do { |p| var at = p[0] * 4;
 			if(at > t) { (type: \rest, dur: at - t).yield; t = at };
 			(type: \ceCtl, cc: p[1], v: p[2] ? 1, dur: 0.25).yield; (type: \ceCtl, cc: p[1], v: 0, dur: 0).yield; t = t + 0.25 } });
 	ce.log = List[];
 	~ce = ce; ~lastCe = ce;
-	ce.makeScore(Ppar([ctl, ce.patterns]).asStream, bars * 4, track.bpm / 60, msgs);
+	ce.makeScore(Ppar([ctl, pats]).asStream, bars * 4, track.bpm / 60, msgs);
 	[ce, ce.log.asArray]
 };
 tmp = Platform.defaultTempDir +/+ "stemlab-test";

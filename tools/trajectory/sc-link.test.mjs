@@ -32,8 +32,10 @@ test('track list: every SC track is a live track on engine sc', async () => {
 })
 
 // the set view's data path without SuperCollider: OSC /ce/setsample (as sc/lib/ui.scd sends it every 10 s) → kept by
-// the link → SSE setsample to open pages, and the whole history as one sethistory event to a page that connects later
-test('set samples: passed on as they come, and a new page gets the history', { timeout: 30e3 }, async () => {
+// the link → SSE setsample to open pages, and the whole history as one sethistory event to a page that connects later;
+// a failed column (/ce/stemerror) is passed on too
+test('set samples: passed on as they come, a new page gets the history; failed columns reach the page',
+  { timeout: 30e3 }, async () => {
   const port = 8792, osc = 57171
   const server = spawn(process.execPath, [path.join(here, 'server.mjs'), String(port)],
     { env: { ...process.env, CE_SC_PORT: String(osc), CE_SC_SERVER_PORT: '57172', SCLANG: 'none' }, stdio: 'ignore' })
@@ -83,6 +85,10 @@ test('set samples: passed on as they come, and a new page gets the history', { t
     const later = listen()
     const history = await until(() => later.find(e => e.type === 'sethistory'))
     assert.deepEqual(history?.data, live.map(e => e.data), 'a page that connects later gets the whole history')
+    const failed = ['2:1', 'pump-chords-colour-2', "Message 'atBar' not understood."]
+    await new Promise(resolve => udp.send(encode('/ce/stemerror', failed), osc, '127.0.0.1', resolve))
+    const shown = await until(() => first.find(e => e.type === 'stemerror'))
+    assert.deepEqual(shown?.data, failed, 'a failed column reaches the page')
   } finally {
     udp.close()
     for (const abort of streams) abort.abort()

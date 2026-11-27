@@ -22,6 +22,7 @@
 //                /ce/swapped <slot> <ref>     the swap waits for the next bar line
 //                /ce/swapReload <slot> <why>  the stem cannot take over while the track plays: load it with the stem
 //                /ce/swapError <slot> <text>  the swap failed (nothing changed)
+//                /ce/stemerror <slot> <stem> <text>  the column's code failed: it is silent, the others play on
 // Controllers go straight to SC (MIDI), never through the player. Live play from the IDE stays sc/live.scd.
 (
 var here = thisProcess.nowExecutingPath.dirname, port = (thisProcess.argv[0] ? "57131").asInteger;

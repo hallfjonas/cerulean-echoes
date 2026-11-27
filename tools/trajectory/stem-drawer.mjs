@@ -6,6 +6,9 @@
 // A Stem Designer project (selection field lab: true) uses the same drawer: Replace on a column, or Add (field adding: true on a free slot,
 // every role) from the controllers; a pick changes the project file and plays from the next bar or loads it again
 // (stem-lab.mjs). There is no Revert or Save as: the sidebar's Save as copies the project.
+// Stems whose code does not fit the track's frame (GET /stems/fit, stem-fit.mjs) are greyed out with the reason and
+// cannot be picked. The check starts when the track loads (a few seconds the first time for a track); a drawer opened
+// before it is done shows the list only once it is.
 import { askText, toast } from './toast.mjs'
 
 const el = (tag, props = {}, ...children) => {
@@ -33,6 +36,7 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
   const panel = el('aside', { id: 'stemDrawer', hidden: true })
   document.body.append(panel)
   let current = null, message = ''
+  let fit = null   // the drawer's track: { track } while checking, then { track, misfits, error? }
   const filters = { role: '', genre: '', energy: '', tag: '' }
 
   let filteredColumn = null
@@ -53,11 +57,14 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
       return select
     }
     const list = el('ul')
+    const checking = el('p', { className: 'loading', textContent: 'Checking which stems fit this track …' })
     for (const version of versions) {
       const marks = [version.file === slot.stem && 'plays', version.file === slot.file && 'in the file'].filter(Boolean)
-      const meta = [`energy ${version.meta.energy}`, version.meta.genres.join(', '), version.meta.tags.join(', '), ...marks]
-      list.append(el('li', {},
-        el('button', { className: version.file === slot.stem ? 'on' : '', disabled: !state.playing && !lab,
+      const misfit = fit?.misfits?.[version.file]
+      const meta = [misfit && `doesn't fit this track: ${misfit}`, `energy ${version.meta.energy}`,
+        version.meta.genres.join(', '), version.meta.tags.join(', '), ...marks]
+      list.append(el('li', { className: misfit ? 'misfit' : '' },
+        el('button', { className: version.file === slot.stem ? 'on' : '', disabled: (!state.playing && !lab) || !!misfit,
           onclick: () => pick(version) }, version.name),
         el('div', { className: 'meta', textContent: meta.filter(Boolean).join(' · ') }),
         el('div', { className: 'about', textContent: version.about })))
@@ -69,12 +76,21 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
       el('div', { className: 'row' }, choice('Role', 'role', [...new Set(all.map(v => v.meta.role))].sort()),
         choice('Genre', 'genre', [...new Set(all.flatMap(v => v.meta.genres))].sort()),
         choice('Energy', 'energy', [1, 2, 3, 4, 5]), choice('Tag', 'tag', [...new Set(all.flatMap(v => v.meta.tags))].sort())),
-      list,
+      fit && !fit.misfits ? checking : list,
       ...(lab ? [] : [el('div', { className: 'row' },
         el('button', { disabled: !state.playing, onclick: revert, title: 'Put the file\'s stems back' }, 'Revert'),
         el('button', { onclick: saveAs, title: 'Write a new track file with the stems that play' }, 'Save as …'))]),
-      el('output', { textContent: message || (lab ? 'Pick a stem: the project file changes.' : state.playing
+      el('output', { textContent: message || fitNote() || (fit && !fit.misfits ? '' : lab
+        ? 'Pick a stem: the project file changes.' : state.playing
         ? 'Pick a stem: it plays from the next bar.' : 'Press Play to swap; the list shows the file.') }))
+  }
+
+  const fitNote = () => fit?.error ? `Not checked which stems fit: ${fit.error}` : ''
+  const loadFit = track => {
+    fit = { track }
+    const done = result => { if (fit?.track === track) { fit = { track, ...result }; if (current) show() } }
+    getJson('stems/fit?track=' + encodeURIComponent(track))
+      .then(done, error => done({ misfits: {}, error: error.message }))
   }
 
   const show = async () => {
@@ -164,6 +180,7 @@ export const mountStemDrawer = ({ selection, onSaved = () => {} }) => {
       return
     }
     if (current?.track !== item.track || current?.slot !== item.slot) say('')
+    if (current?.track !== item.track || !current) loadFit(item.track)
     current = item
     panel.hidden = false
     document.body.classList.add('drawer-open')

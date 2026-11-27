@@ -149,4 +149,4 @@ judge.
 
 ## Order with other epics
 
-- `launchkey-knob-target` also changes the live tracks / LC view: merge one at a time.
+- `lk-pad-knobs` also changes the live tracks / LC view: merge one at a time.

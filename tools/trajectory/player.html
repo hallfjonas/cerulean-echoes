@@ -274,7 +274,10 @@ createScSource({ onLine: smoother.push, onStatus: text => { scVisuals = text } }
 // SuperCollider makes the sound, through the server (catalogue entry engine 'sc'); takes, auto-perform and the recorder
 // read its one clock. A take of an SC play keeps SC's state echoes per bar as its events (check-replay).
 const scTap = createScTap({ onBatch: batch => recorder.addEvents(batch) })
-const engine = createScEngine({ onEvent: (type, data) => scTap.push(type, data) })
+const engine = createScEngine({ onEvent: (type, data) => {
+  if (type === 'stemerror') toast(`Slot ${data[0]} (${data[1]}) is silent: ${data[2]}`, { kind: 'error' })
+  else scTap.push(type, data)
+} })
 let scStarted = false
 const onSc = () => scStarted
 const entryOf = id => catalogue.find(entry => entry.id === id)

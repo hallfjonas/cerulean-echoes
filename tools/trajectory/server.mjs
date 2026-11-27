@@ -23,7 +23,7 @@ import { fileURLToPath } from 'url'
 import { find, scan, toPublic } from './catalogue.mjs'
 import { handleTake } from './take-save.mjs'
 import { handleRecording, useScLink } from './recording.mjs'
-import { createScLink } from './sc-link.mjs'
+import { createScLink, findSclang } from './sc-link.mjs'
 import { createSampleLab } from './sample-lab.mjs'
 import { createStemLab } from './stem-lab.mjs'
 import { createSpaceLab } from './space-lab.mjs'
@@ -31,6 +31,7 @@ import { repo } from './catalogue.mjs'
 import { stemIndex } from '../stems/stem-index.mjs'
 import { knobPresets, soundParams } from '../stems/knob.mjs'
 import { createStemSwap } from './stem-swap.mjs'
+import { createStemFit } from './stem-fit.mjs'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const port = Number(process.argv[2] ?? 8766)
@@ -47,8 +48,9 @@ const stemLab = createStemLab({ getSc: () => sc })
 const spaceLab = createSpaceLab()
 const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
   resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null },
-  onLoaded: (id, slots) => swaps.loaded(id, slots) })
+  onLoaded: (id, slots) => { swaps.loaded(id, slots); fits.fitOf(id).catch(() => {}) } })
 const swaps = createStemSwap({ repo, find, sc })
+const fits = createStemFit({ repo, find, sclang: findSclang() })
 useScLink(sc)
 
 const server = http.createServer((request, response) => {
@@ -79,6 +81,7 @@ const server = http.createServer((request, response) => {
     return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json' })
       .end(JSON.stringify(scan().map(toPublic)))
   }
+  if (url.pathname === '/stems/fit') return fits.handle(request, response, url)
   if (url.pathname === '/stems') {
     try {
       const filters = Object.fromEntries(['role', 'genre', 'energy', 'tag']

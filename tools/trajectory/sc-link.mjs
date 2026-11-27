@@ -9,6 +9,7 @@
 //                     ({ running, ready, track, error }); for the set view: sethistory (every set sample of this server
 //                     session, sent once on connect) and setsample (each new one, every 10 s; see setSample below)
 //                     and notes: [[stem, instrument, Hz, pan, level, seconds, room], …] per 25 ms (the sounding notes, for the visuals)
+//                     and stemerror: [slot, stem, error] when a column's code fails and the column goes quiet
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
 //   POST /sc/load     { id, cc?, lk? } start the track (SC is started first if needed) → { track }  (own pages only)
@@ -154,6 +155,8 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
       case '/ce/lknote': broadcast('lknote', [m.args[0], m.args[1]]); break
       case '/ce/level': broadcast('level', Math.round(m.args[0] * 1000) / 1000); break
       case '/ce/recorded': recordEnded(); break
+      // a column whose code failed and went quiet (sc/lib/stemtrack.scd): [slot, stem, error]; not kept
+      case '/ce/stemerror': broadcast('stemerror', m.args.map(String)); break
       case '/ce/save': onSave?.(json()); break
       // the master output's spectrum, ~20 frames a second: passed on, not kept for new pages
       case '/ce/spectrum': broadcast('spectrum', m.args.map(v => Math.round(v * 1000) / 1000)); break

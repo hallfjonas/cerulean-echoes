@@ -6,7 +6,7 @@
 //   { bar, press }                       a momentary Launch Control button (its CC)
 //   { bar, keys, velocity?, length? }    Launchkey keys: note names played together ('c3 e3 g3' = chord)
 //   { bar, pad, velocity? }              a Launchkey drum pad (note 36-51, channel 10)
-//   { bar, lk, value, ramp? }            a Launchkey CC: mod wheel 1 (keys level) or knob 21-28
+//   { bar, lk, value, ramp? }            a Launchkey CC: mod wheel 1 (keys level), knob 21-28 (keys) or 31-38 (drum pads)
 // Bars of the playing track (1 cycle = 1 bar in every live track), counted from the start; ramp = bars to move from
 // the control's value at `bar` to `value`. A control the script never sets stays at 0. velocity 0..1 (default 0.8);
 // length = bars a key is held (default 1): the tracks' midikeys has no note-off, so the sound's length is the track's
@@ -22,7 +22,7 @@ export const TICK_MS = 50
 export const HOLD_TICKS = 2
 export const BAR_TOLERANCE = 1e-6
 export const PADS = [36, 51]
-export const LK_CCS = [1, 21, 22, 23, 24, 25, 26, 27, 28]   // the Launchkey's default: knobs on CC 21-28
+export const LK_CCS = [1, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38]   // knobs: bank A CC 21-28 (keys), bank B 31-38 (pads)
 export const PAD_CHANNEL = 10
 const KEYS_CHANNEL = 1
 const DEFAULT_VELOCITY = 0.8
