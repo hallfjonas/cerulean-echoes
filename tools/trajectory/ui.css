@@ -101,6 +101,9 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #tracksStage .tl-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); z-index: 4;
   pointer-events: none }
 #tracksStage .tl-row { display: flex; border-bottom: 1px solid var(--line) }
+#tracksStage .tl-caret { margin: 0 4px 0 -4px; padding: 0 3px; background: none; color: var(--dim); font: inherit }
+#tracksStage .tl-label small { color: var(--dim) }
+#tracksStage .tl-inner .tl-label { padding-left: 22px }
 #tracksStage .tl-label { position: sticky; left: 0; z-index: 2; width: var(--label-w); flex: none;
   box-sizing: border-box; padding: 4px 8px; background: var(--bg); border-right: 1px solid var(--line);
   color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }

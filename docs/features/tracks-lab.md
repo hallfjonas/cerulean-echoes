@@ -43,8 +43,12 @@ explain, Launchkey steps among them).
 
 ## Good to know
 - Bars count from 0, as in the script, and a range ends before its last number: a section 16→32 holds bars 16 to 31.
-- On the Moves level, moves that overlap in time stack in their row, which grows, so every move stays visible and
-  clickable at any zoom.
+- Sections, Moves and Lanes list the stems in one order (Global, then the columns of Mode 1 and Mode 2, then the
+  Launchkey), each named after its fader: 1 Kick, 2 Perc.
+- On Moves, a stem's moves share one line; where they overlap in time, the caret ▸ unfolds the stem so they stack
+  and each one can be clicked. Selecting a move that overlaps another unfolds its stem.
+- On Lanes, a stem shows its Level lane (Global: Master; Launchkey: the mod wheel); the caret unfolds the lanes of its
+  knobs and buttons, and **+n** says how many are folded away. Selecting a step of a folded lane unfolds it.
 - A lane shows what the performer plays: a step starts from the value the control holds at its bar, so a step that
   starts inside the ramp before it cuts that ramp (a warning in the footer). Dragging keeps a step between its
   neighbours on the lane, so a drag never makes such a cut.

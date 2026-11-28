@@ -136,26 +136,40 @@ const voiceOf = (controls, cc) => {
   return fader ? fader.name.replace(/ Level$/, '') : `${column.mode === 2 ? 'Mode 2 ' : ''}Column ${column.col}`
 }
 
-const keyRank = (key, controls) => {
-  if (key === 'keys') return 500
-  if (key === 'pad') return 600
-  if (typeof key === 'string') return 700 + parseInt(key.slice(3))
+// the stem a control belongs to, the same on the Sections, Moves and Lanes levels: { id, title, rank }, in the order
+// Global, Layers (Moves only), the columns of Mode 1, then Mode 2 (titled by their fader: '1 Kick'), Launchkey keys,
+// pads, knobs; key = controlKey of a step, or 'layers'
+export const stemOf = (key, controls) => {
+  if (key === 'layers') return { id: 'layers', title: 'Layers', rank: 10 }
+  if (key === 'keys') return { id: 'keys', title: 'Keys', rank: 500 }
+  if (key === 'pad') return { id: 'pad', title: 'Pads', rank: 600 }
+  if (typeof key === 'string') return { id: 'lk', title: 'LK knobs', rank: 700 }
   const column = columnOf(key)
-  if (!column || column.col === 8) return key / 1000
-  return 100 + column.mode * 100 + column.col * 10 + key / 1000 + (controls.has(key) ? 0 : 1)
+  if (!column) return { id: `cc:${key}`, title: `CC ${key}`, rank: 900 + key / 1000 }
+  if (column.col === 8) return { id: 'global', title: 'Global', rank: 0 }
+  return { id: `${column.mode}:${column.col}`, title: voiceOf(controls, key), rank: 100 + column.mode * 100 +
+    column.col * 10 }
 }
 
-// the Moves level's row of a move: { key, rank }; a Hand-made move goes by the control of its first step
-export const moveRow = (move, controls) => {
-  if (move.kind === 'layers') return { key: 'Layers', rank: 10 }
-  const key = move.kind === 'handMade' ? (move.p.steps[0] ? controlKey(move.p.steps[0]) : null) : move.p.cc
-  if (key === null) return { key: 'Hand-made', rank: 800 }
-  if (key === 'keys') return { key: 'Keys', rank: 500 }
-  if (key === 'pad') return { key: 'Pads', rank: 600 }
-  if (typeof key === 'string') return { key: 'LK knobs', rank: 700 }
-  const voice = voiceOf(controls, key)
-  return { key: voice, rank: voice === 'Global' ? 0 : 20 + keyRank(key, controls) / 1000 }
+// the order of a stem's controls: its main control first, then by CC
+const keyRank = (key, controls) => (isMainKey(key, controls) ? 0 : 1) + (typeof key === 'number' ? key / 1000
+  : key.startsWith?.('lk:') ? parseInt(key.slice(3)) / 1000 : 0)
+
+// the control a folded stem shows on the Lanes level: a column's fader, Master for Global, the Launchkey mod wheel
+export const isMainKey = (key, controls) => {
+  if (typeof key !== 'number') return key === 'keys' || key === 'pad' || key === 'lk:1'
+  const name = controls.get(key)?.name ?? ''
+  return name === 'Global Master' || (!name.startsWith('Global') && / Level$/.test(name))
 }
+
+// the Moves level's stem of a move ({ id, title, rank }); a Hand-made move goes by the control of its first step
+export const moveRow = (move, controls) => {
+  if (move.kind === 'layers') return stemOf('layers', controls)
+  const key = move.kind === 'handMade' ? (move.p.steps[0] ? controlKey(move.p.steps[0]) : null) : move.p.cc
+  return key === null ? { id: 'handMade', title: 'Hand-made', rank: 800 } : stemOf(key, controls)
+}
+
+const overlapping = (a, b) => a.left < b.right && b.left < a.right
 
 const option = (value, text, selected) =>
   `<option value="${escapeHtml(value)}"${selected ? ' selected' : ''}>${escapeHtml(text)}</option>`
@@ -188,7 +202,7 @@ export function mountTracksLab({ section, stage, perform }) {
   const state = { tracks: null, info: null, controls: new Map(), lab: null, name: null, owned: false, level: 'moves',
     sel: null, scope: null, cursor: 0, zoom: 12, ppb: 12, bpm: null, history: [], dirty: false, stepView: 'table',
     tagged: [], spans: new Map(), errors: [], run: 0, checkRun: 0, from: 0, playing: null, playBar: null,
-    playSection: null }
+    playSection: null, open: { moves: new Set(), lanes: new Set() }, revealed: null }
 
   const post = async (route, body) => {
     const response = await fetch('lab/tracks/' + route,
@@ -284,9 +298,42 @@ export function mountTracksLab({ section, stage, perform }) {
       sel.range[0])}px"></div>` : '')
     return band + `<div class="tl-cursor" style="left:${bx(state.cursor)}px"></div>`
   }
-  const row = (label, inner, height = 0, cls = '') => `<div class="tl-row ${cls}"><div class="tl-label" ` +
-    `title="${escapeHtml(label)}">${escapeHtml(label)}</div><div class="tl-area" style="width:${width()}px` +
+  // fold: { level, id, open, more? } adds the caret that folds and unfolds a stem (more: lanes hidden while folded)
+  const row = (label, inner, height = 0, cls = '', fold = null) => `<div class="tl-row ${cls}"><div class="tl-label" ` +
+    `title="${escapeHtml(label)}">${fold ? `<button class="tl-caret" data-act="fold" data-level="${fold.level}" ` +
+      `data-id="${fold.id}" aria-expanded="${fold.open}" title="${fold.open ? 'Fold' : 'Unfold'}">` +
+      `${fold.open ? '▾' : '▸'}</button>` : ''}${escapeHtml(label)}${fold?.more && !fold.open
+      ? ` <small>+${fold.more}</small>` : ''}</div><div class="tl-area" style="width:${width()}px` +
     `${height ? `;height:${height}px` : ''}">${inner}${overlay()}</div></div>`
+  const byStem = (a, b) => {
+    const [stemA, stemB] = [stemOf(a, state.controls), stemOf(b, state.controls)]
+    return stemA.rank - stemB.rank || keyRank(a, state.controls) - keyRank(b, state.controls)
+  }
+  const moveBox = move => {
+    const [from, to] = state.spans.get(move.id)
+    const left = bx(from), boxWidth = Math.max(14, bx(to - from))
+    return { id: move.id, move, left, width: boxWidth, right: left + boxWidth + MOVE_GAP }
+  }
+  // a newly selected move that overlaps another unfolds its stem on Moves; a step of a folded lane unfolds on Lanes
+  const reveal = () => {
+    const sel = state.sel
+    const id = sel?.type === 'move' ? sel.id : sel?.type === 'step' ? `${sel.move}:${sel.index}` : null
+    if (id === state.revealed) return
+    state.revealed = id
+    if (sel?.type === 'move') {
+      const move = findMove(sel.id)
+      if (!move) return
+      const stem = moveRow(move, state.controls).id
+      const box = moveBox(move)
+      if (state.lab.moves.some(other => other !== move && moveRow(other, state.controls).id === stem &&
+        overlapping(moveBox(other), box))) state.open.moves.add(stem)
+    } else if (sel?.type === 'step') {
+      const key = taggedOf(sel.move, sel.index) && controlKey(taggedOf(sel.move, sel.index).step)
+      if (key === undefined) return
+      const stem = stemOf(key, state.controls).id
+      if (!isMainKey(key, state.controls)) state.open.lanes.add(stem)
+    }
+  }
   const ruler = () => `<div class="tl-row tl-ruler"><div class="tl-label">bar (from 0)</div><div class="tl-area" ` +
     `data-drag="cursor" style="width:${width()}px">${rulerMarks(state.lab.bars, state.ppb)
       .map(bar => `<span style="left:${bx(bar)}px">${bar}</span>`).join('')}${overlay()}</div></div>`
@@ -320,7 +367,7 @@ export function mountTracksLab({ section, stage, perform }) {
     const used = [...new Set(steps.map(step => step.cc))]
       .filter(cc => / Level$/.test(state.controls.get(cc)?.name ?? '') || ['Global Tension', 'Global Fog']
         .includes(state.controls.get(cc)?.name))
-      .sort((a, b) => keyRank(a, state.controls) - keyRank(b, state.controls))
+      .sort(byStem)
     return used.map(cc => {
       const own = steps.filter(step => step.cc === cc)
       let cells = ''
@@ -329,7 +376,8 @@ export function mountTracksLab({ section, stage, perform }) {
         if (value > 0.02) cells += `<i style="left:${bx(bar)}px;width:${Math.max(1, bx(1) - 0.5)}px;` +
           `opacity:${round(0.15 + value * 0.85, 2)}"></i>`
       }
-      return row(controlName(cc), cells, 20, 'tl-heat')
+      return row(isMainKey(cc, state.controls) ? stemOf(cc, state.controls).title : controlName(cc), cells, 20,
+        'tl-heat')
     }).join('')
   }
   const storyView = () => {
@@ -351,30 +399,30 @@ export function mountTracksLab({ section, stage, perform }) {
   const movesView = () => {
     const rows = new Map()
     for (const move of state.lab.moves) {
-      const { key, rank } = moveRow(move, state.controls)
-      if (!rows.has(key)) rows.set(key, { key, rank, moves: [] })
-      rows.get(key).moves.push(move)
+      const stem = moveRow(move, state.controls)
+      if (!rows.has(stem.id)) rows.set(stem.id, { ...stem, moves: [] })
+      rows.get(stem.id).moves.push(move)
     }
-    const body = [...rows.values()].sort((a, b) => a.rank - b.rank).map(({ key, moves }) => {
-      const boxes = moves.map(move => {
-        const [from, to] = state.spans.get(move.id)
-        const left = bx(from), boxWidth = Math.max(14, bx(to - from))
-        return { id: move.id, move, left, width: boxWidth, right: left + boxWidth + MOVE_GAP }
-      })
-      const { lane, count } = packLanes(boxes)
-      return row(key, boxes.map(({ move, left, width: boxWidth }) => {
+    const body = [...rows.values()].sort((a, b) => a.rank - b.rank).map(({ id, title, moves }) => {
+      const boxes = moves.map(moveBox)
+      const packed = packLanes(boxes)
+      const open = state.open.moves.has(id) && packed.count > 1
+      const count = open ? packed.count : 1
+      const top = move => open ? 2 + packed.lane.get(move.id) * MOVE_LANE : 4
+      const fold = packed.count > 1 ? { level: 'moves', id, open } : null
+      return row(title, boxes.map(({ move, left, width: boxWidth }) => {
         const on = state.sel?.type === 'move' && state.sel.id === move.id
         const edited = Object.keys(move.edits ?? {}).length
           ? '<span class="tl-edited" title="hand-edited steps">●</span> ' : ''
         const text = escapeHtml(moveText(move, state.controls))
         return `<div class="tl-move cat-${CATEGORY[move.kind]}${on ? ' on' : ''}" data-drag="move" ` +
-          `data-id="${move.id}" style="left:${left}px;width:${boxWidth}px;top:${2 + lane.get(move.id) * MOVE_LANE}px;` +
+          `data-id="${move.id}" style="left:${left}px;width:${boxWidth}px;top:${top(move)}px;` +
           `height:${MOVE_LANE - 4}px" title="${text} @ ${fmt(move.bar)}">${edited}${text}</div>`
-      }).join(''), count * MOVE_LANE + 4)
+      }).join(''), count * MOVE_LANE + 4, '', fold)
     }).join('')
     return `<div class="tl">${head()}${body}</div>`
   }
-  const laneSvg = (key, items) => {
+  const laneSvg = (key, items, label, fold = null, inner = false) => {
     const height = 40
     const y = value => round(height - 5 - value * (height - 10), 1)
     const selected = state.sel?.type === 'step' ? `${state.sel.move}:${state.sel.index}` : null
@@ -409,18 +457,33 @@ export function mountTracksLab({ section, stage, perform }) {
           `${item.step.value} @ ${fmt(item.step.bar)}${item.step.ramp ? ` over ${item.step.ramp}` : ''}</title>` +
           `</circle>`).join('')
     }
-    return row(keyLabel(key), `<svg width="${width()}" height="${height}" style="opacity:${dim ? 0.3 : 1}">${body}` +
-      `</svg>`, height, 'tl-lane-row')
+    return row(label, `<svg width="${width()}" height="${height}" style="opacity:${dim ? 0.3 : 1}">${body}` +
+      `</svg>`, height, `tl-lane-row${inner ? ' tl-inner' : ''}`, fold)
   }
+  // the main control of a stem that has no step on it: its column's fader, or Master
+  const mainOf = id => [...state.controls.keys()].find(cc => stemOf(cc, state.controls).id === id &&
+    isMainKey(cc, state.controls))
   const lanesView = () => {
     const lanes = new Map()
     for (const item of state.tagged) {
       const key = controlKey(item.step)
       lanes.set(key, [...lanes.get(key) ?? [], item])
     }
-    const ordered = [...lanes].sort(([a], [b]) => keyRank(a, state.controls) - keyRank(b, state.controls))
-    return `<div class="tl">${head()}${ordered.map(([key, items]) =>
-      laneSvg(key, items)).join('')}</div>`
+    const stems = new Map()
+    for (const key of [...lanes.keys()].sort(byStem)) {
+      const stem = stemOf(key, state.controls)
+      if (!stems.has(stem.id)) stems.set(stem.id, { ...stem, keys: [] })
+      stems.get(stem.id).keys.push(key)
+    }
+    const role = (key, stem) => keyLabel(key).replace(`${stem.title} `, '')
+    return `<div class="tl">${head()}${[...stems.values()].map(stem => {
+      const main = stem.keys.find(key => isMainKey(key, state.controls)) ?? mainOf(stem.id) ?? stem.keys[0]
+      const others = stem.keys.filter(key => key !== main)
+      const open = state.open.lanes.has(stem.id)
+      const fold = others.length ? { level: 'lanes', id: stem.id, open, more: others.length } : null
+      return laneSvg(main, lanes.get(main) ?? [], stem.title, fold) + (open ? others.map(key =>
+        laneSvg(key, lanes.get(key), role(key, stem), null, true)).join('') : '')
+    }).join('')}</div>`
   }
   const stepItems = () => {
     const scope = scoped()
@@ -690,6 +753,7 @@ export function mountTracksLab({ section, stage, perform }) {
     }
     if (state.sel?.type === 'section') state.scope = state.sel.id
     derive()
+    reveal()
     renderBar()
     renderSide()
     renderHint()
@@ -715,6 +779,8 @@ export function mountTracksLab({ section, stage, perform }) {
     state.errors = []
     state.sel = null
     state.scope = null
+    state.open = { moves: new Set(), lanes: new Set() }
+    state.revealed = null
     state.cursor = 0
     state.history = []
     state.dirty = false
@@ -930,6 +996,12 @@ export function mountTracksLab({ section, stage, perform }) {
         state.lab.sections = removeSection(state.lab.sections, el.dataset.id)
         state.sel = null
       })
+    },
+    fold: el => {
+      const open = state.open[el.dataset.level]
+      if (open.has(el.dataset.id)) open.delete(el.dataset.id)
+      else open.add(el.dataset.id)
+      render()
     },
     toggleStem: el => change(() => {
       const move = findMove(el.dataset.id)
