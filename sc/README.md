@@ -25,6 +25,8 @@ sc/
   lib/                     Kern, für alle Tracks gleich
     ce.scd                 lädt alles → ~ce
     controls.scd           CC → Control-Bus, Tasten, Latches (Umschalten auf den Takt), MIDI
+    lcxl3-custom.scd       Treiber: Launch Control XL 3 in den Custom Modes
+    launchkey-mk4.scd      Treiber: Launchkey MK4 25
     mixer.scd              Kanalzug (Thin, Master, Überblend-Pegel, Hall-Send; Fader pro Note), Hall-Return, Master (Trim, Limiter −1 dBFS)
     sounds.scd             Sound-Bibliothek: Laden + Formatprüfung, Hüllkurven/Filter wie superdough
     steps.scd              Step-Engine: pro 16tel eine Funktion k → Noten

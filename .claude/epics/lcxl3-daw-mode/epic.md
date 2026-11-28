@@ -1,9 +1,9 @@
 ---
 name: lcxl3-daw-mode
-status: backlog
+status: in-progress
 created: 2026-11-28T12:00:00Z
-updated: 2026-11-28T12:00:00Z
-progress: 0%
+updated: 2026-11-28T18:00:00Z
+progress: 17%
 prd: .claude/prds/lcxl3-daw-mode.md
 github: (not synced; issue sync is off, see CONTRIBUTING.md)
 ---
@@ -100,7 +100,7 @@ Risks:
 
 ## Tasks Created
 - [ ] 001.md - Device spike (parallel: true)
-- [ ] 002.md - Driver layer (parallel: true)
+- [x] 002.md - Driver layer (parallel: true)
 - [ ] 003.md - DAW driver: input and knob feedback (parallel: false)
 - [ ] 004.md - LEDs and screen (parallel: false)
 - [ ] 005.md - Mode-press defence (parallel: false)
