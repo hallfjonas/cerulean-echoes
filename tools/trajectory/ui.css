@@ -136,6 +136,22 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
   var(--control)) }
 #tracksStage .tl-move.on { outline: 2px solid var(--accent); z-index: 1 }
 #tracksStage .tl-edited { color: var(--rec) }
+#tracksStage .tl-plus { position: absolute; top: 0; bottom: 0; display: flex; align-items: center;
+  justify-content: center; color: var(--dim); background: color-mix(in srgb, var(--fg) 6%, transparent);
+  pointer-events: none }
+#tracksStage .tl-row[data-stem] > .tl-area { cursor: copy }
+#tracksStage .tl-row.tl-target > .tl-area { background-color: color-mix(in srgb, var(--accent) 14%, transparent) }
+#tracksStage .tl-row.tl-refuse > .tl-area { background-color: color-mix(in srgb, var(--err) 18%, transparent) }
+#tracksStage .tl-empty svg { opacity: 0.45 }
+#tracksStage .tl-pop, #tracksStage .tl-drophint { position: absolute; z-index: 10; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--bg); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) }
+#tracksStage .tl-pop { display: flex; flex-direction: column; min-width: 200px; max-height: 60%; overflow: auto;
+  padding: 4px }
+#tracksStage .tl-pop p { margin: 4px 8px }
+#tracksStage .tl-pop button { padding: 5px 8px; border: 0; background: none; color: var(--fg); font: inherit;
+  text-align: left; cursor: pointer }
+#tracksStage .tl-pop button:hover { background: var(--control) }
+#tracksStage .tl-drophint { padding: 4px 8px; font-size: 12px; pointer-events: none; white-space: nowrap }
 .cat-enter { --c: var(--c-enter) } .cat-leave { --c: var(--c-leave) } .cat-build { --c: var(--c-build) }
 .cat-change { --c: var(--c-change) } .cat-raw { --c: var(--c-raw) }
 #tracksStage .tl-heat i { position: absolute; top: 3px; bottom: 3px; background: var(--c-enter) }

@@ -1,10 +1,10 @@
 // The pure parts of the Tracks lab page (perform-lab-ui.mjs): ruler marks, snap, the fitted bar width, a control's
-// value at a bar as the performer plays it, the lane path, a lane step's room, a CC's column and the Moves row of a
-// move.
+// value at a bar as the performer plays it, the lane path, a lane step's room, moves stacked in a row, a stem's main
+// control.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { columnOf, fitPpb, isMainKey, lanePath, laneRoom, minutesOf, moveRow, packLanes, rulerMarks, segmentsOf, snap,
-  stemOf, valueAt } from './perform-lab-ui.mjs'
+import { fitPpb, isMainKey, lanePath, laneRoom, minutesOf, packLanes, rulerMarks, segmentsOf, snap, valueAt }
+  from './perform-lab-ui.mjs'
 
 test('perform lab ui: ruler marks every 4, 8 or 16 bars by width, snap, fitted width', () => {
   assert.deepEqual(rulerMarks(16, 12), [0, 4, 8, 12, 16])
@@ -58,33 +58,10 @@ test('perform lab ui: moves that overlap in a row stack on sub-lanes, touching o
   assert.deepEqual(lanes(same), [1, 0], 'equal left edges go by id, whatever the order')
 })
 
-test('perform lab ui: a CC’s column, the Moves row of a move', () => {
-  assert.deepEqual(columnOf(5), { mode: 1, col: 1 })
-  assert.deepEqual(columnOf(36), { mode: 1, col: 8 })
-  assert.deepEqual(columnOf(53), { mode: 2, col: 1 })
-  assert.deepEqual(columnOf(100), { mode: 2, col: 8 })
-  assert.equal(columnOf(1), null)
-  const controls = new Map([[5, { name: '1 Kick Level', button: false }],
-    [13, { name: '1 Kick Brightness', button: false }], [36, { name: 'Global Tension', button: false }]])
-  assert.equal(moveRow({ kind: 'enter', p: { cc: 5 } }, controls).title, '1 Kick')
-  assert.equal(moveRow({ kind: 'control', p: { cc: 13 } }, controls).title, '1 Kick', 'a knob shares its stem’s row')
-  assert.equal(moveRow({ kind: 'build', p: { cc: 36 } }, controls).title, 'Global')
-  assert.equal(moveRow({ kind: 'layers', p: { ccs: [5] } }, controls).title, 'Layers')
-  assert.equal(moveRow({ kind: 'handMade', p: { steps: [{ at: 0, keys: 'c4' }] } }, controls).title, 'Keys')
-  assert.equal(moveRow({ kind: 'handMade', p: { steps: [{ at: 0, lk: 1, value: 1 }] } }, controls).title, 'LK knobs')
-  assert.ok(moveRow({ kind: 'build', p: { cc: 36 } }, controls).rank < moveRow({ kind: 'enter', p: { cc: 5 } },
-    controls).rank, 'Global first')
-})
-
-test('perform lab ui: one stem order for Sections, Moves and Lanes, titled by the fader, main control first', () => {
+test('perform lab ui: a stem’s main control', () => {
   const controls = new Map([[5, { name: '1 Kick Level', button: false }], [13, { name: '1 Kick Brightness' }],
     [11, { name: '7 Perc Level' }], [53, { name: '1 Chords Level' }], [12, { name: 'Global Master' }],
     [36, { name: 'Global Tension' }], [37, { name: '1 Kick Pattern', button: true }]])
-  const keys = ['lk:21', 'pad', 53, 'keys', 11, 13, 36, 5, 'layers']
-  assert.deepEqual(keys.map(key => stemOf(key, controls)).sort((a, b) => a.rank - b.rank).map(stem => stem.title),
-    ['Global', 'Layers', '1 Kick', '1 Kick', '7 Perc', '1 Chords', 'Keys', 'Pads', 'LK knobs'])
-  assert.equal(stemOf(29, controls).title, '1 Kick', 'a control the track does not name stays in its column')
-  assert.equal(stemOf(13, controls).id, stemOf(37, controls).id, 'knobs and buttons share their fader’s stem')
   assert.ok(isMainKey(5, controls) && isMainKey(12, controls) && isMainKey('lk:1', controls))
   assert.ok(!isMainKey(13, controls) && !isMainKey(36, controls) && !isMainKey(37, controls) && !isMainKey('lk:21',
     controls))
