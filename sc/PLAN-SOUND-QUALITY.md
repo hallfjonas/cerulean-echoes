@@ -51,6 +51,20 @@ The orchestral (VSCO 2, SSO), Rhodes, vibraphone and Strat sets are fine as a ba
    correct taste, not source differences.
 6. **Gentle bus processing:** the master limiter already exists. A soft saturation/glue stage on the drum and the
    music buses before it makes randomized stems sit together better.
+7. **Club output (safety, one PR, listened to together):** standard protection for a club sound system, all in
+   `sc/lib/mixer.scd` unless noted. Changes every track slightly.
+   - Low cut (~150 Hz) on the reverb and delay inputs: kick, sub and bass are mono, but their Space send puts stereo
+     energy into the sub range today. One filter per return (`~ce.hpf`), the stems stay as they are.
+   - Master: a deep high-pass (~25 Hz) and `LeakDC` (removes DC offset, a constant shift that wastes headroom and
+     clicks at starts and stops).
+   - Master: mono below ~100 Hz, by high-passing only the side (stereo difference) signal.
+   - Master: a blow-up guard before the limiter (`Sanitize`, if our SC version has it): replaces invalid values from
+     an exploding filter with silence.
+   - The limiter stays (ceiling -1 dBFS; it should hardly act, if it does the track is too loud).
+   - With 2.1 (48 kHz in the player) and a choice of the audio output in the player settings (today: the Mac's
+     default output).
+   Later, as the library grows: `~ce.checkSound` measures a sound's side energy below ~120 Hz and warns (the `mono:`
+   key is only declared today, not enforced).
 
 ## 3. Better sources per role (free only)
 
