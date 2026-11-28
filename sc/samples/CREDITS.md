@@ -3,7 +3,7 @@
 - `tr909/bd-01.wav` — Roland TR-909 bass drum, from [ritchse/tidal-drum-machines](https://github.com/ritchse/tidal-drum-machines)
   (`machines/RolandTR909/rolandtr909-bd/Bassdrum-01.wav`), the same file Strudel plays for `s("bd").bank("RolandTR909")`.
 - `ir/orbit-0.6.wav`, `ir/orbit-1.2.wav` — impulse responses of Strudel's orbit reverb (superdough, room size 0.6 and 1.2),
-  measured with `tools/sc-port/reverb-ir.mjs`. superdough generates noise for its reverb, so every browser session has a
+  measured with `tools/sc-port/reverb-ir.mjs` (removed on 2026-11-27; git history keeps it). superdough generates noise for its reverb, so every browser session has a
   slightly different one; these are one such reverb, measured including the browser's normalisation.
 - `tr909/*`, `tr727/*`, `tr808/*`, `tr707/*` — further drum-machine one-shots from the same collection
   (tidal-drum-machines, via strudel.cc's `felixroos/dough-samples` map), each the file Strudel plays for that sound

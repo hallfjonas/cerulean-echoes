@@ -41,13 +41,13 @@ const until = async (test, ms) => {
 
 test.after(() => { if (!process.env.KEEP) fs.rmSync(scratch, { recursive: true, force: true }) })
 
-test('check: plain messages, "install" when the helpers are missing', () => {
+test('check: plain messages when Node.js or SuperCollider is missing, "ok" otherwise', () => {
   const missing = run(['check'], { SCLANG: path.join(scratch, 'no-sclang') })
   assert.equal(missing.status, 1)
   assert.match(missing.stderr, /SuperCollider is missing\. Install it once from https:\/\/supercollider\.github\.io/)
   const ok = run(['check'], { SCLANG: process.execPath })
   assert.equal(ok.status, 0, ok.stderr)
-  assert.equal(ok.stdout.trim(), fs.existsSync(path.join(repo, 'tools', 'node_modules')) ? 'ok' : 'install')
+  assert.equal(ok.stdout.trim(), 'ok')
   assert.match(fs.readFileSync(env.CE_LOG, 'utf8'), /launcher: check: node /, 'the log names the node it found')
   assert.equal(run(['url']).stdout.trim(), `http://localhost:${PORT}`)
 })

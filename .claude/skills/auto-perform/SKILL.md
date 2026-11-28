@@ -60,8 +60,7 @@ the defaults in the design: say so in the log.
    it, open hat on off-beats), never scattered single hits.
 2. Checks: `cd tools && node trajectory/check-perform.mjs <track file>` (every step a control of the track, bars,
    values) and `npm run verify-sc -- <track.scd>` (also loads and plays the track headless in sclang: a heavy step, one
-   at a time on the 16 GB machine; several agents: take a lock directory around it). A new worktree has no
-   `tools/node_modules`: symlink one from another worktree.
+   at a time on the 16 GB machine; several agents: take a lock directory around it).
 3. Honest limits: no check renders the script or measures levels, clipping or CPU; never claim them. The listen in the
    player is the only proof.
 4. Start the player from the working tree on its own ports (`/player`, or `cd tools && CE_SC_PORT=<osc>

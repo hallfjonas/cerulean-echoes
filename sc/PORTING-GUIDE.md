@@ -51,12 +51,12 @@ dann Jojos Spalten, dann Jonas', dann Launchkey. Neue Sounds in `sc/sounds/`, ne
 | `gm_*` | `sdFont` + `tools/sc-port/soundfont-extract.py <preset>` (erstes Preset = Strudels Standard) |
 | `phaser*` | `sdSamplePh` (Notch + Dreieck-LFO); nur verwenden, wenn der Phaser an ist |
 | Noise (`pink`/`white`/`brown`) | `sdNoise` mit superdoughs Puffern |
-| Orbit (room, roomsize, delay) | `orbits:` im Track (IR je Raumgröße: `tools/sc-port/reverb-ir.mjs <size>` messen), `ownDelay` |
+| Orbit (room, roomsize, delay) | `orbits:` im Track (IR je Raumgröße: `ir/orbit-<Größe>.wav`, die vorhandenen Größen liegen in `sc/samples/ir/`; `reverb-ir.mjs`, das sie gemessen hat, steht in der Git-Historie), `ownDelay` |
 | `postgain(level × master)`, Thin, Fog/Tension-Tiefpass | level: pro Note (`post`); master, Thin: Kanalzug (`ce_strip`); Tiefpass pro Note mit `tone`-Bus |
 | `midikeys` (Launchkey) | `lkNote` / `lkCtl` im Track, Kanal 10 = Pads |
 
-**Neu für 007/008/010** (in 009 nicht gebraucht, vor dem Einbau gegen superdough-Quellcode prüfen,
-`tools/node_modules/superdough/*.mjs`): `vowel` (Formantfilter), `shape` (Waveshaper), `penv`/`pdecay`
+**Neu für 007/008/010** (in 009 nicht gebraucht, vor dem Einbau gegen den superdough-Quellcode prüfen,
+Strudel-Repo, `packages/superdough`): `vowel` (Formantfilter), `shape` (Waveshaper), `penv`/`pdecay`
 (Tonhöhenhüllkurve), `lpenv`/`ftype` (Filterhüllkurve), `superimpose`, `slice`/`splice`, evtl. `chop`.
 Jeweils als Parameter des passenden `sd*`-Sounds oder als eigener Sound, nicht im Track.
 
