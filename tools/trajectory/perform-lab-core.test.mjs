@@ -2,15 +2,16 @@
 // a step edit survives a parameter change and follows its move, a deleted step stays deleted, bars are 0-based and
 // ranges half-open, the lab's own warnings, ramps cut by the next step, the section helpers, and the importer: it
 // recognises the moves, and every script and take in perform/ (takes only where check-perform accepts them) compiles
-// back to its steps, compared per control in bar order.
+// back to its steps, compared per control in bar order. The stems: a CC's column and stem, the Moves row of a move,
+// the moves that fit a row or a lane, a move dragged to another stem, the busiest stem of a section.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'fs'
 import path from 'path'
 import { PERFORM, checkScript, controlsOf, scTrackFileOf, tagSource } from './check-perform.mjs'
-import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, controlKey, cutRamps, fitSections, importScript,
-  insertSection, moveEdge, moveText, movesIn, newMove, newSection, removeSection, sectionOf, spanOf, toScript }
-  from './perform-lab-core.mjs'
+import { MAX_AT_ONCE, MOVES, busiestStem, checkLab, columnOf, compileMoves, compileTagged, controlKey, cutRamps,
+  fitSections, importScript, insertSection, moveEdge, moveRow, moveText, movesFor, movesIn, newMove, newSection,
+  removeSection, retarget, sectionOf, spanOf, stemOf, stemsOf, toScript } from './perform-lab-core.mjs'
 
 const trackId = '009-house'
 const controls = controlsOf(tagSource(scTrackFileOf(trackId)))
@@ -186,4 +187,106 @@ test('perform lab: every script and take in perform/ compiles back to its steps'
     }
   }
   assert.ok(count >= 15, `${count} scripts`)
+})
+
+test('perform lab: a CC’s column, the Moves row of a move', () => {
+  assert.deepEqual(columnOf(5), { mode: 1, col: 1 })
+  assert.deepEqual(columnOf(36), { mode: 1, col: 8 })
+  assert.deepEqual(columnOf(53), { mode: 2, col: 1 })
+  assert.deepEqual(columnOf(100), { mode: 2, col: 8 })
+  assert.equal(columnOf(1), null)
+  const few = new Map([[5, { name: '1 Kick Level', button: false }],
+    [13, { name: '1 Kick Brightness', button: false }], [36, { name: 'Global Tension', button: false }]])
+  assert.equal(moveRow({ kind: 'enter', p: { cc: 5 } }, few).title, '1 Kick')
+  assert.equal(moveRow({ kind: 'control', p: { cc: 13 } }, few).title, '1 Kick', 'a knob shares its stem’s row')
+  assert.equal(moveRow({ kind: 'build', p: { cc: 36 } }, few).title, 'Global')
+  assert.equal(moveRow({ kind: 'layers', p: { ccs: [5] } }, few).title, 'Layers')
+  assert.equal(moveRow({ kind: 'handMade', p: { steps: [{ at: 0, keys: 'c4' }] } }, few).title, 'Keys')
+  assert.equal(moveRow({ kind: 'handMade', p: { steps: [{ at: 0, lk: 1, value: 1 }] } }, few).title, 'LK knobs')
+  assert.ok(moveRow({ kind: 'build', p: { cc: 36 } }, few).rank < moveRow({ kind: 'enter', p: { cc: 5 } }, few).rank,
+    'Global first')
+})
+
+test('perform lab: one stem order, titled by the fader; a Mode 2 twin says its mode', () => {
+  const few = new Map([[5, { name: '1 Kick Level', button: false }], [13, { name: '1 Kick Brightness' }],
+    [11, { name: '7 Perc Level' }], [53, { name: '1 Chords Level' }], [12, { name: 'Global Master' }],
+    [36, { name: 'Global Tension' }], [37, { name: '1 Kick Pattern', button: true }]])
+  const keys = ['lk:21', 'pad', 53, 'keys', 11, 13, 36, 5, 'layers']
+  assert.deepEqual(keys.map(key => stemOf(key, few)).sort((a, b) => a.rank - b.rank).map(stem => stem.title),
+    ['Global', 'Layers', '1 Kick', '1 Kick', '7 Perc', '1 Chords', 'Keys', 'Pads', 'LK knobs'])
+  assert.equal(stemOf(29, few).title, '1 Kick', 'a control the track does not name stays in its column')
+  assert.equal(stemOf(13, few).id, stemOf(37, few).id, 'knobs and buttons share their fader’s stem')
+  const twins = new Map([[7, { name: '3 Lead Level' }], [55, { name: '3 Lead Level' }]])
+  assert.deepEqual([stemOf(7, twins).title, stemOf(55, twins).title], ['3 Lead', '3 Lead (Mode 2)'])
+})
+
+const nameOf = cc => controls.get(cc).name
+const fitsOf = target => movesFor(target, controls).map(fit => `${fit.kind} ${fit.p.cc ? nameOf(fit.p.cc) : fit.p.dir}`)
+
+test('perform lab: every stem with controls is a Moves row, empty ones too', () => {
+  const stems = stemsOf(controls).map(stem => stem.id)
+  assert.deepEqual(stems.slice(0, 3), ['global', 'layers', '1:1'])
+  assert.equal(stems.length, 2 + 14, 'Global, Layers and the 14 columns of 009-house')
+  assert.ok(stems.every(id => movesFor(id, controls).length), 'each row has moves to offer')
+})
+
+test('perform lab: the moves that fit a row or a lane', () => {
+  assert.deepEqual(fitsOf('global'), ['build Global Tension', 'fogDip Global Fog', 'break Global Break',
+    'press Global Chapter', 'control Global Master', 'control Global Thin', 'control Global Fog',
+    'control Global Tension'], 'Global once: its Mode 2 aliases are left out')
+  assert.deepEqual(fitsOf('1:4'), ['enter 4 Bass Level', 'leave 4 Bass Level', 'control 4 Bass Brightness',
+    'control 4 Bass Space', 'control 4 Bass Sound', 'control 4 Bass Level', 'build 4 Bass Brightness',
+    'build 4 Bass Space', 'build 4 Bass Sound', 'press 4 Bass Pattern', 'press 4 Bass Octave'])
+  assert.deepEqual(fitsOf('2:1').slice(0, 1), ['enter 1 Chords Level'], 'a Mode 2 column on its own CCs')
+  assert.deepEqual(fitsOf('layers'), ['layers in', 'layers out'])
+  assert.deepEqual(fitsOf(8), ['enter 4 Bass Level', 'leave 4 Bass Level', 'control 4 Bass Level'])
+  assert.deepEqual(fitsOf(12), ['control Global Master', 'build Global Master'])
+  assert.deepEqual(fitsOf(68), ['control Global Fog', 'build Global Fog', 'fogDip Global Fog'],
+    'a Mode 2 alias lane adds on Mode 1')
+  assert.equal(movesFor(68, controls)[0].p.cc, 20)
+  assert.deepEqual(fitsOf(52), ['press Global Break', 'break Global Break'])
+  assert.deepEqual(fitsOf(40), ['press 4 Bass Pattern'])
+  for (const target of ['keys', 'pad', 'lk:1', 'lk', 'handMade']) assert.deepEqual(fitsOf(target), [], target)
+})
+
+test('perform lab: every move from a row or a lane passes check-perform', () => {
+  const targets = [...stemsOf(controls).map(stem => stem.id), ...controls.keys()]
+  const moves = targets.flatMap(target => movesFor(target, controls)).map(fit => newMove(fit.kind, 8, controls, fit.p))
+  for (const move of moves) assert.deepEqual(check(labOf([move])).errors, [], JSON.stringify(move))
+})
+
+test('perform lab: a move dragged to another stem keeps its place on the LC', () => {
+  const to = (move, stem) => {
+    const result = retarget(move, stem, controls)
+    return result.move ? nameOf(result.move.p.cc) : result.reason
+  }
+  const enter = newMove('enter', 4, controls, { cc: 5 })
+  assert.equal(to(enter, '1:5'), '5 Clap Level')
+  assert.equal(to(enter, '2:1'), '1 Chords Level', 'across modes')
+  assert.equal(to(enter, 'global'), 'Enter works on a stem’s Level only')
+  const punch = newMove('control', 4, controls, { cc: 29 })
+  assert.equal(to(punch, '1:2'), '2 Fx Motion', 'row 3 under its own name')
+  assert.equal(to(punch, '2:7'), '7 Lead Complexity')
+  assert.equal(retarget(newMove('control', 4, controls, { cc: 77 }), 'global', controls).move.p.cc, 36,
+    'into Global on the Mode 1 CC')
+  assert.equal(to(newMove('fogDip', 4, controls), '1:1'), 'Fog dip works on Global Fog only')
+  assert.equal(to(newMove('break', 4, controls), '1:1'), 'Break works on Global Break only')
+  assert.equal(to(newMove('layers', 4, controls), '1:1'), 'Layers stays in the Layers row')
+  assert.equal(to(enter, 'layers'), 'Enter does not fit the Layers row')
+  assert.match(to(newMove('handMade', 4, controls, { steps: [{ at: 0, cc: 13, value: 0.5 }] }), '1:2'), /Hand-made/)
+  assert.equal(retarget(enter, '1:1', controls).move, enter, 'its own stem: unchanged')
+  const edited = { ...newMove('build', 4, controls, { cc: 13 }), edits: { 1: { at: 6 } } }
+  const moved = retarget(edited, '1:6', controls).move
+  assert.equal(nameOf(moved.p.cc), '6 Hats Brightness')
+  assert.deepEqual(moved.edits, { 1: { at: 6 } }, 'edits stay')
+  assert.equal(compileMoves([moved])[1].bar, 10)
+})
+
+test('perform lab: the busiest stem of a section', () => {
+  const lab = labOf([newMove('enter', 2, controls, { cc: 8 }), newMove('control', 4, controls, { cc: 16 }),
+    newMove('build', 6, controls), newMove('enter', 20, controls, { cc: 5 }),
+    newMove('handMade', 3, controls, { steps: [{ at: 0, keys: 'c4' }] })])
+  assert.equal(busiestStem(lab, sections[0], controls), '1:4')
+  assert.equal(busiestStem(lab, sections[1], controls), '1:1')
+  assert.equal(busiestStem(labOf([]), sections[0], controls), null)
 })

@@ -122,6 +122,125 @@ export const spanOf = move => {
   return [Math.min(...steps.map(step => step.bar)), Math.max(...steps.map(stepEnd))]
 }
 
+// the LC column of a CC: { mode: 1 | 2, col: 1-8 } (col 8 is the global column), or null for another number
+export const columnOf = cc => {
+  const base = cc > 52 ? cc - 48 : cc
+  return Number.isInteger(cc) && base >= 5 && base <= 52 ? { mode: cc > 52 ? 2 : 1, col: (base - 5) % 8 + 1 } : null
+}
+
+// a column's controls by their place on the LC, as an offset from the column number: the fader, knob rows 1-3,
+// buttons 1 and 2
+const ROLES = [['fader', 4], ['row 1', 12], ['row 2', 20], ['row 3', 28], ['button 1', 36], ['button 2', 44]]
+const ccAt = (column, offset) => offset + column.col + (column.mode === 2 && column.col !== 8 ? 48 : 0)
+const offsetOf = cc => {
+  const column = columnOf(cc)
+  return (cc > 52 ? cc - 48 : cc) - column.col
+}
+
+const stemTitle = (controls, column) => {
+  const fader = controls.get(ccAt(column, 4))
+  const title = fader ? fader.name.replace(/ Level$/, '') : `${column.mode === 2 ? 'Mode 2 ' : ''}Column ${column.col}`
+  const twin = column.mode === 2 && controls.get(ccAt({ mode: 1, col: column.col }, 4))?.name === fader?.name
+  return twin ? `${title} (Mode 2)` : title
+}
+
+// the stem a control belongs to, the same on the Sections, Moves and Lanes levels: { id, title, rank }, in the order
+// Global, Layers (Moves only), the columns of Mode 1, then Mode 2 (titled by their fader: '1 Kick'), Launchkey keys,
+// pads, knobs; key = controlKey of a step, or 'layers'
+export const stemOf = (key, controls) => {
+  if (key === 'layers') return { id: 'layers', title: 'Layers', rank: 10 }
+  if (key === 'keys') return { id: 'keys', title: 'Keys', rank: 500 }
+  if (key === 'pad') return { id: 'pad', title: 'Pads', rank: 600 }
+  if (typeof key === 'string') return { id: 'lk', title: 'LK knobs', rank: 700 }
+  const column = columnOf(key)
+  if (!column) return { id: `cc:${key}`, title: `CC ${key}`, rank: 900 + key / 1000 }
+  if (column.col === 8) return { id: 'global', title: 'Global', rank: 0 }
+  return { id: `${column.mode}:${column.col}`, title: stemTitle(controls, column), rank: 100 + column.mode * 100 +
+    column.col * 10 }
+}
+
+// the Moves level's stem of a move ({ id, title, rank }); a Hand-made move goes by the control of its first step
+export const moveRow = (move, controls) => {
+  if (move.kind === 'layers') return stemOf('layers', controls)
+  const key = move.kind === 'handMade' ? (move.p.steps[0] ? controlKey(move.p.steps[0]) : null) : move.p.cc
+  return key === null ? { id: 'handMade', title: 'Hand-made', rank: 800 } : stemOf(key, controls)
+}
+
+const columnOfStem = id => {
+  if (id === 'global') return { mode: 1, col: 8 }
+  const match = /^([12]):([1-7])$/.exec(id)
+  return match ? { mode: Number(match[1]), col: Number(match[2]) } : null
+}
+// a Global control on its Mode 1 CC: column 8's Mode 2 CCs are aliases of Mode 1's
+const plainCc = cc => columnOf(cc)?.col === 8 && cc > 52 ? cc - 48 : cc
+const roleCcs = (controls, column, roles) =>
+  roles.map(role => ccAt(column, ROLES.find(([name]) => name === role)[1])).filter(cc => controls.has(cc))
+
+// The stems that take moves, in stem order: Global, Layers (when the track has Level faders), every column with a
+// control
+export const stemsOf = controls => {
+  const stems = new Map()
+  for (const cc of controls.keys()) {
+    if (columnOf(cc)) stems.set(stemOf(cc, controls).id, stemOf(cc, controls))
+  }
+  if (levelsOf(controls).length) stems.set('layers', stemOf('layers', controls))
+  return [...stems.values()].sort((a, b) => a.rank - b.rank)
+}
+
+// [{ kind, p }]: the moves that fit a target, each with the parameters that place it there (newMove adds the
+// defaults). target: a stem id (a Moves row: 'global', 'layers', '1:4' …) or a control's key (a lane: a CC,
+// 'keys' …). Launchkey targets take none yet.
+export const movesFor = (target, controls) => {
+  if (target === 'layers') return levelsOf(controls).length ? [{ kind: 'layers', p: { dir: 'in' } },
+    { kind: 'layers', p: { dir: 'out' } }] : []
+  if (typeof target === 'number') {
+    const cc = plainCc(target), control = controls.get(cc)
+    if (!control) return []
+    if (control.button) return [{ kind: 'press', p: { cc } }, ...isGlobal(control, 'Break')
+      ? [{ kind: 'break', p: { cc } }] : []]
+    if (isLevel(control)) return ['enter', 'leave', 'control'].map(kind => ({ kind, p: { cc } }))
+    return [{ kind: 'control', p: { cc } }, { kind: 'build', p: { cc } }, ...isGlobal(control, 'Fog')
+      ? [{ kind: 'fogDip', p: { cc } }] : []]
+  }
+  const column = columnOfStem(target)
+  if (!column) return []
+  const each = (kind, ccs) => ccs.map(cc => ({ kind, p: { cc } }))
+  if (column.col === 8) {
+    const named = name => roleCcs(controls, column, ROLES.map(([role]) => role))
+      .filter(cc => isGlobal(controls.get(cc), name))
+    return [...each('build', named('Tension')), ...each('fogDip', named('Fog')), ...each('break', named('Break')),
+      ...each('press', named('Chapter')), ...each('control', ['Master', 'Thin', 'Fog', 'Tension'].flatMap(named))]
+  }
+  const fader = roleCcs(controls, column, ['fader']).filter(cc => isLevel(controls.get(cc)))
+  const knobs = roleCcs(controls, column, ['row 1', 'row 2', 'row 3']).filter(cc => !controls.get(cc).button)
+  const buttons = roleCcs(controls, column, ['button 1', 'button 2']).filter(cc => controls.get(cc).button)
+  return [...each('enter', fader), ...each('leave', fader), ...each('control', [...knobs, ...fader]),
+    ...each('build', knobs), ...each('press', buttons)]
+}
+
+const ONLY_ON = { fogDip: 'Fog dip works on Global Fog only', break: 'Break works on Global Break only',
+  enter: 'Enter works on a stem’s Level only', leave: 'Leave works on a stem’s Level only' }
+
+// { move } (a copy on the other stem) | { reason }: a move dragged to the Moves row `toStem`. The control keeps its
+// place on the LC (row 1, row 2, row 3, fader, button 1, button 2), so its CC moves by the column distance; Global
+// takes the Mode 1 CC. The move's edits stay (they go by step index). The same stem gives the move back unchanged.
+export const retarget = (move, toStem, controls) => {
+  if (moveRow(move, controls).id === toStem) return { move }
+  if (move.kind === 'handMade') return { reason: 'A Hand-made move stays with its steps' }
+  if (move.kind === 'layers') return { reason: 'Layers stays in the Layers row' }
+  const column = columnOfStem(toStem)
+  if (!columnOf(move.p.cc)) return { reason: `${nameOf(controls, move.p.cc)} is not on a Launch Control column` }
+  if (!column) return { reason: `${MOVES[move.kind].name} does not fit the ${stemOf(toStem, controls).title} row` }
+  const offset = offsetOf(move.p.cc)
+  const cc = ccAt(column, offset)
+  const title = column.col === 8 ? 'Global' : stemTitle(controls, column)
+  if (!controls.has(cc)) return { reason: `${title} has no ${ROLES.find(([, at]) => at === offset)[0]}` }
+  if (!movesFor(toStem, controls).some(fit => fit.kind === move.kind && fit.p.cc === cc)) {
+    return { reason: ONLY_ON[move.kind] ?? `${MOVES[move.kind].name} does not fit ${nameOf(controls, cc)}` }
+  }
+  return { move: { ...move, p: { ...move.p, cc } } }
+}
+
 export const sectionOf = (lab, bar) => sectionAt(lab, bar)
 export const movesIn = (lab, section) => lab.moves.filter(move => section.from <= move.bar && move.bar < section.to)
 
@@ -299,6 +418,18 @@ const busiestBar = (moves, section) => {
     if (count > best.count) best = { bar, count }
   }
   return best
+}
+
+// the id of the stem with the most moves that start in the section (ties: the first in stem order), among the stems
+// that take moves; null when none has one
+export const busiestStem = (lab, section, controls) => {
+  const counts = new Map(stemsOf(controls).map(stem => [stem.id, 0]))
+  for (const move of movesIn(lab, section)) {
+    const id = moveRow(move, controls).id
+    if (counts.has(id)) counts.set(id, counts.get(id) + 1)
+  }
+  const [id, count] = [...counts].reduce((best, entry) => entry[1] > best[1] ? entry : best, [null, 0])
+  return count ? id : null
 }
 
 // [{ key, bar }]: where a value step (steps in bar order) starts inside the ramp of the step before it on the same

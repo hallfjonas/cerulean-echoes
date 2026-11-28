@@ -6,7 +6,10 @@
 // head that stays on top while the rows scroll: the ruler and the section strip. The section selected there (or in
 // the Steps dropdown) is the scope: Steps lists its steps, the timelines tint it. Drag: section edges (the head),
 // moves (Moves), energy dots (Sections, Story), lane handles (Lanes: a step's dot, and a square for a ramp's start; a
-// step stays between its neighbours on the lane); a click on the ruler sets the cursor, where new things are added.
+// step stays between its neighbours on the lane); a click on the ruler sets the cursor, where the sidebar adds.
+// Adding where you point: every stem has a Moves row and every Launch Control control a lane (empty ones too); a +
+// follows the pointer over a row's or a lane's empty space, and a click there opens a popup of the moves that fit
+// (perform-lab-core.mjs movesFor). A move dragged onto another Moves row moves to that stem (retarget) or snaps back.
 // Lanes and valueAt follow the performer (autoperform.mjs addSegment): a step moves from the value held at its bar,
 // so a step inside a running ramp cuts it there (a warning).
 // Keys on this page: 1-5 the level, ⌘Z / Ctrl-Z undo, Escape clears the selection, Backspace / Delete removes the
@@ -18,9 +21,9 @@
 //   performances again (new takes appear), keeping what is open;
 //   perform: { play(script, id, from) → Promise<played>, stop() } (the player's auto-perform); progress(p) is the
 //   performer's onChange ({ bar, script } or null)
-import { MOVES, PRESS_LEAD, compileTagged, controlKey, cutRamps, fitSections, importScript, insertSection, labWarnings,
-  moveEdge, moveText, movesIn, newId, newMove, newSection, removeSection, sectionOf, spanOf, stepEnd, toScript }
-  from './perform-lab-core.mjs'
+import { MOVES, PRESS_LEAD, busiestStem, columnOf, compileTagged, controlKey, cutRamps, fitSections, importScript,
+  insertSection, labWarnings, moveEdge, moveRow, moveText, movesFor, movesIn, newId, newMove, newSection, removeSection,
+  retarget, sectionOf, spanOf, stemOf, stemsOf, stepEnd, toScript } from './perform-lab-core.mjs'
 import { askText, toast } from './toast.mjs'
 
 const TAKE_PREFIX = 'takes/'
@@ -35,8 +38,10 @@ const LEVELS = [['story', 'Story', 'why'], ['sections', 'Sections', 'where'], ['
 const LEVEL_HINTS = {
   story: 'Describe the piece: title, length, mood, story. The curve is the energy of the sections.',
   sections: 'Bar ranges with a name, an intent and an energy. Drag the edges and the energy dots.',
-  moves: 'Musical gestures: a stem enters, a build, a break. Each compiles to steps. Drag a move to place it.',
-  lanes: 'One lane per control, like automation. Drag a dot for value and time, a square for where a ramp starts.',
+  moves: 'Musical gestures: a stem enters, a build, a break. Each compiles to steps. Click a row to add a move; ' +
+    'drag a move along its row or onto another stem.',
+  lanes: 'One lane per control, like automation. Drag a dot for value and time, a square for where a ramp starts. ' +
+    'Click a lane to add a move.',
   steps: 'The exact script v2 rows of the section chosen above. Edit any field; the move that made the step keeps ' +
     'the edit.',
 }
@@ -122,35 +127,6 @@ export const laneRoom = (items, position, bars) => {
   return [before ? before.bar + (before.ramp ?? 0) : 0, after ? after.bar : bars]
 }
 
-// the LC column of a CC: { mode: 1 | 2, col: 1-8 } (col 8 is the global column), or null for another number
-export const columnOf = cc => {
-  const base = cc > 52 ? cc - 48 : cc
-  return Number.isInteger(cc) && base >= 5 && base <= 52 ? { mode: cc > 52 ? 2 : 1, col: (base - 5) % 8 + 1 } : null
-}
-
-const voiceOf = (controls, cc) => {
-  const column = columnOf(cc)
-  if (!column) return `CC ${cc}`
-  if (column.col === 8) return 'Global'
-  const fader = controls.get(column.col + 4 + (column.mode === 2 ? 48 : 0))
-  return fader ? fader.name.replace(/ Level$/, '') : `${column.mode === 2 ? 'Mode 2 ' : ''}Column ${column.col}`
-}
-
-// the stem a control belongs to, the same on the Sections, Moves and Lanes levels: { id, title, rank }, in the order
-// Global, Layers (Moves only), the columns of Mode 1, then Mode 2 (titled by their fader: '1 Kick'), Launchkey keys,
-// pads, knobs; key = controlKey of a step, or 'layers'
-export const stemOf = (key, controls) => {
-  if (key === 'layers') return { id: 'layers', title: 'Layers', rank: 10 }
-  if (key === 'keys') return { id: 'keys', title: 'Keys', rank: 500 }
-  if (key === 'pad') return { id: 'pad', title: 'Pads', rank: 600 }
-  if (typeof key === 'string') return { id: 'lk', title: 'LK knobs', rank: 700 }
-  const column = columnOf(key)
-  if (!column) return { id: `cc:${key}`, title: `CC ${key}`, rank: 900 + key / 1000 }
-  if (column.col === 8) return { id: 'global', title: 'Global', rank: 0 }
-  return { id: `${column.mode}:${column.col}`, title: voiceOf(controls, key), rank: 100 + column.mode * 100 +
-    column.col * 10 }
-}
-
 // the order of a stem's controls: its main control first, then by CC
 const keyRank = (key, controls) => (isMainKey(key, controls) ? 0 : 1) + (typeof key === 'number' ? key / 1000
   : key.startsWith?.('lk:') ? parseInt(key.slice(3)) / 1000 : 0)
@@ -160,13 +136,6 @@ export const isMainKey = (key, controls) => {
   if (typeof key !== 'number') return key === 'keys' || key === 'pad' || key === 'lk:1'
   const name = controls.get(key)?.name ?? ''
   return name === 'Global Master' || (!name.startsWith('Global') && / Level$/.test(name))
-}
-
-// the Moves level's stem of a move ({ id, title, rank }); a Hand-made move goes by the control of its first step
-export const moveRow = (move, controls) => {
-  if (move.kind === 'layers') return stemOf('layers', controls)
-  const key = move.kind === 'handMade' ? (move.p.steps[0] ? controlKey(move.p.steps[0]) : null) : move.p.cc
-  return key === null ? { id: 'handMade', title: 'Hand-made', rank: 800 } : stemOf(key, controls)
 }
 
 const overlapping = (a, b) => a.left < b.right && b.left < a.right
@@ -298,8 +267,10 @@ export function mountTracksLab({ section, stage, perform }) {
       sel.range[0])}px"></div>` : '')
     return band + `<div class="tl-cursor" style="left:${bx(state.cursor)}px"></div>`
   }
-  // fold: { level, id, open, more? } adds the caret that folds and unfolds a stem (more: lanes hidden while folded)
-  const row = (label, inner, height = 0, cls = '', fold = null) => `<div class="tl-row ${cls}"><div class="tl-label" ` +
+  // fold: { level, id, open, more? } adds the caret that folds and unfolds a stem (more: lanes with steps hidden while
+  // folded); attrs: data attributes of the row (data-stem on Moves, data-key on Lanes)
+  const row = (label, inner, height = 0, cls = '', fold = null, attrs = '') => `<div class="tl-row ${cls}" ${attrs}>` +
+    `<div class="tl-label" ` +
     `title="${escapeHtml(label)}">${fold ? `<button class="tl-caret" data-act="fold" data-level="${fold.level}" ` +
       `data-id="${fold.id}" aria-expanded="${fold.open}" title="${fold.open ? 'Fold' : 'Unfold'}">` +
       `${fold.open ? '▾' : '▸'}</button>` : ''}${escapeHtml(label)}${fold?.more && !fold.open
@@ -397,7 +368,7 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   const sectionsView = () => `<div class="tl">${head()}${energyCurve(70)}${heatRows()}</div>`
   const movesView = () => {
-    const rows = new Map()
+    const rows = new Map(stemsOf(state.controls).map(stem => [stem.id, { ...stem, moves: [] }]))
     for (const move of state.lab.moves) {
       const stem = moveRow(move, state.controls)
       if (!rows.has(stem.id)) rows.set(stem.id, { ...stem, moves: [] })
@@ -418,7 +389,7 @@ export function mountTracksLab({ section, stage, perform }) {
         return `<div class="tl-move cat-${CATEGORY[move.kind]}${on ? ' on' : ''}" data-drag="move" ` +
           `data-id="${move.id}" style="left:${left}px;width:${boxWidth}px;top:${top(move)}px;` +
           `height:${MOVE_LANE - 4}px" title="${text} @ ${fmt(move.bar)}">${edited}${text}</div>`
-      }).join(''), count * MOVE_LANE + 4, '', fold)
+      }).join(''), count * MOVE_LANE + 4, '', fold, `data-stem="${escapeHtml(id)}"`)
     }).join('')
     return `<div class="tl">${head()}${body}</div>`
   }
@@ -457,12 +428,14 @@ export function mountTracksLab({ section, stage, perform }) {
           `${item.step.value} @ ${fmt(item.step.bar)}${item.step.ramp ? ` over ${item.step.ramp}` : ''}</title>` +
           `</circle>`).join('')
     }
-    return row(label, `<svg width="${width()}" height="${height}" style="opacity:${dim ? 0.3 : 1}">${body}` +
-      `</svg>`, height, `tl-lane-row${inner ? ' tl-inner' : ''}`, fold)
+    return row(label, `<svg width="${width()}" height="${height}"${dim ? ' style="opacity:0.3"' : ''}>${body}` +
+      `</svg>`, height, `tl-lane-row${inner ? ' tl-inner' : ''}${items.length ? '' : ' tl-empty'}`, fold,
+    `data-key="${escapeHtml(key)}"`)
   }
-  // the main control of a stem that has no step on it: its column's fader, or Master
-  const mainOf = id => [...state.controls.keys()].find(cc => stemOf(cc, state.controls).id === id &&
-    isMainKey(cc, state.controls))
+  // every Launch Control control has a lane, with or without steps (Global on its Mode 1 CCs); Launchkey lanes only
+  // with steps
+  const laneKeys = lanes => [...new Set([...lanes.keys(), ...[...state.controls.keys()]
+    .filter(cc => columnOf(cc) && !(columnOf(cc).col === 8 && cc > 52))])]
   const lanesView = () => {
     const lanes = new Map()
     for (const item of state.tagged) {
@@ -470,19 +443,20 @@ export function mountTracksLab({ section, stage, perform }) {
       lanes.set(key, [...lanes.get(key) ?? [], item])
     }
     const stems = new Map()
-    for (const key of [...lanes.keys()].sort(byStem)) {
+    for (const key of laneKeys(lanes).sort(byStem)) {
       const stem = stemOf(key, state.controls)
       if (!stems.has(stem.id)) stems.set(stem.id, { ...stem, keys: [] })
       stems.get(stem.id).keys.push(key)
     }
     const role = (key, stem) => keyLabel(key).replace(`${stem.title} `, '')
     return `<div class="tl">${head()}${[...stems.values()].map(stem => {
-      const main = stem.keys.find(key => isMainKey(key, state.controls)) ?? mainOf(stem.id) ?? stem.keys[0]
+      const main = stem.keys.find(key => isMainKey(key, state.controls)) ?? stem.keys[0]
       const others = stem.keys.filter(key => key !== main)
       const open = state.open.lanes.has(stem.id)
-      const fold = others.length ? { level: 'lanes', id: stem.id, open, more: others.length } : null
+      const fold = others.length ? { level: 'lanes', id: stem.id, open,
+        more: others.filter(key => lanes.has(key)).length } : null
       return laneSvg(main, lanes.get(main) ?? [], stem.title, fold) + (open ? others.map(key =>
-        laneSvg(key, lanes.get(key), role(key, stem), null, true)).join('') : '')
+        laneSvg(key, lanes.get(key) ?? [], role(key, stem), null, true)).join('') : '')
     }).join('')}</div>`
   }
   const stepItems = () => {
@@ -628,18 +602,28 @@ export function mountTracksLab({ section, stage, perform }) {
       `data-move="${move.id}" data-index="${index}">Delete step</button></p>`
   }
 
+  // the stem the palette adds to: the selected move's, else the busiest of the scope; null = the move's default
+  const paletteStem = () => {
+    const sel = selection()
+    if (sel && sel.type !== 'section') return moveRow(sel.move, state.controls).id
+    return scoped() ? busiestStem(state.lab, scoped(), state.controls) : null
+  }
   const renderSide = () => {
     const groups = {}
     for (const [kind, spec] of Object.entries(MOVES)) {
       if (kind !== 'handMade') (groups[spec.group] ??= []).push([kind, spec])
     }
     const at = `bar ${fmt(state.cursor)}`
+    const stem = state.lab && paletteStem()
+    const on = stem && movesFor(stem, state.controls).length
+      ? `, on ${stemsOf(state.controls).find(item => item.id === stem).title} where the move fits` : ''
     const palette = {
       story: '<p class="hint">Nothing to add here: describe the piece on the stage.</p>',
       sections: `<h2>Add a section</h2><p class="hint">At the cursor (${at}).</p><div class="tl-palette">` +
         Object.entries(SECTION_TYPES).map(([type, [name, , intent]]) => `<button data-act="addSection" ` +
           `data-v="${type}">${name}<small>${escapeHtml(intent)}</small></button>`).join('') + '</div>',
-      moves: `<h2>Add a move</h2><p class="hint">At the cursor (${at}); click the ruler to move it.</p>` +
+      moves: `<h2>Add a move</h2><p class="hint">At the cursor (${at})${on}; click the ruler to move it. Or ` +
+        'click a row on Moves or a lane on Lanes.</p>' +
         Object.entries(groups).map(([group, list]) => `<h3>${group}</h3><div class="tl-palette">` +
           list.map(([kind, spec]) => `<button class="cat-${CATEGORY[kind]}" data-act="addMove" data-v="${kind}">` +
             `${spec.name}<small>${spec.hint}</small></button>`).join('') + '</div>').join(''),
@@ -965,7 +949,9 @@ export function mountTracksLab({ section, stage, perform }) {
       render()
     },
     addMove: el => change(() => {
-      const move = newMove(el.dataset.v, state.cursor, state.controls)
+      const stem = paletteStem()
+      const fit = stem && movesFor(stem, state.controls).find(candidate => candidate.kind === el.dataset.v)
+      const move = newMove(el.dataset.v, state.cursor, state.controls, fit?.p)
       state.lab.moves.push(move)
       state.sel = { type: 'move', id: move.id }
     }),
@@ -1109,6 +1095,7 @@ export function mountTracksLab({ section, stage, perform }) {
   stage.addEventListener('pointerdown', event => {
     const el = event.target.closest('[data-drag]')
     if (!el || event.button || !state.lab) return
+    suppressClick = true
     const kind = el.dataset.drag
     const rect = (el.closest('svg') ?? el.closest('.tl-area')).getBoundingClientRect()
     const barAt = ev => (ev.clientX - rect.left) / state.ppb
@@ -1124,15 +1111,37 @@ export function mountTracksLab({ section, stage, perform }) {
     }
     if (kind === 'move') {
       const move = findMove(el.dataset.id)
-      const [x, from] = [event.clientX, move.bar]
+      const [x, from, dirty] = [event.clientX, move.bar, state.dirty]
+      const home = moveRow(move, state.controls).id
+      let started = false, target = null
+      const begin = () => { started = true; start() }
       state.sel = { type: 'move', id: move.id }
       drag = { move: ev => {
         const bar = Math.max(0, snap(from + (ev.clientX - x) / state.ppb, 1))
-        if (bar === move.bar) return
-        start()
-        move.bar = bar
-        renderLive()
-      }, end: render }
+        if (bar !== move.bar) {
+          begin()
+          move.bar = bar
+          renderLive()
+        }
+        const id = [...stage.querySelectorAll('.tl-row[data-stem]')].find(item => {
+          const box = item.getBoundingClientRect()
+          return box.top <= ev.clientY && ev.clientY < box.bottom
+        })?.dataset.stem
+        target = id && id !== home ? { id, ...retarget(move, id, state.controls) } : null
+        showTarget(ev, move, target)
+      }, end: () => {
+        showTarget(null)
+        if (target?.move) {
+          begin()
+          move.p.cc = target.move.p.cc
+          state.revealed = null
+        } else if (target) {
+          move.bar = from
+          if (started) state.history.pop()
+          state.dirty = dirty
+        }
+        render()
+      } }
       return render()
     }
     if (kind === 'edge') {
@@ -1194,6 +1203,106 @@ export function mountTracksLab({ section, stage, perform }) {
     const done = drag
     drag = null
     done?.end?.()
+    setTimeout(() => { suppressClick = false })
+  })
+
+  // a move dragged onto another Moves row: the row tints (red where the move does not fit) and a hint names the new
+  // control or the reason
+  let suppressClick = false
+  const dropHint = Object.assign(document.createElement('div'), { className: 'tl-drophint' })
+  const roleOf = cc => controlName(cc).replace(`${stemOf(cc, state.controls).title} `, '')
+  const showTarget = (ev, move, target) => {
+    for (const el of stage.querySelectorAll('.tl-target, .tl-refuse')) el.classList.remove('tl-target', 'tl-refuse')
+    if (!target) return dropHint.remove()
+    stage.querySelector(`.tl-row[data-stem="${CSS.escape(target.id)}"]`)
+      ?.classList.add(target.move ? 'tl-target' : 'tl-refuse')
+    const [was, now] = target.move ? [move.p.cc, target.move.p.cc] : []
+    dropHint.textContent = !target.move ? target.reason : roleOf(was) === roleOf(now)
+      ? `→ ${state.controls.get(now)?.name}` : `${state.controls.get(was)?.name} → ${state.controls.get(now)?.name}`
+    dropHint.classList.toggle('bad', !target.move)
+    const rect = stage.getBoundingClientRect()
+    Object.assign(dropHint.style, { left: `${ev.clientX - rect.left + 14}px`, top: `${ev.clientY - rect.top + 14}px` })
+    stage.append(dropHint)
+  }
+
+  // the popup of the moves that fit where the pointer is (a click on a Moves row or a lane); a line
+  // adds its move at that bar, a Move control or Enter on a lane at the value under the pointer
+  let popup = null
+  const closePopup = () => {
+    popup?.el.remove()
+    popup = null
+  }
+  const fitText = fit => `${MOVES[fit.kind].name} · ${fit.p.cc === undefined ? fit.p.dir
+    : state.controls.get(fit.p.cc)?.name ?? `CC ${fit.p.cc}`}`
+  const openPopup = (event, title, fits, bar, value) => {
+    closePopup()
+    const el = document.createElement('div')
+    el.className = 'tl-pop'
+    const at = `bar ${fmt(bar)}${value === undefined ? '' : ` · ${value}`}`
+    const lines = fits.map((fit, i) => `<button data-pop="${i}">${escapeHtml(fitText(fit))}</button>`).join('')
+    el.innerHTML = `<p class="dim">${escapeHtml(title)} · ${at}</p>${lines ||
+      '<p class="hint">Nothing fits here yet: Launchkey moves come later.</p>'}`
+    stage.append(el)
+    const rect = stage.getBoundingClientRect()
+    el.style.left = `${clamp(event.clientX - rect.left, 0, rect.width - el.offsetWidth)}px`
+    el.style.top = `${clamp(event.clientY - rect.top, 0, rect.height - el.offsetHeight)}px`
+    popup = { el, fits, bar, value }
+    el.addEventListener('click', ev => {
+      const line = ev.target.closest('[data-pop]')
+      if (line) addFit(popup.fits[Number(line.dataset.pop)])
+    })
+  }
+  const addFit = fit => {
+    const { bar, value } = popup
+    closePopup()
+    change(() => {
+      const to = value !== undefined && ['control', 'enter'].includes(fit.kind) ? { to: value } : {}
+      const move = newMove(fit.kind, BUTTON_MOVES.includes(fit.kind) ? Math.round(bar) : bar, state.controls,
+        { ...fit.p, ...to })
+      state.lab.moves.push(move)
+      state.sel = { type: 'move', id: move.id }
+    })
+  }
+  addEventListener('pointerdown', event => { if (popup && !popup.el.contains(event.target)) closePopup() }, true)
+
+  // Moves and Lanes: a + at the bar under the pointer on a row's or a lane's empty space; a click there opens the
+  // popup. A Moves row snaps to the bar; a lane to ¼ bar, whole bars on a button, the 4-bar line on Chapter, and takes
+  // the value from the height on a knob or fader.
+  const plus = Object.assign(document.createElement('div'), { className: 'tl-plus', textContent: '+' })
+  const addSpot = event => {
+    const lanes = state.level === 'lanes'
+    if (!state.lab || drag || !(lanes || state.level === 'moves') ||
+      event.target.closest('.tl-move, .tl-pop, [data-drag], [data-act]')) return null
+    const area = event.target.closest(lanes ? '.tl-row[data-key] > .tl-area' : '.tl-row[data-stem] > .tl-area')
+    if (!area) return null
+    const rect = area.getBoundingClientRect()
+    const at = (event.clientX - rect.left) / state.ppb
+    if (!lanes) {
+      const id = area.parentNode.dataset.stem
+      return { area, grid: 1, bar: clamp(Math.floor(at), 0, state.lab.bars - 1),
+        title: area.parentNode.querySelector('.tl-label').title, fits: movesFor(id, state.controls) }
+    }
+    const raw = area.parentNode.dataset.key
+    const key = /^\d+$/.test(raw) ? Number(raw) : raw
+    const control = state.controls.get(key)
+    const grid = control?.name === 'Global Chapter' ? 4 : control?.button ? 1 : 0.25
+    const svg = area.querySelector('svg')
+    const height = Number(svg.getAttribute('height')), top = svg.getBoundingClientRect().top
+    const value = control && !control.button
+      ? round(clamp(snap((height - 5 - (event.clientY - top)) / (height - 10), 0.05), 0, 1), 2) : undefined
+    return { area, grid, bar: clamp(snap(at, grid), 0, state.lab.bars - grid), title: keyLabel(key),
+      fits: movesFor(key, state.controls), value }
+  }
+  stage.addEventListener('pointermove', event => {
+    const spot = addSpot(event)
+    if (!spot) return plus.remove()
+    Object.assign(plus.style, { left: `${bx(spot.bar)}px`, width: `${Math.max(14, bx(spot.grid))}px` })
+    if (plus.parentNode !== spot.area) spot.area.append(plus)
+  })
+  stage.addEventListener('pointerleave', () => plus.remove())
+  stage.addEventListener('click', event => {
+    const spot = !suppressClick && addSpot(event)
+    if (spot) openPopup(event, spot.title, spot.fits, spot.bar, spot.value)
   })
 
   const typing = target => target.closest?.('input:not([type=range]):not([type=checkbox]), textarea, select')
@@ -1206,7 +1315,7 @@ export function mountTracksLab({ section, stage, perform }) {
     } else if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
       event.preventDefault()
       undo()
-    } else if (event.key === 'Escape') select(null)
+    } else if (event.key === 'Escape') popup ? closePopup() : select(null)
     else if (event.key === 'Backspace' || event.key === 'Delete') {
       const sel = state.sel
       if (sel?.type === 'move') ACTIONS.deleteMove({ dataset: { id: sel.id } })

@@ -34,24 +34,34 @@ explain, Launchkey steps among them).
 4. Story, Sections, Moves and Lanes share one head that stays on top while you scroll: the ruler and the sections.
    Click a section to work on it: the panel edits it and the timelines mark it; drag its edge to resize it. Steps
    has a Section dropdown instead: it lists only that section's steps, or all of them.
-5. Click the ruler to set the cursor; the sidebar adds sections, moves or steps there. Drag moves, section edges,
-   energy dots and lane dots. **Cmd-Z** undoes, **Escape** clears the selection, **Backspace** deletes the selected
-   move or step.
-6. **Play** in the sidebar plays the performance as it is now, saved or not, from the bar in "From bar". While it plays,
+5. Add a move where you point: on Moves hover a row, on Lanes a lane (a **+** follows the pointer), and click; a
+   popup lists the moves that fit there (on a lane, the height sets the value). The sidebar adds at the
+   cursor (click the ruler to set it), on the selected move's stem or the selected section's busiest one, where the
+   move fits.
+6. Drag moves, section edges, energy dots and lane dots. Drag a move up or down onto another stem: it takes that
+   stem's control in the same place on the Launch Control (row 1 stays row 1). Where it does not fit (a Fog dip on a
+   column) the row turns red, the hint says why, and the move snaps back. **Cmd-Z** undoes, **Escape** closes the
+   popup or clears the selection, **Backspace** deletes the selected move or step.
+7. **Play** in the sidebar plays the performance as it is now, saved or not, from the bar in "From bar". While it plays,
    click a section or the ruler to go there; **Stop** ends it.
-7. **Save as** writes a new script under a name you give; **Save** writes over a performance the lab saved before.
+8. **Save as** writes a new script under a name you give; **Save** writes over a performance the lab saved before.
 
 ## Good to know
 - Bars count from 0, as in the script, and a range ends before its last number: a section 16→32 holds bars 16 to 31.
 - Sections, Moves and Lanes list the stems in one order (Global, then the columns of Mode 1 and Mode 2, then the
   Launchkey), each named after its fader: 1 Kick, 2 Perc.
-- On Moves, a stem's moves share one line; where they overlap in time, the caret ▸ unfolds the stem so they stack
-  and each one can be clicked. Selecting a move that overlaps another unfolds its stem.
-- On Lanes, a stem shows its Level lane (Global: Master; Launchkey: the mod wheel); the caret unfolds the lanes of its
-  knobs and buttons, and **+n** says how many are folded away. Selecting a step of a folded lane unfolds it.
+- Moves has a row for every stem of the track, empty ones too. A stem's moves share one line; where they overlap in
+  time, the caret ▸ unfolds the stem so they stack and each one can be clicked. Selecting a move that overlaps another
+  unfolds its stem, also after a drag onto another stem.
+- On Lanes, every stem shows its Level lane (Global: Master; Launchkey: the mod wheel), with or without steps; the
+  caret unfolds the lanes of all its knobs and buttons (empty ones dimmed), and **+n** says how many lanes with steps
+  are folded away. Selecting a step of a folded lane unfolds it.
+- Global shows its controls once, on the Mode 1 CCs (column 8 of Mode 2 is the same controls).
+- What fits where: Global takes Build, Fog dip, Break, Press and Move control; a column Enter, Leave, Move control,
+  Build and Press on its own controls; Layers only Layers. The Launchkey rows and lanes take no move yet.
 - A lane shows what the performer plays: a step starts from the value the control holds at its bar, so a step that
-  starts inside the ramp before it cuts that ramp (a warning in the footer). Dragging keeps a step between its
-  neighbours on the lane, so a drag never makes such a cut.
+  starts inside the ramp before it cuts that ramp (a warning in the footer). Dragging a lane dot keeps a step between
+  its neighbours on the lane, so that drag never makes such a cut; adding a move or dragging a move can.
 - A take recorded in the app window holds no steps (the window has no Web MIDI); the sidebar says so.
 - The tempo on top is a what-if: it changes the minutes shown, not the track (`tempo` in the `.track` file).
 - A button switches at the next bar line, Chapter at the next 4-bar line. So a Press or Break move sits on the bar where
