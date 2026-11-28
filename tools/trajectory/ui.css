@@ -67,3 +67,121 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 .toast span { flex: 1 1 240px }
 .toast .toast-close { background: none; color: var(--dim); padding: 0 6px }
 .toast .toast-input { flex: 1 1 100%; order: 2 }
+#tracksStage, #tracksLab { --c-enter: #6f9f86; --c-leave: #a58a6a; --c-build: #d85a30; --c-change: #8a84b8;
+  --c-raw: #8a8984; --c-keys: #7f9fc4; --c-pad: #b88aa6 }
+#tracksStage { --label-w: 116px; position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  font-size: 13px }
+#tracksStage .tl-bar, #tracksStage .tl-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 8px 14px 8px 44px; border-bottom: 1px solid var(--line) }
+#tracksStage .tl-foot { border: 0; border-top: 1px solid var(--line) }
+#tracksStage .grow { flex: 1 }
+#tracksStage .dim, #tracksStage .hint { color: var(--dim) }
+#tracksStage .hint { font-size: 12px }
+#tracksStage .bad { color: var(--err) }
+#tracksStage .ok { color: var(--c-enter) }
+#tracksStage .metric { padding: 3px 8px; background: var(--control); border-radius: var(--radius) }
+#tracksStage input, #tracksStage textarea, #tracksStage select { background: var(--control); color: var(--fg);
+  border: 0; border-radius: var(--radius); padding: 4px 7px; font: inherit; min-width: 0 }
+#tracksStage input[type=number] { width: 64px }
+#tracksStage textarea { width: 100%; box-sizing: border-box; resize: vertical }
+#tracksStage .seg { display: inline-flex; background: var(--control); border-radius: var(--radius) }
+#tracksStage .seg button { background: none; color: var(--dim); padding: 5px 11px }
+#tracksStage .seg button[aria-pressed=true] { background: var(--accent); color: var(--on-accent) }
+#tracksStage .seg button small { display: block; font-size: 10px; opacity: 0.7 }
+#tracksStage .tl-main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; min-height: 0 }
+#tracksStage .tl-scroll { overflow: auto; min-height: 0; padding-left: 30px }
+#tracksStage .tl-inspector { overflow: auto; padding: 12px 14px; border-left: 1px solid var(--line) }
+#tracksStage h3 { margin: 14px 0 6px; font-size: 12px; font-weight: 500; color: var(--dim); text-transform: lowercase }
+#tracksStage h3:first-child { margin-top: 0 }
+#tracksStage p { margin: 6px 0 }
+#tracksStage .tl-hint { position: sticky; left: 0; display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 0 4px; color: var(--dim); font-size: 12px }
+#tracksStage .tl { position: relative; min-width: max-content; padding-bottom: 24px; user-select: none }
+#tracksStage .tl-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); z-index: 4;
+  pointer-events: none }
+#tracksStage .tl-row { display: flex; border-bottom: 1px solid var(--line) }
+#tracksStage .tl-caret { margin: 0 4px 0 -4px; padding: 0 3px; background: none; color: var(--dim); font: inherit }
+#tracksStage .tl-label small { color: var(--dim) }
+#tracksStage .tl-inner .tl-label { padding-left: 22px }
+#tracksStage .tl-label { position: sticky; left: 0; z-index: 2; width: var(--label-w); flex: none;
+  box-sizing: border-box; padding: 4px 8px; background: var(--bg); border-right: 1px solid var(--line);
+  color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#tracksStage .tl-area { position: relative; flex: none; background-image: repeating-linear-gradient(90deg,
+  var(--line) 0 1px, transparent 1px calc(var(--ppb) * 4px)) }
+#tracksStage .tl-ruler { height: 22px }
+#tracksStage .tl-ruler .tl-area { cursor: pointer }
+#tracksStage .tl-ruler span { position: absolute; top: 4px; font-size: 10px; color: var(--dim);
+  transform: translateX(3px); pointer-events: none }
+#tracksStage .tl-cursor { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rec);
+  pointer-events: none; z-index: 1 }
+#tracksStage .tl-band { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--accent) 9%,
+  transparent); pointer-events: none }
+#tracksStage .tl-scopeband { position: absolute; top: 0; bottom: 0; pointer-events: none;
+  background: color-mix(in srgb, var(--accent) 5%, transparent); box-shadow: inset 1px 0 var(--accent),
+  inset -1px 0 var(--accent) }
+#tracksStage .tl-head { position: sticky; top: 0; z-index: 3; background: var(--bg) }
+#tracksStage .tl-sec { position: absolute; top: 3px; bottom: 3px; box-sizing: border-box; padding: 3px 7px;
+  overflow: hidden; background: var(--control); border-radius: var(--radius); cursor: pointer; white-space: nowrap }
+#tracksStage .tl-sec b { font-weight: 600 }
+#tracksStage .tl-sec small { margin-left: 6px; color: var(--dim) }
+#tracksStage .tl-sec.on { background: var(--accent); color: var(--on-accent) }
+#tracksStage .tl-sec.on small { color: inherit; opacity: 0.7 }
+#tracksStage .tl-sec.playing { box-shadow: inset 0 -3px 0 var(--accent) }
+#tracksStage .tl-sec.on.playing { box-shadow: inset 0 -3px 0 var(--on-accent) }
+#tracksStage .tl-edge { position: absolute; top: 0; bottom: 0; right: 0; width: 8px; cursor: ew-resize; z-index: 3 }
+#tracksStage .tl-move { position: absolute; box-sizing: border-box; min-width: 14px;
+  padding: 2px 6px; overflow: hidden; white-space: nowrap; font-size: 11px; border-radius: 2px; cursor: grab;
+  border-left: 3px solid var(--c, var(--c-raw)); background: color-mix(in srgb, var(--c, var(--c-raw)) 28%,
+  var(--control)) }
+#tracksStage .tl-move.on { outline: 2px solid var(--accent); z-index: 1 }
+#tracksStage .tl-edited { color: var(--rec) }
+.cat-enter { --c: var(--c-enter) } .cat-leave { --c: var(--c-leave) } .cat-build { --c: var(--c-build) }
+.cat-change { --c: var(--c-change) } .cat-raw { --c: var(--c-raw) }
+#tracksStage .tl-heat i { position: absolute; top: 3px; bottom: 3px; background: var(--c-enter) }
+#tracksStage svg { display: block }
+#tracksStage svg text { fill: var(--dim) }
+#tracksStage .tl-energy { cursor: ns-resize; fill: var(--bg); stroke: var(--rec); stroke-width: 2 }
+#tracksStage .tl-energy-area { fill: var(--rec); opacity: 0.14 }
+#tracksStage .tl-energy-line { fill: none; stroke: var(--rec); stroke-width: 1.5 }
+#tracksStage .tl-lane { fill: none; stroke: var(--fg); stroke-width: 1.5; opacity: 0.8 }
+#tracksStage .tl-dot { cursor: grab; fill: var(--bg); stroke: var(--rec); stroke-width: 2 }
+#tracksStage .tl-dot.press { stroke: var(--c-change) }
+#tracksStage .tl-dot.on { stroke: var(--accent); stroke-width: 3 }
+#tracksStage .tl-press { stroke: var(--c-change); stroke-width: 2 }
+#tracksStage .tl-key { cursor: grab; fill: var(--c-keys); opacity: 0.8 }
+#tracksStage .tl-body { padding: 14px 0 }
+#tracksStage .tl-hit { cursor: grab; fill: var(--c-pad) }
+#tracksStage .tl-key.on, #tracksStage .tl-hit.on { stroke: var(--accent); stroke-width: 2 }
+#tracksStage .tl-grid { display: grid; grid-template-columns: 90px 1fr; gap: 8px 10px; align-items: center;
+  max-width: 820px }
+#tracksStage .tl-grid > span { color: var(--dim) }
+#tracksStage .tl-stats { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0 }
+#tracksStage .tl-stats b { font-size: 16px }
+#tracksStage .tl-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-bottom: 0 }
+#tracksStage .tl-json { margin: 0; white-space: pre-wrap; font-size: 12px }
+#tracksStage table { border-collapse: collapse; font-variant-numeric: tabular-nums }
+#tracksStage th { position: sticky; top: 0; padding: 4px 6px; background: var(--bg); color: var(--dim);
+  font-weight: 400; text-align: left }
+#tracksStage td { padding: 2px 6px; border-top: 1px solid var(--line) }
+#tracksStage td input { width: 64px }
+#tracksStage tr.on td { background: var(--control) }
+#tracksStage .tl-mini td { font-size: 11px; cursor: pointer }
+#tracksStage .tl-field { display: grid; grid-template-columns: 90px 1fr; gap: 6px 8px; align-items: center;
+  margin: 6px 0 }
+#tracksStage .tl-field > span { color: var(--dim); font-size: 12px }
+#tracksStage .tl-field select, #tracksStage .tl-field input:not([type]) { width: 100% }
+#tracksStage .tl-crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 10px;
+  font-size: 12px }
+#tracksStage .tl-crumbs button { background: none; padding: 2px 4px; color: var(--dim) }
+#tracksStage .tl-crumbs button.here { color: var(--fg) }
+#tracksStage .chips, #tracksLab .chips { display: flex; flex-wrap: wrap; gap: 6px }
+#tracksStage .chip { padding: 3px 8px; border-radius: 99px; font-size: 12px }
+#tracksStage .chip.on { background: var(--accent); color: var(--on-accent) }
+#tracksLab .tl-palette { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
+#tracksLab .tl-palette button { text-align: left; padding: 6px 8px; border-left: 3px solid var(--c, var(--c-raw));
+  font-size: 12px }
+#tracksLab .tl-palette button small { display: block; color: var(--dim); font-size: 10px }
+#tracksLab h3 { margin: 10px 0 4px; font-size: 11px; font-weight: 500; color: var(--dim) }
+#tracksLab .hint { color: var(--dim); font-size: 12px }
+body.tracks #scPanel, body.tracks #panelEmpty { display: none }

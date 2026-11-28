@@ -150,8 +150,8 @@
 <!-- Plays a track through SuperCollider (the server starts it on the first load, sc-link.mjs). The controllers go
      straight to SC; this page mirrors its state.
      Three pages share the page, so the sound keeps playing when switching (pages.mjs, URL hash #live, #labs/samples,
-     #labs/stems, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and Labs
-     show the track's LC view (sc/ui/index.html in the iframe #scPanel) and the visuals (render.mjs on
+     #labs/stems, #labs/tracks, #labs/sets, #visuals; a sidebar element lists its pages in data-pages): Live and
+     Labs show the track's LC view (sc/ui/index.html in the iframe #scPanel) and the visuals (render.mjs on
      the canvas). The Settings view (the gear) lays over the current page.
      The sidebar (key S) holds the page links, the track, Play-Pause / Stop / Record and auto-perform.
      The handle on the sidebar edge holds the sidebar toggle, the settings gear and the help button.
@@ -203,6 +203,7 @@
   <section id="sampleLab" data-pages="labs/samples" hidden></section>
   <section id="stemLab" data-pages="labs/stems"></section>
   <section id="spaceLab" data-pages="labs/space"></section>
+  <section id="tracksLab" data-pages="labs/tracks"></section>
   <section id="autoPerform" data-pages="live"></section>
   <section id="panelSide" data-pages="live">
     <h2>MIDI panel</h2>
@@ -222,6 +223,7 @@
   <div id="panelEmpty">Pick a track and press Play: its controllers show here.</div>
   <div id="placeholder" hidden></div>
   <div id="spaceStage" data-pages="labs/space"></div>
+  <div id="tracksStage" data-pages="labs/tracks"></div>
   <div id="settingsPage" hidden>
     <nav id="settingsNav" aria-label="Settings sections"></nav>
     <div id="settingsBody">
@@ -249,7 +251,7 @@ import { mountSettings, SETTINGS } from './settings.mjs'
 import { mountHelp } from './help.mjs'
 import { helpFor } from './page-help.mjs'
 import { mountTheme } from './theme.mjs'
-import { createPerformer, mountAutoPerform, sectionLabel } from './autoperform.mjs'
+import { createPerformer, mountAutoPerform, pressCounts, sectionLabel } from './autoperform.mjs'
 import { createRecorder } from './take.mjs'
 import { createScAuto, createScTap } from './sc-auto.mjs'
 import { createScRecorder } from './recorder-sc.mjs'
@@ -260,6 +262,7 @@ import { mountKnobEditor } from './knob-editor.mjs'
 import { mountSampleLab } from './sample-lab-ui.mjs'
 import { mountStemLab } from './stem-lab-ui.mjs'
 import { mountSpaceLab } from './space-lab-ui.mjs'
+import { mountTracksLab } from './perform-lab-ui.mjs'
 import { toast } from './toast.mjs'
 import { PAGES, parseHash, hashFor, pageKey, placeholderFor, shownOn, entriesFor, showsShape } from './pages.mjs'
 
@@ -317,6 +320,10 @@ const sampleLab = mountSampleLab({ section: $('sampleLab'), selected: () => entr
 const stemLab = mountStemLab({ section: $('stemLab'), selected: () => entryOf($('track').value),
   play: () => play(), refresh: loadCatalogue })
 const spaceLab = mountSpaceLab({ section: $('spaceLab'), stage: $('spaceStage') })
+const tracksLab = mountTracksLab({ section: $('tracksLab'), stage: $('tracksStage'), perform: {
+  play: (script, id, from) => playScript(script, id, { track: script.track, from, record: false }),
+  stop: () => stopTransport(),
+} })
 
 // stem tracks: a click on a column's name in the SC panel selects the column; the stem drawer acts on it
 const selection = createSelection()
@@ -435,6 +442,7 @@ const performer = createPerformer({ midi: scAuto, engine, onChange: progress => 
   const barText = progress ? `auto bar ${Math.floor(progress.bar) + 1} / ${Math.ceil(progress.end)}` : ''
   autoLabel = [barText, progress && sectionLabel(progress.section, progress.bar)].filter(Boolean).join(' · ')
   autoPerform.show(!!progress, barText, progress)
+  tracksLab.progress(progress)
 } })
 const stopPerformer = () => {
   stoppedByPage = true
@@ -442,14 +450,15 @@ const stopPerformer = () => {
   stoppedByPage = false
 }
 
-const play = async script => {
+// script: the id of the auto-perform script that plays (none for a plain Play); press: [[cc, count]] for a script
+// started at a later bar (autoperform.mjs pressCounts)
+const play = async (script, { track = $('track').value, press = [] } = {}) => {
   stopPerformer()
-  const track = $('track').value
   scStarted = true
   label = engine.host().ready ? 'loading track …' : 'starting SuperCollider …'
   try {
     if (!script) scAuto.clear()
-    await engine.load(track, scAuto.loadInit())
+    await engine.load(track, { ...scAuto.loadInit(), ...press.length && { press } })
     setPlaying(track)
     recorder.start({ track, trackHash: null, cps: engine.cps(), ...script && { script } })
     scAuto.live()
@@ -478,22 +487,27 @@ const togglePlay = () => {
 $('play').onclick = togglePlay
 $('stop').onclick = stopTransport
 
+// A script plays from bar `from` (0: from the start): the steps go to SC, the values at `from` and the presses before
+// it are held and sent with the load. The Tracks lab plays its own script this way (record: false, its own track).
+const playScript = async (script, id, { track = $('track').value, from = 0, record = true } = {}) => {
+  stopPerformer()
+  scAuto.hold()
+  performer.prime(script, from)
+  const recordAudio = record && ($('recordAuto').checked || recordArmed)
+  if (recordAudio) await stopRecording()
+  if (!await play(id, { track, press: pressCounts(script, from) })) return false
+  if (recordAudio) await startRecording('auto', id)
+  performing = id
+  performer.start(script, from)
+  return true
+}
 const startScript = async id => {
   const track = $('track').value
   const response = await fetch(`perform/${encodeURIComponent(track)}/${encodeURIComponent(id)}`, { cache: 'no-store' })
   if (!response.ok) return void (label = `Error: script ${id}: ${response.status}`)
   const script = await response.json()
   if (script.track !== track) return void (label = `Error: script ${id} is for ${script.track}`)
-  stopPerformer()
-  // the steps go to SC; bar 0 is held and sent with the load
-  scAuto.hold()
-  performer.prime(script)
-  const recordAudio = $('recordAuto').checked || recordArmed
-  if (recordAudio) await stopRecording()
-  if (!await play(id)) return
-  if (recordAudio) await startRecording('auto', id)
-  performing = id
-  performer.start(script)
+  await playScript(script, id)
 }
 
 const settings = mountSettings($('settings'), { renderer, smoother })
@@ -598,6 +612,9 @@ const showPage = next => {
   const onSpace = page.id === 'labs' && page.sub === 'space'
   document.body.classList.toggle('space', onSpace)
   if (onSpace) spaceLab.show()
+  const onTracks = page.id === 'labs' && page.sub === 'tracks'
+  document.body.classList.toggle('tracks', onTracks)
+  if (onTracks) tracksLab.show()
   $('placeholder').hidden = !placeholder
   $('placeholder').textContent = placeholder ?? ''
   $('placeholderNote').textContent = placeholder ?? ''

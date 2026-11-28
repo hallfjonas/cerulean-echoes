@@ -15,6 +15,7 @@
 //   /lab/sample/…    Sample Designer projects: save, save as, export (see sample-lab.mjs)
 //   /lab/stems/…     Stem Designer projects: save, save as, add, replace, remove, promote, knob (see stem-lab.mjs)
 //   /lab/space/…     Space Analyzer: stem tracks, one stem rendered alone and measured per band and time cell (see space-lab.mjs)
+//   /lab/tracks/…    Tracks lab: live tracks with their performances, a track's tempo and controls (perform-lab.mjs)
 //   GET /sound-params?sample=<name>, GET /knobs   the parameters a knob can drive on that sound, the knob presets
 import http from 'http'
 import fs from 'fs'
@@ -27,6 +28,7 @@ import { createScLink, findSclang } from './sc-link.mjs'
 import { createSampleLab } from './sample-lab.mjs'
 import { createStemLab } from './stem-lab.mjs'
 import { createSpaceLab } from './space-lab.mjs'
+import { createPerformLab } from './perform-lab.mjs'
 import { repo } from './catalogue.mjs'
 import { stemIndex } from '../stems/stem-index.mjs'
 import { knobPresets, soundParams } from '../stems/knob.mjs'
@@ -46,6 +48,7 @@ const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods
 const sampleLab = createSampleLab({ getSc: () => sc })
 const stemLab = createStemLab({ getSc: () => sc })
 const spaceLab = createSpaceLab()
+const performLab = createPerformLab()
 const sc = createScLink({ repo, onSave: values => sampleLab.onSave(values),
   resolveTrack: id => { const entry = find(id); return entry?.engine === 'sc' ? entry.path : null },
   onLoaded: (id, slots) => { swaps.loaded(id, slots); fits.fitOf(id).catch(() => {}) } })
@@ -76,6 +79,7 @@ const server = http.createServer((request, response) => {
   if (url.pathname.startsWith('/lab/sample/')) return sampleLab.handle(request, response, url, fromOwnPage)
   if (url.pathname.startsWith('/lab/stems/')) return stemLab.handle(request, response, url, fromOwnPage)
   if (url.pathname.startsWith('/lab/space/')) return spaceLab.handle(request, response, url, fromOwnPage)
+  if (url.pathname.startsWith('/lab/tracks/')) return performLab.handle(request, response, url, fromOwnPage)
   if (request.method === 'OPTIONS') return response.writeHead(204, CORS).end()
   if (url.pathname === '/catalogue') {
     return response.writeHead(200, { ...CORS, 'Content-Type': 'application/json' })

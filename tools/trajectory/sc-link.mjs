@@ -12,8 +12,10 @@
 //                     and stemerror: [slot, stem, error] when a column's code fails and the column goes quiet
 //   POST /sc/cc       [[cc, value], …] a click in the LC view, the same as a MIDI message   (own pages only)
 //   POST /sc/lk       { cc: [[num, value]] } or { note: [note, velocity, chan] }             (own pages only)
-//   POST /sc/load     { id, cc?, lk? } start the track (SC is started first if needed) → { track }  (own pages only)
-//                     cc / lk: [[number, value]] set before the first note (an auto-perform script's bar 0)
+//   POST /sc/load     { id, cc?, lk?, press? } start the track (SC is started first if needed) → { track }
+//                     (own pages only); cc / lk: [[number, value]] set before the first note (an auto-perform
+//                     script's bar 0), press: [[cc, count]] buttons pressed that many times before it (a script
+//                     started at a later bar)
 //   (recording: recording.mjs asks `record.start(path)` / `record.stop()` of this link: OSC /ce/record start|stop, the
 //   answers /ce/recording, /ce/recorded, /ce/recerror; `record.onEnd(fn)` is told when SC closed the WAV, also when a
 //   load or SC ending did it; the master's peak comes as SSE `level`, 0..1, 10 times a second)
@@ -65,6 +67,17 @@ const readBody = request => new Promise((resolve, reject) => {
   request.on('error', reject)
 })
 const clamp01 = v => Math.min(1, Math.max(0, +v))
+
+// The arguments of /ce/load: <file> [slots JSON] cc <n> <v> … lk <n> <v> … [press <cc> <count> …]; slots (a stem
+// track): { "1:4": stem ref, … }; init: { cc, lk } as [[number, value]] (an auto-perform script's bar 0), press as
+// [[cc, count]] (sent only when there are presses, so a load without them is as it always was)
+export const loadArgs = (file, slots, init = {}) => {
+  const values = kind => (init[kind] ?? []).flatMap(([n, v]) => [{ i: n | 0 }, { f: clamp01(v) }])
+  const presses = (init.press ?? []).filter(([, count]) => count > 0)
+    .flatMap(([cc, count]) => [{ i: cc | 0 }, { i: count | 0 }])
+  return [file, ...slots ? [JSON.stringify(slots)] : [], 'cc', ...values('cc'), 'lk', ...values('lk'),
+    ...presses.length ? ['press', ...presses] : []]
+}
 const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits
 // a set sample from SC's /ce/setsample (sc/lib/ui.scd uiSetFrame) as the pages get it: t = when it came (ms since
 // 1970), e = energy in dB (loudness power, floor -70), p = punch 0..1, x = tension 0..1, s = 64 bands 0..1 (20 Hz-20 kHz)
@@ -206,15 +219,12 @@ export const createScLink = ({ repo, resolveTrack, onSave = null, sclang = findS
     return waitFor(m => m.address === '/ce/ready', BOOT_TIMEOUT, 'boot')
   }
 
-  // slots (a stem track): { "1:4": stem ref, … }; init: { cc, lk } as [[number, value]] (an auto-perform script's bar 0).
-  // Sent as /ce/load <file> [slots JSON] cc <n> <v> … lk <n> <v> …
   const load = async (id, slots, init = {}) => {
     const file = resolveTrack(id)
     if (!file) throw new Error(`no SuperCollider track '${id}'`)
     await start()
     const loaded = waitFor(m => m.address === '/ce/loaded' || m.address === '/ce/error', LOAD_TIMEOUT, 'answer to the load')
-    const values = kind => (init[kind] ?? []).flatMap(([n, v]) => [{ i: n | 0 }, { f: clamp01(v) }])
-    toSc('/ce/load', file, ...slots ? [JSON.stringify(slots)] : [], 'cc', ...values('cc'), 'lk', ...values('lk'))
+    toSc('/ce/load', ...loadArgs(file, slots, init))
     const answer = await loaded
     if (answer.address === '/ce/error') throw new Error('SuperCollider: ' + answer.args[0])
     onLoaded(id, slots)

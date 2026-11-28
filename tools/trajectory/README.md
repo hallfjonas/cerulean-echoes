@@ -44,7 +44,7 @@ built-in browser pane), the status line says "No MIDI" and the track plays as be
 ### Layout
 
 - **No top bar**: the page is the sidebar and the view. The handle on the sidebar edge holds three equal buttons, top to bottom: **‹** (hide / show the sidebar, key **S**), the **⚙** gear (Settings) and **?** ("About this page", closed on every load); with the sidebar hidden the handle stays at the left edge.
-- **Sidebar** (left): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems &
+- **Sidebar** (left): the pages (Live, Labs, Visuals; Labs has the sub-tabs Samples, Stems, Space,
   Tracks, Sets) and the sections of the page
   you are on: Live = the live track list with Play / Pause, Stop and Record (icon buttons), the status line (what plays,
   MIDI inputs, auto-perform bar) and Auto-perform (with Record audio); Labs = the project list of the sub-tab, Play /
@@ -152,6 +152,11 @@ can be tried without hardware. It is open loop: the script does not listen to wh
   sets it before the first note. The bar clock is SC's: `engine-sc.mjs` `cycle()` follows the `/ce/beat` messages
   (sent when the beat sounds) and runs on at the track's tempo in between, never backwards; beat to beat it is a few
   ms off, far less than the half bar scripts place presses early.
+- **From a bar** (`prime(script, from)` / `start(script, from)`, used by the Tracks lab): the values the script holds at
+  `from` go with the load, the presses before it go as counts (`pressCounts`, sent as
+  `/sc/load { press: [[cc, count]] }` → `/ce/load … press <cc> <count>`, pressed before the first note, so patterns
+  and chapters are where the script put them), keys and pads before it are skipped, and the clock counts on from
+  `from`. A load without presses sends what it always sent.
 - While a script plays, the sidebar shows its title, mood and sections (the current one in bold, `intent` on hover),
   and the status line the current section and the bars left in it (`Drop · 3 bars left`); without sections only the bar.
 - `node trajectory/check-perform.mjs [<track> …]` checks every script: the meta fields and sections, the shape of each
@@ -259,10 +264,12 @@ it was retired on 2026-11-20):
 | `smoothing.mjs` | slider Raw ↔ Smooth: moving average, window grows exponentially up to 2^53 lines |
 | `server.mjs` | `/` player, static pages, `/catalogue`, `/perform/<track>/<script>`, `/take/<track>`, `/recording/<track>`, the `/sc/…`, `/lab/…` and stem swap routes |
 | `player.html` | the player page: loads a track through the engine, the sidebar, the Live / Labs panel (the track's LC view in an iframe), the visuals (`render.mjs`) and the Settings view |
-| `pages.mjs` | the pages (Live, Labs with Samples / Stems / Space / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
+| `pages.mjs` | the pages (Live, Labs with Samples / Stems / Space / Tracks / Sets, Visuals): pickers, `data-pages` matching, URL hash; test `pages.test.mjs` |
 | `space-analysis.mjs` | Space Analyzer maths (DOM-free): bytes ↔ dB, coarser time cells, which stems are active where; test `space-analysis.test.mjs` |
 | `space-render.mjs` | Space Analyzer render side: one stem rendered alone (`sc-port/sc-render.sh`), measured per band and 1/32-bar cell, cached in `recordings/space/`; test `space-render.test.mjs` |
 | `space-lab.mjs`, `space-lab-ui.mjs` | the `/lab/space/…` routes (stem tracks, one stem per request, one at a time) and the Labs / Space page (sidebar rows, map) |
+| `perform-lab-core.mjs` | Tracks lab model (DOM-free): the move catalogue, `compileMoves` (moves and step edits → script v2 steps), `importScript` (a script's steps recognised as moves, compiled back unchanged), section helpers, `checkLab`; test `perform-lab-core.test.mjs` |
+| `perform-lab.mjs`, `perform-lab-ui.mjs` | the `/lab/tracks/…` routes (tracks and performances, a track's tempo and controls, open, check, save with the `<name>.lab.json` sidecar; test `perform-lab.test.mjs`) and the Labs / Tracks page (five levels, Play from a bar; pure parts tested in `perform-lab-ui.test.mjs`) |
 | `midi.mjs` | Web MIDI in the page: the messages of every non-DAW input, for the takes and the "MIDI: n inputs" status |
 | `autoperform.mjs` | the script player (script v2: LC, keys, pads, Launchkey CCs) and the sidebar section |
 | `take.mjs`, `take-save.mjs` | the capture of a play's MIDI input and its conversion to a take script; `POST /take/<track>` writes the take and its events |
