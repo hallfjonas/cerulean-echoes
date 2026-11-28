@@ -51,9 +51,12 @@
 		var show = { |i| r.names !? { r.names[i] } ? (i + 1).asString };
 		rows[key] = [show.(r.latch.now), show.(r.latch.pending)]
 	};
-	// cols: what a lab column really uses (its start values until a control moves), button texts: track.uiCols
+	// cols: what a lab column really uses (its start values until a control moves), button texts: track.uiCols;
+	// keys: the column the Launchkey keys play (a stem track's lkKeys) and the knob that picks it
 	(rows: rows, head: head, global: self.track[\uiGlobal] !? { |f| f.(self.track, self) })
 		++ (self.track[\uiCols] !? { |f| f.(self.track, self) } ? ())
+		++ (self.track[\lkKeys] !? { |k| (keys: (slot: self.track[\lkKeysSlot].asString, label: self.lkColumnLabel,
+			cc: k[\cc])) } ? ())
 };
 ~ce.uiPush = { |self| if(self.uiOn) { self.uiSend('/ce/state', self.toJSON(self.uiState)) } };
 ~ce.uiPorts = { |self| self.uiSend('/ce/midi', self.toJSON(self.midiPorts.values.asArray.collect { |p| [p.name, p.kind] })) };
