@@ -66,10 +66,28 @@ the app. What the new buttons, LEDs and the screen are used for is a separate PR
   sysex `F0 00 20 29 02 15 01 53 <index> R G B F7`). No new LED meanings in this PRD.
 - FR6 **Screen.** The stationary display shows the mode (`jojo` / `jonas`) and the track name; lower-case labels.
   Configure `F0 00 20 29 02 15 04 35 <config> F7`, text `… 06 35 <field> <ascii> F7` (measured 2026-11-23).
-- FR7 **Mode press on stage.** The engine reads the mode report (DAW Out, ch 7 CC 30). The custom-mode port (MIDI Out)
-  stays connected as today, so if the LC lands in Custom Mode 1 or 2 the track keeps reacting through the old path;
-  if it lands on a DAW page the DAW path is used. Whether the engine actively returns to the DAW page is decided in
-  the task (both are acceptable).
+- FR7 **Mode press on stage.** The Mode button cannot be locked (no feature control for it, guide pp. 16-17), so the
+  engine defends in layers:
+  - **Auto-return:** the engine keeps the page each LC should be on; a mode report (DAW Out, ch 7 CC 30) of anything
+    else is answered at once with CC 30 = that page, then a full repaint (LEDs, screen, knob positions).
+  - **Fallback while away:** the custom-mode port (MIDI Out) stays connected as today, so in Custom Mode 1 or 2 the
+    track keeps reacting through the old path.
+  - **Watchdog:** the 2 s scan queries each LC's mode (ch 8 CC 30, p. 16) and corrects it, if the LC answers in DAW
+    mode (measured in the spike; without an answer the watchdog is dropped).
+  - **Setup:** the docs tell the player to load the two `.syx` modes into every custom slot (odd = Mode 1, even =
+    Mode 2) and to cover the Mode button for gigs.
+- FR11 **Driver layer.** Each device kind gets a driver in `sc/lib/` that turns its MIDI into the engine's controls
+  and the engine's output (knob positions, LED colours, screen text) into its MIDI: `lcxl3-daw`, `lcxl3-custom` (the
+  fallback, today's path), `launchkey-mk4` (today's path, unchanged). The engine's control ids stay today's CC numbers
+  (5-100) for knobs, faders and bottom buttons, so takes, auto-perform scripts, the web view and `@ctl` texts do not
+  change. The DAW-only buttons get named ids (`page-up`, `page-down`, `track-left`, `track-right`, `solo`, `mute`,
+  `record`, `play`, `shift`, `small`), passed to the UI as presses (FR9). A new controller later = a new driver.
+- FR12 **Screen parity.** In custom mode the LC shows the name and value of a control while it moves; in DAW mode
+  the host must draw that. On every knob or fader move the engine writes the control's `@ctl` name and value on the
+  temporary display (timeout ch 7 CC 113).
+- FR13 **Persistent settings.** The encoder curve (ch 7 CC 121) and the global MIDI channel (CC 100) persist across
+  power cycles and can be changed from the device's menus. If the spike shows a menu reachable in DAW mode, the engine
+  sets both on connect to the values the tracks expect.
 - FR8 **Fallback.** The custom modes and their `.syx` files stay; a device without the app (strudel.cc, another
   program) uses them as today. If DAW mode cannot be enabled (no DAW port, no mode report within a second), the engine
   logs it and uses the custom-mode path.
@@ -90,7 +108,10 @@ the app. What the new buttons, LEDs and the screen are used for is a separate PR
 - Every SC track (`sc/tracks/`) loads and reacts to knobs, faders and its Pattern buttons with one and with two LCs in
   DAW mode, in both modes (manual check with the device + `npm test` with simulated DAW ports).
 - `tools/sc-test/run.scd` covers: DAW port detected as `lc`, Mode 2 offset, knob feedback channel and numbers, mode
-  switch fader handover, fallback when no DAW port answers. Feature tests, no device needed.
+  switch fader handover, fallback when no DAW port answers, auto-return after a simulated mode report. Feature tests,
+  no device needed.
+- An accidental Mode + bottom button press during a track costs at most that one button press: the LC is back on its
+  DAW page with its LEDs, screen and knob positions before the next bar (manual check with the device).
 - Quit the app: the LC is in Custom Mode 1 and strudel.cc works with it.
 - One rehearsal with both LCs (Jojo + Jonas) without a mode or pickup surprise.
 - `docs/reference/lcxl3-daw-mode.md`, `midi-layouts/devices.md`, `docs/features/controllers.md` and `CLAUDE.md`
@@ -113,7 +134,10 @@ the app. What the new buttons, LEDs and the screen are used for is a separate PR
 - Relative encoder mode (could replace the knob value scaling): only if the next PRD needs it.
 - The Strudel player engine and the producer (deprecated, `DEPRECATION.md`).
 - The Launchkey (unchanged).
-- Removing the custom modes or their `.syx` files.
+- Removing the custom modes or their `.syx` files. They stay as the fallback; once DAW mode is approved after the
+  rehearsal, they get an entry in `DEPRECATION.md` (fallback only, no new features; user decision 2026-11-28).
+- Shift layers, pages beyond Mode 1 / 2, set mode, automations: later phases of the set-mode plan, each with its own
+  PRD after this epic is merged.
 
 ## Dependencies
 

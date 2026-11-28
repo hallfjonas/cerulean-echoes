@@ -77,21 +77,22 @@
 ~ce.status = { |self, label, value| if(self.quiet != true) { "▣ %: %".format(label, value).postln } };
 
 // Live MIDI: controllers are found automatically, also when they are plugged in later (checked every 2 s).
-// What a controller does is decided by its port name (midiKinds, first match wins):
-//   lc        every Launch Control XL 3 gets the full layout (Mode 1 + Mode 2 + column 8); with several, the control
-//             moved last wins (every message writes the bus). Its DAW port is ignored.
-//   launchkey the Launchkey MK4 25: its own stem as in the Strudel tracks: keys and drum pads (channel 10) play at
-//             once (the track's lkNote), its mod wheel and knobs (CC 1, 21-28) go to ~ce.lkCC and the track's lkCtl
-//             (its own controls, apart from the LC's: its knobs would collide with the LC knobs).
-//   (none)    any other controller: listed in the post window, ignored, so it cannot change the track by accident.
-~ce.midiKinds = [
-	[\lc, { |n| n.contains("LCXL3") and: { n.contains("DAW").not } }],
-	[\launchkey, { |n| n.contains("Launchkey") and: { n.contains("DAW").not } }],
-];
-~ce.midiKindOf = { |self, portName| var hit = self.midiKinds.detect { |k| k[1].(portName) }; hit !? { hit[0] } };
+// A driver per device kind (one file each, loaded after this one: lcxl3-custom.scd, launchkey-mk4.scd) turns the
+// device's MIDI into the engine's controls and the engine's output into the device's MIDI. A driver is an Event:
+//   name, kind        the driver's name and the kind a port shows in the post window and the web view
+//   portMatch(name)   true for a port this driver plays (midiKinds, first match wins)
+//   opened(ce, src)   a port was connected (src: its MIDIEndPoint)
+//   inCC(ce, uid, val, num, chan), inNote(ce, uid, note, vel, chan)   MIDI in → setCC, setLkCC, lkPlay, presses
+//   outKnob(ce, uid, cc, v), outLed(ce, uid, …), outScreen(ce, uid, …)   engine out → the device
+// A port no driver matches is listed in the post window and ignored, so it cannot change the track by accident.
+~ce.midiKinds = [];
+~ce.addDriver = { |self, d|
+	self.midiKinds = self.midiKinds.add((opened: { }, inCC: { }, inNote: { [] }, outKnob: { }, outLed: { }, outScreen: { })
+		.putAll(d)) };
+~ce.midiKindOf = { |self, portName| self.midiKinds.detect { |d| d.portMatch(portName) } !? { |d| d.kind } };
+~ce.driverFor = { |self, uid| self.midiPorts[uid] !? { |p| self.midiKinds.detect { |d| d.kind == p.kind } } };
 ~ce.midiPorts = ();    // uid → (name, kind)
 ~ce.lkCC = 0 ! 128;
-// One CC message from a port (also usable without hardware, for tests)
 // The LC XL 3 knobs are endless but each device keeps its own value and sends it absolutely: with two Launch Controls
 // (or a knob moved in the web view), turning a knob on the other device would jump the value to that device's own
 // number. So a knob message counts as a MOVE, scaled to what is left ("value scaling"): turning up, the device's
@@ -106,15 +107,7 @@
 ~ce.lcRaw = ();   // uid → (cc → the last raw value 0..127 this Launch Control sent or was sent)
 ~ce.lcOuts = ();  // uid → the Launch Control's MIDI In (a MIDIOut; tests: anything that answers control(chan, cc, value))
 ~ce.lcChan = ();  // cc → the MIDI channel (0-based) the Launch Controls send it on (learned; unknown: all 16)
-~ce.knobOut = { |self, c, v|
-	var b = (v * 127).round.asInteger.clip(0, 127), nums = [c] ++ self.ccAlias.keys.asArray.select { |k| self.ccAlias[k] == c };
-	self.lcOuts.keysValuesDo { |uid, out|
-		var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e };
-		nums.do { |num|
-			if(raw[num] != b) {
-				raw[num] = b;
-				{ var ch = self.lcChan[num]; if(ch.notNil) { out.control(ch, num, b) } { 16.do { |k| out.control(k, num, b) } } }
-					.try { |e| "Launch Control feedback: %".format(e.errorString).warn } } } } };
+~ce.knobOut = { |self, c, v| self.midiPorts.keysDo { |uid| self.driverFor(uid) !? { |d| d.outKnob(self, uid, c, v) } } };
 // every knob to its current value on every Launch Control (after a load: the new track's values)
 ~ce.syncKnobs = { |self| ((13..36) ++ (61..84)).do { |c| if(self.ccAlias[c].isNil) { self.knobOut(c, self.cc[c]) } } };
 // Faders and the Launchkey mod wheel have a physical position SC cannot set (no motor). Pickup ("soft takeover", user
@@ -152,31 +145,18 @@
 				if(self.ccAlias[f].isNil and: { self.ccAlias.includes(f).not }) {
 					var key = ("c" ++ f).asSymbol;
 					cg !? { cg[key] = false }; raw !? { raw[key] = nil } } } } } };
-~ce.midiCC = { |self, val, num, uid, chan|
-	switch(self.midiPorts[uid] !? { |p| p.kind },
-		\lc, {
-			chan !? { self.lcChan[num] = chan };
-			self.lcModeSwitch(uid, num);
-			if(self.isKnobCC(num)) {
-				var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e }, last = raw[num];
-				raw[num] = val;
-				if(last.notNil and: { val != last }) {
-					// at least 1:1 per step (the short side never feels dead), faster where the shared value must catch up
-					var cur = self.val(num), next = if(val > last) {
-						cur + ((val - last) * max((1 - cur) / (127 - last), 1 / 127))
-					} { cur - ((last - val) * max(cur / last, 1 / 127)) };
-					self.setCC(num, next.clip(0, 1), { |msg| self.server.sendMsg(*msg) }) }
-			} {
-				if(self.isFaderCC(num)) {
-					var c = self.ccAlias[num] ? num;
-					self.pickup(uid, ("c" ++ c).asSymbol, val / 127, self.cc[c], { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) })
-				} { self.setCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) } }
-		},
-		\launchkey, {
-			if(num == 1) { self.pickup(uid, \lk1, val / 127, self.lkCC[1], { self.setLkCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) }) }
-				{ self.setLkCC(num, val / 127, { |msg| self.server.sendMsg(*msg) }) } }
-	)
-};
+// A knob message from a Launch Control as a move (value scaling, above): at least 1:1 per step (the short side never
+// feels dead), faster where the shared value must catch up
+~ce.knobTurn = { |self, uid, num, val|
+	var raw = self.lcRaw[uid] ?? { var e = (); self.lcRaw[uid] = e; e }, last = raw[num];
+	raw[num] = val;
+	if(last.notNil and: { val != last }) {
+		var cur = self.val(num), next = if(val > last) {
+			cur + ((val - last) * max((1 - cur) / (127 - last), 1 / 127))
+		} { cur - ((last - val) * max(cur / last, 1 / 127)) };
+		self.setCC(num, next.clip(0, 1), { |msg| self.server.sendMsg(*msg) }) } };
+// One CC message from a port (also usable without hardware, for tests)
+~ce.midiCC = { |self, val, num, uid, chan| self.driverFor(uid) !? { |d| d.inCC(self, uid, val, num, chan) } };
 // A Launchkey control: kept in lkCC; the track may turn it into state buses (lkCtl: level, room, echo)
 ~ce.setLkCC = { |self, num, v, send|
 	if(num == 1 and: { v != self.lkCC[num] }) { self.releasePickup(\lk1) };
@@ -188,9 +168,7 @@
 // A Launchkey key or pad (chan 0-based: 9 = MIDI channel 10, the drum pads): the track's notes, played at once —
 // sent without a time stamp, so the server starts them on arrival (a few ms: audio buffer + MIDI), not with the
 // patterns' look-ahead (s.latency). Offline renders play them as \ceLk events.
-~ce.midiNote = { |self, note, vel, chan, uid|
-	if(self.midiPorts[uid] !? { |p| p.kind } == \launchkey and: { vel > 0 }) { self.lkPlay(note, vel / 127, chan) } { [] }
-};
+~ce.midiNote = { |self, note, vel, chan, uid| self.driverFor(uid) !? { |d| d.inNote(self, uid, note, vel, chan) } ? [] };
 // A Launchkey key / pad from the device or the web UI: the track's notes at once; the UI lights the key / pad
 ~ce.lkPlay = { |self, note, vel, chan|
 	var r = self.lkRoute(note, vel, chan);
@@ -254,7 +232,7 @@
 			var kind = self.midiKindOf(name);
 			MIDIIn.connect(0, e);
 			self.midiPorts[e.uid] = (name: name, kind: kind);
-			if(kind == \lc) { self.lcOuts[e.uid] = self.lcOutFor(e) };
+			self.driverFor(e.uid) !? { |d| d.opened(self, e) };
 			found.add(name -> kind);
 		}
 	};
@@ -266,12 +244,6 @@
 	if(found.notEmpty and: { self.midiPorts.values.any { |p| p.kind == \lc }.not }) {
 		"No Launch Control XL 3 yet: plug one in, it is picked up within 2 s".warn };
 };
-// the MIDI In of a Launch Control source (same device; not DAW, not the DIN outs), or nil (also with lcFeedback false:
-// a muted test run never moves the user's knobs)
-~ce.lcOutFor = { |self, src|
-	var d = if(self.lcFeedback == false) { nil } { MIDIClient.destinations.detect { |d| d.device == src.device and: { d.name.containsi("DAW").not }
-		and: { d.name.containsi("DIN").not } } };
-	d !? { { var o = MIDIOut.newByName(d.device, d.name); o.latency = 0; o }.try { nil } } };
 ~ce.connectMidi = { |self|
 	MIDIClient.initialized.not.if { MIDIClient.init(verbose: false) };
 	MIDIdef.cc(\ce_midi, { |val, num, chan, src| self.midiCC(val, num, src, chan) }).permanent_(true);

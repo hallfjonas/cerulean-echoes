@@ -49,8 +49,8 @@ Andere Controller:
   spielt eine Note fester Länge (Regler 5), wie in Strudel. Anders als in
   Strudel klingen Tasten und Pads **sofort** (wenige Millisekunden statt des Vorlaufs des Schedulers).
 - **Alle anderen Controller** werden erkannt und im Post-Fenster aufgelistet, aber ignoriert. Ihre CC-Nummern
-  würden sonst die Regler des Tracks verstellen. Ein neuer Controller-Typ bekommt einen Eintrag in `midiKinds`
-  (`sc/lib/controls.scd`).
+  würden sonst die Regler des Tracks verstellen. Ein neuer Controller-Typ bekommt einen Treiber
+  (eine Datei in `sc/lib/` wie `lcxl3-custom.scd`, Schnittstelle in `sc/lib/controls.scd`).
 
 ### Mode 1 – Jojo (Fundament)
 

@@ -17,7 +17,8 @@ var dir = thisProcess.nowExecutingPath.dirname;
 	                              // limiter (-1 dBFS) only catches extremes (0 = as loud as Strudel, which clips)
 	limit: 1,                     // 1 = limiter on the master (ceiling -1 dBFS), 0 = off (comparisons)
 );
-["sounds.scd", "controls.scd", "mixer.scd", "steps.scd", "score.scd", "setup.scd", "ui.scd", "strudel.scd", "mini.scd",
-	"addons.scd", "stems.scd", "stemlayers.scd", "stemtrack.scd", "stemkit.scd"].do { |f| (dir +/+ f).load };
+["sounds.scd", "controls.scd", "lcxl3-custom.scd", "launchkey-mk4.scd", "mixer.scd", "steps.scd", "score.scd",
+	"setup.scd", "ui.scd", "strudel.scd", "mini.scd", "addons.scd", "stems.scd", "stemlayers.scd", "stemtrack.scd",
+	"stemkit.scd"].do { |f| (dir +/+ f).load };
 ~ce
 )
