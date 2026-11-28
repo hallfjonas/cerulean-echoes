@@ -4,28 +4,27 @@ import { parseHash, hashFor, shownOn, entriesFor, showsShape, placeholderFor } f
 
 const catalogue = [
   { id: 'a', kind: 'live', engine: 'sc' },
-  { id: 'b', kind: 'live', engine: 'strudel' },
-  { id: 'lab-board', kind: 'lab', engine: 'strudel' },
   { id: 'sample-kick', kind: 'lab', lab: 'sample' },
   { id: 'stems-flute', kind: 'lab', lab: 'stems' },
 ]
 
 test('hash: every page round-trips, unknown hashes land on Live, Labs defaults to Samples', () => {
-  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/space', '#labs/sets', '#visuals'])
+  for (const hash of ['#live', '#labs/samples', '#labs/stems', '#labs/space', '#labs/tracks', '#labs/sets', '#visuals'])
     assert.equal(hashFor(parseHash(hash)), hash)
   assert.deepEqual(parseHash(''), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#nonsense'), { id: 'live', sub: null })
   assert.deepEqual(parseHash('#labs'), { id: 'labs', sub: 'samples' })
   assert.deepEqual(parseHash('#labs/nope'), { id: 'labs', sub: 'samples' })
-  assert.deepEqual(parseHash('#labs/tracks'), { id: 'labs', sub: 'samples' })
+  assert.deepEqual(parseHash('#labs/tracks'), { id: 'labs', sub: 'tracks' })
 })
 
-test('pickers: Live lists live tracks, Samples and Stems their projects, Strudel boards never', () => {
+test('pickers: Live lists live tracks, Samples and Stems their projects', () => {
   const ids = page => entriesFor(parseHash(page), catalogue).map(entry => entry.id)
-  assert.deepEqual(ids('#live'), ['a', 'b'])
+  assert.deepEqual(ids('#live'), ['a'])
   assert.deepEqual(ids('#labs/samples'), ['sample-kick'])
   assert.deepEqual(ids('#labs/stems'), ['stems-flute'])
   assert.deepEqual(ids('#labs/space'), [])
+  assert.deepEqual(ids('#labs/tracks'), [])
   assert.deepEqual(ids('#labs/sets'), [])
   assert.deepEqual(ids('#visuals'), [])
 })

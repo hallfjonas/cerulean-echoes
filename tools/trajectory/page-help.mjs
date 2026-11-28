@@ -4,7 +4,7 @@ const LIVE = [
   { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
     + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample Designer, Stems & '
     + 'Tracks and Space (Sets is planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
-    + 'only what the page needs. No strudel.cc needed.' },
+    + 'only what the page needs.' },
   { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
   { heading: 'Output', text: 'Sound, the Live panel and visuals. With "Save take on record stop" ticked (Settings), a '
@@ -105,6 +105,26 @@ const SPACE = [
     + 'cell: use 1/16 or coarser to judge the bass. Each cell is the loudest part of a band, not an average.' }
 ]
 
+const TRACKS = [
+  { heading: 'What it does', text: 'Edits an auto-performance of a live track at five levels (Story, Sections, '
+    + 'Moves, Lanes and Steps), checks it, saves it as a new script and plays it from any bar.' },
+  { heading: 'How to use', text: ['Pick a track, then one of its performances (scripts and takes), or press New '
+    + 'performance.',
+    'Keys 1-5 pick the level; the selection stays when the level changes. Click the ruler to set the cursor: the '
+    + 'sidebar adds sections, moves or steps there.',
+    'Drag moves, section edges, energy dots and lane dots. Cmd-Z undoes, Escape clears the selection, Backspace '
+    + 'deletes the selected move or step.',
+    'Play (sidebar) plays this version, saved or not, from "From bar" (a 4-bar line). While it plays, click a '
+    + 'section or the ruler to go there.',
+    'Save as writes a new script; Save writes over one the lab saved before. Errors from check-perform show in the '
+    + 'footer and block saving.',
+    'Press and Break moves sit on the bar where the button takes over: the press goes half a bar before.',
+    'Bars count from 0, as in the script. The tempo on top is a what-if: it changes the minutes shown, not the '
+    + 'track.'] },
+  { heading: 'Output', text: 'perform/<track>/<name>.json (the script) and <name>.lab.json (sections and moves). An '
+    + 'existing script is never overwritten.' }
+]
+
 const PLANNED = [
   { heading: 'What it does', text: 'Planned: this designer is not built yet. The Labs menu keeps its place.' }
 ]
@@ -116,6 +136,7 @@ const VISUALS = [
     'S hides the sidebar, F is fullscreen.'] }
 ]
 
-const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/space': SPACE, 'labs/sets': PLANNED, visuals: VISUALS }
+const BY_PAGE = { live: LIVE, 'labs/samples': SAMPLES, 'labs/stems': STEMS, 'labs/space': SPACE, 'labs/tracks': TRACKS,
+  'labs/sets': PLANNED, visuals: VISUALS }
 
 export const helpFor = key => BY_PAGE[key] ?? LIVE

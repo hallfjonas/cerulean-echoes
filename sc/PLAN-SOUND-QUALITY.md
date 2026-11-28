@@ -37,8 +37,8 @@ The orchestral (VSCO 2, SSO), Rhodes, vibraphone and Strat sets are fine as a ba
 1. **Fix the sample rate** at 48 kHz in `sc/engine.scd` too (`sc/live.scd` already is), and convert new samples to
    48 kHz on import (one step in `/add-sample`).
 2. **Anti-aliasing for drive and folding:** run the nonlinear part at a higher rate, or use band-limited versions:
-   - `.tanh` / `.fold2` in the `drive` block and in `bassPluck`, `softTom`, …: oversample the shaper (which
-     oversampling plugin to use is still to be checked) or at least low-pass before and after it;
+   - `.tanh` / `.fold2` in the `drive` block and in `bassPluck`, `softTom`, …: oversample the shaper (candidates
+     in 4.3) or at least low-pass before and after it;
    - `LFTri.ar` as an audio oscillator → `VarSaw.ar(freq, 0, 0.5)` or a band-limited triangle.
 3. **Better reverb:** the noise IRs stay for now. Direction: high-quality algorithmic SC reverbs (e.g. `Greyhole` /
    `JPverb`, 4.1), so Space can move the room live (size, decay, damping), not only blend a fixed tail. Needs
@@ -51,6 +51,20 @@ The orchestral (VSCO 2, SSO), Rhodes, vibraphone and Strat sets are fine as a ba
    correct taste, not source differences.
 6. **Gentle bus processing:** the master limiter already exists. A soft saturation/glue stage on the drum and the
    music buses before it makes randomized stems sit together better.
+7. **Club output (safety, one PR, listened to together):** standard protection for a club sound system, all in
+   `sc/lib/mixer.scd` unless noted. Changes every track slightly.
+   - Low cut (~150 Hz) on the reverb and delay inputs: kick, sub and bass are mono, but their Space send puts stereo
+     energy into the sub range today. One filter per return (`~ce.hpf`), the stems stay as they are.
+   - Master: a deep high-pass (~25 Hz) and `LeakDC` (removes DC offset, a constant shift that wastes headroom and
+     clicks at starts and stops).
+   - Master: mono below ~100 Hz, by high-passing only the side (stereo difference) signal.
+   - Master: a blow-up guard before the limiter (`Sanitize`, if our SC version has it): replaces invalid values from
+     an exploding filter with silence.
+   - The limiter stays (ceiling -1 dBFS; it should hardly act, if it does the track is too loud).
+   - With 2.1 (48 kHz in the player) and a choice of the audio output in the player settings (today: the Mac's
+     default output).
+   Later, as the library grows: `~ce.checkSound` measures a sound's side energy below ~120 Hz and warns (the `mono:`
+   key is only declared today, not enforced).
 
 ## 3. Better sources per role (free only)
 
@@ -91,6 +105,54 @@ These cover a large part of the machine table with tested, musical sounds, inste
 How they would appear on the controller (Sample Designer blocks, stem columns, randomizing) is in
 `docs/features/sound-lab.md`, "Ideas: plugin blocks (not built)".
 
+### 4.3 Researched 2026-11-27: reverbs, anti-aliasing, Faust
+What the sources say; nothing tested here yet. "Not confirmed" = the search found no source.
+
+**Reverbs (for 2.3).** No head-to-head comparison found, so the ear test decides.
+- `NHHall` (sc3-plugins, NHUGens): algorithmic, modulated allpass loop, adjustable stereo spread, infinite hold
+  ([source](https://sources.debian.org/src/supercollider-sc3-plugins/3.13.0~repack-1/source/NHUGens/nh_hall.hpp)).
+- `JPverb` (sc3-plugins, DEINDUGens): modelled on the chorused sound of vintage Lexicon and Alesis units, made for
+  synthetic sources rather than realistic rooms; `Greyhole` is its sibling
+  ([JPverb docs](https://javadoc.io/static/de.sciss/scalacolliderugens-plugins_2.11/1.19.0/de/sciss/synth/ugen/JPverb.html)).
+- `GVerb` (built into SC): room size, reverb time, damping, spread
+  ([docs](https://docs.supercollider.online/Classes/GVerb.html)).
+- Faust's reverb library lists JPverb, Greyhole, Freeverb, Dattorro and zita-rev1 (a free FDN reverb by Fons
+  Adriaensen) ([reverbs.lib](https://faustlibraries.grame.fr/libs/reverbs/),
+  [zita-rev1](https://dsprelated.com/freebooks/pasp/Zita_Rev1.html)).
+- Candidates for the ear test: NHHall, JPverb, Greyhole; zita-rev1 (via Faust) only if none of them passes.
+
+**Anti-aliasing (for 2.2).**
+- SC core has no oversampling, and many core oscillators are not band-limited
+  ([Tour of UGens](https://depts.washington.edu/dxscdoc/Help/Guides/Tour_of_UGens.html)).
+- `portedplugins` (Mads Kjeldgaard, GPL-3, install `Plugins.installPlugin("portedplugins")` or a release):
+  `AnalogVintageDistortion` (oversampling up to ×16), `AnalogTape` (oversampling), `LockhartWavefolder` (anti-aliased
+  folder), `VAKorg35` (virtual-analog Korg35 filter)
+  ([repo](https://github.com/madskjeldgaard/portedplugins),
+  [AnalogVintageDistortion](https://doc.sccode.org/Classes/AnalogVintageDistortion.html)).
+- `DADAA` (Robbie Lyman): anti-derivative anti-aliased distortions ([repo](https://github.com/robbielyman/DADAA)).
+- Background: oversampling is the standard baseline against aliasing in waveshaping; 8× at 44.1 kHz was generally
+  enough for distortion in the tests of Kahles et al. 2019
+  ([paper](https://acris.aalto.fi/ws/portalfiles/portal/34665796/ELEC_Kahles2019_Oversampling_JAES.pdf)).
+
+**Faust (a language for audio DSP).**
+- `faust2supercollider` ships with Faust and compiles a `.dsp` file into an SC plugin (`.scx` plus a class file); it
+  needs SC's plugin headers ([CCRMA](https://ccrma.stanford.edu/realsimple/faust/Using_FAUST_SuperCollider.html)).
+- Its virtual-analog library `vaeffects.lib` has `moog_vcf` (self-oscillating at the top of its range) and
+  `diodeLadder`; the Faust examples include Korg35 filters and a Sallen-Key one-pole low-pass
+  ([vaeffects](https://faustlibraries.grame.fr/libs/vaeffects/), [examples](https://faustdoc.grame.fr/examples/filtering)).
+- Apple Silicon: found only a 2021 workaround that forces an x86 build
+  ([gist](https://gist.github.com/madskjeldgaard/8e484b88ee16df3d9ab9b180480a043c)); a native build is not confirmed.
+  Test once before relying on it.
+- Use it only for a block no SC plugin covers (e.g. an analog filter for `018-alt` if `DFM1`, `MoogLadder` and
+  `VAKorg35` are not close enough). Each Faust plugin is a build step and an install on every machine.
+- **When to check Faust again:** only for one of SC's two limits, and only if no ready plugin covers it:
+  - feedback patched in SC (`LocalIn` / `LocalOut`, buses) is delayed by one block (64 samples, about 1.3 ms at
+    48 kHz): audio-rate self-modulation, cross-modulation with feedback, a filter feedback path built from separate
+    UGens. Feedback inside one UGen (e.g. `MoogLadder`'s resonance) is not affected. A server block size of 1 fixes it
+    but costs a lot of CPU.
+  - hard nonlinearities (saturation, folding) alias, and SC core has no oversampling (portedplugins above first).
+  Slow modulation (LFOs, envelopes, the 018-alt pin matrix) is not affected by either.
+
 ## 5. How to compare
 
 - **Sample by sample:** old and new back to back, at the same loudness. No tool for this yet: it needs a small one
@@ -101,7 +163,7 @@ How they would appear on the controller (Sample Designer blocks, stem columns, r
 
 1. Quick wins 2.1, 2.2, 2.4 (no new dependencies).
 2. The sample-by-sample comparison (5).
-3. Install sc3-plugins + mi-UGens on both machines; a check in `verify-sc` for missing UGens.
+3. Install sc3-plugins, mi-UGens and portedplugins on both machines; a check in `verify-sc` for missing UGens.
 4. Better reverb (2.3), drum and piano sample upgrade (3).
 5. New synth voices from the mi-UGens in the Sound Lab; one Stem Designer round against 009 with Plaits candidates.
 

@@ -4,11 +4,9 @@
   "type": "module",
   "description": "Tools for the tracks: tests, the player, SuperCollider checks, sound lab",
   "scripts": {
-    "postinstall": "node strudel-sim/patch-core.mjs",
     "verify-sc": "node verify/verify-sc.mjs",
     "path-lint": "node path-lint.mjs",
     "track-map": "node track-map.mjs",
-    "shared": "node shared/sync.mjs",
     "test": "node --test --test-concurrency=1 'trajectory/*.test.mjs' 'sc-test/*.test.mjs' 'stems/*.test.mjs' 'sound-lab/*.test.mjs' 'launcher/*.test.mjs'",
     "check-stems": "node stems/check-stems.mjs",
     "stems": "node stems/stems.mjs",
@@ -17,10 +15,6 @@
     "launcher": "bash launcher/build.sh"
   },
   "dependencies": {
-    "@strudel/core": "1.2.6",
-    "@strudel/mini": "1.2.6",
-    "@strudel/tonal": "1.2.6",
-    "@strudel/transpiler": "^1.2.6",
     "node-web-audio-api": "2.2.0",
     "superdough": "1.3.0"
   }

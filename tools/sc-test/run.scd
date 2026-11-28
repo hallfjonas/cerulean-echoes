@@ -288,6 +288,18 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 				ce.prepare(ScoreStreamPlayer.new, track);
 				(track.slots['1:4'] == bassRef) and: { ce.swapProblem('1:4', ce.loadTrack(house).slots['1:4']).notNil }
 					and: { ce.swapProblem('1:1', "kick909/kick909-brightness-space-punch-pattern-drop-out.stem").isNil } });
+			check.("stem track lkKeys: keys play a pitched JSON column at the key's note, a knob picks the column", {
+				var ce, track, slots, notes;
+				play.(house, 1);
+				ce = ~lastCe; track = ce.track;
+				slots = ce.stemSlots.select { |s| var c = track.columns[s];
+					c.notNil and: { c[\colCode].isNil } and: { c[\pitch] != \none } and: { c[\kit].isNil } };
+				track.lkKeys = (slots: slots.keep(2), start: slots[0], cc: 21);
+				track.lkKeysSlot = slots[0];
+				notes = ce.lkColumnNotes(64, 0.8);
+				ce.setLkCC(21, 1, {});
+				(slots.size >= 2) and: { notes.notEmpty } and: { notes.every { |n| n[\midi] == 64 } }
+					and: { track.lkKeysSlot == slots[1] } });
 		}.value;
 	}.value;
 	};
@@ -303,15 +315,34 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 		check.("% loads and plays notes with the faders up".format(name), {
 			log = play.(file, 4); log.size > 0 });
 		// the Launchkey's knob 1 sends CC 21 (its default): it must reach the track (brightness of the keys)
+		// (on a stem track whose keys play a column, lkKeys, the knob picks that column)
 		check.("% Launchkey knob 1 (CC 21) reaches the track".format(name), {
-			var ce = ~lastCe; ce.setLkCC(21, 0.7, {}); ce.stateVal[\lkBright] == 0.7 });
+			var ce = ~lastCe, keys = ce.track[\lkKeys];
+			ce.setLkCC(21, 0.7, {});
+			if(keys.notNil and: { keys[\cc] == 21 }) { ce.lkColumnChoices.includes(ce.track[\lkKeysSlot]) } {
+				ce.stateVal[\lkBright] == 0.7 } });
+		if((~lastCe !? { |c| c.track !? { |t| t[\lkKeys] } }).notNil) {
+			check.("% Launchkey keys play the chosen column into its strip, silent at level 0".format(name), {
+				var ce = ~lastCe, t = ce.track, lv = t[\lkKeys][\level], was = ce.stateVal[lv], r, silent;
+				ce.setState(lv, 0.8, {});
+				r = ce.lkRoute(60, 0.8, 0);
+				ce.setState(lv, 0, {});
+				silent = ce.lkRoute(60, 0.8, 0)[\notes].isEmpty;
+				ce.setState(lv, was, {});
+				r[\notes].notEmpty and: { r[\lanes] === ce.stemBus[t[\columns][t[\lkKeysSlot]][\stemName]] } and: { silent } });
+			check.("% Launchkey keys: every column the knob can pick plays notes".format(name), {
+				var ce = ~lastCe, t = ce.track, was = t[\lkKeysSlot], ok;
+				ok = ce.lkColumnChoices.every { |s| t[\lkKeysSlot] = s; ce.lkColumnNotes(60, 0.8).notEmpty };
+				t[\lkKeysSlot] = was;
+				ok });
+		};
 		check.("% key pan (CC 28) starts at its maximum".format(name), { ~lastCe.lkCC[28] == 1 });
 		// the pad bank and the key pan at full: the pads still play, every key is panned
 		check.("% pad bank knobs (CC 31-38) and key pan (CC 28) turned up still play pads and keys".format(name), {
 			var ce = ~lastCe, f = ce.track[\lkNote], pads, keys;
 			f.isNil or: {
 				(31..38).do { |n| ce.setLkCC(n, 1, { }) }; ce.setLkCC(28, 1, { });
-				pads = f.(ce, 36, 1, 9); keys = f.(ce, 60, 1, 0);
+				pads = f.(ce, 36, 1, 9); keys = ce.lkRoute(60, 1, 0)[\notes];
 				(31..38).do { |n| ce.setLkCC(n, 0, { }) }; ce.setLkCC(28, 0, { });
 				pads.notEmpty and: { keys.every { |n| n[\pan].notNil and: { n[\pan] >= 0 } } } } });
 		check.("% every sample file it loads exists".format(name), {

@@ -39,7 +39,7 @@ this order: `keys`, `pad`, `lk`, `press`, else `cc`.
 - `length` of a keys step only times the note-off seen by the LC view: `midikeys` has no note-off, the sound length is
   the track's. A take writes it from the recorded note-off when one came (rounded to 0.01 bar), else leaves it out.
 - `velocity` is sent as MIDI `max(1, round(v × 127))`; takes write `byte / 127` rounded to 3 decimals.
-- A take writes one keys step per note-on (no chord merging), note names in Strudel spelling with `#` ('c#4').
+- A take writes one keys step per note-on (no chord merging), note names with `#` ('c#4').
 
 ## Virtual inputs
 
@@ -94,6 +94,7 @@ take: {
 
 | File | Content |
 |---|---|
+| `tools/trajectory/perform/<track>/<name>.lab.json` | the Tracks lab's sidecar of a script it saved: `{ format, scriptHash, lab }` (sections and moves; `check-perform` skips it) |
 | `tools/trajectory/perform/<track>/takes/<YYYY-MM-DD>-<HHMMSS>-<source>.json` | the take (a script with `take`) |
 | `tools/trajectory/perform/<track>/takes/<same name>.events.jsonl` | tapped events of the play, one batch per line as posted to `/events`, `cycle` counted from the load's bar line (task 7) |
 | `recordings/<track>/<YYYY-MM-DD>-<HHMMSS>-<human\|auto>.wav` | audio, 16-bit PCM, context sample rate, stereo |

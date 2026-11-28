@@ -10,7 +10,7 @@ import { execFileSync } from 'child_process'
 import { fileURLToPath } from 'url'
 import { repoRoot } from './check-stems.mjs'
 
-// LUFS-M at fader 1 per role: the 009-house kick (−13.7 LUFS-M, gain 1) plus the strudel-mix offsets per role
+// LUFS-M at fader 1 per role: the 009-house kick (−13.7 LUFS-M, gain 1) plus the offsets per role of the house mix
 export const TARGET_KICK = -13.7
 export const ROLE_OFFSET = { kick: 0, sub: -4, bass: -4, clap: -5.5, keys: -5, chords: -5, pad: -5, lead: -5, hats: -10,
   perc: -10, fx: -10, texture: -10 }

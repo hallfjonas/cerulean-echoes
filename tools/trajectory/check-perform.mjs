@@ -4,7 +4,7 @@
 // velocities 0..1, and the `take` meta field of a take (perform/<track>/takes/<take>.json, checked like a script).
 // A track's scripts are checked against its SuperCollider version (sc/tracks/<id>/<id>.scd). A stem track (sc/tracks/<id>/<id>.track) takes its controls from
 // its stems and frame.
-// usage (in tools/): node trajectory/check-perform.mjs [<track.strudel | track.scd | track.track> …]
+// usage (in tools/): node trajectory/check-perform.mjs [<track.scd | track.track> …]
 //   (default: every track that has scripts)
 // Exit 1 if a script fails.
 import fs from 'fs'
@@ -140,32 +140,22 @@ export const checkScript = (script, controls, trackId) => {
 
 const trackIdOf = file => path.basename(file, path.extname(file))
 const jsonFiles = dir => fs.existsSync(dir)
-  ? fs.readdirSync(dir).filter(f => f.endsWith('.json')).sort().map(f => path.join(dir, f))
+  ? fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.lab.json')).sort().map(f => path.join(dir, f))
   : []
 export const scriptFiles = trackId => jsonFiles(path.join(PERFORM, trackId))
 const takeFiles = trackId => jsonFiles(path.join(PERFORM, trackId, 'takes'))
-
-const findFile = (dir, name) => {
-  if (!fs.existsSync(dir)) return null
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name)
-    const found = entry.isDirectory() ? findFile(full, name) : entry.name === name ? full : null
-    if (found) return found
-  }
-  return null
-}
 
 const stemTrackOf = trackId => {
   const file = path.join(repo, 'sc', 'tracks', trackId, trackId + '.track')
   return fs.existsSync(file) ? file : null
 }
-export const trackFileOf = trackId => findFile(path.join(repo, 'tracks'), trackId + '.strudel') ?? stemTrackOf(trackId)
+export const trackFileOf = stemTrackOf
 // The SuperCollider version of a track (its .scd, else its stem track), or null
 export const scTrackFileOf = trackId => {
   const file = path.join(repo, 'sc', 'tracks', trackId, trackId + '.scd')
   return fs.existsSync(file) ? file : stemTrackOf(trackId)
 }
-// a stem track's controls come from its stems and frame (stem-tags.mjs), a Strudel or SC track's from its comments
+// a stem track's controls come from its stems and frame (stem-tags.mjs), an SC track's from its comments
 export const tagSource = file => file.endsWith('.track') ? trackTags(file) : fs.readFileSync(file, 'utf8')
 
 // { file: errors[] } for every script and take of the track

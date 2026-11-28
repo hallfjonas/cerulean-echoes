@@ -178,7 +178,12 @@
 	)
 };
 // A Launchkey control: kept in lkCC; the track may turn it into state buses (lkCtl: level, room, echo)
-~ce.setLkCC = { |self, num, v, send| if(num == 1 and: { v != self.lkCC[num] }) { self.releasePickup(\lk1) }; self.lkCC[num] = v; self.track !? { |t| t[\lkCtl] !? { |f| f.(self, num, v, send) } };
+~ce.setLkCC = { |self, num, v, send|
+	if(num == 1 and: { v != self.lkCC[num] }) { self.releasePickup(\lk1) };
+	self.lkCC[num] = v;
+	self.track !? { |t|
+		t[\lkKeys] !? { |k| if(k[\cc] == num) { self.lkColumnSelect(v) } };
+		t[\lkCtl] !? { |f| f.(self, num, v, send) } };
 	self.uiSend('/ce/lkcc', num, v) };
 // A Launchkey key or pad (chan 0-based: 9 = MIDI channel 10, the drum pads): the track's notes, played at once —
 // sent without a time stamp, so the server starts them on arrival (a few ms: audio buffer + MIDI), not with the
@@ -188,9 +193,19 @@
 };
 // A Launchkey key / pad from the device or the web UI: the track's notes at once; the UI lights the key / pad
 ~ce.lkPlay = { |self, note, vel, chan|
-	var notes = self.track !? { |t| t[\lkNote] !? { |f| f.(self, note, vel, chan) } } ? [];
+	var r = self.lkRoute(note, vel, chan);
 	self.uiSend('/ce/lknote', note, chan);
-	self.playNow(notes, self.stemBus[\lk], self.groups.src, \lk)
+	self.playNow(r[\notes], r[\lanes], self.groups.src, r[\stem])
+};
+// What a key / pad plays: (notes, lanes, stem). The keys of a stem track with lkKeys play its chosen column into
+// that column's strip (~ce.lkColumnNotes); the pads, and the keys of every other track, play the track's lkNote on
+// the \lk stem.
+~ce.lkRoute = { |self, note, vel, chan|
+	var t = self.track;
+	if((chan != 9) and: { t.notNil } and: { t[\lkKeys].notNil }) {
+		(notes: self.lkColumnNotes(note, vel), stem: \lkKeys,
+			lanes: t[\columns][t[\lkKeysSlot]] !? { |c| self.stemBus[c[\stemName]] })
+	} { (notes: t !? { t[\lkNote] !? { |f| f.(self, note, vel, chan) } } ? [], lanes: self.stemBus[\lk], stem: \lk) }
 };
 // Knob 8 (CC 28) spreads the keys across the stereo field (0 = all in the middle, 1 = the lowest key of the keyboard window
 // hard left, the highest hard right); the window follows the octave buttons: it moves to the octave of a key outside it
@@ -279,10 +294,10 @@ Event.addEventType(\ceCtl, {
 Event.addEventType(\ceLk, {
 	var sb = ~schedBundleArray, srv = ~server, ce = topEnvironment[\ce], parent = currentEnvironment;
 	if(~key.isNil) { ce.setLkCC(~lkCc, ~v, { |msg| sb.(0, 0, srv, [msg]) }) } {
-		var notes = ce.track[\lkNote].(ce, ~key, ~vel, ~chan) ? [];
+		var r = ce.lkRoute(~key, ~vel, ~chan), notes = r[\notes];
 		if(notes.notEmpty) {
 			var e = (type: \ceMulti, notes: notes.reject { |n| n[\msg].notNil }, msgs: notes.select { |n| n[\msg].notNil },
-				lanes: ce.stemBus[\lk], group: ce.groups.src, stem: \lk);
+				lanes: r[\lanes], group: ce.groups.src, stem: r[\stem]);
 			[\server, \latency, \schedBundleArray, \schedBundle].do { |k| e[k] = parent[k] };
 			e.play
 		}

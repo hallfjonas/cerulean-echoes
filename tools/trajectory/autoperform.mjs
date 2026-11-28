@@ -1,5 +1,5 @@
 // Auto-perform: plays a script of control moves and button presses into the virtual input 'LCXL3 Auto' and keys, drum
-// pads and knobs into the virtual Launchkey 'Launchkey MK4 25 Auto' (midi.mjs), so a track can be tried without a
+// pads and knobs into the virtual Launchkey 'Launchkey MK4 25 Auto' (sc-auto.mjs), so a track can be tried without a
 // controller. Open loop: the script does not listen to what it hears.
 // Script: { track, title?, bars?, mood?, sections?: [{ name, from, to, intent? }], steps } with steps
 //   { bar, cc, value, ramp? }            a Launch Control CC (value 0..1, sent as MIDI 0..127)
@@ -18,6 +18,9 @@
 // prime(script) before the track loads, then start(script) after it: the last run's values are reset and the script's
 // bar-0 values set before the load, so the first query already reads them (and a capture of the play sees neither
 // the reset nor a late bar-0 step). start alone does both just after the load, a query or two late.
+// prime(script, from) / start(script, from) start at bar `from` instead: the values the script holds there are set
+// before the load, the presses before it go with the load as counts (pressCounts, so patterns and chapters are where
+// the script put them), keys and pads before it are skipped, and the clock counts on from `from`.
 export const TICK_MS = 50
 export const HOLD_TICKS = 2
 export const BAR_TOLERANCE = 1e-6
@@ -32,7 +35,7 @@ const midiValue = value => Math.round(value * 127) / 127
 
 const CHROMA = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 }
 const ACCIDENTAL = { '#': 1, s: 1, b: -1, f: -1 }
-// A note name as Strudel reads it (c4 = 60, octave 3 if left out, # / s sharp, b / f flat) or a MIDI number
+// A note name (c4 = 60, octave 3 if left out, # / s sharp, b / f flat) or a MIDI number
 export const noteNumber = name => {
   if (/^\d+$/.test(name)) return Number(name) <= 127 ? Number(name) : null
   const match = name.match(/^([a-g])([#sbf]*)(-?\d)?$/i)
@@ -107,13 +110,22 @@ export const valueChanges = (script, stepBars) => {
     .sort((a, b) => a.bar - b.bar)
 }
 
+// [[cc, count]]: how often each button is pressed before `bar`
+export const pressCounts = (script, bar) => {
+  const counts = new Map()
+  for (const step of script.steps) if (step.press !== undefined && step.bar < bar - BAR_TOLERANCE) {
+    counts.set(step.press, (counts.get(step.press) ?? 0) + 1)
+  }
+  return [...counts]
+}
+
 // The bar line the script starts on: the nearest one, never before 0. Rounding down turned a clock reading just below
 // 0 or just below a bar line into the bar before and played the whole script a bar early.
 export const startBarOf = cycle => Math.max(0, Math.round(cycle))
 
 export const createPerformer =({ midi, engine, onChange = () => {} }) => {
   let timer = null, script = null, compiled = null, primed = null
-  let startBar = 0, fired = 0, firedNotes = 0, held = [], sounding = []
+  let startBar = 0, from = 0, fired = 0, firedNotes = 0, held = [], sounding = []
   const written = new Map(), lkWritten = new Map()
 
   const release = () => {
@@ -136,19 +148,20 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
       send(cc, value)
     }
   }
-  const prepare = next => {
+  const prepare = (next, at) => {
     script = next
+    from = at
     compiled = compile(script)
     midi.resetAuto()
     written.clear()
     lkWritten.clear()
-    fired = 0
-    firedNotes = 0
-    write(compiled.curves, written, midi.setAuto, 0)
-    write(compiled.lkCurves, lkWritten, midi.setAutoLk, 0)
+    fired = compiled.presses.filter(press => press.bar < from - BAR_TOLERANCE).length
+    firedNotes = compiled.notes.filter(note => note.bar < from - BAR_TOLERANCE).length
+    write(compiled.curves, written, midi.setAuto, from)
+    write(compiled.lkCurves, lkWritten, midi.setAutoLk, from)
   }
   const tick = () => {
-    const bar = engine.cycle() - startBar
+    const bar = engine.cycle() - startBar + from
     const reached = bar + BAR_TOLERANCE
     write(compiled.curves, written, midi.setAuto, bar)
     write(compiled.lkCurves, lkWritten, midi.setAutoLk, bar)
@@ -179,17 +192,17 @@ export const createPerformer =({ midi, engine, onChange = () => {} }) => {
   }
 
   return {
-    start: next => {
+    start: (next, at = 0) => {
       if (timer) stop()
-      if (next !== primed) prepare(next)
+      if (next !== primed || at !== from) prepare(next, at)
       primed = null
       startBar = startBarOf(engine.cycle())
       timer = setInterval(tick, TICK_MS)
       tick()
     },
-    prime: next => {
+    prime: (next, at = 0) => {
       if (timer) stop()
-      prepare(next)
+      prepare(next, at)
       primed = next
     },
     stop: () => { if (timer) stop() },

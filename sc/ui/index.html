@@ -63,6 +63,8 @@ body:not(.noframe) .pn.live{border-color:var(--frame)}
 .slotbar button:hover:not(:disabled){background:var(--panel)}
 .slotbar button:disabled{opacity:.25;cursor:default}
 .name.add{color:var(--off);cursor:pointer}.name.add:hover{color:var(--text)}
+/* the column the Launchkey keys play (a stem track's lkKeys) */
+.name.kpick{background:var(--text);color:var(--bg);padding:0 calc(3 * var(--px));border-radius:calc(2 * var(--px))}
 .name,.kl,.btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .name,.kl,.b2{text-transform:lowercase}
 .kw{display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--px));min-width:0;max-width:100%}
@@ -504,16 +506,21 @@ const draw = () => {
       c.el.classList.toggle('ghosted', g != null); if (g != null) c.el.style.setProperty('--g', g) }
     else { setKnob(c.el, sv); setText(c.el.querySelector('.kl'), name ?? c.name) }
   }
+  for (const el of document.querySelectorAll('.name[data-col]'))
+    el.classList.toggle('kpick', el.dataset.col === S.state?.keys?.slot)
   // Launchkey: values, the keyboard window, lit keys / pads, frame while it is the last thing moved
   const lk = document.getElementById('lk')
   if (lk && hasLk()) {
     const now = performance.now(), lit = k => now - (S.lkLit.get(k) ?? -1e9) < 200
     lk.classList.toggle('live', now - S.lkLive < 4000)
     const bankB = S.lkBank === 'b', tagOf = key => (tags()['lk.' + key] ?? '').split(' | ')
+    // the knob that picks the keys' column (lkKeys) shows that column's name
+    const ks = S.state?.keys
     for (const el of lk.querySelectorAll('[data-kn]')) {
-      const kn = el.dataset.kn, [name, desc] = tagOf((bankB ? 'pad.k' : 'k') + kn)
+      const kn = el.dataset.kn, [tagName, desc] = tagOf((bankB ? 'pad.k' : 'k') + kn)
       el.dataset.lk = (bankB ? 30 : 20) + +kn
-      setText(el.querySelector('.kl'), name || '–'); el.title = (name || '–') + (desc ? ': ' + desc : '')
+      const name = ks && +el.dataset.lk === ks.cc ? ks.label : tagName
+      setText(el.querySelector('.kl'), name || '–'); el.title = (tagName || '–') + (desc ? ': ' + desc : '')
       el.style.opacity = name ? '' : '.35'
     }
     setText(document.getElementById('lkBank'), bankB ? 'knobs: pads (bank B)' : 'knobs: keys (bank A)')

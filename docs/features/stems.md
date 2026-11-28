@@ -243,6 +243,7 @@ add-on: the code reads them (`col.knob(\k3)`, `col.held(\b2)`).
 | `start` | `{ \|col, ce\| }` after the server set-up: latches, own CC hooks; `col[\st]` holds the column's state |
 | `update` | `{ \|col, send\| }` on every move of a knob, the fader or button 2: set the column's state buses |
 | `b1` | `{ \|col\| }` button 1 instead of "next pattern at the next bar" |
+| `keys` | `{ \|col, note, vel\| notes }`: what a Launchkey key plays on this column when the frame's `lkKeys` picks it (see Stem track) |
 | `gate` | `false`: asked at fader 0 too, for state that moves every 16th (lifts, the harmony's look-ahead) |
 | `states` | `(name: start value)`: the column's state buses (`col.setState(\name, v, send)`, `col.stateMapOf(\name)`) |
 | `maps` | `(name: (ccs: [\k1 …], fn: { \|v\| ugen }))`: values the server derives from its controls (`col.mapBusOf`); a map named `trim` is the strip trim, × `gain` |
@@ -389,7 +390,8 @@ A stem track is `sc/tracks/<id>/<id>.track`, JSON, schema `sc/stems/track.schema
   The file returns an Event: `chordAt: { |frame, track, bar| chord }` (required; `track.chapterAt(bar)` is the
   chapter, a chord is made with `~ce.chordOf("Am9", "a1", "c4 e4 g4 b4", "a b c d e f# g")`), optional
   `chapterBars` (Chapter switches at the next phrase of that many bars, default 4), `orbits`, `states`, `samples`,
-  `maps`, `stems` (e.g. the Launchkey's own stem), `lkNote`, `lkCtl`, `lkPadNames`, `build: { |frame, track, ce| }`,
+  `maps`, `stems` (e.g. the Launchkey's own stem), `lkNote`, `lkCtl`, `lkPadNames`, `lkKeys` (below),
+  `build: { |frame, track, ce| }`,
   `chordAtK: { |frame, track, k, push| chord }` (the chord at a 16th: chords that change inside a bar, `push` = the next
   bar's chord two 16ths early) and `nextChords: { |frame, track| }` (what Chords on a chords stem does).
   Its `// @` comment lines (`@ctl g.…`, `@col 16:8`, `@lk …`) join the `@ctl` lines made from the stems.
@@ -400,6 +402,13 @@ A stem track is `sc/tracks/<id>/<id>.track`, JSON, schema `sc/stems/track.schema
   Any other key is the frame's own: column code reads it through `col[\track][\frame]` (001's `degMidi`, `rootAt`, `tonesAt`).
   Example: `sc/tracks/009-house/009-house-frame.scd` (progressions, the scale of each bar on its chords, a stem's own
   chords through `col.riffAt`).
+- `lkKeys: (slots: ['2:1', …], start: '2:4', cc: 21, level: \lkLevel, tone: \lkBright)`: the Launchkey keys
+  play one of these columns, `start` first; the Launchkey knob `cc` picks another (its range split evenly over the
+  columns that can play keys). A column can when its column code has `keys`, or when its stem is pitched JSON (no
+  column code, no kit): then a key plays one hit of its first layer at the key's note, with the knobs as they are. The
+  keys go into the column's own strip (orbit, room, echo, trim follow it, also after a swap); its fader does not reach
+  them. `level` and `tone` are state buses: the keys' level (0 = silent) and a low-pass range factor (× 0.25 … 4,
+  neutral at 0.5). `lkNote` then gets only the drum pads. Example: `sc/tracks/017-lsd-fx-2/017-lsd-fx-2-frame.scd`.
 - Fog, Thin, Tension, Master and Break are the same in every stem track (CC 20, 28, 36, 12, 52; Mode 2 + 48).
   `swing` is how far the off 16ths come late, as a fraction of a 16th.
 - A stem track is never overwritten by a swap or the designers: they write a new track file ("Save as").

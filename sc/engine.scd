@@ -3,10 +3,13 @@
 // needed.
 // Talks OSC with the player's server on UDP <port> (default 57131; not 57130, the port of live.scd's LC view bridge,
 // so both can run), with the messages of the LC view (lib/ui.scd), plus:
-//   player → SC: /ce/load <track file path> [slots] [cc <n> <v> … lk <n> <v> …]
+//   player → SC: /ce/load <track file path> [slots] [cc <n> <v> … lk <n> <v> … press <cc> <count> …]
 //                                             stop what plays, load that track, start it at bar 0; slots (a stem
 //                                             track): JSON { "1:4": stem ref, … } in place of the file's; the CCs (0..1)
-//                                             after cc / lk are set before the first note (an auto-perform script's bar 0)
+//                                             after cc / lk are set before the first note (a script's bar 0); each
+//                                             button after press is pressed <count> times before the first note, so
+//                                             its patterns and chapters are where a script started at a later bar has
+//                                             put them
 //                /ce/swap <slot> <stem ref>   that stem takes over the slot at the next bar (~ce.swapSlot)
 //                /ce/stop                     stop what plays (the server keeps running)
 //                /ce/quit                     stop and end sclang (the server quits with it)
@@ -90,13 +93,17 @@ stopTrack = {
 	~ceClock !? { |c| c.clear };
 	s.freeAll;
 };
-// the values a load starts with: init = [cc, n, v, …, lk, n, v, …] as /ce/load sends them (LC CCs, Launchkey CCs)
+// the values a load starts with: init = [cc, n, v, …, lk, n, v, …, press, cc, count, …] as /ce/load sends them
+// (LC CCs, Launchkey CCs, button presses)
 setInit = { |ce, init|
 	var kind = \cc, i = 0, send = { |m| s.sendMsg(*m) };
 	while { i < init.size } {
 		if(init[i].isKindOf(Symbol) or: { init[i].isString }) { kind = init[i].asSymbol; i = i + 1 } {
-			var n = init[i].asInteger, v = init[i + 1].asFloat.clip(0, 1);
-			if(kind == \lk) { ce.setLkCC(n, v, send) } { ce.setCC(n, v, send) };
+			var n = init[i].asInteger;
+			case
+			{ kind == \press } { init[i + 1].asInteger.do { ce.setCC(n, 1, send); ce.setCC(n, 0, send) } }
+			{ kind == \lk } { ce.setLkCC(n, init[i + 1].asFloat.clip(0, 1), send) }
+			{ ce.setCC(n, init[i + 1].asFloat.clip(0, 1), send) };
 			i = i + 2
 		}
 	}

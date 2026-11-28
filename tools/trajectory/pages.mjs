@@ -1,4 +1,4 @@
-// The pages of the player: Live, Labs (Samples, Stems, Space, Sets) and Visuals. DOM-free: which catalogue
+// The pages of the player: Live, Labs (Samples, Stems, Space, Tracks, Sets) and Visuals. DOM-free: which catalogue
 // entries a page offers, which sidebar sections it shows and how a page is written in the URL hash.
 export const PAGES = [
   { id: 'live', label: 'Live', subs: [] },
@@ -6,6 +6,7 @@ export const PAGES = [
     { id: 'samples', label: 'Samples' },
     { id: 'stems', label: 'Stems' },
     { id: 'space', label: 'Space' },
+    { id: 'tracks', label: 'Tracks' },
     { id: 'sets', label: 'Sets', placeholder: 'Set Designer: planned (.claude/epics/set-designer).' }] },
   { id: 'visuals', label: 'Visuals', subs: [] },
 ]
@@ -31,8 +32,7 @@ export const placeholderFor = ({ id, sub }) =>
 export const shownOn = (tokens, page) => String(tokens).split(/\s+/).filter(Boolean)
   .some(token => token === page.id || token === pageKey(page))
 
-// the picker of a page: Live lists live tracks, Samples and Stems their designer projects; the Strudel lab boards
-// (kind 'lab' without a designer) are not offered
+// the picker of a page: Live lists live tracks, Samples and Stems their designer projects
 export const entriesFor = (page, catalogue) => {
   if (page.id === 'live') return catalogue.filter(entry => entry.kind === 'live')
   if (page.id === 'labs' && page.sub === 'samples') return catalogue.filter(entry => entry.lab === 'sample')
