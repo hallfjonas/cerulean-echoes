@@ -330,6 +330,11 @@ missing = { |ce| ce.sampleBuffers.keys.asArray.reject { |rel|
 				silent = ce.lkRoute(60, 0.8, 0)[\notes].isEmpty;
 				ce.setState(lv, was, {});
 				r[\notes].notEmpty and: { r[\lanes] === ce.stemBus[t[\columns][t[\lkKeysSlot]][\stemName]] } and: { silent } });
+			check.("% Launchkey keys: every column the knob can pick plays notes".format(name), {
+				var ce = ~lastCe, t = ce.track, was = t[\lkKeysSlot], ok;
+				ok = ce.lkColumnChoices.every { |s| t[\lkKeysSlot] = s; ce.lkColumnNotes(60, 0.8).notEmpty };
+				t[\lkKeysSlot] = was;
+				ok });
 		};
 		check.("% key pan (CC 28) starts at its maximum".format(name), { ~lastCe.lkCC[28] == 1 });
 		// the pad bank and the key pan at full: the pads still play, every key is panned

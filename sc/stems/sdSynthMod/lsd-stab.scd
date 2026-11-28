@@ -3,6 +3,12 @@
 // accent (counted on through the bars), slides between near notes, the filter wandering on two slow cycles (7 and 3 bars).
 // Eight figures. Vanish (row 3) leaves bars out at random (up to 85 %); the answer plays in those bars. The shape is fixed
 // here (snap 3 octaves, decay 0.17 s, Q 8, no drive): the translation has no Stab Shape column. Button 2 throws an echo.
+// The Launchkey keys (keys, the frame's lkKeys): a key strikes the same chord shape on its own pitch, an octave down; a
+// hard press is an accent.
+(
+// [wave, scale degree over the root, detune in semitones, pan]
+var voices = [[\sawtooth, 0, 0, 0.2], [\sawtooth, 0, 0.12, 0.8], [\sawtooth, 2, 0, 0.42], [\sawtooth, 6, 0, 0.58],
+	[\square, 8, 0, 0.5], [\square, -7, 0, 0.5]];
 (
 states: (room: 0.9 * 0.25, echo: 0),
 strip: (roomR: \room, echoSend: \echo),
@@ -22,8 +28,7 @@ notes: { |col, k|
 		["~ 0 0 ~ 2 ~ 0 ~ ~ 4 ~ 0 ~ 2 0 ~"],
 		["~ ~ 0 0 ~ ~ 0 ~ ~ ~ 0 ~ ~ 0 ~ ~", "~ ~ 0 0 ~ ~ -1 ~ ~ ~ -3 ~ ~ -1 ~ ~"],
 	].collect { |p| p.collect(kit[\line]) } };
-	st[\voices] = [[\sawtooth, 0, 0, 0.2], [\sawtooth, 0, 0.12, 0.8], [\sawtooth, 2, 0, 0.42], [\sawtooth, 6, 0, 0.58],
-		[\square, 8, 0, 0.5], [\square, -7, 0, 0.5]];
+	st[\voices] = voices;
 	l = st[\stabs][col[\patLatch].atBar(b)]; row = l[b % l.size]; d = row[s16];
 	if(d.isNil or: { fr.stabHere(tr, b).not }) { [] } {
 		count = row.select(_.notNil).size;
@@ -42,5 +47,17 @@ notes: { |col, k|
 		};
 		out
 	}
+},
+keys: { |col, note, vel|
+	var ce = col[\ce], kit = ce.kitOf(col), tr = col[\track], fr = tr[\frame], t = TempoClock.default.beats / 4;
+	var mood = tr.chapterAt(t.floor.max(0)), base = fr.degMidi(0, 3, mood), acc = vel > 0.8, len = 0.17;
+	var w = 0.55 + (0.6 * ce.sine(t / 7)) + (0.35 * ce.sine(t / 3));
+	var lp = (lpOn: 1, bright: col.knob(\k1), lo: 400 * w, hi: 4000 * w, tone: kit[\tone], hp: 300,
+		lpq: 8 + if(acc) { 5 } { 0 }, lpenv: 3 + if(acc) { 1.5 } { 0 }, la: 0.002, ld: len * if(acc) { 0.7 } { 0.47 },
+		ls: 0, lr: 0.01, shape: 0.25, penv: 0.5, pd: 0.05, ps: 0.001, hold: 1)
+		++ kit[\adsr].(0.002, len * if(acc) { 1.4 } { 1 }, 0, 0.08);
+	voices.collect { |x| kit[\syn].(x[0], note - 12 + fr.degMidi(x[1], 3, mood) - base + x[2],
+		0.22 * kit[\dB].(0) * vel * if(acc) { 1.35 } { 1 }, lp ++ (pan: x[3])) }
 }
+)
 )

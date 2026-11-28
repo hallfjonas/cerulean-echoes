@@ -7,6 +7,8 @@
 // and hiss around it, notes drifting and dropping out. Button 1: one gesture at random each phrase, then the seven in
 // turn. Button 2 (Tune): a whistle and hiss gliding like a turned shortwave dial, while held. Space scales room (from
 // 0.15) and echo (from 0.25).
+// The Launchkey keys (keys, the frame's lkKeys): a key sends the first beat of the gesture (a random one per press
+// while Pattern is on Random) an octave above its own pitch; Static drops notes and drifts them as in the column.
 (
 var morse = (o: "---", s: "...");
 // a word as [[start, length]] in 16ths: dit 1/2, dah 3/2, a 1/2 gap inside a letter, 3/2 between letters
@@ -73,6 +75,20 @@ notes: { |col, k|
 		out.add(syn.(\sine, mm, 0.07, lp ++ (hold: 1, pan: 0.5, penv: was - mm, pd: 0.11, ps: 0.001) ++ adsr.(0.005, nil, 1, 0.03)));
 		out.add(noise.(1, 0.05, lp ++ (hold: 1, bp: 2 * mm.midicps, bpq: 4, pan: 0.5) ++ adsr.(0.01, nil, 1, 0.03))) } { st[\tune] = nil };
 	out.reject { |n| n.amp <= 0 }
+},
+keys: { |col, note, vel|
+	var ce = col[\ce], kit = ce.kitOf(col), c = col.knob(\k3), v = col[\patLatch].now, out = List[];
+	var g = gestures[if(v > 0) { v - 1 } { gestures.size.rand }];
+	var lp = (lpOn: 1, bright: col.knob(\k1), lo: 3000, hi: 12000, tone: kit[\tone]);
+	g.(0, { |o| 1.0.rand }).select { |e| e[\pos] < 4 }.do { |e|
+		var a = lp ++ (at: e[\pos], hold: e[\len].min(4 - e[\pos]), pan: e[\pan] ? 0.5)
+			++ if(e[\bp].notNil) { (bp: e[\bp], bpq: e[\bpq] ? 2) } { () } ++ kit[\adsr].(0.003, nil, 1, 0.01);
+		if(1.0.rand >= ((e[\drop] ? 0) + (0.35 * c))) {
+			if(e[\noise].notNil) { out.add(kit[\noise].(e[\noise], e[\g] * vel, a ++ (e[\args] ? ()))) } {
+				var drift = if((e[\args] ? ())[\penv].isNil) {
+					(penv: c * 0.6 * (1.0.rand - 0.5), pd: 0.2, ps: 0.001) } { () };
+				out.add(kit[\syn].(e[\wave], note + 12 + e[\m], e[\g] * vel, a ++ drift ++ (e[\args] ? ()))) } } };
+	out.reject { |n| n.amp <= 0 }.asArray
 }
 )
 )

@@ -4,6 +4,8 @@
 // ring. Six families: chirp (a sine flicking up or falling), pluck (triangle), spark (real FM metal), laser (a falling
 // saw), bleep (a three-note run), acid (a squelch). Button 1: one family at random each phrase, then the six in turn.
 // Button 2 (Burst): the series twice as fast, half of it, in 32nds. Space scales room (from 0.3) and echo (from 0.3).
+// The Launchkey keys (keys, the frame's lkKeys): a key fires one shot of the family (a random one per press while
+// Pattern is on Random) two octaves above its own pitch.
 (
 // [kind, wave, fm index, fm ratio, pitch env, pitch decay, decay, octave shift]
 var shots = [[\syn, \sine, 0, 1, 12, 0.03, 0.06, 0], [\syn, \sine, 0, 1, -24, 0.04, 0.07, -12],
@@ -36,6 +38,21 @@ notes: { |col, k|
 	if(col.held(\b2)) { 2.do { |j| var u = t + (j / 32);
 		if(ce.rand(u) >= 0.5) { out.addAll(hit.(2 * u, 0.2, j / 2, 0.5)) } } };
 	out
+},
+keys: { |col, note, vel|
+	var ce = col[\ce], kit = ce.kitOf(col), v = col[\patLatch].now, syn = kit[\syn];
+	var fam = families[if(v > 0) { v - 1 } { families.size.rand }], sh = shots[fam[0].choose];
+	var g = 0.25 * fam[1] * vel;
+	var m = note + 24 + sh[7], args = (lpOn: 1, bright: col.knob(\k1), lo: 5000, hi: 18000, tone: kit[\tone], hold: 1)
+		++ kit[\adsr].(0.001, sh[6], 0, 0.04);
+	if(sh[2] > 0) { args = args ++ (fmi: sh[2], fmh: sh[3]) };
+	args = args ++ if(sh[4] != 0) { (penv: sh[4], pd: sh[5], ps: 0.001) } {
+		(penv: 0.3 * (1.0.rand - 0.5), pd: 0.3, ps: 0.001) };
+	switch(sh[0],
+		\run, { 3.collect { |i| syn.(sh[1], m + [0, 7, 12][i], g * 0.7, args ++ (at: i / 3, hold: 1 / 3)) } },
+		\squelch, { [syn.(sh[1], m, g,
+			args ++ (lo: 300, hi: 300, bright: 0, lpq: 16, lpenv: 5, la: 0.002, ld: 0.09, ls: 0, lr: 0.02))] },
+		{ [syn.(sh[1], m, g, args)] })
 }
 )
 )

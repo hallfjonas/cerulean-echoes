@@ -70,12 +70,12 @@ stems: [
 ],
 // the Launchkey's start values: the mod wheel at a third, the key tone neutral
 lkStart: (1: 0.34, 22: 0.5, 28: 1),
-// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play one Mode 2 column that can play
-// keys (lkKeys, sc/lib/stemtrack.scd; today the metal, 2:4): a second player on the keys, the first one shaping the
-// column on the Launch Control. Its knobs and buttons reach the keys, its fader does not (it keeps playing its own
-// hits). Knob 1 (CC 21) picks the column, the mod wheel (CC 1) is the keys' level, knob 2 (CC 22) their tone (the
-// filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the key pan spread; bank B (CC 31-38) = the drum pads:
-// 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost.
+// LAUNCHKEY MK4 25 (optional; live: sc/lib/controls.scd calls these). The keys play one Mode 2 column (lkKeys,
+// sc/lib/stemtrack.scd; every one has a keys hook in its code, the metal, 2:4, at the start): a second player on the
+// keys, the first one shaping the column on the Launch Control. Its knobs and buttons reach the keys, its fader does
+// not (it keeps playing its own hits). Knob 1 (CC 21) picks the column, the mod wheel (CC 1) is the keys' level,
+// knob 2 (CC 22) their tone (the filter range × 0.25 … 4, neutral at half), knob 8 (CC 28) the key pan spread; bank B
+// (CC 31-38) = the drum pads: 1 pitch, 2 fog, 3 thin, 4 drive, 5 spread, 6 boost.
 lkKeys: (slots: ['2:1', '2:2', '2:3', '2:4', '2:5', '2:6', '2:7'], start: '2:4', cc: 21,
 	level: \lkLevel, tone: \lkBright),
 lkCtl: { |ce, num, v, send|
