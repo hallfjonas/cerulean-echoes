@@ -2,11 +2,11 @@
 // (where), Moves (what), Lanes (how much) and Steps (exact). The sidebar picks the track and the performance (a script
 // opens as sections and Hand-made moves, perform-lab-core.mjs importScript) or starts a new one, and holds the palette
 // of the level; the stage holds the bar, the timeline, the inspector of the selection and the footer.
-// The selection (a section, a move or a step) survives a level change. The section bar under the top bar shows every
-// section on every level; the section clicked there (or selected anywhere) is the scope: Steps lists its steps, the
-// timelines tint it. Drag: moves (Moves), section edges and energy dots (Sections, Story), lane handles (Lanes: a
-// step's dot, and a square for a ramp's start; a step stays between its neighbours on the lane); a click on the ruler
-// sets the cursor, where new things are added.
+// The selection (a section, a move or a step) survives a level change. Story, Sections, Moves and Lanes share one
+// head that stays on top while the rows scroll: the ruler and the section strip. The section selected there (or in
+// the Steps dropdown) is the scope: Steps lists its steps, the timelines tint it. Drag: section edges (the head),
+// moves (Moves), energy dots (Sections, Story), lane handles (Lanes: a step's dot, and a square for a ramp's start; a
+// step stays between its neighbours on the lane); a click on the ruler sets the cursor, where new things are added.
 // Lanes and valueAt follow the performer (autoperform.mjs addSegment): a step moves from the value held at its bar,
 // so a step inside a running ramp cuts it there (a warning).
 // Keys on this page: 1-5 the level, ⌘Z / Ctrl-Z undo, Escape clears the selection, Backspace / Delete removes the
@@ -163,8 +163,7 @@ export function mountTracksLab({ section, stage, perform }) {
     '<label>Performance <select data-pick="performance"></select></label>' +
     '<p class="hint" data-part="meta"></p><button data-act="newPerformance">New performance</button>' +
     '<output data-part="status"></output><div data-part="play"></div><div data-part="palette"></div>'
-  stage.innerHTML = '<div class="tl-bar" data-part="bar"></div><div class="tl-secbar" data-part="secbar"></div>' +
-    '<div class="tl-main"><div class="tl-scroll" ' +
+  stage.innerHTML = '<div class="tl-bar" data-part="bar"></div><div class="tl-main"><div class="tl-scroll" ' +
     'data-part="scroll"><div class="tl-hint" data-part="hint"></div><div data-part="timeline"></div></div>' +
     '<aside class="tl-inspector" data-part="inspector"></aside></div><div class="tl-foot" data-part="foot"></div>'
 
@@ -275,15 +274,18 @@ export function mountTracksLab({ section, stage, perform }) {
   const ruler = () => `<div class="tl-row tl-ruler"><div class="tl-label">bar (from 0)</div><div class="tl-area" ` +
     `data-drag="cursor" style="width:${width()}px">${rulerMarks(state.lab.bars, state.ppb)
       .map(bar => `<span style="left:${bx(bar)}px">${bar}</span>`).join('')}${overlay()}</div></div>`
-  const sectionStrip = (height, thin) => row('sections', state.lab.sections.map((item, i) => {
+  const sectionStrip = () => row('sections', state.lab.sections.map((item, i) => {
     const on = state.sel?.type === 'section' && state.sel.id === item.id
+    const playing = state.playBar !== null && item.from <= state.playBar && state.playBar < item.to
     const edge = i < state.lab.sections.length - 1 ? `<span class="tl-edge" data-drag="edge" data-i="${i}"></span>` : ''
-    const detail = thin ? '' : `<small>${item.from}→${item.to} · ${minutesOf(item.to - item.from, state.bpm)}` +
-      `${item.intent ? ` · ${escapeHtml(item.intent)}` : ''}</small>`
-    return `<div class="tl-sec${thin ? ' thin' : ''}${on ? ' on' : ''}" data-act="select" data-type="section" ` +
-      `data-id="${item.id}" style="left:${bx(item.from)}px;width:${Math.max(2, bx(item.to - item.from) - 2)}px">` +
-      `<b>${escapeHtml(item.name)}</b>${detail}${edge}</div>`
-  }).join(''), height)
+    const about = `${item.name} · bars ${item.from}→${item.to} · ${minutesOf(item.to - item.from, state.bpm)}` +
+      `${item.intent ? ` · ${item.intent}` : ''}`
+    return `<div class="tl-sec${on ? ' on' : ''}${playing ? ' playing' : ''}" data-act="select" data-type="section" ` +
+      `data-id="${item.id}" title="${escapeHtml(about)}" style="left:${bx(item.from)}px;width:${Math.max(2,
+        bx(item.to - item.from) - 2)}px"><b>${escapeHtml(item.name)}</b><small>${item.from}→${item.to}</small>` +
+      `${edge}</div>`
+  }).join(''), 28)
+  const head = () => `<div class="tl-head">${ruler()}${sectionStrip()}</div>`
   const energyCurve = height => {
     const { sections, bars } = state.lab
     if (!sections.length) return ''
@@ -318,7 +320,7 @@ export function mountTracksLab({ section, stage, perform }) {
     const lab = state.lab
     const kinds = {}
     for (const { step } of state.tagged) kinds[stepKind(step)] = (kinds[stepKind(step)] ?? 0) + 1
-    return `<div class="tl">${ruler()}${energyCurve(120)}</div><div class="tl-body"><div class="tl-grid">` +
+    return `<div class="tl">${head()}${energyCurve(120)}</div><div class="tl-body"><div class="tl-grid">` +
       `<span>Title</span><input data-f="lab" data-k="title" value="${escapeHtml(lab.title)}">` +
       `<span>Length</span><div><input type="number" step="4" min="4" data-f="lab" data-k="bars" value="${lab.bars}">` +
       ` bars <span class="dim">= ${minutesOf(lab.bars, state.bpm)} at ${state.bpm} BPM</span></div>` +
@@ -329,7 +331,7 @@ export function mountTracksLab({ section, stage, perform }) {
       `moves</span><span><b>${state.tagged.length}</b> steps</span><span class="dim">${Object.entries(kinds)
         .map(([kind, n]) => `${kind} ${n}`).join(' · ')}</span></p></div>`
   }
-  const sectionsView = () => `<div class="tl">${ruler()}${energyCurve(70)}${sectionStrip(60, false)}${heatRows()}</div>`
+  const sectionsView = () => `<div class="tl">${head()}${energyCurve(70)}${heatRows()}</div>`
   const movesView = () => {
     const rows = new Map()
     for (const move of state.lab.moves) {
@@ -348,7 +350,7 @@ export function mountTracksLab({ section, stage, perform }) {
         `style="left:${bx(from)}px;width:${Math.max(14, bx(to - from))}px" title="${text} @ ${fmt(move.bar)}">` +
         `${edited}${text}</div>`
     }).join(''), 30)).join('')
-    return `<div class="tl">${ruler()}${sectionStrip(24, true)}${body}</div>`
+    return `<div class="tl">${head()}${body}</div>`
   }
   const laneSvg = (key, items) => {
     const height = 40
@@ -395,7 +397,7 @@ export function mountTracksLab({ section, stage, perform }) {
       lanes.set(key, [...lanes.get(key) ?? [], item])
     }
     const ordered = [...lanes].sort(([a], [b]) => keyRank(a, state.controls) - keyRank(b, state.controls))
-    return `<div class="tl">${ruler()}${sectionStrip(24, true)}${ordered.map(([key, items]) =>
+    return `<div class="tl">${head()}${ordered.map(([key, items]) =>
       laneSvg(key, items)).join('')}</div>`
   }
   const stepItems = () => {
@@ -407,9 +409,10 @@ export function mountTracksLab({ section, stage, perform }) {
     const scope = scoped()
     const toolbar = `<div class="tl-body tl-tools"><span class="seg"><button data-act="stepView" data-v="table" ` +
       `aria-pressed="${state.stepView === 'table'}">Table</button><button data-act="stepView" data-v="json" ` +
-      `aria-pressed="${state.stepView === 'json'}">JSON</button></span>` +
-      `<span class="dim">${items.length} of ${state.tagged.length} steps · ${scope ? `${escapeHtml(scope.name)} ` +
-        `(bars ${scope.from}→${scope.to})` : 'all sections'}</span></div>`
+      `aria-pressed="${state.stepView === 'json'}">JSON</button></span><label>Section <select data-f="scope">` +
+      `${option('', 'All sections', !scope)}${state.lab.sections.map(item => option(item.id, `${item.name} ` +
+        `(bars ${item.from}→${item.to})`, item === scope)).join('')}</select></label>` +
+      `<span class="dim">${items.length} of ${state.tagged.length} steps</span></div>`
     if (state.stepView === 'json') {
       return toolbar + `<pre class="tl-json">${escapeHtml(JSON.stringify({ ...toScript(state.lab),
         steps: items.map(item => item.step) }, null, 1).replace(/\n\s+(?=[^\s[\]{}])/g, ' ')
@@ -574,16 +577,6 @@ export function mountTracksLab({ section, stage, perform }) {
       '</span><span class="grow"></span>' +
       `<button data-act="undo"${state.history.length ? '' : ' disabled'} title="⌘Z">Undo</button>`
   }
-  const renderSecbar = () => {
-    const scope = scoped()
-    const block = item => `<button class="tl-scope${scope === item ? ' on' : ''}${state.playSection === item.id
-      ? ' playing' : ''}" data-act="scope" data-id="${item.id}" style="flex-grow:${item.to - item.from};` +
-      `--energy:${Math.round((item.energy ?? 0.5) * 40)}%" title="${escapeHtml(item.name)} · bars ${item.from}→` +
-      `${item.to}${item.intent ? ` · ${escapeHtml(item.intent)}` : ''}"><b>${escapeHtml(item.name)}</b><small>` +
-      `${item.from}→${item.to}</small></button>`
-    part('secbar').innerHTML = `<button class="tl-scope all${scope ? '' : ' on'}" data-act="scope" ` +
-      `title="Every section">All</button><span class="tl-scopes">${state.lab.sections.map(block).join('')}</span>`
-  }
   const renderHint = () => {
     const zoom = ['moves', 'lanes'].includes(state.level) ? `<label>zoom <input type="range" min="4" max="28" ` +
       `value="${state.zoom}" data-f="zoom" data-live="1"><output>${state.zoom}</output></label>` : ''
@@ -669,14 +662,13 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   const render = () => {
     if (!state.lab) {
-      for (const name of ['bar', 'secbar', 'hint', 'timeline', 'inspector', 'foot']) part(name).innerHTML = ''
+      for (const name of ['bar', 'hint', 'timeline', 'inspector', 'foot']) part(name).innerHTML = ''
       renderSide()
       return
     }
     if (state.sel?.type === 'section') state.scope = state.sel.id
     derive()
     renderBar()
-    renderSecbar()
     renderSide()
     renderHint()
     renderTimeline()
@@ -687,7 +679,6 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   const renderLive = () => {
     derive()
-    renderSecbar()
     renderTimeline()
     renderFoot()
     scheduleCheck()
@@ -864,14 +855,6 @@ export function mountTracksLab({ section, stage, perform }) {
         !(scope.from <= sel.range[0] && sel.range[0] < scope.to)) state.scope = sectionOf(state.lab, sel.range[0])?.id
       render()
     },
-    scope: el => {
-      const item = el.dataset.id ? findSection(el.dataset.id) : null
-      state.scope = item?.id ?? null
-      state.sel = item ? { type: 'section', id: item.id } : state.sel?.type === 'section' ? null : state.sel
-      render()
-      if (item && ['moves', 'lanes'].includes(state.level)) part('scroll').scrollLeft = bx(item.from)
-      if (item && state.playing) startPlay(item.from)
-    },
     select: el => {
       select(el.dataset.type === 'step' ? { type: 'step', move: el.dataset.move, index: Number(el.dataset.index) }
         : { type: el.dataset.type, id: el.dataset.id })
@@ -972,6 +955,11 @@ export function mountTracksLab({ section, stage, perform }) {
       state.zoom = Number(el.value)
       el.nextElementSibling.textContent = el.value
       return renderLive()
+    }
+    if (kind === 'scope') {
+      state.scope = el.value || null
+      state.sel = el.value ? { type: 'section', id: el.value } : state.sel?.type === 'section' ? null : state.sel
+      return render()
     }
     if (kind === 'bpm') {
       state.bpm = clamp(Number(el.value) || state.info.tempo || 120, 40, 220)
@@ -1154,7 +1142,7 @@ export function mountTracksLab({ section, stage, perform }) {
       const playSection = state.lab && state.playBar !== null ? sectionOf(state.lab, state.playBar)?.id ?? null : null
       if (playSection !== state.playSection && state.lab) {
         state.playSection = playSection
-        renderSecbar()
+        renderTimeline()
       }
       const line = part('playing')
       if (p && line) line.textContent = `bar ${Math.floor(p.bar)} (from 0) of ${state.lab?.bars ?? '?'}` +

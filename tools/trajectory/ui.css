@@ -69,24 +69,12 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 .toast .toast-input { flex: 1 1 100%; order: 2 }
 #tracksStage, #tracksLab { --c-enter: #6f9f86; --c-leave: #a58a6a; --c-build: #d85a30; --c-change: #8a84b8;
   --c-raw: #8a8984; --c-keys: #7f9fc4; --c-pad: #b88aa6 }
-#tracksStage { --label-w: 116px; position: absolute; inset: 0; display: grid;
-  grid-template-rows: auto auto 1fr auto;
+#tracksStage { --label-w: 116px; position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   font-size: 13px }
 #tracksStage .tl-bar, #tracksStage .tl-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
   padding: 8px 14px 8px 44px; border-bottom: 1px solid var(--line) }
 #tracksStage .tl-foot { border: 0; border-top: 1px solid var(--line) }
-#tracksStage .tl-secbar { display: flex; gap: 6px; padding: 6px 14px 6px 44px; border-bottom: 1px solid var(--line) }
-#tracksStage .tl-scopes { display: flex; flex: 1; gap: 2px; min-width: 0 }
-#tracksStage .tl-scope { flex: 1 1 0; min-width: 0; padding: 3px 7px; overflow: hidden; text-align: left;
-  white-space: nowrap; text-overflow: ellipsis; color: var(--fg); border-radius: var(--radius);
-  background: color-mix(in srgb, var(--rec) var(--energy, 0%), var(--control)) }
-#tracksStage .tl-scope.all { flex: none }
-#tracksStage .tl-scope b { font-weight: 600 }
-#tracksStage .tl-scope small { margin-left: 6px; color: var(--dim) }
-#tracksStage .tl-scope.on { background: var(--accent); color: var(--on-accent) }
-#tracksStage .tl-scope.on small { color: inherit; opacity: 0.7 }
-#tracksStage .tl-scope.playing { box-shadow: inset 0 -3px 0 var(--accent) }
-#tracksStage .tl-scope.on.playing { box-shadow: inset 0 -3px 0 var(--on-accent) }
 #tracksStage .grow { flex: 1 }
 #tracksStage .dim, #tracksStage .hint { color: var(--dim) }
 #tracksStage .hint { font-size: 12px }
@@ -129,13 +117,15 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #tracksStage .tl-scopeband { position: absolute; top: 0; bottom: 0; pointer-events: none;
   background: color-mix(in srgb, var(--accent) 5%, transparent); box-shadow: inset 1px 0 var(--accent),
   inset -1px 0 var(--accent) }
-#tracksStage .tl-sec { position: absolute; top: 3px; bottom: 3px; box-sizing: border-box; padding: 4px 8px;
+#tracksStage .tl-head { position: sticky; top: 0; z-index: 3; background: var(--bg) }
+#tracksStage .tl-sec { position: absolute; top: 3px; bottom: 3px; box-sizing: border-box; padding: 3px 7px;
   overflow: hidden; background: var(--control); border-radius: var(--radius); cursor: pointer; white-space: nowrap }
 #tracksStage .tl-sec b { font-weight: 600 }
-#tracksStage .tl-sec small { display: block; overflow: hidden; text-overflow: ellipsis; color: var(--dim) }
+#tracksStage .tl-sec small { margin-left: 6px; color: var(--dim) }
 #tracksStage .tl-sec.on { background: var(--accent); color: var(--on-accent) }
 #tracksStage .tl-sec.on small { color: inherit; opacity: 0.7 }
-#tracksStage .tl-sec.thin { padding: 1px 6px; font-size: 11px }
+#tracksStage .tl-sec.playing { box-shadow: inset 0 -3px 0 var(--accent) }
+#tracksStage .tl-sec.on.playing { box-shadow: inset 0 -3px 0 var(--on-accent) }
 #tracksStage .tl-edge { position: absolute; top: 0; bottom: 0; right: 0; width: 8px; cursor: ew-resize; z-index: 3 }
 #tracksStage .tl-move { position: absolute; top: 4px; bottom: 4px; box-sizing: border-box; min-width: 14px;
   padding: 2px 6px; overflow: hidden; white-space: nowrap; font-size: 11px; border-radius: 2px; cursor: grab;

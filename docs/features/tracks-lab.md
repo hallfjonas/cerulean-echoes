@@ -31,8 +31,9 @@ explain, Launchkey steps among them).
    is read again each time you open the page, so a take you just recorded is there.
 3. Change the level with the buttons on top or the keys **1**-**5**. Click a section, a move or a step to select it:
    the panel on the right edits it, and the selection stays when you change the level.
-4. The section bar under the level buttons shows every section on every level. Click one to work on it: the panel
-   edits it, the timelines mark it and scroll to it, and Steps lists only its steps; **All** shows every step.
+4. Story, Sections, Moves and Lanes share one head that stays on top while you scroll: the ruler and the sections.
+   Click a section to work on it: the panel edits it and the timelines mark it; drag its edge to resize it. Steps
+   has a Section dropdown instead: it lists only that section's steps, or all of them.
 5. Click the ruler to set the cursor; the sidebar adds sections, moves or steps there. Drag moves, section edges,
    energy dots and lane dots. **Cmd-Z** undoes, **Escape** clears the selection, **Backspace** deletes the selected
    move or step.
