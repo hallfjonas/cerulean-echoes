@@ -93,7 +93,10 @@
     "sdSynthMod/sd-synth-mod-brightness-space-swell-pattern-freeze.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw.stem": "the frame has no stabHere",
-    "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt"
+    "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-7.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw-2.stem": "the frame has no rootAt"
   },
   "008-groove-techno": {
     "sdSampleFx/sd-sample-fx-brightness-space-complexity-pattern-layer.stem": "the frame has no moodAt",
@@ -181,7 +184,10 @@
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw.stem": "the frame has no stabHere",
     "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt",
-    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi"
+    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-7.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw-2.stem": "the frame has no rootAt"
   },
   "009-house-3": {
     "sdNoise/sd-noise-brightness-space-motion-pattern-riser-2.stem": "the frame has no rootAt",
@@ -240,7 +246,10 @@
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw.stem": "the frame has no stabHere",
     "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt",
-    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi"
+    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-7.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw-2.stem": "the frame has no rootAt"
   },
   "009-house": {
     "sdNoise/sd-noise-brightness-space-motion-pattern-riser-2.stem": "the frame has no rootAt",
@@ -299,7 +308,10 @@
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw.stem": "the frame has no stabHere",
     "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt",
-    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi"
+    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-7.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw-2.stem": "the frame has no rootAt"
   },
   "010-ambient-house": {
     "sdSampleFx/sd-sample-fx-brightness-space-complexity-pattern-layer.stem": "the frame has no moodAt",
@@ -491,7 +503,10 @@
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw.stem": "the frame has no stabHere",
     "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt",
-    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi"
+    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-7.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw-2.stem": "the frame has no rootAt"
   },
   "091-soft-tom-demo": {
     "sdNoise/sd-noise-brightness-space-motion-pattern-riser-2.stem": "the frame has no rootAt",
@@ -550,6 +565,37 @@
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw-2.stem": "the frame has no rootAt",
     "sdSynthMod/sd-synth-mod-brightness-space-vanish-pattern-echo-throw.stem": "the frame has no stabHere",
     "sdSynthMod/sd-synth-mod-brightness-space-variation-pattern-echo-throw.stem": "the frame has no rootAt",
-    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi"
+    "sdSynthMod/sd-synth-mod-brightness-space-vibrato-pattern-echo-throw.stem": "the frame has no degMidi",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-7.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw.stem": "the frame has no rootAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-echo-throw-2.stem": "the frame has no rootAt"
+  },
+  "018-acid-tech-house": {
+    "sdSampleFx/sd-sample-fx-brightness-space-complexity-pattern-layer.stem": "the frame has no moodAt",
+    "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-echo-throw-2.stem": "the frame has no moodAt",
+    "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-echo-throw-3.stem": "the frame has no moodAt",
+    "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-run-2.stem": "the frame has no moodAt",
+    "sdSampleMod/sd-sample-mod-brightness-space-complexity-pattern-run.stem": "Primitive '_BasicAt' failed.",
+    "sdSupersaw/sd-supersaw-brightness-space-movement-pattern-echo-throw.stem": "the frame has no tonesAt",
+    "sdSupersaw/sd-supersaw-brightness-space-swipe-pattern-swipe.stem": "the frame has no tonesAt",
+    "sdSynthFx/sd-synth-fx-brightness-space-complexity-pattern-full-choir.stem": "the frame has no moodAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-beating-pattern-spare.stem": "the frame has no moodAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-answer-4.stem": "Primitive '_BasicAt' failed.",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-echo-throw.stem": "Primitive '_BasicAt' failed.",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-fill-3.stem": "the frame has no moodAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-flock.stem": "Primitive '_BasicAt' failed.",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-4.stem": "the frame has no lowAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-5.stem": "Primitive '_BasicAt' failed.",
+    "sdSynthMod/sd-synth-mod-brightness-space-decay-pattern-echo-throw.stem": "the frame has no tonesAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-drive-pattern-ratchet.stem": "the frame has no tonesAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-groove-pattern-octave.stem": "the frame has no moodAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-chords-rhythm.stem": "Message 'atBar' not understood.",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-octave-6.stem": "the frame has no lowAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-length-pattern-stab.stem": "Primitive '_BasicAt' failed.",
+    "sdSynthMod/sd-synth-mod-brightness-space-pump-chords-colour-2.stem": "Message 'atBar' not understood.",
+    "sdSynthMod/sd-synth-mod-brightness-space-pump-chords-colour-3.stem": "Message 'atBar' not understood.",
+    "sdSynthMod/sd-synth-mod-brightness-space-pump-chords-colour.stem": "Message 'atBar' not understood.",
+    "sdSynthMod/sd-synth-mod-brightness-space-swell-pattern-freeze-2.stem": "the frame has no moodAt",
+    "sdSynthMod/sd-synth-mod-brightness-space-swell-pattern-freeze.stem": "Primitive '_BasicAt' failed."
   }
 }

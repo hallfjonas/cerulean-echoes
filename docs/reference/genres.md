@@ -43,7 +43,8 @@ this PR and accepted it. Until then, the numbers are the ones the existing track
   playful melody on flute-like or bright sounds; a dry sound (little reverb on the drums).
 - **Must not have**: long pads and no bass groove (ambient house); a dark, minimal loop at 130+ BPM (techno).
 - **Tracks here**: 009-house ([stem track](../../sc/tracks/009-house/), A minor, 124 BPM); 001-groove ([stem track](../../sc/tracks/001-groove/), 80s groove house: disco / boogie and
-  rave colours, D dorian, 124 BPM).
+  rave colours, D dorian, 124 BPM); 018-acid-tech-house ([stem track](../../sc/tracks/018-acid-tech-house/), acid tech
+  house: funky bass, synth keys, shakers, F minor, 129 BPM).
 - **Listen**: Sarah Wild, Fusion 2025 (the main reference for 009, with its tracklist).
 
 ## Techno

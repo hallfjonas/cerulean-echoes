@@ -1,0 +1,70 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-complexity-pattern-octave-7",
+  "parent": "sdSynthMod/sd-synth-mod-brightness-space-complexity-pattern-octave-3.stem",
+  "about": "Funky syncopated bass: octave pops, slides, ghosts.",
+  "meta": {
+    "role": "bass",
+    "genres": [
+      "house",
+      "groove-techno"
+    ],
+    "energy": 4,
+    "tags": [
+      "bass",
+      "funk",
+      "syncopated",
+      "slide",
+      "wumms"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 1,
+  "code": "acid-funk-bass.scd",
+  "frame": {
+    "thin": false
+  },
+  "patterns": [
+    {
+      "label": "Funk"
+    },
+    {
+      "label": "Octave"
+    },
+    {
+      "label": "Bounce"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "dry ↔ room."
+    },
+    "k3": {
+      "label": "Complexity",
+      "about": "the line as written ↔ + muted ghost notes."
+    },
+    "fader": {
+      "label": "Level",
+      "about": "funky bass line, off the kick."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "funk → octave → bounce."
+    },
+    "b2": {
+      "label": "Octave",
+      "about": "one octave up while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 0.45
+}

@@ -1,0 +1,75 @@
+{
+  "format": 2,
+  "name": "sd-synth-mod-brightness-space-length-pattern-echo-throw",
+  "parent": null,
+  "about": "Soft synth keys: off-beat chords, also on the Launchkey.",
+  "meta": {
+    "role": "keys",
+    "label": "Keys",
+    "genres": [
+      "house"
+    ],
+    "energy": 3,
+    "tags": [
+      "synth",
+      "keys",
+      "chords",
+      "acid",
+      "launchkey"
+    ],
+    "harmony": "scale"
+  },
+  "sample": {
+    "name": "sdSynthMod"
+  },
+  "pitch": "none",
+  "orbit": 2,
+  "code": "acid-keys.scd",
+  "frame": {
+    "thin": false,
+    "tensionEcho": false
+  },
+  "patterns": [
+    {
+      "label": "Off-beat"
+    },
+    {
+      "label": "Comp"
+    },
+    {
+      "label": "Swell"
+    },
+    {
+      "label": "Keys only"
+    }
+  ],
+  "controls": {
+    "k1": {
+      "label": "Brightness",
+      "about": "dull ↔ bright, also on the keys."
+    },
+    "k2": {
+      "label": "Space",
+      "about": "close ↔ room and echo."
+    },
+    "k3": {
+      "label": "Length",
+      "about": "short stab ↔ long, ringing chord.",
+      "default": 0.35
+    },
+    "fader": {
+      "label": "Level",
+      "about": "the synth keys chords (the mod wheel: the keys)."
+    },
+    "b1": {
+      "label": "Pattern",
+      "about": "off-beat → comp → swell → keys only."
+    },
+    "b2": {
+      "label": "Echo throw",
+      "about": "long echo on the keys while held.",
+      "mode": "hold"
+    }
+  },
+  "gain": 1.1
+}
