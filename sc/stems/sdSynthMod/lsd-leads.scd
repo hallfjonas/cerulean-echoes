@@ -3,6 +3,8 @@
 // the blips alone, four duos of a loop and a phrase, and a trade (the loop in bars 1-4 of 8, the blips in bars 5-8). The
 // blips also play where the stab leaves a bar (frame.stabGap). Complexity fills the loop in and adds the blips' voices.
 // Button 2 lifts the loop an octave. Space scales room and echo of both.
+// The Launchkey keys (keys, the frame's lkKeys): a key plays one note of the FM mallet loop at its own pitch (button 2
+// lifts it an octave); Complexity blends the rubbery blip in, an octave up.
 (
 states: (room: 0.9 * 0.3, echo: 0.5 * 2 * 0.3),
 strip: (roomR: \room, echoSend: \echo),
@@ -50,5 +52,17 @@ notes: { |col, k|
 	half = if(combo[2] == \trade) { (b % 8) < 4 };
 	(if(combo[0].notNil and: { half != false }) { loop.(combo[0]) } { [] })
 		++ (if(combo[1].notNil and: { half != true }) { blips.(combo[1]) } { [] })
+},
+keys: { |col, note, vel|
+	var ce = col[\ce], kit = ce.kitOf(col), t = TempoClock.default.beats / 4, blip = kit[\ramp].(col.knob(\k3), 0.5, 1);
+	var m = note + if(col.held(\b2)) { 12 } { 0 }, out = List[];
+	out.add(kit[\syn].(\sine, m, 0.8 * 0.6 * vel, (fmi: 0.4 + (1.6 * col.knob(\k1)), fmh: 2, hold: 1,
+		pan: 0.35 + (0.3 * ce.sine(t / 3)), lpOn: 1, bright: col.knob(\k1), lo: 1500, hi: 12000, tone: kit[\tone])
+		++ kit[\adsr].(0.003, 0.28, 0, 0.25)));
+	if(blip > 0) { var lp = (lpOn: 1, bright: col.knob(\k1), lo: 2000, hi: 12000, tone: kit[\tone], hold: 1,
+			penv: 0.5, pd: 0.03, ps: 0.001) ++ kit[\adsr].(nil, 0.085, 0, 0.06);
+		out.add(kit[\syn].(\square, m + 12, 0.54 * blip * vel, lp));
+		out.add(kit[\syn].(\sine, m + 24, 0.35 * 0.54 * blip * vel, lp ++ kit[\adsr].(nil, 0.06, 0, 0.04))) };
+	out.asArray
 }
 )

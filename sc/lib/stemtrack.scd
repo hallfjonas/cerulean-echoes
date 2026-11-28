@@ -9,6 +9,9 @@
 //   chapterBars                              Chapter switches at the next phrase of this many bars (default 4)
 //   orbits, states, samples, maps, stems     merged into the track (stems: e.g. the Launchkey's own stem)
 //   lkNote, lkCtl, lkPadNames                the Launchkey, as in a hand-written track
+//   lkKeys: (slots: ['2:1', …], start: '2:4', cc: 21, level: \lkLevel, tone: \lkBright)   the keys play one of
+//                                            these columns through its own strip (~ce.lkColumnNotes; lkNote then gets
+//                                            the pads only), the Launchkey knob `cc` picks it; level, tone: state buses
 //   build: { |frame, track, ce| }            more latches or buttons, after the stem columns
 //   global: (fog: cc, thin: cc, tension: cc, master: cc)   the CCs the strips read instead of column 8's Fog, Thin,
 //                                            Tension and Master (007: its Room knob is the strips' Tension, no Thin)
@@ -55,7 +58,7 @@
 		name: json[\name], bpm: bpm, swing: self.numOf(json[\swing] ? 0), frame: frame, frameFile: frameFile,
 		slots: (), columns: (), backing: (), pending: (), lab: json[\lab] == true,
 		ccCount: json[\ccCount], ccStart: (), lkNote: frame[\lkNote], lkCtl: frame[\lkCtl], lkStart: frame[\lkStart],
-		lkPadNames: frame[\lkPadNames],
+		lkPadNames: frame[\lkPadNames], lkKeys: frame[\lkKeys], lkKeysSlot: frame[\lkKeys] !? { |k| k[\start] },
 		global: frame[\global] ?? { if(frame[\masterless] == true) { (fog: glob.fog, thin: glob.thin, tension: glob.tension) } {
 			(fog: glob.fog, thin: glob.thin, tension: glob.tension, master: glob.master) } },
 		tensionEchoAmt: frame[\tensionEchoAmt], tensionRoomAmt: frame[\tensionRoomAmt],
@@ -193,6 +196,53 @@
 			out } };
 	};
 	entry
+};
+
+// The Launchkey keys on a stem track whose frame has lkKeys: they play one column (track.lkKeysSlot) into that
+// column's own strip, so orbit, room, echo and trim follow the column, also after a swap; its fader does not reach
+// them. A column can play keys when its column code has keys: { |col, note, vel| notes } or its stem is pitched JSON
+// (no column code, no kit): then a key plays one hit of its first layer at the key's note, the knobs as they are.
+~ce.lkColumnPlayable = { |self, col|
+	col.notNil and: { if(col[\colCode].notNil) { col[\colCode][\keys].notNil } {
+		(col[\pitch] != \none) and: { col[\kit].isNil } } }
+};
+~ce.lkColumnChoices = { |self|
+	var t = self.track;
+	t[\lkKeys][\slots].select { |s| self.lkColumnPlayable(t[\columns][s]) }
+};
+~ce.lkColumnLabel = { |self|
+	var col = self.track[\columns][self.track[\lkKeysSlot]];
+	var name = col !? { (col[\stem][\meta][\label] ? col[\stem][\meta][\role]).asString };
+	if(name.isNil) { "–" } { name[0].toUpper.asString ++ name.drop(1) }
+};
+// the knob value v picks the choice in its zone; the start column holds until the knob moves
+~ce.lkColumnSelect = { |self, v|
+	var t = self.track, choices = self.lkColumnChoices;
+	if(choices.notEmpty) {
+		t[\lkKeysSlot] = choices[(v * choices.size).floor.asInteger.min(choices.size - 1)];
+		self.status("Keys", self.lkColumnLabel);
+		self.uiPush }
+};
+// the notes of a key: the column's, with the tone (× the low-pass range, neutral at half), the key pan (knob 8) and the
+// level on top
+~ce.lkColumnNotes = { |self, note, vel|
+	var t = self.track, cfg = t[\lkKeys], col = t[\columns][t[\lkKeysSlot]];
+	var level = cfg[\level] !? { |x| self.stateVal[x] } ? 1;
+	var tone = cfg[\tone] !? { |x| 2 ** (4 * ((self.stateVal[x] ? 0.5) - 0.5)) } ? 1;
+	if((level <= 0) or: { self.lkColumnPlayable(col).not }) { [] } {
+		var lanes = self.stemBus[col[\stemName]], pan = self.lkKeyPanArgs(note), notes;
+		notes = if(col[\colCode].notNil) { col[\colCode][\keys].(col, note, vel) } {
+			var k = (TempoClock.default.beats * 4).floor.asInteger.max(0), hit = (at: 0, dur: 4, note: 0, vel: vel);
+			[col.noteOf(hit, k, (k / 16).floor, col.knobValues(false), false, col[\layers][0])]
+				.reject(_.isNil).collect { |n| n.put(\freq, note.midicps).put(\midi, note) } };
+		(notes ? []).do { |n| if(n[\instrument].notNil) {
+			if(lanes[n[\lane]].isNil) { n.removeAt(\lane) };
+			n[\lo] !? { |x| n[\lo] = x * tone };
+			n[\hi] !? { |x| n[\hi] = x * tone };
+			n.putAll(pan);
+			n[\post] = (n[\post] ? 1) * level } };
+		notes ? []
+	}
 };
 
 // The @ tags of a stem track (read by the web UI instead of the file's comments): modes, a heading and six @ctl

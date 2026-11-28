@@ -6,6 +6,8 @@
 // taking the four tails in turn. Complexity (row 3) adds a rising saw (from 0), a small riser in the middle (from 0.5)
 // and a dub siren in the last half (from 0.75); button 2 is a riser by hand (4 bars). Space scales room (from 0.4) and
 // echo (from 0.2).
+// The Launchkey keys (keys, the frame's lkKeys): a key plays a tail (the phrase's own while Pattern fixes one, else one
+// at random per press) with its boom, laser, bells or dive two octaves below its own pitch.
 (
 // [phrase length in bars, tail (nil: picked anew, \turn: the four in turn)]
 var phrases = [[8, nil], [16, nil], [4, nil], [8, 0], [8, 1], [8, 2], [8, 3], [16, \turn]];
@@ -50,6 +52,30 @@ notes: { |col, k|
 	r = st[\rise].(t);
 	r !? { out.addAll(riser.(r, 1.2)) };
 	out.reject { |n| n.amp <= 0 }
+},
+keys: { |col, note, vel|
+	var ce = col[\ce], kit = ce.kitOf(col), v = col[\patLatch].now, out = List[];
+	var syn = kit[\syn], noise = kit[\noise], adsr = kit[\adsr], m = note - 24;
+	var fixed = if(v > 0) { phrases[v - 1][1] }, tail = if(fixed.isNumber) { fixed } { 4.rand };
+	var lp = (lpOn: 1, bright: col.knob(\k1), lo: 2000, hi: 16000, tone: kit[\tone]);
+	var fall = { |g, bp, to, q| 16.do { |i| var x = i / 16;
+		out.add(noise.(0, g * vel * ((1 - x) ** 2),
+			lp ++ (at: i, hold: 1, bp: bp * (to ** x), bpq: q) ++ adsr.(0.005, nil, 1, 0.2))) } };
+	var boom = { out.add(syn.(\sine, m, 0.45 * vel,
+		lp ++ (hold: 16, penv: 12, pd: 0.25) ++ adsr.(0.005, 1.2, 0, 0.3))) };
+	var bell = { |d, i, at, up| var g = (0.5 - (0.15 * i)) * vel;
+		out.add(ce.note(\modalPerc, lp ++ (kind: 1, freq: (m + d + up).midicps, decay: 1.8, glide: 0, hard: 0.8,
+			skin: 0, amp: g, pan: 0.3 + (0.4 * i), hold: 1, at: at, thinF: kit[\thin], tag: "bell", g: g, midi: m + d))) };
+	switch(tail,
+		0, { fall.(0.6, 6000, 1 / 20, 1); boom.() },
+		1, { out.add(syn.(\sawtooth, m, 0.14 * vel, lp ++ (hold: 8, penv: 36, pd: 1.4, ps: 0.001, lpq: 14, lo: 900,
+				hi: 900, bright: 0) ++ adsr.(0.002, 1.6, 0, 0.3)));
+			boom.() },
+		2, { fall.(0.35, 4000, 1 / 10, 2); [0, 6].do { |at, j| [24, 31].do { |d, i| bell.(d, i, at, 12 * j) } } },
+		3, { [[\sawtooth, 12, 0.12], [\sine, 0, 0.4]].do { |w| out.add(syn.(w[0], m + w[1], w[2] * vel,
+				lp ++ (hold: 32, penv: 36, pd: 3.2, ps: 0.001, lpq: 4) ++ adsr.(0.005, 3.4, 0, 0.4))) };
+			fall.(0.25, 3000, 1 / 10, 1.5) });
+	out.asArray
 }
 )
 )

@@ -18,6 +18,7 @@
 //   start: { |col, ce| }           after the server set-up: latches, own hooks (col.st holds the column's state)
 //   update: { |col, send| }        on every move of a knob, the fader or button 2: set the column's state buses
 //   b1: { |col| }                  button 1 instead of "next pattern at the next bar"
+//   keys: { |col, note, vel| }    a Launchkey key on this column (the frame's lkKeys, stemtrack.scd): its notes
 //   gate: false                    asked at fader 0 too (state that moves every 16th: lifts, look-ahead)
 //   states: (name: start value)    the column's state buses (col.setState, col.stateMapOf)
 //   maps: (name: (ccs: [\k1 …], fn: { |v …| ugen }))   server-side values of the column's controls (col.mapBusOf)
