@@ -3,7 +3,7 @@
 // move.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { columnOf, fitPpb, lanePath, laneRoom, minutesOf, moveRow, rulerMarks, segmentsOf, snap, valueAt }
+import { columnOf, fitPpb, lanePath, laneRoom, minutesOf, moveRow, packLanes, rulerMarks, segmentsOf, snap, valueAt }
   from './perform-lab-ui.mjs'
 
 test('perform lab ui: ruler marks every 4, 8 or 16 bars by width, snap, fitted width', () => {
@@ -43,6 +43,19 @@ test('perform lab ui: a lane step stays between its neighbours', () => {
   assert.deepEqual(laneRoom(lane, 1, 32), [4, 12], 'after the ramp before it, before the step after it')
   assert.deepEqual(laneRoom(lane, 0, 32), [0, 8])
   assert.deepEqual(laneRoom(lane, 2, 32), [8, 32])
+})
+
+test('perform lab ui: moves that overlap in a row stack on sub-lanes, touching ones share one', () => {
+  const lanes = boxes => boxes.map(box => packLanes(boxes).lane.get(box.id))
+  assert.deepEqual(lanes([{ id: 'a', left: 0, right: 50 }, { id: 'b', left: 40, right: 60 }]), [0, 1])
+  assert.deepEqual(lanes([{ id: 'a', left: 0, right: 50 }, { id: 'b', left: 50, right: 60 }]), [0, 0])
+  const enterThenPresses = [{ id: 'enter', left: 96, right: 122 }, { id: 'press1', left: 114, right: 130 },
+    { id: 'press2', left: 120, right: 136 }]
+  assert.deepEqual(lanes(enterThenPresses), [0, 1, 2], 'a ramp and two presses right after it')
+  assert.equal(packLanes(enterThenPresses).count, 3)
+  assert.equal(packLanes([]).count, 1, 'an empty row keeps one lane')
+  const same = [{ id: 'b', left: 10, right: 20 }, { id: 'a', left: 10, right: 20 }]
+  assert.deepEqual(lanes(same), [1, 0], 'equal left edges go by id, whatever the order')
 })
 
 test('perform lab ui: a CC’s column, the Moves row of a move', () => {

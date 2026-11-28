@@ -43,6 +43,8 @@ explain, Launchkey steps among them).
 
 ## Good to know
 - Bars count from 0, as in the script, and a range ends before its last number: a section 16→32 holds bars 16 to 31.
+- On the Moves level, moves that overlap in time stack in their row, which grows, so every move stays visible and
+  clickable at any zoom.
 - A lane shows what the performer plays: a step starts from the value the control holds at its bar, so a step that
   starts inside the ramp before it cuts that ramp (a warning in the footer). Dragging keeps a step between its
   neighbours on the lane, so a drag never makes such a cut.

@@ -28,6 +28,8 @@ const NAME = /^[a-z0-9][a-z0-9-]*$/
 const CHECK_DELAY_MS = 300
 const HISTORY = 100
 const LABEL_WIDTH = 116
+const MOVE_LANE = 26
+const MOVE_GAP = 2
 const LEVELS = [['story', 'Story', 'why'], ['sections', 'Sections', 'where'], ['moves', 'Moves', 'what'],
   ['lanes', 'Lanes', 'how much'], ['steps', 'Steps', 'exact']]
 const LEVEL_HINTS = {
@@ -97,6 +99,20 @@ export const lanePath = (steps, x, y, width) => {
     d += `L${x(segment.bar)},${y(segment.from)}L${x(end)},${y(heldAt([segment], end))}`
   })
   return d + `L${width},${y(heldAt(segments, Infinity))}`
+}
+
+// { lane: Map<id, index>, count }: boxes [{ id, left, right }] (pixels) stacked so that no two overlap, each on the
+// first sub-lane free at its left edge; boxes that only touch share a sub-lane
+export const packLanes = boxes => {
+  const ends = [], lane = new Map()
+  const ordered = [...boxes].sort((a, b) => a.left - b.left || String(a.id).localeCompare(String(b.id)))
+  for (const box of ordered) {
+    let index = ends.findIndex(end => end <= box.left)
+    if (index < 0) index = ends.length
+    ends[index] = box.right
+    lane.set(box.id, index)
+  }
+  return { lane, count: Math.max(1, ends.length) }
 }
 
 // [low, high]: the bars a lane step may take, between the end of the step before it and the start of the step after
@@ -339,17 +355,23 @@ export function mountTracksLab({ section, stage, perform }) {
       if (!rows.has(key)) rows.set(key, { key, rank, moves: [] })
       rows.get(key).moves.push(move)
     }
-    const body = [...rows.values()].sort((a, b) => a.rank - b.rank).map(({ key, moves }) => row(key, moves.map(move => {
-      const [from, to] = state.spans.get(move.id)
-      const on = state.sel?.type === 'move' && state.sel.id === move.id
-      const edited = Object.keys(move.edits ?? {}).length
-        ? '<span class="tl-edited" title="hand-edited steps">●</span> ' : ''
-      const text = escapeHtml(moveText(move, state.controls))
-      return `<div class="tl-move cat-${CATEGORY[move.kind]}${on ? ' on' : ''}" data-drag="move" ` +
-        `data-id="${move.id}" ` +
-        `style="left:${bx(from)}px;width:${Math.max(14, bx(to - from))}px" title="${text} @ ${fmt(move.bar)}">` +
-        `${edited}${text}</div>`
-    }).join(''), 30)).join('')
+    const body = [...rows.values()].sort((a, b) => a.rank - b.rank).map(({ key, moves }) => {
+      const boxes = moves.map(move => {
+        const [from, to] = state.spans.get(move.id)
+        const left = bx(from), boxWidth = Math.max(14, bx(to - from))
+        return { id: move.id, move, left, width: boxWidth, right: left + boxWidth + MOVE_GAP }
+      })
+      const { lane, count } = packLanes(boxes)
+      return row(key, boxes.map(({ move, left, width: boxWidth }) => {
+        const on = state.sel?.type === 'move' && state.sel.id === move.id
+        const edited = Object.keys(move.edits ?? {}).length
+          ? '<span class="tl-edited" title="hand-edited steps">●</span> ' : ''
+        const text = escapeHtml(moveText(move, state.controls))
+        return `<div class="tl-move cat-${CATEGORY[move.kind]}${on ? ' on' : ''}" data-drag="move" ` +
+          `data-id="${move.id}" style="left:${left}px;width:${boxWidth}px;top:${2 + lane.get(move.id) * MOVE_LANE}px;` +
+          `height:${MOVE_LANE - 4}px" title="${text} @ ${fmt(move.bar)}">${edited}${text}</div>`
+      }).join(''), count * MOVE_LANE + 4)
+    }).join('')
     return `<div class="tl">${head()}${body}</div>`
   }
   const laneSvg = (key, items) => {
