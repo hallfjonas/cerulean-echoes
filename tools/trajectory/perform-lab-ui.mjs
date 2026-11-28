@@ -7,8 +7,8 @@
 // the Steps dropdown) is the scope: Steps lists its steps, the timelines tint it. Drag: section edges (the head),
 // moves (Moves), energy dots (Sections, Story), lane handles (Lanes: a step's dot, and a square for a ramp's start; a
 // step stays between its neighbours on the lane); a click on the ruler sets the cursor, where the sidebar adds.
-// Adding where you point: every stem has a Moves row and every Launch Control control a lane (empty ones too); a
-// click on a row's empty space (Moves) or a double-click on a lane (Lanes) opens a popup of the moves that fit there
+// Adding where you point: every stem has a Moves row and every Launch Control control a lane (empty ones too); a +
+// follows the pointer over a row's or a lane's empty space, and a click there opens a popup of the moves that fit
 // (perform-lab-core.mjs movesFor). A move dragged onto another Moves row moves to that stem (retarget) or snaps back.
 // Lanes and valueAt follow the performer (autoperform.mjs addSegment): a step moves from the value held at its bar,
 // so a step inside a running ramp cuts it there (a warning).
@@ -41,7 +41,7 @@ const LEVEL_HINTS = {
   moves: 'Musical gestures: a stem enters, a build, a break. Each compiles to steps. Click a row to add a move; ' +
     'drag a move along its row or onto another stem.',
   lanes: 'One lane per control, like automation. Drag a dot for value and time, a square for where a ramp starts. ' +
-    'Double-click a lane to add a move.',
+    'Click a lane to add a move.',
   steps: 'The exact script v2 rows of the section chosen above. Edit any field; the move that made the step keeps ' +
     'the edit.',
 }
@@ -623,7 +623,7 @@ export function mountTracksLab({ section, stage, perform }) {
         Object.entries(SECTION_TYPES).map(([type, [name, , intent]]) => `<button data-act="addSection" ` +
           `data-v="${type}">${name}<small>${escapeHtml(intent)}</small></button>`).join('') + '</div>',
       moves: `<h2>Add a move</h2><p class="hint">At the cursor (${at})${on}; click the ruler to move it. Or ` +
-        'click a row on Moves, double-click a lane on Lanes.</p>' +
+        'click a row on Moves or a lane on Lanes.</p>' +
         Object.entries(groups).map(([group, list]) => `<h3>${group}</h3><div class="tl-palette">` +
           list.map(([kind, spec]) => `<button class="cat-${CATEGORY[kind]}" data-act="addMove" data-v="${kind}">` +
             `${spec.name}<small>${spec.hint}</small></button>`).join('') + '</div>').join(''),
@@ -1095,6 +1095,7 @@ export function mountTracksLab({ section, stage, perform }) {
   stage.addEventListener('pointerdown', event => {
     const el = event.target.closest('[data-drag]')
     if (!el || event.button || !state.lab) return
+    suppressClick = true
     const kind = el.dataset.drag
     const rect = (el.closest('svg') ?? el.closest('.tl-area')).getBoundingClientRect()
     const barAt = ev => (ev.clientX - rect.left) / state.ppb
@@ -1128,7 +1129,6 @@ export function mountTracksLab({ section, stage, perform }) {
         })?.dataset.stem
         target = id && id !== home ? { id, ...retarget(move, id, state.controls) } : null
         showTarget(ev, move, target)
-        suppressClick = true
       }, end: () => {
         showTarget(null)
         if (target?.move) {
@@ -1225,7 +1225,7 @@ export function mountTracksLab({ section, stage, perform }) {
     stage.append(dropHint)
   }
 
-  // the popup of the moves that fit where the pointer is (a click on a Moves row, a double-click on a lane); a line
+  // the popup of the moves that fit where the pointer is (a click on a Moves row or a lane); a line
   // adds its move at that bar, a Move control or Enter on a lane at the value under the pointer
   let popup = null
   const closePopup = () => {
@@ -1265,43 +1265,44 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   addEventListener('pointerdown', event => { if (popup && !popup.el.contains(event.target)) closePopup() }, true)
 
-  // Moves: a + at the bar under the pointer on a row's empty space; a click there opens the popup
+  // Moves and Lanes: a + at the bar under the pointer on a row's or a lane's empty space; a click there opens the
+  // popup. A Moves row snaps to the bar; a lane to ¼ bar, whole bars on a button, the 4-bar line on Chapter, and takes
+  // the value from the height on a knob or fader.
   const plus = Object.assign(document.createElement('div'), { className: 'tl-plus', textContent: '+' })
-  const emptyArea = event => state.lab && state.level === 'moves' && !drag &&
-    !event.target.closest('.tl-move, .tl-pop') ? event.target.closest('.tl-row[data-stem] > .tl-area') : null
-  const barUnder = (event, area) =>
-    clamp(Math.floor((event.clientX - area.getBoundingClientRect().left) / state.ppb), 0, state.lab.bars - 1)
-  stage.addEventListener('pointermove', event => {
-    const area = emptyArea(event)
-    if (!area) return plus.remove()
-    Object.assign(plus.style, { left: `${bx(barUnder(event, area))}px`, width: `${Math.max(14, bx(1))}px` })
-    if (plus.parentNode !== area) area.append(plus)
-  })
-  stage.addEventListener('pointerleave', () => plus.remove())
-  stage.addEventListener('click', event => {
-    const area = emptyArea(event)
-    if (!area || suppressClick) return
-    const id = area.parentNode.dataset.stem
-    openPopup(event, area.parentNode.querySelector('.tl-label').title, movesFor(id, state.controls),
-      barUnder(event, area))
-  })
-
-  // Lanes: a double-click on a lane opens the popup for its control (¼ bar, whole bars on a button, the 4-bar line on
-  // Chapter; the value from the height on a knob or fader)
-  stage.addEventListener('dblclick', event => {
-    if (!state.lab || state.level !== 'lanes' || event.target.closest('[data-drag], [data-act]')) return
-    const svg = event.target.closest('.tl-row[data-key] > .tl-area')?.querySelector('svg')
-    if (!svg) return
-    const raw = svg.closest('.tl-row').dataset.key
+  const addSpot = event => {
+    const lanes = state.level === 'lanes'
+    if (!state.lab || drag || !(lanes || state.level === 'moves') ||
+      event.target.closest('.tl-move, .tl-pop, [data-drag], [data-act]')) return null
+    const area = event.target.closest(lanes ? '.tl-row[data-key] > .tl-area' : '.tl-row[data-stem] > .tl-area')
+    if (!area) return null
+    const rect = area.getBoundingClientRect()
+    const at = (event.clientX - rect.left) / state.ppb
+    if (!lanes) {
+      const id = area.parentNode.dataset.stem
+      return { area, grid: 1, bar: clamp(Math.floor(at), 0, state.lab.bars - 1),
+        title: area.parentNode.querySelector('.tl-label').title, fits: movesFor(id, state.controls) }
+    }
+    const raw = area.parentNode.dataset.key
     const key = /^\d+$/.test(raw) ? Number(raw) : raw
     const control = state.controls.get(key)
     const grid = control?.name === 'Global Chapter' ? 4 : control?.button ? 1 : 0.25
-    const rect = svg.getBoundingClientRect()
-    const bar = clamp(snap((event.clientX - rect.left) / state.ppb, grid), 0, state.lab.bars - grid)
-    const height = Number(svg.getAttribute('height'))
-    const value = round(clamp(snap((height - 5 - (event.clientY - rect.top)) / (height - 10), 0.05), 0, 1), 2)
-    openPopup(event, keyLabel(key), movesFor(key, state.controls), bar,
-      control && !control.button ? value : undefined)
+    const svg = area.querySelector('svg')
+    const height = Number(svg.getAttribute('height')), top = svg.getBoundingClientRect().top
+    const value = control && !control.button
+      ? round(clamp(snap((height - 5 - (event.clientY - top)) / (height - 10), 0.05), 0, 1), 2) : undefined
+    return { area, grid, bar: clamp(snap(at, grid), 0, state.lab.bars - grid), title: keyLabel(key),
+      fits: movesFor(key, state.controls), value }
+  }
+  stage.addEventListener('pointermove', event => {
+    const spot = addSpot(event)
+    if (!spot) return plus.remove()
+    Object.assign(plus.style, { left: `${bx(spot.bar)}px`, width: `${Math.max(14, bx(spot.grid))}px` })
+    if (plus.parentNode !== spot.area) spot.area.append(plus)
+  })
+  stage.addEventListener('pointerleave', () => plus.remove())
+  stage.addEventListener('click', event => {
+    const spot = !suppressClick && addSpot(event)
+    if (spot) openPopup(event, spot.title, spot.fits, spot.bar, spot.value)
   })
 
   const typing = target => target.closest?.('input:not([type=range]):not([type=checkbox]), textarea, select')

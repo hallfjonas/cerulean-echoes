@@ -139,7 +139,7 @@ output { color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2.2em 
 #tracksStage .tl-plus { position: absolute; top: 0; bottom: 0; display: flex; align-items: center;
   justify-content: center; color: var(--dim); background: color-mix(in srgb, var(--fg) 6%, transparent);
   pointer-events: none }
-#tracksStage .tl-row[data-stem] > .tl-area { cursor: copy }
+#tracksStage .tl-row[data-stem] > .tl-area, #tracksStage .tl-row[data-key] > .tl-area { cursor: copy }
 #tracksStage .tl-row.tl-target > .tl-area { background-color: color-mix(in srgb, var(--accent) 14%, transparent) }
 #tracksStage .tl-row.tl-refuse > .tl-area { background-color: color-mix(in srgb, var(--err) 18%, transparent) }
 #tracksStage .tl-empty svg { opacity: 0.45 }

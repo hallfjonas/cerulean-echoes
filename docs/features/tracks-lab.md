@@ -34,8 +34,8 @@ explain, Launchkey steps among them).
 4. Story, Sections, Moves and Lanes share one head that stays on top while you scroll: the ruler and the sections.
    Click a section to work on it: the panel edits it and the timelines mark it; drag its edge to resize it. Steps
    has a Section dropdown instead: it lists only that section's steps, or all of them.
-5. Add a move where you point: on Moves, hover a row (a **+** follows the pointer) and click, on Lanes double-click
-   a lane; a popup lists the moves that fit there (on a lane, the height sets the value). The sidebar adds at the
+5. Add a move where you point: on Moves hover a row, on Lanes a lane (a **+** follows the pointer), and click; a
+   popup lists the moves that fit there (on a lane, the height sets the value). The sidebar adds at the
    cursor (click the ruler to set it), on the selected move's stem or the selected section's busiest one, where the
    move fits.
 6. Drag moves, section edges, energy dots and lane dots. Drag a move up or down onto another stem: it takes that

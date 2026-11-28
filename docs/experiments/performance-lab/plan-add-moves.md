@@ -50,10 +50,10 @@ with its number ("Enter · 4 Bass Level"), and add the mode where two stems woul
   `stemOf` order. Today only controls with a step have a lane.
 - The caret unfolds every control of the stem, empty lanes dimmed; **+n** still counts the folded lanes that hold
   steps. This replaces a separate "+ lane" picker.
-- Double-click on a lane → the same popup, filtered to the lane's control; the bar from x (¼ bar snap; whole bars on
-  a button lane, the 4-bar line on Chapter), and for Move control / Enter the value from y. Single click keeps
-  selecting.
-- Keys, Pads and LK knobs lanes stay as today (only with steps); a double-click there says nothing fits yet.
+- The same + as on Moves follows the pointer over a lane's empty space; a click → the same popup, filtered to the
+  lane's control; the bar from x (¼ bar snap; whole bars on a button lane, the 4-bar line on Chapter), and for Move
+  control / Enter the value from y. A click on a dot keeps selecting it.
+- Keys, Pads and LK knobs lanes stay as today (only with steps); a click there says nothing fits yet.
 
 ## Moves level: drag to another row
 - A move drag follows the pointer vertically too. The row under the pointer is the target: the stem, never a sub-lane
@@ -88,7 +88,7 @@ stem does not list the kind (Fog dip with a Kick move selected), the kind's defa
 - `tools/trajectory/perform-lab-core.mjs` (+ test): `columnOf` and `stemOf` (moved from the UI), `movesFor`,
   `retarget(move, toStem, controls)` → `{ move } | { reason }`, the busiest stem of a section.
 - `tools/trajectory/perform-lab-ui.mjs` (+ test): every row and main lane, unfolded stems with all their controls,
-  hover +, popup, lane double-click, vertical drag.
+  hover + and click on rows and lanes, popup, vertical drag.
 - `tools/trajectory/ui.css`: popup, + marker, red target row, dimmed empty lane.
 - Docs: `docs/features/tracks-lab.md` (how to add and move moves: step 5 of "How to use it", and the Lanes fold in
   "Good to know").
@@ -99,7 +99,7 @@ stem does not list the kind (Fog dip with a Kick move selected), the kind's defa
   on a column, keeps edits; every move added from the popup passes `check-perform`.
 - `perform-lab-ui.test.mjs`: the `stemOf` tests follow it to core; every stem gets a row on a lab without moves.
 - In the player: on 009-house, hover the 4 Bass row (no moves yet) → + → Enter → it lands on 4 Bass Level at that
-  bar; double-click the Master lane at bar 8, y = 0.7 → Move control Master → 0.7 at 8; drag 1 Kick Enter onto the
+  bar; click the Master lane at bar 8, y = 0.7 → Move control Master → 0.7 at 8; drag 1 Kick Enter onto the
   5 Clap row → 5 Clap Level; drag a Fog dip onto 1 Kick → red row, snaps back; drag a move onto one it overlaps →
   the row unfolds. Screenshots in the PR.
 - `npm test`.
