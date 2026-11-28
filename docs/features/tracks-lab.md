@@ -12,7 +12,7 @@ The five levels show the same performance at different zoom:
 | Story | title, length, mood, story text, references; the energy curve of the sections |
 | Sections | name, bar range, type, intent, energy |
 | Moves | musical gestures with parameters (below) |
-| Lanes | one automation lane per control; drag a dot for value and time |
+| Lanes | one automation lane per control; drag a dot for value and time, a square for where a ramp starts |
 | Steps | the exact rows of the script |
 
 The moves: **Enter** and **Leave** (a stem's fader comes in or goes out), **Layers** (stems one by one, in or out),
@@ -27,18 +27,25 @@ explain, Launchkey steps among them).
 
 ## How to use it
 1. Open the player (`cd tools && node trajectory/server.mjs`), go to Labs, then Tracks.
-2. Pick a track, then a performance (scripts and takes), or press **New performance** (one 64-bar section).
+2. Pick a track, then a performance (scripts and takes), or press **New performance** (one 64-bar section). The list
+   is read again each time you open the page, so a take you just recorded is there.
 3. Change the level with the buttons on top or the keys **1**-**5**. Click a section, a move or a step to select it:
    the panel on the right edits it, and the selection stays when you change the level.
-4. Click the ruler to set the cursor; the sidebar adds sections, moves or steps there. Drag moves, section edges,
+4. The section bar under the level buttons shows every section on every level. Click one to work on it: the panel
+   edits it, the timelines mark it and scroll to it, and Steps lists only its steps; **All** shows every step.
+5. Click the ruler to set the cursor; the sidebar adds sections, moves or steps there. Drag moves, section edges,
    energy dots and lane dots. **Cmd-Z** undoes, **Escape** clears the selection, **Backspace** deletes the selected
    move or step.
-5. **Play** in the sidebar plays the performance as it is now, saved or not, from the bar in "From bar". While it plays,
+6. **Play** in the sidebar plays the performance as it is now, saved or not, from the bar in "From bar". While it plays,
    click a section or the ruler to go there; **Stop** ends it.
-6. **Save as** writes a new script under a name you give; **Save** writes over a performance the lab saved before.
+7. **Save as** writes a new script under a name you give; **Save** writes over a performance the lab saved before.
 
 ## Good to know
 - Bars count from 0, as in the script, and a range ends before its last number: a section 16→32 holds bars 16 to 31.
+- A lane shows what the performer plays: a step starts from the value the control holds at its bar, so a step that
+  starts inside the ramp before it cuts that ramp (a warning in the footer). Dragging keeps a step between its
+  neighbours on the lane, so a drag never makes such a cut.
+- A take recorded in the app window holds no steps (the window has no Web MIDI); the sidebar says so.
 - The tempo on top is a what-if: it changes the minutes shown, not the track (`tempo` in the `.track` file).
 - A button switches at the next bar line, Chapter at the next 4-bar line. So a Press or Break move sits on the bar where
   the button takes over and presses half a bar before it; button moves snap to whole bars. An existing script that

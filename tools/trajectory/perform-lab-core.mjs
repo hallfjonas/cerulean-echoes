@@ -301,6 +301,19 @@ const busiestBar = (moves, section) => {
   return best
 }
 
+// [{ key, bar }]: where a value step (steps in bar order) starts inside the ramp of the step before it on the same
+// control (controlKey); the performer cuts that ramp there
+export const cutRamps = steps => {
+  const last = new Map(), cuts = []
+  for (const step of steps) {
+    if (!('value' in step)) continue
+    const key = controlKey(step), before = last.get(key)
+    if (before?.ramp && step.bar < before.bar + before.ramp) cuts.push({ key, bar: step.bar })
+    last.set(key, step)
+  }
+  return cuts
+}
+
 // The lab's own warnings: a section without moves, too many moves at once
 export const labWarnings = lab => (lab.sections ?? []).flatMap(section => {
   const label = `${section.name} (bars ${section.from}→${section.to})`

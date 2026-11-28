@@ -2,18 +2,24 @@
 // (where), Moves (what), Lanes (how much) and Steps (exact). The sidebar picks the track and the performance (a script
 // opens as sections and Hand-made moves, perform-lab-core.mjs importScript) or starts a new one, and holds the palette
 // of the level; the stage holds the bar, the timeline, the inspector of the selection and the footer.
-// The selection (a section, a move or a step) survives a level change. Drag: moves (Moves), section edges and energy
-// dots (Sections, Story), lane dots (Lanes); a click on the ruler sets the cursor, where new things are added.
+// The selection (a section, a move or a step) survives a level change. The section bar under the top bar shows every
+// section on every level; the section clicked there (or selected anywhere) is the scope: Steps lists its steps, the
+// timelines tint it. Drag: moves (Moves), section edges and energy dots (Sections, Story), lane handles (Lanes: a
+// step's dot, and a square for a ramp's start; a step stays between its neighbours on the lane); a click on the ruler
+// sets the cursor, where new things are added.
+// Lanes and valueAt follow the performer (autoperform.mjs addSegment): a step moves from the value held at its bar,
+// so a step inside a running ramp cuts it there (a warning).
 // Keys on this page: 1-5 the level, ⌘Z / Ctrl-Z undo, Escape clears the selection, Backspace / Delete removes the
 // selected move or step. The tempo is a what-if: it changes the minutes shown, never the track.
 // Bars count from 0 and ranges end before their last number, as in the script.
 // Play (sidebar) plays the lab's script as it is now, saved or not, from a bar on a 4-bar line (Chapter switches on
 // 4-bar phrases counted from the load); while it plays, a click on a section or the ruler starts it again there.
-//   mountTracksLab({ section, stage, perform }) → { show(), progress(p) }   show() loads the tracks on first use;
+//   mountTracksLab({ section, stage, perform }) → { show(), progress(p) }   show() lists the tracks and their
+//   performances again (new takes appear), keeping what is open;
 //   perform: { play(script, id, from) → Promise<played>, stop() } (the player's auto-perform); progress(p) is the
 //   performer's onChange ({ bar, script } or null)
-import { MOVES, PRESS_LEAD, compileTagged, controlKey, fitSections, importScript, insertSection, labWarnings, moveEdge,
-  moveText, movesIn, newId, newMove, newSection, removeSection, sectionOf, spanOf, stepEnd, toScript }
+import { MOVES, PRESS_LEAD, compileTagged, controlKey, cutRamps, fitSections, importScript, insertSection, labWarnings,
+  moveEdge, moveText, movesIn, newId, newMove, newSection, removeSection, sectionOf, spanOf, stepEnd, toScript }
   from './perform-lab-core.mjs'
 import { askText, toast } from './toast.mjs'
 
@@ -28,8 +34,9 @@ const LEVEL_HINTS = {
   story: 'Describe the piece: title, length, mood, story. The curve is the energy of the sections.',
   sections: 'Bar ranges with a name, an intent and an energy. Drag the edges and the energy dots.',
   moves: 'Musical gestures: a stem enters, a build, a break. Each compiles to steps. Drag a move to place it.',
-  lanes: 'One lane per control, like automation. Drag a dot for value and time.',
-  steps: 'The exact script v2 rows. Edit any field; the move that made the step keeps the edit.',
+  lanes: 'One lane per control, like automation. Drag a dot for value and time, a square for where a ramp starts.',
+  steps: 'The exact script v2 rows of the section chosen above. Edit any field; the move that made the step keeps ' +
+    'the edit.',
 }
 const SECTION_TYPES = {
   intro: ['Intro', 0.2, 'Fade in the foundation'], layers: ['Layers', 0.45, 'Layers join one at a time'],
@@ -65,26 +72,38 @@ export const rulerMarks = (bars, ppb) => {
 // pixels per bar so that `bars` fit `width`
 export const fitPpb = (width, bars) => clamp(width / bars, 2, 24)
 
-// the value a control holds at `bar` after its steps (in bar order), a ramp read part-way
-export const valueAt = (steps, bar) => {
-  let value = 0
-  for (const step of steps) {
-    if (step.bar > bar) break
-    if (step.ramp && bar < step.bar + step.ramp) return value + (step.value - value) * (bar - step.bar) / step.ramp
-    value = step.value
-  }
-  return value
+const heldAt = (segments, bar) => {
+  const segment = segments.findLast(candidate => candidate.bar <= bar)
+  if (!segment) return 0
+  const progress = segment.ramp ? Math.min(1, Math.max(0, bar - segment.bar) / segment.ramp) : 1
+  return progress === 1 ? segment.to : segment.from + (segment.to - segment.from) * progress
 }
 
-// the SVG path of a control lane: flat until a step, then a ramp or a jump to its value, flat to `width`
+// a control's steps (in bar order) as the performer plays them: [{ bar, from, to, ramp }], `from` = the value held
+// at the step's bar
+export const segmentsOf = steps => steps.reduce((segments, step) => [...segments,
+  { bar: step.bar, from: heldAt(segments, step.bar), to: step.value, ramp: step.ramp ?? 0 }], [])
+
+// the value a control holds at `bar` after its steps (in bar order), a ramp read part-way
+export const valueAt = (steps, bar) => heldAt(segmentsOf(steps), bar)
+
+// the SVG path of a control lane: flat until a step, then a ramp (cut where the next step starts) or a jump to its
+// value, flat to `width`
 export const lanePath = (steps, x, y, width) => {
-  let d = `M0,${y(0)}`, previous = 0
-  for (const step of steps) {
-    d += `L${x(step.bar)},${y(previous)}`
-    d += step.ramp ? `L${x(step.bar + step.ramp)},${y(step.value)}` : `L${x(step.bar)},${y(step.value)}`
-    previous = step.value
-  }
-  return d + `L${width},${y(previous)}`
+  const segments = segmentsOf(steps)
+  let d = `M0,${y(0)}`
+  segments.forEach((segment, i) => {
+    const end = Math.min(segment.bar + segment.ramp, segments[i + 1]?.bar ?? Infinity)
+    d += `L${x(segment.bar)},${y(segment.from)}L${x(end)},${y(heldAt([segment], end))}`
+  })
+  return d + `L${width},${y(heldAt(segments, Infinity))}`
+}
+
+// [low, high]: the bars a lane step may take, between the end of the step before it and the start of the step after
+// it on the same lane (items: the lane's tagged steps in bar order)
+export const laneRoom = (items, position, bars) => {
+  const before = items[position - 1]?.step, after = items[position + 1]?.step
+  return [before ? before.bar + (before.ramp ?? 0) : 0, after ? after.bar : bars]
 }
 
 // the LC column of a CC: { mode: 1 | 2, col: 1-8 } (col 8 is the global column), or null for another number
@@ -144,16 +163,17 @@ export function mountTracksLab({ section, stage, perform }) {
     '<label>Performance <select data-pick="performance"></select></label>' +
     '<p class="hint" data-part="meta"></p><button data-act="newPerformance">New performance</button>' +
     '<output data-part="status"></output><div data-part="play"></div><div data-part="palette"></div>'
-  stage.innerHTML = '<div class="tl-bar" data-part="bar"></div><div class="tl-main"><div class="tl-scroll" ' +
+  stage.innerHTML = '<div class="tl-bar" data-part="bar"></div><div class="tl-secbar" data-part="secbar"></div>' +
+    '<div class="tl-main"><div class="tl-scroll" ' +
     'data-part="scroll"><div class="tl-hint" data-part="hint"></div><div data-part="timeline"></div></div>' +
     '<aside class="tl-inspector" data-part="inspector"></aside></div><div class="tl-foot" data-part="foot"></div>'
 
   const part = name => section.querySelector(`[data-part="${name}"]`) ?? stage.querySelector(`[data-part="${name}"]`)
   const pick = name => section.querySelector(`[data-pick="${name}"]`)
   const state = { tracks: null, info: null, controls: new Map(), lab: null, name: null, owned: false, level: 'moves',
-    sel: null, cursor: 0, zoom: 12, ppb: 12, bpm: null, history: [], dirty: false, stepView: 'table',
-    stepScope: 'selection', tagged: [], spans: new Map(), errors: [], run: 0, checkRun: 0, from: 0, playing: null,
-    playBar: null }
+    sel: null, scope: null, cursor: 0, zoom: 12, ppb: 12, bpm: null, history: [], dirty: false, stepView: 'table',
+    tagged: [], spans: new Map(), errors: [], run: 0, checkRun: 0, from: 0, playing: null, playBar: null,
+    playSection: null }
 
   const post = async (route, body) => {
     const response = await fetch('lab/tracks/' + route,
@@ -175,6 +195,9 @@ export function mountTracksLab({ section, stage, perform }) {
 
   const findSection = id => state.lab.sections.find(item => item.id === id)
   const findMove = id => state.lab.moves.find(move => move.id === id)
+  const scoped = () => findSection(state.scope) ?? null
+  const warningsOf = () => [...labWarnings(state.lab), ...cutRamps(state.tagged.map(item => item.step))
+    .map(({ key, bar }) => `${keyLabel(key)}: a ramp is cut at bar ${fmt(bar)} by the next step`)]
   const taggedOf = (moveId, index) => state.tagged.find(item => item.move === moveId && item.index === index)
   const derive = () => {
     state.tagged = compileTagged(state.lab.moves)
@@ -239,8 +262,11 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   const overlay = () => {
     const sel = selection()
-    const band = sel ? `<div class="tl-band" style="left:${bx(sel.range[0])}px;width:${bx(sel.range[1] -
-      sel.range[0])}px"></div>` : ''
+    const scope = scoped()
+    const tint = scope ? `<div class="tl-scopeband" style="left:${bx(scope.from)}px;width:${bx(scope.to -
+      scope.from)}px"></div>` : ''
+    const band = tint + (sel ? `<div class="tl-band" style="left:${bx(sel.range[0])}px;width:${bx(sel.range[1] -
+      sel.range[0])}px"></div>` : '')
     return band + `<div class="tl-cursor" style="left:${bx(state.cursor)}px"></div>`
   }
   const row = (label, inner, height = 0, cls = '') => `<div class="tl-row ${cls}"><div class="tl-label" ` +
@@ -348,9 +374,14 @@ export function mountTracksLab({ section, stage, perform }) {
         `y2="${height - 4}"/><circle class="tl-dot press${on(item)}" ${attrs(item)} cx="${bx(item.step.bar)}" cy="8" ` +
         `r="5"><title>${escapeHtml(stepText(item.step))} @ ${fmt(item.step.bar)}</title></circle>`).join('')
     } else {
+      const segments = segmentsOf(items.map(item => item.step))
+      const start = (item, i) => item.step.ramp ? `<rect class="tl-dot start${on(item)}" ${attrs(item)} ` +
+        `data-handle="start" x="${bx(item.step.bar) - 4}" y="${y(segments[i].from) - 4}" width="8" height="8">` +
+        `<title>${escapeHtml(stepText(item.step))}: ramp starts @ ${fmt(item.step.bar)}</title></rect>` : ''
       body = `<path class="tl-lane" d="${lanePath(items.map(item => item.step), bx, y, width())}"/>` +
-        items.map(item => `<circle class="tl-dot${on(item)}" ${attrs(item)} cx="${bx(item.step.bar +
-          (item.step.ramp ?? 0))}" cy="${y(item.step.value)}" r="5"><title>${escapeHtml(stepText(item.step))} → ` +
+        items.map((item, i) => `${start(item, i)}<circle class="tl-dot${on(item)}" ${attrs(item)} ` +
+          `cx="${bx(item.step.bar + (item.step.ramp ?? 0))}" cy="${y(item.step.value)}" r="5"><title>` +
+          `${escapeHtml(stepText(item.step))} → ` +
           `${item.step.value} @ ${fmt(item.step.bar)}${item.step.ramp ? ` over ${item.step.ramp}` : ''}</title>` +
           `</circle>`).join('')
     }
@@ -368,21 +399,17 @@ export function mountTracksLab({ section, stage, perform }) {
       laneSvg(key, items)).join('')}</div>`
   }
   const stepItems = () => {
-    const sel = selection()
-    if (state.stepScope !== 'selection' || !sel) return state.tagged
-    if (sel.type !== 'section') return state.tagged.filter(item => item.move === sel.move.id)
-    return state.tagged.filter(({ step }) => step.bar >= sel.range[0] && step.bar < sel.range[1])
+    const scope = scoped()
+    return scope ? state.tagged.filter(({ step }) => step.bar >= scope.from && step.bar < scope.to) : state.tagged
   }
   const stepsView = () => {
     const items = stepItems()
-    const sel = selection()
+    const scope = scoped()
     const toolbar = `<div class="tl-body tl-tools"><span class="seg"><button data-act="stepView" data-v="table" ` +
       `aria-pressed="${state.stepView === 'table'}">Table</button><button data-act="stepView" data-v="json" ` +
-      `aria-pressed="${state.stepView === 'json'}">JSON</button></span><span class="seg">` +
-      '<button data-act="stepScope" ' +
-      `data-v="selection" aria-pressed="${state.stepScope === 'selection'}">Selection</button><button ` +
-      `data-act="stepScope" data-v="all" aria-pressed="${state.stepScope === 'all'}">All</button></span>` +
-      `<span class="dim">${items.length} of ${state.tagged.length} steps${sel ? ` · ${sel.type}` : ''}</span></div>`
+      `aria-pressed="${state.stepView === 'json'}">JSON</button></span>` +
+      `<span class="dim">${items.length} of ${state.tagged.length} steps · ${scope ? `${escapeHtml(scope.name)} ` +
+        `(bars ${scope.from}→${scope.to})` : 'all sections'}</span></div>`
     if (state.stepView === 'json') {
       return toolbar + `<pre class="tl-json">${escapeHtml(JSON.stringify({ ...toScript(state.lab),
         steps: items.map(item => item.step) }, null, 1).replace(/\n\s+(?=[^\s[\]{}])/g, ' ')
@@ -390,7 +417,8 @@ export function mountTracksLab({ section, stage, perform }) {
     }
     const rows = items.map(item => {
       const { step } = item
-      const on = state.sel?.type === 'step' && state.sel.move === item.move && state.sel.index === item.index
+      const on = state.sel?.type === 'step' ? state.sel.move === item.move && state.sel.index === item.index
+        : state.sel?.type === 'move' && state.sel.id === item.move
       const field = key => key in step ? `<input data-f="step" data-move="${item.move}" data-index="${item.index}" ` +
         `data-k="${key}" value="${escapeHtml(step[key])}">` : ''
       const move = findMove(item.move)
@@ -444,7 +472,7 @@ export function mountTracksLab({ section, stage, perform }) {
     return `<div class="tl-crumbs">${parts.map(crumb).join('')}</div>`
   }
   const inspectOverview = () => {
-    const warnings = labWarnings(state.lab)
+    const warnings = warningsOf()
     const list = (items, cls) => items.length ? items.map(text => `<p class="${cls}">${escapeHtml(text)}</p>`).join('')
       : '<p>None.</p>'
     return `<h3>This performance</h3><p>${escapeHtml(state.lab.title ?? 'Untitled')}: ${state.lab.sections.length} ` +
@@ -546,13 +574,23 @@ export function mountTracksLab({ section, stage, perform }) {
       '</span><span class="grow"></span>' +
       `<button data-act="undo"${state.history.length ? '' : ' disabled'} title="⌘Z">Undo</button>`
   }
+  const renderSecbar = () => {
+    const scope = scoped()
+    const block = item => `<button class="tl-scope${scope === item ? ' on' : ''}${state.playSection === item.id
+      ? ' playing' : ''}" data-act="scope" data-id="${item.id}" style="flex-grow:${item.to - item.from};` +
+      `--energy:${Math.round((item.energy ?? 0.5) * 40)}%" title="${escapeHtml(item.name)} · bars ${item.from}→` +
+      `${item.to}${item.intent ? ` · ${escapeHtml(item.intent)}` : ''}"><b>${escapeHtml(item.name)}</b><small>` +
+      `${item.from}→${item.to}</small></button>`
+    part('secbar').innerHTML = `<button class="tl-scope all${scope ? '' : ' on'}" data-act="scope" ` +
+      `title="Every section">All</button><span class="tl-scopes">${state.lab.sections.map(block).join('')}</span>`
+  }
   const renderHint = () => {
     const zoom = ['moves', 'lanes'].includes(state.level) ? `<label>zoom <input type="range" min="4" max="28" ` +
       `value="${state.zoom}" data-f="zoom" data-live="1"><output>${state.zoom}</output></label>` : ''
     part('hint').innerHTML = `<span>${LEVEL_HINTS[state.level]}</span>${zoom}`
   }
   const renderFoot = () => {
-    const warnings = labWarnings(state.lab)
+    const warnings = warningsOf()
     const errors = state.errors.length
     const canSave = state.owned && state.dirty && !errors
     part('foot').innerHTML = `<span>${state.tagged.length} steps from ${state.lab.moves.length} moves</span>` +
@@ -631,12 +669,14 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   const render = () => {
     if (!state.lab) {
-      for (const name of ['bar', 'hint', 'timeline', 'inspector', 'foot']) part(name).innerHTML = ''
+      for (const name of ['bar', 'secbar', 'hint', 'timeline', 'inspector', 'foot']) part(name).innerHTML = ''
       renderSide()
       return
     }
+    if (state.sel?.type === 'section') state.scope = state.sel.id
     derive()
     renderBar()
+    renderSecbar()
     renderSide()
     renderHint()
     renderTimeline()
@@ -647,6 +687,7 @@ export function mountTracksLab({ section, stage, perform }) {
   }
   const renderLive = () => {
     derive()
+    renderSecbar()
     renderTimeline()
     renderFoot()
     scheduleCheck()
@@ -660,6 +701,7 @@ export function mountTracksLab({ section, stage, perform }) {
     state.owned = owned
     state.errors = []
     state.sel = null
+    state.scope = null
     state.cursor = 0
     state.history = []
     state.dirty = false
@@ -685,7 +727,9 @@ export function mountTracksLab({ section, stage, perform }) {
       const opened = await post('open', { track, name: performance.name })
       if (run !== state.run) return
       open(opened.lab ?? importScript(opened.script, state.controls), performance.name, opened.owned)
-      setStatus(opened.note ?? '')
+      const empty = opened.script.take && !opened.script.steps?.length
+      setStatus(opened.note ?? (empty ? 'This take holds no steps: it was recorded without MIDI input (the app ' +
+        'window has no Web MIDI).' : ''))
     } catch (error) {
       if (run === state.run) setStatus(error.message)
     }
@@ -748,6 +792,23 @@ export function mountTracksLab({ section, stage, perform }) {
     }
   }
 
+  const refresh = async () => {
+    try {
+      state.tracks = (await post('tracks', {})).tracks
+    } catch {
+      return
+    }
+    fillTrackOptions()
+    pick('track').value = shownTrack
+    fillPerformanceOptions()
+    if (shownPerformance) pick('performance').value = shownPerformance
+    else if (state.lab) pick('performance').append(new Option('new (unsaved)', '', true, true))
+    else if (pick('performance').value) {
+      shownPerformance = pick('performance').value
+      openPerformance()
+    }
+  }
+
   const slug = text => String(text ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
   const saveAs = async () => {
     const track = state.lab.track
@@ -796,7 +857,21 @@ export function mountTracksLab({ section, stage, perform }) {
     newPerformance,
     save: () => state.owned && state.name ? save(state.name) : saveAs(),
     saveAs,
-    level: el => { state.level = el.dataset.v; render() },
+    level: el => {
+      state.level = el.dataset.v
+      const sel = selection(), scope = scoped()
+      if (state.level === 'steps' && sel && sel.type !== 'section' && scope &&
+        !(scope.from <= sel.range[0] && sel.range[0] < scope.to)) state.scope = sectionOf(state.lab, sel.range[0])?.id
+      render()
+    },
+    scope: el => {
+      const item = el.dataset.id ? findSection(el.dataset.id) : null
+      state.scope = item?.id ?? null
+      state.sel = item ? { type: 'section', id: item.id } : state.sel?.type === 'section' ? null : state.sel
+      render()
+      if (item && ['moves', 'lanes'].includes(state.level)) part('scroll').scrollLeft = bx(item.from)
+      if (item && state.playing) startPlay(item.from)
+    },
     select: el => {
       select(el.dataset.type === 'step' ? { type: 'step', move: el.dataset.move, index: Number(el.dataset.index) }
         : { type: el.dataset.type, id: el.dataset.id })
@@ -807,7 +882,6 @@ export function mountTracksLab({ section, stage, perform }) {
     undo,
     resetBpm: () => { state.bpm = state.info.tempo; render() },
     stepView: el => { state.stepView = el.dataset.v; render() },
-    stepScope: el => { state.stepScope = el.dataset.v; render() },
     gotoMove: el => {
       state.sel = { type: 'move', id: el.dataset.id }
       if (['story', 'sections'].includes(state.level)) state.level = 'moves'
@@ -1004,14 +1078,26 @@ export function mountTracksLab({ section, stage, perform }) {
     if (kind === 'dot') {
       const move = findMove(el.dataset.move)
       const index = Number(el.dataset.index)
-      const { step } = taggedOf(move.id, index)
+      const item = taggedOf(move.id, index)
+      const { step } = item
       const height = Number(el.closest('svg').getAttribute('height'))
       const [bar, ramp] = [step.bar, step.ramp ?? 0]
+      const end = bar + ramp
+      const lane = state.tagged.filter(other => controlKey(other.step) === controlKey(step))
+      const [low, high] = ['keys', 'pad'].includes(stepKind(step)) ? [0, state.lab.bars]
+        : laneRoom(lane, lane.indexOf(item), state.lab.bars)
+      const rampStart = el.dataset.handle === 'start'
       state.sel = { type: 'step', move: move.id, index }
       drag = { move: ev => {
         start()
         const at = snap(barAt(ev), 0.25)
-        const changes = ramp > 0 ? { ramp: Math.max(0.25, round(at - bar)) } : { bar: Math.max(0, at) }
+        if (rampStart) {
+          const from = clamp(at, Math.min(low, bar), end - 0.25)
+          editStep(move, index, { bar: from, ramp: round(end - from) })
+          return renderLive()
+        }
+        const changes = ramp > 0 ? { ramp: round(clamp(at, bar + 0.25, Math.max(high, end)) - bar) }
+          : { bar: clamp(at, Math.min(low, bar), Math.max(high, bar)) }
         if ('value' in step) {
           changes.value = round(clamp(snap((height - 5 - (ev.clientY - rect.top)) / (height - 10), 0.05), 0, 1), 2)
         }
@@ -1054,13 +1140,22 @@ export function mountTracksLab({ section, stage, perform }) {
   })
 
   return {
-    show: () => { if (!state.tracks) load(); else if (state.lab) render() },
+    show: () => {
+      if (!state.tracks) return load()
+      if (state.lab) render()
+      refresh()
+    },
     progress: p => {
       if (!p) {
         if (state.playing) Object.assign(state, { playing: null, playBar: null })
       } else if (p.script === state.playing) state.playBar = p.bar
       else return
       placePlayhead()
+      const playSection = state.lab && state.playBar !== null ? sectionOf(state.lab, state.playBar)?.id ?? null : null
+      if (playSection !== state.playSection && state.lab) {
+        state.playSection = playSection
+        renderSecbar()
+      }
       const line = part('playing')
       if (p && line) line.textContent = `bar ${Math.floor(p.bar)} (from 0) of ${state.lab?.bars ?? '?'}` +
         `${p.section ? ` · ${p.section.name}` : ''}`

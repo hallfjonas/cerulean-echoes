@@ -1,14 +1,14 @@
 // The Tracks lab's core (perform-lab-core.mjs): every move compiles to steps check-perform accepts on a real track,
 // a step edit survives a parameter change and follows its move, a deleted step stays deleted, bars are 0-based and
-// ranges half-open, the lab's own warnings, the section helpers, and the importer: it recognises the moves, and every
-// script and take in perform/ (takes only where check-perform accepts them) compiles back to its steps, compared per
-// control in bar order.
+// ranges half-open, the lab's own warnings, ramps cut by the next step, the section helpers, and the importer: it
+// recognises the moves, and every script and take in perform/ (takes only where check-perform accepts them) compiles
+// back to its steps, compared per control in bar order.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'fs'
 import path from 'path'
 import { PERFORM, checkScript, controlsOf, scTrackFileOf, tagSource } from './check-perform.mjs'
-import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, controlKey, fitSections, importScript,
+import { MAX_AT_ONCE, MOVES, checkLab, compileMoves, compileTagged, controlKey, cutRamps, fitSections, importScript,
   insertSection, moveEdge, moveText, movesIn, newMove, newSection, removeSection, sectionOf, spanOf, toScript }
   from './perform-lab-core.mjs'
 
@@ -98,6 +98,12 @@ test('perform lab: warnings for a section without moves and for too many moves a
   const lab = labOf([newMove('enter', 2, controls), ...crowd])
   assert.deepEqual(check(lab).warnings, [`Groove (bars 16→64): ${MAX_AT_ONCE + 1} moves at once at bar 20`])
   assert.deepEqual(check(lab).errors, [])
+})
+
+test('perform lab: a step inside the ramp before it on the same control is a cut', () => {
+  const steps = [{ bar: 0, cc: 36, value: 1, ramp: 8 }, { bar: 2, cc: 12, value: 0.5 }, { bar: 4, cc: 36, value: 0 },
+    { bar: 8, cc: 12, value: 1, ramp: 4 }, { bar: 12, cc: 12, value: 0 }, { bar: 9, press: 44 }]
+  assert.deepEqual(cutRamps(steps), [{ key: 36, bar: 4 }], 'a step where the ramp ends is no cut, presses are none')
 })
 
 test('perform lab: sections are cut around an inserted one, a removed one leaves no gap, edges keep a bar', () => {

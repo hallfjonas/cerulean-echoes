@@ -1,8 +1,10 @@
 // The pure parts of the Tracks lab page (perform-lab-ui.mjs): ruler marks, snap, the fitted bar width, a control's
-// value at a bar, the lane path, a CC's column and the Moves row of a move.
+// value at a bar as the performer plays it, the lane path, a lane step's room, a CC's column and the Moves row of a
+// move.
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { columnOf, fitPpb, lanePath, minutesOf, moveRow, rulerMarks, snap, valueAt } from './perform-lab-ui.mjs'
+import { columnOf, fitPpb, lanePath, laneRoom, minutesOf, moveRow, rulerMarks, segmentsOf, snap, valueAt }
+  from './perform-lab-ui.mjs'
 
 test('perform lab ui: ruler marks every 4, 8 or 16 bars by width, snap, fitted width', () => {
   assert.deepEqual(rulerMarks(16, 12), [0, 4, 8, 12, 16])
@@ -25,6 +27,22 @@ test('perform lab ui: a control’s value at a bar and its lane path', () => {
   assert.equal(valueAt(steps, 12), 0.2, 'a jump at its bar')
   const path = lanePath(steps, bar => bar * 10, value => 100 - value * 100, 200)
   assert.equal(path, 'M0,100L40,100L80,0L120,0L120,80L200,80')
+})
+
+test('perform lab ui: a step inside a running ramp cuts it, as the performer plays it', () => {
+  const steps = [{ bar: 0, value: 1, ramp: 8 }, { bar: 4, value: 0 }]
+  assert.deepEqual(segmentsOf(steps).map(segment => segment.from), [0, 0.5], 'the second step starts from 0.5')
+  assert.equal(valueAt(steps, 6), 0, 'the ramp no longer runs after bar 4')
+  const path = lanePath(steps, bar => bar * 10, value => 100 - value * 100, 100)
+  assert.equal(path, 'M0,100L0,100L40,50L40,50L40,100L100,100', 'the ramp line ends at the cut, no line back')
+})
+
+test('perform lab ui: a lane step stays between its neighbours', () => {
+  const lane = [{ step: { bar: 0, value: 1, ramp: 4 } }, { step: { bar: 8, value: 0.5 } },
+    { step: { bar: 12, value: 0 } }]
+  assert.deepEqual(laneRoom(lane, 1, 32), [4, 12], 'after the ramp before it, before the step after it')
+  assert.deepEqual(laneRoom(lane, 0, 32), [0, 8])
+  assert.deepEqual(laneRoom(lane, 2, 32), [8, 32])
 })
 
 test('perform lab ui: a CC’s column, the Moves row of a move', () => {
