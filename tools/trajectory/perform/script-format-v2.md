@@ -39,7 +39,7 @@ this order: `keys`, `pad`, `lk`, `press`, else `cc`.
 - `length` of a keys step only times the note-off seen by the LC view: `midikeys` has no note-off, the sound length is
   the track's. A take writes it from the recorded note-off when one came (rounded to 0.01 bar), else leaves it out.
 - `velocity` is sent as MIDI `max(1, round(v × 127))`; takes write `byte / 127` rounded to 3 decimals.
-- A take writes one keys step per note-on (no chord merging), note names in Strudel spelling with `#` ('c#4').
+- A take writes one keys step per note-on (no chord merging), note names with `#` ('c#4').
 
 ## Virtual inputs
 

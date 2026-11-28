@@ -4,7 +4,7 @@ const LIVE = [
   { heading: 'What it does', text: 'Plays a live track or a lab project right here. Live shows both controller '
     + 'pages and the Launchkey row with every control\'s name and value; Labs holds the Sample Designer, Stems & '
     + 'Tracks and Space (Sets is planned); Visuals draws every stem with its name and the tempo. The sidebar shows '
-    + 'only what the page needs. No strudel.cc needed.' },
+    + 'only what the page needs.' },
   { heading: 'Input', text: 'A track or project from the list (the file is read again on every load, so Play plays your '
     + 'latest edit), plus every connected MIDI controller. A control not moved yet reads 0.' },
   { heading: 'Output', text: 'Sound, the Live panel and visuals. With "Save take on record stop" ticked (Settings), a '

@@ -83,7 +83,7 @@ Tools (run in `tools/`):
 - After editing an SC track or its perform scripts: `npm run verify-sc -- [<track.scd | .track> …]` (tags parse,
   perform scripts valid, the track loads and plays headless in `sclang`; stems and Sample Designer projects too; no
   args = every changed SC track). Scripts alone: `node trajectory/check-perform.mjs [<track file>]`.
-- Outline a long track before reading it: `npm run track-map -- <track.scd | track.strudel>`, then `sed -n` ranges
+- Outline a long track before reading it: `npm run track-map -- <track.scd>`, then `sed -n` ranges
 - Stem library (`sc/stems/`, `docs/features/stems.md`): `npm run check-stems [-- <file…>]`, `npm run stems` (list,
   filter, used-by); designers from the terminal: `npm run sample-lab`, `npm run stem-lab`
 - Offline render: `sclang sc/tools/render.scd <track.scd|.track> <scenario.json> <out-prefix>`; scenarios,
@@ -110,8 +110,7 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   Labs = Sample / Stem Designer, Space (frequency × time map of a stem track, `docs/features/space-analyzer.md`); the handle on its edge holds the sidebar toggle, the gear (opens Settings: Theme, Visuals, MIDI panel,
   Recording, keyboard shortcuts) and **?** (opens the help), three equal buttons that stay when the sidebar is hidden.
 - Auto-perform (sidebar, key P) plays a script (`tools/trajectory/perform/<track>/*.json`, in bars; script format v2:
-  controls, buttons, keys, pads, Launchkey CCs); on an SC track the steps go to SC over OSC (`sc-auto.mjs`), on a
-  Strudel one into the virtual controllers `LCXL3 Auto` and `Launchkey MK4 25 Auto`. A new control or a changed `@ctl`
+  controls, buttons, keys, pads, Launchkey CCs); the steps go to SC over OSC (`sc-auto.mjs`). A new control or a changed `@ctl`
   needs the script checked (`node trajectory/check-perform.mjs`, part of `npm run verify-sc`). Every load restarts the
   clock (bar 0 = cycle 0).
 - Record (key R) writes the master output to `recordings/<track>/` as a WAV (SC records itself); human set, or
@@ -121,10 +120,8 @@ The player is the main tool: `cd tools && node trajectory/server.mjs`, then http
   compares a replayed take with its original bar by bar. Details: `tools/trajectory/README.md`.
 - Without Web MIDI the player still plays ("No MIDI").
 
-## Shared code in the Strudel tracks
-Blocks the Strudel tracks share are marked `// @shared <name> begin` / `end`; the canonical copy is
-`tools/shared/<name>.strudel-part`. `npm run shared -- --check`
-shows drift; `npm run shared -- --from <track> <name>` syncs a changed block. SC tracks share code through `sc/lib/`.
+## Shared code
+SC tracks share code through `sc/lib/`.
 
 ## Samples and sounds (SC)
 An SC track loads its files from disk: `sc/samples/<folder>/<file>` or `repo:<path>` (the repo's own `samples/`),
@@ -133,7 +130,7 @@ checked when loaded. A missing file is silent without an error: `npm run verify-
 SC cannot read m4a; use wav or flac.
 
 ## Control texts (`@ctl`)
-The `// @ctl` comments in a track (`.scd` or `.strudel`; a stem track's come from its stems and frame,
+The `// @ctl` comments in a track (`.scd`; a stem track's come from its stems and frame,
 `tools/stems/stem-tags.mjs`) describe every control; the player's Live page, the SC UI (`sc/ui/index.html`) and
 `check-perform` read them (`tools/lcxl-layout/ctl.mjs`). Layout sheets (PDF) and per-track `.syx` modes were retired on
 2026-11-20. Every LC XL 3 gets the same two custom modes once, with Novation Components: `midi-layouts/lcxl3-mode1.syx` / `-mode2.syx` in slots 1
